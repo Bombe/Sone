@@ -32,8 +32,7 @@
 				<configuration>
 					<archive>
 						<manifestEntries>
-							<mode>Plugin-Main-Class</mode>
-							<url>net.pterodactylus.sone.main.SonePlugin</url>
+							<Plugin-Main-Class>net.pterodactylus.sone.main.SonePlugin</Plugin-Main-Class>
 						</manifestEntries>
 					</archive>
 				</configuration>
