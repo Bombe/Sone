@@ -69,12 +69,16 @@ public class FreenetInterface extends AbstractService {
 	 * @return The result of the fetch, or {@code null} if an error occured
 	 */
 	public FetchResult fetchUri(FreenetURI uri) {
+		logger.entering(FreenetInterface.class.getName(), "fetchUri(FreenetURI)", uri);
+		FetchResult fetchResult = null;
 		try {
-			return client.fetch(uri);
+			fetchResult = client.fetch(uri);
 		} catch (FetchException fe1) {
 			logger.log(Level.WARNING, "Could not fetch “" + uri + "”!", fe1);
-			return null;
+		} finally {
+			logger.exiting(FreenetInterface.class.getName(), "fetchUri(FreenetURI)", fetchResult);
 		}
+		return fetchResult;
 	}
 
 }
