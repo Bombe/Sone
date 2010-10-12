@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core;
 
 import net.pterodactylus.util.service.AbstractService;
+import freenet.client.HighLevelSimpleClient;
 import freenet.node.Node;
 
 /**
@@ -30,14 +31,18 @@ public class FreenetInterface extends AbstractService {
 	/** The node to interact with. */
 	private final Node node;
 
+	/** The high-level client to use for requests. */
+	private final HighLevelSimpleClient client;
+
 	/**
 	 * Creates a new Freenet interface.
 	 *
 	 * @param node
 	 *            The node to interact with
 	 */
-	public FreenetInterface(Node node) {
+	public FreenetInterface(Node node, HighLevelSimpleClient client) {
 		this.node = node;
+		this.client = client;
 	}
 
 }

@@ -78,7 +78,7 @@ public class SonePlugin implements FredPlugin {
 		}
 
 		/* create freenet interface. */
-		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
+		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode(), pluginRespirator.getHLSimpleClient());
 
 		/* create core. */
 		core = new Core();
