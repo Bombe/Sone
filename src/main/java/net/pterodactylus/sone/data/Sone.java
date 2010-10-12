@@ -131,4 +131,17 @@ public class Sone {
 		return this;
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		/* TODO improve */
+		return requestUri.hashCode();
+	}
+
 }
