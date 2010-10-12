@@ -17,7 +17,19 @@
 
 package net.pterodactylus.sone.main;
 
+import java.io.File;
+import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
+import net.pterodactylus.util.config.Configuration;
+import net.pterodactylus.util.config.ConfigurationException;
+import net.pterodactylus.util.config.MapConfigurationBackend;
+import net.pterodactylus.util.config.XMLConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
+import freenet.client.async.DatabaseDisabledException;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.PluginRespirator;
 
@@ -34,6 +46,12 @@ public class SonePlugin implements FredPlugin {
 		Logging.setup("sone");
 	}
 
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SonePlugin.class);
+
+	/** The core. */
+	private Core core;
+
 	//
 	// FREDPLUGIN METHODS
 	//
@@ -43,7 +61,25 @@ public class SonePlugin implements FredPlugin {
 	 */
 	@Override
 	public void runPlugin(PluginRespirator pluginRespirator) {
-		/* TODO */
+		Configuration configuration;
+		try {
+			configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator.getStore()));
+		} catch (DatabaseDisabledException dde1) {
+			logger.log(Level.WARNING, "Could not load plugin store, using XML files.");
+			try {
+				configuration = new Configuration(new XMLConfigurationBackend(new File("sone.xml"), true));
+			} catch (ConfigurationException ce1) {
+				logger.log(Level.SEVERE, "Could not load or create the “sone.xml” configuration file!");
+				configuration = new Configuration(new MapConfigurationBackend(Collections.<String, String> emptyMap()));
+			}
+		}
+
+		/* create core. */
+		core = new Core();
+		core.configuration(configuration);
+
+		/* start core! */
+		core.start();
 	}
 
 	/**
@@ -51,7 +87,10 @@ public class SonePlugin implements FredPlugin {
 	 */
 	@Override
 	public void terminate() {
-		/* TODO */
+		/* stop the core. */
+		core.stop();
+
+		/* TODO wait for core to stop? */
 	}
 
 }
