@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import freenet.keys.FreenetURI;
 
 /**
@@ -33,6 +37,9 @@ public class Sone {
 	/** The URI used to insert a new version of this Sone. */
 	/* This will be null for remote Sones! */
 	private final FreenetURI insertUri;
+
+	/** All friend Sones. */
+	private final Set<Sone> friendSones = new HashSet<Sone>();
 
 	/**
 	 * Creates a new Sone.
@@ -77,6 +84,51 @@ public class Sone {
 	 */
 	public FreenetURI insertUri() {
 		return insertUri;
+	}
+
+	/**
+	 * Returns all friend Sones of this Sone.
+	 *
+	 * @return The friend Sones of this Sone
+	 */
+	public Set<Sone> getFriendSones() {
+		return Collections.unmodifiableSet(friendSones);
+	}
+
+	/**
+	 * Returns whether this Sone has the given Sone as a friend Sone.
+	 *
+	 * @param friendSone
+	 *            The friend Sone to check for
+	 * @return {@code true} if this Sone has the given Sone as a friend,
+	 *         {@code false} otherwise
+	 */
+	public boolean hasFriendSone(Sone friendSone) {
+		return friendSones.contains(friendSone);
+	}
+
+	/**
+	 * Adds the given Sone as a friend Sone.
+	 *
+	 * @param friendSone
+	 *            The friend Sone to add
+	 * @return This Sone (for method chaining)
+	 */
+	public Sone addFriendSone(Sone friendSone) {
+		friendSones.add(friendSone);
+		return this;
+	}
+
+	/**
+	 * Removes the given Sone as a friend Sone.
+	 *
+	 * @param friendSone
+	 *            The friend Sone to remove
+	 * @return This Sone (for method chaining)
+	 */
+	public Sone removeFriendSone(Sone friendSone) {
+		friendSones.remove(friendSone);
+		return this;
 	}
 
 }
