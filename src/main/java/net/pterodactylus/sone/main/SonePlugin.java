@@ -61,6 +61,8 @@ public class SonePlugin implements FredPlugin {
 	 */
 	@Override
 	public void runPlugin(PluginRespirator pluginRespirator) {
+
+		/* create a configuration. */
 		Configuration configuration;
 		try {
 			configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator.getStore()));
