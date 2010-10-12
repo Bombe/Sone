@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.main;
 
+import net.pterodactylus.util.logging.Logging;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.PluginRespirator;
 
@@ -27,6 +28,11 @@ import freenet.pluginmanager.PluginRespirator;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SonePlugin implements FredPlugin {
+
+	static {
+		/* initialize logging. */
+		Logging.setup("sone");
+	}
 
 	//
 	// FREDPLUGIN METHODS
