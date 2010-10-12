@@ -46,6 +46,9 @@ public class Core extends AbstractService {
 	/** The configuration. */
 	private Configuration configuration;
 
+	/** Interface to freenet. */
+	private FreenetInterface freenetInterface;
+
 	/** The local Sones. */
 	private final Set<Sone> localSones = new HashSet<Sone>();
 
@@ -69,6 +72,18 @@ public class Core extends AbstractService {
 	 */
 	public Core configuration(Configuration configuration) {
 		this.configuration = configuration;
+		return this;
+	}
+
+	/**
+	 * Sets the Freenet interface to use.
+	 *
+	 * @param freenetInterface
+	 *            The Freenet interface to use
+	 * @return This core (for method chaining)
+	 */
+	public Core freenetInterface(FreenetInterface freenetInterface) {
+		this.freenetInterface = freenetInterface;
 		return this;
 	}
 

@@ -23,6 +23,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -76,9 +77,13 @@ public class SonePlugin implements FredPlugin {
 			}
 		}
 
+		/* create freenet interface. */
+		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
+
 		/* create core. */
 		core = new Core();
 		core.configuration(configuration);
+		core.freenetInterface(freenetInterface);
 
 		/* start core! */
 		core.start();
