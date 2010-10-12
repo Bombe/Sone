@@ -39,6 +39,8 @@ public class FreenetInterface extends AbstractService {
 	 *
 	 * @param node
 	 *            The node to interact with
+	 * @param client
+	 *            The high-level client
 	 */
 	public FreenetInterface(Node node, HighLevelSimpleClient client) {
 		this.node = node;
