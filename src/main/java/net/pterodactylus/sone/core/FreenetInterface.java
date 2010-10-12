@@ -17,8 +17,15 @@
 
 package net.pterodactylus.sone.core;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
+import freenet.client.FetchException;
+import freenet.client.FetchResult;
 import freenet.client.HighLevelSimpleClient;
+import freenet.keys.FreenetURI;
 import freenet.node.Node;
 
 /**
@@ -27,6 +34,9 @@ import freenet.node.Node;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FreenetInterface extends AbstractService {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(FreenetInterface.class);
 
 	/** The node to interact with. */
 	private final Node node;
@@ -45,6 +55,26 @@ public class FreenetInterface extends AbstractService {
 	public FreenetInterface(Node node, HighLevelSimpleClient client) {
 		this.node = node;
 		this.client = client;
+	}
+
+	//
+	// ACTIONS
+	//
+
+	/**
+	 * Fetches the given URI.
+	 *
+	 * @param uri
+	 *            The URI to fetch
+	 * @return The result of the fetch, or {@code null} if an error occured
+	 */
+	public FetchResult fetchUri(FreenetURI uri) {
+		try {
+			return client.fetch(uri);
+		} catch (FetchException fe1) {
+			logger.log(Level.WARNING, "Could not fetch “" + uri + "”!", fe1);
+			return null;
+		}
 	}
 
 }
