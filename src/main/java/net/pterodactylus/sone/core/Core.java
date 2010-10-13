@@ -137,15 +137,20 @@ public class Core extends AbstractService {
 		if ((name == null) || (name.trim().length() == 0)) {
 			throw new SoneException(Type.INVALID_SONE_NAME);
 		}
+		String finalRequestUri;
+		String finalInsertUri;
 		if ((requestUri == null) || (insertUri == null)) {
 			String[] keyPair = freenetInterface.generateKeyPair();
-			requestUri = keyPair[0];
-			insertUri = keyPair[1];
+			finalRequestUri = keyPair[0];
+			finalInsertUri = keyPair[1];
+		} else {
+			finalRequestUri = requestUri;
+			finalInsertUri = insertUri;
 		}
 		Sone sone;
 		try {
-			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, requestUri, insertUri });
-			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(requestUri), new FreenetURI(insertUri));
+			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
+			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri), new FreenetURI(finalInsertUri));
 		} catch (MalformedURLException mue1) {
 			throw new SoneException(Type.INVALID_URI);
 		}
