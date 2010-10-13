@@ -5,3 +5,8 @@
 	font-size: 200%;
 	font-weight: bold;
 }
+
+#sone .error label {
+	color: red;
+	font-weight: bold;
+}
