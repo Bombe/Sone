@@ -20,6 +20,7 @@ package net.pterodactylus.sone.data;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import freenet.keys.FreenetURI;
 
@@ -30,6 +31,9 @@ import freenet.keys.FreenetURI;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Sone {
+
+	/** A GUID for this Sone. */
+	private final UUID id = UUID.randomUUID();
 
 	/** The URI under which the Sone is stored in Freenet. */
 	private final FreenetURI requestUri;
@@ -67,6 +71,15 @@ public class Sone {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the ID of this Sone.
+	 *
+	 * @return The ID of this Sone
+	 */
+	public String getId() {
+		return id.toString();
+	}
 
 	/**
 	 * Returns the request URI of this Sone.
@@ -140,8 +153,7 @@ public class Sone {
 	 */
 	@Override
 	public int hashCode() {
-		/* TODO improve */
-		return requestUri.hashCode();
+		return id.hashCode();
 	}
 
 }
