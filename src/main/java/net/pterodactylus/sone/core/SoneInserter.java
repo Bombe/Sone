@@ -33,10 +33,12 @@ public class SoneInserter extends AbstractService {
 	/**
 	 * Creates a new Sone inserter.
 	 *
+	 * @param freenetInterface
+	 *            The freenet interface
 	 * @param sone
 	 *            The Sone to insert
 	 */
-	public SoneInserter(Sone sone) {
+	public SoneInserter(FreenetInterface freenetInterface, Sone sone) {
 		super("Sone Inserter for “" + sone.getName() + "”");
 		this.sone = sone;
 	}
