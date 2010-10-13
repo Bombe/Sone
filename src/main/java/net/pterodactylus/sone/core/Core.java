@@ -19,8 +19,10 @@ package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -54,6 +56,9 @@ public class Core extends AbstractService {
 
 	/** The local Sones. */
 	private final Set<Sone> localSones = new HashSet<Sone>();
+
+	/** Sone inserters. */
+	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
 
 	/**
 	 * Creates a new core.
@@ -104,6 +109,20 @@ public class Core extends AbstractService {
 	//
 
 	/**
+	 * Adds the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to add
+	 */
+	public void addSone(Sone sone) {
+		if (localSones.add(sone)) {
+			SoneInserter soneInserter = new SoneInserter(sone);
+			soneInserter.start();
+			soneInserters.put(sone, soneInserter);
+		}
+	}
+
+	/**
 	 * Creates a new Sone at a random location.
 	 *
 	 * @param name
@@ -151,6 +170,7 @@ public class Core extends AbstractService {
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
 			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri), new FreenetURI(finalInsertUri));
+			addSone(sone);
 		} catch (MalformedURLException mue1) {
 			throw new SoneException(Type.INVALID_URI);
 		}
@@ -165,6 +185,8 @@ public class Core extends AbstractService {
 	 *            The sone to delete
 	 */
 	public void deleteSone(Sone sone) {
+		SoneInserter soneInserter = soneInserters.remove(sone);
+		soneInserter.stop();
 		localSones.remove(sone);
 	}
 
@@ -218,7 +240,7 @@ public class Core extends AbstractService {
 			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
 			try {
-				localSones.add(new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri)));
+				addSone(new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri)));
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + requestUri + "”) and insertUri (“" + insertUri + "”)!", mue1);
 			}
