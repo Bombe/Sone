@@ -26,6 +26,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.SoneException.Type;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -101,6 +102,55 @@ public class Core extends AbstractService {
 	//
 	// ACTIONS
 	//
+
+	/**
+	 * Creates a new Sone at a random location.
+	 *
+	 * @param name
+	 *            The name of the Sone
+	 * @return The created Sone
+	 * @throws SoneException
+	 *             if a Sone error occurs
+	 */
+	public Sone createSone(String name) throws SoneException {
+		return createSone(name, null, null);
+	}
+
+	/**
+	 * Creates a new Sone at the given location. If one of {@code requestUri} or
+	 * {@code insertUrI} is {@code null}, the Sone is created at a random
+	 * location.
+	 *
+	 * @param name
+	 *            The name of the Sone
+	 * @param requestUri
+	 *            The request URI of the Sone, or {@link NullPointerException}
+	 *            to create a Sone at a random location
+	 * @param insertUri
+	 *            The insert URI of the Sone, or {@code null} to create a Sone
+	 *            at a random location
+	 * @return The created Sone
+	 * @throws SoneException
+	 *             if a Sone error occurs
+	 */
+	public Sone createSone(String name, String requestUri, String insertUri) throws SoneException {
+		if ((name == null) || (name.trim().length() == 0)) {
+			throw new SoneException(Type.INVALID_SONE_NAME);
+		}
+		if ((requestUri == null) || (insertUri == null)) {
+			String[] keyPair = freenetInterface.generateKeyPair();
+			requestUri = keyPair[0];
+			insertUri = keyPair[1];
+		}
+		Sone sone;
+		try {
+			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(requestUri), new FreenetURI(insertUri));
+		} catch (MalformedURLException mue1) {
+			throw new SoneException(Type.INVALID_URI);
+		}
+		localSones.add(sone);
+		return sone;
+	}
 
 	//
 	// SERVICE METHODS
