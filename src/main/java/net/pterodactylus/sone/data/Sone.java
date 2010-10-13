@@ -48,6 +48,9 @@ public class Sone {
 	/** All friend Sones. */
 	private final Set<Sone> friendSones = new HashSet<Sone>();
 
+	/** Modification count. */
+	private volatile long modificationCounter = 0;
+
 	/**
 	 * Creates a new Sone.
 	 *
@@ -149,8 +152,10 @@ public class Sone {
 	 *            The friend Sone to add
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone addFriendSone(Sone friendSone) {
-		friendSones.add(friendSone);
+	public synchronized Sone addFriendSone(Sone friendSone) {
+		if (friendSones.add(friendSone)) {
+			modificationCounter++;
+		}
 		return this;
 	}
 
@@ -161,9 +166,30 @@ public class Sone {
 	 *            The friend Sone to remove
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone removeFriendSone(Sone friendSone) {
-		friendSones.remove(friendSone);
+	public synchronized Sone removeFriendSone(Sone friendSone) {
+		if (friendSones.remove(friendSone)) {
+			modificationCounter++;
+		}
 		return this;
+	}
+
+	/**
+	 * Returns the modification counter.
+	 *
+	 * @return The modification counter
+	 */
+	public synchronized long getModificationCounter() {
+		return modificationCounter;
+	}
+
+	/**
+	 * Sets the modification counter.
+	 *
+	 * @param modificationCounter
+	 *            The new modification counter
+	 */
+	public synchronized void setModificationCounter(long modificationCounter) {
+		this.modificationCounter = modificationCounter;
 	}
 
 	//

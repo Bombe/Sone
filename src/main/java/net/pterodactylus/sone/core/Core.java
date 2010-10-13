@@ -243,8 +243,11 @@ public class Core extends AbstractService {
 			String id = configuration.getStringValue("Sone/Name." + soneName + "/ID").getValue(null);
 			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
+			long modificationCounter = configuration.getLongValue("Sone/Name." + soneName + "/ModificationCounter").getValue((long) 0);
 			try {
-				addSone(new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri)));
+				Sone sone = new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri));
+				sone.setModificationCounter(modificationCounter);
+				addSone(sone);
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + requestUri + "”) and insertUri (“" + insertUri + "”)!", mue1);
 			}
@@ -275,6 +278,7 @@ public class Core extends AbstractService {
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/ID").setValue(sone.getId());
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/RequestURI").setValue(sone.getRequestUri().toString());
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/InsertURI").setValue(sone.getInsertUri().toString());
+				configuration.getLongValue("Sone/Name." + sone.getName() + "/ModificationCounter").setValue(sone.getModificationCounter());
 			}
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
