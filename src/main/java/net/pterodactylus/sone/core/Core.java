@@ -114,7 +114,10 @@ public class Core extends AbstractService {
 		logger.entering(Core.class.getName(), "loadConfiguration()");
 
 		/* get names of all local Sones. */
-		String allSoneNamesString = configuration.getStringValue("Sone/Names").getValue("");
+		String allSoneNamesString = configuration.getStringValue("Sone/Names").getValue(null);
+		if (allSoneNamesString == null) {
+			allSoneNamesString = "";
+		}
 		List<String> allSoneNames;
 		try {
 			allSoneNames = StringEscaper.parseLine(allSoneNamesString);
