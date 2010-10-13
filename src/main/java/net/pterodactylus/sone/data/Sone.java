@@ -35,6 +35,9 @@ public class Sone {
 	/** A GUID for this Sone. */
 	private final UUID id = UUID.randomUUID();
 
+	/** The name of this Sone. */
+	private final String name;
+
 	/** The URI under which the Sone is stored in Freenet. */
 	private final FreenetURI requestUri;
 
@@ -48,22 +51,27 @@ public class Sone {
 	/**
 	 * Creates a new Sone.
 	 *
+	 * @param name
+	 *            The name of the Sone
 	 * @param requestUri
 	 *            The request URI of the Sone
 	 */
-	public Sone(FreenetURI requestUri) {
-		this(requestUri, null);
+	public Sone(String name, FreenetURI requestUri) {
+		this(name, requestUri, null);
 	}
 
 	/**
 	 * Creates a new Sone.
 	 *
+	 * @param name
+	 *            The name of the Sone
 	 * @param requestUri
 	 *            The request URI of the Sone
 	 * @param insertUri
 	 *            The insert URI of the Sone
 	 */
-	public Sone(FreenetURI requestUri, FreenetURI insertUri) {
+	public Sone(String name, FreenetURI requestUri, FreenetURI insertUri) {
+		this.name = name;
 		this.requestUri = requestUri;
 		this.insertUri = insertUri;
 	}
@@ -79,6 +87,15 @@ public class Sone {
 	 */
 	public String getId() {
 		return id.toString();
+	}
+
+	/**
+	 * Returns the name of this Sone.
+	 *
+	 * @return The name of this Sone
+	 */
+	public String getName() {
+		return name;
 	}
 
 	/**
