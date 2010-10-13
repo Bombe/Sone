@@ -60,6 +60,22 @@ public class SoneTemplatePage extends TemplatePage {
 	//
 
 	/**
+	 * Returns the current session.
+	 *
+	 * @param request
+	 *            The request to extract the session information from
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	protected Session getCurrentSession(Request request) {
+		try {
+			return webInterface.sessionManager().useSession(request.getToadletContext());
+		} catch (RedirectException re1) {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns the currently logged in Sone.
 	 *
 	 * @param request
@@ -68,16 +84,11 @@ public class SoneTemplatePage extends TemplatePage {
 	 *         currently logged in
 	 */
 	protected Sone getCurrentSone(Request request) {
-		try {
-			Session session = webInterface.sessionManager().useSession(request.getToadletContext());
-			if (session == null) {
-				return null;
-			}
-			return (Sone) session.getAttribute("Sone.CurrentSone");
-		} catch (RedirectException re1) {
-			/* okay, no current session, return null. */
+		Session session = getCurrentSession(request);
+		if (session == null) {
 			return null;
 		}
+		return (Sone) session.getAttribute("Sone.CurrentSone");
 	}
 
 	//
