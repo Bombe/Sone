@@ -78,4 +78,12 @@ public class LoginPage extends SoneTemplatePage {
 		return null;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEnabled(ToadletContext toadletContext) {
+		return getCurrentSone(toadletContext) == null;
+	}
+
 }
