@@ -136,6 +136,7 @@ public class Core extends AbstractService {
 		}
 
 		/* parse local Sones. */
+		logger.log(Level.INFO, "Loading %d Sones…", allSoneNames.size());
 		for (String soneName : allSoneNames) {
 			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
