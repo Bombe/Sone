@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.UUID;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page;
@@ -60,7 +61,8 @@ public class SoneTemplatePage extends TemplatePage {
 	//
 
 	/**
-	 * Returns the current session.
+	 * Returns the current session, creating a new session if there is no
+	 * current session.
 	 *
 	 * @param request
 	 *            The request to extract the session information from
@@ -68,8 +70,28 @@ public class SoneTemplatePage extends TemplatePage {
 	 *         session
 	 */
 	protected Session getCurrentSession(Request request) {
+		return getCurrentSession(request, true);
+	}
+
+	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session and {@code create} is {@code true}.
+	 *
+	 * @param request
+	 *            The request to extract the session information from
+	 * @param create
+	 *            {@code true} to create a new session if there is no current
+	 *            session, {@code false} otherwise
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	protected Session getCurrentSession(Request request, boolean create) {
 		try {
-			return webInterface.sessionManager().useSession(request.getToadletContext());
+			Session session = webInterface.sessionManager().useSession(request.getToadletContext());
+			if (create && (session == null)) {
+				session = webInterface.sessionManager().createSession(UUID.randomUUID().toString(), request.getToadletContext());
+			}
+			return session;
 		} catch (RedirectException re1) {
 			return null;
 		}
