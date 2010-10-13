@@ -149,7 +149,7 @@ public class WebInterface extends AbstractService {
 		for (PageToadlet toadlet : pageToadlets) {
 			String menuName = toadlet.getMenuName();
 			if (menuName != null) {
-				toadletContainer.register(toadlet, "Navigation.Menu.Name", toadlet.path(), true, "Navigation.Menu.Item." + menuName + ".Name", "Navigation.Menu.Item." + menuName + ".Tooltip", false, new AlwaysEnabledCallback());
+				toadletContainer.register(toadlet, "Navigation.Menu.Name", toadlet.path(), true, "Navigation.Menu.Item." + menuName + ".Name", "Navigation.Menu.Item." + menuName + ".Tooltip", false, toadlet);
 			} else {
 				toadletContainer.register(toadlet, null, toadlet.path(), true, false);
 			}
