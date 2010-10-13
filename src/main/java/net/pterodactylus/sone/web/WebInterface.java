@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.CSSPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
@@ -72,6 +73,15 @@ public class WebInterface extends AbstractService {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the Sone core used by the Sone plugin.
+	 *
+	 * @return The Sone core
+	 */
+	public Core core() {
+		return sonePlugin.core();
+	}
 
 	/**
 	 * Returns the l10n helper of the node.
