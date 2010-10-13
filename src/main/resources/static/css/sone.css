@@ -1,0 +1,7 @@
+/* Sone Main CSS File */
+
+#sone h1 {
+	font-family: inherit;
+	font-size: 200%;
+	font-weight: bold;
+}

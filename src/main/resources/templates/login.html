@@ -1,3 +1,43 @@
-<div id="Sone">
-	<h1>Login</h1>
+<div id="sone">
+	<%if !sones.empty>
+		<h1><%= Page.Login.Page.Title|l10n|html></h1>
+		<form method="post">
+			<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+			<label for="sone-id"><%= Page.Login.Label.SelectSone|l10n|html></label>
+			<select name="sone-id">
+				<option disabled="disabled"><%= Page.Login.Option.NoSone|l10n|html></option>
+				<%foreach sones sone>
+					<option value="<% sone.id|html>"><% sone.name|html></option>
+				<%/foreach>
+			</select>
+			<button type="submit">Select</button>
+		</form>
+	<%/if>
+	<h1><%= Page.Login.LoadSone.Title|l10n|html></h1>
+	<div><%= Page.Login.LoadSone.Description|l10n|html|replace needle="{mark}" replacement="<i>"|replace needle="{/mark}" replacement="</i>"></div>
+	<form action="loadSone.html" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<div>
+			<label for="insert-uri"><%= Page.Login.LoadSone.Label.InsertURI|l10n|html></label>
+			<input type="text" name="insert-uri" />
+			<button type="submit"><%= Page.Login.LoadSone.Button.LoadSone|l10n|html></button>
+		</div>
+	</form>
+	<h1><%= Page.Login.CreateSone.Title|l10n|html></h1>
+	<div><%= Page.Login.CreateSone.Description|l10n|html></div>
+	<form action="createSone.html" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<div>
+			<label for="name"><%= Page.Login.CreateSone.Label.Name|l10n|html></label>
+			<input type="text" name="name" />
+		</div>
+		<div>
+			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
+			<input type="text" name="insert-uri" value="" />
+			<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
+		</div>
+		<div>
+			<button type="submit" name="create-random" value="1"><%= Page.Login.CreateSone.Button.CreateRandom|l10n|html></button>
+		</div>
+	</form>
 </div>

@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.Set;
+
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -36,6 +40,41 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	public LoginPage(Template template, WebInterface webInterface) {
 		super("login.html", template, "Page.Login.Title", webInterface);
+	}
+
+	//
+	// TEMPLATEPAGE METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void processTemplate(Request request, Template template) {
+		Set<Sone> localSones = webInterface.core().localSones();
+		template.set("sones", localSones);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getRedirectTarget(Request request) {
+		if (request.getMethod() == Method.POST) {
+			String soneId = request.getHttpRequest().getParam("sone-id");
+			Sone selectedSone = null;
+			for (Sone sone : webInterface.core().localSones()) {
+				if (sone.getId().equals(soneId)) {
+					selectedSone = sone;
+					break;
+				}
+			}
+			if (selectedSone != null) {
+				setCurrentSone(request, selectedSone);
+				return "index.html";
+			}
+		}
+		return null;
 	}
 
 }
