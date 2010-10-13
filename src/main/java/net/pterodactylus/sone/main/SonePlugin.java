@@ -25,13 +25,18 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
+import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
 import net.pterodactylus.util.config.XMLConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
 import freenet.client.async.DatabaseDisabledException;
+import freenet.l10n.BaseL10n.LANGUAGE;
+import freenet.l10n.PluginL10n;
 import freenet.pluginmanager.FredPlugin;
+import freenet.pluginmanager.FredPluginBaseL10n;
+import freenet.pluginmanager.FredPluginL10n;
 import freenet.pluginmanager.PluginRespirator;
 
 /**
@@ -40,7 +45,7 @@ import freenet.pluginmanager.PluginRespirator;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SonePlugin implements FredPlugin {
+public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10n {
 
 	static {
 		/* initialize logging. */
@@ -50,8 +55,45 @@ public class SonePlugin implements FredPlugin {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);
 
+	/** The plugin respirator. */
+	private PluginRespirator pluginRespirator;
+
 	/** The core. */
 	private Core core;
+
+	/** The l10n helper. */
+	private PluginL10n l10n;
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the plugin respirator for this plugin.
+	 *
+	 * @return The plugin respirator
+	 */
+	public PluginRespirator pluginRespirator() {
+		return pluginRespirator;
+	}
+
+	/**
+	 * Returns the core started by this plugin.
+	 *
+	 * @return The core
+	 */
+	public Core core() {
+		return core;
+	}
+
+	/**
+	 * Returns the plugin’s l10n helper.
+	 *
+	 * @return The plugin’s l10n helper
+	 */
+	public PluginL10n l10n() {
+		return l10n;
+	}
 
 	//
 	// FREDPLUGIN METHODS
@@ -62,6 +104,7 @@ public class SonePlugin implements FredPlugin {
 	 */
 	@Override
 	public void runPlugin(PluginRespirator pluginRespirator) {
+		this.pluginRespirator = pluginRespirator;
 
 		/* create a configuration. */
 		Configuration configuration;
@@ -80,6 +123,9 @@ public class SonePlugin implements FredPlugin {
 		/* create freenet interface. */
 		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode(), pluginRespirator.getHLSimpleClient());
 
+		/* create the web interface. */
+		WebInterface webInterface = new WebInterface(this);
+
 		/* create core. */
 		core = new Core();
 		core.configuration(configuration);
@@ -87,6 +133,7 @@ public class SonePlugin implements FredPlugin {
 
 		/* start core! */
 		core.start();
+		webInterface.start();
 	}
 
 	/**
@@ -98,6 +145,62 @@ public class SonePlugin implements FredPlugin {
 		core.stop();
 
 		/* TODO wait for core to stop? */
+	}
+
+	//
+	// INTERFACE FredPluginL10n
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getString(String key) {
+		return l10n.getBase().getString(key);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setLanguage(LANGUAGE newLanguage) {
+		l10n = new PluginL10n(this, newLanguage);
+	}
+
+	//
+	// INTERFACE FredPluginBaseL10n
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getL10nFilesBasePath() {
+		return "i18n";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getL10nFilesMask() {
+		return "sone.${lang}.properties";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getL10nOverrideFilesMask() {
+		return "sone.${lang}.override.properties";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public ClassLoader getPluginClassLoader() {
+		return SonePlugin.class.getClassLoader();
 	}
 
 }
