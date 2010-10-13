@@ -30,21 +30,21 @@ import freenet.support.api.HTTPRequest;
 /**
  * A page is responsible for handling HTTP requests and creating appropriate
  * responses.
- * 
+ *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Page {
 
 	/**
 	 * Returns the path of this toadlet.
-	 * 
+	 *
 	 * @return The path of this toadlet
 	 */
 	public String getPath();
 
 	/**
 	 * Handles a request.
-	 * 
+	 *
 	 * @param request
 	 *            The request to handle
 	 * @return The response
@@ -53,7 +53,7 @@ public interface Page {
 
 	/**
 	 * Container for request data.
-	 * 
+	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class Request {
@@ -103,7 +103,7 @@ public interface Page {
 
 		/**
 		 * Creates a new request that holds the given data.
-		 * 
+		 *
 		 * @param uri
 		 *            The URI of the request
 		 * @param method
@@ -122,7 +122,7 @@ public interface Page {
 
 		/**
 		 * Returns the URI that was accessed.
-		 * 
+		 *
 		 * @return The accessed URI
 		 */
 		public URI getURI() {
@@ -131,7 +131,7 @@ public interface Page {
 
 		/**
 		 * Returns the HTTP method that was used to access the page.
-		 * 
+		 *
 		 * @return The HTTP method
 		 */
 		public Method getMethod() {
@@ -140,7 +140,7 @@ public interface Page {
 
 		/**
 		 * Returns the HTTP request.
-		 * 
+		 *
 		 * @return The HTTP request
 		 */
 		public HTTPRequest getHttpRequest() {
@@ -149,7 +149,7 @@ public interface Page {
 
 		/**
 		 * Returns the toadlet context.
-		 * 
+		 *
 		 * @return The toadlet context
 		 */
 		public ToadletContext getToadletContext() {
@@ -160,7 +160,7 @@ public interface Page {
 
 	/**
 	 * Container for the HTTP response of a {@link Page}.
-	 * 
+	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class Response {
@@ -182,7 +182,7 @@ public interface Page {
 
 		/**
 		 * Creates a new response.
-		 * 
+		 *
 		 * @param statusCode
 		 *            The HTTP status code of the response
 		 * @param statusText
@@ -198,7 +198,7 @@ public interface Page {
 
 		/**
 		 * Creates a new response.
-		 * 
+		 *
 		 * @param statusCode
 		 *            The HTTP status code of the response
 		 * @param statusText
@@ -214,7 +214,7 @@ public interface Page {
 
 		/**
 		 * Creates a new response.
-		 * 
+		 *
 		 * @param statusCode
 		 *            The HTTP status code of the response
 		 * @param statusText
@@ -230,7 +230,7 @@ public interface Page {
 
 		/**
 		 * Creates a new response.
-		 * 
+		 *
 		 * @param statusCode
 		 *            The HTTP status code of the response
 		 * @param statusText
@@ -248,7 +248,7 @@ public interface Page {
 
 		/**
 		 * Creates a new response.
-		 * 
+		 *
 		 * @param statusCode
 		 *            The HTTP status code of the response
 		 * @param statusText
@@ -270,7 +270,7 @@ public interface Page {
 
 		/**
 		 * Returns the HTTP status code of the response.
-		 * 
+		 *
 		 * @return The HTTP status code
 		 */
 		public int getStatusCode() {
@@ -279,7 +279,7 @@ public interface Page {
 
 		/**
 		 * Returns the HTTP status text.
-		 * 
+		 *
 		 * @return The HTTP status text
 		 */
 		public String getStatusText() {
@@ -288,7 +288,7 @@ public interface Page {
 
 		/**
 		 * Returns the content type of the response.
-		 * 
+		 *
 		 * @return The content type of the reponse
 		 */
 		public String getContentType() {
@@ -298,7 +298,7 @@ public interface Page {
 		/**
 		 * Returns HTTP headers of the response. May be {@code null} if no
 		 * headers are returned.
-		 * 
+		 *
 		 * @return The response headers, or {@code null} if there are no
 		 *         response headers
 		 */
@@ -309,7 +309,7 @@ public interface Page {
 		/**
 		 * Returns the content of the response body. May be {@code null} if the
 		 * response does not have a body.
-		 * 
+		 *
 		 * @return The content of the response body
 		 */
 		public InputStream getContent() {
@@ -322,7 +322,7 @@ public interface Page {
 
 		/**
 		 * Returns the UTF-8 representation of the given text.
-		 * 
+		 *
 		 * @param text
 		 *            The text to encode
 		 * @return The encoded text
@@ -338,7 +338,7 @@ public interface Page {
 
 		/**
 		 * Creates a header map containing a single header.
-		 * 
+		 *
 		 * @param name
 		 *            The name of the header
 		 * @param value
@@ -355,14 +355,14 @@ public interface Page {
 
 	/**
 	 * {@link Response} implementation that performs an HTTP redirect.
-	 * 
+	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class RedirectResponse extends Response {
 
 		/**
 		 * Creates a new redirect response to the new location.
-		 * 
+		 *
 		 * @param newLocation
 		 *            The new location
 		 */
@@ -372,7 +372,7 @@ public interface Page {
 
 		/**
 		 * Creates a new redirect response to the new location.
-		 * 
+		 *
 		 * @param newLocation
 		 *            The new location
 		 * @param permanent
