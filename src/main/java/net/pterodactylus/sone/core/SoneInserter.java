@@ -17,7 +17,11 @@
 
 package net.pterodactylus.sone.core;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
 /**
@@ -26,6 +30,9 @@ import net.pterodactylus.util.service.AbstractService;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneInserter extends AbstractService {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SoneInserter.class);
 
 	/** The Sone to insert. */
 	private final Sone sone;
@@ -52,6 +59,15 @@ public class SoneInserter extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
+		while (!shouldStop()) {
+			synchronized (sone) {
+				if (sone.getModificationCounter() > 0) {
+					sone.setModificationCounter(0);
+				}
+			}
+			logger.log(Level.FINEST, "Waiting 60 seconds before checking Sone “" + sone.getName() + "” again.");
+			sleep(60 * 1000);
+		}
 	}
 
 }
