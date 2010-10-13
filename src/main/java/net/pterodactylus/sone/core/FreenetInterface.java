@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.core;
 
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import net.pterodactylus.util.service.AbstractService;
 import freenet.client.FetchException;
 import freenet.client.FetchResult;
 import freenet.client.HighLevelSimpleClient;
+import freenet.client.InsertException;
 import freenet.keys.FreenetURI;
 import freenet.node.Node;
 
@@ -90,6 +92,27 @@ public class FreenetInterface extends AbstractService {
 	public String[] generateKeyPair() {
 		FreenetURI[] keyPair = client.generateKeyPair("");
 		return new String[] { keyPair[1].toString(), keyPair[0].toString() };
+	}
+
+	/**
+	 * Inserts a directory into Freenet.
+	 *
+	 * @param insertUri
+	 *            The insert URI
+	 * @param manifestEntries
+	 *            The directory entries
+	 * @param defaultFile
+	 *            The name of the default file
+	 * @return The generated URI
+	 * @throws SoneException
+	 *             if an insert error occurs
+	 */
+	public FreenetURI insertDirectory(FreenetURI insertUri, HashMap<String, Object> manifestEntries, String defaultFile) throws SoneException {
+		try {
+			return client.insertManifest(insertUri, manifestEntries, defaultFile);
+		} catch (InsertException ie1) {
+			throw new SoneException(null, ie1);
+		}
 	}
 
 }
