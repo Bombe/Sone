@@ -129,7 +129,11 @@ public class SoneTemplatePage extends TemplatePage {
 	 */
 	protected void setCurrentSone(ToadletContext toadletContext, Sone sone) {
 		Session session = getCurrentSession(toadletContext);
-		session.setAttribute("Sone.CurrentSone", sone.getId());
+		if (sone == null) {
+			session.removeAttribute("Sone.CurrentSone");
+		} else {
+			session.setAttribute("Sone.CurrentSone", sone.getId());
+		}
 	}
 
 	//
