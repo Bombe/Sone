@@ -62,6 +62,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	/** The core. */
 	private Core core;
 
+	/** The web interface. */
+	private WebInterface webInterface;
+
 	/** The l10n helper. */
 	private PluginL10n l10n;
 
@@ -125,7 +128,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode(), pluginRespirator.getHLSimpleClient());
 
 		/* create the web interface. */
-		WebInterface webInterface = new WebInterface(this);
+		webInterface = new WebInterface(this);
 
 		/* create core. */
 		core = new Core();
@@ -142,6 +145,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	 */
 	@Override
 	public void terminate() {
+		/* stop the web interface. */
+		webInterface.stop();
+
 		/* stop the core. */
 		core.stop();
 
