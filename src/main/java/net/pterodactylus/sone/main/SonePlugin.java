@@ -37,6 +37,7 @@ import freenet.l10n.PluginL10n;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.FredPluginBaseL10n;
 import freenet.pluginmanager.FredPluginL10n;
+import freenet.pluginmanager.FredPluginThreadless;
 import freenet.pluginmanager.PluginRespirator;
 
 /**
@@ -45,7 +46,7 @@ import freenet.pluginmanager.PluginRespirator;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10n {
+public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless {
 
 	static {
 		/* initialize logging. */
