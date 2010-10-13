@@ -204,4 +204,15 @@ public class Sone {
 		return id.hashCode();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Sone)) {
+			return false;
+		}
+		return ((Sone) object).id.equals(id);
+	}
+
 }
