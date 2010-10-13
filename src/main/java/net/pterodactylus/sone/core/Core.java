@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.config.Configuration;
+import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.text.StringEscaper;
@@ -112,6 +113,14 @@ public class Core extends AbstractService {
 		loadConfiguration();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void serviceStop() {
+		saveConfiguration();
+	}
+
 	//
 	// PRIVATE METHODS
 	//
@@ -148,6 +157,33 @@ public class Core extends AbstractService {
 		}
 
 		logger.exiting(Core.class.getName(), "loadConfiguration()");
+	}
+
+	/**
+	 * Saves the configuraiton.
+	 */
+	private void saveConfiguration() {
+
+		/* get the names of all Sones. */
+		Set<String> soneNames = new HashSet<String>();
+		for (Sone sone : localSones) {
+			soneNames.add(sone.getName());
+		}
+		String soneNamesString = StringEscaper.escapeWords(soneNames);
+
+		logger.log(Level.INFO, "Storing %d Sones…", soneNames.size());
+		try {
+			/* store names of all Sones. */
+			configuration.getStringValue("Sone/Names").setValue(soneNamesString);
+
+			/* store all Sones. */
+			for (Sone sone : localSones) {
+				configuration.getStringValue("Sone/Name." + sone.getName() + "/RequestURI").setValue(sone.getRequestUri().toString());
+				configuration.getStringValue("Sone/Name." + sone.getName() + "/InsertURI").setValue(sone.getInsertUri().toString());
+			}
+		} catch (ConfigurationException ce1) {
+			logger.log(Level.WARNING, "Could not store configuration!", ce1);
+		}
 	}
 
 }
