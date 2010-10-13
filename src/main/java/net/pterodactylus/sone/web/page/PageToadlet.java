@@ -173,6 +173,9 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (page instanceof LinkEnabledCallback) {
+			return ((LinkEnabledCallback) page).isEnabled(toadletContext);
+		}
 		return true;
 	}
 
