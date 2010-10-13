@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -50,6 +52,13 @@ public class DeleteSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
+		if (request.getMethod() == Method.POST) {
+			if (request.getHttpRequest().isPartSet("deleteSone")) {
+				Sone currentSone = getCurrentSone(request.getToadletContext());
+				webInterface.core().deleteSone(currentSone);
+			}
+			throw new RedirectException("index.html");
+		}
 	}
 
 	//
