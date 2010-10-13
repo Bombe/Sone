@@ -95,7 +95,7 @@ public class Core extends AbstractService {
 	 *
 	 * @return The local Sones
 	 */
-	public Set<Sone> localSones() {
+	public Set<Sone> getSones() {
 		return Collections.unmodifiableSet(localSones);
 	}
 

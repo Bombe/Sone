@@ -111,7 +111,7 @@ public class SoneTemplatePage extends TemplatePage {
 			return null;
 		}
 		String soneId = (String) session.getAttribute("Sone.CurrentSone");
-		for (Sone sone : webInterface.core().localSones()) {
+		for (Sone sone : webInterface.core().getSones()) {
 			if (sone.getId().equals(soneId)) {
 				return sone;
 			}
