@@ -113,6 +113,19 @@ public class SoneTemplatePage extends TemplatePage {
 		return (Sone) session.getAttribute("Sone.CurrentSone");
 	}
 
+	/**
+	 * Sets the currently logged in Sone.
+	 *
+	 * @param request
+	 *            The request
+	 * @param sone
+	 *            The Sone to set as currently logged in
+	 */
+	protected void setCurrentSone(Request request, Sone sone) {
+		Session session = getCurrentSession(request);
+		session.setAttribute("Sone.CurrentSone", sone);
+	}
+
 	//
 	// TEMPLATEPAGE METHODS
 	//
