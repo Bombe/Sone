@@ -21,6 +21,12 @@
 			<version>0.7.5.1292-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.freenetproject</groupId>
+			<artifactId>fred-ext</artifactId>
+			<version>26</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
