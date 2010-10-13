@@ -51,18 +51,11 @@ public class LoginPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) {
+	protected void processTemplate(Request request, Template template) throws RedirectException {
 		Set<Sone> localSones = webInterface.core().localSones();
 		template.set("sones", localSones);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected String getRedirectTarget(Request request) {
 		if (request.getMethod() == Method.POST) {
-			String soneId = request.getHttpRequest().getParam("sone-id");
+			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
 			Sone selectedSone = null;
 			for (Sone sone : webInterface.core().localSones()) {
 				if (sone.getId().equals(soneId)) {
@@ -72,10 +65,9 @@ public class LoginPage extends SoneTemplatePage {
 			}
 			if (selectedSone != null) {
 				setCurrentSone(request.getToadletContext(), selectedSone);
-				return "index.html";
+				throw new RedirectException("index.html");
 			}
 		}
-		return null;
 	}
 
 	/**
