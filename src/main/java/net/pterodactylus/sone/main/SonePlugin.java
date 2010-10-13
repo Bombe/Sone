@@ -157,6 +157,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		core.stop();
 
 		/* TODO wait for core to stop? */
+
+		/* shutdown logger. */
+		Logging.shutdown();
 	}
 
 	//
