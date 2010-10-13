@@ -170,6 +170,8 @@ public class Core extends AbstractService {
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
 			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri), new FreenetURI(finalInsertUri));
+			/* set modification counter to 1 so it is inserted immediately. */
+			sone.setModificationCounter(1);
 			addSone(sone);
 		} catch (MalformedURLException mue1) {
 			throw new SoneException(Type.INVALID_URI);
