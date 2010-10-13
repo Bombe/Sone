@@ -153,6 +153,16 @@ public class Core extends AbstractService {
 		return sone;
 	}
 
+	/**
+	 * Deletes the given Sone from this plugin instance.
+	 *
+	 * @param sone
+	 *            The sone to delete
+	 */
+	public void deleteSone(Sone sone) {
+		localSones.remove(sone);
+	}
+
 	//
 	// SERVICE METHODS
 	//
