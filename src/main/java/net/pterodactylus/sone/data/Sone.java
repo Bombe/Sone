@@ -73,7 +73,7 @@ public class Sone {
 	 *
 	 * @return The request URI of this Sone
 	 */
-	public FreenetURI requestUri() {
+	public FreenetURI getRequestUri() {
 		return requestUri;
 	}
 
@@ -82,7 +82,7 @@ public class Sone {
 	 *
 	 * @return The insert URI of this Sone
 	 */
-	public FreenetURI insertUri() {
+	public FreenetURI getInsertUri() {
 		return insertUri;
 	}
 
