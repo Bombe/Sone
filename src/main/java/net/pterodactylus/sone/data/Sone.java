@@ -27,6 +27,8 @@ import freenet.keys.FreenetURI;
 /**
  * A Sone defines everything about a user: the {@link User} itself, her profile,
  * her status updates.
+ * <p>
+ * Operations that modify the Sone need to synchronize on the Sone in question.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
