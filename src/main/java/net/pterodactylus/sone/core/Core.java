@@ -207,6 +207,10 @@ public class Core extends AbstractService {
 	 */
 	@Override
 	protected void serviceStop() {
+		/* stop all Sone inserters. */
+		for (SoneInserter soneInserter : soneInserters.values()) {
+			soneInserter.stop();
+		}
 		saveConfiguration();
 	}
 
