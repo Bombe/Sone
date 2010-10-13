@@ -52,6 +52,7 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
+		super.processTemplate(request, template);
 		Set<Sone> localSones = webInterface.core().localSones();
 		template.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {

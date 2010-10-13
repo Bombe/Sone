@@ -59,6 +59,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
+		super.processTemplate(request, template);
 		String name = "";
 		String requestUri = null;
 		String insertUri = null;
