@@ -91,7 +91,12 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			pageNode.addCustomStyleSheet(styleSheet);
 		}
 
-		processTemplate(request, template);
+		try {
+			processTemplate(request, template);
+		} catch (RedirectException re1) {
+			return new RedirectResponse(re1.getTarget());
+		}
+
 		StringWriter stringWriter = new StringWriter();
 		template.render(stringWriter);
 		pageNode.content.addChild("%", stringWriter.toString());
@@ -117,8 +122,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *            The request that is rendered
 	 * @param template
 	 *            The template to set variables in
+	 * @throws RedirectException
+	 *             if the processing page wants to redirect after processing
 	 */
-	protected void processTemplate(Request request, Template template) {
+	protected void processTemplate(Request request, Template template) throws RedirectException {
 		/* do nothing. */
 	}
 
@@ -144,6 +151,40 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
 		return true;
+	}
+
+	/**
+	 * Exception that can be thrown to signal that a subclassed {@link Page}
+	 * wants to redirect the user during the
+	 * {@link TemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, Template)}
+	 * method call.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public class RedirectException extends Exception {
+
+		/** The target to redirect to. */
+		private final String target;
+
+		/**
+		 * Creates a new redirect exception.
+		 *
+		 * @param target
+		 *            The target of the redirect
+		 */
+		public RedirectException(String target) {
+			this.target = target;
+		}
+
+		/**
+		 * Returns the target to redirect to.
+		 *
+		 * @return The target to redirect to
+		 */
+		public String getTarget() {
+			return target;
+		}
+
 	}
 
 }
