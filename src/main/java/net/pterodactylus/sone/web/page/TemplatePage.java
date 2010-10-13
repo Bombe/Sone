@@ -30,7 +30,7 @@ import freenet.l10n.BaseL10n;
 
 /**
  * Base class for all {@link Page}s that are rendered with {@link Template}s.
- * 
+ *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TemplatePage implements Page, LinkEnabledCallback {
@@ -49,7 +49,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 
 	/**
 	 * Creates a new template page.
-	 * 
+	 *
 	 * @param path
 	 *            The path of the page
 	 * @param template
@@ -107,7 +107,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/**
 	 * Can be overridden to return a custom set of style sheets that are to be
 	 * included in the page’s header.
-	 * 
+	 *
 	 * @return Additional style sheets to load
 	 */
 	protected Collection<String> getStyleSheets() {
@@ -117,7 +117,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/**
 	 * Can be overridden when extending classes need to set variables in the
 	 * template before it is rendered.
-	 * 
+	 *
 	 * @param request
 	 *            The request that is rendered
 	 * @param template
@@ -132,7 +132,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/**
 	 * Can be overridden to redirect the user to a different page, in case a log
 	 * in is required, or something else is wrong.
-	 * 
+	 *
 	 * @param request
 	 *            The request that is processed
 	 * @return The URL to redirect to, or {@code null} to not redirect

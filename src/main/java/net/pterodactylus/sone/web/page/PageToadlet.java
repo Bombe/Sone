@@ -35,7 +35,7 @@ import freenet.support.io.Closer;
 
 /**
  * {@link Toadlet} implementation that is wrapped around a {@link Page}.
- * 
+ *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PageToadlet extends Toadlet implements LinkEnabledCallback {
@@ -51,7 +51,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 
 	/**
 	 * Creates a new toadlet that hands off processing to a {@link Page}.
-	 * 
+	 *
 	 * @param highLevelSimpleClient
 	 * @param menuName
 	 *            The name of the menu item
@@ -70,7 +70,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 
 	/**
 	 * Returns the name to display in the menu.
-	 * 
+	 *
 	 * @return The name in the menu
 	 */
 	public String getMenuName() {
@@ -87,7 +87,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 
 	/**
 	 * Handles a HTTP GET request.
-	 * 
+	 *
 	 * @param uri
 	 *            The URI of the request
 	 * @param httpRequest
@@ -105,7 +105,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 
 	/**
 	 * Handles a HTTP POST request.
-	 * 
+	 *
 	 * @param uri
 	 *            The URI of the request
 	 * @param httpRequest
@@ -131,7 +131,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 
 	/**
 	 * Handles a HTTP request.
-	 * 
+	 *
 	 * @param pageRequest
 	 *            The request to handle
 	 * @throws IOException
