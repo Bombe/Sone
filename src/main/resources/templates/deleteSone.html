@@ -2,4 +2,24 @@
 
 	<h1><%= Page.DeleteSone.Page.Title|l10n|replace needle="{zone}" replacementKey=currentSone.name|html></h1>
 
+	<div><%= Page.DeleteSone.Page.Description|l10n|html></div>
+
+	<form method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<div>
+			<label><%= Page.DeleteSone.Label.RequestURI|l10n|html></label>
+			<input type="text" readonly="readonly" value="<% currentSone.requestUri|html>" />
+		</div>
+		<div>
+			<label><%= Page.DeleteSone.Label.InsertURI|l10n|html></label>
+			<input type="text" readonly="readonly" value="<% currentSone.insertUri|html>" />
+		</div>
+		<div>
+			<button type="submit" name="deleteSone" value="1"><%= Page.DeleteSone.Button.Yes|l10n|html></button>
+		</div>
+		<div>
+			<button type="submit"><%= Page.DeleteSone.Button.No|l10n|html></button>
+		</div>
+	</form>
+
 </div>
