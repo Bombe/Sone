@@ -31,8 +31,12 @@ public class SoneException extends Exception {
 	 */
 	public static enum Type {
 
+		/** An invalid Sone name was specified. */
+		INVALID_SONE_NAME,
+
 		/** An invalid URI was specified. */
-		INVALID_URI
+		INVALID_URI,
+
 	}
 
 	/** The type of the exception. */
