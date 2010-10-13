@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map.Entry;
 
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import freenet.client.HighLevelSimpleClient;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.Toadlet;
@@ -99,7 +100,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodGET(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new Page.Request(uri, "GET", httpRequest, toadletContext));
+		handleRequest(new Page.Request(uri, Method.GET, httpRequest, toadletContext));
 	}
 
 	/**
@@ -117,7 +118,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodPOST(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new Page.Request(uri, "POST", httpRequest, toadletContext));
+		handleRequest(new Page.Request(uri, Method.POST, httpRequest, toadletContext));
 	}
 
 	/**

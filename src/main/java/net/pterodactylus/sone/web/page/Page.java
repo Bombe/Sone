@@ -58,11 +58,42 @@ public interface Page {
 	 */
 	public class Request {
 
+		/**
+		 * Enumeration for all possible HTTP request methods.
+		 *
+		 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’
+		 *         Roden</a>
+		 */
+		public enum Method {
+
+			/** GET. */
+			GET,
+
+			/** POST. */
+			POST,
+
+			/** PUT. */
+			PUT,
+
+			/** DELETE. */
+			DELETE,
+
+			/** HEAD. */
+			HEAD,
+
+			/** OPTIONS. */
+			OPTIONS,
+
+			/** TRACE. */
+			TRACE,
+
+		}
+
 		/** The URI that was accessed. */
 		private final URI uri;
 
 		/** The HTTP method that was used. */
-		private final String method;
+		private final Method method;
 
 		/** The HTTP request. */
 		private final HTTPRequest httpRequest;
@@ -82,7 +113,7 @@ public interface Page {
 		 * @param toadletContext
 		 *            The toadlet context of the request
 		 */
-		public Request(URI uri, String method, HTTPRequest httpRequest, ToadletContext toadletContext) {
+		public Request(URI uri, Method method, HTTPRequest httpRequest, ToadletContext toadletContext) {
 			this.uri = uri;
 			this.method = method;
 			this.httpRequest = httpRequest;
@@ -103,7 +134,7 @@ public interface Page {
 		 * 
 		 * @return The HTTP method
 		 */
-		public String getMethod() {
+		public Method getMethod() {
 			return method;
 		}
 
