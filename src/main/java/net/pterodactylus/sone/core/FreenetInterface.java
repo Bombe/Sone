@@ -81,4 +81,14 @@ public class FreenetInterface extends AbstractService {
 		return fetchResult;
 	}
 
+	/**
+	 * Creates a key pair.
+	 *
+	 * @return The request key at index 0, the insert key at index 1
+	 */
+	public String[] generateKeyPair() {
+		FreenetURI[] keyPair = client.generateKeyPair("/");
+		return new String[] { keyPair[1].toString(), keyPair[0].toString() };
+	}
+
 }
