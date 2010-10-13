@@ -14,12 +14,18 @@
 		</form>
 	<%/if>
 	<h1><%= Page.Login.LoadSone.Title|l10n|html></h1>
-	<div><%= Page.Login.LoadSone.Description|l10n|html|replace needle="{mark}" replacement="<i>"|replace needle="{/mark}" replacement="</i>"></div>
+	<div><%= Page.Login.LoadSone.Description|l10n|html></div>
 	<form action="loadSone.html" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 		<div>
+			<label for="request-uri"><%= Page.Login.LoadSone.Label.RequestURI|l10n|html></label>
+			<input type="text" name="request-uri" />
+		</div>
+		<div>
 			<label for="insert-uri"><%= Page.Login.LoadSone.Label.InsertURI|l10n|html></label>
 			<input type="text" name="insert-uri" />
+		</div>
+		<div>
 			<button type="submit"><%= Page.Login.LoadSone.Button.LoadSone|l10n|html></button>
 		</div>
 	</form>
@@ -32,8 +38,14 @@
 			<input type="text" name="name" />
 		</div>
 		<div>
+			<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
+			<input type="text" name="insert-uri" value="" />
+		</div>
+		<div>
 			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
 			<input type="text" name="insert-uri" value="" />
+		</div>
+		<div>
 			<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
 		</div>
 		<div>
