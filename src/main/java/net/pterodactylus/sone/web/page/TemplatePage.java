@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import net.pterodactylus.util.template.Template;
+import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
 import freenet.clients.http.PageNode;
 import freenet.clients.http.ToadletContext;
@@ -32,7 +33,7 @@ import freenet.l10n.BaseL10n;
  * 
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplatePage implements Page {
+public class TemplatePage implements Page, LinkEnabledCallback {
 
 	/** The path of the page. */
 	private final String path;
@@ -131,6 +132,18 @@ public class TemplatePage implements Page {
 	 */
 	protected String getRedirectTarget(Page.Request request) {
 		return null;
+	}
+
+	//
+	// INTERFACE LinkEnabledCallback
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEnabled(ToadletContext toadletContext) {
+		return true;
 	}
 
 }
