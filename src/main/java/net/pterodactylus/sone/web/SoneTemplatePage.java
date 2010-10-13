@@ -110,7 +110,13 @@ public class SoneTemplatePage extends TemplatePage {
 		if (session == null) {
 			return null;
 		}
-		return (Sone) session.getAttribute("Sone.CurrentSone");
+		String soneId = (String) session.getAttribute("Sone.CurrentSone");
+		for (Sone sone : webInterface.core().localSones()) {
+			if (sone.getId().equals(soneId)) {
+				return sone;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -123,7 +129,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 */
 	protected void setCurrentSone(ToadletContext toadletContext, Sone sone) {
 		Session session = getCurrentSession(toadletContext);
-		session.setAttribute("Sone.CurrentSone", sone);
+		session.setAttribute("Sone.CurrentSone", sone.getId());
 	}
 
 	//

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -147,10 +148,11 @@ public class Core extends AbstractService {
 		/* parse local Sones. */
 		logger.log(Level.INFO, "Loading %d Sones…", allSoneNames.size());
 		for (String soneName : allSoneNames) {
+			String id = configuration.getStringValue("Sone/Name." + soneName + "/ID").getValue(null);
 			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
 			try {
-				localSones.add(new Sone(soneName, new FreenetURI(requestUri), new FreenetURI(insertUri)));
+				localSones.add(new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri)));
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + requestUri + "”) and insertUri (“" + insertUri + "”)!", mue1);
 			}
@@ -178,6 +180,7 @@ public class Core extends AbstractService {
 
 			/* store all Sones. */
 			for (Sone sone : localSones) {
+				configuration.getStringValue("Sone/Name." + sone.getName() + "/ID").setValue(sone.getId());
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/RequestURI").setValue(sone.getRequestUri().toString());
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/InsertURI").setValue(sone.getInsertUri().toString());
 			}

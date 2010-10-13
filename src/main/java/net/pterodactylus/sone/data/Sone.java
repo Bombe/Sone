@@ -33,7 +33,7 @@ import freenet.keys.FreenetURI;
 public class Sone {
 
 	/** A GUID for this Sone. */
-	private final UUID id = UUID.randomUUID();
+	private final UUID id;
 
 	/** The name of this Sone. */
 	private final String name;
@@ -51,18 +51,22 @@ public class Sone {
 	/**
 	 * Creates a new Sone.
 	 *
+	 * @param id
+	 *            The ID of this Sone
 	 * @param name
 	 *            The name of the Sone
 	 * @param requestUri
 	 *            The request URI of the Sone
 	 */
-	public Sone(String name, FreenetURI requestUri) {
-		this(name, requestUri, null);
+	public Sone(UUID id, String name, FreenetURI requestUri) {
+		this(id, name, requestUri, null);
 	}
 
 	/**
 	 * Creates a new Sone.
 	 *
+	 * @param id
+	 *            The ID of this Sone
 	 * @param name
 	 *            The name of the Sone
 	 * @param requestUri
@@ -70,7 +74,8 @@ public class Sone {
 	 * @param insertUri
 	 *            The insert URI of the Sone
 	 */
-	public Sone(String name, FreenetURI requestUri, FreenetURI insertUri) {
+	public Sone(UUID id, String name, FreenetURI requestUri, FreenetURI insertUri) {
+		this.id = id;
 		this.name = name;
 		this.requestUri = requestUri;
 		this.insertUri = insertUri;
