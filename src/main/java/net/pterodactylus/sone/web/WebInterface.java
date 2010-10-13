@@ -145,7 +145,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CSSPage("css/", "/static/css/")));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
-		toadletContainer.getPageMaker().addNavigationCategory("/Sone/", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
+		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
 		for (PageToadlet toadlet : pageToadlets) {
 			String menuName = toadlet.getMenuName();
 			if (menuName != null) {
