@@ -31,6 +31,7 @@ import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
 import net.pterodactylus.util.config.XMLConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.version.Version;
 import freenet.client.async.DatabaseDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
@@ -38,6 +39,7 @@ import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.FredPluginBaseL10n;
 import freenet.pluginmanager.FredPluginL10n;
 import freenet.pluginmanager.FredPluginThreadless;
+import freenet.pluginmanager.FredPluginVersioned;
 import freenet.pluginmanager.PluginRespirator;
 
 /**
@@ -46,12 +48,15 @@ import freenet.pluginmanager.PluginRespirator;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless {
+public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
 
 	static {
 		/* initialize logging. */
 		Logging.setup("sone");
 	}
+
+	/** The version. */
+	private static final Version VERSION = new Version("SNAPSHOT", 0, 1);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);
@@ -208,6 +213,18 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	@Override
 	public ClassLoader getPluginClassLoader() {
 		return SonePlugin.class.getClassLoader();
+	}
+
+	//
+	// INTERFACE FredPluginVersioned
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getVersion() {
+		return VERSION.toString();
 	}
 
 }
