@@ -39,6 +39,7 @@ public class FreenetInterface extends AbstractService {
 	private static final Logger logger = Logging.getLogger(FreenetInterface.class);
 
 	/** The node to interact with. */
+	@SuppressWarnings("unused")
 	private final Node node;
 
 	/** The high-level client to use for requests. */
