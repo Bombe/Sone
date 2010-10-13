@@ -147,11 +147,15 @@ public class WebInterface extends AbstractService {
 		Template createSoneTemplate = templateFactory.createTemplate(createReader("/templates/createSone.html"));
 		createSoneTemplate.set("formPassword", formPassword);
 
+		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
+		deleteSoneTemplate.set("formPassword", formPassword);
+
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(logoutTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CSSPage("css/", "/static/css/")));
