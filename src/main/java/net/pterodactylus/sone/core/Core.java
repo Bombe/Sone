@@ -140,7 +140,7 @@ public class Core extends AbstractService {
 			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
 			try {
-				localSones.add(new Sone(new FreenetURI(requestUri), new FreenetURI(insertUri)));
+				localSones.add(new Sone(soneName, new FreenetURI(requestUri), new FreenetURI(insertUri)));
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + requestUri + "”) and insertUri (“" + insertUri + "”)!", mue1);
 			}
