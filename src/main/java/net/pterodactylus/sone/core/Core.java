@@ -87,6 +87,15 @@ public class Core extends AbstractService {
 		return this;
 	}
 
+	/**
+	 * Returns the local Sones.
+	 *
+	 * @return The local Sones
+	 */
+	public Set<Sone> localSones() {
+		return localSones;
+	}
+
 	//
 	// ACTIONS
 	//
