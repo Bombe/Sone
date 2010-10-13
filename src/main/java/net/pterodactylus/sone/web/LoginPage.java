@@ -22,6 +22,7 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
+import freenet.clients.http.ToadletContext;
 
 /**
  * The login page manages logging the user in.
@@ -70,7 +71,7 @@ public class LoginPage extends SoneTemplatePage {
 				}
 			}
 			if (selectedSone != null) {
-				setCurrentSone(request, selectedSone);
+				setCurrentSone(request.getToadletContext(), selectedSone);
 				return "index.html";
 			}
 		}

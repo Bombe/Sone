@@ -25,8 +25,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.sone.web.page.TemplatePage;
 import net.pterodactylus.util.template.Template;
-import freenet.clients.http.RedirectException;
 import freenet.clients.http.SessionManager.Session;
+import freenet.clients.http.ToadletContext;
 
 /**
  * Base page for the Freetalk web interface.
@@ -64,35 +64,35 @@ public class SoneTemplatePage extends TemplatePage {
 	 * Returns the current session, creating a new session if there is no
 	 * current session.
 	 *
-	 * @param request
-	 *            The request to extract the session information from
+	 * @param toadletContenxt
+	 *            The toadlet context
 	 * @return The current session, or {@code null} if there is no current
 	 *         session
 	 */
-	protected Session getCurrentSession(Request request) {
-		return getCurrentSession(request, true);
+	protected Session getCurrentSession(ToadletContext toadletContenxt) {
+		return getCurrentSession(toadletContenxt, true);
 	}
 
 	/**
 	 * Returns the current session, creating a new session if there is no
 	 * current session and {@code create} is {@code true}.
 	 *
-	 * @param request
-	 *            The request to extract the session information from
+	 * @param toadletContenxt
+	 *            The toadlet context
 	 * @param create
 	 *            {@code true} to create a new session if there is no current
 	 *            session, {@code false} otherwise
 	 * @return The current session, or {@code null} if there is no current
 	 *         session
 	 */
-	protected Session getCurrentSession(Request request, boolean create) {
+	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
 		try {
-			Session session = webInterface.sessionManager().useSession(request.getToadletContext());
+			Session session = webInterface.sessionManager().useSession(toadletContenxt);
 			if (create && (session == null)) {
-				session = webInterface.sessionManager().createSession(UUID.randomUUID().toString(), request.getToadletContext());
+				session = webInterface.sessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
 			}
 			return session;
-		} catch (RedirectException re1) {
+		} catch (freenet.clients.http.RedirectException re1) {
 			return null;
 		}
 	}
@@ -100,13 +100,13 @@ public class SoneTemplatePage extends TemplatePage {
 	/**
 	 * Returns the currently logged in Sone.
 	 *
-	 * @param request
-	 *            The request to extract the session information from
+	 * @param toadletContenxt
+	 *            The toadlet context
 	 * @return The currently logged in Sone, or {@code null} if no Sone is
 	 *         currently logged in
 	 */
-	protected Sone getCurrentSone(Request request) {
-		Session session = getCurrentSession(request);
+	protected Sone getCurrentSone(ToadletContext toadletContenxt) {
+		Session session = getCurrentSession(toadletContenxt);
 		if (session == null) {
 			return null;
 		}
@@ -116,13 +116,13 @@ public class SoneTemplatePage extends TemplatePage {
 	/**
 	 * Sets the currently logged in Sone.
 	 *
-	 * @param request
-	 *            The request
+	 * @param toadletContext
+	 *            The toadlet context
 	 * @param sone
 	 *            The Sone to set as currently logged in
 	 */
-	protected void setCurrentSone(Request request, Sone sone) {
-		Session session = getCurrentSession(request);
+	protected void setCurrentSone(ToadletContext toadletContext, Sone sone) {
+		Session session = getCurrentSession(toadletContext);
 		session.setAttribute("Sone.CurrentSone", sone);
 	}
 
@@ -153,10 +153,21 @@ public class SoneTemplatePage extends TemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(Page.Request request) {
-		if (requiresLogin() && (getCurrentSone(request) == null)) {
+		if (requiresLogin() && (getCurrentSone(request.getToadletContext()) == null)) {
 			return "login.html";
 		}
 		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEnabled(ToadletContext toadletContext) {
+		if (requiresLogin()) {
+			return getCurrentSone(toadletContext) != null;
+		}
+		return true;
 	}
 
 }
