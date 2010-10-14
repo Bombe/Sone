@@ -302,7 +302,12 @@ public class Core extends AbstractService {
 					if (replyId == null) {
 						break;
 					}
-					Sone replySone = soneCache.get(configuration.getStringValue(replyPrefix + "/Sone").getValue(null));
+					Sone replySone = soneCache.get(configuration.getStringValue(replyPrefix + "/Sone/ID").getValue(null));
+					String replySoneKey = configuration.getStringValue(replyPrefix + "/Sone/Key").getValue(null);
+					String replySoneName = configuration.getStringValue(replyPrefix + "/Sone/Name").getValue(null);
+					if (replySone instanceof SoneShell) {
+						((SoneShell) replySone).setRequestUri(new FreenetURI(replySoneKey)).setName(replySoneName);
+					}
 					Post replyPost = postCache.get(configuration.getStringValue(replyPrefix + "/Post").getValue(null));
 					long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue(null);
 					String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
@@ -351,7 +356,9 @@ public class Core extends AbstractService {
 				for (Reply reply : sone.getReplies()) {
 					String replyPrefix = sonePrefix + "/Reply." + replyId++;
 					configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
-					configuration.getStringValue(replyPrefix + "/Sone").setValue(reply.getSone().getId());
+					configuration.getStringValue(replyPrefix + "/Sone/ID").setValue(reply.getSone().getId());
+					configuration.getStringValue(replyPrefix + "/Sone/Key").setValue(reply.getSone().getRequestUri().toString());
+					configuration.getStringValue(replyPrefix + "/Sone/Name").setValue(reply.getSone().getName());
 					configuration.getStringValue(replyPrefix + "/Post").setValue(reply.getPost().getId());
 					configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
 					configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
