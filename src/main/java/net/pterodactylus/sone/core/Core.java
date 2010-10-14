@@ -128,7 +128,11 @@ public class Core extends AbstractService {
 	 * @return The Sone, or a {@link Shell} around one
 	 */
 	public Sone getSone(String soneId) {
-		return soneCache.get(soneId);
+		Sone sone = soneCache.get(soneId);
+		if (sone instanceof SoneShell) {
+			soneCache.put(soneId, sone = ((SoneShell) sone).getShelled());
+		}
+		return sone;
 	}
 
 	//
