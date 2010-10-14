@@ -12,6 +12,14 @@
 
 		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
 
+		<%if ! sone.isCurrent>
+			<%if sone.isFriend>
+				<div><a href="removeFriend.html?sone=<% sone.id>"><%= Page.ViewSone.RemoveFriend.Text|l10n|html></a></div>
+			<%else>
+				<div><a href="addFriend.html?sone=<% sone.id>"><%= Page.ViewSone.AddFriend.Text|l10n|html></a></div>
+			<%/if>
+		<%/if>
+
 		<div id="posts">
 			<%foreach sone.posts post>
 				<div class="post">
