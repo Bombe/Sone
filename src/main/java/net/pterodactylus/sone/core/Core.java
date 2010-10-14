@@ -33,6 +33,7 @@ import net.pterodactylus.sone.data.PostShell;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.ReplyShell;
+import net.pterodactylus.sone.data.Shell;
 import net.pterodactylus.sone.data.ShellCache;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneShell;
@@ -117,6 +118,17 @@ public class Core extends AbstractService {
 	 */
 	public Set<Sone> getSones() {
 		return Collections.unmodifiableSet(localSones);
+	}
+
+	/**
+	 * Returns a Sone or a {@link Shell} around one for the given ID.
+	 *
+	 * @param soneId
+	 *            The ID of the Sone
+	 * @return The Sone, or a {@link Shell} around one
+	 */
+	public Sone getSone(String soneId) {
+		return soneCache.get(soneId);
 	}
 
 	//
