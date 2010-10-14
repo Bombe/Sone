@@ -133,7 +133,7 @@ public class Post {
 	 */
 	@Override
 	public int hashCode() {
-		return text.hashCode() ^ (int) (time >> 32) ^ (int) (time & 0xffffffff);
+		return id.hashCode();
 	}
 
 	/**
