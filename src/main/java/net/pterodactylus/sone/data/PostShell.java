@@ -199,7 +199,7 @@ public class PostShell extends Post implements Shell<Post> {
 	 */
 	@Override
 	public boolean canUnshell() {
-		return (id != null) && (sone != null) && (time != null) && (text != null);
+		return (id != null) && (sone != null) && (!(sone instanceof Shell<?>)) && (time != null) && (text != null);
 	}
 
 	/**
