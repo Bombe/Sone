@@ -56,6 +56,7 @@ public class FreenetInterface extends AbstractService {
 	 *            The high-level client
 	 */
 	public FreenetInterface(Node node, HighLevelSimpleClient client) {
+		super("Sone Freenet Interface");
 		this.node = node;
 		this.client = client;
 	}
