@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.UUID;
+
 /**
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
@@ -24,6 +26,9 @@ package net.pterodactylus.sone.data;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Post {
+
+	/** The GUID of the post. */
+	private final UUID id;
 
 	/** The Sone this post belongs to. */
 	private final Sone sone;
@@ -39,15 +44,53 @@ public class Post {
 	 *
 	 * @param sone
 	 *            The Sone this post belongs to
+	 * @param text
+	 *            The text of the post
+	 */
+	public Post(Sone sone, String text) {
+		this(sone, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone this post belongs to
 	 * @param time
 	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
 	 * @param text
 	 *            The text of the post
 	 */
 	public Post(Sone sone, long time, String text) {
+		this(UUID.randomUUID(), sone, time, text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param id
+	 *            The ID of the post
+	 * @param sone
+	 *            The Sone this post belongs to
+	 * @param time
+	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
+	 * @param text
+	 *            The text of the post
+	 */
+	public Post(UUID id, Sone sone, long time, String text) {
+		this.id = id;
 		this.sone = sone;
 		this.time = time;
 		this.text = text;
+	}
+
+	/**
+	 * Returns the ID of the post.
+	 *
+	 * @return The ID of the post
+	 */
+	public String getId() {
+		return id.toString();
 	}
 
 	/**
@@ -97,8 +140,7 @@ public class Post {
 		if (!(object instanceof Post)) {
 			return false;
 		}
-		Post post = (Post) object;
-		return (post.time == time) && (post.text.equals(text));
+		return ((Post) object).id.equals(id);
 	}
 
 }
