@@ -51,6 +51,9 @@ public class SoneInserter extends AbstractService {
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
 	}
 
+	/** The UTF-8 charset. */
+	private static final Charset utf8Charset = Charset.forName("UTF-8");
+
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
@@ -178,20 +181,11 @@ public class SoneInserter extends AbstractService {
 		 *
 		 * @return The manifest entries for the Sone insert
 		 */
-		@SuppressWarnings("synthetic-access")
 		public HashMap<String, Object> generateManifestEntries() {
 			HashMap<String, Object> manifestEntries = new HashMap<String, Object>();
 
-			Charset utf8Charset = Charset.forName("UTF-8");
-
 			/* first, create an index.html. */
-			Template indexTemplate = templateFactory.createTemplate(new InputStreamReader(getClass().getResourceAsStream("/templates/insert/index.html"), utf8Charset));
-			indexTemplate.set("currentSone", sone);
-			StringWriter indexWriter = new StringWriter();
-			indexTemplate.render(indexWriter);
-			StringBucket indexBucket = new StringBucket(indexWriter.toString(), utf8Charset);
-			ManifestElement indexManifestElement = new ManifestElement("index.html", indexBucket, "text/html; charset=utf-8", indexBucket.size());
-			manifestEntries.put("index.html", indexManifestElement);
+			manifestEntries.put("index.html", createManifestElement("index.html", "text/html; charset=utf-8", "/templates/insert/index.html"));
 
 			return manifestEntries;
 		}
@@ -199,6 +193,27 @@ public class SoneInserter extends AbstractService {
 		//
 		// PRIVATE METHODS
 		//
+
+		/**
+		 * Creates a new manifest element.
+		 *
+		 * @param name
+		 *            The name of the file
+		 * @param contentType
+		 *            The content type of the file
+		 * @param templateName
+		 *            The name of the template to render
+		 * @return The manifest element
+		 */
+		@SuppressWarnings("synthetic-access")
+		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
+			Template template = templateFactory.createTemplate(new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset));
+			template.set("currentSone", sone);
+			StringWriter writer = new StringWriter();
+			template.render(writer);
+			StringBucket bucket = new StringBucket(writer.toString(), utf8Charset);
+			return new ManifestElement(name, bucket, contentType, bucket.size());
+		}
 
 	}
 
