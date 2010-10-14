@@ -343,4 +343,12 @@ public class Sone {
 		return ((Sone) object).id.equals(id);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getName() + "[id=" + getId() + ",requestUri=" + getRequestUri() + ",insertUri=" + getInsertUri() + ",posts(" + posts.size() + "),replies(" + replies.size() + ")]";
+	}
+
 }

@@ -200,4 +200,12 @@ public class Post {
 		return post.id.equals(id) && post.sone.equals(sone) && (post.time == time) && post.text.equals(text);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getClass().getName() + "[id=" + getId() + ",sone=" + getSone() + ",time=" + getTime() + ",text=" + getText() + "]";
+	}
+
 }
