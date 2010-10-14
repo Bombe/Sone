@@ -12,10 +12,11 @@
 
 	<posts>
 		<%foreach currentSone.posts post>
-			<post>
-				<time><% post.time></time>
-				<text><% post.text|html></text>
-			</post>
+		<post>
+			<id><% post.id></id>
+			<time><% post.time></time>
+			<text><% post.text|html></text>
+		</post>
 		<%/foreach>
 	</posts>
 
