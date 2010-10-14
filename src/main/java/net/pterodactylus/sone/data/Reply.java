@@ -27,6 +27,9 @@ import java.util.UUID;
  */
 public class Reply {
 
+	/** The Sone that posted this reply. */
+	private final Sone sone;
+
 	/** The ID of the reply. */
 	private final UUID id;
 
@@ -42,18 +45,22 @@ public class Reply {
 	/**
 	 * Creates a new reply.
 	 *
+	 * @param sone
+	 *            The sone that posted the reply
 	 * @param post
 	 *            The post to reply to
 	 * @param text
 	 *            The text of the reply
 	 */
-	public Reply(Post post, String text) {
-		this(post, System.currentTimeMillis(), text);
+	public Reply(Sone sone, Post post, String text) {
+		this(sone, post, System.currentTimeMillis(), text);
 	}
 
 	/**
 	 * Creates a new reply-
 	 *
+	 * @param sone
+	 *            The sone that posted the reply
 	 * @param post
 	 *            The post to reply to
 	 * @param time
@@ -61,13 +68,15 @@ public class Reply {
 	 * @param text
 	 *            The text of the reply
 	 */
-	public Reply(Post post, long time, String text) {
-		this(UUID.randomUUID(), post, time, text);
+	public Reply(Sone sone, Post post, long time, String text) {
+		this(sone, UUID.randomUUID(), post, time, text);
 	}
 
 	/**
 	 * Creates a new reply-
 	 *
+	 * @param sone
+	 *            The sone that posted the reply
 	 * @param id
 	 *            The ID of the reply
 	 * @param post
@@ -77,7 +86,8 @@ public class Reply {
 	 * @param text
 	 *            The text of the reply
 	 */
-	public Reply(UUID id, Post post, long time, String text) {
+	public Reply(Sone sone, UUID id, Post post, long time, String text) {
+		this.sone = sone;
 		this.id = id;
 		this.post = post;
 		this.time = time;
@@ -87,6 +97,15 @@ public class Reply {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the Sone that posted this reply.
+	 *
+	 * @return The Sone that posted this reply
+	 */
+	public Sone getSone() {
+		return sone;
+	}
 
 	/**
 	 * Returns the ID of the reply.
