@@ -24,17 +24,10 @@ package net.pterodactylus.sone.data;
  */
 public class Profile {
 
-	/** The name of the user this profile belongs to. */
-	private final String username;
-
 	/**
 	 * Creates a new profile.
-	 *
-	 * @param username
-	 *            The name of the user this profile belongs to
 	 */
-	public Profile(String username) {
-		this.username = username;
+	public Profile() {
 	}
 
 	/**
@@ -44,16 +37,6 @@ public class Profile {
 	 *            The profile to copy
 	 */
 	public Profile(Profile profile) {
-		this.username = profile.username;
-	}
-
-	/**
-	 * Returns the name of the user this profile belongs to.
-	 *
-	 * @return The name of the user this profile belongs to
-	 */
-	public String getUsername() {
-		return username;
 	}
 
 }
