@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.SoneException.Type;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -298,6 +299,15 @@ public class Core extends AbstractService {
 					configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
 					configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
 					configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
+				}
+				int replyId = 0;
+				for (Reply reply : sone.getReplies()) {
+					String replyPrefix = sonePrefix + "/Reply." + replyId++;
+					configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
+					configuration.getStringValue(replyPrefix + "/Sone").setValue(reply.getSone().getId());
+					configuration.getStringValue(replyPrefix + "/Post").setValue(reply.getPost().getId());
+					configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
+					configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
 				}
 			}
 		} catch (ConfigurationException ce1) {
