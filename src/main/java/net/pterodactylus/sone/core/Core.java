@@ -248,8 +248,16 @@ public class Core extends AbstractService {
 			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
 			long modificationCounter = configuration.getLongValue("Sone/Name." + soneName + "/ModificationCounter").getValue((long) 0);
+			String firstName = configuration.getStringValue("Sone/Name." + soneName + "/Profile/FirstName").getValue(null);
+			String middleName = configuration.getStringValue("Sone/Name." + soneName + "/Profile/MiddleName").getValue(null);
+			String lastName = configuration.getStringValue("Sone/Name." + soneName + "/Profile/LastName").getValue(null);
 			try {
+				Profile profile = new Profile();
+				profile.setFirstName(firstName);
+				profile.setMiddleName(middleName);
+				profile.setLastName(lastName);
 				Sone sone = new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri));
+				sone.setProfile(profile);
 				sone.setModificationCounter(modificationCounter);
 				addSone(sone);
 			} catch (MalformedURLException mue1) {
@@ -283,6 +291,10 @@ public class Core extends AbstractService {
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/RequestURI").setValue(sone.getRequestUri().toString());
 				configuration.getStringValue("Sone/Name." + sone.getName() + "/InsertURI").setValue(sone.getInsertUri().toString());
 				configuration.getLongValue("Sone/Name." + sone.getName() + "/ModificationCounter").setValue(sone.getModificationCounter());
+				Profile profile = sone.getProfile();
+				configuration.getStringValue("Sone/Name." + sone.getName() + "/Profile/FirstName").setValue(profile.getFirstName());
+				configuration.getStringValue("Sone/Name." + sone.getName() + "/Profile/MiddleName").setValue(profile.getMiddleName());
+				configuration.getStringValue("Sone/Name." + sone.getName() + "/Profile/LastName").setValue(profile.getLastName());
 			}
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
