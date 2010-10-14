@@ -17,8 +17,10 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -52,6 +54,9 @@ public class Sone {
 
 	/** All friend Sones. */
 	private final Set<Sone> friendSones = new HashSet<Sone>();
+
+	/** All posts. */
+	private final List<Post> posts = new ArrayList<Post>();
 
 	/** Modification count. */
 	private volatile long modificationCounter = 0;
@@ -200,6 +205,39 @@ public class Sone {
 			modificationCounter++;
 		}
 		return this;
+	}
+
+	/**
+	 * Returns the list of posts of this Sone.
+	 *
+	 * @return All posts of this Sone
+	 */
+	public List<Post> getPosts() {
+		return Collections.unmodifiableList(posts);
+	}
+
+	/**
+	 * Adds the given post to this Sone.
+	 *
+	 * @param post
+	 *            The post to add
+	 */
+	public synchronized void addPost(Post post) {
+		if (posts.add(post)) {
+			modificationCounter++;
+		}
+	}
+
+	/**
+	 * Removes the given post from this Sone.
+	 *
+	 * @param post
+	 *            The post to remove
+	 */
+	public synchronized void removePost(Post post) {
+		if (posts.remove(post)) {
+			modificationCounter++;
+		}
 	}
 
 	/**
