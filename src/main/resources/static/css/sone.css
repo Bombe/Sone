@@ -10,3 +10,12 @@
 	color: red;
 	font-weight: bold;
 }
+
+#sone .post .author {
+	display: inline;
+	font-weight: bold;
+}
+
+#sone .post .text {
+	display: inline;
+}
