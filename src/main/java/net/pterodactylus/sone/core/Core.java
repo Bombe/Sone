@@ -201,7 +201,7 @@ public class Core extends AbstractService {
 		Sone sone;
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
-			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri), new FreenetURI(finalInsertUri));
+			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri).setKeyType("USK"), new FreenetURI(finalInsertUri).setKeyType("USK"));
 			sone.setProfile(new Profile());
 			/* set modification counter to 1 so it is inserted immediately. */
 			sone.setModificationCounter(1);
