@@ -236,7 +236,7 @@ public class Sone {
 	 *            The post to remove
 	 */
 	public synchronized void removePost(Post post) {
-		if (posts.remove(post)) {
+		if (post.getSone().equals(this) && posts.remove(post)) {
 			modificationCounter++;
 		}
 	}
