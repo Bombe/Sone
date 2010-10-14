@@ -352,6 +352,9 @@ public class Core extends AbstractService {
 					configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
 					configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
 				}
+				/* write null ID as terminator. */
+				configuration.getStringValue(sonePrefix + "/Post." + postId + "/ID").setValue(null);
+
 				int replyId = 0;
 				for (Reply reply : sone.getReplies()) {
 					String replyPrefix = sonePrefix + "/Reply." + replyId++;
@@ -363,6 +366,9 @@ public class Core extends AbstractService {
 					configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
 					configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
 				}
+				/* write null ID as terminator. */
+				configuration.getStringValue(sonePrefix + "/Reply." + replyId + "/ID").setValue(null);
+
 			}
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
