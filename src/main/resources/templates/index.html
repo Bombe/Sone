@@ -16,7 +16,7 @@
 
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 
-	<div>
+	<div id="posts">
 		<%foreach posts post>
 			<div class="post">
 				<div class="author"><a href="viewSone.html?sone=<% post.sone.id>"><% post.sone.name|html></a></div>
