@@ -17,7 +17,9 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.util.template.Template;
+import freenet.clients.http.ToadletContext;
 
 /**
  * This page lets the user edit her profile.
@@ -48,6 +50,14 @@ public class EditProfilePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
+		ToadletContext toadletContenxt = request.getToadletContext();
+		Profile profile = getCurrentSone(toadletContenxt).getProfile();
+		String firstName = profile.getFirstName();
+		String middleName = profile.getMiddleName();
+		String lastName = profile.getLastName();
+		template.set("firstName", firstName);
+		template.set("middleName", middleName);
+		template.set("lastName", lastName);
 	}
 
 	//
