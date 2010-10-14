@@ -49,17 +49,7 @@ public class SoneAccessor extends ReflectionAccessor {
 	public Object get(DataProvider dataProvider, Object object, String member) {
 		Sone sone = (Sone) object;
 		if (member.equals("niceName")) {
-			Profile profile = sone.getProfile();
-			String firstName = profile.getFirstName();
-			String middleName = profile.getMiddleName();
-			String lastName = profile.getLastName();
-			if (firstName == null) {
-				if (lastName == null) {
-					return sone.getName();
-				}
-				return lastName;
-			}
-			return firstName + ((middleName != null) ? " " + middleName : "") + ((lastName != null) ? " " + lastName : "");
+			return getNiceName(sone);
 		} else if (member.equals("isFriend")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return currentSone.hasFriendSone(sone) ? true : null;
@@ -68,6 +58,31 @@ public class SoneAccessor extends ReflectionAccessor {
 			return currentSone.equals(sone);
 		}
 		return super.get(dataProvider, object, member);
+	}
+
+	//
+	// STATIC METHODS
+	//
+
+	/**
+	 * Returns the nice name of the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to get the nice name for
+	 * @return The nice name of the Sone
+	 */
+	public static String getNiceName(Sone sone) {
+		Profile profile = sone.getProfile();
+		String firstName = profile.getFirstName();
+		String middleName = profile.getMiddleName();
+		String lastName = profile.getLastName();
+		if (firstName == null) {
+			if (lastName == null) {
+				return sone.getName();
+			}
+			return lastName;
+		}
+		return firstName + ((middleName != null) ? " " + middleName : "") + ((lastName != null) ? " " + lastName : "");
 	}
 
 }
