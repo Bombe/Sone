@@ -19,7 +19,7 @@
 	<div>
 		<%foreach posts post>
 			<div class="post">
-				<div class="author"><a href="viewProfile?sone=<% post.sone.id>"><% post.sone.name|html></a></div>
+				<div class="author"><a href="viewSone?sone=<% post.sone.id>"><% post.sone.name|html></a></div>
 				<div class="text"><% post.text|html></div>
 				<div class="time"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></div>
 			</div>
