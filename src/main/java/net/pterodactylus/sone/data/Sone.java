@@ -47,6 +47,9 @@ public class Sone {
 	/* This will be null for remote Sones! */
 	private final FreenetURI insertUri;
 
+	/** The profile of this Sone. */
+	private Profile profile;
+
 	/** All friend Sones. */
 	private final Set<Sone> friendSones = new HashSet<Sone>();
 
@@ -124,6 +127,28 @@ public class Sone {
 	 */
 	public FreenetURI getInsertUri() {
 		return insertUri;
+	}
+
+	/**
+	 * Returns a copy of the profile. If you want to update values in the
+	 * profile of this Sone, update the values in the returned {@link Profile}
+	 * and use {@link #setProfile(Profile)} to change the profile in this Sone.
+	 *
+	 * @return A copy of the profile
+	 */
+	public Profile getProfile() {
+		return new Profile(profile);
+	}
+
+	/**
+	 * Sets the profile of this Sone.
+	 *
+	 * @param profile
+	 *            The profile to set
+	 */
+	public synchronized void setProfile(Profile profile) {
+		this.profile = profile;
+		modificationCounter++;
 	}
 
 	/**
