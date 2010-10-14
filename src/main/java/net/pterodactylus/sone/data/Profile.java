@@ -18,7 +18,7 @@
 package net.pterodactylus.sone.data;
 
 /**
- * A profile stores personal information about a {@link User}. All information
+ * A profile stores personal information about a {@link Sone}. All information
  * is optional and can be {@code null}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>

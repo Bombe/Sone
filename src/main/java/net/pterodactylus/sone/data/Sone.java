@@ -27,8 +27,8 @@ import java.util.UUID;
 import freenet.keys.FreenetURI;
 
 /**
- * A Sone defines everything about a user: the {@link User} itself, her profile,
- * her status updates.
+ * A Sone defines everything about a user: her profile, her status updates, her
+ * replies, her likes and dislikes, etc.
  * <p>
  * Operations that modify the Sone need to synchronize on the Sone in question.
  *
