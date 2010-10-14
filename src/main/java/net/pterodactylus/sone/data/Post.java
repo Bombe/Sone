@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.data;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -136,7 +135,7 @@ public class Post {
 	 *
 	 * @return All replies to this post
 	 */
-	public Collection<Reply> getReplies() {
+	public Set<Reply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
 
