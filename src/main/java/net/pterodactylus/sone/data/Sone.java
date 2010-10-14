@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -211,12 +212,21 @@ public class Sone {
 	}
 
 	/**
-	 * Returns the list of posts of this Sone.
+	 * Returns the list of posts of this Sone, sorted by time, newest first.
 	 *
 	 * @return All posts of this Sone
 	 */
 	public List<Post> getPosts() {
-		return Collections.unmodifiableList(posts);
+		List<Post> sortedPosts = new ArrayList<Post>(posts);
+		Collections.sort(sortedPosts, new Comparator<Post>() {
+
+			@Override
+			public int compare(Post leftPost, Post rightPost) {
+				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
+			}
+
+		});
+		return sortedPosts;
 	}
 
 	/**
