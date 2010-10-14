@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -38,6 +42,9 @@ public class Post {
 
 	/** The text of the post. */
 	private final String text;
+
+	/** The replies that have been loaded for this post. */
+	private final Set<Reply> replies = new HashSet<Reply>();
 
 	/**
 	 * Creates a new post.
@@ -122,6 +129,40 @@ public class Post {
 	 */
 	public String getText() {
 		return text;
+	}
+
+	/**
+	 * Returns all replies to this post in unspecified order.
+	 *
+	 * @return All replies to this post
+	 */
+	public Collection<Reply> getReplies() {
+		return Collections.unmodifiableSet(replies);
+	}
+
+	/**
+	 * Adds a reply to this post. The reply will not be added if its
+	 * {@link Reply#getPost() post} is not equal to this post.
+	 *
+	 * @param reply
+	 *            The reply to add
+	 */
+	public void addReply(Reply reply) {
+		if (reply.getPost().equals(this)) {
+			replies.add(reply);
+		}
+	}
+
+	/**
+	 * Removes a reply from this post.
+	 *
+	 * @param reply
+	 *            The reply to remove
+	 */
+	public void removeReply(Reply reply) {
+		if (reply.getPost().equals(this)) {
+			replies.remove(reply);
+		}
 	}
 
 	//
