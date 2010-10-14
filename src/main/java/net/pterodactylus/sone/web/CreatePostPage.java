@@ -51,8 +51,7 @@ public class CreatePostPage extends SoneTemplatePage {
 		super.processTemplate(request, template);
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		if (text.length() != 0) {
-			Post post = new Post(System.currentTimeMillis(), text);
-			getCurrentSone(request.getToadletContext()).addPost(post);
+			getCurrentSone(request.getToadletContext()).addPost(text);
 			throw new RedirectException("index.html");
 		}
 		template.set("errorTextEmpty", true);

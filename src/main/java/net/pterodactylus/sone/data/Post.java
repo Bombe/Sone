@@ -25,6 +25,9 @@ package net.pterodactylus.sone.data;
  */
 public class Post {
 
+	/** The Sone this post belongs to. */
+	private final Sone sone;
+
 	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
 	private final long time;
 
@@ -34,14 +37,26 @@ public class Post {
 	/**
 	 * Creates a new post.
 	 *
+	 * @param sone
+	 *            The Sone this post belongs to
 	 * @param time
 	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
 	 * @param text
 	 *            The text of the post
 	 */
-	public Post(long time, String text) {
+	public Post(Sone sone, long time, String text) {
+		this.sone = sone;
 		this.time = time;
 		this.text = text;
+	}
+
+	/**
+	 * Returns the Sone this post belongs to.
+	 *
+	 * @return The Sone of this post
+	 */
+	public Sone getSone() {
+		return sone;
 	}
 
 	/**

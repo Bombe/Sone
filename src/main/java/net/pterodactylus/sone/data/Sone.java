@@ -217,12 +217,13 @@ public class Sone {
 	}
 
 	/**
-	 * Adds the given post to this Sone.
+	 * Adds a post with the given text to this Sone.
 	 *
-	 * @param post
-	 *            The post to add
+	 * @param text
+	 *            The text to post
 	 */
-	public synchronized void addPost(Post post) {
+	public synchronized void addPost(String text) {
+		Post post = new Post(this, System.currentTimeMillis(), text);
 		if (posts.add(post)) {
 			modificationCounter++;
 		}
