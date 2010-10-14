@@ -209,7 +209,6 @@ public class Core extends AbstractService {
 		} catch (MalformedURLException mue1) {
 			throw new SoneException(Type.INVALID_URI);
 		}
-		localSones.add(sone);
 		return sone;
 	}
 
