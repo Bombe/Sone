@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,7 +32,27 @@ import java.util.Map;
 public class ShellCache<T> {
 
 	/** The object cache. */
-	private final Map<String, T> cache = new HashMap<String, T>();
+	private final Map<String, T> objectCache = new HashMap<String, T>();
+
+	/** The shell cache. */
+	private final Map<String, Shell<T>> shellCache = new HashMap<String, Shell<T>>();
+
+	/** The shell creator. */
+	private final ShellCreator<T> shellCreator;
+
+	/**
+	 * Creates a new shell cache.
+	 *
+	 * @param shellCreator
+	 *            The creator for new shells
+	 */
+	public ShellCache(ShellCreator<T> shellCreator) {
+		this.shellCreator = shellCreator;
+	}
+
+	//
+	// ACCESSORS
+	//
 
 	/**
 	 * Stores the given object in this cache. If the given object is not a
@@ -43,9 +64,13 @@ public class ShellCache<T> {
 	 * @param object
 	 *            The object to store
 	 */
+	@SuppressWarnings("unchecked")
 	public void put(String id, T object) {
-		if (!(object instanceof Shell<?>) || !cache.containsKey(id)) {
-			cache.put(id, object);
+		if (!(object instanceof Shell<?>)) {
+			objectCache.put(id, object);
+			shellCache.remove(id);
+		} else {
+			shellCache.put(id, (Shell<T>) object);
 		}
 	}
 
@@ -58,7 +83,21 @@ public class ShellCache<T> {
 	 *         with the given ID
 	 */
 	public T get(String id) {
-		return cache.get(id);
+		if (!objectCache.containsKey(id)) {
+			Shell<T> shell = shellCreator.createShell();
+			shellCache.put(id, shell);
+			return shell.getShelled();
+		}
+		return objectCache.get(id);
+	}
+
+	/**
+	 * Returns all cached shells.
+	 *
+	 * @return All cached shells
+	 */
+	public Collection<Shell<T>> getShells() {
+		return shellCache.values();
 	}
 
 }
