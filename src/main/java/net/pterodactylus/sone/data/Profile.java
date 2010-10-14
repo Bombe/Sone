@@ -42,7 +42,7 @@ public class Profile {
 	 *
 	 * @return The name of the user this profile belongs to
 	 */
-	public String username() {
+	public String getUsername() {
 		return username;
 	}
 
