@@ -187,6 +187,9 @@ public class SoneInserter extends AbstractService {
 			/* first, create an index.html. */
 			manifestEntries.put("index.html", createManifestElement("index.html", "text/html; charset=utf-8", "/templates/insert/index.html"));
 
+			/* now, store the sone. */
+			manifestEntries.put("sone.xml", createManifestElement("sone.xml", "text/xml; charset=utf-8", "/templates/insert/sone.xml"));
+
 			return manifestEntries;
 		}
 

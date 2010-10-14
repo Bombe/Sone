@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<sone>
+
+	<name><% currentSone.name|html></name>
+
+</sone>
