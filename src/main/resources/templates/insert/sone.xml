@@ -39,7 +39,7 @@
 		<friend>
 			<sone-id><% friend.id|html></sone-id>
 			<sone-key><% friend.requestUri|html></sone-key>
-			<sone-name><% friend.niceName|html></sone-name>
+			<sone-name><% friend.name|html></sone-name>
 		</friend>
 		<%/foreach>
 	</friends>
