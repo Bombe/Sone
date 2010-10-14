@@ -29,8 +29,10 @@ public interface ShellCreator<T> {
 	/**
 	 * Creates a new shell.
 	 *
+	 * @param id
+	 *            The ID of the shell object
 	 * @return The new shell
 	 */
-	public Shell<T> createShell();
+	public Shell<T> createShell(String id);
 
 }

@@ -34,8 +34,8 @@ public class PostShell extends Post implements Shell<Post> {
 	public static final ShellCreator<Post> creator = new ShellCreator<Post>() {
 
 		@Override
-		public Shell<Post> createShell() {
-			return new PostShell();
+		public Shell<Post> createShell(String id) {
+			return new PostShell().setId(UUID.fromString(id));
 		}
 	};
 

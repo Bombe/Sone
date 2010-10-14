@@ -37,8 +37,8 @@ public class SoneShell extends Sone implements Shell<Sone> {
 	public static final ShellCreator<Sone> creator = new ShellCreator<Sone>() {
 
 		@Override
-		public Shell<Sone> createShell() {
-			return new SoneShell();
+		public Shell<Sone> createShell(String id) {
+			return new SoneShell().setId(UUID.fromString(id));
 		}
 	};
 

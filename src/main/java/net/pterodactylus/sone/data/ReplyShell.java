@@ -31,8 +31,8 @@ public class ReplyShell extends Reply implements Shell<Reply> {
 	public static final ShellCreator<Reply> creator = new ShellCreator<Reply>() {
 
 		@Override
-		public Shell<Reply> createShell() {
-			return new ReplyShell();
+		public Shell<Reply> createShell(String id) {
+			return new ReplyShell().setId(UUID.fromString(id));
 		}
 	};
 
