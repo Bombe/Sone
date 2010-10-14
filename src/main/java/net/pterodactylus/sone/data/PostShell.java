@@ -204,7 +204,7 @@ public class PostShell extends Post implements Shell<Post> {
 				post.addReply(reply);
 			}
 		}
-		return null;
+		return this;
 	}
 
 }

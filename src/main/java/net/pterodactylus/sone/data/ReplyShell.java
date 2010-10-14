@@ -183,7 +183,7 @@ public class ReplyShell extends Reply implements Shell<Reply> {
 		if (canUnshell()) {
 			return new Reply(sone, id, post, time, text);
 		}
-		return null;
+		return this;
 	}
 
 }

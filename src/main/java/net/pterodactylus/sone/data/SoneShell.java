@@ -297,7 +297,7 @@ public class SoneShell extends Sone implements Shell<Sone> {
 			}
 			return sone;
 		}
-		return null;
+		return this;
 	}
 
 }

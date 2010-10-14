@@ -36,11 +36,11 @@ public interface Shell<T> {
 	public boolean canUnshell();
 
 	/**
-	 * Returns the object that is shelled. Returns {@code null} if the real
-	 * object has not yet been retrieved.
+	 * Returns the object that is shelled. This method with return the shell
+	 * itself if {@link #canUnshell()} returns {@code false} and will return the
+	 * real object once {@link #canUnshell()} returns true.
 	 *
-	 * @return The shelled object, or {@code null} if the shelled object is not
-	 *         retrieved yet
+	 * @return The shelled object, or the shell itself
 	 */
 	public T getShelled();
 
