@@ -10,7 +10,7 @@
 	</profile>
 
 	<posts>
-		<%foreach posts post>
+		<%foreach currentSone.posts post>
 			<post>
 				<time><% post.time></time>
 				<text><% post.text|html></text>
