@@ -59,6 +59,9 @@ public class Core extends AbstractService {
 	/** Interface to freenet. */
 	private FreenetInterface freenetInterface;
 
+	/** The Sone downloader. */
+	private SoneDownloader soneDownloader;
+
 	/** The local Sones. */
 	private final Set<Sone> localSones = new HashSet<Sone>();
 
@@ -108,6 +111,7 @@ public class Core extends AbstractService {
 	 */
 	public Core freenetInterface(FreenetInterface freenetInterface) {
 		this.freenetInterface = freenetInterface;
+		soneDownloader = new SoneDownloader(freenetInterface);
 		return this;
 	}
 
@@ -150,6 +154,7 @@ public class Core extends AbstractService {
 			soneCache.put(sone.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(freenetInterface, sone);
 			soneInserter.start();
+			soneDownloader.addSone(sone);
 			soneInserters.put(sone, soneInserter);
 		}
 	}
@@ -241,6 +246,7 @@ public class Core extends AbstractService {
 	 */
 	@Override
 	protected void serviceStop() {
+		soneDownloader.stop();
 		/* stop all Sone inserters. */
 		for (SoneInserter soneInserter : soneInserters.values()) {
 			soneInserter.stop();
