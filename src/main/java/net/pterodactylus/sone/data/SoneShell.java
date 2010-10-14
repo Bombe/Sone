@@ -23,7 +23,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
 
 /**
@@ -33,12 +36,15 @@ import freenet.keys.FreenetURI;
  */
 public class SoneShell extends Sone implements Shell<Sone> {
 
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SoneShell.class);
+
 	/** The shell creator. */
 	public static final ShellCreator<Sone> creator = new ShellCreator<Sone>() {
 
 		@Override
 		public Shell<Sone> createShell(String id) {
-			return new SoneShell().setId(UUID.fromString(id));
+			return new SoneShell().setId(id);
 		}
 	};
 
@@ -91,8 +97,13 @@ public class SoneShell extends Sone implements Shell<Sone> {
 	 *            The ID of the Sone
 	 * @return This Sone shell (for method chaining)
 	 */
-	public SoneShell setId(UUID id) {
-		this.id = id;
+	public SoneShell setId(String id) {
+		try {
+			this.id = UUID.fromString(id);
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Invalid ID: “" + id + "”.", iae1);
+			this.id = UUID.randomUUID();
+		}
 		return this;
 	}
 

@@ -21,6 +21,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.pterodactylus.util.logging.Logging;
 
 /**
  * {@link Shell} around a {@link Post} that has not yet been retrieved from
@@ -30,12 +34,15 @@ import java.util.UUID;
  */
 public class PostShell extends Post implements Shell<Post> {
 
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(PostShell.class);
+
 	/** The shell creator. */
 	public static final ShellCreator<Post> creator = new ShellCreator<Post>() {
 
 		@Override
 		public Shell<Post> createShell(String id) {
-			return new PostShell().setId(UUID.fromString(id));
+			return new PostShell().setId(id);
 		}
 	};
 
@@ -82,8 +89,13 @@ public class PostShell extends Post implements Shell<Post> {
 	 *            The ID of the post
 	 * @return This post shell (for method chaining)
 	 */
-	public PostShell setId(UUID id) {
-		this.id = id;
+	public PostShell setId(String id) {
+		try {
+			this.id = UUID.fromString(id);
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Invalid ID: “" + id + "”.", iae1);
+			this.id = UUID.randomUUID();
+		}
 		return this;
 	}
 

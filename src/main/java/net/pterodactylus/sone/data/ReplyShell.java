@@ -18,6 +18,10 @@
 package net.pterodactylus.sone.data;
 
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import net.pterodactylus.util.logging.Logging;
 
 /**
  * A shell around a {@link Reply} for replies that have not yet been retrieved
@@ -27,12 +31,15 @@ import java.util.UUID;
  */
 public class ReplyShell extends Reply implements Shell<Reply> {
 
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(ReplyShell.class);
+
 	/** The shell creator. */
 	public static final ShellCreator<Reply> creator = new ShellCreator<Reply>() {
 
 		@Override
 		public Shell<Reply> createShell(String id) {
-			return new ReplyShell().setId(UUID.fromString(id));
+			return new ReplyShell().setId(id);
 		}
 	};
 
@@ -101,8 +108,13 @@ public class ReplyShell extends Reply implements Shell<Reply> {
 	 *            The ID of this reply
 	 * @return This reply shell (for method chaining)
 	 */
-	public ReplyShell setId(UUID id) {
-		this.id = id;
+	public ReplyShell setId(String id) {
+		try {
+			this.id = UUID.fromString(id);
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Invalid ID: “" + id + "”.", iae1);
+			this.id = UUID.randomUUID();
+		}
 		return this;
 	}
 
