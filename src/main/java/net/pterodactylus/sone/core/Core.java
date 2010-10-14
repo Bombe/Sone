@@ -147,6 +147,7 @@ public class Core extends AbstractService {
 	 */
 	public void addSone(Sone sone) {
 		if (localSones.add(sone)) {
+			soneCache.put(sone.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(freenetInterface, sone);
 			soneInserter.start();
 			soneInserters.put(sone, soneInserter);
