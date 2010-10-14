@@ -58,6 +58,9 @@ public class Sone {
 	/** All posts. */
 	private final List<Post> posts = new ArrayList<Post>();
 
+	/** All replies. */
+	private final Set<Reply> replies = new HashSet<Reply>();
+
 	/** Modification count. */
 	private volatile long modificationCounter = 0;
 
@@ -237,6 +240,40 @@ public class Sone {
 	 */
 	public synchronized void removePost(Post post) {
 		if (post.getSone().equals(this) && posts.remove(post)) {
+			modificationCounter++;
+		}
+	}
+
+	/**
+	 * Returns all replies this Sone made.
+	 *
+	 * @return All replies this Sone made
+	 */
+	public Set<Reply> getReplies() {
+		return Collections.unmodifiableSet(replies);
+	}
+
+	/**
+	 * Adds a reply to this Sone. If the given reply was not made by this Sone,
+	 * nothing is added to this Sone.
+	 *
+	 * @param reply
+	 *            The reply to add
+	 */
+	public synchronized void addReply(Reply reply) {
+		if (reply.getSone().equals(this) && replies.add(reply)) {
+			modificationCounter++;
+		}
+	}
+
+	/**
+	 * Removes a reply from this Sone.
+	 *
+	 * @param reply
+	 *            The reply to remove
+	 */
+	public synchronized void removeReply(Reply reply) {
+		if (reply.getSone().equals(this) && replies.remove(reply)) {
 			modificationCounter++;
 		}
 	}
