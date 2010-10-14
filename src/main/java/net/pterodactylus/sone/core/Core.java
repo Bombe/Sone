@@ -21,7 +21,6 @@ import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -29,14 +28,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.SoneException.Type;
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
-import net.pterodactylus.util.text.StringEscaper;
-import net.pterodactylus.util.text.TextException;
 import freenet.keys.FreenetURI;
 
 /**
@@ -228,24 +226,16 @@ public class Core extends AbstractService {
 	private void loadConfiguration() {
 		logger.entering(Core.class.getName(), "loadConfiguration()");
 
-		/* get names of all local Sones. */
-		String allSoneNamesString = configuration.getStringValue("Sone/Names").getValue(null);
-		if (allSoneNamesString == null) {
-			allSoneNamesString = "";
-		}
-		List<String> allSoneNames;
-		try {
-			allSoneNames = StringEscaper.parseLine(allSoneNamesString);
-		} catch (TextException te1) {
-			logger.log(Level.WARNING, "Could not parse Sone names: “" + allSoneNamesString + "”", te1);
-			allSoneNames = Collections.emptyList();
-		}
-
 		/* parse local Sones. */
-		logger.log(Level.INFO, "Loading %d Sones…", allSoneNames.size());
-		for (String soneName : allSoneNames) {
-			String sonePrefix = "Sone/Name." + soneName;
+		logger.log(Level.INFO, "Loading Sones…");
+		int soneId = 0;
+		do {
+			String sonePrefix = "Sone/Sone." + soneId++;
 			String id = configuration.getStringValue(sonePrefix + "/ID").getValue(null);
+			if (id == null) {
+				break;
+			}
+			String name = configuration.getStringValue(sonePrefix + "/Name").getValue(null);
 			String insertUri = configuration.getStringValue(sonePrefix + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue(sonePrefix + "/RequestURI").getValue(null);
 			long modificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
@@ -257,14 +247,27 @@ public class Core extends AbstractService {
 				profile.setFirstName(firstName);
 				profile.setMiddleName(middleName);
 				profile.setLastName(lastName);
-				Sone sone = new Sone(UUID.fromString(id), soneName, new FreenetURI(requestUri), new FreenetURI(insertUri));
+				Sone sone = new Sone(UUID.fromString(id), name, new FreenetURI(requestUri), new FreenetURI(insertUri));
 				sone.setProfile(profile);
+				int postId = 0;
+				do {
+					String postPrefix = sonePrefix + "/Post." + postId++;
+					id = configuration.getStringValue(postPrefix + "/ID").getValue(null);
+					if (id == null) {
+						break;
+					}
+					long time = configuration.getLongValue(postPrefix + "/Time").getValue(null);
+					String text = configuration.getStringValue(postPrefix + "/Text").getValue(null);
+					Post post = new Post(UUID.fromString(id), sone, time, text);
+					sone.addPost(post);
+				} while (true);
 				sone.setModificationCounter(modificationCounter);
 				addSone(sone);
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + requestUri + "”) and insertUri (“" + insertUri + "”)!", mue1);
 			}
-		}
+		} while (true);
+		logger.log(Level.INFO, "Loaded %d Sones.", getSones().size());
 
 		logger.exiting(Core.class.getName(), "loadConfiguration()");
 	}
@@ -273,23 +276,15 @@ public class Core extends AbstractService {
 	 * Saves the configuraiton.
 	 */
 	private void saveConfiguration() {
-
-		/* get the names of all Sones. */
-		Set<String> soneNames = new HashSet<String>();
-		for (Sone sone : localSones) {
-			soneNames.add(sone.getName());
-		}
-		String soneNamesString = StringEscaper.escapeWords(soneNames);
-
-		logger.log(Level.INFO, "Storing %d Sones…", soneNames.size());
+		Set<Sone> sones = getSones();
+		logger.log(Level.INFO, "Storing %d Sones…", sones.size());
 		try {
-			/* store names of all Sones. */
-			configuration.getStringValue("Sone/Names").setValue(soneNamesString);
-
 			/* store all Sones. */
+			int soneId = 0;
 			for (Sone sone : localSones) {
-				String sonePrefix = "Sone/Name." + sone.getName();
+				String sonePrefix = "Sone/Sone." + soneId++;
 				configuration.getStringValue(sonePrefix + "/ID").setValue(sone.getId());
+				configuration.getStringValue(sonePrefix + "/Name").setValue(sone.getName());
 				configuration.getStringValue(sonePrefix + "/RequestURI").setValue(sone.getRequestUri().toString());
 				configuration.getStringValue(sonePrefix + "/InsertURI").setValue(sone.getInsertUri().toString());
 				configuration.getLongValue(sonePrefix + "/ModificationCounter").setValue(sone.getModificationCounter());
@@ -297,6 +292,13 @@ public class Core extends AbstractService {
 				configuration.getStringValue(sonePrefix + "/Profile/FirstName").setValue(profile.getFirstName());
 				configuration.getStringValue(sonePrefix + "/Profile/MiddleName").setValue(profile.getMiddleName());
 				configuration.getStringValue(sonePrefix + "/Profile/LastName").setValue(profile.getLastName());
+				int postId = 0;
+				for (Post post : sone.getPosts()) {
+					String postPrefix = sonePrefix + "/Post." + postId++;
+					configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
+					configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
+					configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
+				}
 			}
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
