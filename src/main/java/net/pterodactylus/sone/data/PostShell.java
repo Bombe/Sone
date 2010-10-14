@@ -30,6 +30,15 @@ import java.util.UUID;
  */
 public class PostShell extends Post implements Shell<Post> {
 
+	/** The shell creator. */
+	public static final ShellCreator<Post> creator = new ShellCreator<Post>() {
+
+		@Override
+		public Shell<Post> createShell() {
+			return new PostShell();
+		}
+	};
+
 	/** The GUID of the post. */
 	private UUID id;
 

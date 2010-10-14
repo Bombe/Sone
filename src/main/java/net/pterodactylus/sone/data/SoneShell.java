@@ -33,6 +33,15 @@ import freenet.keys.FreenetURI;
  */
 public class SoneShell extends Sone implements Shell<Sone> {
 
+	/** The shell creator. */
+	public static final ShellCreator<Sone> creator = new ShellCreator<Sone>() {
+
+		@Override
+		public Shell<Sone> createShell() {
+			return new SoneShell();
+		}
+	};
+
 	/** A GUID for this Sone. */
 	private UUID id;
 

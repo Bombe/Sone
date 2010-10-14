@@ -27,6 +27,15 @@ import java.util.UUID;
  */
 public class ReplyShell extends Reply implements Shell<Reply> {
 
+	/** The shell creator. */
+	public static final ShellCreator<Reply> creator = new ShellCreator<Reply>() {
+
+		@Override
+		public Shell<Reply> createShell() {
+			return new ReplyShell();
+		}
+	};
+
 	/** The Sone that posted this reply. */
 	private Sone sone;
 
