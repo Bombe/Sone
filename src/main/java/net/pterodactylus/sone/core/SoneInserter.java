@@ -111,7 +111,10 @@ public class SoneInserter extends AbstractService {
 				if (success) {
 					synchronized (sone) {
 						if (sone.getModificationCounter() == modificationCounter) {
+							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
 							sone.setModificationCounter(0);
+						} else {
+							logger.log(Level.FINE, "Sone “%s” was modified since the insert started, starting another insert…", new Object[] { sone });
 						}
 					}
 				}
