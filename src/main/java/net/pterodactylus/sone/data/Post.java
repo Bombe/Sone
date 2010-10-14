@@ -84,6 +84,10 @@ public class Post {
 		this.text = text;
 	}
 
+	//
+	// ACCESSORS
+	//
+
 	/**
 	 * Returns the ID of the post.
 	 *
