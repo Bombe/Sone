@@ -181,7 +181,7 @@ public class ReplyShell extends Reply implements Shell<Reply> {
 	 */
 	@Override
 	public boolean canUnshell() {
-		return (sone != null) && (id != null) && (post != null) && (time != null) && (text != null);
+		return (sone != null) && (!(sone instanceof Shell<?>)) && (id != null) && (post != null) && (!(post instanceof Shell<?>)) && (time != null) && (text != null);
 	}
 
 	/**
