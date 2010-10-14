@@ -17,8 +17,11 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -135,8 +138,17 @@ public class Post {
 	 *
 	 * @return All replies to this post
 	 */
-	public Set<Reply> getReplies() {
-		return Collections.unmodifiableSet(replies);
+	public List<Reply> getReplies() {
+		List<Reply> sortedReplies = new ArrayList<Reply>(replies);
+		Collections.sort(sortedReplies, new Comparator<Reply>() {
+
+			@Override
+			public int compare(Reply leftReply, Reply rightReply) {
+				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, leftReply.getTime() - rightReply.getTime()));
+			}
+
+		});
+		return sortedReplies;
 	}
 
 	/**
