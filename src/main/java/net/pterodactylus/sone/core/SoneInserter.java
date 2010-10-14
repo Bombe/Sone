@@ -86,7 +86,13 @@ public class SoneInserter extends AbstractService {
 	@Override
 	protected void serviceRun() {
 		long modificationCounter = 0;
+		boolean restartNow = true;
 		while (!shouldStop()) {
+			if (!restartNow) {
+				logger.log(Level.FINEST, "Waiting 60 seconds before checking Sone “" + sone.getName() + "”.");
+				sleep(60 * 1000);
+			}
+			restartNow = false;
 			InsertInformation insertInformation = null;
 			synchronized (sone) {
 				modificationCounter = sone.getModificationCounter();
@@ -117,12 +123,11 @@ public class SoneInserter extends AbstractService {
 							sone.setModificationCounter(0);
 						} else {
 							logger.log(Level.FINE, "Sone “%s” was modified since the insert started, starting another insert…", new Object[] { sone });
+							restartNow = true;
 						}
 					}
 				}
 			}
-			logger.log(Level.FINEST, "Waiting 60 seconds before checking Sone “" + sone.getName() + "” again.");
-			sleep(60 * 1000);
 		}
 	}
 
