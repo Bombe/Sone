@@ -3,4 +3,10 @@
 
 	<name><% currentSone.name|html></name>
 
+	<profile>
+		<first-name><% currentSone.profile.firstName|html></first-name>
+		<middle-name><% currentSone.profile.middleName|html></middle-name>
+		<last-name><% currentSone.profile.lastName|html></last-name>
+	</profile>
+
 </sone>
