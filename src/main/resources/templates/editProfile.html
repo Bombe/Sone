@@ -5,24 +5,28 @@
 	<div><%= Page.EditProfile.Page.Description|l10n|html></div>
 	<div><%= Page.EditProfile.Page.Hint.Optionality|l10n|html></div>
 
+	<%if changed>
+		<div><%= Page.EditProfile.Page.Status.Changed|l10n|html></div>
+	<%/if>
+
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		
+
 		<div>
 			<label for="first-name"><%= Page.EditProfile.Label.FirstName|l10n|html></label>
 			<input type="text" name="first-name" value="<% firstName|html>" />
 		</div>
-		
+
 		<div>
 			<label for="middle-name"><%= Page.EditProfile.Label.MiddleName|l10n|html></label>
 			<input type="text" name="middle-name" value="<% middleName|html>" />
 		</div>
-		
+
 		<div>
 			<label for="last-name"><%= Page.EditProfile.Label.LastName|l10n|html></label>
 			<input type="text" name="last-name" value="<% lastName|html>" />
 		</div>
-		
+
 	</form>
 
 </div>
