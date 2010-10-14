@@ -173,7 +173,7 @@ public class Post {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return id.hashCode() ^ sone.hashCode() ^ (int) (time >>> 32) ^ (int) (time & 0xffffffff) ^ text.hashCode();
 	}
 
 	/**
@@ -184,7 +184,8 @@ public class Post {
 		if (!(object instanceof Post)) {
 			return false;
 		}
-		return ((Post) object).id.equals(id);
+		Post post = (Post) object;
+		return post.id.equals(id) && post.sone.equals(sone) && (post.time == time) && post.text.equals(text);
 	}
 
 }
