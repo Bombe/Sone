@@ -24,7 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
 
 /**
@@ -36,6 +39,9 @@ import freenet.keys.FreenetURI;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Sone {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(Sone.class);
 
 	/** A GUID for this Sone. */
 	private final UUID id;
@@ -238,6 +244,7 @@ public class Sone {
 	 */
 	public synchronized void addPost(Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
+			logger.log(Level.FINEST, "Adding %s to “%s”.", new Object[] { post, getName() });
 			modificationCounter++;
 		}
 	}
