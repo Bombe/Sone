@@ -141,13 +141,15 @@ public class Sone {
 	}
 
 	/**
-	 * Sets the profile of this Sone.
+	 * Sets the profile of this Sone. A copy of the given profile is stored so
+	 * that subsequent modifications of the given profile are not reflected in
+	 * this Sone!
 	 *
 	 * @param profile
 	 *            The profile to set
 	 */
 	public synchronized void setProfile(Profile profile) {
-		this.profile = profile;
+		this.profile = new Profile(profile);
 		modificationCounter++;
 	}
 
