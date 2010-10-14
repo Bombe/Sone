@@ -38,6 +38,16 @@ public class Profile {
 	}
 
 	/**
+	 * Creates a copy of a profile.
+	 *
+	 * @param profile
+	 *            The profile to copy
+	 */
+	public Profile(Profile profile) {
+		this.username = profile.username;
+	}
+
+	/**
 	 * Returns the name of the user this profile belongs to.
 	 *
 	 * @return The name of the user this profile belongs to
