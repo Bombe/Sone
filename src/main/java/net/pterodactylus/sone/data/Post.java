@@ -62,4 +62,28 @@ public class Post {
 		return text;
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return text.hashCode() ^ (int) (time >> 32) ^ (int) (time & 0xffffffff);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Post)) {
+			return false;
+		}
+		Post post = (Post) object;
+		return (post.time == time) && (post.text.equals(text));
+	}
+
 }
