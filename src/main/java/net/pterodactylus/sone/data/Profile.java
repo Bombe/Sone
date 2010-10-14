@@ -25,6 +25,9 @@ package net.pterodactylus.sone.data;
  */
 public class Profile {
 
+	/** Whether the profile was modified. */
+	private boolean modified;
+
 	/** The first name. */
 	private String firstName;
 
@@ -58,6 +61,18 @@ public class Profile {
 	//
 
 	/**
+	 * Returns whether this profile was modified after creation. To clear the
+	 * “is modified” flag you need to create a new profile from this one using
+	 * the {@link #Profile(Profile)} constructor.
+	 *
+	 * @return {@code true} if this profile was modified after creation,
+	 *         {@code false} otherwise
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
+	/**
 	 * Returns the first name.
 	 *
 	 * @return The first name
@@ -73,6 +88,7 @@ public class Profile {
 	 *            The first name to set
 	 */
 	public void setFirstName(String firstName) {
+		modified |= ((firstName != null) && (!firstName.equals(this.firstName))) || (this.firstName != null);
 		this.firstName = firstName;
 	}
 
@@ -92,6 +108,7 @@ public class Profile {
 	 *            The middle name to set
 	 */
 	public void setMiddleName(String middleName) {
+		modified |= ((middleName != null) && (!middleName.equals(this.middleName))) || (this.middleName != null);
 		this.middleName = middleName;
 	}
 
@@ -111,6 +128,7 @@ public class Profile {
 	 *            The last name to set
 	 */
 	public void setLastName(String lastName) {
+		modified |= ((lastName != null) && (!lastName.equals(this.lastName))) || (this.lastName != null);
 		this.lastName = lastName;
 	}
 
