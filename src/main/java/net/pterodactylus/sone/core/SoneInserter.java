@@ -26,11 +26,13 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
+import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateException;
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
 
@@ -213,12 +215,32 @@ public class SoneInserter extends AbstractService {
 		 */
 		@SuppressWarnings("synthetic-access")
 		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
-			Template template = templateFactory.createTemplate(new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset));
+			InputStreamReader templateInputStreamReader;
+			Template template = templateFactory.createTemplate(templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset));
+			try {
+				template.parse();
+			} catch (TemplateException te1) {
+				logger.log(Level.SEVERE, "Could not parse template “" + templateName + "”!", te1);
+				return null;
+			} finally {
+				Closer.close(templateInputStreamReader);
+			}
 			template.set("currentSone", sone);
 			StringWriter writer = new StringWriter();
-			template.render(writer);
-			StringBucket bucket = new StringBucket(writer.toString(), utf8Charset);
-			return new ManifestElement(name, bucket, contentType, bucket.size());
+			StringBucket bucket = null;
+			try {
+				template.render(writer);
+				bucket = new StringBucket(writer.toString(), utf8Charset);
+				return new ManifestElement(name, bucket, contentType, bucket.size());
+			} catch (TemplateException te1) {
+				logger.log(Level.SEVERE, "Could not render template “" + templateName + "”!", te1);
+				return null;
+			} finally {
+				Closer.close(writer);
+				if (bucket != null) {
+					bucket.free();
+				}
+			}
 		}
 
 	}
