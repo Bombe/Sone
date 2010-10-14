@@ -368,8 +368,10 @@ public class Core extends AbstractService {
 				}
 				/* write null ID as terminator. */
 				configuration.getStringValue(sonePrefix + "/Reply." + replyId + "/ID").setValue(null);
-
 			}
+			/* write null ID as terminator. */
+			configuration.getStringValue("Sone/Sone." + soneId + "/ID").setValue(null);
+
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
 		}
