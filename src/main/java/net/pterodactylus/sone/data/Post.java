@@ -49,7 +49,7 @@ public class Post {
 	 *
 	 * @return The time of the post (in milliseconds since Jan 1, 1970 UTC)
 	 */
-	public long time() {
+	public long getTime() {
 		return time;
 	}
 
@@ -58,7 +58,7 @@ public class Post {
 	 *
 	 * @return The text of the post
 	 */
-	public String text() {
+	public String getText() {
 		return text;
 	}
 
