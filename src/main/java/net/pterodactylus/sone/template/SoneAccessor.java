@@ -29,6 +29,13 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  * <dt>niceName</dt>
  * <dd>Will show a combination of first name, middle name, and last name, if
  * available, otherwise the username of the Sone is returned.</dd>
+ * <dt>isFriend</dt>
+ * <dd>Will return {@code true} if the sone in question is a friend of the
+ * currently logged in Sone (as determined by accessing the “currentSone”
+ * variable of the given {@link DataProvider}).</dd>
+ * <dt>isCurrent</dt>
+ * <dd>Will return {@code true} if the sone in question is the currently logged
+ * in Sone.</dd>
  * </dl>
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -53,6 +60,12 @@ public class SoneAccessor extends ReflectionAccessor {
 				return lastName;
 			}
 			return firstName + ((middleName != null) ? " " + middleName : "") + ((lastName != null) ? " " + lastName : "");
+		} else if (member.equals("isFriend")) {
+			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			return currentSone.hasFriendSone(sone) ? true : null;
+		} else if (member.equals("isCurrent")) {
+			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			return currentSone.equals(sone);
 		}
 		return super.get(dataProvider, object, member);
 	}
