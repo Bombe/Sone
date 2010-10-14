@@ -95,7 +95,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
-		return true;
+		return getCurrentSone(toadletContext) == null;
 	}
 
 }
