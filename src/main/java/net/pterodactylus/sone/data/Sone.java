@@ -44,11 +44,11 @@ public class Sone {
 	private final String name;
 
 	/** The URI under which the Sone is stored in Freenet. */
-	private final FreenetURI requestUri;
+	private FreenetURI requestUri;
 
 	/** The URI used to insert a new version of this Sone. */
 	/* This will be null for remote Sones! */
-	private final FreenetURI insertUri;
+	private FreenetURI insertUri;
 
 	/** The profile of this Sone. */
 	private Profile profile;
@@ -305,6 +305,19 @@ public class Sone {
 	 */
 	public synchronized void setModificationCounter(long modificationCounter) {
 		this.modificationCounter = modificationCounter;
+	}
+
+	/**
+	 * Updates the suggested edition in both the request URI and the insert URI.
+	 *
+	 * @param requestUri
+	 *            The request URI that resulted from an insert
+	 */
+	public void updateUris(FreenetURI requestUri) {
+		/* TODO - check for the correct URI. */
+		long latestEdition = requestUri.getSuggestedEdition();
+		this.requestUri = this.requestUri.setSuggestedEdition(latestEdition);
+		this.insertUri = this.insertUri.setSuggestedEdition(latestEdition);
 	}
 
 	//
