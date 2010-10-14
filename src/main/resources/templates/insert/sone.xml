@@ -20,4 +20,16 @@
 		<%/foreach>
 	</posts>
 
+	<replies>
+		<%foreach currentSone.replies reply>
+		<reply>
+			<id><% reply.id></id>
+			<sone-id><% reply.post.sone.requestUri|html></sone-id>
+			<post-id><% reply.post.id></post-id>
+			<time><% reply.time></time>
+			<text><% reply.text></text>
+		</reply>
+		<%/foreach>
+	</replies>
+
 </sone>
