@@ -29,6 +29,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.SoneException.Type;
+import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -170,6 +171,7 @@ public class Core extends AbstractService {
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
 			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri), new FreenetURI(finalInsertUri));
+			sone.setProfile(new Profile());
 			/* set modification counter to 1 so it is inserted immediately. */
 			sone.setModificationCounter(1);
 			addSone(sone);
