@@ -1,0 +1,23 @@
+<div id="sone">
+
+	<h1><%= Page.CreatePost.Page.Title|l10n|html></h1>
+
+	<%if errorTextEmpty>
+		<div><%= Page.CreatePost.Error.EmptyText|l10n|html></div>
+	<%/if>
+
+	<form method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+
+		<div>
+			<label for="text"><%= Page.CreatePost.Label.Text|l10n|html></label>
+			<textarea name="text"><% text|html></textarea>
+		</div>
+
+		<div>
+			<button type="submit"><%= Page.CreatePost.Button.Post|l10n|html></button>
+		</div>
+
+	</form>
+
+</div>
