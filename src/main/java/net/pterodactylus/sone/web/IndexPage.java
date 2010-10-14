@@ -17,6 +17,13 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -39,6 +46,33 @@ public class IndexPage extends SoneTemplatePage {
 
 	//
 	// TEMPLATEPAGE METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void processTemplate(Request request, Template template) throws RedirectException {
+		super.processTemplate(request, template);
+		Sone sone = getCurrentSone(request.getToadletContext());
+		List<Post> allPosts = new ArrayList<Post>();
+		allPosts.addAll(sone.getPosts());
+		for (Sone friendSone : sone.getFriendSones()) {
+			allPosts.addAll(friendSone.getPosts());
+		}
+		Collections.sort(allPosts, new Comparator<Post>() {
+
+			@Override
+			public int compare(Post leftPost, Post rightPost) {
+				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
+			}
+
+		});
+		template.set("posts", allPosts);
+	}
+
+	//
+	// SONETEMPLATEPAGE METHODS
 	//
 
 	/**

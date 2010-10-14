@@ -14,4 +14,18 @@
 		</form>
 	</div>
 
+	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
+
+	<div>
+		<%foreach posts post>
+			<div>
+				<div class="author"><% post.sone.name|html></div>
+				<div class="text"><% post.text|html></div>
+				<div class="time"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+			</div>
+		<%foreachelse>
+			<div><%= Page.Index.PostList.Text.NoPostYet|l10n|html></div>
+		<%/foreach>
+	</div>
+
 </div>
