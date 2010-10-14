@@ -29,9 +29,13 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.SoneException.Type;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostShell;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.ReplyShell;
+import net.pterodactylus.sone.data.ShellCache;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.SoneShell;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -59,6 +63,17 @@ public class Core extends AbstractService {
 
 	/** Sone inserters. */
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
+
+	/* various caches follow here. */
+
+	/** Cache for all known Sones. */
+	private final ShellCache<Sone> soneCache = new ShellCache<Sone>(SoneShell.creator);
+
+	/** Cache for all known posts. */
+	private final ShellCache<Post> postCache = new ShellCache<Post>(PostShell.creator);
+
+	/** Cache for all known replies. */
+	private final ShellCache<Reply> replyCache = new ShellCache<Reply>(ReplyShell.creator);
 
 	/**
 	 * Creates a new core.
@@ -249,6 +264,7 @@ public class Core extends AbstractService {
 				profile.setMiddleName(middleName);
 				profile.setLastName(lastName);
 				Sone sone = new Sone(UUID.fromString(id), name, new FreenetURI(requestUri), new FreenetURI(insertUri));
+				soneCache.put(id, sone);
 				sone.setProfile(profile);
 				int postId = 0;
 				do {
@@ -260,7 +276,22 @@ public class Core extends AbstractService {
 					long time = configuration.getLongValue(postPrefix + "/Time").getValue(null);
 					String text = configuration.getStringValue(postPrefix + "/Text").getValue(null);
 					Post post = new Post(UUID.fromString(id), sone, time, text);
+					postCache.put(id, post);
 					sone.addPost(post);
+				} while (true);
+				int replyCounter = 0;
+				do {
+					String replyPrefix = sonePrefix + "/Reply." + replyCounter++;
+					String replyId = configuration.getStringValue(replyPrefix + "/ID").getValue(null);
+					if (replyId == null) {
+						break;
+					}
+					Sone replySone = soneCache.get(configuration.getStringValue(replyPrefix + "/Sone").getValue(null));
+					Post replyPost = postCache.get(configuration.getStringValue(replyPrefix + "/Post").getValue(null));
+					long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue(null);
+					String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
+					Reply reply = new ReplyShell().setSone(replySone).setPost(replyPost).setTime(replyTime).setText(replyText).getShelled();
+					replyCache.put(replyId, reply);
 				} while (true);
 				sone.setModificationCounter(modificationCounter);
 				addSone(sone);
