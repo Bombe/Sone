@@ -1,5 +1,5 @@
 /*
- * Sone - PostCache.java - Copyright © 2010 David Roden
+ * Sone - ShellCache.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.data;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostShell;
-import net.pterodactylus.sone.data.Shell;
-
 /**
- * {@link Shell}-aware {@link Map} from post IDs to {@link Post}s that exchanges
- * an existing {@link Shell} against the real object once it’s available.
+ * {@link Shell}-aware cache that will replace {@link Shell}s with the real
+ * objects but not the other way around.
  *
+ * @param <T>
+ *            The type of the cached objects
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PostCache {
+public class ShellCache<T> {
 
-	/** The posts. */
-	private final Map<String, Post> posts = new HashMap<String, Post>();
+	/** The object cache. */
+	private final Map<String, T> cache = new HashMap<String, T>();
 
 	/**
-	 * Stores the given post in this cache. If the given post is not a
+	 * Stores the given object in this cache. If the given object is not a
 	 * {@link Shell}, it is stored. If it is a {@link Shell} it is only stored
-	 * if there is no post stored for the ID of the given post. If the given
-	 * {@code post} is a {@link Shell}, it needs to have its
-	 * {@link PostShell#setId(java.util.UUID) ID} set!
+	 * if there is no object stored for the given ID.
 	 *
-	 * @param post
-	 *            The post to store
+	 * @param id
+	 *            The ID of the object
+	 * @param object
+	 *            The object to store
 	 */
-	public void store(Post post) {
-		if (!(post instanceof Shell<?>) || !posts.containsKey(post.getId())) {
-			posts.put(post.getId(), post);
+	public void put(String id, T object) {
+		if (!(object instanceof Shell<?>) || !cache.containsKey(id)) {
+			cache.put(id, object);
 		}
 	}
 
@@ -59,8 +57,8 @@ public class PostCache {
 	 * @return The post with the given ID, or {@code null} if there is no post
 	 *         with the given ID
 	 */
-	public Post get(String id) {
-		return posts.get(id);
+	public T get(String id) {
+		return cache.get(id);
 	}
 
 }
