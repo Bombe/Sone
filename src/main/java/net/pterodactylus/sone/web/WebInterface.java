@@ -29,8 +29,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.page.CSSPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
@@ -140,6 +142,7 @@ public class WebInterface extends AbstractService {
 	private void registerToadlets() {
 		DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateFactory.addAccessor(Sone.class, new SoneAccessor());
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
 
