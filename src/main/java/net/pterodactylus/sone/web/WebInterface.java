@@ -29,14 +29,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.CSSPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
+import net.pterodactylus.util.template.DateFilter;
+import net.pterodactylus.util.template.DefaultTemplateFactory;
+import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
-import net.pterodactylus.util.template.TemplateFactory;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.ToadletContainer;
@@ -135,7 +138,11 @@ public class WebInterface extends AbstractService {
 	 * Register all toadlets.
 	 */
 	private void registerToadlets() {
-		TemplateFactory templateFactory = new SoneTemplateFactory(l10n());
+		DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
+		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateFactory.addFilter("date", new DateFilter());
+		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
+
 		String formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
 		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
