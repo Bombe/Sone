@@ -244,13 +244,14 @@ public class Core extends AbstractService {
 		/* parse local Sones. */
 		logger.log(Level.INFO, "Loading %d Sones…", allSoneNames.size());
 		for (String soneName : allSoneNames) {
-			String id = configuration.getStringValue("Sone/Name." + soneName + "/ID").getValue(null);
-			String insertUri = configuration.getStringValue("Sone/Name." + soneName + "/InsertURI").getValue(null);
-			String requestUri = configuration.getStringValue("Sone/Name." + soneName + "/RequestURI").getValue(null);
-			long modificationCounter = configuration.getLongValue("Sone/Name." + soneName + "/ModificationCounter").getValue((long) 0);
-			String firstName = configuration.getStringValue("Sone/Name." + soneName + "/Profile/FirstName").getValue(null);
-			String middleName = configuration.getStringValue("Sone/Name." + soneName + "/Profile/MiddleName").getValue(null);
-			String lastName = configuration.getStringValue("Sone/Name." + soneName + "/Profile/LastName").getValue(null);
+			String sonePrefix = "Sone/Name." + soneName;
+			String id = configuration.getStringValue(sonePrefix + "/ID").getValue(null);
+			String insertUri = configuration.getStringValue(sonePrefix + "/InsertURI").getValue(null);
+			String requestUri = configuration.getStringValue(sonePrefix + "/RequestURI").getValue(null);
+			long modificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
+			String firstName = configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null);
+			String middleName = configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null);
+			String lastName = configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null);
 			try {
 				Profile profile = new Profile();
 				profile.setFirstName(firstName);
@@ -287,14 +288,15 @@ public class Core extends AbstractService {
 
 			/* store all Sones. */
 			for (Sone sone : localSones) {
-				configuration.getStringValue("Sone/Name." + sone.getName() + "/ID").setValue(sone.getId());
-				configuration.getStringValue("Sone/Name." + sone.getName() + "/RequestURI").setValue(sone.getRequestUri().toString());
-				configuration.getStringValue("Sone/Name." + sone.getName() + "/InsertURI").setValue(sone.getInsertUri().toString());
-				configuration.getLongValue("Sone/Name." + sone.getName() + "/ModificationCounter").setValue(sone.getModificationCounter());
+				String sonePrefix = "Sone/Name." + sone.getName();
+				configuration.getStringValue(sonePrefix + "/ID").setValue(sone.getId());
+				configuration.getStringValue(sonePrefix + "/RequestURI").setValue(sone.getRequestUri().toString());
+				configuration.getStringValue(sonePrefix + "/InsertURI").setValue(sone.getInsertUri().toString());
+				configuration.getLongValue(sonePrefix + "/ModificationCounter").setValue(sone.getModificationCounter());
 				Profile profile = sone.getProfile();
-				configuration.getStringValue("Sone/Name." + sone.getName() + "/Profile/FirstName").setValue(profile.getFirstName());
-				configuration.getStringValue("Sone/Name." + sone.getName() + "/Profile/MiddleName").setValue(profile.getMiddleName());
-				configuration.getStringValue("Sone/Name." + sone.getName() + "/Profile/LastName").setValue(profile.getLastName());
+				configuration.getStringValue(sonePrefix + "/Profile/FirstName").setValue(profile.getFirstName());
+				configuration.getStringValue(sonePrefix + "/Profile/MiddleName").setValue(profile.getMiddleName());
+				configuration.getStringValue(sonePrefix + "/Profile/LastName").setValue(profile.getLastName());
 			}
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
