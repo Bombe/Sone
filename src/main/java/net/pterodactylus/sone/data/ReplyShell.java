@@ -147,7 +147,7 @@ public class ReplyShell extends Reply implements Shell<Reply> {
 	 */
 	@Override
 	public long getTime() {
-		return time;
+		return (time != null) ? time : 0;
 	}
 
 	/**

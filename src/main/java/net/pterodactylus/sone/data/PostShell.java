@@ -128,7 +128,7 @@ public class PostShell extends Post implements Shell<Post> {
 	 */
 	@Override
 	public long getTime() {
-		return time;
+		return (time != null) ? time : 0;
 	}
 
 	/**
