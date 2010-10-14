@@ -173,7 +173,7 @@ public class Post {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode() ^ sone.hashCode() ^ (int) (time >>> 32) ^ (int) (time & 0xffffffff) ^ text.hashCode();
+		return id.hashCode() ^ sone.hashCode() ^ (int) (time >> 32) ^ (int) (time & 0xffffffff) ^ text.hashCode();
 	}
 
 	/**
