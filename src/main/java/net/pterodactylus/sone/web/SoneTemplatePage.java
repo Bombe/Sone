@@ -100,13 +100,13 @@ public class SoneTemplatePage extends TemplatePage {
 	/**
 	 * Returns the currently logged in Sone.
 	 *
-	 * @param toadletContenxt
+	 * @param toadletContext
 	 *            The toadlet context
 	 * @return The currently logged in Sone, or {@code null} if no Sone is
 	 *         currently logged in
 	 */
-	protected Sone getCurrentSone(ToadletContext toadletContenxt) {
-		Session session = getCurrentSession(toadletContenxt);
+	protected Sone getCurrentSone(ToadletContext toadletContext) {
+		Session session = getCurrentSession(toadletContext);
 		if (session == null) {
 			return null;
 		}
