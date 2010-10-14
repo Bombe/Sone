@@ -217,14 +217,14 @@ public class Sone {
 	}
 
 	/**
-	 * Adds a post with the given text to this Sone.
+	 * Adds the given post to this Sone. The post will not be added if its
+	 * {@link Post#getSone() Sone} is not this Sone.
 	 *
-	 * @param text
-	 *            The text to post
+	 * @param post
+	 *            The post to add
 	 */
-	public synchronized void addPost(String text) {
-		Post post = new Post(this, System.currentTimeMillis(), text);
-		if (posts.add(post)) {
+	public synchronized void addPost(Post post) {
+		if (post.getSone().equals(this) && posts.add(post)) {
 			modificationCounter++;
 		}
 	}

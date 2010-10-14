@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -51,7 +52,9 @@ public class CreatePostPage extends SoneTemplatePage {
 		super.processTemplate(request, template);
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		if (text.length() != 0) {
-			getCurrentSone(request.getToadletContext()).addPost(text);
+			Sone currentSone = getCurrentSone(request.getToadletContext());
+			Post post = new Post(currentSone, System.currentTimeMillis(), text);
+			currentSone.addPost(post);
 			throw new RedirectException("index.html");
 		}
 		template.set("errorTextEmpty", true);
