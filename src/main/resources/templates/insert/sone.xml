@@ -9,4 +9,13 @@
 		<last-name><% currentSone.profile.lastName|html></last-name>
 	</profile>
 
+	<posts>
+		<%foreach posts post>
+			<post>
+				<time><% post.time></time>
+				<text><% post.text|html></text>
+			</post>
+		<%/foreach>
+	</posts>
+
 </sone>
