@@ -1,0 +1,29 @@
+<div id="sone">
+
+	<%ifnull sone.name>
+
+		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
+
+		<div><%= Page.ViewSone.UnknownSone.Description|l10n|html></div>
+
+	<%else>
+
+		<h1></h1><%= Page.ViewSone.Page.TitleWithSone|l10n|insert needle="{sone}" key=sone.name|html></h1>
+
+		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.name|html></h1>
+
+		<div id="posts">
+			<%foreach sone.posts post>
+				<div class="post">
+					<div class="author"><a href="viewSone.html?sone=<% post.sone.id>"><% post.sone.name|html></a></div>
+					<div class="text"><% post.text|html></div>
+					<div class="time"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+				</div>
+			<%foreachelse>
+				<div><%= Page.ViewSone.PostList.Text.NoPostYet|l10n|html></div>
+			<%/foreach>
+		</div>
+
+	<%/if>
+
+</div>

@@ -160,6 +160,9 @@ public class WebInterface extends AbstractService {
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
 		editProfileTemplate.set("formPassword", formPassword);
 
+		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
+		viewSoneTemplate.set("formPassword", formPassword);
+
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
 		deleteSoneTemplate.set("formPassword", formPassword);
 
@@ -170,6 +173,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(logoutTemplate, this), "Logout"));
