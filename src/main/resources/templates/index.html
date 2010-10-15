@@ -1,6 +1,6 @@
 <div id="sone">
 
-	<h1><%= Page.Index.Page.Title|l10n|html></h1>
+	<h1><%= Page.Index.Page.Title|l10n|insert needle="{sone}" key=currentSone.name|html></h1>
 
 	<div>
 		<form action="createPost.html" method="post">
