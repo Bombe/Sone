@@ -179,25 +179,11 @@ public class Core extends AbstractService {
 	 */
 	public void addLocalSone(Sone sone) {
 		if (localSones.add(sone)) {
-			soneCache.put(sone.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(freenetInterface, sone);
 			soneInserter.start();
 			soneDownloader.addSone(sone);
 			soneInserters.put(sone, soneInserter);
 		}
-	}
-
-	/**
-	 * Adds a remote Sone so that it is watched for updates.
-	 *
-	 * @param sone
-	 *            The sone to watch
-	 */
-	public void addSone(Sone sone) {
-		if (!soneCache.containsKey(sone.getId())) {
-			soneCache.put(sone.getId(), sone);
-		}
-		soneDownloader.addSone(sone);
 	}
 
 	/**
@@ -247,7 +233,7 @@ public class Core extends AbstractService {
 		Sone sone;
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
-			sone = new Sone(UUID.randomUUID().toString()).setName(name).setRequestUri(new FreenetURI(finalRequestUri).setKeyType("USK").setDocName("Sone-" + name)).setInsertUri(new FreenetURI(finalInsertUri).setKeyType("USK").setDocName("Sone-" + name));
+			sone = getSone(UUID.randomUUID().toString()).setName(name).setRequestUri(new FreenetURI(finalRequestUri).setKeyType("USK").setDocName("Sone-" + name)).setInsertUri(new FreenetURI(finalInsertUri).setKeyType("USK").setDocName("Sone-" + name));
 			sone.setProfile(new Profile());
 			/* set modification counter to 1 so it is inserted immediately. */
 			sone.setModificationCounter(1);
@@ -383,8 +369,7 @@ public class Core extends AbstractService {
 				profile.setFirstName(firstName);
 				profile.setMiddleName(middleName);
 				profile.setLastName(lastName);
-				Sone sone = new Sone(id).setName(name).setRequestUri(new FreenetURI(requestUri)).setInsertUri(new FreenetURI(insertUri));
-				soneCache.put(id, sone);
+				Sone sone = getSone(id).setName(name).setRequestUri(new FreenetURI(requestUri)).setInsertUri(new FreenetURI(insertUri));
 				sone.setProfile(profile);
 				int postId = 0;
 				do {
@@ -405,15 +390,11 @@ public class Core extends AbstractService {
 					if (replyId == null) {
 						break;
 					}
-					Sone replySone = getSone(configuration.getStringValue(replyPrefix + "/Sone/ID").getValue(null));
-					String replySoneKey = configuration.getStringValue(replyPrefix + "/Sone/Key").getValue(null);
-					String replySoneName = configuration.getStringValue(replyPrefix + "/Sone/Name").getValue(null);
-					replySone.setRequestUri(new FreenetURI(replySoneKey)).setName(replySoneName);
-					Post replyPost = postCache.get(configuration.getStringValue(replyPrefix + "/Post").getValue(null));
+					Post replyPost = getPost(configuration.getStringValue(replyPrefix + "/Post").getValue(null));
 					long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue(null);
 					String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
-					Reply reply = getReply(replyId).setSone(replySone).setPost(replyPost).setTime(replyTime).setText(replyText);
-					replyCache.put(replyId, reply);
+					Reply reply = getReply(replyId).setSone(sone).setPost(replyPost).setTime(replyTime).setText(replyText);
+					sone.addReply(reply);
 				} while (true);
 
 				/* load friends. */
@@ -428,7 +409,7 @@ public class Core extends AbstractService {
 					String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
 					String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
 					friendSone.setRequestUri(new FreenetURI(friendKey)).setName(friendName);
-					addSone(friendSone);
+					soneDownloader.addSone(friendSone);
 					sone.addFriend(sone);
 				}
 
@@ -477,9 +458,6 @@ public class Core extends AbstractService {
 				for (Reply reply : sone.getReplies()) {
 					String replyPrefix = sonePrefix + "/Reply." + replyId++;
 					configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
-					configuration.getStringValue(replyPrefix + "/Sone/ID").setValue(reply.getSone().getId());
-					configuration.getStringValue(replyPrefix + "/Sone/Key").setValue(reply.getSone().getRequestUri().toString());
-					configuration.getStringValue(replyPrefix + "/Sone/Name").setValue(reply.getSone().getName());
 					configuration.getStringValue(replyPrefix + "/Post").setValue(reply.getPost().getId());
 					configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
 					configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
