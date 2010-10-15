@@ -63,6 +63,7 @@ public class ShellCache<T> {
 	 *            The ID of the object
 	 * @param object
 	 *            The object to store
+	 * @return The real object, or the shell if there is no real object yet
 	 */
 	@SuppressWarnings("unchecked")
 	public T put(String id, T object) {
