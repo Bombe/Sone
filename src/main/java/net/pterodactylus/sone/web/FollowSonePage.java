@@ -49,9 +49,9 @@ public class FollowSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		String soneId = request.getHttpRequest().getParam("sone");
+		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Sone sone = webInterface.core().getSone(soneId);
-		if (!(sone instanceof SoneShell)) {
-			Sone currentSone = getCurrentSone(request.getToadletContext());
+		if (!(sone instanceof SoneShell) && !sone.equals(currentSone)) {
 			currentSone.addFriendSone(sone);
 		}
 		throw new RedirectException("viewSone.html?sone=" + soneId);
