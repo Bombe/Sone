@@ -146,7 +146,7 @@ public class Core extends AbstractService {
 	 * @param sone
 	 *            The Sone to add
 	 */
-	public void addSone(Sone sone) {
+	public void addLocalSone(Sone sone) {
 		if (localSones.add(sone)) {
 			soneCache.put(sone.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(freenetInterface, sone);
@@ -162,7 +162,7 @@ public class Core extends AbstractService {
 	 * @param sone
 	 *            The sone to watch
 	 */
-	public void addRemoteSone(Sone sone) {
+	public void addSone(Sone sone) {
 		if (!soneCache.containsKey(sone.getId())) {
 			soneCache.put(sone.getId(), sone);
 		}
@@ -220,7 +220,7 @@ public class Core extends AbstractService {
 			sone.setProfile(new Profile());
 			/* set modification counter to 1 so it is inserted immediately. */
 			sone.setModificationCounter(1);
-			addSone(sone);
+			addLocalSone(sone);
 		} catch (MalformedURLException mue1) {
 			throw new SoneException(Type.INVALID_URI);
 		}
@@ -341,12 +341,12 @@ public class Core extends AbstractService {
 					String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
 					String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
 					friendSone.setRequestUri(new FreenetURI(friendKey)).setName(friendName);
-					addRemoteSone(friendSone);
+					addSone(friendSone);
 					sone.addFriend(sone);
 				}
 
 				sone.setModificationCounter(modificationCounter);
-				addSone(sone);
+				addLocalSone(sone);
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + requestUri + "”) and insertUri (“" + insertUri + "”)!", mue1);
 			}
