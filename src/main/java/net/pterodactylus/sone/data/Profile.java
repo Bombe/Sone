@@ -86,10 +86,12 @@ public class Profile {
 	 *
 	 * @param firstName
 	 *            The first name to set
+	 * @return This profile (for method chaining)
 	 */
-	public void setFirstName(String firstName) {
+	public Profile setFirstName(String firstName) {
 		modified |= ((firstName != null) && (!firstName.equals(this.firstName))) || (this.firstName != null);
 		this.firstName = firstName;
+		return this;
 	}
 
 	/**
@@ -106,10 +108,12 @@ public class Profile {
 	 *
 	 * @param middleName
 	 *            The middle name to set
+	 * @return This profile (for method chaining)
 	 */
-	public void setMiddleName(String middleName) {
+	public Profile setMiddleName(String middleName) {
 		modified |= ((middleName != null) && (!middleName.equals(this.middleName))) || (this.middleName != null);
 		this.middleName = middleName;
+		return this;
 	}
 
 	/**
@@ -126,10 +130,12 @@ public class Profile {
 	 *
 	 * @param lastName
 	 *            The last name to set
+	 * @return This profile (for method chaining)
 	 */
-	public void setLastName(String lastName) {
+	public Profile setLastName(String lastName) {
 		modified |= ((lastName != null) && (!lastName.equals(this.lastName))) || (this.lastName != null);
 		this.lastName = lastName;
+		return this;
 	}
 
 }
