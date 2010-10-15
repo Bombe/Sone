@@ -49,6 +49,9 @@ public class SoneDownloader extends AbstractService {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SoneDownloader.class);
 
+	/** The core. */
+	private final Core core;
+
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
@@ -58,11 +61,14 @@ public class SoneDownloader extends AbstractService {
 	/**
 	 * Creates a new Sone downloader.
 	 *
+	 * @param core
+	 *            The core
 	 * @param freenetInterface
 	 *            The Freenet interface
 	 */
-	public SoneDownloader(FreenetInterface freenetInterface) {
+	public SoneDownloader(Core core, FreenetInterface freenetInterface) {
 		super("Sone Downloader");
+		this.core = core;
 		this.freenetInterface = freenetInterface;
 	}
 
@@ -180,7 +186,7 @@ public class SoneDownloader extends AbstractService {
 					return;
 				}
 				try {
-					posts.add(new Post(postId, sone, Long.parseLong(postTime), postText));
+					posts.add(core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText));
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
@@ -202,7 +208,24 @@ public class SoneDownloader extends AbstractService {
 				String replyPostId = replyXml.getValue("post-id", null);
 				String replyTime = replyXml.getValue("time", null);
 				String replyText = replyXml.getValue("text", null);
-				/* TODO - finish! */
+				if ((replyId == null) || (replyPostId == null) || (replyTime == null) || (replyText == null)) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded reply for Sone %s with missing data! ID: %s, Post: %s, Time: %s, Text: %s", new Object[] { sone, replyId, replyPostId, replyTime, replyText });
+					return;
+				}
+				try {
+					replies.add(core.getReply(replyId).setSone(sone).setPost(core.getPost(replyPostId)).setTime(Long.parseLong(replyTime)).setText(replyText));
+				} catch (NumberFormatException nfe1) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded reply for Sone %s with invalid time: %s", new Object[] { sone, replyTime });
+					return;
+				}
+			}
+
+			/* okay, apparently everything was parsed correctly. Now import. */
+			/* atomic setter operation on the Sone. */
+			synchronized (sone) {
+				sone.setProfile(profile);
 			}
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not read XML file from " + sone + "!", ioe1);

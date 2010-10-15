@@ -106,7 +106,7 @@ public class Core extends AbstractService {
 	 */
 	public Core freenetInterface(FreenetInterface freenetInterface) {
 		this.freenetInterface = freenetInterface;
-		soneDownloader = new SoneDownloader(freenetInterface);
+		soneDownloader = new SoneDownloader(this, freenetInterface);
 		soneDownloader.start();
 		return this;
 	}
@@ -134,6 +134,34 @@ public class Core extends AbstractService {
 			soneCache.put(soneId, sone);
 		}
 		return soneCache.get(soneId);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The sone that creates the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, String text) {
+		return createPost(sone, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param time
+	 *            The time of the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, long time, String text) {
+		return getPost(UUID.randomUUID().toString()).setSone(sone).setTime(time).setText(text);
 	}
 
 	//
@@ -239,6 +267,36 @@ public class Core extends AbstractService {
 		localSones.remove(sone);
 	}
 
+	/**
+	 * Returns the post with the given ID. If no post exists yet with the given
+	 * ID, a new post is returned.
+	 *
+	 * @param postId
+	 *            The ID of the post
+	 * @return The post
+	 */
+	public Post getPost(String postId) {
+		if (!postCache.containsKey(postId)) {
+			postCache.put(postId, new Post(postId));
+		}
+		return postCache.get(postId);
+	}
+
+	/**
+	 * Returns the reply with the given ID. If no reply exists yet with the
+	 * given ID, a new reply is returned.
+	 *
+	 * @param replyId
+	 *            The ID of the reply
+	 * @return The reply
+	 */
+	public Reply getReply(String replyId) {
+		if (!replyCache.containsKey(replyId)) {
+			replyCache.put(replyId, new Reply(replyId));
+		}
+		return replyCache.get(replyId);
+	}
+
 	//
 	// SERVICE METHODS
 	//
@@ -307,8 +365,7 @@ public class Core extends AbstractService {
 					}
 					long time = configuration.getLongValue(postPrefix + "/Time").getValue(null);
 					String text = configuration.getStringValue(postPrefix + "/Text").getValue(null);
-					Post post = new Post(id, sone, time, text);
-					postCache.put(id, post);
+					Post post = getPost(id).setSone(sone).setTime(time).setText(text);
 					sone.addPost(post);
 				} while (true);
 				int replyCounter = 0;
@@ -325,7 +382,7 @@ public class Core extends AbstractService {
 					Post replyPost = postCache.get(configuration.getStringValue(replyPrefix + "/Post").getValue(null));
 					long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue(null);
 					String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
-					Reply reply = new Reply(replyId, replySone, replyPost, replyTime, replyText);
+					Reply reply = getReply(replyId).setSone(replySone).setPost(replyPost).setTime(replyTime).setText(replyText);
 					replyCache.put(replyId, reply);
 				} while (true);
 

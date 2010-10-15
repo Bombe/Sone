@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -191,6 +192,20 @@ public class Sone {
 	}
 
 	/**
+	 * Sets all friends of this Sone at once.
+	 *
+	 * @param friends
+	 *            The new (and only) friends of this Sone
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone setFriends(Collection<Sone> friends) {
+		friendSones.clear();
+		friendSones.addAll(friends);
+		modificationCounter++;
+		return this;
+	}
+
+	/**
 	 * Returns whether this Sone has the given Sone as a friend Sone.
 	 *
 	 * @param friendSone
@@ -249,6 +264,20 @@ public class Sone {
 	}
 
 	/**
+	 * Sets all posts of this Sone at once.
+	 *
+	 * @param posts
+	 *            The new (and only) posts of this Sone
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone setPosts(Collection<Post> posts) {
+		this.posts.clear();
+		this.posts.addAll(posts);
+		modificationCounter++;
+		return this;
+	}
+
+	/**
 	 * Adds the given post to this Sone. The post will not be added if its
 	 * {@link Post#getSone() Sone} is not this Sone.
 	 *
@@ -282,6 +311,20 @@ public class Sone {
 	public Set<Reply> getReplies() {
 		logger.log(Level.FINEST, "Friends of %s: %s", new Object[] { this, friendSones });
 		return Collections.unmodifiableSet(replies);
+	}
+
+	/**
+	 * Sets all replies of this Sone at once.
+	 *
+	 * @param replies
+	 *            The new (and only) replies of this Sone
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone setReplies(Collection<Reply> replies) {
+		this.replies.clear();
+		this.replies.addAll(replies);
+		modificationCounter++;
+		return this;
 	}
 
 	/**

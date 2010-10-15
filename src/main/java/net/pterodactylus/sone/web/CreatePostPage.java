@@ -53,7 +53,7 @@ public class CreatePostPage extends SoneTemplatePage {
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		if (text.length() != 0) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			Post post = new Post(currentSone, System.currentTimeMillis(), text);
+			Post post = webInterface.core().createPost(currentSone, System.currentTimeMillis(), text);
 			currentSone.addPost(post);
 			throw new RedirectException("index.html");
 		}
