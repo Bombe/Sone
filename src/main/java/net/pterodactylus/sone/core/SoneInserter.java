@@ -33,6 +33,7 @@ import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateException;
+import net.pterodactylus.util.template.XmlFilter;
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
 
@@ -51,6 +52,7 @@ public class SoneInserter extends AbstractService {
 
 	static {
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateFactory.addFilter("xml", new XmlFilter());
 	}
 
 	/** The UTF-8 charset. */

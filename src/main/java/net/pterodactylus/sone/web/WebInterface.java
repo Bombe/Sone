@@ -44,7 +44,6 @@ import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
-import net.pterodactylus.util.template.XmlFilter;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.ToadletContainer;
@@ -149,7 +148,6 @@ public class WebInterface extends AbstractService {
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
-		templateFactory.addFilter("xml", new XmlFilter());
 
 		String formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
