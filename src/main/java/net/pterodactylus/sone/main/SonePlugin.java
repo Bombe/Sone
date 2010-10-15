@@ -145,8 +145,21 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		core.freenetInterface(freenetInterface);
 
 		/* start core! */
-		core.start();
-		webInterface.start();
+		boolean startupFailed = true;
+		try {
+			core.start();
+			webInterface.start();
+			startupFailed = false;
+		} finally {
+			if (startupFailed) {
+				/*
+				 * we let the exception bubble up but shut the logging down so
+				 * that the logfile is not swamped by the installed logging
+				 * handlers of the failed instances.
+				 */
+				Logging.shutdown();
+			}
+		}
 	}
 
 	/**
