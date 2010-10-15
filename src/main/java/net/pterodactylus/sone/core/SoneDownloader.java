@@ -235,6 +235,7 @@ public class SoneDownloader extends AbstractService {
 				sone.setProfile(profile);
 				sone.setPosts(posts);
 				sone.setReplies(replies);
+				sone.setModificationCounter(0);
 			}
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not read XML file from " + sone + "!", ioe1);
