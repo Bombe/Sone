@@ -2,20 +2,20 @@
 <sone>
 
 	<id><% currentSone.id></id>
-	<name><% currentSone.name|html></name>
+	<name><% currentSone.name|xml></name>
 
 	<profile>
-		<first-name><% currentSone.profile.firstName|html></first-name>
-		<middle-name><% currentSone.profile.middleName|html></middle-name>
-		<last-name><% currentSone.profile.lastName|html></last-name>
+		<first-name><% currentSone.profile.firstName|xml></first-name>
+		<middle-name><% currentSone.profile.middleName|xml></middle-name>
+		<last-name><% currentSone.profile.lastName|xml></last-name>
 	</profile>
 
 	<posts>
 		<%foreach currentSone.posts post>
 		<post>
-			<id><% post.id></id>
+			<id><% post.id|xml></id>
 			<time><% post.time></time>
-			<text><% post.text|html></text>
+			<text><% post.text|xml></text>
 		</post>
 		<%/foreach>
 	</posts>
@@ -24,9 +24,9 @@
 		<%foreach currentSone.replies reply>
 		<reply>
 			<id><% reply.id></id>
-			<post-id><% reply.post.id></post-id>
+			<post-id><% reply.post.id|xml></post-id>
 			<time><% reply.time></time>
-			<text><% reply.text></text>
+			<text><% reply.text|xml></text>
 		</reply>
 		<%/foreach>
 	</replies>
@@ -34,9 +34,9 @@
 	<friends>
 		<%foreach currentSone.friends friend>
 		<friend>
-			<sone-id><% friend.id|html></sone-id>
-			<sone-key><% friend.requestUri|html></sone-key>
-			<sone-name><% friend.name|html></sone-name>
+			<sone-id><% friend.id|xml></sone-id>
+			<sone-key><% friend.requestUri|xml></sone-key>
+			<sone-name><% friend.name|xml></sone-name>
 		</friend>
 		<%/foreach>
 	</friends>
@@ -44,9 +44,9 @@
 	<known-sones>
 		<%foreach knownSones sone>
 		<known-sone>
-			<sone-id><% sone.id|html></sone-id>
-			<sone-key><% sone.requestUri|html></sone-key>
-			<sone-name><% sone.name|html></sone-name>
+			<sone-id><% sone.id|xml></sone-id>
+			<sone-key><% sone.requestUri|xml></sone-key>
+			<sone-name><% sone.name|xml></sone-name>
 		</known-sone>
 		<%/foreach>
 	</known-sones>
