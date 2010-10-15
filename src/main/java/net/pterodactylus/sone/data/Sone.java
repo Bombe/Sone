@@ -47,7 +47,7 @@ public class Sone {
 	private final UUID id;
 
 	/** The name of this Sone. */
-	private final String name;
+	private String name;
 
 	/** The URI under which the Sone is stored in Freenet. */
 	private FreenetURI requestUri;
@@ -76,32 +76,9 @@ public class Sone {
 	 *
 	 * @param id
 	 *            The ID of this Sone
-	 * @param name
-	 *            The name of the Sone
-	 * @param requestUri
-	 *            The request URI of the Sone
 	 */
-	public Sone(UUID id, String name, FreenetURI requestUri) {
-		this(id, name, requestUri, null);
-	}
-
-	/**
-	 * Creates a new Sone.
-	 *
-	 * @param id
-	 *            The ID of this Sone
-	 * @param name
-	 *            The name of the Sone
-	 * @param requestUri
-	 *            The request URI of the Sone
-	 * @param insertUri
-	 *            The insert URI of the Sone
-	 */
-	public Sone(UUID id, String name, FreenetURI requestUri, FreenetURI insertUri) {
-		this.id = id;
-		this.name = name;
-		this.requestUri = requestUri;
-		this.insertUri = insertUri;
+	public Sone(String id) {
+		this.id = UUID.fromString(id);
 	}
 
 	//
@@ -127,6 +104,18 @@ public class Sone {
 	}
 
 	/**
+	 * Sets the name of this Sone.
+	 *
+	 * @param name
+	 *            The name of this Sone
+	 * @return This sone (for method chaining)
+	 */
+	public Sone setName(String name) {
+		this.name = name;
+		return this;
+	}
+
+	/**
 	 * Returns the request URI of this Sone.
 	 *
 	 * @return The request URI of this Sone
@@ -136,12 +125,36 @@ public class Sone {
 	}
 
 	/**
+	 * Sets the request URI of this Sone.
+	 *
+	 * @param requestUri
+	 *            The request URI of this Sone
+	 * @return This Sone (for method chaining)
+	 */
+	public Sone setRequestUri(FreenetURI requestUri) {
+		this.requestUri = requestUri;
+		return this;
+	}
+
+	/**
 	 * Returns the insert URI of this Sone.
 	 *
 	 * @return The insert URI of this Sone
 	 */
 	public FreenetURI getInsertUri() {
 		return insertUri;
+	}
+
+	/**
+	 * Sets the insert URI of this Sone.
+	 *
+	 * @param insertUri
+	 *            The insert URI of this Sone
+	 * @return This Sone (for method chaining)
+	 */
+	public Sone setInsertUri(FreenetURI insertUri) {
+		this.insertUri = insertUri;
+		return this;
 	}
 
 	/**
@@ -267,6 +280,7 @@ public class Sone {
 	 * @return All replies this Sone made
 	 */
 	public Set<Reply> getReplies() {
+		logger.log(Level.FINEST, "Friends of %s: %s", new Object[] { this, friendSones });
 		return Collections.unmodifiableSet(replies);
 	}
 
@@ -324,7 +338,9 @@ public class Sone {
 		/* TODO - check for the correct URI. */
 		long latestEdition = requestUri.getSuggestedEdition();
 		this.requestUri = this.requestUri.setSuggestedEdition(latestEdition);
-		this.insertUri = this.insertUri.setSuggestedEdition(latestEdition);
+		if (this.insertUri != null) {
+			this.insertUri = this.insertUri.setSuggestedEdition(latestEdition);
+		}
 	}
 
 	//
@@ -336,7 +352,7 @@ public class Sone {
 	 */
 	@Override
 	public int hashCode() {
-		return getId().hashCode();
+		return id.hashCode();
 	}
 
 	/**
@@ -347,7 +363,7 @@ public class Sone {
 		if (!(object instanceof Sone)) {
 			return false;
 		}
-		return ((Sone) object).id.equals(getId());
+		return ((Sone) object).id.equals(id);
 	}
 
 	/**
@@ -355,7 +371,7 @@ public class Sone {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + getId() + ",name=" + getName() + ",requestUri=" + getRequestUri() + ",insertUri=" + getInsertUri() + ",friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + ")]";
+		return getClass().getName() + "[id=" + id + ",name=" + name + ",requestUri=" + requestUri + ",insertUri=" + insertUri + ",friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + ")]";
 	}
 
 }

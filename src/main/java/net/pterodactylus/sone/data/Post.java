@@ -37,13 +37,13 @@ public class Post {
 	private final UUID id;
 
 	/** The Sone this post belongs to. */
-	private final Sone sone;
+	private Sone sone;
 
 	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
-	private final long time;
+	private long time;
 
 	/** The text of the post. */
-	private final String text;
+	private String text;
 
 	/** The replies that have been loaded for this post. */
 	private final Set<Reply> replies = new HashSet<Reply>();
@@ -71,7 +71,7 @@ public class Post {
 	 *            The text of the post
 	 */
 	public Post(Sone sone, long time, String text) {
-		this(UUID.randomUUID(), sone, time, text);
+		this(UUID.randomUUID().toString(), sone, time, text);
 	}
 
 	/**
@@ -86,8 +86,8 @@ public class Post {
 	 * @param text
 	 *            The text of the post
 	 */
-	public Post(UUID id, Sone sone, long time, String text) {
-		this.id = id;
+	public Post(String id, Sone sone, long time, String text) {
+		this.id = UUID.fromString(id);
 		this.sone = sone;
 		this.time = time;
 		this.text = text;
@@ -116,6 +116,18 @@ public class Post {
 	}
 
 	/**
+	 * Sets the Sone of this post.
+	 *
+	 * @param sone
+	 *            The Sone of this post
+	 * @return This post (for method chaining)
+	 */
+	public Post setSone(Sone sone) {
+		this.sone = sone;
+		return this;
+	}
+
+	/**
 	 * Returns the time of the post.
 	 *
 	 * @return The time of the post (in milliseconds since Jan 1, 1970 UTC)
@@ -125,12 +137,36 @@ public class Post {
 	}
 
 	/**
+	 * Sets the time of this post.
+	 *
+	 * @param time
+	 *            The time of this post (in milliseconds since Jan 1, 1970 UTC)
+	 * @return This post (for method chaining)
+	 */
+	public Post setTime(long time) {
+		this.time = time;
+		return this;
+	}
+
+	/**
 	 * Returns the text of the post.
 	 *
 	 * @return The text of the post
 	 */
 	public String getText() {
 		return text;
+	}
+
+	/**
+	 * Sets the text of this post.
+	 *
+	 * @param text
+	 *            The text of this post
+	 * @return This post (for method chaining)
+	 */
+	public Post setText(String text) {
+		this.text = text;
+		return this;
 	}
 
 	/**
@@ -205,7 +241,7 @@ public class Post {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + getId() + ",sone=" + getSone() + ",time=" + getTime() + ",text=" + getText() + "]";
+		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + ",replies(" + replies.size() + ")]";
 	}
 
 }

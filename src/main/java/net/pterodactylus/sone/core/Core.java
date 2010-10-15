@@ -29,14 +29,9 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.SoneException.Type;
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostShell;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
-import net.pterodactylus.sone.data.ReplyShell;
-import net.pterodactylus.sone.data.Shell;
-import net.pterodactylus.sone.data.ShellCache;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.SoneShell;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -71,13 +66,13 @@ public class Core extends AbstractService {
 	/* various caches follow here. */
 
 	/** Cache for all known Sones. */
-	private final ShellCache<Sone> soneCache = new ShellCache<Sone>(SoneShell.creator);
+	private final Map<String, Sone> soneCache = new HashMap<String, Sone>();
 
 	/** Cache for all known posts. */
-	private final ShellCache<Post> postCache = new ShellCache<Post>(PostShell.creator);
+	private final Map<String, Post> postCache = new HashMap<String, Post>();
 
 	/** Cache for all known replies. */
-	private final ShellCache<Reply> replyCache = new ShellCache<Reply>(ReplyShell.creator);
+	private final Map<String, Reply> replyCache = new HashMap<String, Reply>();
 
 	/**
 	 * Creates a new core.
@@ -125,18 +120,19 @@ public class Core extends AbstractService {
 	}
 
 	/**
-	 * Returns a Sone or a {@link Shell} around one for the given ID.
+	 * Returns the Sone with the given ID, or an empty Sone that has been
+	 * initialized with the given ID.
 	 *
 	 * @param soneId
 	 *            The ID of the Sone
-	 * @return The Sone, or a {@link Shell} around one
+	 * @return The Sone
 	 */
 	public Sone getSone(String soneId) {
-		Sone sone = soneCache.get(soneId);
-		if (sone instanceof SoneShell) {
-			soneCache.put(soneId, sone = ((SoneShell) sone).getShelled());
+		if (!soneCache.containsKey(soneId)) {
+			Sone sone = new Sone(soneId);
+			soneCache.put(soneId, sone);
 		}
-		return sone;
+		return soneCache.get(soneId);
 	}
 
 	//
@@ -166,8 +162,10 @@ public class Core extends AbstractService {
 	 *            The sone to watch
 	 */
 	public void addRemoteSone(Sone sone) {
-		Sone updatedSone = soneCache.put(sone.getId(), sone);
-		soneDownloader.addSone(updatedSone);
+		if (!soneCache.containsKey(sone.getId())) {
+			soneCache.put(sone.getId(), sone);
+		}
+		soneDownloader.addSone(sone);
 	}
 
 	/**
@@ -217,7 +215,7 @@ public class Core extends AbstractService {
 		Sone sone;
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
-			sone = new Sone(UUID.randomUUID(), name, new FreenetURI(finalRequestUri).setKeyType("USK").setDocName("Sone-" + name), new FreenetURI(finalInsertUri).setKeyType("USK").setDocName("Sone-" + name));
+			sone = new Sone(UUID.randomUUID().toString()).setName(name).setRequestUri(new FreenetURI(finalRequestUri).setKeyType("USK").setDocName("Sone-" + name)).setInsertUri(new FreenetURI(finalInsertUri).setKeyType("USK").setDocName("Sone-" + name));
 			sone.setProfile(new Profile());
 			/* set modification counter to 1 so it is inserted immediately. */
 			sone.setModificationCounter(1);
@@ -296,7 +294,7 @@ public class Core extends AbstractService {
 				profile.setFirstName(firstName);
 				profile.setMiddleName(middleName);
 				profile.setLastName(lastName);
-				Sone sone = new Sone(UUID.fromString(id), name, new FreenetURI(requestUri), new FreenetURI(insertUri));
+				Sone sone = new Sone(id).setName(name).setRequestUri(new FreenetURI(requestUri)).setInsertUri(new FreenetURI(insertUri));
 				soneCache.put(id, sone);
 				sone.setProfile(profile);
 				int postId = 0;
@@ -308,7 +306,7 @@ public class Core extends AbstractService {
 					}
 					long time = configuration.getLongValue(postPrefix + "/Time").getValue(null);
 					String text = configuration.getStringValue(postPrefix + "/Text").getValue(null);
-					Post post = new Post(UUID.fromString(id), sone, time, text);
+					Post post = new Post(id, sone, time, text);
 					postCache.put(id, post);
 					sone.addPost(post);
 				} while (true);
@@ -319,16 +317,14 @@ public class Core extends AbstractService {
 					if (replyId == null) {
 						break;
 					}
-					Sone replySone = soneCache.get(configuration.getStringValue(replyPrefix + "/Sone/ID").getValue(null));
+					Sone replySone = getSone(configuration.getStringValue(replyPrefix + "/Sone/ID").getValue(null));
 					String replySoneKey = configuration.getStringValue(replyPrefix + "/Sone/Key").getValue(null);
 					String replySoneName = configuration.getStringValue(replyPrefix + "/Sone/Name").getValue(null);
-					if (replySone instanceof SoneShell) {
-						((SoneShell) replySone).setRequestUri(new FreenetURI(replySoneKey)).setName(replySoneName);
-					}
+					replySone.setRequestUri(new FreenetURI(replySoneKey)).setName(replySoneName);
 					Post replyPost = postCache.get(configuration.getStringValue(replyPrefix + "/Post").getValue(null));
 					long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue(null);
 					String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
-					Reply reply = new ReplyShell().setSone(replySone).setPost(replyPost).setTime(replyTime).setText(replyText).getShelled();
+					Reply reply = new Reply(replyId, replySone, replyPost, replyTime, replyText);
 					replyCache.put(replyId, reply);
 				} while (true);
 
@@ -341,11 +337,9 @@ public class Core extends AbstractService {
 						break;
 					}
 					Sone friendSone = soneCache.get(friendId);
-					if (friendSone instanceof SoneShell) {
-						String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
-						String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
-						((SoneShell) friendSone).setRequestUri(new FreenetURI(friendKey)).setName(friendName);
-					}
+					String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
+					String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
+					friendSone.setRequestUri(new FreenetURI(friendKey)).setName(friendName);
 					addRemoteSone(friendSone);
 					sone.addFriend(sone);
 				}

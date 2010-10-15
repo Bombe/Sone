@@ -27,20 +27,20 @@ import java.util.UUID;
  */
 public class Reply {
 
-	/** The Sone that posted this reply. */
-	private final Sone sone;
-
 	/** The ID of the reply. */
 	private final UUID id;
 
+	/** The Sone that posted this reply. */
+	private Sone sone;
+
 	/** The Post this reply refers to. */
-	private final Post post;
+	private Post post;
 
 	/** The time of the reply. */
-	private final long time;
+	private long time;
 
 	/** The text of the reply. */
-	private final String text;
+	private String text;
 
 	/**
 	 * Creates a new reply.
@@ -69,7 +69,7 @@ public class Reply {
 	 *            The text of the reply
 	 */
 	public Reply(Sone sone, Post post, long time, String text) {
-		this(sone, UUID.randomUUID(), post, time, text);
+		this(UUID.randomUUID().toString(), sone, post, time, text);
 	}
 
 	/**
@@ -86,9 +86,9 @@ public class Reply {
 	 * @param text
 	 *            The text of the reply
 	 */
-	public Reply(Sone sone, UUID id, Post post, long time, String text) {
+	public Reply(String id, Sone sone, Post post, long time, String text) {
+		this.id = UUID.fromString(id);
 		this.sone = sone;
-		this.id = id;
 		this.post = post;
 		this.time = time;
 		this.text = text;
@@ -97,6 +97,15 @@ public class Reply {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the ID of the reply.
+	 *
+	 * @return The ID of the reply
+	 */
+	public String getId() {
+		return id.toString();
+	}
 
 	/**
 	 * Returns the Sone that posted this reply.
@@ -108,12 +117,15 @@ public class Reply {
 	}
 
 	/**
-	 * Returns the ID of the reply.
+	 * Sets the Sone that posted this reply.
 	 *
-	 * @return The ID of the reply
+	 * @param sone
+	 *            The Sone that posted this reply
+	 * @return This reply (for method chaining)
 	 */
-	public String getId() {
-		return id.toString();
+	public Reply setSone(Sone sone) {
+		this.sone = sone;
+		return this;
 	}
 
 	/**
@@ -126,12 +138,36 @@ public class Reply {
 	}
 
 	/**
+	 * Sets the post this reply refers to.
+	 *
+	 * @param post
+	 *            The post this reply refers to
+	 * @return This reply (for method chaining)
+	 */
+	public Reply setPost(Post post) {
+		this.post = post;
+		return this;
+	}
+
+	/**
 	 * Returns the time of the reply.
 	 *
 	 * @return The time of the reply (in milliseconds since Jan 1, 1970 UTC)
 	 */
 	public long getTime() {
 		return time;
+	}
+
+	/**
+	 * Sets the time of this reply.
+	 *
+	 * @param time
+	 *            The time of this reply (in milliseconds since Jan 1, 1970 UTC)
+	 * @return This reply (for method chaining)
+	 */
+	public Reply setTime(long time) {
+		this.time = time;
+		return this;
 	}
 
 	/**
@@ -143,6 +179,18 @@ public class Reply {
 		return text;
 	}
 
+	/**
+	 * Sets the text of this reply.
+	 *
+	 * @param text
+	 *            The text of this reply
+	 * @return This reply (for method chaining)
+	 */
+	public Reply setText(String text) {
+		this.text = text;
+		return this;
+	}
+
 	//
 	// OBJECT METHODS
 	//
@@ -152,7 +200,7 @@ public class Reply {
 	 */
 	@Override
 	public int hashCode() {
-		return sone.hashCode() ^ id.hashCode() ^ post.hashCode() ^ (int) (time >> 32) ^ (int) (time & 0xffffffff);
+		return sone.hashCode() ^ id.hashCode() ^ post.hashCode() ^ (int) (time >> 32) ^ (int) (time & 0xffffffff) ^ text.hashCode();
 	}
 
 	/**
@@ -165,6 +213,14 @@ public class Reply {
 		}
 		Reply reply = (Reply) object;
 		return reply.sone.equals(sone) && reply.id.equals(id) && reply.post.equals(post) && (reply.time == time) && reply.text.equals(text);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",post=" + post + ",time=" + time + ",text=" + text + "]";
 	}
 
 }
