@@ -107,6 +107,7 @@ public class Core extends AbstractService {
 	public Core freenetInterface(FreenetInterface freenetInterface) {
 		this.freenetInterface = freenetInterface;
 		soneDownloader = new SoneDownloader(freenetInterface);
+		soneDownloader.start();
 		return this;
 	}
 
