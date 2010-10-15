@@ -14,9 +14,9 @@
 
 		<%if ! sone.isCurrent>
 			<%if sone.isFriend>
-				<div><a href="removeFriend.html?sone=<% sone.id>"><%= Page.ViewSone.RemoveFriend.Text|l10n|html></a></div>
+				<div><a href="unfollowSone.html?sone=<% sone.id>"><%= Page.ViewSone.UnfollowSone.Text|l10n|html></a></div>
 			<%else>
-				<div><a href="addFriend.html?sone=<% sone.id>"><%= Page.ViewSone.AddFriend.Text|l10n|html></a></div>
+				<div><a href="followSone.html?sone=<% sone.id>"><%= Page.ViewSone.FollowSone.Text|l10n|html></a></div>
 			<%/if>
 		<%/if>
 

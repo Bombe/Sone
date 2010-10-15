@@ -1,5 +1,5 @@
 /*
- * Sone - AddFriendPage.java - Copyright © 2010 David Roden
+ * Sone - FollowSonePage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,11 +22,11 @@ import net.pterodactylus.sone.data.SoneShell;
 import net.pterodactylus.util.template.Template;
 
 /**
- * This page lets the user add another Sone as a friend Sone.
+ * This page lets the user follow another Sone.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class AddFriendPage extends SoneTemplatePage {
+public class FollowSonePage extends SoneTemplatePage {
 
 	/**
 	 * @param template
@@ -34,8 +34,8 @@ public class AddFriendPage extends SoneTemplatePage {
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public AddFriendPage(Template template, WebInterface webInterface) {
-		super("addFriend.html", template, "Page.AddFriend.Title", webInterface);
+	public FollowSonePage(Template template, WebInterface webInterface) {
+		super("followSone.html", template, "Page.FollowSone.Title", webInterface);
 	}
 
 	//
