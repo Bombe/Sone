@@ -24,6 +24,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
@@ -153,7 +156,54 @@ public class SoneDownloader extends AbstractService {
 			}
 
 			/* parse profile. */
+			String profileFirstName = profileXml.getValue("first-name", null);
+			String profileMiddleName = profileXml.getValue("middle-name", null);
+			String profileLastName = profileXml.getValue("last-name", null);
+			Profile profile = new Profile().setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
 
+			/* parse posts. */
+			SimpleXML postsXml = soneXml.getNode("posts");
+			if (postsXml == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded Sone %s has no posts!", new Object[] { sone });
+				return;
+			}
+
+			Set<Post> posts = new HashSet<Post>();
+			for (SimpleXML postXml : postsXml.getNodes("post")) {
+				String postId = postXml.getValue("id", null);
+				String postTime = postXml.getValue("time", null);
+				String postText = postXml.getValue("text", null);
+				if ((postId == null) || (postTime == null) || (postText == null)) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded post for Sone %s with missing data! ID: %s, Time: %s, Text: %s", new Object[] { sone, postId, postTime, postText });
+					return;
+				}
+				try {
+					posts.add(new Post(postId, sone, Long.parseLong(postTime), postText));
+				} catch (NumberFormatException nfe1) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
+					return;
+				}
+			}
+
+			/* parse replies. */
+			SimpleXML repliesXml = soneXml.getNode("replies");
+			if (repliesXml == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded Sone %s has no replies!", new Object[] { sone });
+				return;
+			}
+
+			Set<Reply> replies = new HashSet<Reply>();
+			for (SimpleXML replyXml : repliesXml.getNodes("reply")) {
+				String replyId = replyXml.getValue("id", null);
+				String replyPostId = replyXml.getValue("post-id", null);
+				String replyTime = replyXml.getValue("time", null);
+				String replyText = replyXml.getValue("text", null);
+				/* TODO - finish! */
+			}
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not read XML file from " + sone + "!", ioe1);
 		} finally {
