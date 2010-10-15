@@ -355,7 +355,7 @@ public class Sone {
 	 */
 	@Override
 	public String toString() {
-		return getName() + "[id=" + getId() + ",requestUri=" + getRequestUri() + ",insertUri=" + getInsertUri() + ",posts(" + posts.size() + "),replies(" + replies.size() + ")]";
+		return getClass().getName() + "[id=" + getId() + ",name=" + getName() + ",requestUri=" + getRequestUri() + ",insertUri=" + getInsertUri() + ",posts(" + posts.size() + "),replies(" + replies.size() + ")]";
 	}
 
 }
