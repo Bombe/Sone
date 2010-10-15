@@ -336,7 +336,7 @@ public class Sone {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return getId().hashCode();
 	}
 
 	/**
@@ -347,7 +347,7 @@ public class Sone {
 		if (!(object instanceof Sone)) {
 			return false;
 		}
-		return ((Sone) object).id.equals(id);
+		return ((Sone) object).id.equals(getId());
 	}
 
 	/**
