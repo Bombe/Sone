@@ -149,8 +149,8 @@ public class FreenetInterface extends AbstractService {
 					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s.", new Object[] { sone, key });
 					if (newKnownGood) {
 						sone.updateUris(key.getURI());
+						soneDownloader.fetchSone(sone);
 					}
-					soneDownloader.fetchSone(sone);
 				}
 
 				@Override
