@@ -18,9 +18,12 @@
 package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -295,6 +298,33 @@ public class Core extends AbstractService {
 			replyCache.put(replyId, new Reply(replyId));
 		}
 		return replyCache.get(replyId);
+	}
+
+	/**
+	 * Gets all replies to the given post, sorted by date, oldest first.
+	 *
+	 * @param post
+	 *            The post the replies refer to
+	 * @return The sorted list of replies for the post
+	 */
+	public List<Reply> getReplies(Post post) {
+		List<Reply> replies = new ArrayList<Reply>();
+		for (Reply reply : replyCache.values()) {
+			if (reply.getPost().equals(post)) {
+				replies.add(reply);
+			}
+		}
+		Collections.sort(replies, new Comparator<Reply>() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public int compare(Reply leftReply, Reply rightReply) {
+				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, leftReply.getTime() - rightReply.getTime()));
+			}
+		});
+		return replies;
 	}
 
 	//
