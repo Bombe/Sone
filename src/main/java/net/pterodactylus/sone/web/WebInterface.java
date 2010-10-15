@@ -166,7 +166,7 @@ public class WebInterface extends AbstractService {
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
 		viewSoneTemplate.set("formPassword", formPassword);
 
-		Template followSoneTemplate = templateFactory.createTemplate(createReader("/templates/addFriend.html"));
+		Template followSoneTemplate = templateFactory.createTemplate(createReader("/templates/followSone.html"));
 		followSoneTemplate.set("formPassword", formPassword);
 
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
