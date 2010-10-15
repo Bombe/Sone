@@ -24,9 +24,6 @@
 		<%foreach currentSone.replies reply>
 		<reply>
 			<id><% reply.id></id>
-			<sone-id><% reply.post.sone.requestUri|html></sone-id>
-			<sone-key><% reply.post.sone.requestUri|html></sone-key>
-			<sone-name><% reply.post.sone.niceName|html></sone-name>
 			<post-id><% reply.post.id></post-id>
 			<time><% reply.time></time>
 			<text><% reply.text></text>
