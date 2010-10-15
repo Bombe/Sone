@@ -146,7 +146,7 @@ public class FreenetInterface extends AbstractService {
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
-					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s.", new Object[] { sone, key });
+					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", new Object[] { sone, key, newKnownGood, newSlotToo });
 					if (newKnownGood) {
 						sone.updateUris(key.getURI());
 						soneDownloader.fetchSone(sone);
@@ -182,6 +182,7 @@ public class FreenetInterface extends AbstractService {
 			return;
 		}
 		try {
+			logger.log(Level.FINEST, "Unsubscribing from USK for %s…", new Object[] { sone });
 			node.clientCore.uskManager.unsubscribe(USK.create(sone.getRequestUri()), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.FINE, "Could not unsubscribe USK “" + sone.getRequestUri() + "”!", mue1);
