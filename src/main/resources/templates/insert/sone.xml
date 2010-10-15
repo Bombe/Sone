@@ -44,4 +44,14 @@
 		<%/foreach>
 	</friends>
 
+	<known-sones>
+		<%foreach knownSones sone>
+		<known-sone>
+			<sone-id><% sone.id|html></sone-id>
+			<sone-key><% sone.requestUri|html></sone-key>
+			<sone-name><% sone.name|html></sone-name>
+		</known-sone>
+		<%/foreach>
+	</known-sones>
+
 </sone>
