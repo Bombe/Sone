@@ -17,12 +17,6 @@
 
 package net.pterodactylus.sone.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -44,9 +38,6 @@ public class Post {
 
 	/** The text of the post. */
 	private String text;
-
-	/** The replies that have been loaded for this post. */
-	private final Set<Reply> replies = new HashSet<Reply>();
 
 	/**
 	 * Creates a new post.
@@ -179,49 +170,6 @@ public class Post {
 		return this;
 	}
 
-	/**
-	 * Returns all replies to this post in unspecified order.
-	 *
-	 * @return All replies to this post
-	 */
-	public List<Reply> getReplies() {
-		List<Reply> sortedReplies = new ArrayList<Reply>(replies);
-		Collections.sort(sortedReplies, new Comparator<Reply>() {
-
-			@Override
-			public int compare(Reply leftReply, Reply rightReply) {
-				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, leftReply.getTime() - rightReply.getTime()));
-			}
-
-		});
-		return sortedReplies;
-	}
-
-	/**
-	 * Adds a reply to this post. The reply will not be added if its
-	 * {@link Reply#getPost() post} is not equal to this post.
-	 *
-	 * @param reply
-	 *            The reply to add
-	 */
-	public void addReply(Reply reply) {
-		if (reply.getPost().equals(this)) {
-			replies.add(reply);
-		}
-	}
-
-	/**
-	 * Removes a reply from this post.
-	 *
-	 * @param reply
-	 *            The reply to remove
-	 */
-	public void removeReply(Reply reply) {
-		if (reply.getPost().equals(this)) {
-			replies.remove(reply);
-		}
-	}
-
 	//
 	// OBJECT METHODS
 	//
@@ -251,7 +199,7 @@ public class Post {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + ",replies(" + replies.size() + ")]";
+		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
 	}
 
 }
