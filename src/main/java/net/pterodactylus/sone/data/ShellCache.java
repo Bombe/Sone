@@ -89,9 +89,11 @@ public class ShellCache<T> {
 	 */
 	public T get(String id) {
 		if (!objectCache.containsKey(id)) {
-			Shell<T> shell = shellCreator.createShell(id);
-			shellCache.put(id, shell);
-			return shell.getShelled();
+			if (!shellCache.containsKey(id)) {
+				Shell<T> shell = shellCreator.createShell(id);
+				shellCache.put(id, shell);
+			}
+			return shellCache.get(id).getShelled();
 		}
 		return objectCache.get(id);
 	}
