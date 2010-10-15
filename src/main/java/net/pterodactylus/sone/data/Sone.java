@@ -197,7 +197,7 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone addFriend(Sone friendSone) {
-		if (friendSones.add(friendSone)) {
+		if (!friendSone.equals(this) && friendSones.add(friendSone)) {
 			modificationCounter++;
 		}
 		return this;
