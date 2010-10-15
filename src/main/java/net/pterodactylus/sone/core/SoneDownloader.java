@@ -137,7 +137,14 @@ public class SoneDownloader extends AbstractService {
 			xmlBucket = fetchResult.asBucket();
 			xmlInputStream = xmlBucket.getInputStream();
 			Document document = XML.transformToDocument(xmlInputStream);
-			SimpleXML soneXml = SimpleXML.fromDocument(document);
+			SimpleXML soneXml;
+			try {
+				soneXml = SimpleXML.fromDocument(document);
+			} catch (NullPointerException npe1) {
+				/* for some reason, invalid XML can cause NPEs. */
+				logger.log(Level.WARNING, "XML for Sone " + sone + " can not be parsed!", npe1);
+				return;
+			}
 
 			/* check ID. */
 			String soneId = soneXml.getValue("id", null);
