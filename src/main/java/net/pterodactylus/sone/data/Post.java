@@ -51,6 +51,16 @@ public class Post {
 	/**
 	 * Creates a new post.
 	 *
+	 * @param id
+	 *            The ID of the post
+	 */
+	public Post(String id) {
+		this(id, null, 0, null);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
 	 * @param sone
 	 *            The Sone this post belongs to
 	 * @param text

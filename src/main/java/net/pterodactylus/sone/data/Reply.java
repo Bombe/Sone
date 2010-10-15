@@ -45,6 +45,16 @@ public class Reply {
 	/**
 	 * Creates a new reply.
 	 *
+	 * @param id
+	 *            The ID of the reply
+	 */
+	public Reply(String id) {
+		this(id, null, null, 0, null);
+	}
+
+	/**
+	 * Creates a new reply.
+	 *
 	 * @param sone
 	 *            The sone that posted the reply
 	 * @param post
