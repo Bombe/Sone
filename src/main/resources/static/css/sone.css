@@ -19,3 +19,7 @@
 #sone .post .text {
 	display: inline;
 }
+
+#sone input.createpost.default {
+	color: #888;
+}
