@@ -20,11 +20,11 @@ package net.pterodactylus.sone.web.page;
 import java.io.InputStream;
 
 /**
- * {@link Page} implementation that delivers CSS files from the class path.
- * 
+ * {@link Page} implementation that delivers static files from the class path.
+ *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class CSSPage implements Page {
+public class StaticPage implements Page {
 
 	/** The prefix for {@link #getPath()}. */
 	private final String pathPrefix;
@@ -32,17 +32,23 @@ public class CSSPage implements Page {
 	/** The path used as prefix when loading resources. */
 	private final String resourcePathPrefix;
 
+	/** The MIME type for the files this path contains. */
+	private final String mimeType;
+
 	/**
 	 * Creates a new CSS page.
-	 * 
+	 *
 	 * @param pathPrefix
 	 *            The prefix for {@link #getPath()}
 	 * @param resourcePathPrefix
 	 *            The path prefix when loading resources
+	 * @param mimeType
+	 *            The MIME type of the files this path contains
 	 */
-	public CSSPage(String pathPrefix, String resourcePathPrefix) {
+	public StaticPage(String pathPrefix, String resourcePathPrefix, String mimeType) {
 		this.pathPrefix = pathPrefix;
 		this.resourcePathPrefix = resourcePathPrefix;
+		this.mimeType = mimeType;
 	}
 
 	/**
@@ -60,12 +66,12 @@ public class CSSPage implements Page {
 	public Response handleRequest(Request request) {
 		String path = request.getURI().getPath();
 		int lastSlash = path.lastIndexOf('/');
-		String cssFilename = path.substring(lastSlash + 1);
-		InputStream cssInputStream = getClass().getResourceAsStream(resourcePathPrefix + cssFilename);
-		if (cssInputStream == null) {
+		String filename = path.substring(lastSlash + 1);
+		InputStream fileInputStream = getClass().getResourceAsStream(resourcePathPrefix + filename);
+		if (fileInputStream == null) {
 			return new Response(404, "Not found.", null, (String) null);
 		}
-		return new Response(200, "OK", "text/css", null, cssInputStream);
+		return new Response(200, "OK", mimeType, null, fileInputStream);
 	}
 
 }
