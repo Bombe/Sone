@@ -160,6 +160,17 @@ public class Core extends AbstractService {
 	}
 
 	/**
+	 * Adds a remote Sone so that it is watched for updates.
+	 *
+	 * @param sone
+	 *            The sone to watch
+	 */
+	public void addRemoteSone(Sone sone) {
+		Sone updatedSone = soneCache.put(sone.getId(), sone);
+		soneDownloader.addSone(updatedSone);
+	}
+
+	/**
 	 * Creates a new Sone at a random location.
 	 *
 	 * @param name
