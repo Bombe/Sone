@@ -65,13 +65,17 @@ public class ShellCache<T> {
 	 *            The object to store
 	 */
 	@SuppressWarnings("unchecked")
-	public void put(String id, T object) {
+	public T put(String id, T object) {
 		if (!(object instanceof Shell<?>)) {
 			objectCache.put(id, object);
 			shellCache.remove(id);
-		} else {
-			shellCache.put(id, (Shell<T>) object);
+			return object;
 		}
+		if (objectCache.containsKey(id)) {
+			return objectCache.get(id);
+		}
+		shellCache.put(id, (Shell<T>) object);
+		return object;
 	}
 
 	/**
