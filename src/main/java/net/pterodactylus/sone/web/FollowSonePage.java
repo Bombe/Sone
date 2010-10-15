@@ -52,7 +52,7 @@ public class FollowSonePage extends SoneTemplatePage {
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Sone sone = webInterface.core().getSone(soneId);
 		if (!(sone instanceof SoneShell) && !sone.equals(currentSone)) {
-			currentSone.addFriendSone(sone);
+			currentSone.addFriend(sone);
 		}
 		throw new RedirectException("viewSone.html?sone=" + soneId);
 	}

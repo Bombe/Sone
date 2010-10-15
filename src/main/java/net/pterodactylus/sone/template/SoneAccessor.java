@@ -52,7 +52,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			return getNiceName(sone);
 		} else if (member.equals("isFriend")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return currentSone.hasFriendSone(sone) ? true : null;
+			return currentSone.hasFriend(sone) ? true : null;
 		} else if (member.equals("isCurrent")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return currentSone.equals(sone);

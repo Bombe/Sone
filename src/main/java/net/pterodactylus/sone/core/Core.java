@@ -347,7 +347,7 @@ public class Core extends AbstractService {
 						((SoneShell) friendSone).setRequestUri(new FreenetURI(friendKey)).setName(friendName);
 					}
 					addRemoteSone(friendSone);
-					sone.addFriendSone(sone);
+					sone.addFriend(sone);
 				}
 
 				sone.setModificationCounter(modificationCounter);
@@ -406,7 +406,7 @@ public class Core extends AbstractService {
 				configuration.getStringValue(sonePrefix + "/Reply." + replyId + "/ID").setValue(null);
 
 				int friendId = 0;
-				for (Sone friend : sone.getFriendSones()) {
+				for (Sone friend : sone.getFriends()) {
 					String friendPrefix = sonePrefix + "/Friend." + friendId++;
 					configuration.getStringValue(friendPrefix + "/ID").setValue(friend.getId());
 					configuration.getStringValue(friendPrefix + "/Key").setValue(friend.getRequestUri().toString());

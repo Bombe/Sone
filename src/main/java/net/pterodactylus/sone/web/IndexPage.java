@@ -57,7 +57,7 @@ public class IndexPage extends SoneTemplatePage {
 		Sone sone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(sone.getPosts());
-		for (Sone friendSone : sone.getFriendSones()) {
+		for (Sone friendSone : sone.getFriends()) {
 			allPosts.addAll(friendSone.getPosts());
 		}
 		Collections.sort(allPosts, new Comparator<Post>() {

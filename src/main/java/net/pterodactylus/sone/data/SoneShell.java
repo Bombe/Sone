@@ -178,7 +178,7 @@ public class SoneShell extends Sone implements Shell<Sone> {
 	 * @return The friend Sones of this Sone
 	 */
 	@Override
-	public Set<Sone> getFriendSones() {
+	public Set<Sone> getFriends() {
 		return Collections.unmodifiableSet(friendSones);
 	}
 
@@ -191,7 +191,7 @@ public class SoneShell extends Sone implements Shell<Sone> {
 	 *         {@code false} otherwise
 	 */
 	@Override
-	public boolean hasFriendSone(Sone friendSone) {
+	public boolean hasFriend(Sone friendSone) {
 		return friendSones.contains(friendSone);
 	}
 
@@ -203,7 +203,7 @@ public class SoneShell extends Sone implements Shell<Sone> {
 	 * @return This Sone (for method chaining)
 	 */
 	@Override
-	public Sone addFriendSone(Sone friendSone) {
+	public Sone addFriend(Sone friendSone) {
 		friendSones.add(friendSone);
 		return this;
 	}
@@ -216,7 +216,7 @@ public class SoneShell extends Sone implements Shell<Sone> {
 	 * @return This Sone (for method chaining)
 	 */
 	@Override
-	public Sone removeFriendSone(Sone friendSone) {
+	public Sone removeFriend(Sone friendSone) {
 		friendSones.remove(friendSone);
 		return this;
 	}
@@ -317,7 +317,7 @@ public class SoneShell extends Sone implements Shell<Sone> {
 			Sone sone = new Sone(id, name, requestUri);
 			sone.setProfile(profile);
 			for (Sone friendSone : friendSones) {
-				sone.addFriendSone(friendSone);
+				sone.addFriend(friendSone);
 			}
 			for (Post post : posts) {
 				sone.addPost(post);

@@ -173,7 +173,7 @@ public class Sone {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	public Set<Sone> getFriendSones() {
+	public Set<Sone> getFriends() {
 		return Collections.unmodifiableSet(friendSones);
 	}
 
@@ -185,7 +185,7 @@ public class Sone {
 	 * @return {@code true} if this Sone has the given Sone as a friend,
 	 *         {@code false} otherwise
 	 */
-	public boolean hasFriendSone(Sone friendSone) {
+	public boolean hasFriend(Sone friendSone) {
 		return friendSones.contains(friendSone);
 	}
 
@@ -196,7 +196,7 @@ public class Sone {
 	 *            The friend Sone to add
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone addFriendSone(Sone friendSone) {
+	public synchronized Sone addFriend(Sone friendSone) {
 		if (friendSones.add(friendSone)) {
 			modificationCounter++;
 		}
@@ -210,7 +210,7 @@ public class Sone {
 	 *            The friend Sone to remove
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone removeFriendSone(Sone friendSone) {
+	public synchronized Sone removeFriend(Sone friendSone) {
 		if (friendSones.remove(friendSone)) {
 			modificationCounter++;
 		}
