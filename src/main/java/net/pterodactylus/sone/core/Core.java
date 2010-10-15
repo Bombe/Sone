@@ -331,6 +331,25 @@ public class Core extends AbstractService {
 					Reply reply = new ReplyShell().setSone(replySone).setPost(replyPost).setTime(replyTime).setText(replyText).getShelled();
 					replyCache.put(replyId, reply);
 				} while (true);
+
+				/* load friends. */
+				int friendCounter = 0;
+				while (true) {
+					String friendPrefix = sonePrefix + "/Friend." + friendCounter++;
+					String friendId = configuration.getStringValue(friendPrefix + "/ID").getValue(null);
+					if (friendId == null) {
+						break;
+					}
+					Sone friendSone = soneCache.get(friendId);
+					if (friendSone instanceof SoneShell) {
+						String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
+						String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
+						((SoneShell) friendSone).setRequestUri(new FreenetURI(friendKey)).setName(friendName);
+					}
+					addRemoteSone(friendSone);
+					sone.addFriendSone(sone);
+				}
+
 				sone.setModificationCounter(modificationCounter);
 				addSone(sone);
 			} catch (MalformedURLException mue1) {
@@ -385,6 +404,17 @@ public class Core extends AbstractService {
 				}
 				/* write null ID as terminator. */
 				configuration.getStringValue(sonePrefix + "/Reply." + replyId + "/ID").setValue(null);
+
+				int friendId = 0;
+				for (Sone friend : sone.getFriendSones()) {
+					String friendPrefix = sonePrefix + "/Friend." + friendId++;
+					configuration.getStringValue(friendPrefix + "/ID").setValue(friend.getId());
+					configuration.getStringValue(friendPrefix + "/Key").setValue(friend.getRequestUri().toString());
+					configuration.getStringValue(friendPrefix + "/Name").setValue(friend.getName());
+				}
+				/* write null ID as terminator. */
+				configuration.getStringValue(sonePrefix + "/Friend." + friendId + "/ID").setValue(null);
+
 			}
 			/* write null ID as terminator. */
 			configuration.getStringValue("Sone/Sone." + soneId + "/ID").setValue(null);
