@@ -210,7 +210,7 @@ public class Reply {
 	 */
 	@Override
 	public int hashCode() {
-		return sone.hashCode() ^ id.hashCode() ^ post.hashCode() ^ (int) (time >> 32) ^ (int) (time & 0xffffffff) ^ text.hashCode();
+		return id.hashCode();
 	}
 
 	/**
@@ -222,7 +222,7 @@ public class Reply {
 			return false;
 		}
 		Reply reply = (Reply) object;
-		return reply.sone.equals(sone) && reply.id.equals(id) && reply.post.equals(post) && (reply.time == time) && reply.text.equals(text);
+		return reply.id.equals(id);
 	}
 
 	/**
