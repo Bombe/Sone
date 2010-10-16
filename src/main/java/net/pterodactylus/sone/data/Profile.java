@@ -51,6 +51,9 @@ public class Profile {
 	 *            The profile to copy
 	 */
 	public Profile(Profile profile) {
+		if (profile == null) {
+			return;
+		}
 		this.firstName = profile.firstName;
 		this.middleName = profile.middleName;
 		this.lastName = profile.lastName;
