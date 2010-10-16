@@ -308,17 +308,24 @@ public class Core extends AbstractService {
 	 * @param requestUri
 	 *            The request URI to load the Sone from
 	 */
-	public void loadSone(String requestUri) {
-		try {
-			FreenetURI realRequestUri = new FreenetURI(requestUri).setMetaString(new String[] { "sone.xml" });
-			FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
-			Sone parsedSone = soneDownloader.parseSone(null, fetchResult, realRequestUri);
-			if (parsedSone != null) {
-				addSone(parsedSone);
+	public void loadSone(final String requestUri) {
+		new Thread(new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				try {
+					FreenetURI realRequestUri = new FreenetURI(requestUri).setMetaString(new String[] { "sone.xml" });
+					FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
+					Sone parsedSone = soneDownloader.parseSone(null, fetchResult, realRequestUri);
+					if (parsedSone != null) {
+						addSone(parsedSone);
+					}
+				} catch (MalformedURLException mue1) {
+					logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
+				}
 			}
-		} catch (MalformedURLException mue1) {
-			logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
-		}
+		}, "Sone Downloader").start();
 	}
 
 	/**
