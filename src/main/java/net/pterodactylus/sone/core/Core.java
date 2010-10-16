@@ -164,7 +164,9 @@ public class Core extends AbstractService {
 	 * @return The created post
 	 */
 	public Post createPost(Sone sone, long time, String text) {
-		return getPost(UUID.randomUUID().toString()).setSone(sone).setTime(time).setText(text);
+		Post post = getPost(UUID.randomUUID().toString()).setSone(sone).setTime(time).setText(text);
+		sone.addPost(post);
+		return post;
 	}
 
 	//
