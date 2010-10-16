@@ -350,6 +350,28 @@ public class Core extends AbstractService {
 	}
 
 	/**
+	 * Loads and updates the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to load
+	 */
+	public void loadSone(final Sone sone) {
+		new Thread(new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				FreenetURI realRequestUri = sone.getRequestUri().setMetaString(new String[] { "sone.xml" });
+				FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
+				Sone parsedSone = soneDownloader.parseSone(sone, fetchResult, realRequestUri);
+				if (parsedSone != null) {
+					addSone(parsedSone);
+				}
+			}
+		}, "Sone Downloader").start();
+	}
+
+	/**
 	 * Deletes the given Sone from this plugin instance.
 	 *
 	 * @param sone
