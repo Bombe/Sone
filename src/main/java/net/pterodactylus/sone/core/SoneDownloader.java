@@ -117,17 +117,18 @@ public class SoneDownloader extends AbstractService {
 	/**
 	 * Parses a Sone from a fetch result.
 	 *
-	 * @param sone
+	 * @param originalSone
 	 *            The sone to parse, or {@code null} if the Sone is yet unknown
 	 * @param fetchResult
 	 *            The fetch result
 	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
 	 */
-	public Sone parseSone(Sone sone, FetchResult fetchResult) {
-		logger.log(Level.FINEST, "Persing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), sone });
+	public Sone parseSone(Sone originalSone, FetchResult fetchResult) {
+		logger.log(Level.FINEST, "Persing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), originalSone });
 		/* TODO - impose a size limit? */
 		InputStream xmlInputStream = null;
 		Bucket xmlBucket = null;
+		Sone sone;
 		try {
 			xmlBucket = fetchResult.asBucket();
 			xmlInputStream = xmlBucket.getInputStream();
@@ -137,19 +138,20 @@ public class SoneDownloader extends AbstractService {
 				soneXml = SimpleXML.fromDocument(document);
 			} catch (NullPointerException npe1) {
 				/* for some reason, invalid XML can cause NPEs. */
-				logger.log(Level.WARNING, "XML for Sone " + sone + " can not be parsed!", npe1);
+				logger.log(Level.WARNING, "XML for Sone " + originalSone + " can not be parsed!", npe1);
 				return null;
 			}
 
 			/* check ID. */
 			String soneId = soneXml.getValue("id", null);
-			if ((sone != null) && !sone.getId().equals(soneId)) {
+			if ((originalSone != null) && !originalSone.getId().equals(soneId)) {
 				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, "Downloaded ID for Sone %s (%s) does not match known ID (%s)!", new Object[] { sone, sone.getId(), soneId });
+				logger.log(Level.WARNING, "Downloaded ID for Sone %s (%s) does not match known ID (%s)!", new Object[] { originalSone, originalSone.getId(), soneId });
 				return null;
 			}
 
 			/* load Sone from core. */
+			sone = originalSone;
 			if (sone == null) {
 				sone = core.getSone(soneId);
 			}
@@ -238,7 +240,7 @@ public class SoneDownloader extends AbstractService {
 				sone.setModificationCounter(0);
 			}
 		} catch (IOException ioe1) {
-			logger.log(Level.WARNING, "Could not read XML file from " + sone + "!", ioe1);
+			logger.log(Level.WARNING, "Could not read XML file from " + originalSone + "!", ioe1);
 			return null;
 		} finally {
 			if (xmlBucket != null) {
