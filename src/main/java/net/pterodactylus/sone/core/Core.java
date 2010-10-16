@@ -291,6 +291,7 @@ public class Core extends AbstractService {
 	public void loadSone(String requestUri) {
 		try {
 			FetchResult fetchResult = freenetInterface.fetchUri(new FreenetURI(requestUri).setMetaString(new String[] { "sone.xml" }));
+			soneDownloader.parseSone(null, fetchResult);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
 		}
