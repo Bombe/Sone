@@ -44,6 +44,9 @@ import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateException;
+import net.pterodactylus.util.template.TemplateFactory;
+import net.pterodactylus.util.template.TemplateProvider;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.ToadletContainer;
@@ -148,6 +151,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
+		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
 
 		String formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
@@ -266,4 +270,47 @@ public class WebInterface extends AbstractService {
 		}
 	}
 
+	/**
+	 * Template provider implementation that uses
+	 * {@link WebInterface#createReader(String)} to load templates for
+	 * inclusion.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class ClassPathTemplateProvider implements TemplateProvider {
+
+		/** The template factory. */
+		private final TemplateFactory templateFactory;
+
+		/**
+		 * Creates a new template provider that locates templates on the
+		 * classpath.
+		 *
+		 * @param templateFactory
+		 *            The template factory to create the templates
+		 */
+		public ClassPathTemplateProvider(TemplateFactory templateFactory) {
+			this.templateFactory = templateFactory;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@SuppressWarnings("synthetic-access")
+		public Template getTemplate(String templateName) {
+			Reader templateReader = createReader("/templates/" + templateName);
+			if (templateReader == null) {
+				return null;
+			}
+			Template template = templateFactory.createTemplate(templateReader);
+			try {
+				template.parse();
+			} catch (TemplateException te1) {
+				logger.log(Level.WARNING, "Could not parse template “" + templateName + "” for inclusion!", te1);
+			}
+			return template;
+		}
+
+	}
 }
