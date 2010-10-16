@@ -99,36 +99,10 @@ public class SoneDownloader extends AbstractService {
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" }) });
 		FetchResult fetchResult = freenetInterface.fetchUri(sone.getRequestUri().setMetaString(new String[] { "sone.xml" }));
 		logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
-		updateSoneFromXml(sone, fetchResult);
+		parseSone(sone, fetchResult);
 	}
 
-	//
-	// SERVICE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void serviceStop() {
-		for (Sone sone : sones) {
-			freenetInterface.unregisterUsk(sone);
-		}
-	}
-
-	//
-	// PRIVATE METHODS
-	//
-
-	/**
-	 * Updates the contents of the given Sone from the given fetch result.
-	 *
-	 * @param sone
-	 *            The Sone to update
-	 * @param fetchResult
-	 *            The fetch result
-	 */
-	private void updateSoneFromXml(Sone sone, FetchResult fetchResult) {
+	public Sone parseSone(Sone sone, FetchResult fetchResult) {
 		logger.log(Level.FINEST, "Persing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), sone });
 		/* TODO - impose a size limit? */
 		InputStream xmlInputStream = null;
@@ -143,29 +117,34 @@ public class SoneDownloader extends AbstractService {
 			} catch (NullPointerException npe1) {
 				/* for some reason, invalid XML can cause NPEs. */
 				logger.log(Level.WARNING, "XML for Sone " + sone + " can not be parsed!", npe1);
-				return;
+				return null;
 			}
 
 			/* check ID. */
 			String soneId = soneXml.getValue("id", null);
-			if (!sone.getId().equals(soneId)) {
+			if ((sone != null) && !sone.getId().equals(soneId)) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded ID for Sone %s (%s) does not match known ID (%s)!", new Object[] { sone, sone.getId(), soneId });
-				return;
+				return null;
+			}
+
+			/* load Sone from core. */
+			if (sone == null) {
+				sone = core.getSone(soneId);
 			}
 
 			String soneName = soneXml.getValue("name", null);
 			if (soneName == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded name for Sone %s was null!", new Object[] { sone });
-				return;
+				return null;
 			}
 
 			SimpleXML profileXml = soneXml.getNode("profile");
 			if (profileXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no profile!", new Object[] { sone });
-				return;
+				return null;
 			}
 
 			/* parse profile. */
@@ -179,7 +158,7 @@ public class SoneDownloader extends AbstractService {
 			if (postsXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no posts!", new Object[] { sone });
-				return;
+				return null;
 			}
 
 			Set<Post> posts = new HashSet<Post>();
@@ -190,14 +169,14 @@ public class SoneDownloader extends AbstractService {
 				if ((postId == null) || (postTime == null) || (postText == null)) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded post for Sone %s with missing data! ID: %s, Time: %s, Text: %s", new Object[] { sone, postId, postTime, postText });
-					return;
+					return null;
 				}
 				try {
 					posts.add(core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText));
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
-					return;
+					return null;
 				}
 			}
 
@@ -206,7 +185,7 @@ public class SoneDownloader extends AbstractService {
 			if (repliesXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no replies!", new Object[] { sone });
-				return;
+				return null;
 			}
 
 			Set<Reply> replies = new HashSet<Reply>();
@@ -218,14 +197,14 @@ public class SoneDownloader extends AbstractService {
 				if ((replyId == null) || (replyPostId == null) || (replyTime == null) || (replyText == null)) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded reply for Sone %s with missing data! ID: %s, Post: %s, Time: %s, Text: %s", new Object[] { sone, replyId, replyPostId, replyTime, replyText });
-					return;
+					return null;
 				}
 				try {
 					replies.add(core.getReply(replyId).setSone(sone).setPost(core.getPost(replyPostId)).setTime(Long.parseLong(replyTime)).setText(replyText));
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded reply for Sone %s with invalid time: %s", new Object[] { sone, replyTime });
-					return;
+					return null;
 				}
 			}
 
@@ -239,11 +218,27 @@ public class SoneDownloader extends AbstractService {
 			}
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not read XML file from " + sone + "!", ioe1);
+			return null;
 		} finally {
 			if (xmlBucket != null) {
 				xmlBucket.free();
 			}
 			Closer.close(xmlInputStream);
+		}
+		return sone;
+	}
+
+	//
+	// SERVICE METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void serviceStop() {
+		for (Sone sone : sones) {
+			freenetInterface.unregisterUsk(sone);
 		}
 	}
 
