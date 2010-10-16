@@ -169,6 +169,40 @@ public class Core extends AbstractService {
 		return post;
 	}
 
+	/**
+	 * Creates a reply.
+	 *
+	 * @param sone
+	 *            The Sone that posts the reply
+	 * @param post
+	 *            The post the reply refers to
+	 * @param text
+	 *            The text of the reply
+	 * @return The created reply
+	 */
+	public Reply createReply(Sone sone, Post post, String text) {
+		return createReply(sone, post, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a reply.
+	 *
+	 * @param sone
+	 *            The Sone that posts the reply
+	 * @param post
+	 *            The post the reply refers to
+	 * @param time
+	 *            The time of the post
+	 * @param text
+	 *            The text of the reply
+	 * @return The created reply
+	 */
+	public Reply createReply(Sone sone, Post post, long time, String text) {
+		Reply reply = getReply(UUID.randomUUID().toString()).setSone(sone).setPost(post).setTime(time).setText(text);
+		sone.addReply(reply);
+		return reply;
+	}
+
 	//
 	// ACTIONS
 	//
