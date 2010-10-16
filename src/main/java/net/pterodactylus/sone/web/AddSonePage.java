@@ -49,16 +49,7 @@ public class AddSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		final String soneKey = request.getHttpRequest().getPartAsStringFailsafe("request-uri", 256);
-		new Thread(new Runnable() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void run() {
-				webInterface.core().loadSone(soneKey);
-			}
-		}, "Sone Downloader").start();
+		webInterface.core().loadSone(soneKey);
 	}
 
 }
