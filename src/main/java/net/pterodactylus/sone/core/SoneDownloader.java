@@ -169,6 +169,7 @@ public class SoneDownloader extends AbstractService {
 				logger.log(Level.WARNING, "Downloaded name for Sone %s was null!", new Object[] { sone });
 				return null;
 			}
+			sone.setName(soneName);
 
 			SimpleXML profileXml = soneXml.getNode("profile");
 			if (profileXml == null) {
