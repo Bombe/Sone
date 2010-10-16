@@ -38,6 +38,8 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
+import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import freenet.client.FetchResult;
@@ -151,7 +153,23 @@ public class Core extends AbstractService {
 	}
 
 	/**
-	 * Creates a new post.
+	 * Gets all known Sones that are not local Sones.
+	 *
+	 * @return All remote Sones
+	 */
+	public Collection<Sone> getRemoteSones() {
+		return Filters.filteredCollection(getKnownSones(), new Filter<Sone>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public boolean filterObject(Sone object) {
+				return !localSones.contains(object);
+			}
+		});
+	}
+
+	/**
+	 * Creates a new post and adds it to the given Sone.
 	 *
 	 * @param sone
 	 *            The sone that creates the post
@@ -164,7 +182,7 @@ public class Core extends AbstractService {
 	}
 
 	/**
-	 * Creates a new post.
+	 * Creates a new post and adds it to the given Sone.
 	 *
 	 * @param sone
 	 *            The Sone that creates the post
