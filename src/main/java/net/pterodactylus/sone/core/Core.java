@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -138,6 +139,15 @@ public class Core extends AbstractService {
 			soneCache.put(soneId, sone);
 		}
 		return soneCache.get(soneId);
+	}
+
+	/**
+	 * Returns all known sones.
+	 *
+	 * @return All known sones
+	 */
+	public Collection<Sone> getKnownSones() {
+		return soneCache.values();
 	}
 
 	/**

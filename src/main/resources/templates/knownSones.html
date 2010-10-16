@@ -1,0 +1,13 @@
+<div id="sone">
+
+	<h1><%= Page.KnownSones.Page.Title|l10n|html></h1>
+
+	<div id="known-sones">
+		<%foreach knownSones sone>
+			<div><a href="viewSone.html?sone=<% sone.id>"><% sone.niceName|html></a> (<% sone.requestUri|html>)</div>
+		<%foreachelse>
+			<div><%= Page.KnownSones.Text.NoKnownSones|l10n|html></div>
+		<%/foreach>
+	</div>
+
+</div>
