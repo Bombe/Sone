@@ -111,7 +111,10 @@ public class SoneDownloader extends AbstractService {
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" }) });
 		FetchResult fetchResult = freenetInterface.fetchUri(sone.getRequestUri().setMetaString(new String[] { "sone.xml" }));
 		logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
-		parseSone(sone, fetchResult);
+		Sone parsedSone = parseSone(sone, fetchResult);
+		if (parsedSone != null) {
+			core.addSone(parsedSone);
+		}
 	}
 
 	/**
