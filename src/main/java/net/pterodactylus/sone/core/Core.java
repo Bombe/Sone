@@ -536,7 +536,6 @@ public class Core extends AbstractService {
 					String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
 					String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
 					friendSone.setRequestUri(new FreenetURI(friendKey)).setName(friendName);
-					loadSone(friendKey);
 					sone.addFriend(friendSone);
 				}
 
@@ -547,6 +546,11 @@ public class Core extends AbstractService {
 			}
 		} while (true);
 		logger.log(Level.INFO, "Loaded %d Sones.", getSones().size());
+
+		/* load all remote Sones. */
+		for (Sone remoteSone : getRemoteSones()) {
+			loadSone(remoteSone);
+		}
 
 		logger.exiting(Core.class.getName(), "loadConfiguration()");
 	}
