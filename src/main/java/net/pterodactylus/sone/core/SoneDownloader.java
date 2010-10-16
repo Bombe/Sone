@@ -37,6 +37,7 @@ import net.pterodactylus.util.xml.XML;
 import org.w3c.dom.Document;
 
 import freenet.client.FetchResult;
+import freenet.keys.FreenetURI;
 import freenet.support.api.Bucket;
 
 /**
@@ -109,9 +110,10 @@ public class SoneDownloader extends AbstractService {
 	 */
 	public void fetchSone(Sone sone) {
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" }) });
-		FetchResult fetchResult = freenetInterface.fetchUri(sone.getRequestUri().setMetaString(new String[] { "sone.xml" }));
+		FreenetURI requestUri = sone.getRequestUri().setMetaString(new String[] { "sone.xml" });
+		FetchResult fetchResult = freenetInterface.fetchUri(requestUri);
 		logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
-		Sone parsedSone = parseSone(sone, fetchResult);
+		Sone parsedSone = parseSone(sone, fetchResult, requestUri);
 		if (parsedSone != null) {
 			core.addSone(parsedSone);
 		}
@@ -124,9 +126,11 @@ public class SoneDownloader extends AbstractService {
 	 *            The sone to parse, or {@code null} if the Sone is yet unknown
 	 * @param fetchResult
 	 *            The fetch result
+	 * @param requestUri
+	 *            The requested URI
 	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
 	 */
-	public Sone parseSone(Sone originalSone, FetchResult fetchResult) {
+	public Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
 		logger.log(Level.FINEST, "Persing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), originalSone });
 		/* TODO - impose a size limit? */
 		InputStream xmlInputStream = null;
@@ -156,7 +160,7 @@ public class SoneDownloader extends AbstractService {
 			/* load Sone from core. */
 			sone = originalSone;
 			if (sone == null) {
-				sone = core.getSone(soneId);
+				sone = core.getSone(soneId).setRequestUri(requestUri.setMetaString(new String[] {}));
 			}
 
 			String soneName = soneXml.getValue("name", null);
