@@ -245,7 +245,9 @@ public class Core extends AbstractService {
 	 */
 	public void addSone(Sone sone) {
 		soneCache.put(sone.getId(), sone);
-		soneDownloader.addSone(sone);
+		if (!localSones.contains(sone)) {
+			soneDownloader.addSone(sone);
+		}
 	}
 
 	/**
