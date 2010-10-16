@@ -39,6 +39,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
+import freenet.client.FetchResult;
 import freenet.keys.FreenetURI;
 
 /**
@@ -278,6 +279,20 @@ public class Core extends AbstractService {
 			throw new SoneException(Type.INVALID_URI);
 		}
 		return sone;
+	}
+
+	/**
+	 * Loads the Sone from the given request URI.
+	 *
+	 * @param requestUri
+	 *            The request URI to load the Sone from
+	 */
+	public void loadSone(String requestUri) {
+		try {
+			FetchResult fetchResult = freenetInterface.fetchUri(new FreenetURI(requestUri).setMetaString(new String[] { "sone.xml" }));
+		} catch (MalformedURLException mue1) {
+			logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
+		}
 	}
 
 	/**
