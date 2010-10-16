@@ -48,6 +48,7 @@ public class ViewPostPage extends SoneTemplatePage {
 	 */
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
+		super.processTemplate(request, template);
 		String postId = request.getHttpRequest().getParam("post");
 		Post post = webInterface.core().getPost(postId);
 		template.set("post", post);

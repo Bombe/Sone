@@ -50,6 +50,7 @@ public class CreateReplyPage extends SoneTemplatePage {
 	 */
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
+		super.processTemplate(request, template);
 		String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		if (request.getMethod() == Method.POST) {
