@@ -493,7 +493,7 @@ public class Core extends AbstractService {
 					String friendKey = configuration.getStringValue(friendPrefix + "/Key").getValue(null);
 					String friendName = configuration.getStringValue(friendPrefix + "/Name").getValue(null);
 					friendSone.setRequestUri(new FreenetURI(friendKey)).setName(friendName);
-					soneDownloader.addSone(friendSone);
+					loadSone(friendKey);
 					sone.addFriend(friendSone);
 				}
 
