@@ -187,6 +187,8 @@ public class WebInterface extends AbstractService {
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
 		deleteSoneTemplate.set("formPassword", formPassword);
 
+		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
+
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
@@ -203,6 +205,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(logoutTemplate, this), "Logout"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 
