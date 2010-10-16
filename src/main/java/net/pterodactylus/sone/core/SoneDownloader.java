@@ -114,6 +114,15 @@ public class SoneDownloader extends AbstractService {
 		parseSone(sone, fetchResult);
 	}
 
+	/**
+	 * Parses a Sone from a fetch result.
+	 *
+	 * @param sone
+	 *            The sone to parse, or {@code null} if the Sone is yet unknown
+	 * @param fetchResult
+	 *            The fetch result
+	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
+	 */
 	public Sone parseSone(Sone sone, FetchResult fetchResult) {
 		logger.log(Level.FINEST, "Persing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), sone });
 		/* TODO - impose a size limit? */
