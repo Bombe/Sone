@@ -89,6 +89,18 @@ public class SoneDownloader extends AbstractService {
 	}
 
 	/**
+	 * Removes the given Sone from the downloader.
+	 *
+	 * @param sone
+	 *            The Sone to stop watching
+	 */
+	public void removeSone(Sone sone) {
+		if (sones.remove(sone)) {
+			freenetInterface.unregisterUsk(sone);
+		}
+	}
+
+	/**
 	 * Fetches the updated Sone. This method is a callback method for
 	 * {@link FreenetInterface#registerUsk(Sone, SoneDownloader)}.
 	 *

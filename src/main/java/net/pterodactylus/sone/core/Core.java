@@ -135,6 +135,7 @@ public class Core extends AbstractService {
 	public Sone getSone(String soneId) {
 		if (!soneCache.containsKey(soneId)) {
 			Sone sone = new Sone(soneId);
+			soneDownloader.addSone(sone);
 			soneCache.put(soneId, sone);
 		}
 		return soneCache.get(soneId);
@@ -218,7 +219,7 @@ public class Core extends AbstractService {
 		if (localSones.add(sone)) {
 			SoneInserter soneInserter = new SoneInserter(freenetInterface, sone);
 			soneInserter.start();
-			soneDownloader.addSone(sone);
+			soneDownloader.removeSone(sone);
 			soneInserters.put(sone, soneInserter);
 		}
 	}
