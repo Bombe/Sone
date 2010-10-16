@@ -226,6 +226,7 @@ public class Core extends AbstractService {
 	 *            The Sone to watch for updates
 	 */
 	public void addSone(Sone sone) {
+		soneCache.put(sone.getId(), sone);
 		soneDownloader.addSone(sone);
 	}
 
