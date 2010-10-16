@@ -303,7 +303,8 @@ public class Core extends AbstractService {
 	}
 
 	/**
-	 * Loads the Sone from the given request URI.
+	 * Loads the Sone from the given request URI. The fetching of the data is
+	 * performed in a new thread so this method returns immediately.
 	 *
 	 * @param requestUri
 	 *            The request URI to load the Sone from
