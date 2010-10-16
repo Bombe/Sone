@@ -312,7 +312,8 @@ public class Core extends AbstractService {
 		try {
 			FreenetURI realRequestUri = new FreenetURI(requestUri).setMetaString(new String[] { "sone.xml" });
 			FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
-			soneDownloader.parseSone(null, fetchResult, realRequestUri);
+			Sone parsedSone = soneDownloader.parseSone(null, fetchResult, realRequestUri);
+			addSone(parsedSone);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
 		}
