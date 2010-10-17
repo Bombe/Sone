@@ -99,6 +99,7 @@ public class SoneInserter extends AbstractService {
 			synchronized (sone) {
 				modificationCounter = sone.getModificationCounter();
 				if (modificationCounter > 0) {
+					sone.setTime(System.currentTimeMillis());
 					insertInformation = new InsertInformation(sone.getRequestUri(), sone.getInsertUri());
 				}
 			}
