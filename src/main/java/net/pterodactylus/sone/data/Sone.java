@@ -57,6 +57,9 @@ public class Sone {
 	/* This will be null for remote Sones! */
 	private FreenetURI insertUri;
 
+	/** The time of the last inserted update. */
+	private long time;
+
 	/** The profile of this Sone. */
 	private Profile profile;
 
@@ -155,6 +158,27 @@ public class Sone {
 	 */
 	public Sone setInsertUri(FreenetURI insertUri) {
 		this.insertUri = insertUri;
+		return this;
+	}
+
+	/**
+	 * Return the time of the last inserted update of this Sone.
+	 *
+	 * @return The time of the update (in milliseconds since Jan 1, 1970 UTC)
+	 */
+	public long getTime() {
+		return time;
+	}
+
+	/**
+	 * Sets the time of the last inserted update of this Sone.
+	 *
+	 * @param time
+	 *            The time of the update (in milliseconds since Jan 1, 1970 UTC)
+	 * @return This Sone (for method chaining)
+	 */
+	public Sone setTime(long time) {
+		this.time = time;
 		return this;
 	}
 
