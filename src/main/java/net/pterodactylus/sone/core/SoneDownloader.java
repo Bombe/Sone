@@ -171,6 +171,20 @@ public class SoneDownloader extends AbstractService {
 			}
 			sone.setName(soneName);
 
+			String soneTime = soneXml.getValue("time", null);
+			if (soneTime == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded time for Sone %s was null!", new Object[] { sone });
+				return null;
+			}
+			try {
+				sone.setTime(Long.parseLong(soneTime));
+			} catch (NumberFormatException nfe1) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded Sone %s with invalid time: %s", new Object[] { sone, soneTime });
+				return null;
+			}
+
 			SimpleXML profileXml = soneXml.getNode("profile");
 			if (profileXml == null) {
 				/* TODO - mark Sone as bad. */
