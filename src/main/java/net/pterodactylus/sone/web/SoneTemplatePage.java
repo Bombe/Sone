@@ -152,6 +152,14 @@ public class SoneTemplatePage extends TemplatePage {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getShortcutIcon() {
+		return "images/icon.png";
+	}
+
+	/**
 	 * Returns whether this page requires the user to log in.
 	 *
 	 * @return {@code true} if the user is required to be logged in to use this
