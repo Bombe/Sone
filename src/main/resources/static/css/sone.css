@@ -153,6 +153,10 @@
 	display: inline;
 }
 
+#sone #known-sones .last-update {
+	display: inline;
+}
+
 #sone #known-sones form.block button, #sone #known-sones form.unblock button {
 	display: inline;
 	color: rgb(28, 131, 191);
