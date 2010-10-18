@@ -3,8 +3,10 @@
 		<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id>"><% post.sone.niceName|html></a></div>
 		<div class="text"><% post.text|html></div>
 	</div>
-	<div class="time"><a href="viewPost.html?post=<% post.id>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
-	<%if post.sone.isCurrent><div class="delete"><a href="deletePost.html?post=<% post.id>"><%= View.Post.DeleteLink|l10n|html></a></div><%/if>
+	<div class="status-line">
+		<div class="time"><a href="viewPost.html?post=<% post.id>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
+		<%if post.sone.isCurrent><div class="delete"><a href="deletePost.html?post=<% post.id>"><%= View.Post.DeleteLink|l10n|html></a></div><%/if>
+	</div>
 	<div class="replies">
 		<%foreach post.replies reply>
 			<div class="reply">
@@ -12,7 +14,10 @@
 					<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id>"><% reply.sone.niceName|html></a></div>
 					<div class="text"><% reply.text|html></div>
 				</div>
-				<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+				<div class="status-line">
+					<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+					<%if reply.sone.isCurrent><div class="delete"><a href="deleteReply.html?reply=<% reply.id>"><%= View.Post.Reply.DeleteLink|l10n|html></a></div><%/if>
+				</div>
 			</div>
 		<%/foreach>
 		<div class="create-reply">

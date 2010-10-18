@@ -52,6 +52,10 @@
 	display: inline;
 }
 
+#sone .post .status-line {
+	clear: both;
+}
+
 #sone .post .time {
 	color: #666;
 	float: left;
@@ -80,8 +84,18 @@
 
 #sone .post .reply .time {
 	float: none;
+	display: inline;
 	color: #666;
 	font-size: inherit;
+}
+
+#sone .post .reply .status-line .delete {
+	float: none;
+	display: inline;
+}
+
+#sone .post .reply .status-line .delete:before {
+	content: ' · ';
 }
 
 #sone .post .create-reply {
