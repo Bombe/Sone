@@ -185,6 +185,12 @@ public class WebInterface extends AbstractService {
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
 		viewSoneTemplate.set("formPassword", formPassword);
 
+		Template blockSoneTemplate = templateFactory.createTemplate(createReader("/templates/blockSone.html"));
+		blockSoneTemplate.set("formPassword", formPassword);
+
+		Template unblockSoneTemplate = templateFactory.createTemplate(createReader("/templates/unblockSone.html"));
+		unblockSoneTemplate.set("formPassword", formPassword);
+
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
 		viewPostTemplate.set("formPassword", formPassword);
 
@@ -211,6 +217,8 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlockSonePage(blockSoneTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblockSonePage(unblockSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewPostPage(viewPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostPage(deletePostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(followSoneTemplate, this)));

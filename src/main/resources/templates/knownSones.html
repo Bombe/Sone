@@ -4,7 +4,15 @@
 
 	<div id="known-sones">
 		<%foreach knownSones sone>
-			<div><a href="viewSone.html?sone=<% sone.id>"><% sone.niceName|html></a> (<% sone.requestUri|html>)</div>
+			<div>
+				<div class="profile-link"><a href="viewSone.html?sone=<% sone.id>"><% sone.niceName|html></a></div>
+				<div>(<% sone.requestUri|html>)</div>
+				<%if sone.isBlocked>
+					<div class="unblock-link"><a href="unblockSone.html?sone=<% sone.id>">unblock</a></div>
+				<%else>
+					<div class="block-link"><a href="blockSone.html?sone=<% sone.id>">block</a></div>
+				<%/if>
+			</div>
 		<%foreachelse>
 			<div><%= Page.KnownSones.Text.NoKnownSones|l10n|html></div>
 		<%/foreach>
