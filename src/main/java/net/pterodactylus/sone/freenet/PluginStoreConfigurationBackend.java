@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.freenet;
 
+import net.pterodactylus.util.config.AttributeNotFoundException;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.ExtendedConfigurationBackend;
@@ -47,6 +48,9 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	 */
 	@Override
 	public String getValue(String attribute) throws ConfigurationException {
+		if (!pluginStore.strings.containsKey(attribute)) {
+			throw new AttributeNotFoundException(attribute);
+		}
 		return pluginStore.strings.get(attribute);
 	}
 
@@ -63,6 +67,9 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	 */
 	@Override
 	public Boolean getBooleanValue(String attribute) throws ConfigurationException {
+		if (!pluginStore.booleans.containsKey(attribute)) {
+			throw new AttributeNotFoundException(attribute);
+		}
 		return pluginStore.booleans.get(attribute);
 	}
 
@@ -79,6 +86,9 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	 */
 	@Override
 	public Double getDoubleValue(String attribute) throws ConfigurationException {
+		if (!pluginStore.strings.containsKey(attribute)) {
+			throw new AttributeNotFoundException(attribute);
+		}
 		String stringValue = pluginStore.strings.get(attribute);
 		if (stringValue == null) {
 			return null;
@@ -103,6 +113,9 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	 */
 	@Override
 	public Integer getIntegerValue(String attribute) throws ConfigurationException {
+		if (!pluginStore.integers.containsKey(attribute)) {
+			throw new AttributeNotFoundException(attribute);
+		}
 		return pluginStore.integers.get(attribute);
 	}
 
@@ -119,6 +132,9 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	 */
 	@Override
 	public Long getLongValue(String attribute) throws ConfigurationException {
+		if (!pluginStore.longs.containsKey(attribute)) {
+			throw new AttributeNotFoundException(attribute);
+		}
 		return pluginStore.longs.get(attribute);
 	}
 
