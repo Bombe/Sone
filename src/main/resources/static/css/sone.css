@@ -145,6 +145,28 @@
 	display: none;
 }
 
+#sone #known-sones .profile-link {
+	display: inline;
+}
+
+#sone #known-sones .request-uri {
+	display: inline;
+}
+
+#sone #known-sones form.block button, #sone #known-sones form.unblock button {
+	display: inline;
+	color: rgb(28, 131, 191);
+	background: none;
+	border: none;
+	font: inherit;
+	padding: 0px;
+}
+
+#sone #known-sones form.block button:hover, #sone #known-sones form.unblock button:hover {
+	display: inline;
+	color: rgb(255, 172, 0);
+}
+
 #sone #known-sones form {
 	display: inline;
 }

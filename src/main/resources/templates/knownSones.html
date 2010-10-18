@@ -6,7 +6,7 @@
 		<%foreach knownSones sone>
 			<div>
 				<div class="profile-link"><a href="viewSone.html?sone=<% sone.id>"><% sone.niceName|html></a></div>
-				<div>(<% sone.requestUri|html>)</div>
+				<div class="request-uri"><% sone.requestUri|html></div>
 				<%ifnull ! currentSone>
 					<%if sone.isBlocked>
 						<form class="unblock" action="unblockSone.html" method="post">
