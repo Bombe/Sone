@@ -417,7 +417,7 @@ public class Sone {
 	 * @param soneId
 	 *            The Sone ID to unblock
 	 */
-	public void removeBlockedSoneIds(String soneId) {
+	public void removeBlockedSoneId(String soneId) {
 		blockedSoneIds.remove(soneId);
 	}
 
