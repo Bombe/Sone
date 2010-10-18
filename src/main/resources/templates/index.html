@@ -1,7 +1,4 @@
-<div id="sone">
-
-	<script src="javascript/jquery-1.4.2.js" language="javascript"></script>
-	<script src="javascript/sone.js" language="javascript"></script>
+<%include include/head.html>
 
 	<script language="javascript">
 		/* register input field/textarea swap. */
@@ -43,4 +40,5 @@
 		<input id="addsone" type="text" name="request-uri" />
 		<button type="submit"><%= Page.Index.AddSone.Button.Add|l10n|html></button>
 	</form>
-</div>
+
+<%include include/tail.html>

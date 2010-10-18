@@ -1,14 +1,46 @@
 /* Sone Main CSS File */
 
-#sone h1 {
-	font-family: inherit;
-	font-size: 200%;
+#sone {
+	width: 50em;
+	margin: auto;
+}
+
+#sone a {
+	color: inherit;
+	text-decoration: none;
+}
+
+#sone a:visited {
+	color: inherit;
+}
+
+#sone #sidebar {
+	width: 200px;
+	position: absolute;
+}
+
+#sone .profile-link {
+	font-weight: bold;
+	color: #23e;
+}
+
+#sone #profile .picture {
+	float: left;
+}
+
+#sone .nice-name {
 	font-weight: bold;
 }
 
-#sone .error label {
-	color: red;
-	font-weight: bold;
+#sone #main {
+	margin-left: 200px;
+	padding-left: 1em;
+}
+
+#sone .post {
+	padding: 1ex 0px;
+	border-bottom: solid 1px #ccc;
+	margin-bottom: 1ex;
 }
 
 #sone .post .author {
@@ -18,6 +50,53 @@
 
 #sone .post .text {
 	display: inline;
+}
+
+#sone .post .time {
+	color: #666;
+	float: left;
+	font-size: 85%;
+}
+
+#sone .post .delete {
+	float: right;
+}
+
+#sone .post .replies {
+	clear: both;
+}
+
+#sone .post .reply {
+	clear: both;
+	background-color: #eef;
+	font-size: 85%;
+	margin: 1ex 0px;
+	padding: 1ex;
+}
+
+#sone .post .reply div {
+	font-size: inherit; /* or else fproxy's css rules will fuck us. */
+}
+
+#sone .post .reply .time {
+	float: none;
+	color: #666;
+	font-size: inherit;
+}
+
+#sone .post .create-reply {
+	clear: both;
+}
+
+#sone h1 {
+	font-family: inherit;
+	font-size: 200%;
+	font-weight: bold;
+}
+
+#sone .error label {
+	color: red;
+	font-weight: bold;
 }
 
 #sone input.createpost.default {
