@@ -5,9 +5,8 @@
 	<div id="known-sones">
 		<%foreach knownSones sone>
 			<div>
-				<div class="profile-link"><a href="viewSone.html?sone=<% sone.id>"><% sone.niceName|html></a></div>
-				<div class="request-uri"><span title="<% sone.requestUri|html>"><% sone.requestUri|substring start=4 length=43|html>…</span></div>
-				<div class="last-update"><% sone.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+				<div class="profile-link"><a href="viewSone.html?sone=<% sone.id>" title="<% sone.requestUri|html>"><% sone.niceName|html></a></div>
+				<div class="last-update">(<%= View.Sone.Label.LastUpdate|l10n|html> <% sone.time|date format="MMM d, yyyy, HH:mm:ss">)</div>
 				<%ifnull ! currentSone>
 					<%if sone.isBlocked>
 						<form class="unblock" action="unblockSone.html" method="post">
