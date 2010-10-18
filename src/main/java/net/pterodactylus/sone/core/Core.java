@@ -505,6 +505,7 @@ public class Core extends AbstractService {
 				break;
 			}
 			String name = configuration.getStringValue(sonePrefix + "/Name").getValue(null);
+			long time = configuration.getLongValue(sonePrefix + "/Time").getValue((long) 0);
 			String insertUri = configuration.getStringValue(sonePrefix + "/InsertURI").getValue(null);
 			String requestUri = configuration.getStringValue(sonePrefix + "/RequestURI").getValue(null);
 			long modificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
@@ -516,7 +517,7 @@ public class Core extends AbstractService {
 				profile.setFirstName(firstName);
 				profile.setMiddleName(middleName);
 				profile.setLastName(lastName);
-				Sone sone = getSone(id).setName(name).setRequestUri(new FreenetURI(requestUri)).setInsertUri(new FreenetURI(insertUri));
+				Sone sone = getSone(id).setName(name).setTime(time).setRequestUri(new FreenetURI(requestUri)).setInsertUri(new FreenetURI(insertUri));
 				sone.setProfile(profile);
 				int postId = 0;
 				do {
@@ -525,7 +526,7 @@ public class Core extends AbstractService {
 					if (id == null) {
 						break;
 					}
-					long time = configuration.getLongValue(postPrefix + "/Time").getValue(null);
+					time = configuration.getLongValue(postPrefix + "/Time").getValue((long) 0);
 					String text = configuration.getStringValue(postPrefix + "/Text").getValue(null);
 					Post post = getPost(id).setSone(sone).setTime(time).setText(text);
 					sone.addPost(post);
@@ -616,6 +617,7 @@ public class Core extends AbstractService {
 				String sonePrefix = "Sone/Sone." + soneId++;
 				configuration.getStringValue(sonePrefix + "/ID").setValue(sone.getId());
 				configuration.getStringValue(sonePrefix + "/Name").setValue(sone.getName());
+				configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
 				configuration.getStringValue(sonePrefix + "/RequestURI").setValue(sone.getRequestUri().toString());
 				configuration.getStringValue(sonePrefix + "/InsertURI").setValue(sone.getInsertUri().toString());
 				configuration.getLongValue(sonePrefix + "/ModificationCounter").setValue(sone.getModificationCounter());
