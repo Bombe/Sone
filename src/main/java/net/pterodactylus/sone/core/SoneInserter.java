@@ -20,12 +20,15 @@ package net.pterodactylus.sone.core;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
+import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -58,6 +61,9 @@ public class SoneInserter extends AbstractService {
 	/** The UTF-8 charset. */
 	private static final Charset utf8Charset = Charset.forName("UTF-8");
 
+	/** The core. */
+	private final Core core;
+
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
@@ -67,13 +73,16 @@ public class SoneInserter extends AbstractService {
 	/**
 	 * Creates a new Sone inserter.
 	 *
+	 * @param core
+	 *            The core
 	 * @param freenetInterface
 	 *            The freenet interface
 	 * @param sone
 	 *            The Sone to insert
 	 */
-	public SoneInserter(FreenetInterface freenetInterface, Sone sone) {
+	public SoneInserter(Core core, FreenetInterface freenetInterface, Sone sone) {
 		super("Sone Inserter for “" + sone.getName() + "”");
+		this.core = core;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
 	}
@@ -234,7 +243,19 @@ public class SoneInserter extends AbstractService {
 			} finally {
 				Closer.close(templateInputStreamReader);
 			}
+			Collection<Sone> knownSones = Filters.filteredCollection(core.getKnownSones(), new Filter<Sone>() {
+
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				public boolean filterObject(Sone object) {
+					return !sone.isSoneBlocked(object.getId()) && !object.equals(sone);
+				}
+			});
+
 			template.set("currentSone", sone);
+			template.set("knownSones", knownSones);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
 			try {
