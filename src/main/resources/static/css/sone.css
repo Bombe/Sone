@@ -54,16 +54,20 @@
 
 #sone .post .status-line {
 	clear: both;
-}
-
-#sone .post .time {
-	color: #666;
-	float: left;
 	font-size: 85%;
 }
 
+#sone .post .time {
+	display: inline;
+	color: #666;
+}
+
 #sone .post .delete {
-	float: right;
+	display: inline;
+}
+
+#sone .post .delete:before {
+	content: ' ‧ ';
 }
 
 #sone .post .replies {
@@ -79,7 +83,7 @@
 	padding: 1ex;
 }
 
-#sone .post .reply div {
+#sone .post .reply div, #sone .post .time, #sone .post .delete {
 	font-size: inherit; /* or else fproxy's css rules will fuck us. */
 }
 
