@@ -307,6 +307,21 @@ public interface Page {
 		}
 
 		/**
+		 * Sets the HTTP header with the given name to the given value. Multiple
+		 * headers with the same name are not implemented so that latest call to
+		 * {@link #setHeader(String, String)} determines what is sent to the
+		 * browser.
+		 *
+		 * @param name
+		 *            The name of the header
+		 * @param value
+		 *            The value of the header
+		 */
+		public void setHeader(String name, String value) {
+			headers.put(name, value);
+		}
+
+		/**
 		 * Returns the content of the response body. May be {@code null} if the
 		 * response does not have a body.
 		 *
