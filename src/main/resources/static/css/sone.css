@@ -68,6 +68,7 @@
 
 #sone .post .replies {
 	clear: both;
+	padding-top: 0.2ex;
 }
 
 #sone .post .reply {
