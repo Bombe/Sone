@@ -4,14 +4,26 @@
 		/* register input field/textarea swap. */
 		$(document).ready(function() {
 			registerInputTextareaSwap("#sone input.createpost", "What are you doing?");
-			registerInputTextareaSwap("#sone input.create-reply", "Write a Reply…");
+			registerInputTextareaSwap("#sone input.reply-input", "Write a Reply…");
 
 			/* hide all the “create reply” forms until a link is clicked. */
 			$("#sone .post").each(function() {
 				postId = $(this).attr("id");
 				(function(postId) {
 					commentElement = $("<div>Comment</div>").addClass("show-reply-form").click(function() {
-						$("#sone .post#" + postId + " .create-reply").removeClass("hidden");
+						replyElement = $("#sone .post#" + postId + " .create-reply");
+						replyElement.removeClass("hidden");
+						replyElement.removeClass("light");
+						(function(replyElement) {
+							replyElement.find("input.reply-input").blur(function() {
+								if ($(this).hasClass("default")) {
+									replyElement.addClass("light");
+								}
+							}).focus(function() {
+								replyElement.removeClass("light");
+							});
+						})(replyElement);
+						replyElement.find("input.create-reply").focus();
 					});
 				})(postId);
 				$(this).find(".create-reply").addClass("hidden");

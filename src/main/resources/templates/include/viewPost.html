@@ -24,7 +24,7 @@
 			<form method="post" action="createReply.html">
 				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 				<input type="hidden" name="post" value="<% post.id>" />
-				<input type="text" class="create-reply" name="text" value="" />
+				<input type="text" class="reply-input" name="text" value="" />
 				<button type="submit"><%= View.Post.SendReply|l10n|html></button>
 			</form>
 		</div>

@@ -1,5 +1,17 @@
 /* Sone Main CSS File */
 
+/* first, override some fproxy rules. */
+#sone .post .reply div,#sone .post .time,#sone .post .delete,#sone .post .show-reply-form
+	{
+	font-size: inherit;
+}
+
+#sone form {
+	margin: 0px;
+}
+
+/* now for the real stuff. */
+
 #sone {
 	width: 50em;
 	margin: auto;
@@ -87,10 +99,6 @@
 	padding: 1ex;
 }
 
-#sone .post .reply div, #sone .post .time, #sone .post .delete, #sone .post .show-reply-form {
-	font-size: inherit; /* or else fproxy's css rules will fuck us. */
-}
-
 #sone .post .reply .time {
 	float: none;
 	display: inline;
@@ -117,6 +125,12 @@
 
 #sone .post .create-reply {
 	clear: both;
+	background-color: #eef;
+	padding: 0.5ex;
+}
+
+#sone .post .create-reply.light button {
+	display: none;
 }
 
 #sone h1 {
@@ -130,6 +144,6 @@
 	font-weight: bold;
 }
 
-#sone input.createpost.default, input.create-reply.default {
+#sone input.createpost.default, input.reply-input.default {
 	color: #888;
 }
