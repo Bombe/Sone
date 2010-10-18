@@ -118,6 +118,6 @@
 	font-weight: bold;
 }
 
-#sone input.createpost.default {
+#sone input.createpost.default, input.create-reply.default {
 	color: #888;
 }
