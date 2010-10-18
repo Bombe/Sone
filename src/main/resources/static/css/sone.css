@@ -27,7 +27,7 @@
 	text-decoration: none;
 }
 
-#sone a:active {
+#sone a:active, #sone a:hover {
 	color: rgb(255, 172, 0);
 }
 
@@ -116,6 +116,10 @@
 	display: inline;
 	color: rgb(28, 131, 191);
 	cursor: pointer;
+}
+
+#sone .post .show-reply-form:hover {
+	color: rgb(255, 172, 0);
 }
 
 #sone .post .show-reply-form:before {
