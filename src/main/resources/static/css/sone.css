@@ -21,13 +21,14 @@
 	display: none;
 }
 
-#sone a {
-	color: inherit;
+#sone a, #sone a:link, #sone a:visited {
+	color: rgb(28, 131, 191);
+	font-size: inherit;
 	text-decoration: none;
 }
 
-#sone a:visited {
-	color: inherit;
+#sone a:active {
+	color: rgb(255, 172, 0);
 }
 
 #sone #sidebar {
@@ -37,7 +38,7 @@
 
 #sone .profile-link {
 	font-weight: bold;
-	color: #23e;
+	color: rgb(28, 131, 191);
 }
 
 #sone #profile .picture {
@@ -113,6 +114,8 @@
 
 #sone .post .show-reply-form {
 	display: inline;
+	color: rgb(28, 131, 191);
+	cursor: pointer;
 }
 
 #sone .post .show-reply-form:before {
