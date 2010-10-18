@@ -35,6 +35,7 @@ import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
@@ -151,6 +152,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
+		templateFactory.addFilter("substring", new SubstringFilter());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
 
 		String formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
