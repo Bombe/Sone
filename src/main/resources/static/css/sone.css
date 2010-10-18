@@ -157,7 +157,7 @@
 	display: inline;
 }
 
-#sone #known-sones form.block button, #sone #known-sones form.unblock button {
+#sone #known-sones form.block button, #sone #known-sones form.unblock button, #sone #known-sones form.follow button, #sone #known-sones form.unfollow button {
 	display: inline;
 	color: rgb(28, 131, 191);
 	background: none;
@@ -166,7 +166,7 @@
 	padding: 0px;
 }
 
-#sone #known-sones form.block button:hover, #sone #known-sones form.unblock button:hover {
+#sone #known-sones form.block button:hover, #sone #known-sones form.unblock button:hover, #sone #known-sones form.follow button:hover, #sone #known-sones form.unfollow button:hover {
 	display: inline;
 	color: rgb(255, 172, 0);
 }
