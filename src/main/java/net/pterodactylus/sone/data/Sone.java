@@ -67,7 +67,7 @@ public class Sone {
 	private final Set<Sone> friendSones = new HashSet<Sone>();
 
 	/** All posts. */
-	private final List<Post> posts = new ArrayList<Post>();
+	private final Set<Post> posts = new HashSet<Post>();
 
 	/** All replies. */
 	private final Set<Reply> replies = new HashSet<Reply>();
