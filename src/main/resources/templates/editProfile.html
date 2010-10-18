@@ -33,4 +33,13 @@
 
 	</form>
 
+	<h1><%= Page.EditProfile.Backup.Title|l10n|html></h1>
+
+	<div><%= Page.EditProfile.Backup.Description|l10n|html></div>
+
+	<form action="backupProfile.html" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<button type="submit"><%= Page.EditProfile.Backup.Button.DownloadBackup|l10n|html></button>
+	</form>
+
 </div>
