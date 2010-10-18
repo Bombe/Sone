@@ -1,7 +1,7 @@
-<div id="sone">
+<%include include/head.html>
 
 	<h1><%= Page.ViewPost.Page.Title|l10n|insert needle="{sone}" key=post.sone.niceName|html></h1>
 
 	<%include include/viewPost.html>
 
-</div>
+<%include include/tail.html>

@@ -1,4 +1,4 @@
-<div id="sone">
+<%include include/head.html>
 	<%if !sones.empty>
 		<h1><%= Page.Login.Page.Title|l10n|html></h1>
 		<form method="post">
@@ -52,4 +52,4 @@
 			<button type="submit" name="create-random" value="1"><%= Page.Login.CreateSone.Button.CreateRandom|l10n|html></button>
 		</div>
 	</form>
-</div>
+<%include include/tail.html>
