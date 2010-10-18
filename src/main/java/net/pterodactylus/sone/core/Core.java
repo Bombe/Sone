@@ -578,6 +578,23 @@ public class Core extends AbstractService {
 		} while (true);
 		logger.log(Level.INFO, "Loaded %d Sones.", getSones().size());
 
+		/* load all known Sones. */
+		int knownSonesCounter = 0;
+		while (true) {
+			String knownSonePrefix = "KnownSone." + knownSonesCounter++;
+			String knownSoneId = configuration.getStringValue(knownSonePrefix + "/ID").getValue(null);
+			if (knownSoneId == null) {
+				break;
+			}
+			String knownSoneName = configuration.getStringValue(knownSonePrefix + "/Name").getValue(null);
+			String knownSoneKey = configuration.getStringValue(knownSonePrefix + "/Key").getValue(null);
+			try {
+				getSone(knownSoneId).setName(knownSoneName).setRequestUri(new FreenetURI(knownSoneKey));
+			} catch (MalformedURLException mue1) {
+				logger.log(Level.WARNING, "Could not create Sone from requestUri (“" + knownSoneKey + "”)!", mue1);
+			}
+		}
+
 		/* load all remote Sones. */
 		for (Sone remoteSone : getRemoteSones()) {
 			loadSone(remoteSone);
@@ -648,6 +665,17 @@ public class Core extends AbstractService {
 			}
 			/* write null ID as terminator. */
 			configuration.getStringValue("Sone/Sone." + soneId + "/ID").setValue(null);
+
+			/* write all known Sones. */
+			int knownSonesCounter = 0;
+			for (Sone knownSone : getRemoteSones()) {
+				String knownSonePrefix = "KnownSone." + knownSonesCounter++;
+				configuration.getStringValue(knownSonePrefix + "/ID").setValue(knownSone.getId());
+				configuration.getStringValue(knownSonePrefix + "/Name").setValue(knownSone.getName());
+				configuration.getStringValue(knownSonePrefix + "/Key").setValue(knownSone.getRequestUri().toString());
+				/* TODO - store all known stuff? */
+			}
+			configuration.getStringValue("KnownSone." + knownSonesCounter + "/ID").setValue(null);
 
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
