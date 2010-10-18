@@ -39,7 +39,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	private final String path;
 
 	/** The template to render. */
-	private final Template template;
+	protected final Template template;
 
 	/** The L10n handler. */
 	private final BaseL10n l10n;
