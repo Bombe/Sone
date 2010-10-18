@@ -68,7 +68,7 @@ public class EditProfilePage extends SoneTemplatePage {
 			if (profile.isModified()) {
 				currentSone.setProfile(profile);
 			}
-			template.set("changed", true);
+			throw new RedirectException("index.html");
 		}
 		template.set("firstName", firstName);
 		template.set("middleName", middleName);
