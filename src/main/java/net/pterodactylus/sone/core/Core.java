@@ -330,6 +330,21 @@ public class Core extends AbstractService {
 	 *            The request URI to load the Sone from
 	 */
 	public void loadSone(final String requestUri) {
+		loadSone(requestUri, null);
+	}
+
+	/**
+	 * Loads the Sone from the given request URI. The fetching of the data is
+	 * performed in a new thread so this method returns immediately. If
+	 * {@code insertUri} is not {@code null} the loaded Sone is converted into a
+	 * local Sone and available using as any other local Sone.
+	 *
+	 * @param requestUri
+	 *            The request URI to load the Sone from
+	 * @param insertUri
+	 *            The insert URI of the Sone
+	 */
+	public void loadSone(final String requestUri, final String insertUri) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -340,7 +355,12 @@ public class Core extends AbstractService {
 					FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
 					Sone parsedSone = soneDownloader.parseSone(null, fetchResult, realRequestUri);
 					if (parsedSone != null) {
-						addSone(parsedSone);
+						if (insertUri != null) {
+							parsedSone.setInsertUri(new FreenetURI(insertUri));
+							addLocalSone(parsedSone);
+						} else {
+							addSone(parsedSone);
+						}
 					}
 				} catch (MalformedURLException mue1) {
 					logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
