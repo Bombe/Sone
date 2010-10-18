@@ -1,9 +1,9 @@
 <%include include/head.html>
 
 	<h1><%= Page.DeletePost.Page.Title|l10n|html></h1>
-	
+
 	<div><%= Page.DeletePost.Text.PostWillBeGone|l10n|html></div>
-	
+
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 		<button type="submit" name="confirmDelete" value="1"><%= Page.DeletePost.Button.Yes|l10n|html></button>
