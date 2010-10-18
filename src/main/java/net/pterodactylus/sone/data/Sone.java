@@ -407,8 +407,10 @@ public class Sone {
 	 * @param soneId
 	 *            The Sone ID to block
 	 */
-	public void addBlockedSoneId(String soneId) {
-		blockedSoneIds.add(soneId);
+	public synchronized void addBlockedSoneId(String soneId) {
+		if (blockedSoneIds.add(soneId)) {
+			modificationCounter++;
+		}
 	}
 
 	/**
@@ -417,8 +419,10 @@ public class Sone {
 	 * @param soneId
 	 *            The Sone ID to unblock
 	 */
-	public void removeBlockedSoneId(String soneId) {
-		blockedSoneIds.remove(soneId);
+	public synchronized void removeBlockedSoneId(String soneId) {
+		if (blockedSoneIds.remove(soneId)) {
+			modificationCounter++;
+		}
 	}
 
 	/**
