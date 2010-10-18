@@ -145,6 +145,10 @@
 	display: none;
 }
 
+#sone #known-sones form {
+	display: inline;
+}
+
 #sone h1 {
 	font-family: inherit;
 	font-size: 200%;
