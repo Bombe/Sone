@@ -145,19 +145,19 @@
 	display: none;
 }
 
-#sone #known-sones .profile-link {
+#sone .sone .profile-link {
 	display: inline;
 }
 
-#sone #known-sones .request-uri {
+#sone .sone .request-uri {
 	display: inline;
 }
 
-#sone #known-sones .last-update {
+#sone .sone .last-update {
 	display: inline;
 }
 
-#sone #known-sones form.block button, #sone #known-sones form.unblock button, #sone #known-sones form.follow button, #sone #known-sones form.unfollow button {
+#sone .sone form.block button, #sone .sone form.unblock button, #sone .sone form.follow button, #sone .sone form.unfollow button {
 	display: inline;
 	color: rgb(28, 131, 191);
 	background: none;
@@ -166,12 +166,12 @@
 	padding: 0px;
 }
 
-#sone #known-sones form.block button:hover, #sone #known-sones form.unblock button:hover, #sone #known-sones form.follow button:hover, #sone #known-sones form.unfollow button:hover {
+#sone .sone form.block button:hover, #sone .sone form.unblock button:hover, #sone .sone form.follow button:hover, #sone .sone form.unfollow button:hover {
 	display: inline;
 	color: rgb(255, 172, 0);
 }
 
-#sone #known-sones form {
+#sone .sone form {
 	display: inline;
 }
 

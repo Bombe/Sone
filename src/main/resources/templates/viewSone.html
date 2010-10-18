@@ -31,16 +31,8 @@
 		<h1><%= Page.ViewSone.Following.Title|l10n|html></h1>
 
 		<div id="following">
-			<%foreach sone.friends friend>
-				<%first>
-					<ul>
-				<%/first>
-					<li><a href="viewSone.html?sone=<% friend.id>"><% friend.niceName|html></a> (<% friend.requestUri|html>)</li>
-				<%last>
-					</ul>
-				<%/last>
-			<%foreachelse>
-				<div><%= Page.ViewSone.Following.FollowingNone.Text|l10n|html></div>
+			<%foreach sone.friends sone>
+				<%include include/viewSone.html>
 			<%/foreach>
 		</div>
 
