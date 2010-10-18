@@ -90,6 +90,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 		for (String styleSheet : getStyleSheets()) {
 			pageNode.addCustomStyleSheet(styleSheet);
 		}
+		String shortcutIcon = getShortcutIcon();
+		if (shortcutIcon != null) {
+			pageNode.addForwardLink("icon", shortcutIcon);
+		}
 
 		try {
 			processTemplate(request, template);
@@ -112,6 +116,15 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 */
 	protected Collection<String> getStyleSheets() {
 		return Collections.emptySet();
+	}
+
+	/**
+	 * Returns the name of the shortcut icon to include in the page’s header.
+	 *
+	 * @return The URL of the shortcut icon, or {@code null} for no icon
+	 */
+	protected String getShortcutIcon() {
+		return null;
 	}
 
 	/**
