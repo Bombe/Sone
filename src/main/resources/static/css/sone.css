@@ -5,6 +5,10 @@
 	margin: auto;
 }
 
+#sone .hidden {
+	display: none;
+}
+
 #sone a {
 	color: inherit;
 	text-decoration: none;
@@ -83,7 +87,7 @@
 	padding: 1ex;
 }
 
-#sone .post .reply div, #sone .post .time, #sone .post .delete {
+#sone .post .reply div, #sone .post .time, #sone .post .delete, #sone .post .show-reply-form {
 	font-size: inherit; /* or else fproxy's css rules will fuck us. */
 }
 
@@ -92,6 +96,14 @@
 	display: inline;
 	color: #666;
 	font-size: inherit;
+}
+
+#sone .post .show-reply-form {
+	display: inline;
+}
+
+#sone .post .show-reply-form:before {
+	content: ' ‧ ';
 }
 
 #sone .post .reply .status-line .delete {
