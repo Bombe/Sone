@@ -1,4 +1,4 @@
-<div class="post">
+<div id="<% post.id>" class="post">
 	<div>
 		<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id>"><% post.sone.niceName|html></a></div>
 		<div class="text"><% post.text|html></div>
@@ -20,7 +20,7 @@
 				</div>
 			</div>
 		<%/foreach>
-		<div class="create-reply">
+		<div class="create-reply" id="create-reply-<% post.id>">
 			<form method="post" action="createReply.html">
 				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 				<input type="hidden" name="post" value="<% post.id>" />

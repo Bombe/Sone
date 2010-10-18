@@ -7,10 +7,16 @@
 			registerInputTextareaSwap("#sone input.create-reply", "Write a Reply…");
 
 			/* hide all the “create reply” forms until a link is clicked. */
-			commentElement = $("<div>Comment</div>").addClass("show-reply-form").click(function() {
+			$("#sone .post").each(function() {
+				postId = $(this).attr("id");
+				(function(postId) {
+					commentElement = $("<div>Comment</div>").addClass("show-reply-form").click(function() {
+						$("#sone .post#" + postId + " .create-reply").removeClass("hidden");
+					});
+				})(postId);
+				$(this).find(".create-reply").addClass("hidden");
+				$(this).find(".status-line .time").after(commentElement);
 			});
-			$("#sone .post > .status-line .time").after(commentElement);
-			$("#sone .post .create-reply").addClass("hidden");
 		});
 	</script>
 
