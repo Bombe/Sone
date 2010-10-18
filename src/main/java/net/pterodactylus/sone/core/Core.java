@@ -559,6 +559,17 @@ public class Core extends AbstractService {
 					sone.addFriend(friendSone);
 				}
 
+				/* load blocked Sone IDs. */
+				int blockedSoneCounter = 0;
+				while (true) {
+					String blockedSonePrefix = sonePrefix + "/BlockedSone." + blockedSoneCounter++;
+					String blockedSoneId = configuration.getStringValue(blockedSonePrefix + "/ID").getValue(null);
+					if (blockedSoneId == null) {
+						break;
+					}
+					sone.addBlockedSoneId(blockedSoneId);
+				}
+
 				sone.setModificationCounter(modificationCounter);
 				addLocalSone(sone);
 			} catch (MalformedURLException mue1) {
@@ -625,6 +636,14 @@ public class Core extends AbstractService {
 				}
 				/* write null ID as terminator. */
 				configuration.getStringValue(sonePrefix + "/Friend." + friendId + "/ID").setValue(null);
+
+				/* write all blocked Sones. */
+				int blockedSoneCounter = 0;
+				for (String blockedSoneId : sone.getBlockedSoneIds()) {
+					String blockedSonePrefix = sonePrefix + "/BlockedSone." + blockedSoneCounter++;
+					configuration.getStringValue(blockedSonePrefix + "/ID").setValue(blockedSoneId);
+				}
+				configuration.getStringValue(sonePrefix + "/BlockedSone." + blockedSoneCounter + "/ID").setValue(null);
 
 			}
 			/* write null ID as terminator. */
