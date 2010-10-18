@@ -209,7 +209,7 @@ public interface Page {
 		 *            The content of the reponse body
 		 */
 		public Response(int statusCode, String statusText, String contentType, byte[] content) {
-			this(statusCode, statusText, contentType, null, content);
+			this(statusCode, statusText, contentType, new HashMap<String, String>(), content);
 		}
 
 		/**
