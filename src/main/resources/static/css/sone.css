@@ -153,24 +153,24 @@
 	display: inline;
 }
 
-#sone .sone .download-marker, #sone .sone .insert-marker, #sone .sone .idle-marker {
+#sone .sone .unknown-marker, #sone .sone .download-marker, #sone .sone .insert-marker, #sone .sone .idle-marker, #sone .sone .modified-marker {
+	display: none;
+}
+
+#sone .sone.unknown .unknown-marker {
 	display: inline;
 }
 
-#sone .sone.idle .download-marker, #sone .sone.idle .insert-marker {
-	display: none;
+#sone .sone.idle .idle-marker {
+	display: inline;
 }
 
-#sone .sone.downloading .insert-marker, #sone .sone.downloading .idle-marker {
-	display: none;
+#sone .sone.downloading .download-marker {
+	display: inline;
 }
 
-#sone .sone.inserting .download-marker, #sone .sone.inserting .idle-marker {
-	display: none;
-}
-
-#sone .sone .modified-marker {
-	display: none;
+#sone .sone.inserting .insert-marker {
+	display: inline;
 }
 
 #sone .sone.modified .modified-marker {

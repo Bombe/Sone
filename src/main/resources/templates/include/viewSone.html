@@ -1,6 +1,7 @@
 <div class="sone <% sone.status><%if sone.modified> modified<%/if>">
 	<div class="profile-link"><a href="viewSone.html?sone=<% sone.id>" title="<% sone.requestUri|html>"><% sone.niceName|html></a></div>
 	<div class="last-update">(<%= View.Sone.Label.LastUpdate|l10n|html> <% sone.time|date format="MMM d, yyyy, HH:mm:ss">)</div>
+	<div class="unknown-marker">?</div>
 	<div class="modified-marker">!</div>
 	<div class="download-marker">⬊</div>
 	<div class="insert-marker">⬈</div>

@@ -125,7 +125,7 @@ public class SoneDownloader extends AbstractService {
 				core.addSone(parsedSone);
 			}
 		} finally {
-			core.setSoneStatus(sone, SoneStatus.idle);
+			core.setSoneStatus(sone, (sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 		}
 	}
 

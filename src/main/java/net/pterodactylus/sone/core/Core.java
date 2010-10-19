@@ -59,6 +59,9 @@ public class Core extends AbstractService {
 	 */
 	public enum SoneStatus {
 
+		/** The Sone is unknown, i.e. not yet downloaded. */
+		unknown,
+
 		/** The Sone is idle, i.e. not being downloaded or inserted. */
 		idle,
 
@@ -159,7 +162,7 @@ public class Core extends AbstractService {
 		if (!soneCache.containsKey(soneId)) {
 			Sone sone = new Sone(soneId);
 			soneCache.put(soneId, sone);
-			setSoneStatus(sone, SoneStatus.idle);
+			setSoneStatus(sone, SoneStatus.unknown);
 		}
 		return soneCache.get(soneId);
 	}
@@ -302,6 +305,7 @@ public class Core extends AbstractService {
 	 */
 	public void addLocalSone(Sone sone) {
 		if (localSones.add(sone)) {
+			setSoneStatus(sone, SoneStatus.idle);
 			SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserter.start();
 			soneInserters.put(sone, soneInserter);
@@ -443,7 +447,7 @@ public class Core extends AbstractService {
 						addSone(parsedSone);
 					}
 				} finally {
-					setSoneStatus(sone, SoneStatus.idle);
+					setSoneStatus(sone, (sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 				}
 			}
 		}, "Sone Downloader").start();
