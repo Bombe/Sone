@@ -1,2 +1,9 @@
 	</div>
+	
+	<div id="tail">
+		<%ifnull ! currentSone>
+			<div class="import-key"><%= Page.Tail.Text.KeyOfSone|l10n|html><br/><% currentSone.requestUri|html></div>
+		<%/if>
+	</div>
+	
 </div>

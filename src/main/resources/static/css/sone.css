@@ -230,6 +230,15 @@
 	display: inline;
 }
 
+#sone #tail .import-key {
+	margin-top: 1em;
+	border-top: solid 1px #ccc;
+	padding-top: 1em;
+	text-align: center;
+	font-size: 85%;
+	color: #888;
+}
+
 
 #sone h1 {
 	font-family: inherit;
