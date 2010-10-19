@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -50,13 +51,16 @@ public class CreatePostPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
-		if (text.length() != 0) {
-			Sone currentSone = getCurrentSone(request.getToadletContext());
-			webInterface.core().createPost(currentSone, System.currentTimeMillis(), text);
-			throw new RedirectException("index.html");
+		if (request.getMethod() == Method.POST) {
+			String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			if (text.length() != 0) {
+				Sone currentSone = getCurrentSone(request.getToadletContext());
+				webInterface.core().createPost(currentSone, System.currentTimeMillis(), text);
+				throw new RedirectException(returnPage);
+			}
+			template.set("errorTextEmpty", true);
 		}
-		template.set("errorTextEmpty", true);
 	}
 
 	//
