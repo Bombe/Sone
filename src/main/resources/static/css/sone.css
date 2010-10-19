@@ -181,6 +181,11 @@
 	display: inline;
 }
 
+#sone .sone .modified-marker, #sone .sone .unknown-marker {
+	color: red;
+	font-weight: bold;
+}
+
 #sone .sone form.block button, #sone .sone form.unblock button, #sone .sone form.follow button, #sone .sone form.unfollow button {
 	display: inline;
 	color: rgb(28, 131, 191);
