@@ -64,7 +64,7 @@ public class StaticPage implements Page {
 	 */
 	@Override
 	public Response handleRequest(Request request) {
-		String path = request.getURI().getPath();
+		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
 		String filename = path.substring(lastSlash + 1);
 		InputStream fileInputStream = getClass().getResourceAsStream(resourcePathPrefix + filename);

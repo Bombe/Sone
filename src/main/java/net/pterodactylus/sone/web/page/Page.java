@@ -125,7 +125,7 @@ public interface Page {
 		 *
 		 * @return The accessed URI
 		 */
-		public URI getURI() {
+		public URI getUri() {
 			return uri;
 		}
 
