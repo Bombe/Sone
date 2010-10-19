@@ -54,16 +54,4 @@ public class ViewSonePage extends SoneTemplatePage {
 		template.set("sone", sone);
 	}
 
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
-	}
-
 }
