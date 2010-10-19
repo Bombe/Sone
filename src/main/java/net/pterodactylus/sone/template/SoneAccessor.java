@@ -67,13 +67,13 @@ public class SoneAccessor extends ReflectionAccessor {
 			return getNiceName(sone);
 		} else if (member.equals("friend")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return currentSone.hasFriend(sone) ? true : null;
+			return (currentSone != null) && currentSone.hasFriend(sone);
 		} else if (member.equals("current")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return currentSone.equals(sone);
+			return (currentSone != null) && currentSone.equals(sone);
 		} else if (member.equals("blocked")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return currentSone.isSoneBlocked(sone.getId());
+			return (currentSone != null) && currentSone.isSoneBlocked(sone.getId());
 		} else if (member.equals("modified")) {
 			return sone.getModificationCounter() > 0;
 		} else if (member.equals("status")) {
