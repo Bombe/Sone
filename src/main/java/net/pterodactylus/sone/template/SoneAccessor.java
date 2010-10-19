@@ -33,7 +33,7 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  * <dd>Will return {@code true} if the sone in question is a friend of the
  * currently logged in Sone (as determined by accessing the “currentSone”
  * variable of the given {@link DataProvider}).</dd>
- * <dt>isCurrent</dt>
+ * <dt>current</dt>
  * <dd>Will return {@code true} if the sone in question is the currently logged
  * in Sone.</dd>
  * </dl>
@@ -53,7 +53,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("friend")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return currentSone.hasFriend(sone) ? true : null;
-		} else if (member.equals("isCurrent")) {
+		} else if (member.equals("current")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return currentSone.equals(sone);
 		} else if (member.equals("blocked")) {

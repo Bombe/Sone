@@ -5,7 +5,7 @@
 	</div>
 	<div class="status-line">
 		<div class="time"><a href="viewPost.html?post=<% post.id>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
-		<%if post.sone.isCurrent><div class="delete"><a href="deletePost.html?post=<% post.id>"><%= View.Post.DeleteLink|l10n|html></a></div><%/if>
+		<%if post.sone.current><div class="delete"><a href="deletePost.html?post=<% post.id>"><%= View.Post.DeleteLink|l10n|html></a></div><%/if>
 	</div>
 	<div class="replies">
 		<%foreach post.replies reply>
@@ -16,7 +16,7 @@
 				</div>
 				<div class="status-line">
 					<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
-					<%if reply.sone.isCurrent><div class="delete"><a href="deleteReply.html?reply=<% reply.id>"><%= View.Post.Reply.DeleteLink|l10n|html></a></div><%/if>
+					<%if reply.sone.current><div class="delete"><a href="deleteReply.html?reply=<% reply.id>"><%= View.Post.Reply.DeleteLink|l10n|html></a></div><%/if>
 				</div>
 			</div>
 		<%/foreach>

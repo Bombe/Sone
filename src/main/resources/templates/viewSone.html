@@ -12,7 +12,7 @@
 
 		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
 
-		<%if ! sone.isCurrent>
+		<%if ! sone.current>
 			<%if sone.friend>
 				<div><a href="unfollowSone.html?sone=<% sone.id>"><%= Page.ViewSone.UnfollowSone.Text|l10n|html></a></div>
 			<%else>
