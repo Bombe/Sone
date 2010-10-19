@@ -33,6 +33,7 @@
 
 #sone #profile {
 	height: 80px;
+	margin-bottom: 1ex;
 }
 
 #sone .profile-link {
