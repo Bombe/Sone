@@ -148,7 +148,7 @@ public class WebInterface extends AbstractService {
 	private void registerToadlets() {
 		DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateFactory.addAccessor(Sone.class, new SoneAccessor());
+		templateFactory.addAccessor(Sone.class, new SoneAccessor(core()));
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));

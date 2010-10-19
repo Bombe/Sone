@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.template;
 
+import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Accessor;
@@ -42,6 +44,19 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  */
 public class SoneAccessor extends ReflectionAccessor {
 
+	/** The core. */
+	private final Core core;
+
+	/**
+	 * Creates a new Sone accessor.
+	 *
+	 * @param core
+	 *            The Sone core
+	 */
+	public SoneAccessor(Core core) {
+		this.core = core;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -61,6 +76,14 @@ public class SoneAccessor extends ReflectionAccessor {
 			return currentSone.isSoneBlocked(sone.getId());
 		} else if (member.equals("modified")) {
 			return sone.getModificationCounter() > 0;
+		} else if (member.equals("status")) {
+			return core.getSoneStatus(sone).toString();
+		} else if (member.equals("idle")) {
+			return core.getSoneStatus(sone) == SoneStatus.idle;
+		} else if (member.equals("inserting")) {
+			return core.getSoneStatus(sone) == SoneStatus.inserting;
+		} else if (member.equals("downloading")) {
+			return core.getSoneStatus(sone) == SoneStatus.downloading;
 		}
 		return super.get(dataProvider, object, member);
 	}
