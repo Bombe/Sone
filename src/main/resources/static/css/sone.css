@@ -153,6 +153,30 @@
 	display: inline;
 }
 
+#sone .sone .download-marker, #sone .sone .insert-marker, #sone .sone .idle-marker {
+	display: inline;
+}
+
+#sone .sone.idle .download-marker, #sone .sone.idle .insert-marker {
+	display: none;
+}
+
+#sone .sone.downloading .insert-marker, #sone .sone.downloading .idle-marker {
+	display: none;
+}
+
+#sone .sone.inserting .download-marker, #sone .sone.inserting .idle-marker {
+	display: none;
+}
+
+#sone .sone .modified-marker {
+	display: none;
+}
+
+#sone .sone.modified .modified-marker {
+	display: inline;
+}
+
 #sone .sone .last-update {
 	display: inline;
 }
