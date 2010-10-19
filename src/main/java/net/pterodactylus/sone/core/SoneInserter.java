@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.util.filter.Filter;
@@ -117,12 +118,15 @@ public class SoneInserter extends AbstractService {
 
 				boolean success = false;
 				try {
+					core.setSoneStatus(sone, SoneStatus.inserting);
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setDocName("Sone-" + sone.getName()).setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
 					sone.updateUris(finalUri);
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {
 					logger.log(Level.WARNING, "Could not insert Sone “" + sone.getName() + "”!", se1);
+				} finally {
+					core.setSoneStatus(sone, SoneStatus.idle);
 				}
 
 				/*

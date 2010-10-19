@@ -52,6 +52,23 @@ import freenet.keys.FreenetURI;
  */
 public class Core extends AbstractService {
 
+	/**
+	 * Enumeration for the possible states of a {@link Sone}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public enum SoneStatus {
+
+		/** The Sone is idle, i.e. not being downloaded or inserted. */
+		idle,
+
+		/** The Sone is currently being inserted. */
+		inserting,
+
+		/** The Sone is currently being downloaded. */
+		downloading,
+	}
+
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
 
@@ -69,6 +86,9 @@ public class Core extends AbstractService {
 
 	/** Sone inserters. */
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
+
+	/** The Sones’ statuses. */
+	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
 
 	/* various caches follow here. */
 
@@ -139,6 +159,7 @@ public class Core extends AbstractService {
 		if (!soneCache.containsKey(soneId)) {
 			Sone sone = new Sone(soneId);
 			soneCache.put(soneId, sone);
+			setSoneStatus(sone, SoneStatus.idle);
 		}
 		return soneCache.get(soneId);
 	}
@@ -166,6 +187,29 @@ public class Core extends AbstractService {
 				return !localSones.contains(object);
 			}
 		});
+	}
+
+	/**
+	 * Returns the status of the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to get the status for
+	 * @return The status of the Sone
+	 */
+	public SoneStatus getSoneStatus(Sone sone) {
+		return soneStatuses.get(sone);
+	}
+
+	/**
+	 * Sets the status of the Sone.
+	 *
+	 * @param sone
+	 *            The Sone to set the status for
+	 * @param soneStatus
+	 *            The status of the Sone
+	 */
+	public void setSoneStatus(Sone sone, SoneStatus soneStatus) {
+		soneStatuses.put(sone, soneStatus);
 	}
 
 	/**
