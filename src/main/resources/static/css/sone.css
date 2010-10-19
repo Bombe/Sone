@@ -31,9 +31,8 @@
 	color: rgb(255, 172, 0);
 }
 
-#sone #sidebar {
-	width: 200px;
-	position: absolute;
+#sone #profile {
+	height: 80px;
 }
 
 #sone .profile-link {
@@ -68,8 +67,7 @@
 }
 
 #sone #main {
-	margin-left: 200px;
-	padding-left: 1em;
+	padding: 1em;
 }
 
 #sone .post {
@@ -89,6 +87,7 @@
 
 #sone .post .status-line {
 	clear: both;
+	margin-top: 0.5ex;
 	font-size: 85%;
 }
 
@@ -242,6 +241,6 @@
 	font-weight: bold;
 }
 
-#sone input.createpost.default, input.reply-input.default {
+#sone input.status-input.default, input.reply-input.default {
 	color: #888;
 }

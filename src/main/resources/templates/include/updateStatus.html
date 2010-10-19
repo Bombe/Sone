@@ -1,0 +1,8 @@
+<div id="update-status">
+	<form action="createPost.html" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<label for="text"><%= Page.Index.Label.Text|l10n|html></label>
+		<input class="status-input" name="text" />
+		<button type="submit"><%= Page.Index.Button.Post|l10n|html></button>
+	</form>
+</div>

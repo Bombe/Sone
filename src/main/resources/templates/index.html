@@ -3,51 +3,10 @@
 	<script language="javascript">
 		/* register input field/textarea swap. */
 		$(document).ready(function() {
-			registerInputTextareaSwap("#sone input.createpost", "What are you doing?");
 			registerInputTextareaSwap("#sone input.reply-input", "Write a Reply…");
-
-			/* hide all the “create reply” forms until a link is clicked. */
-			$("#sone .post").each(function() {
-				postId = $(this).attr("id");
-				commentElement = (function(postId) {
-					var commentElement = $("<div>Comment</div>").addClass("show-reply-form").click(function() {
-						replyElement = $("#sone .post#" + postId + " .create-reply");
-						replyElement.removeClass("hidden");
-						replyElement.removeClass("light");
-						(function(replyElement) {
-							replyElement.find("input.reply-input").blur(function() {
-								if ($(this).hasClass("default")) {
-									replyElement.addClass("light");
-								}
-							}).focus(function() {
-								replyElement.removeClass("light");
-							});
-						})(replyElement);
-						replyElement.find("input.reply-input").focus();
-					});
-					return commentElement;
-				})(postId);
-				$(this).find(".create-reply").addClass("hidden");
-				$(this).find(".status-line .time").each(function() {
-					$(this).after(commentElement.clone(true));
-				});
-			});
+			addCommentLinks();
 		});
 	</script>
-
-	<h1><%= Page.Index.Page.Title|l10n|insert needle="{sone}" key=currentSone.name|html></h1>
-
-	<div>
-		<form action="createPost.html" method="post">
-			<div>
-				<label for="text"><%= Page.Index.Label.Text|l10n|html></label>
-				<input class="createpost" name="text" />
-			</div>
-			<div>
-				<button type="submit"><%= Page.Index.Button.Post|l10n|html></button>
-			</div>
-		</form>
-	</div>
 
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 

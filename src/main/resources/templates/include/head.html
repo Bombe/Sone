@@ -3,17 +3,19 @@
 	<script src="javascript/jquery-1.4.2.js" language="javascript"></script>
 	<script src="javascript/sone.js" language="javascript"></script>
 
-	<div id="sidebar">
+	<script language="javascript">
+		$(document).ready(function() {
+			registerInputTextareaSwap("#sone #update-status .status-input", "What are you doing?");
+		});
+	</script>
+
+	<div id="main">
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
 			<div class="picture"></div>
 			<div class="nice-name profile-link"><a href="viewSone.html?sone=<% currentSone.id>"><% currentSone.niceName|html></a></div>
 			<div class="edit-profile-link"><a href="editProfile.html"><%= View.Head.ProfileLink.Text|l10n|html></a></div>
+			<%ifnull ! currentSone>
+				<%include include/updateStatus.html>
+			<%/if>
 		</div>
-
-		<div id="links">
-		</div>
-
-	</div>
-
-	<div id="main">
