@@ -20,12 +20,17 @@ package net.pterodactylus.sone.core;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core.SoneStatus;
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.util.filter.Filter;
@@ -110,7 +115,7 @@ public class SoneInserter extends AbstractService {
 				modificationCounter = sone.getModificationCounter();
 				if (modificationCounter > 0) {
 					sone.setTime(System.currentTimeMillis());
-					insertInformation = new InsertInformation(sone.getRequestUri(), sone.getInsertUri());
+					insertInformation = new InsertInformation(sone);
 				}
 			}
 			if (insertInformation != null) {
@@ -157,23 +162,26 @@ public class SoneInserter extends AbstractService {
 	 */
 	private class InsertInformation {
 
-		/** The request URI of the Sone. */
-		private final FreenetURI requestUri;
-
-		/** The insert URI of the Sone. */
-		private final FreenetURI insertUri;
+		/** All properties of the Sone, copied for thread safety. */
+		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
 
 		/**
 		 * Creates a new insert information container.
 		 *
-		 * @param requestUri
-		 *            The request URI of the Sone
-		 * @param insertUri
-		 *            The insert URI of the Sone
+		 * @param sone
+		 *            The sone to insert
 		 */
-		public InsertInformation(FreenetURI requestUri, FreenetURI insertUri) {
-			this.requestUri = requestUri;
-			this.insertUri = insertUri;
+		public InsertInformation(Sone sone) {
+			soneProperties.put("id", sone.getId());
+			soneProperties.put("name", sone.getName());
+			soneProperties.put("time", sone.getTime());
+			soneProperties.put("requestUri", sone.getRequestUri());
+			soneProperties.put("insertUri", sone.getInsertUri());
+			soneProperties.put("profile", sone.getProfile());
+			soneProperties.put("posts", new ArrayList<Post>(sone.getPosts()));
+			soneProperties.put("replies", new HashSet<Reply>(sone.getReplies()));
+			soneProperties.put("friends", new HashSet<Sone>(sone.getFriends()));
+			soneProperties.put("blockedSoneIds", new HashSet<String>(sone.getBlockedSoneIds()));
 		}
 
 		//
@@ -181,22 +189,12 @@ public class SoneInserter extends AbstractService {
 		//
 
 		/**
-		 * Returns the request URI of the Sone.
-		 *
-		 * @return The request URI of the Sone
-		 */
-		@SuppressWarnings("unused")
-		public FreenetURI getRequestUri() {
-			return requestUri;
-		}
-
-		/**
 		 * Returns the insert URI of the Sone.
 		 *
 		 * @return The insert URI of the Sone
 		 */
 		public FreenetURI getInsertUri() {
-			return insertUri;
+			return (FreenetURI) soneProperties.get("insertUri");
 		}
 
 		//
@@ -254,11 +252,11 @@ public class SoneInserter extends AbstractService {
 				 */
 				@Override
 				public boolean filterObject(Sone object) {
-					return !sone.isSoneBlocked(object.getId()) && !object.equals(sone);
+					return !soneProperties.containsKey(object.getId()) && !object.getId().equals(soneProperties.get("id"));
 				}
 			});
 
-			template.set("currentSone", sone);
+			template.set("currentSone", soneProperties);
 			template.set("knownSones", knownSones);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
