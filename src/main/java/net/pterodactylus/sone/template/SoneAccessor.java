@@ -29,7 +29,7 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  * <dt>niceName</dt>
  * <dd>Will show a combination of first name, middle name, and last name, if
  * available, otherwise the username of the Sone is returned.</dd>
- * <dt>isFriend</dt>
+ * <dt>friend</dt>
  * <dd>Will return {@code true} if the sone in question is a friend of the
  * currently logged in Sone (as determined by accessing the “currentSone”
  * variable of the given {@link DataProvider}).</dd>
@@ -50,7 +50,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		Sone sone = (Sone) object;
 		if (member.equals("niceName")) {
 			return getNiceName(sone);
-		} else if (member.equals("isFriend")) {
+		} else if (member.equals("friend")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return currentSone.hasFriend(sone) ? true : null;
 		} else if (member.equals("isCurrent")) {
