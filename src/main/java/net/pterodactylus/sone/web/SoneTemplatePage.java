@@ -176,6 +176,7 @@ public class SoneTemplatePage extends TemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		template.set("currentSone", getCurrentSone(request.getToadletContext()));
+		template.set("request", request);
 	}
 
 	/**
