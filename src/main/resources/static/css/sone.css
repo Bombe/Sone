@@ -254,3 +254,8 @@
 #sone input.status-input.default, input.reply-input.default {
 	color: #888;
 }
+
+#sone input[type=text].key {
+	width: 130ex;;
+	font-size: 75%;
+}

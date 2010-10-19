@@ -32,7 +32,22 @@
 		</div>
 
 	</form>
-
+	
+	<h1><%= Page.EditProfile.Keys.Title|l10n|html></h1>
+	
+	<div><%= Page.EditProfile.Keys.Description.RequestKey|l10n|html></div>
+	<div><%= Page.EditProfile.Keys.Description.InsertKey|l10n|html></div>
+	<div><%= Page.EditProfile.Keys.Description.Summary|l10n|html></div>
+	
+	<div>
+		<label><%= Page.EditProfile.Label.RequestKey|l10n|html></label>
+		<input type="text" class="key" readonly="readonly" value="<% currentSone.requestUri|html>" />
+	</div>
+	<div>
+		<label><%= Page.EditProfile.Label.RequestKey|l10n|html></label>
+		<input type="text" class="key" readonly="readonly" value="<% currentSone.insertUri|html>" />
+	</div>
+	
 	<h1><%= Page.EditProfile.Backup.Title|l10n|html></h1>
 
 	<div><%= Page.EditProfile.Backup.Description|l10n|html></div>
