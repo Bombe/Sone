@@ -59,6 +59,8 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("blocked")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return currentSone.isSoneBlocked(sone.getId());
+		} else if (member.equals("modified")) {
+			return sone.getModificationCounter() > 0;
 		}
 		return super.get(dataProvider, object, member);
 	}
