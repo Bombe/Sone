@@ -16,7 +16,7 @@
 					<button type="submit"><%= View.Sone.Button.FollowSone|l10n|html></button>
 				</form>
 			<%/if>
-			<%if sone.isBlocked>
+			<%if sone.blocked>
 				<form class="unblock" action="unblockSone.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="sone" value="<% sone.id>" />
