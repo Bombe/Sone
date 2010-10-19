@@ -399,6 +399,9 @@ public class Core extends AbstractService {
 				try {
 					FreenetURI realRequestUri = new FreenetURI(requestUri).setMetaString(new String[] { "sone.xml" });
 					FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
+					if (fetchResult == null) {
+						return;
+					}
 					Sone parsedSone = soneDownloader.parseSone(null, fetchResult, realRequestUri);
 					if (parsedSone != null) {
 						if (insertUri != null) {
@@ -428,10 +431,19 @@ public class Core extends AbstractService {
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				FreenetURI realRequestUri = sone.getRequestUri().setMetaString(new String[] { "sone.xml" });
-				FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
-				Sone parsedSone = soneDownloader.parseSone(sone, fetchResult, realRequestUri);
-				if (parsedSone != null) {
-					addSone(parsedSone);
+				setSoneStatus(sone, SoneStatus.downloading);
+				try {
+					FetchResult fetchResult = freenetInterface.fetchUri(realRequestUri);
+					if (fetchResult == null) {
+						/* TODO - mark Sone as bad. */
+						return;
+					}
+					Sone parsedSone = soneDownloader.parseSone(sone, fetchResult, realRequestUri);
+					if (parsedSone != null) {
+						addSone(parsedSone);
+					}
+				} finally {
+					setSoneStatus(sone, SoneStatus.idle);
 				}
 			}
 		}, "Sone Downloader").start();

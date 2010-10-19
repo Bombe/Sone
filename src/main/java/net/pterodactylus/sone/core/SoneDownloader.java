@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
@@ -111,11 +112,20 @@ public class SoneDownloader extends AbstractService {
 	public void fetchSone(Sone sone) {
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" }) });
 		FreenetURI requestUri = sone.getRequestUri().setMetaString(new String[] { "sone.xml" });
-		FetchResult fetchResult = freenetInterface.fetchUri(requestUri);
-		logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
-		Sone parsedSone = parseSone(sone, fetchResult, requestUri);
-		if (parsedSone != null) {
-			core.addSone(parsedSone);
+		core.setSoneStatus(sone, SoneStatus.downloading);
+		try {
+			FetchResult fetchResult = freenetInterface.fetchUri(requestUri);
+			if (fetchResult == null) {
+				/* TODO - mark Sone as bad. */
+				return;
+			}
+			logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
+			Sone parsedSone = parseSone(sone, fetchResult, requestUri);
+			if (parsedSone != null) {
+				core.addSone(parsedSone);
+			}
+		} finally {
+			core.setSoneStatus(sone, SoneStatus.idle);
 		}
 	}
 
