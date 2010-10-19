@@ -51,7 +51,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            The Sone web interface
 	 */
 	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface) {
-		super(path, template, webInterface.l10n(), pageTitleKey);
+		super(path, template, webInterface.l10n(), pageTitleKey, "noPermission.html");
 		this.webInterface = webInterface;
 		template.set("webInterface", webInterface);
 	}

@@ -21,6 +21,7 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
 
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
@@ -47,6 +48,9 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/** The l10n key for the page title. */
 	private final String pageTitleKey;
 
+	/** Where to redirect for invalid form passwords. */
+	private final String invalidFormPasswordRedirectTarget;
+
 	/**
 	 * Creates a new template page.
 	 *
@@ -58,12 +62,16 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *            The L10n handler
 	 * @param pageTitleKey
 	 *            The l10n key of the title page
+	 * @param invalidFormPasswordRedirectTarget
+	 *            The target to redirect to if a POST request does not contain
+	 *            the correct form password
 	 */
-	public TemplatePage(String path, Template template, BaseL10n l10n, String pageTitleKey) {
+	public TemplatePage(String path, Template template, BaseL10n l10n, String pageTitleKey, String invalidFormPasswordRedirectTarget) {
 		this.path = path;
 		this.template = template;
 		this.l10n = l10n;
 		this.pageTitleKey = pageTitleKey;
+		this.invalidFormPasswordRedirectTarget = invalidFormPasswordRedirectTarget;
 	}
 
 	/**
@@ -85,6 +93,13 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 		}
 
 		ToadletContext toadletContext = request.getToadletContext();
+		if (request.getMethod() == Method.POST) {
+			/* require form password. */
+			String formPassword = request.getHttpRequest().getPartAsStringFailsafe("formPassword", 32);
+			if (!formPassword.equals(toadletContext.getContainer().getFormPassword())) {
+				return new RedirectResponse(invalidFormPasswordRedirectTarget);
+			}
+		}
 		PageMaker pageMaker = toadletContext.getPageMaker();
 		PageNode pageNode = pageMaker.getPageNode(l10n.getString(pageTitleKey), toadletContext);
 		for (String styleSheet : getStyleSheets()) {
