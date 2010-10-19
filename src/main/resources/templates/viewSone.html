@@ -29,6 +29,8 @@
 		<div id="following">
 			<%foreach sone.friends sone>
 				<%include include/viewSone.html>
+			<%foreachelse>
+				<div><%= Page.ViewSone.Following.FollowingNone.Text|l10n|html></div>
 			<%/foreach>
 		</div>
 
