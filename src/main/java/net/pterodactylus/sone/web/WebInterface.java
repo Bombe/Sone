@@ -154,62 +154,26 @@ public class WebInterface extends AbstractService {
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
 		templateFactory.addFilter("substring", new SubstringFilter());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
-
-		String formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
+		templateFactory.addTemplateObject("formPassword", sonePlugin.pluginRespirator().getToadletContainer().getFormPassword());
 
 		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
-		loginTemplate.set("formPassword", formPassword);
-
 		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
-		indexTemplate.set("formPassword", formPassword);
-
 		Template addSoneTemplate = templateFactory.createTemplate(createReader("/templates/addSone.html"));
-		addSoneTemplate.set("formPassword", formPassword);
-
 		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
-		knownSonesTemplate.set("formPassword", formPassword);
-
 		Template createSoneTemplate = templateFactory.createTemplate(createReader("/templates/createSone.html"));
-		createSoneTemplate.set("formPassword", formPassword);
-
 		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
-		createPostTemplate.set("formPassword", formPassword);
-
 		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
-		createReplyTemplate.set("formPassword", formPassword);
-
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
-		editProfileTemplate.set("formPassword", formPassword);
-
 		Template backupProfileTemplate = templateFactory.createTemplate(createReader("/templates/backup.xml"));
-		backupProfileTemplate.set("formPassword", formPassword);
-
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
-		viewSoneTemplate.set("formPassword", formPassword);
-
 		Template blockSoneTemplate = templateFactory.createTemplate(createReader("/templates/blockSone.html"));
-		blockSoneTemplate.set("formPassword", formPassword);
-
 		Template unblockSoneTemplate = templateFactory.createTemplate(createReader("/templates/unblockSone.html"));
-		unblockSoneTemplate.set("formPassword", formPassword);
-
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
-		viewPostTemplate.set("formPassword", formPassword);
-
 		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
-		deletePostTemplate.set("formPassword", formPassword);
-
 		Template followSoneTemplate = templateFactory.createTemplate(createReader("/templates/followSone.html"));
-		followSoneTemplate.set("formPassword", formPassword);
-
 		Template unfollowSoneTemplate = templateFactory.createTemplate(createReader("/templates/unfollowSone.html"));
-		unfollowSoneTemplate.set("formPassword", formPassword);
-
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
-		deleteSoneTemplate.set("formPassword", formPassword);
-
 		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
-
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
