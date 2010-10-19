@@ -18,14 +18,4 @@
 		<%/foreach>
 	</div>
 
-	<h1><%= Page.Index.AddSone.Title|l10n|html></h1>
-
-	<div><%= Page.Index.AddSone.Description|l10n|html></div>
-
-	<form action="addSone.html" method="post">
-		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<input id="addsone" type="text" name="request-uri" />
-		<button type="submit"><%= Page.Index.AddSone.Button.Add|l10n|html></button>
-	</form>
-
 <%include include/tail.html>
