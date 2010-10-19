@@ -38,6 +38,10 @@
 			<input type="text" name="name" />
 		</div>
 		<div>
+			<label for="document-name"><%= Page.Login.CreateSone.Label.DocumentName|l10n|html></label>
+			<input type="text" name="document-name" value="<% documentName|html>" />
+		</div>
+		<div>
 			<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
 			<input type="text" name="insert-uri" value="" />
 		</div>

@@ -61,17 +61,22 @@ public class CreateSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		String name = "";
+		String documentName = null;
 		String requestUri = null;
 		String insertUri = null;
 		if (request.getMethod() == Method.POST) {
 			name = request.getHttpRequest().getPartAsStringFailsafe("name", 100);
+			documentName = request.getHttpRequest().getPartAsStringFailsafe("document-name", 96);
+			if (documentName.trim().length() == 0) {
+				documentName = "Sone-" + name;
+			}
 			if (request.getHttpRequest().getParam("create-from-uri").length() > 0) {
 				requestUri = request.getHttpRequest().getPartAsStringFailsafe("request-uri", 256);
 				insertUri = request.getHttpRequest().getPartAsStringFailsafe("insert-uri", 256);
 			}
 			try {
 				/* create Sone. */
-				Sone sone = webInterface.core().createSone(name, requestUri, insertUri);
+				Sone sone = webInterface.core().createSone(name, documentName, requestUri, insertUri);
 
 				/* log in the new Sone. */
 				setCurrentSone(request.getToadletContext(), sone);

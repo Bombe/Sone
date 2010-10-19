@@ -274,7 +274,7 @@ public class Core extends AbstractService {
 	 *             if a Sone error occurs
 	 */
 	public Sone createSone(String name) throws SoneException {
-		return createSone(name, null, null);
+		return createSone(name, "Sone-" + name, null, null);
 	}
 
 	/**
@@ -284,6 +284,8 @@ public class Core extends AbstractService {
 	 *
 	 * @param name
 	 *            The name of the Sone
+	 * @param documentName
+	 *            The document name in the SSK
 	 * @param requestUri
 	 *            The request URI of the Sone, or {@link NullPointerException}
 	 *            to create a Sone at a random location
@@ -294,7 +296,7 @@ public class Core extends AbstractService {
 	 * @throws SoneException
 	 *             if a Sone error occurs
 	 */
-	public Sone createSone(String name, String requestUri, String insertUri) throws SoneException {
+	public Sone createSone(String name, String documentName, String requestUri, String insertUri) throws SoneException {
 		if ((name == null) || (name.trim().length() == 0)) {
 			throw new SoneException(Type.INVALID_SONE_NAME);
 		}
@@ -311,7 +313,7 @@ public class Core extends AbstractService {
 		Sone sone;
 		try {
 			logger.log(Level.FINEST, "Creating new Sone “%s” at %s (%s)…", new Object[] { name, finalRequestUri, finalInsertUri });
-			sone = getSone(UUID.randomUUID().toString()).setName(name).setRequestUri(new FreenetURI(finalRequestUri).setKeyType("USK").setDocName("Sone-" + name)).setInsertUri(new FreenetURI(finalInsertUri).setKeyType("USK").setDocName("Sone-" + name));
+			sone = getSone(UUID.randomUUID().toString()).setName(name).setRequestUri(new FreenetURI(finalRequestUri).setKeyType("USK").setDocName(documentName)).setInsertUri(new FreenetURI(finalInsertUri).setKeyType("USK").setDocName(documentName));
 			sone.setProfile(new Profile());
 			/* set modification counter to 1 so it is inserted immediately. */
 			sone.setModificationCounter(1);
