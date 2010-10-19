@@ -113,7 +113,7 @@
 
 #sone .post .reply {
 	clear: both;
-	background-color: #eef;
+	background-color: #f0f0ff;
 	font-size: 85%;
 	margin: 1ex 0px;
 	padding: 1ex;
@@ -151,7 +151,7 @@
 
 #sone .post .create-reply {
 	clear: both;
-	background-color: #eef;
+	background-color: #f0f0ff;
 	padding: 0.5ex;
 }
 
@@ -159,45 +159,58 @@
 	display: none;
 }
 
-#sone .sone .profile-link {
-	display: inline;
+#sone .sone {
+	clear: both;
+	background-color: #f0f0ff;
+	border: 1px solid #ccc;
+	margin-bottom: 0.5ex;
+	padding: 0.5ex;
 }
 
-#sone .sone .request-uri {
-	display: inline;
+#sone .sone .profile-link {
+	display: block;
+}
+
+#sone .sone .short-request-uri {
+	clear: both;
+	float: right;
 }
 
 #sone .sone .unknown-marker, #sone .sone .download-marker, #sone .sone .insert-marker, #sone .sone .idle-marker, #sone .sone .modified-marker {
 	display: none;
 }
 
-#sone .sone.unknown .unknown-marker {
+#sone .sone.unknown .unknown-marker, #sone .sone.idle .idle-marker, #sone .sone.downloading .download-marker, #sone .sone.inserting .insert-marker, #sone .sone.modified .modified-marker {
 	display: inline;
-}
-
-#sone .sone.idle .idle-marker {
-	display: inline;
-}
-
-#sone .sone.downloading .download-marker {
-	display: inline;
-}
-
-#sone .sone.inserting .insert-marker {
-	display: inline;
-}
-
-#sone .sone.modified .modified-marker {
-	display: inline;
+	float: right;
+	border: solid 1px #ccc;
+	border-right: none;
+	border-top: none;
+	padding: 0 0.5ex;
+	position: relative;
+	right: -0.5ex;
+	top: -0.5ex
 }
 
 #sone .sone .last-update {
+	float: right;
 	display: inline;
 }
 
 #sone .sone .modified-marker, #sone .sone .unknown-marker {
 	color: red;
 	font-weight: bold;
+}
+
+#sone .sone form {
+	display: inline;
+	border: solid 1px #ccc;
+	border-left: none;
+	border-bottom: none;
+	padding: 0 0.5ex;
+	position: relative;
+	left: -0.5ex;
+	bottom: -0.5ex
 }
 
 #sone .sone form.block button, #sone .sone form.unblock button, #sone .sone form.follow button, #sone .sone form.unfollow button {
@@ -214,9 +227,10 @@
 	color: rgb(255, 172, 0);
 }
 
-#sone .sone form {
+#sone .sone .spacer {
 	display: inline;
 }
+
 
 #sone h1 {
 	font-family: inherit;
