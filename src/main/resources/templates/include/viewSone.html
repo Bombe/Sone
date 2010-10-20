@@ -13,12 +13,14 @@
 				<form class="unfollow" action="unfollowSone.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="sone" value="<% sone.id|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<button type="submit"><%= View.Sone.Button.UnfollowSone|l10n|html></button>
 				</form>
 			<%else>
 				<form class="follow" action="followSone.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="sone" value="<% sone.id|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<button type="submit"><%= View.Sone.Button.FollowSone|l10n|html></button>
 				</form>
 			<%/if>
@@ -26,12 +28,14 @@
 				<form class="unblock" action="unblockSone.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="sone" value="<% sone.id|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<button type="submit"><%= View.Sone.Button.UnblockSone|l10n|html></button>
 				</form>
 			<%else>
 				<form class="block" action="blockSone.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="sone" value="<% sone.id|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<button type="submit"><%= View.Sone.Button.BlockSone|l10n|html></button>
 				</form>
 			<%/if>
