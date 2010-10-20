@@ -14,7 +14,9 @@
 
 	<%else>
 
-		<%include include/viewSone.html>
+		<%if ! sone.current>
+			<%include include/viewSone.html>
+		<%/if>
 
 		<div id="posts">
 			<%foreach sone.posts post>
