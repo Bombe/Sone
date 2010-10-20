@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -245,6 +246,8 @@ public class SoneInserter extends AbstractService {
 			} finally {
 				Closer.close(templateInputStreamReader);
 			}
+			@SuppressWarnings("unchecked")
+			final Set<String> blockedSoneIds = (Set<String>) soneProperties.get("blockedSoneIds");
 			Collection<Sone> knownSones = Filters.filteredCollection(core.getKnownSones(), new Filter<Sone>() {
 
 				/**
@@ -252,7 +255,7 @@ public class SoneInserter extends AbstractService {
 				 */
 				@Override
 				public boolean filterObject(Sone object) {
-					return !soneProperties.containsKey(object.getId()) && !object.getId().equals(soneProperties.get("id"));
+					return !blockedSoneIds.contains(object.getId()) && !object.getId().equals(soneProperties.get("id"));
 				}
 			});
 
