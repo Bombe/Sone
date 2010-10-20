@@ -25,7 +25,6 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.service.AbstractService;
 
 import com.db4o.ObjectContainer;
 
@@ -46,7 +45,7 @@ import freenet.node.RequestStarter;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FreenetInterface extends AbstractService {
+public class FreenetInterface {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FreenetInterface.class);
@@ -69,7 +68,6 @@ public class FreenetInterface extends AbstractService {
 	 *            The high-level client
 	 */
 	public FreenetInterface(Node node, HighLevelSimpleClient client) {
-		super("Sone Freenet Interface");
 		this.node = node;
 		this.client = client;
 	}
