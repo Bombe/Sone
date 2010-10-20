@@ -42,14 +42,14 @@
 }
 
 #sone #profile.online .picture {
-	float: left;
+	position: absolute;
 	background-image: url("../images/sone.png");
 	width: 80px;
 	height: 80px;
 }
 
 #sone #profile.offline .picture {
-	float: left;
+	position: absolute;
 	background-image: url("../images/sone-offline.png");
 	width: 80px;
 	height: 80px;
@@ -61,6 +61,11 @@
 
 #sone #profile .edit-profile-link {
 	font-size: 85%;
+}
+
+#sone #home-sone {
+	margin-left: 80px;
+	padding-left: 1ex;
 }
 
 #sone .nice-name {

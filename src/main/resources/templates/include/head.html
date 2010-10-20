@@ -12,10 +12,12 @@
 	<div id="main">
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
-			<a class="picture" href="index.html"></a>
-			<div class="nice-name profile-link"><a href="viewSone.html?sone=<% currentSone.id|html>"><% currentSone.niceName|html></a></div>
-			<div class="edit-profile-link"><a href="editProfile.html"><%= View.Head.ProfileLink.Text|l10n|html></a></div>
+			<a class="picture" href="index.html">&nbsp;</a>
 			<%ifnull ! currentSone>
-				<%include include/updateStatus.html>
+				<div id="home-sone">
+					<% currentSone|store key=sone>
+					<%include include/viewSone.html>
+					<%include include/updateStatus.html>
+				</div>
 			<%/if>
 		</div>
