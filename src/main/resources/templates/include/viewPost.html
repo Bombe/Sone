@@ -16,7 +16,14 @@
 				</div>
 				<div class="status-line">
 					<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
-					<%if reply.sone.current><div class="delete"><a href="deleteReply.html?reply=<% reply.id|html>"><%= View.Post.Reply.DeleteLink|l10n|html></a></div><%/if>
+					<%if reply.sone.current>
+						<form class="delete" action="deleteReply.html" method="post">
+							<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+							<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+							<input type="hidden" name="reply" value="<% reply.id|html>" />
+							<button type="submit"><%= View.Post.Reply.DeleteLink|l10n|html></button>
+						</form>
+					<%/if>
 				</div>
 			</div>
 		<%/foreach>
