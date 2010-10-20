@@ -8,7 +8,8 @@
 
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<input type="hidden" name="postId" value="<% postId>" />
+		<input type="hidden" name="returnPage" value="<% returnPage|html>" />
+		<input type="hidden" name="post" value="<% postId>" />
 
 		<div>
 			<label for="text"><%= Page.CreateReply.Label.Text|l10n|html></label>
