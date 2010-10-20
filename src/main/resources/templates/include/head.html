@@ -12,7 +12,7 @@
 	<div id="main">
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
-			<div class="picture"></div>
+			<a class="picture" href="index.html"></a>
 			<div class="nice-name profile-link"><a href="viewSone.html?sone=<% currentSone.id|html>"><% currentSone.niceName|html></a></div>
 			<div class="edit-profile-link"><a href="editProfile.html"><%= View.Head.ProfileLink.Text|l10n|html></a></div>
 			<%ifnull ! currentSone>
