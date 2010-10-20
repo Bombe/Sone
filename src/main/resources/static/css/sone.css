@@ -286,7 +286,7 @@
 	font-weight: bold;
 }
 
-#sone input.status-input.default, input.reply-input.default {
+#sone input.status-input.default, #sone input.reply-input.default, #sone #add-sone input[name=request-uri].default {
 	color: #888;
 }
 
