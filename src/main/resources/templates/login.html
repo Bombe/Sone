@@ -7,7 +7,7 @@
 			<select name="sone-id">
 				<option disabled="disabled"><%= Page.Login.Option.NoSone|l10n|html></option>
 				<%foreach sones sone>
-					<option value="<% sone.id|html>"><% sone.name|html> (<% sone.id|html>)</option>
+					<option value="<% sone.id|html>"><% sone.niceName|html> (<% sone.name|html>)</option>
 				<%/foreach>
 			</select>
 			<button type="submit">Select</button>
