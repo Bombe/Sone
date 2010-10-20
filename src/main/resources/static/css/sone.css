@@ -1,9 +1,12 @@
 /* Sone Main CSS File */
 
 /* first, override some fproxy rules. */
-#sone .post .reply div,#sone .post .time,#sone .post .delete,#sone .post .show-reply-form
-	{
-	font-size: inherit;
+#sone .post .reply div,#sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
+	font: inherit;
+}
+
+input[type=text], textarea {
+	font-size: 90%;
 }
 
 #sone form {
@@ -64,8 +67,27 @@
 }
 
 #sone #home-sone {
+	margin-top: 1ex;
 	margin-left: 80px;
 	padding-left: 1ex;
+}
+
+#sone #update-status label {
+	display: none;
+}
+
+#sone #update-status input[type=text] {
+	width: 45em;
+} 
+
+#sone #update-status textarea {
+	border: solid 1px #ccc;
+	width: 45em;
+	height: 4em;
+}
+
+#sone #update-status button {
+	float: right;
 }
 
 #sone .nice-name {
@@ -185,8 +207,17 @@
 	padding: 0.5ex;
 }
 
-#sone .post .create-reply.light button {
-	display: none;
+#sone .post .create-reply input[type=text] {
+	width: 50em;
+}
+
+#sone .post .create-reply textarea {
+	width: 50em;
+	height: 4em;
+}
+
+#sone .post .create-reply button {
+	float: right;
 }
 
 #sone .sone {

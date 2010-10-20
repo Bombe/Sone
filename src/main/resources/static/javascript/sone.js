@@ -2,21 +2,25 @@
 
 function registerInputTextareaSwap(inputSelector, defaultText) {
 	$(inputSelector).each(function() {
-		$(this).focus(function() {
-			if ($(this).hasClass("default")) {
-				$(this).removeClass("default").val("");
-			}
-		}).blur(function() {
+		textarea = $("<textarea name=\"text\"></textarea>").blur(function() {
 			if ($(this).val() == "") {
-				$(this).val(defaultText).addClass("default");
+				$(this).hide();
+				$(this).data("inputField").show().removeAttr("disabled");
 			}
-		}).addClass("default").val(defaultText);
-		var inputField = $(this);
-		$(this.form).submit(function() {
-			if (inputField.hasClass("default")) {
-				inputField.val("");
-			}
-		});
+		}).hide().data("inputField", $(this));
+		$(this).after(textarea);
+		(function(inputField, textarea) {
+			$(inputField).focus(function() {
+				$(this).hide().attr("disabled", "disabled");
+				textarea.show().focus();
+			}).addClass("default").val(defaultText);
+			$(inputField.form).submit(function() {
+				if (textarea.val() == "") {
+					return false;
+				}
+				$(inputField).val(textarea.val());
+			});
+		})(this, textarea);
 	});
 }
 
