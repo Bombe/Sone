@@ -30,31 +30,9 @@
 			<button type="submit"><%= Page.Login.LoadSone.Button.LoadSone|l10n|html></button>
 		</div>
 	</form>
+
 	<h1><%= Page.Login.CreateSone.Title|l10n|html></h1>
 	<div><%= Page.Login.CreateSone.Description|l10n|html></div>
-	<form action="createSone.html" method="post">
-		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<div>
-			<label for="name"><%= Page.Login.CreateSone.Label.Name|l10n|html></label>
-			<input type="text" name="name" />
-		</div>
-		<div>
-			<label for="document-name"><%= Page.Login.CreateSone.Label.DocumentName|l10n|html></label>
-			<input type="text" name="document-name" value="<% documentName|html>" />
-		</div>
-		<div>
-			<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
-			<input type="text" name="insert-uri" value="" />
-		</div>
-		<div>
-			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
-			<input type="text" name="insert-uri" value="" />
-		</div>
-		<div>
-			<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
-		</div>
-		<div>
-			<button type="submit" name="create-random" value="1"><%= Page.Login.CreateSone.Button.CreateRandom|l10n|html></button>
-		</div>
-	</form>
+	<%include include/createSone.html>
+
 <%include include/tail.html>

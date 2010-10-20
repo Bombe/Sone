@@ -261,6 +261,10 @@
 	display: inline;
 }
 
+#sone #create-sone {
+	
+}
+
 #sone #tail .import-key {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;

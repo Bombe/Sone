@@ -1,0 +1,25 @@
+<form id="create-sone" action="createSone.html" method="post">
+	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+	<div<%if errorName> class="error"<%/if>>
+		<label for="name"><%= Page.Login.CreateSone.Label.Name|l10n|html></label>
+		<input type="text" name="name" value="<% name|html>"/>
+	</div>
+	<div>
+		<label for="document-name"><%= Page.Login.CreateSone.Label.DocumentName|l10n|html></label>
+		<input type="text" name="document-name" value="<% documentName|html>" />
+	</div>
+	<div>
+		<button type="submit" name="create-random" value="1"><%= Page.Login.CreateSone.Button.CreateRandom|l10n|html></button>
+	</div>
+	<div<%if errorUri> class="error"<%/if>>
+		<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
+		<input type="text" name="insert-uri" value="<% insertUri|html>" />
+	</div>
+	<div<%if errorUri> class="error"<%/if>>
+		<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
+		<input type="text" name="insert-uri" value="<% requestUri|html>" />
+	</div>
+	<div>
+		<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
+	</div>
+</form>
