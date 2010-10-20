@@ -54,7 +54,6 @@ public class CreateReplyPage extends SoneTemplatePage {
 		String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
-		System.out.println("postId: " + postId + ", text: " + text + ", returnPage: " + returnPage);
 		if (request.getMethod() == Method.POST) {
 			Post post = webInterface.core().getPost(postId);
 			if (text.length() > 0) {
