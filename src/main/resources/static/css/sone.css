@@ -81,6 +81,11 @@
 	border-bottom: solid 1px #ccc;
 }
 
+#sone .post:last-child {
+	padding: 1ex 0px;
+	border-bottom: none;
+}
+
 #sone .post .author {
 	display: inline;
 	font-weight: bold;
