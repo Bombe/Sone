@@ -3,7 +3,7 @@
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 		<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 		<label for="text"><%= Page.Index.Label.Text|l10n|html></label>
-		<input class="status-input" name="text" />
+		<input class="status-input" name="text" value="" />
 		<button type="submit"><%= Page.Index.Button.Post|l10n|html></button>
 	</form>
 </div>

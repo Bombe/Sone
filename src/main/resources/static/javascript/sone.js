@@ -1,25 +1,23 @@
 /* Sone JavaScript functions. */
 
 function registerInputTextareaSwap(inputSelector, defaultText) {
-	(function(inputSelector, defaultText) {
-		$(inputSelector).focus(function() {
+	$(inputSelector).each(function() {
+		$(this).focus(function() {
 			if ($(this).hasClass("default")) {
 				$(this).removeClass("default").val("");
 			}
 		}).blur(function() {
-			alert($(this).val());
 			if ($(this).val() == "") {
-				alert("setting default");
 				$(this).val(defaultText).addClass("default");
 			}
 		}).addClass("default").val(defaultText);
-		$($(inputSelector).get(0).form).submit(function() {
-			if ($(inputSelector).hasClass("default")) {
-				$(inputSelector).val("");
+		var inputField = $(this);
+		$(this.form).submit(function() {
+			if (inputField.hasClass("default")) {
+				inputField.val("");
 			}
-			alert(($(inputSelector).hasClass("default") ? "def: ": "ok: ") + $(inputSelector).val());
 		});
-	})(inputSelector, defaultText);
+	});
 }
 
 /* hide all the “create reply” forms until a link is clicked. */
