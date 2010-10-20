@@ -17,6 +17,7 @@
 	<div><%= Page.Login.LoadSone.Description|l10n|html></div>
 	<form action="loadSone.html" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 		<div>
 			<label for="request-uri"><%= Page.Login.LoadSone.Label.RequestURI|l10n|html></label>
 			<input type="text" name="request-uri" />
