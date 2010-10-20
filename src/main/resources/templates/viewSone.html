@@ -20,6 +20,9 @@
 
 		<div id="posts">
 			<%foreach sone.posts post>
+				<%first>
+					<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
+				<%/first>
 				<%include include/viewPost.html>
 			<%foreachelse>
 				<div><%= Page.ViewSone.PostList.Text.NoPostYet|l10n|html></div>
