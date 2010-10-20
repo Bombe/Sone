@@ -101,6 +101,23 @@
 	display: inline;
 }
 
+#sone .post .delete button {
+	font: inherit;
+	border: 0px;
+	background: none;
+	padding: 0px;
+	color: rgb(28, 131, 191);
+}
+
+#sone .post .delete button:hover {
+	font: inherit;
+	border: 0px;
+	background: none;
+	padding: 0px;
+	color: rgb(255, 172, 0);
+	cursor: pointer;
+}
+
 #sone .post .delete:before {
 	content: ' ‧ ';
 }

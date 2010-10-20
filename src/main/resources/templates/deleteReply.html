@@ -1,0 +1,15 @@
+<%include include/head.html>
+
+	<h1><%= Page.DeleteReply.Page.Title|l10n|html></h1>
+
+	<div><%= Page.DeleteReply.Text.PostWillBeGone|l10n|html></div>
+
+	<form method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="returnPage" value="<% returnPage|html>" />
+		<input type="hidden" name="reply" value="<% reply.id|html>" />
+		<button type="submit" name="confirmDelete" value="1"><%= Page.DeleteReply.Button.Yes|l10n|html></button>
+		<button type="submit" name="abortDelete" value="1"><%= Page.DeleteReply.Button.No|l10n|html></button>
+	</form>
+
+<%include include/tail.html>

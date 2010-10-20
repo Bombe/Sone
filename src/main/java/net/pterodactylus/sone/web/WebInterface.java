@@ -170,6 +170,7 @@ public class WebInterface extends AbstractService {
 		Template unblockSoneTemplate = templateFactory.createTemplate(createReader("/templates/unblockSone.html"));
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
 		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
+		Template deleteReplyTemplate = templateFactory.createTemplate(createReader("/templates/deleteReply.html"));
 		Template followSoneTemplate = templateFactory.createTemplate(createReader("/templates/followSone.html"));
 		Template unfollowSoneTemplate = templateFactory.createTemplate(createReader("/templates/unfollowSone.html"));
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
@@ -190,6 +191,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblockSonePage(unblockSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewPostPage(viewPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostPage(deletePostTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyPage(deleteReplyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(followSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(unfollowSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
