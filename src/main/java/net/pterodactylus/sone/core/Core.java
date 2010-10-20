@@ -522,6 +522,18 @@ public class Core extends AbstractService {
 		return replies;
 	}
 
+	/**
+	 * Deletes the given reply. It is removed from its Sone and from the reply
+	 * cache.
+	 *
+	 * @param reply
+	 *            The reply to remove
+	 */
+	public void deleteReply(Reply reply) {
+		reply.getSone().removeReply(reply);
+		replyCache.remove(reply.getId());
+	}
+
 	//
 	// SERVICE METHODS
 	//
