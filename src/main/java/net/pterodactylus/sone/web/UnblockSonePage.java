@@ -49,11 +49,14 @@ public class UnblockSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 36);
 		if (request.getMethod() == Method.POST) {
-			getCurrentSone(request.getToadletContext()).removeBlockedSoneId(soneId);
+			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 36);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			if (request.getMethod() == Method.POST) {
+				getCurrentSone(request.getToadletContext()).removeBlockedSoneId(soneId);
+			}
+			throw new RedirectException(returnPage);
 		}
-		throw new RedirectException("viewSone.html?sone=" + soneId);
 	}
 
 	//
