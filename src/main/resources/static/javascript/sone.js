@@ -25,7 +25,7 @@ function addCommentLinks() {
 	$("#sone .post").each(function() {
 		postId = $(this).attr("id");
 		commentElement = (function(postId) {
-			var commentElement = $("<div>Comment</div>").addClass("show-reply-form").click(function() {
+			var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 				replyElement = $("#sone .post#" + postId + " .create-reply");
 				replyElement.removeClass("hidden");
 				replyElement.removeClass("light");

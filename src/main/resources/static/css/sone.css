@@ -144,11 +144,15 @@
 
 #sone .post .show-reply-form {
 	display: inline;
-	color: rgb(28, 131, 191);
-	cursor: pointer;
 }
 
-#sone .post .show-reply-form:hover {
+#sone .post .show-reply-form span {
+	color: rgb(28, 131, 191);
+	cursor: pointer;
+	font: inherit;
+}
+
+#sone .post .show-reply-form span:hover {
 	color: rgb(255, 172, 0);
 }
 
