@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -48,8 +49,12 @@ public class AddSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		final String soneKey = request.getHttpRequest().getPartAsStringFailsafe("request-uri", 256);
-		webInterface.core().loadSone(soneKey);
+		if (request.getMethod() == Method.POST) {
+			String soneKey = request.getHttpRequest().getPartAsStringFailsafe("request-uri", 256);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			webInterface.core().loadSone(soneKey);
+			throw new RedirectException(returnPage);
+		}
 	}
 
 }

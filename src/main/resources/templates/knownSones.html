@@ -6,6 +6,7 @@
 
 	<form action="addSone.html" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="returnPage" value="<% request.url|html>" />
 		<input id="addsone" type="text" name="request-uri" />
 		<button type="submit"><%= Page.Index.AddSone.Button.Add|l10n|html></button>
 	</form>

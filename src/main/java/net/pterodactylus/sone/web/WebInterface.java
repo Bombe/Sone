@@ -178,7 +178,7 @@ public class WebInterface extends AbstractService {
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new AddSonePage(addSoneTemplate, this), "AddSone"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new AddSonePage(addSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BackupProfilePage(backupProfileTemplate, this)));
