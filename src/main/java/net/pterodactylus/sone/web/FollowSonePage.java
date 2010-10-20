@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -47,13 +48,16 @@ public class FollowSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		String soneId = request.getHttpRequest().getParam("sone");
-		Sone currentSone = getCurrentSone(request.getToadletContext());
-		Sone sone = webInterface.core().getSone(soneId);
-		if (!sone.equals(currentSone)) {
-			currentSone.addFriend(sone);
+		if (request.getMethod() == Method.POST) {
+			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 36);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			Sone currentSone = getCurrentSone(request.getToadletContext());
+			Sone sone = webInterface.core().getSone(soneId);
+			if (!sone.equals(currentSone)) {
+				currentSone.addFriend(sone);
+			}
+			throw new RedirectException(returnPage);
 		}
-		throw new RedirectException("viewSone.html?sone=" + soneId);
 	}
 
 	//
