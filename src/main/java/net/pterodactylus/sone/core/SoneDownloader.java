@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
@@ -263,14 +264,67 @@ public class SoneDownloader extends AbstractService {
 				}
 			}
 
+			/* parse friends. */
+			SimpleXML friendsXml = soneXml.getNode("friends");
+			if (friendsXml == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded Sone %s has no friends!", new Object[] { sone });
+				return null;
+			}
+
+			Set<Sone> friends = new HashSet<Sone>();
+			for (SimpleXML friendXml : friendsXml.getNodes("friend")) {
+				String friendId = friendXml.getValue("sone-id", null);
+				String friendKey = friendXml.getValue("sone-key", null);
+				String friendName = friendXml.getValue("sone-name", null);
+				if ((friendId == null) || (friendKey == null) || (friendName == null)) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded friend for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, friendId, friendKey, friendName });
+					return null;
+				}
+				try {
+					friends.add(core.getSone(friendId).setRequestUri(new FreenetURI(friendKey)).setName(friendName));
+				} catch (MalformedURLException mue1) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded friend for Sone %s with invalid key: %s", new Object[] { sone, friendKey });
+					return null;
+				}
+			}
+
+			Set<Sone> knownSones = new HashSet<Sone>();
+			for (SimpleXML friendXml : friendsXml.getNodes("friend")) {
+				String knownSoneId = friendXml.getValue("sone-id", null);
+				String knownSoneKey = friendXml.getValue("sone-key", null);
+				String knownSoneName = friendXml.getValue("sone-name", null);
+				if ((knownSoneId == null) || (knownSoneKey == null) || (knownSoneName == null)) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, knownSoneId, knownSoneKey, knownSoneName });
+					return null;
+				}
+				try {
+					knownSones.add(core.getSone(knownSoneId).setRequestUri(new FreenetURI(knownSoneKey)).setName(knownSoneName));
+				} catch (MalformedURLException mue1) {
+					/* TODO - mark Sone as bad. */
+					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with invalid key: %s", new Object[] { sone, knownSoneKey });
+					return null;
+				}
+			}
+
 			/* okay, apparently everything was parsed correctly. Now import. */
 			/* atomic setter operation on the Sone. */
 			synchronized (sone) {
 				sone.setProfile(profile);
 				sone.setPosts(posts);
 				sone.setReplies(replies);
+				sone.setFriends(friends);
 				sone.setModificationCounter(0);
 			}
+
+			/* add all known Sones to core for downloading. */
+			for (Sone knownSone : knownSones) {
+				core.addSone(knownSone);
+			}
+
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, "Could not read XML file from " + originalSone + "!", ioe1);
 			return null;
