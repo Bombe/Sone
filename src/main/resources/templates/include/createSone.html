@@ -1,3 +1,15 @@
+<script language="javascript">
+	$(document).ready(function() {
+		registerInputTextareaSwap("#sone #create-sone input[name=name]", "The name of your Sone", "name");
+		registerInputTextareaSwap("#sone #create-sone input[name=document-name]", "The document name of your Sone", "document-name");
+		registerInputTextareaSwap("#sone #create-sone input[name=insert-uri]", "The insert URI of your Sone", "insert-uri");
+		registerInputTextareaSwap("#sone #create-sone input[name=request-uri]", "The request URI of your Sone", "request-uri");
+
+		/* hide all the labels. */
+		$("#sone #create-sone label").hide();
+	});
+</script>
+
 <form id="create-sone" action="createSone.html" method="post">
 	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 	<div<%if errorName> class="error"<%/if>>
