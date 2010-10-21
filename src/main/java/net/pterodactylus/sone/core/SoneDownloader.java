@@ -150,7 +150,16 @@ public class SoneDownloader extends AbstractService {
 		try {
 			xmlBucket = fetchResult.asBucket();
 			xmlInputStream = xmlBucket.getInputStream();
-			Document document = XML.transformToDocument(xmlInputStream);
+			Document document;
+			/* XML parsing is not thread-safe. */
+			synchronized (this) {
+				document = XML.transformToDocument(xmlInputStream);
+			}
+			if (document == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Could not parse XML for Sone %s at %s!", new Object[] { originalSone, requestUri });
+				return null;
+			}
 			SimpleXML soneXml;
 			try {
 				soneXml = SimpleXML.fromDocument(document);
