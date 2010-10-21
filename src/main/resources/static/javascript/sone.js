@@ -15,8 +15,8 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, o
 				textarea.show().focus();
 			}).addClass("default");
 			(function(inputField) {
-				$.getJSON("ajax/getTranslation.ajax", {"key": defaultText}, function(data, textStatus) {
-					$(inputField).val(data.value);
+				getTranslation(defaultText, function(translation) {
+					$(inputField).val(translation);
 				});
 			})(inputField);
 			$(inputField.form).submit(function() {
@@ -54,6 +54,21 @@ function addCommentLinks() {
 		$(this).find(".status-line .time").each(function() {
 			$(this).after(commentElement.clone(true));
 		});
+	});
+}
+
+/**
+ * Retrieves the translation for the given key and calls the callback function.
+ * The callback function takes a single parameter, the translated string.
+ *
+ * @param key
+ *            The key of the translation string
+ * @param callback
+ *            The callback function
+ */
+function getTranslation(key, callback) {
+	$.getJSON("ajax/getTranslation.ajax", {"key": key}, function(data, textStatus) {
+		callback(data.value);
 	});
 }
 
