@@ -4,8 +4,26 @@
 	<script src="javascript/sone.js" language="javascript"></script>
 
 	<script language="javascript">
+		/* this initializes the status update input field. */
 		$(document).ready(function() {
 			registerInputTextareaSwap("#sone #update-status .status-input", "WebInterface.DefaultText.StatusUpdate", "text", false);
+		});
+	</script>
+
+	<script language="javascript">
+		/* these functions are necessary for updating Sone statuses. */
+		$(document).ready(function() {
+			$("#sone .sone").each(function() {
+				watchSone($(this).attr("id"));
+			});
+		});
+	</script>
+
+	<script language="javascript">
+		/* this initializes all reply input fields. */
+		$(document).ready(function() {
+			registerInputTextareaSwap("#sone input.reply-input", "WebInterface.DefaultText.Reply", "text", false);
+			addCommentLinks();
 		});
 	</script>
 

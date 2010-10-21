@@ -1,11 +1,5 @@
 <%include include/head.html>
 
-	<script language="javascript">
-		$(document).ready(function() {
-			addCommentLinks();
-		});
-	</script>
-
 	<%ifnull sone.name>
 
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>

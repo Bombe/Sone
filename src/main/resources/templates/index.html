@@ -1,13 +1,5 @@
 <%include include/head.html>
 
-	<script language="javascript">
-		/* register input field/textarea swap. */
-		$(document).ready(function() {
-			registerInputTextareaSwap("#sone input.reply-input", "WebInterface.DefaultText.Reply", "text", false);
-			addCommentLinks();
-		});
-	</script>
-
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 
 	<div id="posts">
