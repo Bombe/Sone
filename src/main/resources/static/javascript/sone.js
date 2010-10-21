@@ -5,26 +5,38 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, o
 		textarea = $("<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
 			if ($(this).val() == "") {
 				$(this).hide();
-				$(this).data("inputField").show().removeAttr("disabled");
+				inputField = $(this).data("inputField");
+				inputField.show().removeAttr("disabled").addClass("default");
+				(function(inputField) {
+					getTranslation(defaultText, function(translation) {
+						inputField.val(translation);
+					});
+				})(inputField);
 			}
-		}).hide().data("inputField", $(this));
+		}).hide().data("inputField", $(this)).val($(this).val());
 		$(this).after(textarea);
 		(function(inputField, textarea) {
-			$(inputField).focus(function() {
+			inputField.focus(function() {
 				$(this).hide().attr("disabled", "disabled");
 				textarea.show().focus();
-			}).addClass("default");
-			(function(inputField) {
-				getTranslation(defaultText, function(translation) {
-					$(inputField).val(translation);
-				});
-			})(inputField);
-			$(inputField.form).submit(function() {
+			});
+			if (inputField.val() == "") {
+				inputField.addClass("default");
+				(function(inputField) {
+					getTranslation(defaultText, function(translation) {
+						inputField.val(translation);
+					});
+				})(inputField);
+			} else {
+				inputField.hide().attr("disabled", "disabled");
+				textarea.show();
+			}
+			$(inputField.get(0).form).submit(function() {
 				if (!optional && (textarea.val() == "")) {
 					return false;
 				}
 			});
-		})(this, textarea);
+		})($(this), textarea);
 	});
 }
 
