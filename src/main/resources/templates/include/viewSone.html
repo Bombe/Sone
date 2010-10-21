@@ -19,9 +19,20 @@
 		$("#sone .sone#" + soneId + " .last-update span.time").text(lastUpdated);
 	}
 
+	registeredSones = {};
+
 	$(document).ready(function() {
 		$("#sone .sone").each(function() {
-			getStatus($(this).attr("id"));
+			soneId = $(this).attr("id");
+			if (registeredSones[soneId]) {
+				return;
+			}
+			registeredSones[soneId] = true;
+			(function(soneId) {
+				setTimeout(function() {
+					getStatus(soneId);
+				}, 5000);
+			})(soneId);
 		});
 	});
 </script>
