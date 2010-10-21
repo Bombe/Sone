@@ -7,6 +7,24 @@
 
 		/* hide all the labels. */
 		$("#sone #create-sone label").hide();
+
+		/* now hide the “advanced” section. */
+		advancedSection = $("#sone #create-sone .advanced");
+		advancedSection.hide();
+
+		/* show a checkbox instead. */
+		checkboxSection = $("<div></div>");
+		checkbox = $("<input type=\"checkbox\" />").click(function() {
+			if (this.checked) {
+				advancedSection.show();
+				$("#sone #create-sone button[name=create-random]").hide();
+			} else {
+				advancedSection.hide();
+				$("#sone #create-sone button[name=create-random]").show();
+			}
+		})
+		checkboxSection.append(checkbox).append("Show advanced settings");
+		advancedSection.before(checkboxSection);
 	});
 </script>
 
@@ -23,15 +41,17 @@
 	<div>
 		<button type="submit" name="create-random" value="1"><%= Page.Login.CreateSone.Button.CreateRandom|l10n|html></button>
 	</div>
-	<div<%if errorUri> class="error"<%/if>>
-		<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
-		<input type="text" name="insert-uri" value="<% insertUri|html>" />
-	</div>
-	<div<%if errorUri> class="error"<%/if>>
-		<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
-		<input type="text" name="insert-uri" value="<% requestUri|html>" />
-	</div>
-	<div>
-		<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
+	<div class="advanced">
+		<div<%if errorUri> class="error"<%/if>>
+			<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
+			<input type="text" name="insert-uri" value="<% insertUri|html>" />
+		</div>
+		<div<%if errorUri> class="error"<%/if>>
+			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
+			<input type="text" name="insert-uri" value="<% requestUri|html>" />
+		</div>
+		<div>
+			<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
+		</div>
 	</div>
 </form>
