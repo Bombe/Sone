@@ -18,7 +18,6 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName) {
 				if (textarea.val() == "") {
 					return false;
 				}
-				$(inputField).val(textarea.val());
 			});
 		})(this, textarea);
 	});
