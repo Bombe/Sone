@@ -51,20 +51,29 @@ public class DeletePostPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		String postId = request.getHttpRequest().getParam("post", null);
-		if (postId == null) {
-			postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
-		}
-		Post post = webInterface.core().getPost(postId);
-		Sone currentSone = getCurrentSone(request.getToadletContext());
-		if (!post.getSone().equals(currentSone)) {
-			throw new RedirectException("noPermission.html");
-		}
-		if (request.getMethod() == Method.POST) {
+		if (request.getMethod() == Method.GET) {
+			String postId = request.getHttpRequest().getParam("post");
+			String returnPage = request.getHttpRequest().getParam("returnPage");
+			Post post = webInterface.core().getPost(postId);
+			template.set("post", post);
+			template.set("returnPage", returnPage);
+			return;
+		} else if (request.getMethod() == Method.POST) {
+			String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			Post post = webInterface.core().getPost(postId);
+			Sone currentSone = getCurrentSone(request.getToadletContext());
+			if (!post.getSone().equals(currentSone)) {
+				throw new RedirectException("noPermission.html");
+			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {
 				currentSone.removePost(post);
+				throw new RedirectException(returnPage);
+			} else if (request.getHttpRequest().isPartSet("abortDelete")) {
+				throw new RedirectException(returnPage);
 			}
-			throw new RedirectException("index.html");
+			template.set("post", post);
+			template.set("returnPage", returnPage);
 		}
 	}
 
