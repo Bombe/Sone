@@ -3,9 +3,16 @@
 	function getStatus(soneId) {
 		$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
 			updateStatus(soneId, data.status, data.modified, data.lastUpdated);
+			/* seconds! */
+			updateInterval = 60;
+			if (data.age < 600) {
+				updateInterval = 5;
+			} else if (data.age < 86400) {
+				updateInterval = 30;
+			}
 			setTimeout(function() {
 				getStatus(soneId);
-			}, 5000);
+			}, updateInterval * 1000);
 		});
 	}
 
