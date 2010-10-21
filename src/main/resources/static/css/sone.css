@@ -296,15 +296,18 @@ input[type=text], textarea {
 	
 }
 
-#sone #tail .import-key {
+#sone #tail .import-key, #sone #import-key .import-key {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;
 	padding-top: 1em;
 	text-align: center;
-	font-size: 85%;
+	font-size: 75%;
 	color: #888;
 }
 
+#sone #import-key .import-key {
+	border-top: none;
+}
 
 #sone h1 {
 	font-family: inherit;

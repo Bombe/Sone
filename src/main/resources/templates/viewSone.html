@@ -18,6 +18,10 @@
 			<%include include/viewSone.html>
 		<%/if>
 
+		<div id="import-key">
+			<div class="import-key"><% sone.requestUri|html></div>
+		</div>
+
 		<div id="posts">
 			<%foreach sone.posts post>
 				<%first>
