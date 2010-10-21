@@ -3,7 +3,7 @@
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 
 	<div id="posts">
-		<%foreach posts post>
+		<%foreach posts post postLoop>
 			<%include include/viewPost.html>
 		<%foreachelse>
 			<div><%= Page.Index.PostList.Text.NoPostYet|l10n|html></div>
