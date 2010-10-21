@@ -333,6 +333,36 @@ textarea {
 	position: absolute;
 }
 
+#sone .navigation {
+	text-align: center;
+}
+
+#sone .navigation .first a, #sone .navigation .previous a, #sone .navigation .next a, #sone .navigation .last a, #sone .navigation .first span, #sone .navigation .previous span, #sone .navigation .next span, #sone .navigation .last span {
+	display: block;
+	height: 1.5em;
+	padding: 0.5ex;
+	width: 3em;
+	border: solid 1px #ccc;
+	background-color: #f0f0ff;
+}
+
+#sone .navigation .first, #sone .navigation .previous {
+	float: left;
+}
+
+#sone .navigation .current-page, #sone .navigation .total-pages {
+	margin-top: 0.5ex;
+	display: inline;
+}
+
+#sone .navigation .total-pages:before {
+	content: '/ ';
+}
+
+#sone .navigation .next, #sone .navigation .last {
+	float: right;
+}
+
 #sone h1 {
 	font-family: inherit;
 	font-size: 200%;

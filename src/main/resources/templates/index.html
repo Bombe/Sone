@@ -3,11 +3,13 @@
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 
 	<div id="posts">
+		<%include include/pagination.html>
 		<%foreach posts post postLoop>
 			<%include include/viewPost.html>
 		<%foreachelse>
 			<div><%= Page.Index.PostList.Text.NoPostYet|l10n|html></div>
 		<%/foreach>
+		<%include include/pagination.html>
 	</div>
 
 <%include include/tail.html>
