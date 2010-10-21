@@ -27,6 +27,11 @@
 			<version>26</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.pterodactylus</groupId>
+			<artifactId>utils.json</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
