@@ -88,7 +88,7 @@ public class SoneInserter extends AbstractService {
 	 *            The Sone to insert
 	 */
 	public SoneInserter(Core core, FreenetInterface freenetInterface, Sone sone) {
-		super("Sone Inserter for “" + sone.getName() + "”");
+		super("Sone Inserter for “" + sone.getName() + "”", false);
 		this.core = core;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;

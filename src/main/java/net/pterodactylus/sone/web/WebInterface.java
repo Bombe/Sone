@@ -76,7 +76,7 @@ public class WebInterface extends AbstractService {
 	 *            The Sone plugin
 	 */
 	public WebInterface(SonePlugin sonePlugin) {
-		super("Sone Web Interface");
+		super("Sone Web Interface", false);
 		this.sonePlugin = sonePlugin;
 	}
 

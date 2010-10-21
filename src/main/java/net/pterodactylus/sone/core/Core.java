@@ -108,7 +108,7 @@ public class Core extends AbstractService {
 	 * Creates a new core.
 	 */
 	public Core() {
-		super("Sone Core");
+		super("Sone Core", false);
 	}
 
 	//

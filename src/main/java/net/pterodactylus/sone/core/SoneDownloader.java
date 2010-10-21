@@ -69,7 +69,7 @@ public class SoneDownloader extends AbstractService {
 	 *            The Freenet interface
 	 */
 	public SoneDownloader(Core core, FreenetInterface freenetInterface) {
-		super("Sone Downloader");
+		super("Sone Downloader", false);
 		this.core = core;
 		this.freenetInterface = freenetInterface;
 	}
