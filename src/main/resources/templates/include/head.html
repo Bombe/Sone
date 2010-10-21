@@ -14,7 +14,7 @@
 		/* these functions are necessary for updating Sone statuses. */
 		$(document).ready(function() {
 			$("#sone .sone").each(function() {
-				watchSone($(this).attr("id"));
+				watchSone($(this).find(".id").text());
 			});
 		});
 	</script>

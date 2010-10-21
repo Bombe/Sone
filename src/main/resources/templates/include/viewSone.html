@@ -1,4 +1,5 @@
-<div id="<% sone.id|html>" class="sone <% sone.status|html><%if sone.modified> modified<%/if>">
+<div class="sone <% sone.status|html><%if sone.modified> modified<%/if> <% sone.id|html>">
+	<div class="id"><% sone.id|html></div>
 	<div class="unknown-marker" title="<%= View.Sone.Status.Unknown|l10n|html>">?</div>
 	<div class="modified-marker" title="<%= View.Sone.Status.Modified|l10n|html>">!</div>
 	<div class="download-marker" title="<%= View.Sone.Status.Downloading|l10n|html>">⬊</div>

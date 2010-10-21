@@ -239,6 +239,10 @@ textarea {
 	padding: 0.5ex;
 }
 
+#sone .sone .id {
+	display: none;
+}
+
 #sone .sone .profile-link {
 	display: block;
 }
