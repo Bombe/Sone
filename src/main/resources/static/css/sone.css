@@ -320,11 +320,7 @@ textarea {
 	border-top: none;
 }
 
-#sone #add-sone textarea {
-	height: 1.5em;
-}
-
-#sone #create-sone textarea {
+#sone #add-sone textarea, #sone #create-sone textarea, #sone #load-sone textarea {
 	height: 1.5em;
 }
 
