@@ -1,4 +1,31 @@
-<div class="sone <% sone.status><%if sone.modified> modified<%/if>">
+<script language="javascript">
+
+	function getStatus(soneId) {
+		$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
+			updateStatus(soneId, data.status, data.modified);
+			setTimeout(function() {
+				getStatus(soneId);
+			}, 5000);
+		});
+	}
+
+	function updateStatus(soneId, status, modified) {
+		$("#sone .sone#" + soneId).
+			toggleClass("unknown", status == "unknown").
+			toggleClass("idle", status == "idle").
+			toggleClass("inserting", status == "inserting").
+			toggleClass("downloading", status == "downloading").
+			toggleClass("modified", modified);
+	}
+
+	$(document).ready(function() {
+		$("#sone .sone").each(function() {
+			getStatus($(this).attr("id"));
+		});
+	});
+</script>
+
+<div id="<% sone.id|html>" class="sone <% sone.status|html><%if sone.modified> modified<%/if>">
 	<div class="unknown-marker" title="<%= View.Sone.Status.Unknown|l10n|html>">?</div>
 	<div class="modified-marker" title="<%= View.Sone.Status.Modified|l10n|html>">!</div>
 	<div class="download-marker" title="<%= View.Sone.Status.Downloading|l10n|html>">⬊</div>
