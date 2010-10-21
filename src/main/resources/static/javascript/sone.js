@@ -1,6 +1,6 @@
 /* Sone JavaScript functions. */
 
-function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName) {
+function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, optional) {
 	$(inputSelector).each(function() {
 		textarea = $("<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
 			if ($(this).val() == "") {
@@ -13,9 +13,14 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName) {
 			$(inputField).focus(function() {
 				$(this).hide().attr("disabled", "disabled");
 				textarea.show().focus();
-			}).addClass("default").val(defaultText);
+			}).addClass("default");
+			(function(inputField) {
+				$.getJSON("ajax/getTranslation.ajax", {"key": defaultText}, function(data, textStatus) {
+					$(inputField).val(data.value);
+				});
+			})(inputField);
 			$(inputField.form).submit(function() {
-				if (textarea.val() == "") {
+				if (!optional && (textarea.val() == "")) {
 					return false;
 				}
 			});

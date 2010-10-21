@@ -1,9 +1,9 @@
 <script language="javascript">
 	$(document).ready(function() {
-		registerInputTextareaSwap("#sone #create-sone input[name=name]", "The name of your Sone", "name");
-		registerInputTextareaSwap("#sone #create-sone input[name=document-name]", "The document name of your Sone", "document-name");
-		registerInputTextareaSwap("#sone #create-sone input[name=insert-uri]", "The insert URI of your Sone", "insert-uri");
-		registerInputTextareaSwap("#sone #create-sone input[name=request-uri]", "The request URI of your Sone", "request-uri");
+		registerInputTextareaSwap("#sone #create-sone input[name=name]", "WebInterface.DefaultText.CreateSoneName", "name", false);
+		registerInputTextareaSwap("#sone #create-sone input[name=document-name]", "WebInterface.DefaultText.CreateSoneDocumentName", "document-name", false);
+		registerInputTextareaSwap("#sone #create-sone input[name=insert-uri]", "WebInterface.DefaultText.CreateSoneInsertURI", "insert-uri", true);
+		registerInputTextareaSwap("#sone #create-sone input[name=request-uri]", "WebInterface.DefaultText.CreateSoneRequestURI", "request-uri", true);
 
 		/* hide all the labels. */
 		$("#sone #create-sone label").hide();
