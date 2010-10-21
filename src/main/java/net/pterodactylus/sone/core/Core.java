@@ -91,7 +91,7 @@ public class Core extends AbstractService {
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
 
 	/** The Sones’ statuses. */
-	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
+	private final Map<Sone, SoneStatus> soneStatuses = Collections.synchronizedMap(new HashMap<Sone, SoneStatus>());
 
 	/* various caches follow here. */
 
