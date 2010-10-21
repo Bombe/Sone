@@ -1,5 +1,16 @@
 <%include include/head.html>
 
+	<script language="javascript">
+		$(document).ready(function() {
+			registerInputTextareaSwap("#sone #edit-profile input[name=first-name]", "WebInterface.DefaultText.FirstName", true);
+			registerInputTextareaSwap("#sone #edit-profile input[name=middle-name]", "WebInterface.DefaultText.MiddleName", true);
+			registerInputTextareaSwap("#sone #edit-profile input[name=last-name]", "WebInterface.DefaultText.LastName", true);
+
+			/* hide all the labels. */
+			$("#sone #edit-profile label").hide();
+		});
+	</script>
+
 	<h1><%= Page.EditProfile.Page.Title|l10n|html></h1>
 
 	<div><%= Page.EditProfile.Page.Description|l10n|html></div>
@@ -9,7 +20,7 @@
 		<div><%= Page.EditProfile.Page.Status.Changed|l10n|html></div>
 	<%/if>
 
-	<form method="post">
+	<form id="edit-profile" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 
 		<div>
@@ -32,13 +43,13 @@
 		</div>
 
 	</form>
-	
+
 	<h1><%= Page.EditProfile.Keys.Title|l10n|html></h1>
-	
+
 	<div><%= Page.EditProfile.Keys.Description.RequestKey|l10n|html></div>
 	<div><%= Page.EditProfile.Keys.Description.InsertKey|l10n|html></div>
 	<div><%= Page.EditProfile.Keys.Description.Summary|l10n|html></div>
-	
+
 	<div>
 		<label><%= Page.EditProfile.Label.RequestKey|l10n|html></label>
 		<input type="text" class="key" readonly="readonly" value="<% currentSone.requestUri|html>" />
@@ -47,7 +58,7 @@
 		<label><%= Page.EditProfile.Label.RequestKey|l10n|html></label>
 		<input type="text" class="key" readonly="readonly" value="<% currentSone.insertUri|html>" />
 	</div>
-	
+
 	<h1><%= Page.EditProfile.Backup.Title|l10n|html></h1>
 
 	<div><%= Page.EditProfile.Backup.Description|l10n|html></div>

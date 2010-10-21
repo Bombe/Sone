@@ -324,7 +324,7 @@ textarea {
 	border-top: none;
 }
 
-#sone #add-sone textarea, #sone #create-sone textarea, #sone #load-sone textarea {
+#sone #add-sone textarea, #sone #create-sone textarea, #sone #load-sone textarea, #sone #edit-profile textarea {
 	height: 1.5em;
 }
 
