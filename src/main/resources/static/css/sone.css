@@ -7,6 +7,16 @@
 
 input[type=text], textarea {
 	font-size: 90%;
+	margin: 0.5ex;
+	border: solid 1px #ccc;
+	padding: 0.5ex;
+	height: 1.5em;
+	width: 50em;
+	outline: none;
+}
+
+textarea {
+	height: 4em;
 }
 
 #sone form {
@@ -78,12 +88,10 @@ input[type=text], textarea {
 
 #sone #update-status input[type=text] {
 	width: 45em;
-} 
+}
 
 #sone #update-status textarea {
-	border: solid 1px #ccc;
 	width: 45em;
-	height: 4em;
 }
 
 #sone #update-status button {
@@ -293,7 +301,7 @@ input[type=text], textarea {
 }
 
 #sone #create-sone {
-	
+
 }
 
 #sone #tail .import-key, #sone #import-key .import-key {
@@ -307,6 +315,14 @@ input[type=text], textarea {
 
 #sone #import-key .import-key {
 	border-top: none;
+}
+
+#sone #add-sone textarea {
+	height: 1.5em;
+}
+
+#sone #add-sone button {
+	position: absolute;
 }
 
 #sone h1 {
