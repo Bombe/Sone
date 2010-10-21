@@ -110,6 +110,7 @@ textarea {
 #sone .post {
 	padding: 1ex 0px;
 	border-bottom: solid 1px #ccc;
+	clear: both;
 }
 
 #sone .post:last-child {
