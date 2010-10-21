@@ -321,6 +321,10 @@ textarea {
 	height: 1.5em;
 }
 
+#sone #create-sone textarea {
+	height: 1.5em;
+}
+
 #sone #add-sone button {
 	position: absolute;
 }
