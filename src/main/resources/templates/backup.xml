@@ -5,4 +5,41 @@
 	<requestUri><% currentSone.requestUri|xml></requestUri>
 	<insertUri><% currentSone.insertUri|xml></insertUri>
 
+	<profile>
+		<first-name><% currentSone.profile.firstName|xml></first-name>
+		<middle-name><% currentSone.profile.middleName|xml></middle-name>
+		<last-name><% currentSone.profile.lastName|xml></last-name>
+	</profile>
+
+	<posts>
+		<%foreach currentSone.posts post>
+		<post>
+			<id><% post.id|xml></id>
+			<time><% post.time></time>
+			<text><% post.text|xml></text>
+		</post>
+		<%/foreach>
+	</posts>
+
+	<replies>
+		<%foreach currentSone.replies reply>
+		<reply>
+			<id><% reply.id></id>
+			<post-id><% reply.post.id|xml></post-id>
+			<time><% reply.time></time>
+			<text><% reply.text|xml></text>
+		</reply>
+		<%/foreach>
+	</replies>
+
+	<friends>
+		<%foreach currentSone.friends friend>
+		<friend>
+			<sone-id><% friend.id|xml></sone-id>
+			<sone-key><% friend.requestUri|xml></sone-key>
+			<sone-name><% friend.name|xml></sone-name>
+		</friend>
+		<%/foreach>
+	</friends>
+
 </sone>
