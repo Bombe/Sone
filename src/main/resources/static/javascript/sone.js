@@ -1,8 +1,8 @@
 /* Sone JavaScript functions. */
 
-function registerInputTextareaSwap(inputSelector, defaultText) {
+function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName) {
 	$(inputSelector).each(function() {
-		textarea = $("<textarea name=\"text\"></textarea>").blur(function() {
+		textarea = $("<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
 			if ($(this).val() == "") {
 				$(this).hide();
 				$(this).data("inputField").show().removeAttr("disabled");
