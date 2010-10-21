@@ -50,6 +50,7 @@ import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateFactory;
 import net.pterodactylus.util.template.TemplateProvider;
+import net.pterodactylus.util.template.XmlFilter;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.ToadletContainer;
 import freenet.l10n.BaseL10n;
@@ -153,6 +154,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
 		templateFactory.addFilter("substring", new SubstringFilter());
+		templateFactory.addFilter("xml", new XmlFilter());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
 		templateFactory.addTemplateObject("formPassword", sonePlugin.pluginRespirator().getToadletContainer().getFormPassword());
 

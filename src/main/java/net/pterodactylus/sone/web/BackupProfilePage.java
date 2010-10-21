@@ -52,6 +52,7 @@ public class BackupProfilePage extends SoneTemplatePage {
 	@Override
 	public Response handleRequest(Request request) {
 		StringWriter stringWriter = new StringWriter();
+		template.set("currentSone", getCurrentSone(request.getToadletContext()));
 		try {
 			template.render(stringWriter);
 		} finally {
