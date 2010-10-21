@@ -8,6 +8,7 @@
 input[type=text], textarea {
 	font-size: 90%;
 	margin: 0.5ex;
+	margin-left: 0;
 	border: solid 1px #ccc;
 	padding: 0.5ex;
 	height: 1.5em;
@@ -216,10 +217,12 @@ textarea {
 }
 
 #sone .post .create-reply input[type=text] {
+	margin-left: 0.5ex;
 	width: 50em;
 }
 
 #sone .post .create-reply textarea {
+	margin-left: 0.5ex;
 	width: 50em;
 	height: 4em;
 }
