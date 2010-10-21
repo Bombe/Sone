@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
 
@@ -214,8 +215,20 @@ public class Sone {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	public Set<Sone> getFriends() {
-		return Collections.unmodifiableSet(friendSones);
+	public List<Sone> getFriends() {
+		List<Sone> friends = new ArrayList<Sone>(friendSones);
+		Collections.sort(friends, new Comparator<Sone>() {
+
+			@Override
+			public int compare(Sone leftSone, Sone rightSone) {
+				int diff = SoneAccessor.getNiceName(leftSone).compareTo(SoneAccessor.getNiceName(rightSone));
+				if (diff != 0) {
+					return diff;
+				}
+				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightSone.getTime() - leftSone.getTime()));
+			}
+		});
+		return friends;
 	}
 
 	/**
