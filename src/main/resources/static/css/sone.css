@@ -336,7 +336,7 @@ textarea {
 	font-weight: bold;
 }
 
-#sone input.status-input.default, #sone input.reply-input.default, #sone #add-sone input[name=request-uri].default {
+#sone input.default {
 	color: #888;
 }
 
