@@ -33,6 +33,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
@@ -46,6 +47,7 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
+import net.pterodactylus.util.template.PaginationPlugin;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateException;
@@ -157,6 +159,8 @@ public class WebInterface extends AbstractService {
 		templateFactory.addFilter("substring", new SubstringFilter());
 		templateFactory.addFilter("xml", new XmlFilter());
 		templateFactory.addFilter("change", new RequestChangeFilter());
+		templateFactory.addPlugin("getpage", new GetPagePlugin());
+		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
 		templateFactory.addTemplateObject("formPassword", sonePlugin.pluginRespirator().getToadletContainer().getFormPassword());
 
