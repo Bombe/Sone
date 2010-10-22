@@ -95,7 +95,7 @@ function getSoneStatus(soneId) {
 		updateSoneStatus(soneId, data.status, data.modified, data.lastUpdated);
 		/* seconds! */
 		updateInterval = 60;
-		if (data.modified || (data.status == "downloading") || (data.status == "inserting")) {}
+		if (data.modified || (data.status == "downloading") || (data.status == "inserting")) {
 			updateInterval = 5;
 		}
 		setTimeout(function() {
