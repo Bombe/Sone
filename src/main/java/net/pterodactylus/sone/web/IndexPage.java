@@ -24,7 +24,6 @@ import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -69,11 +68,7 @@ public class IndexPage extends SoneTemplatePage {
 			}
 
 		});
-		int page = request.getHttpRequest().getIntParam("page", 0);
-		Pagination<Post> postPagination = new Pagination<Post>(allPosts, 25).setPage(page);
-		List<Post> postsOnPage = postPagination.getItems();
-		template.set("posts", postsOnPage);
-		template.set("pagination", postPagination);
+		template.set("posts", allPosts);
 	}
 
 	//

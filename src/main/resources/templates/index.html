@@ -3,8 +3,10 @@
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 
 	<div id="posts">
+		<%getpage>
+		<%paginate list=posts pagesize=2>
 		<%include include/pagination.html>
-		<%foreach posts post>
+		<%foreach pagination.items post>
 			<%include include/viewPost.html>
 		<%foreachelse>
 			<div><%= Page.Index.PostList.Text.NoPostYet|l10n|html></div>
