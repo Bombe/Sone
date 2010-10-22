@@ -17,7 +17,11 @@
 		</div>
 
 		<div id="posts">
-			<%foreach sone.posts post>
+			<%getpage parameter=postPage>
+			<%paginate list=sone.posts pagesize=2>
+			<%= postPage|store key=pageParameter>
+			<%include include/pagination.html>
+			<%foreach pagination.items post>
 				<%first>
 					<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
 				<%/first>
@@ -25,16 +29,22 @@
 			<%foreachelse>
 				<div><%= Page.ViewSone.PostList.Text.NoPostYet|l10n|html></div>
 			<%/foreach>
+			<%include include/pagination.html>
 		</div>
 
 		<h1><%= Page.ViewSone.Following.Title|l10n|html></h1>
 
 		<div id="following">
-			<%foreach sone.friends sone>
+			<%getpage parameter=sonePage>
+			<%paginate list=sone.friends pagesize=2>
+			<%= sonePage|store key=pageParameter>
+			<%include include/pagination.html>
+			<%foreach pagination.items sone>
 				<%include include/viewSone.html>
 			<%foreachelse>
 				<div><%= Page.ViewSone.Following.FollowingNone.Text|l10n|html></div>
 			<%/foreach>
+			<%include include/pagination.html>
 		</div>
 
 	<%/if>
