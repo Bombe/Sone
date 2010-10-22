@@ -17,10 +17,15 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import java.util.UUID;
+
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.json.JsonUtils;
+import freenet.clients.http.SessionManager.Session;
+import freenet.clients.http.ToadletContext;
 
 /**
  * A JSON page is a specialized {@link Page} that will always return a JSON
@@ -47,6 +52,72 @@ public abstract class JsonPage implements Page {
 	public JsonPage(String path, WebInterface webInterface) {
 		this.path = path;
 		this.webInterface = webInterface;
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session.
+	 *
+	 * @param toadletContenxt
+	 *            The toadlet context
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	protected Session getCurrentSession(ToadletContext toadletContenxt) {
+		return getCurrentSession(toadletContenxt, true);
+	}
+
+	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session and {@code create} is {@code true}.
+	 *
+	 * @param toadletContenxt
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if there is no current
+	 *            session, {@code false} otherwise
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
+		try {
+			Session session = webInterface.sessionManager().useSession(toadletContenxt);
+			if (create && (session == null)) {
+				session = webInterface.sessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
+			}
+			return session;
+		} catch (freenet.clients.http.RedirectException re1) {
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	protected Sone getCurrentSone(ToadletContext toadletContext) {
+		Session session = getCurrentSession(toadletContext);
+		if (session == null) {
+			return null;
+		}
+		String soneId = (String) session.getAttribute("Sone.CurrentSone");
+		if (soneId == null) {
+			return null;
+		}
+		for (Sone sone : webInterface.core().getSones()) {
+			if (sone.getId().equals(soneId)) {
+				return sone;
+			}
+		}
+		return null;
 	}
 
 	//
