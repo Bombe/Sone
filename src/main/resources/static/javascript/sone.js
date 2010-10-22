@@ -95,10 +95,8 @@ function getSoneStatus(soneId) {
 		updateSoneStatus(soneId, data.status, data.modified, data.lastUpdated);
 		/* seconds! */
 		updateInterval = 60;
-		if (data.age < 600) {
+		if (data.modified || (data.status == "downloading") || (data.status == "inserting")) {}
 			updateInterval = 5;
-		} else if (data.age < 86400) {
-			updateInterval = 30;
 		}
 		setTimeout(function() {
 			getSoneStatus(soneId);
