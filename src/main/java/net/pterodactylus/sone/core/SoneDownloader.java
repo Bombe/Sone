@@ -276,38 +276,19 @@ public class SoneDownloader extends AbstractService {
 				}
 			}
 
-			/* parse friends. */
-			SimpleXML friendsXml = soneXml.getNode("friends");
-			if (friendsXml == null) {
+			/* parse known Sones. */
+			SimpleXML knownSonesXml = soneXml.getNode("known-sones");
+			if (knownSonesXml == null) {
 				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, "Downloaded Sone %s has no friends!", new Object[] { sone });
+				logger.log(Level.WARNING, "Downloaded Sone %s has no known Sones!", new Object[] { sone });
 				return null;
 			}
 
-			Set<Sone> friends = new HashSet<Sone>();
-			for (SimpleXML friendXml : friendsXml.getNodes("friend")) {
-				String friendId = friendXml.getValue("sone-id", null);
-				String friendKey = friendXml.getValue("sone-key", null);
-				String friendName = friendXml.getValue("sone-name", null);
-				if ((friendId == null) || (friendKey == null) || (friendName == null)) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded friend for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, friendId, friendKey, friendName });
-					return null;
-				}
-				try {
-					friends.add(core.getSone(friendId).setRequestUri(new FreenetURI(friendKey)).setName(friendName));
-				} catch (MalformedURLException mue1) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded friend for Sone %s with invalid key: %s", new Object[] { sone, friendKey });
-					return null;
-				}
-			}
-
 			Set<Sone> knownSones = new HashSet<Sone>();
-			for (SimpleXML friendXml : friendsXml.getNodes("friend")) {
-				String knownSoneId = friendXml.getValue("sone-id", null);
-				String knownSoneKey = friendXml.getValue("sone-key", null);
-				String knownSoneName = friendXml.getValue("sone-name", null);
+			for (SimpleXML knownSoneXml : knownSonesXml.getNodes("known-sone")) {
+				String knownSoneId = knownSoneXml.getValue("sone-id", null);
+				String knownSoneKey = knownSoneXml.getValue("sone-key", null);
+				String knownSoneName = knownSoneXml.getValue("sone-name", null);
 				if ((knownSoneId == null) || (knownSoneKey == null) || (knownSoneName == null)) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, knownSoneId, knownSoneKey, knownSoneName });
@@ -328,7 +309,6 @@ public class SoneDownloader extends AbstractService {
 				sone.setProfile(profile);
 				sone.setPosts(posts);
 				sone.setReplies(replies);
-				sone.setFriends(friends);
 				sone.setModificationCounter(0);
 			}
 
