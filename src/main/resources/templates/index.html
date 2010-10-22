@@ -5,6 +5,7 @@
 	<div id="posts">
 		<%getpage>
 		<%paginate list=posts pagesize=2>
+		<%= page|store key=pageParameter>
 		<%include include/pagination.html>
 		<%foreach pagination.items post>
 			<%include include/viewPost.html>
