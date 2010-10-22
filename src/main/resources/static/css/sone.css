@@ -35,6 +35,10 @@ textarea {
 	display: none;
 }
 
+#sone #formPassword {
+	display: none;
+}
+
 #sone a, #sone a:link, #sone a:visited {
 	color: rgb(28, 131, 191);
 	font-size: inherit;
