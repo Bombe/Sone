@@ -75,6 +75,9 @@ public class WebInterface extends AbstractService {
 	/** The registered toadlets. */
 	private final List<PageToadlet> pageToadlets = new ArrayList<PageToadlet>();
 
+	/** The form password. */
+	private final String formPassword;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -84,6 +87,7 @@ public class WebInterface extends AbstractService {
 	public WebInterface(SonePlugin sonePlugin) {
 		super("Sone Web Interface", false);
 		this.sonePlugin = sonePlugin;
+		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 	}
 
 	//
@@ -120,6 +124,15 @@ public class WebInterface extends AbstractService {
 			logger.log(Level.SEVERE, "Could not get Session Manager!", use1);
 			return null;
 		}
+	}
+
+	/**
+	 * Returns the node’s form password.
+	 *
+	 * @return The form password
+	 */
+	public String formPassword() {
+		return formPassword;
 	}
 
 	//
@@ -162,7 +175,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addPlugin("getpage", new GetPagePlugin());
 		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
-		templateFactory.addTemplateObject("formPassword", sonePlugin.pluginRespirator().getToadletContainer().getFormPassword());
+		templateFactory.addTemplateObject("formPassword", formPassword);
 
 		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
 		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
