@@ -32,16 +32,6 @@
 		<%/foreach>
 	</replies>
 
-	<friends>
-		<%foreach currentSone.friends friend>
-		<friend>
-			<sone-id><% friend.id|xml></sone-id>
-			<sone-key><% friend.requestUri|xml></sone-key>
-			<sone-name><% friend.name|xml></sone-name>
-		</friend>
-		<%/foreach>
-	</friends>
-
 	<known-sones>
 		<%foreach knownSones sone>
 		<known-sone>
