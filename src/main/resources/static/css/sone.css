@@ -392,3 +392,8 @@ textarea {
 	width: 130ex;;
 	font-size: 75%;
 }
+
+#sone .confirm {
+	font-weight: bold !important;
+	color: red !important;
+}

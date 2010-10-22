@@ -16,7 +16,7 @@
 	</div>
 	<div class="replies">
 		<%foreach post.replies reply>
-			<div class="reply">
+			<div id="<% reply.id|html>" class="reply">
 				<div>
 					<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id|html>"><% reply.sone.niceName|html></a></div>
 					<div class="text"><% reply.text|html></div>

@@ -146,3 +146,89 @@ function watchSone(soneId) {
 		}, 5000);
 	})(soneId);
 }
+
+/**
+ * Enhances a “delete” button so that the confirmation is done on the same page.
+ *
+ * @param buttonId
+ *            The selector of the button
+ * @param translationKey
+ *            The translation key of the text to show on the button
+ * @param deleteCallback
+ *            The callback that actually deletes something
+ */
+function enhanceDeleteButton(buttonId, translationKey, deleteCallback) {
+	button = $(buttonId);
+	(function(button) {
+		getTranslation(translationKey, function(translation) {
+			newButton = $("<button></button>").addClass("confirm").hide().text(translation).click(function() {
+				$(this).fadeOut("slow");
+				deleteCallback();
+				return false;
+			}).insertAfter(button);
+			(function(button, newButton) {
+				button.click(function() {
+					button.fadeOut("slow", function() {
+						newButton.fadeIn("slow");
+						$(document).one("click", function() {
+							if (this != newButton.get(0)) {
+								newButton.fadeOut(function() {
+									button.fadeIn();
+								});
+							}
+						});
+					});
+					return false;
+				});
+			})(button, newButton);
+		});
+	})(button);
+}
+
+/**
+ * Enhances a post’s “delete” button.
+ *
+ * @param buttonId
+ *            The selector of the button
+ * @param postId
+ *            The ID of the post to delete
+ */
+function enhanceDeletePostButton(buttonId, postId) {
+	enhanceDeleteButton(buttonId, "WebInterface.Confirmation.DeletePostButton", function() {
+		$.getJSON("ajax/deletePost.ajax", { "post": postId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+			if (data.success) {
+				$("#sone .post#" + postId).slideUp();
+			} else if (data.error == "invalid-post-id") {
+				alert("Invalid post ID given!");
+			} else if (data.error == "auth-required") {
+				alert("You need to be logged in.");
+			} else if (data.error == "not-authorized") {
+				alert("You are not allowed to delete this post.");
+			}
+		});
+	});
+}
+
+/**
+ * Enhances a reply’s “delete” button.
+ *
+ * @param buttonId
+ *            The selector of the button
+ * @param replyId
+ *            The ID of the reply to delete
+ */
+function enhanceDeleteReplyButton(buttonId, replyId) {
+	enhanceDeleteButton(buttonId, "WebInterface.Confirmation.DeleteReplyButton", function() {
+		$.getJSON("ajax/deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+			if (data.success) {
+				$("#sone .reply#" + replyId).slideUp();
+			} else if (data.error == "invalid-reply-id") {
+				alert("Invalid reply ID given!");
+			} else if (data.error == "auth-required") {
+				alert("You need to be logged in.");
+			} else if (data.error == "not-authorized") {
+				alert("You are not allowed to delete this reply.");
+			}
+		});
+	});
+}
