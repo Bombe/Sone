@@ -47,6 +47,10 @@ public class RequestChangeFilter implements Filter {
 	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
 		Request request = (Request) data;
 		String name = parameters.get("name");
+		String nameKey = parameters.get("nameKey");
+		if (nameKey != null) {
+			name = String.valueOf(dataProvider.getData(nameKey));
+		}
 		String key = parameters.get("key");
 		String value = null;
 		if (key != null) {
