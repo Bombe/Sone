@@ -20,11 +20,16 @@
 	<h1><%= Page.KnownSones.Page.Title|l10n|html></h1>
 
 	<div id="known-sones">
-		<%foreach knownSones sone>
+		<%getpage parameter=page>
+		<%paginate list=knownSones pagesize=2>
+		<%= page|store key=pageParameter>
+		<%include include/pagination.html>
+		<%foreach pagination.items sone>
 			<%include include/viewSone.html>
 		<%foreachelse>
 			<div><%= Page.KnownSones.Text.NoKnownSones|l10n|html></div>
 		<%/foreach>
+		<%include include/pagination.html>
 	</div>
 
 <%include include/tail.html>
