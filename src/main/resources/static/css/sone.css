@@ -344,6 +344,7 @@ textarea {
 	width: 3em;
 	border: solid 1px #ccc;
 	background-color: #f0f0ff;
+	margin: 1ex 0;
 }
 
 #sone .navigation .first, #sone .navigation .previous {
@@ -351,6 +352,8 @@ textarea {
 }
 
 #sone .navigation .current-page, #sone .navigation .total-pages {
+	position: relative;
+	top: 0.5em;
 	margin-top: 0.5ex;
 	display: inline;
 }
@@ -367,6 +370,9 @@ textarea {
 	font-family: inherit;
 	font-size: 200%;
 	font-weight: bold;
+	clear: both;
+	margin: 0;
+	margin-top: 1em;
 }
 
 #sone .error label {
