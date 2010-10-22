@@ -238,10 +238,9 @@ public class Sone {
 	 *            The new (and only) friends of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setFriends(Collection<Sone> friends) {
+	public Sone setFriends(Collection<Sone> friends) {
 		friendSones.clear();
 		friendSones.addAll(friends);
-		modificationCounter++;
 		return this;
 	}
 
@@ -264,9 +263,9 @@ public class Sone {
 	 *            The friend Sone to add
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone addFriend(Sone friendSone) {
-		if (!friendSone.equals(this) && friendSones.add(friendSone)) {
-			modificationCounter++;
+	public Sone addFriend(Sone friendSone) {
+		if (!friendSone.equals(this)) {
+			friendSones.add(friendSone);
 		}
 		return this;
 	}
@@ -278,10 +277,8 @@ public class Sone {
 	 *            The friend Sone to remove
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone removeFriend(Sone friendSone) {
-		if (friendSones.remove(friendSone)) {
-			modificationCounter++;
-		}
+	public Sone removeFriend(Sone friendSone) {
+		friendSones.remove(friendSone);
 		return this;
 	}
 
