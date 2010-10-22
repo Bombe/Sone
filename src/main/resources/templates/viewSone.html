@@ -31,21 +31,6 @@
 			<%include include/pagination.html>
 		</div>
 
-		<h1><%= Page.ViewSone.Following.Title|l10n|html></h1>
-
-		<div id="following">
-			<%getpage parameter=sonePage>
-			<%paginate list=sone.friends pagesize=25>
-			<%= sonePage|store key=pageParameter>
-			<%include include/pagination.html>
-			<%foreach pagination.items sone>
-				<%include include/viewSone.html>
-			<%foreachelse>
-				<div><%= Page.ViewSone.Following.FollowingNone.Text|l10n|html></div>
-			<%/foreach>
-			<%include include/pagination.html>
-		</div>
-
 	<%/if>
 
 <%include include/tail.html>
