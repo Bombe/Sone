@@ -232,3 +232,22 @@ function enhanceDeleteReplyButton(buttonId, replyId) {
 		});
 	});
 }
+
+function getFormPassword() {
+	return $("#sone #formPassword").text();
+}
+
+function getSoneElement(element) {
+	return $(element).parent(".sone");
+}
+
+/**
+ * Returns the ID of the Sone that this element belongs to.
+ *
+ * @param element
+ *            The element to locate the matching Sone ID for
+ * @returns The ID of the Sone, or undefined
+ */
+function getSoneId(element) {
+	return getSoneElement(element).find(".id").text();
+}

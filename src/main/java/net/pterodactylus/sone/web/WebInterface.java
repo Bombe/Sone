@@ -38,10 +38,14 @@ import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
+import net.pterodactylus.sone.web.ajax.BlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
+import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetSoneStatusPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
+import net.pterodactylus.sone.web.ajax.UnblockSoneAjaxPage;
+import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
@@ -230,6 +234,10 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetSoneStatusPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlockSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblockSoneAjaxPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);

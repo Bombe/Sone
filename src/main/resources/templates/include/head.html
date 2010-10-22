@@ -49,6 +49,44 @@
 		});
 	</script>
 
+	<script language="javascript">
+		/* convert all “follow”, “unfollow”, “block”, and “unblock” links to something nicer. */
+		$(document).ready(function() {
+			$("#sone .follow").submit(function() {
+				var followElement = this;
+				$.getJSON("ajax/followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+					$(followElement).addClass("hidden");
+					$(followElement).parent().find(".unfollow").removeClass("hidden");
+				});
+				return false;
+			});
+			$("#sone .unfollow").submit(function() {
+				var unfollowElement = this;
+				$.getJSON("ajax/unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+					$(unfollowElement).addClass("hidden");
+					$(unfollowElement).parent().find(".follow").removeClass("hidden");
+				});
+				return false;
+			});
+			$("#sone .block").submit(function() {
+				var blockElement = this;
+				$.getJSON("ajax/blockSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+					$(blockElement).addClass("hidden");
+					$(blockElement).parent().find(".unblock").removeClass("hidden");
+				});
+				return false;
+			});
+			$("#sone .unblock").submit(function() {
+				var unblockElement = this;
+				$.getJSON("ajax/unblockSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+					$(unblockElement).addClass("hidden");
+					$(unblockElement).parent().find(".block").removeClass("hidden");
+				});
+				return false;
+			});
+		});
+	</script>
+
 	<div id="main">
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
