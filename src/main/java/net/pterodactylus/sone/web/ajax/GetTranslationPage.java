@@ -27,9 +27,6 @@ import net.pterodactylus.util.json.JsonObject;
  */
 public class GetTranslationPage extends JsonPage {
 
-	/** The Sone web interface. */
-	private WebInterface webInterface;
-
 	/**
 	 * Creates a new translation page.
 	 *
@@ -37,9 +34,12 @@ public class GetTranslationPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public GetTranslationPage(WebInterface webInterface) {
-		super("ajax/getTranslation.ajax");
-		this.webInterface = webInterface;
+		super("ajax/getTranslation.ajax", webInterface);
 	}
+
+	//
+	// JSONPAGE METHODS
+	//
 
 	/**
 	 * {@inheritDoc}
@@ -49,6 +49,14 @@ public class GetTranslationPage extends JsonPage {
 		String key = request.getHttpRequest().getParam("key");
 		String translation = webInterface.l10n().getString(key);
 		return new JsonObject().put("value", translation);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean needsFormPassword() {
+		return false;
 	}
 
 }

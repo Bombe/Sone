@@ -225,7 +225,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetSoneStatusPage(core())));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetSoneStatusPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
