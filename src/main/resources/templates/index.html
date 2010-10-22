@@ -4,7 +4,7 @@
 
 	<div id="posts">
 		<%include include/pagination.html>
-		<%foreach posts post postLoop>
+		<%foreach posts post>
 			<%include include/viewPost.html>
 		<%foreachelse>
 			<div><%= Page.Index.PostList.Text.NoPostYet|l10n|html></div>

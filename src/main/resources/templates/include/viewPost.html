@@ -1,4 +1,4 @@
-<div id="<% post.id|html>" class="post <%if postLoop.last>last<%/if>">
+<div id="<% post.id|html>" class="post <%if loop.last>last<%/if>">
 	<div>
 		<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a></div>
 		<div class="text"><% post.text|html></div>
