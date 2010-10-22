@@ -21,7 +21,7 @@
 
 	<div id="known-sones">
 		<%getpage parameter=page>
-		<%paginate list=knownSones pagesize=2>
+		<%paginate list=knownSones pagesize=25>
 		<%= page|store key=pageParameter>
 		<%include include/pagination.html>
 		<%foreach pagination.items sone>

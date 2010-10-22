@@ -20,7 +20,7 @@
 
 		<div id="posts">
 			<%getpage parameter=postPage>
-			<%paginate list=sone.posts pagesize=2>
+			<%paginate list=sone.posts pagesize=25>
 			<%= postPage|store key=pageParameter>
 			<%include include/pagination.html>
 			<%foreach pagination.items post>
@@ -35,7 +35,7 @@
 
 		<div id="following">
 			<%getpage parameter=sonePage>
-			<%paginate list=sone.friends pagesize=2>
+			<%paginate list=sone.friends pagesize=25>
 			<%= sonePage|store key=pageParameter>
 			<%include include/pagination.html>
 			<%foreach pagination.items sone>
