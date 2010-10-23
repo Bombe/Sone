@@ -238,7 +238,7 @@ function getFormPassword() {
 }
 
 function getSoneElement(element) {
-	return $(element).parent(".sone");
+	return $(element).parents(".sone");
 }
 
 /**
