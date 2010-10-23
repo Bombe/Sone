@@ -4,9 +4,9 @@ function isOnline() {
 	return $("#sone").hasClass("online");
 }
 
-function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, optional) {
+function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, optional, dontUseTextarea) {
 	$(inputSelector).each(function() {
-		textarea = $("<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
+		textarea = $(dontUseTextarea ? "<input type=\"text\" name=\"" + inputFieldName + "\">" : "<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
 			if ($(this).val() == "") {
 				$(this).hide();
 				inputField = $(this).data("inputField");
