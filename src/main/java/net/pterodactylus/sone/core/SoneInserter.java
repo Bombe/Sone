@@ -116,9 +116,9 @@ public class SoneInserter extends AbstractService {
 					lastModificationTime = System.currentTimeMillis();
 					sone.setTime(lastModificationTime);
 					logger.log(Level.FINE, "Sone %s has been modified, waiting 60 seconds before inserting.", new Object[] { sone.getName() });
-					if ((System.currentTimeMillis() - lastModificationTime) > (60 * 1000)) {
-						insertInformation = new InsertInformation(sone);
-					}
+				}
+				if ((lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (60 * 1000))) {
+					insertInformation = new InsertInformation(sone);
 				}
 			}
 
@@ -148,6 +148,7 @@ public class SoneInserter extends AbstractService {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
 							sone.setModificationCounter(0);
 							modificationCounter = 0;
+							lastModificationTime = 0;
 						}
 					}
 				}
