@@ -285,6 +285,10 @@ textarea {
 	top: -0.5ex
 }
 
+#sone .sone.idle.modified .idle-marker {
+	display: none;
+}
+
 #sone .sone .last-update {
 	float: right;
 	display: inline;
