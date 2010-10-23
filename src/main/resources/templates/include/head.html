@@ -8,7 +8,7 @@
 	<script language="javascript">
 		/* this initializes the status update input field. */
 		$(document).ready(function() {
-			registerInputTextareaSwap("#sone #update-status .status-input", "WebInterface.DefaultText.StatusUpdate", "text", false);
+			registerInputTextareaSwap("#sone #update-status .status-input", "WebInterface.DefaultText.StatusUpdate", "text", false, false);
 		});
 	</script>
 
@@ -24,7 +24,7 @@
 	<script language="javascript">
 		/* this initializes all reply input fields. */
 		$(document).ready(function() {
-			registerInputTextareaSwap("#sone input.reply-input", "WebInterface.DefaultText.Reply", "text", false);
+			registerInputTextareaSwap("#sone input.reply-input", "WebInterface.DefaultText.Reply", "text", false, false);
 			addCommentLinks();
 		});
 	</script>
