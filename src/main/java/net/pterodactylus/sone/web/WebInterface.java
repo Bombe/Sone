@@ -56,6 +56,7 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
+import net.pterodactylus.util.template.MatchFilter;
 import net.pterodactylus.util.template.PaginationPlugin;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
@@ -181,6 +182,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addFilter("substring", new SubstringFilter());
 		templateFactory.addFilter("xml", new XmlFilter());
 		templateFactory.addFilter("change", new RequestChangeFilter());
+		templateFactory.addFilter("match", new MatchFilter());
 		templateFactory.addPlugin("getpage", new GetPagePlugin());
 		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));

@@ -148,6 +148,10 @@ textarea {
 	font: inherit;
 }
 
+#sone .post .likes.hidden {
+	display: none;
+}
+
 #sone .post .like.hidden, #sone .post .unlike.hidden {
 	display: none;
 }

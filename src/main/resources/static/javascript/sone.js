@@ -286,6 +286,7 @@ function unlikePost(postId) {
 function updatePostLikes(postId) {
 	$.getJSON("ajax/getPostLikes.ajax", { "post": postId }, function(data, textStatus) {
 		if (data.success) {
+			$("#sone .post#" + postId + " > .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .post#" + postId + " > .status-line .likes span.like-count").text(data.likes);
 		}
 	});
