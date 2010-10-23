@@ -1,5 +1,9 @@
 /* Sone JavaScript functions. */
 
+function isOnline() {
+	return $("#sone").hasClass("online");
+}
+
 function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, optional) {
 	$(inputSelector).each(function() {
 		textarea = $("<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
