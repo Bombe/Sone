@@ -280,7 +280,7 @@ public class SoneDownloader extends AbstractService {
 			SimpleXML likePostIdsXml = soneXml.getNode("post-likes");
 			if (likePostIdsXml == null) {
 				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, "Downloaded Sone %s has no known Sones!", new Object[] { sone });
+				logger.log(Level.WARNING, "Downloaded Sone %s has no post likes!", new Object[] { sone });
 				return null;
 			}
 
