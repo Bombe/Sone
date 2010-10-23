@@ -104,21 +104,24 @@ public class SoneInserter extends AbstractService {
 	@Override
 	protected void serviceRun() {
 		long modificationCounter = 0;
-		boolean restartNow = true;
+		long lastModificationTime = 0;
 		while (!shouldStop()) {
-			if (!restartNow) {
-				logger.log(Level.FINEST, "Waiting 60 seconds before checking Sone “" + sone.getName() + "”.");
-				sleep(60 * 1000);
-			}
-			restartNow = false;
+			/* check every seconds. */
+			sleep(1000);
+
 			InsertInformation insertInformation = null;
 			synchronized (sone) {
-				modificationCounter = sone.getModificationCounter();
-				if (modificationCounter > 0) {
-					sone.setTime(System.currentTimeMillis());
-					insertInformation = new InsertInformation(sone);
+				if (sone.getModificationCounter() > modificationCounter) {
+					modificationCounter = sone.getModificationCounter();
+					lastModificationTime = System.currentTimeMillis();
+					sone.setTime(lastModificationTime);
+					logger.log(Level.FINE, "Sone %s has been modified, waiting 60 seconds before inserting.", new Object[] { sone.getName() });
+					if ((System.currentTimeMillis() - lastModificationTime) > (60 * 1000)) {
+						insertInformation = new InsertInformation(sone);
+					}
 				}
 			}
+
 			if (insertInformation != null) {
 				logger.log(Level.INFO, "Inserting Sone “%s”…", new Object[] { sone.getName() });
 
@@ -144,9 +147,7 @@ public class SoneInserter extends AbstractService {
 						if (sone.getModificationCounter() == modificationCounter) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
 							sone.setModificationCounter(0);
-						} else {
-							logger.log(Level.FINE, "Sone “%s” was modified since the insert started, starting another insert…", new Object[] { sone });
-							restartNow = true;
+							modificationCounter = 0;
 						}
 					}
 				}
