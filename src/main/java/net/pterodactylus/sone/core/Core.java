@@ -673,6 +673,17 @@ public class Core extends AbstractService {
 					sone.addLikedPostId(likedPostId);
 				}
 
+				/* load liked reply IDs. */
+				int likedReplyIdCounter = 0;
+				while (true) {
+					String likedReplyIdPrefix = sonePrefix + "/LikedReplyId." + likedReplyIdCounter++;
+					String likedReplyId = configuration.getStringValue(likedReplyIdPrefix + "/ID").getValue(null);
+					if (likedReplyId == null) {
+						break;
+					}
+					sone.addLikedReplyId(likedReplyId);
+				}
+
 				sone.setModificationCounter(modificationCounter);
 				addLocalSone(sone);
 			} catch (MalformedURLException mue1) {
@@ -773,6 +784,14 @@ public class Core extends AbstractService {
 					configuration.getStringValue(likedPostIdPrefix + "/ID").setValue(soneLikedPostId);
 				}
 				configuration.getStringValue(sonePrefix + "/LikedPostId." + likedPostIdCounter + "/ID").setValue(null);
+
+				/* write all liked replies. */
+				int likedReplyIdCounter = 0;
+				for (String soneLikedReplyId : sone.getLikedReplyIds()) {
+					String likedReplyIdPrefix = sonePrefix + "/LikedReplyId." + likedReplyIdCounter++;
+					configuration.getStringValue(likedReplyIdPrefix + "/ID").setValue(soneLikedReplyId);
+				}
+				configuration.getStringValue(sonePrefix + "/LikedReplyId." + likedReplyIdCounter + "/ID").setValue(null);
 
 			}
 			/* write null ID as terminator. */
