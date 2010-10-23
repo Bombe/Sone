@@ -183,6 +183,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", new HashSet<Reply>(sone.getReplies()));
 			soneProperties.put("blockedSoneIds", new HashSet<String>(sone.getBlockedSoneIds()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
+			soneProperties.put("likeReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 		}
 
 		//

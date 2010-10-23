@@ -290,6 +290,20 @@ public class SoneDownloader extends AbstractService {
 				likedPostIds.add(postId);
 			}
 
+			/* parse liked reply IDs. */
+			SimpleXML likeReplyIdsXml = soneXml.getNode("reply-likes");
+			if (likeReplyIdsXml == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded Sone %s has no reply likes!", new Object[] { sone });
+				return null;
+			}
+
+			Set<String> likedReplyIds = new HashSet<String>();
+			for (SimpleXML likedReplyIdXml : likeReplyIdsXml.getNodes("reply-like")) {
+				String replyId = likedReplyIdXml.getValue();
+				likedReplyIds.add(replyId);
+			}
+
 			/* parse known Sones. */
 			SimpleXML knownSonesXml = soneXml.getNode("known-sones");
 			if (knownSonesXml == null) {
