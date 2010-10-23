@@ -276,6 +276,20 @@ public class SoneDownloader extends AbstractService {
 				}
 			}
 
+			/* parse liked post IDs. */
+			SimpleXML likePostIdsXml = soneXml.getNode("post-likes");
+			if (likePostIdsXml == null) {
+				/* TODO - mark Sone as bad. */
+				logger.log(Level.WARNING, "Downloaded Sone %s has no known Sones!", new Object[] { sone });
+				return null;
+			}
+
+			Set<String> likedPostIds = new HashSet<String>();
+			for (SimpleXML likedPostIdXml : likePostIdsXml.getNodes("post-like")) {
+				String postId = likedPostIdXml.getValue();
+				likedPostIds.add(postId);
+			}
+
 			/* parse known Sones. */
 			SimpleXML knownSonesXml = soneXml.getNode("known-sones");
 			if (knownSonesXml == null) {
@@ -309,6 +323,7 @@ public class SoneDownloader extends AbstractService {
 				sone.setProfile(profile);
 				sone.setPosts(posts);
 				sone.setReplies(replies);
+				sone.setLikePostIds(likedPostIds);
 				sone.setModificationCounter(0);
 			}
 

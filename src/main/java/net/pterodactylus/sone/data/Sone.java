@@ -76,6 +76,9 @@ public class Sone {
 	/** The IDs of all blocked Sones. */
 	private final Set<String> blockedSoneIds = new HashSet<String>();
 
+	/** The IDs of all liked posts. */
+	private final Set<String> likedPostIds = new HashSet<String>();
+
 	/** Modification count. */
 	private volatile long modificationCounter = 0;
 
@@ -433,6 +436,69 @@ public class Sone {
 		if (blockedSoneIds.remove(soneId)) {
 			modificationCounter++;
 		}
+	}
+
+	/**
+	 * Returns the IDs of all liked posts.
+	 *
+	 * @return All liked posts’ IDs
+	 */
+	public Set<String> getLikedPostIds() {
+		return Collections.unmodifiableSet(likedPostIds);
+	}
+
+	/**
+	 * Sets the IDs of all liked posts.
+	 *
+	 * @param likedPostIds
+	 *            All liked posts’ IDs
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone setLikePostIds(Set<String> likedPostIds) {
+		this.likedPostIds.clear();
+		this.likedPostIds.addAll(likedPostIds);
+		modificationCounter++;
+		return this;
+	}
+
+	/**
+	 * Checks whether the given post ID is liked by this Sone.
+	 *
+	 * @param postId
+	 *            The ID of the post
+	 * @return {@code true} if this Sone likes the given post, {@code false}
+	 *         otherwise
+	 */
+	public boolean isLikedPostId(String postId) {
+		return likedPostIds.contains(postId);
+	}
+
+	/**
+	 * Adds the given post ID to the list of posts this Sone likes.
+	 *
+	 * @param postId
+	 *            The ID of the post
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone addLikedPostId(String postId) {
+		if (likedPostIds.add(postId)) {
+			modificationCounter++;
+		}
+		return this;
+	}
+
+	/**
+	 * Removes the given post ID from the list of posts this Sone likes.
+	 *
+	 * @param postId
+	 *            The ID of the post
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone removeLikedPostId(String postId) {
+		if (likedPostIds.remove(postId)) {
+			modificationCounter++;
+		}
+		return this;
 	}
 
 	/**

@@ -523,6 +523,23 @@ public class Core extends AbstractService {
 	}
 
 	/**
+	 * Gets all Sones that like the given post.
+	 *
+	 * @param post
+	 *            The post to check for
+	 * @return All Sones that like the post
+	 */
+	public Set<Sone> getLikes(final Post post) {
+		return Filters.filteredSet(getSones(), new Filter<Sone>() {
+
+			@Override
+			public boolean filterObject(Sone sone) {
+				return sone.isLikedPostId(post.getId());
+			}
+		});
+	}
+
+	/**
 	 * Deletes the given reply. It is removed from its Sone and from the reply
 	 * cache.
 	 *
@@ -645,6 +662,17 @@ public class Core extends AbstractService {
 					sone.addBlockedSoneId(blockedSoneId);
 				}
 
+				/* load liked post IDs. */
+				int likedPostIdCounter = 0;
+				while (true) {
+					String likedPostIdPrefix = sonePrefix + "/LikedPostId." + likedPostIdCounter++;
+					String likedPostId = configuration.getStringValue(likedPostIdPrefix + "/ID").getValue(null);
+					if (likedPostId == null) {
+						break;
+					}
+					sone.addLikedPostId(likedPostId);
+				}
+
 				sone.setModificationCounter(modificationCounter);
 				addLocalSone(sone);
 			} catch (MalformedURLException mue1) {
@@ -737,6 +765,14 @@ public class Core extends AbstractService {
 					configuration.getStringValue(blockedSonePrefix + "/ID").setValue(blockedSoneId);
 				}
 				configuration.getStringValue(sonePrefix + "/BlockedSone." + blockedSoneCounter + "/ID").setValue(null);
+
+				/* write all liked posts. */
+				int likedPostIdCounter = 0;
+				for (String soneLikedPostId : sone.getLikedPostIds()) {
+					String likedPostIdPrefix = sonePrefix + "/LikedPostId." + likedPostIdCounter++;
+					configuration.getStringValue(likedPostIdPrefix + "/ID").setValue(soneLikedPostId);
+				}
+				configuration.getStringValue(sonePrefix + "/LikedPostId." + likedPostIdCounter + "/ID").setValue(null);
 
 			}
 			/* write null ID as terminator. */

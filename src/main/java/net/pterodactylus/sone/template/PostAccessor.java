@@ -19,6 +19,7 @@ package net.pterodactylus.sone.template;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 
@@ -51,8 +52,14 @@ public class PostAccessor extends ReflectionAccessor {
 	 */
 	@Override
 	public Object get(DataProvider dataProvider, Object object, String member) {
+		Post post = (Post) object;
 		if ("replies".equals(member)) {
-			return core.getReplies((Post) object);
+			return core.getReplies(post);
+		} else if (member.equals("likes")) {
+			return core.getLikes(post);
+		} else if (member.equals("liked")) {
+			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			return (currentSone != null) && (currentSone.isLikedPostId(post.getId()));
 		}
 		return super.get(dataProvider, object, member);
 	}

@@ -143,20 +143,23 @@ textarea {
 	color: #666;
 }
 
-#sone .post .delete {
+#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike {
 	display: inline;
+	font: inherit;
 }
 
-#sone .post .delete button {
-	font: inherit;
+#sone .post .like.hidden, #sone .post .unlike.hidden {
+	display: none;
+}
+
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button {
 	border: 0px;
 	background: none;
 	padding: 0px;
 	color: rgb(28, 131, 191);
 }
 
-#sone .post .delete button:hover {
-	font: inherit;
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -164,8 +167,13 @@ textarea {
 	cursor: pointer;
 }
 
-#sone .post .delete:before {
+#sone .post .delete:before, #sone .post .likes:before, #sone .post .like:before, #sone .post .unlike:before {
 	content: ' ‧ ';
+}
+
+#sone .post .likes span {
+	font: inherit;
+	color: green;
 }
 
 #sone .post .replies {

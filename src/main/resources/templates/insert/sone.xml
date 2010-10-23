@@ -32,6 +32,12 @@
 		<%/foreach>
 	</replies>
 
+	<post-likes>
+		<%foreach currentSone.likedPostIds postId>
+		<post-like><% postId|xml></post-like>
+		<%/foreach>
+	</post-likes>
+
 	<known-sones>
 		<%foreach knownSones sone>
 		<known-sone>
