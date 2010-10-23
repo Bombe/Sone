@@ -87,6 +87,20 @@
 		});
 	</script>
 
+	<script language="javascript">
+		/* convert all “like” buttons to javascript functions. */
+		$(document).ready(function() {
+			$("#sone .post > .status-line .like").submit(function() {
+				likePost(getPostId(this));
+				return false;
+			});
+			$("#sone .post > .status-line .unlike").submit(function() {
+				unlikePost(getPostId(this));
+				return false;
+			});
+		});
+	</script>
+
 	<div id="main">
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">

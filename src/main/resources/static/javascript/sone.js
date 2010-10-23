@@ -251,3 +251,35 @@ function getSoneElement(element) {
 function getSoneId(element) {
 	return getSoneElement(element).find(".id").text();
 }
+
+function getPostElement(element) {
+	return $(element).parents(".post");
+}
+
+function getPostId(element) {
+	return getPostElement(element).attr("id");
+}
+
+function likePost(postId) {
+	$.getJSON("ajax/likePost.ajax", { "post" : postId, "formPassword": getFormPassword() }, function() {
+		$("#sone .post#" + postId + " > .status-line .like").addClass("hidden");
+		$("#sone .post#" + postId + " > .status-line .unlike").removeClass("hidden");
+		updatePostLikes(postId);
+	});
+}
+
+function unlikePost(postId) {
+	$.getJSON("ajax/unlikePost.ajax", { "post" : postId, "formPassword": getFormPassword() }, function() {
+		$("#sone .post#" + postId + " > .status-line .unlike").addClass("hidden");
+		$("#sone .post#" + postId + " > .status-line .like").removeClass("hidden");
+		updatePostLikes(postId);
+	});
+}
+
+function updatePostLikes(postId) {
+	$.getJSON("ajax/getPostLikes.ajax", { "post": postId }, function(data, textStatus) {
+		if (data.success) {
+			$("#sone .post#" + postId + " > .status-line .likes span.like-count").text(data.likes);
+		}
+	});
+}
