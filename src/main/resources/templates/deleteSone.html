@@ -2,7 +2,7 @@
 
 	<h1><%= Page.DeleteSone.Page.Title|l10n|replace needle="{zone}" replacementKey=currentSone.name|html></h1>
 
-	<div><%= Page.DeleteSone.Page.Description|l10n|html></div>
+	<p><%= Page.DeleteSone.Page.Description|l10n|html></p>
 
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />

@@ -3,7 +3,7 @@
 	<h1><%= Page.CreatePost.Page.Title|l10n|html></h1>
 
 	<%if errorTextEmpty>
-		<div><%= Page.CreatePost.Error.EmptyText|l10n|html></div>
+		<p><%= Page.CreatePost.Error.EmptyText|l10n|html></p>
 	<%/if>
 
 	<form method="post">

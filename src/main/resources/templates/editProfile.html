@@ -13,11 +13,11 @@
 
 	<h1><%= Page.EditProfile.Page.Title|l10n|html></h1>
 
-	<div><%= Page.EditProfile.Page.Description|l10n|html></div>
-	<div><%= Page.EditProfile.Page.Hint.Optionality|l10n|html></div>
+	<p><%= Page.EditProfile.Page.Description|l10n|html></p>
+	<p><%= Page.EditProfile.Page.Hint.Optionality|l10n|html></p>
 
 	<%if changed>
-		<div><%= Page.EditProfile.Page.Status.Changed|l10n|html></div>
+		<p><%= Page.EditProfile.Page.Status.Changed|l10n|html></p>
 	<%/if>
 
 	<form id="edit-profile" method="post">
@@ -46,9 +46,9 @@
 
 	<h1><%= Page.EditProfile.Keys.Title|l10n|html></h1>
 
-	<div><%= Page.EditProfile.Keys.Description.RequestKey|l10n|html></div>
-	<div><%= Page.EditProfile.Keys.Description.InsertKey|l10n|html></div>
-	<div><%= Page.EditProfile.Keys.Description.Summary|l10n|html></div>
+	<p><%= Page.EditProfile.Keys.Description.RequestKey|l10n|html></p>
+	<p><%= Page.EditProfile.Keys.Description.InsertKey|l10n|html></p>
+	<p><%= Page.EditProfile.Keys.Description.Summary|l10n|html></p>
 
 	<div>
 		<label><%= Page.EditProfile.Label.RequestKey|l10n|html></label>
@@ -61,7 +61,7 @@
 
 	<h1><%= Page.EditProfile.Backup.Title|l10n|html></h1>
 
-	<div><%= Page.EditProfile.Backup.Description|l10n|html></div>
+	<p><%= Page.EditProfile.Backup.Description|l10n|html></p>
 
 	<form action="backupProfile.html" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
