@@ -46,6 +46,9 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, o
 
 /* hide all the “create reply” forms until a link is clicked. */
 function addCommentLinks() {
+	if (!isOnline()) {
+		return;
+	}
 	$("#sone .post").each(function() {
 		postId = $(this).attr("id");
 		commentElement = (function(postId) {
