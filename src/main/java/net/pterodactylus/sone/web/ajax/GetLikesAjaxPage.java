@@ -1,5 +1,5 @@
 /*
- * Sone - GetPostLikesAjaxPage.java - Copyright © 2010 David Roden
+ * Sone - GetLikesAjaxPage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
@@ -26,7 +27,7 @@ import net.pterodactylus.util.json.JsonObject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class GetPostLikesAjaxPage extends JsonPage {
+public class GetLikesAjaxPage extends JsonPage {
 
 	/**
 	 * Creates a new “get post likes” AJAX page.
@@ -34,8 +35,8 @@ public class GetPostLikesAjaxPage extends JsonPage {
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public GetPostLikesAjaxPage(WebInterface webInterface) {
-		super("ajax/getPostLikes.ajax", webInterface);
+	public GetLikesAjaxPage(WebInterface webInterface) {
+		super("ajax/getLikes.ajax", webInterface);
 	}
 
 	//
@@ -47,12 +48,19 @@ public class GetPostLikesAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
-		String postId = request.getHttpRequest().getParam("post", null);
-		if ((postId == null) || (postId.length() == 0)) {
-			return new JsonObject().put("success", false).put("error", "invalid-post-id");
+		String type = request.getHttpRequest().getParam("type", null);
+		String id = request.getHttpRequest().getParam(type, null);
+		if ((id == null) || (id.length() == 0)) {
+			return new JsonObject().put("success", false).put("error", "invalid-" + type + "-id");
 		}
-		Post post = webInterface.core().getPost(postId);
-		return new JsonObject().put("success", true).put("likes", webInterface.core().getLikes(post).size());
+		if ("post".equals(type)) {
+			Post post = webInterface.core().getPost(id);
+			return new JsonObject().put("success", true).put("likes", webInterface.core().getLikes(post).size());
+		} else if ("reply".equals(type)) {
+			Reply reply = webInterface.core().getReply(id);
+			return new JsonObject().put("success", true).put("likes", webInterface.core().getLikes(reply).size());
+		}
+		return new JsonObject().put("success", false).put("error", "invalid-type");
 	}
 
 	/**

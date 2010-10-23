@@ -98,6 +98,14 @@
 				unlikePost(getPostId(this));
 				return false;
 			});
+			$("#sone .post .reply .status-line .like").submit(function() {
+				likeReply(getReplyId(this));
+				return false;
+			});
+			$("#sone .post .reply .status-line .unlike").submit(function() {
+				unlikeReply(getReplyId(this));
+				return false;
+			});
 		});
 	</script>
 

@@ -267,8 +267,16 @@ function getPostId(element) {
 	return getPostElement(element).attr("id");
 }
 
+function getReplyElement(element) {
+	return $(element).parents(".reply");
+}
+
+function getReplyId(element) {
+	return getReplyElement(element).attr("id");
+}
+
 function likePost(postId) {
-	$.getJSON("ajax/likePost.ajax", { "post" : postId, "formPassword": getFormPassword() }, function() {
+	$.getJSON("ajax/like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function() {
 		$("#sone .post#" + postId + " > .status-line .like").addClass("hidden");
 		$("#sone .post#" + postId + " > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
@@ -276,7 +284,7 @@ function likePost(postId) {
 }
 
 function unlikePost(postId) {
-	$.getJSON("ajax/unlikePost.ajax", { "post" : postId, "formPassword": getFormPassword() }, function() {
+	$.getJSON("ajax/unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function() {
 		$("#sone .post#" + postId + " > .status-line .unlike").addClass("hidden");
 		$("#sone .post#" + postId + " > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
@@ -284,10 +292,35 @@ function unlikePost(postId) {
 }
 
 function updatePostLikes(postId) {
-	$.getJSON("ajax/getPostLikes.ajax", { "post": postId }, function(data, textStatus) {
+	$.getJSON("ajax/getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if (data.success) {
 			$("#sone .post#" + postId + " > .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .post#" + postId + " > .status-line .likes span.like-count").text(data.likes);
+		}
+	});
+}
+
+function likeReply(replyId) {
+	$.getJSON("ajax/like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function() {
+		$("#sone .reply#" + replyId + " .status-line .like").addClass("hidden");
+		$("#sone .reply#" + replyId + " .status-line .unlike").removeClass("hidden");
+		updateReplyLikes(replyId);
+	});
+}
+
+function unlikeReply(replyId) {
+	$.getJSON("ajax/unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function() {
+		$("#sone .reply#" + replyId + " .status-line .unlike").addClass("hidden");
+		$("#sone .reply#" + replyId + " .status-line .like").removeClass("hidden");
+		updateReplyLikes(replyId);
+	});
+}
+
+function updateReplyLikes(replyId) {
+	$.getJSON("ajax/getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
+		if (data.success) {
+			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0)
+			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
 		}
 	});
 }

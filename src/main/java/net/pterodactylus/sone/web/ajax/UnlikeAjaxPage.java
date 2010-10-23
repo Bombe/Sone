@@ -1,5 +1,5 @@
 /*
- * Sone - UnlikePostAjaxPage.java - Copyright © 2010 David Roden
+ * Sone - UnlikeAjaxPage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,15 +27,15 @@ import net.pterodactylus.util.json.JsonObject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class UnlikePostAjaxPage extends JsonPage {
+public class UnlikeAjaxPage extends JsonPage {
 
 	/**
 	 * Creates a new “unlike post” AJAX page.
 	 *
 	 * @param webInterface
 	 */
-	public UnlikePostAjaxPage(WebInterface webInterface) {
-		super("ajax/unlikePost.ajax", webInterface);
+	public UnlikeAjaxPage(WebInterface webInterface) {
+		super("ajax/unlike.ajax", webInterface);
 	}
 
 	/**
@@ -43,15 +43,22 @@ public class UnlikePostAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
-		String postId = request.getHttpRequest().getParam("post", null);
-		if ((postId == null) || (postId.length() == 0)) {
-			return new JsonObject().put("success", false).put("error", "invalid-post-id");
+		String type = request.getHttpRequest().getParam("type", null);
+		String id = request.getHttpRequest().getParam(type, null);
+		if ((id == null) || (id.length() == 0)) {
+			return new JsonObject().put("success", false).put("error", "invalid-" + type + "-id");
 		}
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (currentSone == null) {
 			return new JsonObject().put("success", false).put("error", "auth-required");
 		}
-		currentSone.removeLikedPostId(postId);
+		if ("post".equals(type)) {
+			currentSone.removeLikedPostId(id);
+		} else if ("reply".equals(type)) {
+			currentSone.removeLikedReplyId(id);
+		} else {
+			return new JsonObject().put("success", false).put("error", "invalid-type");
+		}
 		return new JsonObject().put("success", true);
 	}
 
