@@ -1,5 +1,5 @@
 /*
- * Sone - UnlikePostPage.java - Copyright © 2010 David Roden
+ * Sone - LikePage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,22 +23,22 @@ import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 
 /**
- * Page that lets the user unlike a {@link Post}.
+ * Page that lets the user like a {@link Post}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class UnlikePostPage extends SoneTemplatePage {
+public class LikePage extends SoneTemplatePage {
 
 	/**
-	 * Creates a new “unlike post” page.
+	 * Creates a new “like post” page.
 	 *
 	 * @param template
 	 *            The template to render
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public UnlikePostPage(Template template, WebInterface webInterface) {
-		super("unlikePost.html", template, "Page.UnlikePost.Title", webInterface);
+	public LikePage(Template template, WebInterface webInterface) {
+		super("like.html", template, "Page.LikePost.Title", webInterface);
 	}
 
 	//
@@ -52,10 +52,15 @@ public class UnlikePostPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		if (request.getMethod() == Method.POST) {
-			String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
+			String type=request.getHttpRequest().getPartAsStringFailsafe("type", 16);
+			String id = request.getHttpRequest().getPartAsStringFailsafe(type, 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			currentSone.removeLikedPostId(postId);
+			if ("post".equals(type)) {
+				currentSone.addLikedPostId(id);
+			} else if ("reply".equals(type)) {
+				currentSone.addLikedReplyId(id);
+			}
 			throw new RedirectException(returnPage);
 		}
 	}
