@@ -223,111 +223,106 @@ public class SoneDownloader extends AbstractService {
 
 			/* parse posts. */
 			SimpleXML postsXml = soneXml.getNode("posts");
+			Set<Post> posts = new HashSet<Post>();
 			if (postsXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no posts!", new Object[] { sone });
-				return null;
-			}
-
-			Set<Post> posts = new HashSet<Post>();
-			for (SimpleXML postXml : postsXml.getNodes("post")) {
-				String postId = postXml.getValue("id", null);
-				String postTime = postXml.getValue("time", null);
-				String postText = postXml.getValue("text", null);
-				if ((postId == null) || (postTime == null) || (postText == null)) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded post for Sone %s with missing data! ID: %s, Time: %s, Text: %s", new Object[] { sone, postId, postTime, postText });
-					return null;
-				}
-				try {
-					posts.add(core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText));
-				} catch (NumberFormatException nfe1) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
-					return null;
+			} else {
+				for (SimpleXML postXml : postsXml.getNodes("post")) {
+					String postId = postXml.getValue("id", null);
+					String postTime = postXml.getValue("time", null);
+					String postText = postXml.getValue("text", null);
+					if ((postId == null) || (postTime == null) || (postText == null)) {
+						/* TODO - mark Sone as bad. */
+						logger.log(Level.WARNING, "Downloaded post for Sone %s with missing data! ID: %s, Time: %s, Text: %s", new Object[] { sone, postId, postTime, postText });
+						return null;
+					}
+					try {
+						posts.add(core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText));
+					} catch (NumberFormatException nfe1) {
+						/* TODO - mark Sone as bad. */
+						logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
+						return null;
+					}
 				}
 			}
 
 			/* parse replies. */
 			SimpleXML repliesXml = soneXml.getNode("replies");
+			Set<Reply> replies = new HashSet<Reply>();
 			if (repliesXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no replies!", new Object[] { sone });
-				return null;
-			}
-
-			Set<Reply> replies = new HashSet<Reply>();
-			for (SimpleXML replyXml : repliesXml.getNodes("reply")) {
-				String replyId = replyXml.getValue("id", null);
-				String replyPostId = replyXml.getValue("post-id", null);
-				String replyTime = replyXml.getValue("time", null);
-				String replyText = replyXml.getValue("text", null);
-				if ((replyId == null) || (replyPostId == null) || (replyTime == null) || (replyText == null)) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded reply for Sone %s with missing data! ID: %s, Post: %s, Time: %s, Text: %s", new Object[] { sone, replyId, replyPostId, replyTime, replyText });
-					return null;
-				}
-				try {
-					replies.add(core.getReply(replyId).setSone(sone).setPost(core.getPost(replyPostId)).setTime(Long.parseLong(replyTime)).setText(replyText));
-				} catch (NumberFormatException nfe1) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded reply for Sone %s with invalid time: %s", new Object[] { sone, replyTime });
-					return null;
+			} else {
+				for (SimpleXML replyXml : repliesXml.getNodes("reply")) {
+					String replyId = replyXml.getValue("id", null);
+					String replyPostId = replyXml.getValue("post-id", null);
+					String replyTime = replyXml.getValue("time", null);
+					String replyText = replyXml.getValue("text", null);
+					if ((replyId == null) || (replyPostId == null) || (replyTime == null) || (replyText == null)) {
+						/* TODO - mark Sone as bad. */
+						logger.log(Level.WARNING, "Downloaded reply for Sone %s with missing data! ID: %s, Post: %s, Time: %s, Text: %s", new Object[] { sone, replyId, replyPostId, replyTime, replyText });
+						return null;
+					}
+					try {
+						replies.add(core.getReply(replyId).setSone(sone).setPost(core.getPost(replyPostId)).setTime(Long.parseLong(replyTime)).setText(replyText));
+					} catch (NumberFormatException nfe1) {
+						/* TODO - mark Sone as bad. */
+						logger.log(Level.WARNING, "Downloaded reply for Sone %s with invalid time: %s", new Object[] { sone, replyTime });
+						return null;
+					}
 				}
 			}
 
 			/* parse liked post IDs. */
 			SimpleXML likePostIdsXml = soneXml.getNode("post-likes");
+			Set<String> likedPostIds = new HashSet<String>();
 			if (likePostIdsXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no post likes!", new Object[] { sone });
-				return null;
-			}
-
-			Set<String> likedPostIds = new HashSet<String>();
-			for (SimpleXML likedPostIdXml : likePostIdsXml.getNodes("post-like")) {
-				String postId = likedPostIdXml.getValue();
-				likedPostIds.add(postId);
+			} else {
+				for (SimpleXML likedPostIdXml : likePostIdsXml.getNodes("post-like")) {
+					String postId = likedPostIdXml.getValue();
+					likedPostIds.add(postId);
+				}
 			}
 
 			/* parse liked reply IDs. */
 			SimpleXML likeReplyIdsXml = soneXml.getNode("reply-likes");
+			Set<String> likedReplyIds = new HashSet<String>();
 			if (likeReplyIdsXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no reply likes!", new Object[] { sone });
-				return null;
-			}
-
-			Set<String> likedReplyIds = new HashSet<String>();
-			for (SimpleXML likedReplyIdXml : likeReplyIdsXml.getNodes("reply-like")) {
-				String replyId = likedReplyIdXml.getValue();
-				likedReplyIds.add(replyId);
+			} else {
+				for (SimpleXML likedReplyIdXml : likeReplyIdsXml.getNodes("reply-like")) {
+					String replyId = likedReplyIdXml.getValue();
+					likedReplyIds.add(replyId);
+				}
 			}
 
 			/* parse known Sones. */
 			SimpleXML knownSonesXml = soneXml.getNode("known-sones");
+			Set<Sone> knownSones = new HashSet<Sone>();
 			if (knownSonesXml == null) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone %s has no known Sones!", new Object[] { sone });
-				return null;
-			}
-
-			Set<Sone> knownSones = new HashSet<Sone>();
-			for (SimpleXML knownSoneXml : knownSonesXml.getNodes("known-sone")) {
-				String knownSoneId = knownSoneXml.getValue("sone-id", null);
-				String knownSoneKey = knownSoneXml.getValue("sone-key", null);
-				String knownSoneName = knownSoneXml.getValue("sone-name", null);
-				if ((knownSoneId == null) || (knownSoneKey == null) || (knownSoneName == null)) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, knownSoneId, knownSoneKey, knownSoneName });
-					return null;
-				}
-				try {
-					knownSones.add(core.getSone(knownSoneId).setRequestUri(new FreenetURI(knownSoneKey)).setName(knownSoneName));
-				} catch (MalformedURLException mue1) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with invalid key: %s", new Object[] { sone, knownSoneKey });
-					return null;
+			} else {
+				for (SimpleXML knownSoneXml : knownSonesXml.getNodes("known-sone")) {
+					String knownSoneId = knownSoneXml.getValue("sone-id", null);
+					String knownSoneKey = knownSoneXml.getValue("sone-key", null);
+					String knownSoneName = knownSoneXml.getValue("sone-name", null);
+					if ((knownSoneId == null) || (knownSoneKey == null) || (knownSoneName == null)) {
+						/* TODO - mark Sone as bad. */
+						logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, knownSoneId, knownSoneKey, knownSoneName });
+						return null;
+					}
+					try {
+						knownSones.add(core.getSone(knownSoneId).setRequestUri(new FreenetURI(knownSoneKey)).setName(knownSoneName));
+					} catch (MalformedURLException mue1) {
+						/* TODO - mark Sone as bad. */
+						logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with invalid key: %s", new Object[] { sone, knownSoneKey });
+						return null;
+					}
 				}
 			}
 
