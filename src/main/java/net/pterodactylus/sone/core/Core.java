@@ -322,7 +322,7 @@ public class Core extends AbstractService {
 	 *             if a Sone error occurs
 	 */
 	public Sone createSone(String name) throws SoneException {
-		return createSone(name, "Sone-" + name, null, null);
+		return createSone(name, "Sone", null, null);
 	}
 
 	/**
