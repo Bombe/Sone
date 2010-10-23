@@ -30,11 +30,13 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.PostAccessor;
+import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
@@ -177,6 +179,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
 		templateFactory.addAccessor(Sone.class, new SoneAccessor(core()));
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
+		templateFactory.addAccessor(Reply.class, new ReplyAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
 		templateFactory.addFilter("substring", new SubstringFilter());
