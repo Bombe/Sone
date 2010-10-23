@@ -20,18 +20,27 @@ package net.pterodactylus.sone.template;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 
 /**
- * TODO
+ * {@link Accessor} implementation that adds a couple of properties to
+ * {@link Reply}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ReplyAccessor extends ReflectionAccessor {
 
+	/** The core. */
 	private final Core core;
 
+	/**
+	 * Creates a new reply accessor.
+	 *
+	 * @param core
+	 *            The core
+	 */
 	public ReplyAccessor(Core core) {
 		this.core = core;
 	}
