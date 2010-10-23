@@ -79,6 +79,9 @@ public class Sone {
 	/** The IDs of all liked posts. */
 	private final Set<String> likedPostIds = new HashSet<String>();
 
+	/** The IDs of all liked replies. */
+	private final Set<String> likedReplyIds = new HashSet<String>();
+
 	/** Modification count. */
 	private volatile long modificationCounter = 0;
 
@@ -496,6 +499,69 @@ public class Sone {
 	 */
 	public synchronized Sone removeLikedPostId(String postId) {
 		if (likedPostIds.remove(postId)) {
+			modificationCounter++;
+		}
+		return this;
+	}
+
+	/**
+	 * Returns the IDs of all liked replies.
+	 *
+	 * @return All liked replies’ IDs
+	 */
+	public Set<String> getLikedReplyIds() {
+		return Collections.unmodifiableSet(likedReplyIds);
+	}
+
+	/**
+	 * Sets the IDs of all liked replies.
+	 *
+	 * @param likedReplyIds
+	 *            All liked replies’ IDs
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone setLikeReplyIds(Set<String> likedReplyIds) {
+		this.likedReplyIds.clear();
+		this.likedReplyIds.addAll(likedReplyIds);
+		modificationCounter++;
+		return this;
+	}
+
+	/**
+	 * Checks whether the given reply ID is liked by this Sone.
+	 *
+	 * @param replyId
+	 *            The ID of the reply
+	 * @return {@code true} if this Sone likes the given reply, {@code false}
+	 *         otherwise
+	 */
+	public boolean isLikedReplyId(String replyId) {
+		return likedReplyIds.contains(replyId);
+	}
+
+	/**
+	 * Adds the given reply ID to the list of replies this Sone likes.
+	 *
+	 * @param replyId
+	 *            The ID of the reply
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone addLikedReplyId(String replyId) {
+		if (likedReplyIds.add(replyId)) {
+			modificationCounter++;
+		}
+		return this;
+	}
+
+	/**
+	 * Removes the given post ID from the list of replies this Sone likes.
+	 *
+	 * @param replyId
+	 *            The ID of the reply
+	 * @return This Sone (for method chaining)
+	 */
+	public synchronized Sone removeLikedReplyId(String replyId) {
+		if (likedReplyIds.remove(replyId)) {
 			modificationCounter++;
 		}
 		return this;
