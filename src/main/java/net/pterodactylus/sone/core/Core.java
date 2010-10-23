@@ -540,6 +540,23 @@ public class Core extends AbstractService {
 	}
 
 	/**
+	 * Gets all Sones that like the given reply.
+	 *
+	 * @param reply
+	 *            The reply to check for
+	 * @return All Sones that like the reply
+	 */
+	public Set<Sone> getLikes(final Reply reply) {
+		return Filters.filteredSet(getSones(), new Filter<Sone>() {
+
+			@Override
+			public boolean filterObject(Sone sone) {
+				return sone.isLikedReplyId(reply.getId());
+			}
+		});
+	}
+
+	/**
 	 * Deletes the given reply. It is removed from its Sone and from the reply
 	 * cache.
 	 *
