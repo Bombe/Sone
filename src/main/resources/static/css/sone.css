@@ -391,8 +391,6 @@ textarea {
 	font-size: 200%;
 	font-weight: bold;
 	clear: both;
-	margin: 0;
-	margin-top: 1em;
 }
 
 #sone .error label {
