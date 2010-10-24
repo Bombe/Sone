@@ -22,6 +22,7 @@ import java.util.Date;
 
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
@@ -55,7 +56,7 @@ public class GetSoneStatusPage extends JsonPage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.core().getSone(soneId);
 		SoneStatus soneStatus = webInterface.core().getSoneStatus(sone);
-		return new JsonObject().put("status", soneStatus.name()).put("modified", sone.getModificationCounter() > 0).put("lastUpdated", new SimpleDateFormat("MMM d, yyyy, HH:mm:ss").format(new Date(sone.getTime()))).put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
+		return new JsonObject().put("status", soneStatus.name()).put("name", SoneAccessor.getNiceName(sone)).put("modified", sone.getModificationCounter() > 0).put("lastUpdated", new SimpleDateFormat("MMM d, yyyy, HH:mm:ss").format(new Date(sone.getTime()))).put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
 	}
 
 	/**
