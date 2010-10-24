@@ -9,6 +9,9 @@
 		<first-name><% currentSone.profile.firstName|xml></first-name>
 		<middle-name><% currentSone.profile.middleName|xml></middle-name>
 		<last-name><% currentSone.profile.lastName|xml></last-name>
+		<birth-day><% currentSone.profile.birthDay|xml></birth-day>
+		<birth-month><% currentSone.profile.birthMonth|xml></birth-month>
+		<birth-year><% currentSone.profile.birthYear|xml></birth-year>
 	</profile>
 
 	<posts>

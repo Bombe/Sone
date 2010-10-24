@@ -111,6 +111,16 @@ textarea {
 	padding: 1em;
 }
 
+#sone #edit-profile #birth-day, #sone #edit-profile #birth-month, #sone #edit-profile #birth-year {
+	display: inline;
+	width: 15em;
+}
+
+#sone #edit-profile #birth-day input, #sone #edit-profile #birth-month input, #sone #edit-profile #birth-year input {
+	width: 4em;
+	text-align: right;
+}
+
 #sone .post {
 	padding: 1ex 0px;
 	border-bottom: solid 1px #ccc;

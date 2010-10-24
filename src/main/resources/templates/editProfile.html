@@ -5,6 +5,9 @@
 			registerInputTextareaSwap("#sone #edit-profile input[name=first-name]", "WebInterface.DefaultText.FirstName", "first-name", true, true);
 			registerInputTextareaSwap("#sone #edit-profile input[name=middle-name]", "WebInterface.DefaultText.MiddleName", "middle-name", true, true);
 			registerInputTextareaSwap("#sone #edit-profile input[name=last-name]", "WebInterface.DefaultText.LastName", "last-name", true, true);
+			registerInputTextareaSwap("#sone #edit-profile input[name=birth-day]", "WebInterface.DefaultText.BirthDay", "birth-day", true, true);
+			registerInputTextareaSwap("#sone #edit-profile input[name=birth-month]", "WebInterface.DefaultText.BirthMonth", "birth-month", true, true);
+			registerInputTextareaSwap("#sone #edit-profile input[name=birth-year]", "WebInterface.DefaultText.BirthYear", "birth-year", true, true);
 
 			/* hide all the labels. */
 			$("#sone #edit-profile label").hide();
@@ -36,6 +39,23 @@
 		<div>
 			<label for="last-name"><%= Page.EditProfile.Label.LastName|l10n|html></label>
 			<input type="text" name="last-name" value="<% lastName|html>" />
+		</div>
+
+		<h1><%= Page.EditProfile.Birthday.Title|l10n|html></h1>
+
+		<div id="birth-day">
+			<label for="birth-day"><%= Page.EditProfile.Birthday.Label.Day|l10n|html></label>
+			<input type="text" name="birth-day" value="<% birthDay|html>" />
+		</div>
+
+		<div id="birth-month">
+			<label for="birth-month"><%= Page.EditProfile.Birthday.Label.Month|l10n|html></label>
+			<input type="text" name="birth-month" value="<% birthMonth|html>" />
+		</div>
+
+		<div id="birth-year">
+			<label for="birth-year"><%= Page.EditProfile.Birthday.Label.Year|l10n|html></label>
+			<input type="text" name="birth-year" value="<% birthYear|html>" />
 		</div>
 
 		<div>

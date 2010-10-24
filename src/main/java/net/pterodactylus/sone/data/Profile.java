@@ -37,6 +37,15 @@ public class Profile {
 	/** The last name. */
 	private String lastName;
 
+	/** The day of the birth date. */
+	private Integer birthDay;
+
+	/** The month of the birth date. */
+	private Integer birthMonth;
+
+	/** The year of the birth date. */
+	private Integer birthYear;
+
 	/**
 	 * Creates a new empty profile.
 	 */
@@ -57,6 +66,9 @@ public class Profile {
 		this.firstName = profile.firstName;
 		this.middleName = profile.middleName;
 		this.lastName = profile.lastName;
+		this.birthDay = profile.birthDay;
+		this.birthMonth = profile.birthMonth;
+		this.birthYear = profile.birthYear;
 	}
 
 	//
@@ -138,6 +150,72 @@ public class Profile {
 	public Profile setLastName(String lastName) {
 		modified |= ((lastName != null) && (!lastName.equals(this.lastName))) || (this.lastName != null);
 		this.lastName = lastName;
+		return this;
+	}
+
+	/**
+	 * Returns the day of the birth date.
+	 *
+	 * @return The day of the birth date (from 1 to 31)
+	 */
+	public Integer getBirthDay() {
+		return birthDay;
+	}
+
+	/**
+	 * Sets the day of the birth date.
+	 *
+	 * @param birthDay
+	 *            The day of the birth date (from 1 to 31)
+	 * @return This profile (for method chaining)
+	 */
+	public Profile setBirthDay(Integer birthDay) {
+		modified |= ((birthDay != null) && (!birthDay.equals(this.birthDay))) || (this.birthDay != null);
+		this.birthDay = birthDay;
+		return this;
+	}
+
+	/**
+	 * Returns the month of the birth date.
+	 *
+	 * @return The month of the birth date (from 1 to 12)
+	 */
+	public Integer getBirthMonth() {
+		return birthMonth;
+	}
+
+	/**
+	 * Sets the month of the birth date.
+	 *
+	 * @param birthMonth
+	 *            The month of the birth date (from 1 to 12)
+	 * @return This profile (for method chaining)
+	 */
+	public Profile setBirthMonth(Integer birthMonth) {
+		modified |= ((birthMonth != null) && (!birthMonth.equals(this.birthMonth))) || (this.birthMonth != null);
+		this.birthMonth = birthMonth;
+		return this;
+	}
+
+	/**
+	 * Returns the year of the birth date.
+	 *
+	 * @return The year of the birth date
+	 */
+	public Integer getBirthYear() {
+		return birthYear;
+	}
+
+	/**
+	 * Sets the year of the birth date.
+	 *
+	 * @param birthYear
+	 *            The year of the birth date
+	 * @return This profile (for method chaining)
+	 */
+	public Profile setBirthYear(Integer birthYear) {
+		modified |= ((birthYear != null) && (!birthYear.equals(this.birthYear))) || (this.birthYear != null);
+		this.birthYear = birthYear;
 		return this;
 	}
 

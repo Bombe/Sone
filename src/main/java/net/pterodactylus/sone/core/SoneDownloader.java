@@ -32,6 +32,7 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
@@ -219,7 +220,11 @@ public class SoneDownloader extends AbstractService {
 			String profileFirstName = profileXml.getValue("first-name", null);
 			String profileMiddleName = profileXml.getValue("middle-name", null);
 			String profileLastName = profileXml.getValue("last-name", null);
+			Integer profileBirthDay = Numbers.safeParseInteger(profileXml.getValue("birth-day", null));
+			Integer profileBirthMonth = Numbers.safeParseInteger(profileXml.getValue("birth-month", null));
+			Integer profileBirthYear = Numbers.safeParseInteger(profileXml.getValue("birth-year", null));
 			Profile profile = new Profile().setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
+			profile.setBirthDay(profileBirthDay).setBirthMonth(profileBirthMonth).setBirthYear(profileBirthYear);
 
 			/* parse posts. */
 			SimpleXML postsXml = soneXml.getNode("posts");

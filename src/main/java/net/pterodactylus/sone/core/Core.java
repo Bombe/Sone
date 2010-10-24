@@ -620,11 +620,15 @@ public class Core extends AbstractService {
 			String firstName = configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null);
 			String middleName = configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null);
 			String lastName = configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null);
+			Integer birthDay = configuration.getIntValue(sonePrefix + "/Profile/BirthDay").getValue(null);
+			Integer birthMonth = configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null);
+			Integer birthYear = configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null);
 			try {
 				Profile profile = new Profile();
 				profile.setFirstName(firstName);
 				profile.setMiddleName(middleName);
 				profile.setLastName(lastName);
+				profile.setBirthDay(birthDay).setBirthMonth(birthMonth).setBirthYear(birthYear);
 				Sone sone = getSone(id).setName(name).setTime(time).setRequestUri(new FreenetURI(requestUri)).setInsertUri(new FreenetURI(insertUri));
 				sone.setProfile(profile);
 				int postId = 0;
@@ -755,6 +759,9 @@ public class Core extends AbstractService {
 				configuration.getStringValue(sonePrefix + "/Profile/FirstName").setValue(profile.getFirstName());
 				configuration.getStringValue(sonePrefix + "/Profile/MiddleName").setValue(profile.getMiddleName());
 				configuration.getStringValue(sonePrefix + "/Profile/LastName").setValue(profile.getLastName());
+				configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
+				configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
+				configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
 				int postId = 0;
 				for (Post post : sone.getPosts()) {
 					String postPrefix = sonePrefix + "/Post." + postId++;
