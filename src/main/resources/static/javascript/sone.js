@@ -99,7 +99,7 @@ function getTranslation(key, callback) {
  */
 function getSoneStatus(soneId) {
 	$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
-		updateSoneStatus(soneId, data.status, data.modified, data.lastUpdated);
+		updateSoneStatus(soneId, data.name, data.status, data.modified, data.lastUpdated);
 		/* seconds! */
 		updateInterval = 60;
 		if (data.modified || (data.status == "downloading") || (data.status == "inserting")) {
@@ -124,7 +124,7 @@ function getSoneStatus(soneId) {
  * @param lastUpdated
  *            The date and time of the last update (formatted for display)
  */
-function updateSoneStatus(soneId, status, modified, lastUpdated) {
+function updateSoneStatus(soneId, name, status, modified, lastUpdated) {
 	$("#sone .sone." + soneId).
 		toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
@@ -132,6 +132,7 @@ function updateSoneStatus(soneId, status, modified, lastUpdated) {
 		toggleClass("downloading", status == "downloading").
 		toggleClass("modified", modified);
 	$("#sone .sone." + soneId + " .last-update span.time").text(lastUpdated);
+	$("#sone .sone." + soneId + " .profile-link a").text(name);
 }
 
 var watchedSones = {};
