@@ -31,6 +31,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Options.DefaultOption;
+import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.SoneException.Type;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
@@ -75,6 +78,9 @@ public class Core extends AbstractService {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
 
+	/** The options. */
+	private final Options options = new Options();
+
 	/** The configuration. */
 	private Configuration configuration;
 
@@ -114,6 +120,15 @@ public class Core extends AbstractService {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the options of the Sone plugin.
+	 *
+	 * @return The options of the Sone plugin
+	 */
+	public Options getOptions() {
+		return options;
+	}
 
 	/**
 	 * Sets the configuration of the core.
@@ -603,6 +618,15 @@ public class Core extends AbstractService {
 	private void loadConfiguration() {
 		logger.entering(Core.class.getName(), "loadConfiguration()");
 
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new OptionWatcher<Integer>() {
+
+			@Override
+			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+				SoneInserter.setInsertionDelay(newValue);
+			}
+
+		})).set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+
 		/* parse local Sones. */
 		logger.log(Level.INFO, "Loading Sones…");
 		int soneId = 0;
@@ -744,7 +768,11 @@ public class Core extends AbstractService {
 	private void saveConfiguration() {
 		Set<Sone> sones = getSones();
 		logger.log(Level.INFO, "Storing %d Sones…", sones.size());
+
 		try {
+			/* store the options first. */
+			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+
 			/* store all Sones. */
 			int soneId = 0;
 			for (Sone sone : localSones) {
