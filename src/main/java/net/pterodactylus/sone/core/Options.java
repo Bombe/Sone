@@ -154,8 +154,37 @@ public class Options {
 
 	}
 
+	/** Holds all {@link Boolean} {@link Option}s. */
+	private final Map<String, Option<Boolean>> booleanOptions = new HashMap<String, Option<Boolean>>();
+
 	/** Holds all {@link Integer} {@link Option}s. */
 	private final Map<String, Option<Integer>> integerOptions = new HashMap<String, Option<Integer>>();
+
+	/**
+	 * Adds a boolean option.
+	 *
+	 * @param name
+	 *            The name of the option
+	 * @param booleanOption
+	 *            The option
+	 * @return The given option
+	 */
+	public Option<Boolean> addBooleanOption(String name, Option<Boolean> booleanOption) {
+		booleanOptions.put(name, booleanOption);
+		return booleanOption;
+	}
+
+	/**
+	 * Returns the boolean option with the given name.
+	 *
+	 * @param name
+	 *            The name of the option
+	 * @return The option, or {@code null} if there is no option with the given
+	 *         name
+	 */
+	public Option<Boolean> getBooleanOption(String name) {
+		return booleanOptions.get(name);
+	}
 
 	/**
 	 * Adds an {@link Integer} {@link Option}.
