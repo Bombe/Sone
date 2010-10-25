@@ -615,6 +615,7 @@ public class Core extends AbstractService {
 	/**
 	 * Loads the configuration.
 	 */
+	@SuppressWarnings("unchecked")
 	private void loadConfiguration() {
 		logger.entering(Core.class.getName(), "loadConfiguration()");
 
@@ -626,6 +627,17 @@ public class Core extends AbstractService {
 			}
 
 		})).set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+
+		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false)).set(configuration.getBooleanValue("Option/ClearOnNextRestart").getValue(null));
+		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false)).set(configuration.getBooleanValue("Option/ReallyClearOnNextRestart").getValue(null));
+
+		boolean clearConfiguration = options.getBooleanOption("ClearOnNextRestart").get() && options.getBooleanOption("ReallyClearOnNextRestart").get();
+		options.getBooleanOption("ClearOnNextRestart").set(null);
+		options.getBooleanOption("ReallyClearOnNextRestart").set(null);
+		if (clearConfiguration) {
+			/* stop loading the configuration. */
+			return;
+		}
 
 		/* parse local Sones. */
 		logger.log(Level.INFO, "Loading Sones…");
@@ -772,6 +784,8 @@ public class Core extends AbstractService {
 		try {
 			/* store the options first. */
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
+			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
 
 			/* store all Sones. */
 			int soneId = 0;
