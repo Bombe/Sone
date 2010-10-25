@@ -1,6 +1,9 @@
 package net.pterodactylus.sone.core;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -93,19 +96,19 @@ public class Options {
 		private T value;
 
 		/** The option watcher. */
-		private final OptionWatcher<T> optionWatcher;
+		private final List<OptionWatcher<T>> optionWatchers = new ArrayList<OptionWatcher<T>>();
 
 		/**
 		 * Creates a new default option.
 		 *
 		 * @param defaultValue
 		 *            The default value of the option
-		 * @param optionWatcher
-		 *            The option watcher
+		 * @param optionWatchers
+		 *            The option watchers
 		 */
-		public DefaultOption(T defaultValue, OptionWatcher<T> optionWatcher) {
+		public DefaultOption(T defaultValue, OptionWatcher<T>... optionWatchers) {
 			this.defaultValue = defaultValue;
-			this.optionWatcher = optionWatcher;
+			this.optionWatchers.addAll(Arrays.asList(optionWatchers));
 		}
 
 		/**
@@ -143,7 +146,9 @@ public class Options {
 			T oldValue = this.value;
 			this.value = value;
 			if (!get().equals(oldValue)) {
-				optionWatcher.optionChanged(this, oldValue, get());
+				for (OptionWatcher<T> optionWatcher : optionWatchers) {
+					optionWatcher.optionChanged(this, oldValue, get());
+				}
 			}
 		}
 
