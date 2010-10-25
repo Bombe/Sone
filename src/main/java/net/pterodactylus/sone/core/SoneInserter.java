@@ -57,6 +57,9 @@ public class SoneInserter extends AbstractService {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SoneInserter.class);
 
+	/** The insertion delay (in seconds). */
+	private static volatile int insertionDelay = 60;
+
 	/** The template factory used to create the templates. */
 	private static final DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
 
@@ -95,6 +98,21 @@ public class SoneInserter extends AbstractService {
 	}
 
 	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Changes the insertion delay, i.e. the time the Sone inserter waits after
+	 * it has noticed a Sone modification before it starts the insert.
+	 *
+	 * @param insertionDelay
+	 *            The insertion delay (in seconds)
+	 */
+	public static void setInsertionDelay(int insertionDelay) {
+		SoneInserter.insertionDelay = insertionDelay;
+	}
+
+	//
 	// SERVICE METHODS
 	//
 
@@ -115,9 +133,9 @@ public class SoneInserter extends AbstractService {
 					modificationCounter = sone.getModificationCounter();
 					lastModificationTime = System.currentTimeMillis();
 					sone.setTime(lastModificationTime);
-					logger.log(Level.FINE, "Sone %s has been modified, waiting 60 seconds before inserting.", new Object[] { sone.getName() });
+					logger.log(Level.FINE, "Sone %s has been modified, waiting %d seconds before inserting.", new Object[] { sone.getName(), insertionDelay });
 				}
-				if ((lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (60 * 1000))) {
+				if ((lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
 					insertInformation = new InsertInformation(sone);
 				}
 			}
