@@ -197,6 +197,7 @@ public class WebInterface extends AbstractService {
 		Template loadSoneTemplate = templateFactory.createTemplate(createReader("/templates/loadSone.html"));
 		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
 		Template createSoneTemplate = templateFactory.createTemplate(createReader("/templates/createSone.html"));
+		Template importSoneTemplate = templateFactory.createTemplate(createReader("/templates/importSone.html"));
 		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
 		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
@@ -220,6 +221,7 @@ public class WebInterface extends AbstractService {
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImportSonePage(importSoneTemplate, this), "ImportSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoadSonePage(loadSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AddSonePage(addSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
