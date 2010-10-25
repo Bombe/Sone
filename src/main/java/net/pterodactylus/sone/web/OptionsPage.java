@@ -55,6 +55,10 @@ public class OptionsPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
+			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
+			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
+			options.getBooleanOption("ReallyClearOnNextRestart").set(reallyClearOnNextRestart);
 		}
 		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
 		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
