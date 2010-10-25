@@ -626,7 +626,7 @@ public class Core extends AbstractService {
 				SoneInserter.setInsertionDelay(newValue);
 			}
 
-		})).set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		}));
 
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false)).set(configuration.getBooleanValue("Option/ClearOnNextRestart").getValue(null));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false)).set(configuration.getBooleanValue("Option/ReallyClearOnNextRestart").getValue(null));
@@ -638,6 +638,8 @@ public class Core extends AbstractService {
 			/* stop loading the configuration. */
 			return;
 		}
+
+		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
 
 		/* parse local Sones. */
 		logger.log(Level.INFO, "Loading Sones…");
