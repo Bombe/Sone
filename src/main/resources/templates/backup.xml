@@ -35,6 +35,18 @@
 		<%/foreach>
 	</replies>
 
+	<post-likes>
+		<%foreach currentSone.likedPostIds postId>
+		<post-like><% postId|xml></post-like>
+		<%/foreach>
+	</post-likes>
+
+	<reply-likes>
+		<%foreach currentSone.likedReplyIds replyId>
+		<reply-like><% replyId|xml></reply-like>
+		<%/foreach>
+	</reply-likes>
+
 	<friends>
 		<%foreach currentSone.friends friend>
 		<friend>
