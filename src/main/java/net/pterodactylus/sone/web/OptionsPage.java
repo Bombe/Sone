@@ -55,6 +55,7 @@ public class OptionsPage extends SoneTemplatePage {
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
 		}
 		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
+		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
 	}
 
 	//

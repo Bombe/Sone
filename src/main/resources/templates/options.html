@@ -16,6 +16,9 @@
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
 		<p><input type="text" name="insertion-delay" value="<% insertion-delay|html>" /></p>
 
+		<p><%= Page.Options.Option.ClearOnNextRestart.Description|l10n|html|replace needle="{strong}" replacement="<strong>"|replace needle="{/strong}" replacement="</strong>"></p>
+		<p><select name="clear-on-next-restart"><option disabled="disabled"><%= WebInterface.SelectBox.Choose|l10n|html></option><option value="true"<%if clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.Yes|l10n|html></option><option value="false"<%if ! clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.No|l10n|html></option></select>
+
 		<p><button type="submit"><%= Page.Options.Button.Save|l10n|html></button></p>
 
 	</form>
