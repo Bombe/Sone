@@ -1,0 +1,23 @@
+<%include include/head.html>
+
+	<script language="javascript">
+		$(document).ready(function() {
+			registerInputTextareaSwap("#sone #options input[name=insertion-delay]", "WebInterface.DefaultText.Option.InsertionDelay", "insertion-delay", true, true);
+		});
+	</script>
+
+	<h1><%= Page.Options.Page.Title|l10n|html></h1>
+
+	<p><%= Page.Options.Page.Description|l10n|html></p>
+
+	<form id="options" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+
+		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
+		<p><input type="text" name="insertion-delay" value="<% insertion-delay|html>" /></p>
+
+		<p><button type="submit"><%= Page.Options.Button.Save|l10n|html></button></p>
+
+	</form>
+
+<%include include/tail.html>
