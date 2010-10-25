@@ -33,7 +33,9 @@ public class OptionsPage extends SoneTemplatePage {
 	 * Creates a new options page.
 	 *
 	 * @param template
+	 *            The template to render
 	 * @param webInterface
+	 *            The Sone web interface
 	 */
 	public OptionsPage(Template template, WebInterface webInterface) {
 		super("options.html", template, "Page.Options.Title", webInterface);

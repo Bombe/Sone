@@ -33,6 +33,7 @@ public class UnlikeAjaxPage extends JsonPage {
 	 * Creates a new “unlike post” AJAX page.
 	 *
 	 * @param webInterface
+	 *            The Sone web interface
 	 */
 	public UnlikeAjaxPage(WebInterface webInterface) {
 		super("ajax/unlike.ajax", webInterface);

@@ -33,6 +33,7 @@ public class LikeAjaxPage extends JsonPage {
 	 * Creates a new “like post” AJAX page.
 	 *
 	 * @param webInterface
+	 *            The Sone web interface
 	 */
 	public LikeAjaxPage(WebInterface webInterface) {
 		super("ajax/like.ajax", webInterface);
