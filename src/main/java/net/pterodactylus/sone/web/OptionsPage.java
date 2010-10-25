@@ -59,6 +59,7 @@ public class OptionsPage extends SoneTemplatePage {
 			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
 			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
 			options.getBooleanOption("ReallyClearOnNextRestart").set(reallyClearOnNextRestart);
+			throw new RedirectException(getPath());
 		}
 		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
 		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
