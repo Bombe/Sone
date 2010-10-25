@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.core;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -435,6 +436,26 @@ public class Core extends AbstractService {
 				}
 			}
 		}, "Sone Downloader").start();
+	}
+
+	/**
+	 * Loads a Sone from an input stream.
+	 *
+	 * @param soneInputStream
+	 *            The input stream to load the Sone from
+	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
+	 */
+	public Sone loadSone(InputStream soneInputStream) {
+		Sone parsedSone = soneDownloader.parseSone(soneInputStream);
+		if (parsedSone == null) {
+			return null;
+		}
+		if (parsedSone.getInsertUri() != null) {
+			addLocalSone(parsedSone);
+		} else {
+			addSone(parsedSone);
+		}
+		return parsedSone;
 	}
 
 	/**
