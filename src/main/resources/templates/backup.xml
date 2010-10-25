@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <sone>
 
+	<id><% currentSone.id|xml></id>
 	<name><% currentSone.name|xml></name>
+	<time><% currentSone.time|xml></time>
 	<requestUri><% currentSone.requestUri|xml></requestUri>
 	<insertUri><% currentSone.insertUri|xml></insertUri>
 
