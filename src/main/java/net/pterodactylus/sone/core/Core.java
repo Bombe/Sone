@@ -712,6 +712,16 @@ public class Core extends AbstractService {
 	//
 
 	/**
+	 * Adds some default Sones.
+	 */
+	private void addDefaultSones() {
+		/* Sone’s Sone. */
+		loadSone("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/0");
+		/* Bombe’s Sone. */
+		loadSone("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/15");
+	}
+
+	/**
 	 * Loads the configuration.
 	 */
 	@SuppressWarnings("unchecked")
@@ -721,10 +731,7 @@ public class Core extends AbstractService {
 		boolean firstStart = configuration.getBooleanValue("FirstStart").getValue(true);
 		if (firstStart) {
 			logger.log(Level.INFO, "First start of Sone, adding a couple of default Sones…");
-			/* Sone’s Sone. */
-			loadSone("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/0");
-			/* Bombe’s Sone. */
-			loadSone("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/15");
+			addDefaultSones();
 			try {
 				configuration.getBooleanValue("FirstStart").setValue(false);
 			} catch (ConfigurationException ce1) {
