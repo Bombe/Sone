@@ -999,7 +999,7 @@ public class Core extends AbstractService {
 				configuration.getStringValue(blacklistedSonePrefix + "/ID").setValue(blacklistedSone.getId());
 				configuration.getStringValue(blacklistedSonePrefix + "/Name").setValue(blacklistedSone.getName());
 				configuration.getStringValue(blacklistedSonePrefix + "/Key").setValue(blacklistedSone.getRequestUri().toString());
-				configuration.getStringValue(blacklistedSonePrefix + "/InsertKey").setValue(blacklistedSone.getInsertUri().toString());
+				configuration.getStringValue(blacklistedSonePrefix + "/InsertKey").setValue((blacklistedSone.getInsertUri() != null) ? blacklistedSone.getInsertUri().toString() : null);
 				/* TODO - store all known stuff? */
 			}
 			configuration.getStringValue("BlacklistedSone." + blacklistedSonesCounter + "/ID").setValue(null);
