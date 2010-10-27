@@ -84,6 +84,20 @@
 				});
 				return false;
 			});
+			$("#sone .blacklist").submit(function() {
+				var blacklistElement = this;
+				$.getJSON("ajax/blacklistSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+					$(getSoneElement(blacklistElement)).slideUp();
+				});
+				return false;
+			});
+			$("#sone .unblacklist").submit(function() {
+				var unblacklistElement = this;
+				$.getJSON("ajax/unblacklistSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+					$(getSoneElement(unblacklistElement)).slideUp();
+				});
+				return false;
+			});
 		});
 	</script>
 
