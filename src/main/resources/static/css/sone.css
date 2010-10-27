@@ -328,7 +328,7 @@ textarea {
 	display: none;
 }
 
-#sone .sone form.block button, #sone .sone form.unblock button, #sone .sone form.follow button, #sone .sone form.unfollow button {
+#sone .sone form.block button, #sone .sone form.unblock button, #sone .sone form.follow button, #sone .sone form.unfollow button, #sone .sone form.blacklist button, #sone .sone form.unblacklist button {
 	display: inline;
 	color: rgb(28, 131, 191);
 	background: none;
@@ -337,7 +337,7 @@ textarea {
 	padding: 0px;
 }
 
-#sone .sone form.block button:hover, #sone .sone form.unblock button:hover, #sone .sone form.follow button:hover, #sone .sone form.unfollow button:hover {
+#sone .sone form.block button:hover, #sone .sone form.unblock button:hover, #sone .sone form.follow button:hover, #sone .sone form.unfollow button:hover, #sone .sone form.blacklist button:hover, #sone .sone form.unblacklist button:hover {
 	display: inline;
 	color: rgb(255, 172, 0);
 }

@@ -91,6 +91,9 @@ public class Core extends AbstractService {
 	/** The Sone downloader. */
 	private SoneDownloader soneDownloader;
 
+	/** The Sone blacklist. */
+	private final Set<Sone> blacklistedSones = new HashSet<Sone>();
+
 	/** The local Sones. */
 	private final Set<Sone> localSones = new HashSet<Sone>();
 
@@ -163,7 +166,17 @@ public class Core extends AbstractService {
 	 * @return The local Sones
 	 */
 	public Set<Sone> getSones() {
-		return Collections.unmodifiableSet(localSones);
+		return Filters.filteredSet(localSones, new Filter<Sone>() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public boolean filterObject(Sone sone) {
+				return !blacklistedSones.contains(sone);
+			}
+		});
 	}
 
 	/**
@@ -189,7 +202,17 @@ public class Core extends AbstractService {
 	 * @return All known sones
 	 */
 	public Collection<Sone> getKnownSones() {
-		return soneCache.values();
+		return Filters.filteredCollection(soneCache.values(), new Filter<Sone>() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public boolean filterObject(Sone sone) {
+				return !blacklistedSones.contains(sone);
+			}
+		});
 	}
 
 	/**
@@ -202,10 +225,30 @@ public class Core extends AbstractService {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
-			public boolean filterObject(Sone object) {
-				return !localSones.contains(object);
+			public boolean filterObject(Sone sone) {
+				return !blacklistedSones.contains(sone) && !localSones.contains(sone);
 			}
 		});
+	}
+
+	/**
+	 * Returns all blacklisted Sones.
+	 *
+	 * @return All blacklisted Sones
+	 */
+	public Collection<Sone> getBlacklistedSones() {
+		return Collections.unmodifiableCollection(blacklistedSones);
+	}
+
+	/**
+	 * Checks whether the given Sone is blacklisted.
+	 *
+	 * @param sone
+	 *            The Sone to check
+	 * @return {@code true} if this Sone is blacklisted, {@code false} otherwise
+	 */
+	public boolean isBlacklistedSone(Sone sone) {
+		return blacklistedSones.contains(sone);
 	}
 
 	/**
@@ -325,6 +368,38 @@ public class Core extends AbstractService {
 			SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserter.start();
 			soneInserters.put(sone, soneInserter);
+		}
+	}
+
+	/**
+	 * Blackslists the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to blacklist
+	 */
+	public void blacklistSone(Sone sone) {
+		if (blacklistedSones.add(sone)) {
+			soneDownloader.removeSone(sone);
+			if (localSones.remove(sone)) {
+				SoneInserter soneInserter = soneInserters.remove(sone);
+				soneInserter.stop();
+			}
+		}
+	}
+
+	/**
+	 * Unblacklists the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to unblacklist
+	 */
+	public void unblacklistSone(Sone sone) {
+		if (blacklistedSones.remove(sone)) {
+			if (sone.getInsertUri() != null) {
+				addLocalSone(sone);
+			} else {
+				addSone(sone);
+			}
 		}
 	}
 
@@ -789,6 +864,23 @@ public class Core extends AbstractService {
 			}
 		}
 
+		/* load all blacklisted Sones. */
+		int blacklistedSonesCounter = 0;
+		while (true) {
+			String blacklistedSonePrefix = "BlacklistedSone." + blacklistedSonesCounter++;
+			String blacklistedSoneId = configuration.getStringValue(blacklistedSonePrefix + "/ID").getValue(null);
+			if (blacklistedSoneId == null) {
+				break;
+			}
+			String blacklistedSoneName = configuration.getStringValue(blacklistedSonePrefix + "/Name").getValue(null);
+			String blacklistedSoneKey = configuration.getStringValue(blacklistedSonePrefix + "/Key").getValue(null);
+			try {
+				blacklistSone(getSone(blacklistedSoneId).setName(blacklistedSoneName).setRequestUri(new FreenetURI(blacklistedSoneKey)));
+			} catch (MalformedURLException mue1) {
+				logger.log(Level.WARNING, "Could not create blacklisted Sone from requestUri (“" + blacklistedSoneKey + "”)!", mue1);
+			}
+		}
+
 		/* load all remote Sones. */
 		for (Sone remoteSone : getRemoteSones()) {
 			loadSone(remoteSone);
@@ -896,6 +988,17 @@ public class Core extends AbstractService {
 				/* TODO - store all known stuff? */
 			}
 			configuration.getStringValue("KnownSone." + knownSonesCounter + "/ID").setValue(null);
+
+			/* write all blacklisted Sones. */
+			int blacklistedSonesCounter = 0;
+			for (Sone blacklistedSone : getBlacklistedSones()) {
+				String blacklistedSonePrefix = "BlacklistedSone." + blacklistedSonesCounter++;
+				configuration.getStringValue(blacklistedSonePrefix + "/ID").setValue(blacklistedSone.getId());
+				configuration.getStringValue(blacklistedSonePrefix + "/Name").setValue(blacklistedSone.getName());
+				configuration.getStringValue(blacklistedSonePrefix + "/Key").setValue(blacklistedSone.getRequestUri().toString());
+				/* TODO - store all known stuff? */
+			}
+			configuration.getStringValue("BlacklistedSone." + blacklistedSonesCounter + "/ID").setValue(null);
 
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not store configuration!", ce1);
