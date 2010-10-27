@@ -251,7 +251,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlacklistPage(blacklistTemplate, this), "Blacklist"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlacklistSonePage(blacklistSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblacklistSonePage(unblacklistSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("about.html", aboutTemplate, "Page.About.Title", this), "About"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
