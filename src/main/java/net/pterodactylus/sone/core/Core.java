@@ -574,6 +574,7 @@ public class Core extends AbstractService {
 		SoneInserter soneInserter = soneInserters.remove(sone);
 		soneInserter.stop();
 		localSones.remove(sone);
+		soneStatuses.remove(sone);
 	}
 
 	/**
