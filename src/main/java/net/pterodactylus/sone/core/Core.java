@@ -762,6 +762,7 @@ public class Core extends AbstractService {
 		options.getBooleanOption("ReallyClearOnNextRestart").set(null);
 		if (clearConfiguration) {
 			/* stop loading the configuration. */
+			addDefaultSones();
 			return;
 		}
 
