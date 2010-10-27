@@ -60,7 +60,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 
 			@Override
 			public int compare(Sone leftSone, Sone rightSone) {
-				int diff = SoneAccessor.getNiceName(leftSone).compareTo(SoneAccessor.getNiceName(rightSone));
+				int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
 				if (diff != 0) {
 					return diff;
 				}

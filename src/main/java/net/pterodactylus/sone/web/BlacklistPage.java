@@ -60,7 +60,7 @@ public class BlacklistPage extends SoneTemplatePage {
 
 			@Override
 			public int compare(Sone leftSone, Sone rightSone) {
-				return SoneAccessor.getNiceName(leftSone).compareTo(SoneAccessor.getNiceName(rightSone));
+				return SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
 			}
 
 		});
