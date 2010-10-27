@@ -874,8 +874,9 @@ public class Core extends AbstractService {
 			}
 			String blacklistedSoneName = configuration.getStringValue(blacklistedSonePrefix + "/Name").getValue(null);
 			String blacklistedSoneKey = configuration.getStringValue(blacklistedSonePrefix + "/Key").getValue(null);
+			String blacklistedSoneInsertKey = configuration.getStringValue(blacklistedSonePrefix + "/InsertKey").getValue(null);
 			try {
-				blacklistSone(getSone(blacklistedSoneId).setName(blacklistedSoneName).setRequestUri(new FreenetURI(blacklistedSoneKey)));
+				blacklistSone(getSone(blacklistedSoneId).setName(blacklistedSoneName).setRequestUri(new FreenetURI(blacklistedSoneKey)).setInsertUri((blacklistedSoneInsertKey != null) ? new FreenetURI(blacklistedSoneInsertKey) : null));
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.WARNING, "Could not create blacklisted Sone from requestUri (“" + blacklistedSoneKey + "”)!", mue1);
 			}
@@ -996,6 +997,7 @@ public class Core extends AbstractService {
 				configuration.getStringValue(blacklistedSonePrefix + "/ID").setValue(blacklistedSone.getId());
 				configuration.getStringValue(blacklistedSonePrefix + "/Name").setValue(blacklistedSone.getName());
 				configuration.getStringValue(blacklistedSonePrefix + "/Key").setValue(blacklistedSone.getRequestUri().toString());
+				configuration.getStringValue(blacklistedSonePrefix + "/InsertKey").setValue(blacklistedSone.getInsertUri().toString());
 				/* TODO - store all known stuff? */
 			}
 			configuration.getStringValue("BlacklistedSone." + blacklistedSonesCounter + "/ID").setValue(null);
