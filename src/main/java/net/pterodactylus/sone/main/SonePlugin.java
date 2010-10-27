@@ -167,21 +167,24 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	 */
 	@Override
 	public void terminate() {
-		/* stop the web interface. */
-		webInterface.stop();
-
-		/* stop the core. */
-		core.stop();
-
-		/* TODO wait for core to stop? */
 		try {
-			pluginRespirator.putStore(pluginStore);
-		} catch (DatabaseDisabledException dde1) {
-			logger.log(Level.WARNING, "Could not store plugin store, database is disabled.", dde1);
-		}
+			/* stop the web interface. */
+			webInterface.stop();
 
-		/* shutdown logger. */
-		Logging.shutdown();
+			/* stop the core. */
+			core.stop();
+
+			/* TODO wait for core to stop? */
+			try {
+				pluginRespirator.putStore(pluginStore);
+			} catch (DatabaseDisabledException dde1) {
+				logger.log(Level.WARNING, "Could not store plugin store, database is disabled.", dde1);
+			}
+
+		} finally {
+			/* shutdown logger. */
+			Logging.shutdown();
+		}
 	}
 
 	//
