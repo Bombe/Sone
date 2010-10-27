@@ -60,6 +60,7 @@ public class ImportSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	protected void processTemplate(net.pterodactylus.sone.web.page.Page.Request request, Template template) throws RedirectException {
+		super.processTemplate(request, template);
 		template.set("errorParsingSone", false);
 		if (request.getMethod() == Method.POST) {
 			Bucket soneBucket = request.getHttpRequest().getPart("sone-file");
