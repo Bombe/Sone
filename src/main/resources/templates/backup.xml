@@ -4,8 +4,8 @@
 	<id><% currentSone.id|xml></id>
 	<name><% currentSone.name|xml></name>
 	<time><% currentSone.time|xml></time>
-	<requestUri><% currentSone.requestUri|xml></requestUri>
-	<insertUri><% currentSone.insertUri|xml></insertUri>
+	<request-uri><% currentSone.requestUri|xml></request-uri>
+	<insert-uri><% currentSone.insertUri|xml></insert-uri>
 
 	<profile>
 		<first-name><% currentSone.profile.firstName|xml></first-name>
