@@ -717,6 +717,20 @@ public class Core extends AbstractService {
 	private void loadConfiguration() {
 		logger.entering(Core.class.getName(), "loadConfiguration()");
 
+		boolean firstStart = configuration.getBooleanValue("FirstStart").getValue(true);
+		if (firstStart) {
+			logger.log(Level.INFO, "First start of Sone, adding a couple of default Sones…");
+			/* Sone’s Sone. */
+			loadSone("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/0");
+			/* Bombe’s Sone. */
+			loadSone("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/15");
+			try {
+				configuration.getBooleanValue("FirstStart").setValue(false);
+			} catch (ConfigurationException ce1) {
+				logger.log(Level.WARNING, "Could not clear “first start” flag!");
+			}
+		}
+
 		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new OptionWatcher<Integer>() {
 
 			@Override
@@ -726,9 +740,15 @@ public class Core extends AbstractService {
 
 		}));
 
-		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false)).set(configuration.getBooleanValue("Option/ClearOnNextRestart").getValue(null));
-		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false)).set(configuration.getBooleanValue("Option/ReallyClearOnNextRestart").getValue(null));
+		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
+		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
 
+		if (firstStart) {
+			return;
+		}
+
+		options.getBooleanOption("ClearOnNextRestart").set(configuration.getBooleanValue("Option/ClearOnNextRestart").getValue(null));
+		options.getBooleanOption("ReallyClearOnNextRestart").set(configuration.getBooleanValue("Option/ReallyClearOnNextRestart").getValue(null));
 		boolean clearConfiguration = options.getBooleanOption("ClearOnNextRestart").get() && options.getBooleanOption("ReallyClearOnNextRestart").get();
 		options.getBooleanOption("ClearOnNextRestart").set(null);
 		options.getBooleanOption("ReallyClearOnNextRestart").set(null);
