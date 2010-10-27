@@ -505,6 +505,7 @@ public class Core extends AbstractService {
 						} else {
 							addSone(parsedSone);
 						}
+						setSoneStatus(parsedSone, SoneStatus.idle);
 					}
 				} catch (MalformedURLException mue1) {
 					logger.log(Level.INFO, "Could not create URI from “" + requestUri + "”.", mue1);
