@@ -42,7 +42,7 @@ public class BlacklistPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public BlacklistPage(Template template, WebInterface webInterface) {
-		super("blacklist.html", template, "Page.Blacklist.Title", webInterface);
+		super("blacklist.html", template, "Page.Blacklist.Title", webInterface, false);
 	}
 
 	//

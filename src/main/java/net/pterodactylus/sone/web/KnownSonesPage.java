@@ -42,7 +42,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public KnownSonesPage(Template template, WebInterface webInterface) {
-		super("knownSones.html", template, "Page.KnownSones.Title", webInterface);
+		super("knownSones.html", template, "Page.KnownSones.Title", webInterface, false);
 	}
 
 	//

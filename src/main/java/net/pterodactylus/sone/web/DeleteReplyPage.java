@@ -38,7 +38,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public DeleteReplyPage(Template template, WebInterface webInterface) {
-		super("deleteReply.html", template, "Page.DeleteReply.Title", webInterface);
+		super("deleteReply.html", template, "Page.DeleteReply.Title", webInterface, true);
 	}
 
 	//
@@ -68,18 +68,6 @@ public class DeleteReplyPage extends SoneTemplatePage {
 		}
 		template.set("reply", reply);
 		template.set("returnPage", returnPage);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

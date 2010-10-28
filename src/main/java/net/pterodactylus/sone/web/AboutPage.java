@@ -41,7 +41,7 @@ public class AboutPage extends SoneTemplatePage {
 	 *            The version to display
 	 */
 	public AboutPage(Template template, WebInterface webInterface, Version version) {
-		super("about.html", template, "Page.About.Title", webInterface);
+		super("about.html", template, "Page.About.Title", webInterface, false);
 		this.version = version;
 	}
 
@@ -56,18 +56,6 @@ public class AboutPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		template.set("version", version);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return false;
 	}
 
 }

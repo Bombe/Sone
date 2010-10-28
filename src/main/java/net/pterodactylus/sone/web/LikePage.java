@@ -38,7 +38,7 @@ public class LikePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public LikePage(Template template, WebInterface webInterface) {
-		super("like.html", template, "Page.LikePost.Title", webInterface);
+		super("like.html", template, "Page.LikePost.Title", webInterface, true);
 	}
 
 	//
@@ -63,18 +63,6 @@ public class LikePage extends SoneTemplatePage {
 			}
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

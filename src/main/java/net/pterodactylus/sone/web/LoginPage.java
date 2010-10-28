@@ -26,7 +26,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
-import freenet.clients.http.ToadletContext;
 
 /**
  * The login page manages logging the user in.
@@ -44,7 +43,7 @@ public class LoginPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public LoginPage(Template template, WebInterface webInterface) {
-		super("login.html", template, "Page.Login.Title", webInterface);
+		super("login.html", template, "Page.Login.Title", webInterface, false);
 	}
 
 	//
@@ -85,14 +84,6 @@ public class LoginPage extends SoneTemplatePage {
 				throw new RedirectException("index.html");
 			}
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isEnabled(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext) == null;
 	}
 
 }

@@ -36,7 +36,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public ViewSonePage(Template template, WebInterface webInterface) {
-		super("viewSone.html", template, "Page.ViewSone.Title", webInterface);
+		super("viewSone.html", template, "Page.ViewSone.Title", webInterface, false);
 	}
 
 	//

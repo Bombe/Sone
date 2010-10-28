@@ -47,7 +47,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public CreateSonePage(Template template, WebInterface webInterface) {
-		super("createSone.html", template, "Page.CreateSone.Title", webInterface);
+		super("createSone.html", template, "Page.CreateSone.Title", webInterface, false);
 	}
 
 	//

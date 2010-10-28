@@ -35,7 +35,7 @@ public class UnfollowSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public UnfollowSonePage(Template template, WebInterface webInterface) {
-		super("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface);
+		super("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface, true);
 	}
 
 	//
@@ -58,18 +58,6 @@ public class UnfollowSonePage extends SoneTemplatePage {
 			}
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

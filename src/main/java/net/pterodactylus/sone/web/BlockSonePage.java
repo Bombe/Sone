@@ -36,7 +36,7 @@ public class BlockSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public BlockSonePage(Template template, WebInterface webInterface) {
-		super("blockSone.html", template, "Page.BlockSone.Title", webInterface);
+		super("blockSone.html", template, "Page.BlockSone.Title", webInterface, true);
 	}
 
 	//
@@ -55,19 +55,6 @@ public class BlockSonePage extends SoneTemplatePage {
 			getCurrentSone(request.getToadletContext()).addBlockedSoneId(soneId);
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		// TODO Auto-generated method stub
-		return super.requiresLogin();
 	}
 
 }

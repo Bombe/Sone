@@ -41,7 +41,7 @@ public class IndexPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public IndexPage(Template template, WebInterface webInterface) {
-		super("index.html", template, "Page.Index.Title", webInterface);
+		super("index.html", template, "Page.Index.Title", webInterface, true);
 	}
 
 	//
@@ -69,18 +69,6 @@ public class IndexPage extends SoneTemplatePage {
 
 		});
 		template.set("posts", allPosts);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

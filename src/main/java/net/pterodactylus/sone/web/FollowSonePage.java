@@ -35,7 +35,7 @@ public class FollowSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public FollowSonePage(Template template, WebInterface webInterface) {
-		super("followSone.html", template, "Page.FollowSone.Title", webInterface);
+		super("followSone.html", template, "Page.FollowSone.Title", webInterface, true);
 	}
 
 	//
@@ -58,18 +58,6 @@ public class FollowSonePage extends SoneTemplatePage {
 			}
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

@@ -38,7 +38,7 @@ public class DeletePostPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public DeletePostPage(Template template, WebInterface webInterface) {
-		super("deletePost.html", template, "Page.DeletePost.Title", webInterface);
+		super("deletePost.html", template, "Page.DeletePost.Title", webInterface, true);
 	}
 
 	//
@@ -75,18 +75,6 @@ public class DeletePostPage extends SoneTemplatePage {
 			template.set("post", post);
 			template.set("returnPage", returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

@@ -38,7 +38,7 @@ public class OptionsPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public OptionsPage(Template template, WebInterface webInterface) {
-		super("options.html", template, "Page.Options.Title", webInterface);
+		super("options.html", template, "Page.Options.Title", webInterface, false);
 	}
 
 	//
@@ -64,18 +64,6 @@ public class OptionsPage extends SoneTemplatePage {
 		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
 		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
 		template.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return false;
 	}
 
 }

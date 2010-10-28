@@ -36,7 +36,7 @@ public class ViewPostPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public ViewPostPage(Template template, WebInterface webInterface) {
-		super("viewPost.html", template, "Page.ViewPost.Title", webInterface);
+		super("viewPost.html", template, "Page.ViewPost.Title", webInterface, false);
 	}
 
 	//
@@ -52,18 +52,6 @@ public class ViewPostPage extends SoneTemplatePage {
 		String postId = request.getHttpRequest().getParam("post");
 		Post post = webInterface.core().getPost(postId);
 		template.set("post", post);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

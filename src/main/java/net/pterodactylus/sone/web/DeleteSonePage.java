@@ -39,7 +39,7 @@ public class DeleteSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public DeleteSonePage(Template template, WebInterface webInterface) {
-		super("deleteSone.html", template, "Page.DeleteSone.Title", webInterface);
+		super("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, true);
 	}
 
 	//
@@ -59,18 +59,6 @@ public class DeleteSonePage extends SoneTemplatePage {
 			}
 			throw new RedirectException("index.html");
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

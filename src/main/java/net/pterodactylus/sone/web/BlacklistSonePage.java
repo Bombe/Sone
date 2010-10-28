@@ -37,7 +37,7 @@ public class BlacklistSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public BlacklistSonePage(Template template, WebInterface webInterface) {
-		super("blacklistSone.html", template, "Page.BlacklistSone.Title", webInterface);
+		super("blacklistSone.html", template, "Page.BlacklistSone.Title", webInterface, false);
 	}
 
 	//
@@ -57,18 +57,6 @@ public class BlacklistSonePage extends SoneTemplatePage {
 			webInterface.core().blacklistSone(sone);
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return false;
 	}
 
 }

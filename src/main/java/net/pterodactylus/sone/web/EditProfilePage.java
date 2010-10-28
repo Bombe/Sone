@@ -40,7 +40,7 @@ public class EditProfilePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public EditProfilePage(Template template, WebInterface webInterface) {
-		super("editProfile.html", template, "Page.EditProfile.Title", webInterface);
+		super("editProfile.html", template, "Page.EditProfile.Title", webInterface, true);
 	}
 
 	//
@@ -84,18 +84,6 @@ public class EditProfilePage extends SoneTemplatePage {
 		template.set("birthDay", birthDay);
 		template.set("birthMonth", birthMonth);
 		template.set("birthYear", birthYear);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

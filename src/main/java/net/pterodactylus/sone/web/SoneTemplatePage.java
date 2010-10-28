@@ -38,8 +38,12 @@ public class SoneTemplatePage extends TemplatePage {
 	/** The Sone core. */
 	protected final WebInterface webInterface;
 
+	/** Whether to require a login. */
+	private final boolean requireLogin;
+
 	/**
-	 * Creates a new template page for Freetalk.
+	 * Creates a new template page for Freetalk that does not require the user
+	 * to be logged in.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -51,8 +55,27 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            The Sone web interface
 	 */
 	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface) {
+		this(path, template, pageTitleKey, webInterface, false);
+	}
+
+	/**
+	 * Creates a new template page for Freetalk.
+	 *
+	 * @param path
+	 *            The path of the page
+	 * @param template
+	 *            The template to render
+	 * @param pageTitleKey
+	 *            The l10n key of the page title
+	 * @param webInterface
+	 *            The Sone web interface
+	 * @param requireLogin
+	 *            Whether this page requires a login
+	 */
+	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface, boolean requireLogin) {
 		super(path, template, webInterface.l10n(), pageTitleKey, "noPermission.html");
 		this.webInterface = webInterface;
+		this.requireLogin = requireLogin;
 		template.set("webInterface", webInterface);
 	}
 
@@ -166,7 +189,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *         page, {@code false} otherwise
 	 */
 	protected boolean requiresLogin() {
-		return false;
+		return requireLogin;
 	}
 
 	/**

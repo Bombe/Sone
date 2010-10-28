@@ -34,7 +34,7 @@ public class LogoutPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public LogoutPage(Template template, WebInterface webInterface) {
-		super("logout.html", template, "Page.Logout.Title", webInterface);
+		super("logout.html", template, "Page.Logout.Title", webInterface, true);
 	}
 
 	//
@@ -49,14 +49,6 @@ public class LogoutPage extends SoneTemplatePage {
 		setCurrentSone(request.getToadletContext(), null);
 		super.processTemplate(request, template);
 		throw new RedirectException("index.html");
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 	/**

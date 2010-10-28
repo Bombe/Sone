@@ -38,7 +38,7 @@ public class CreateReplyPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public CreateReplyPage(Template template, WebInterface webInterface) {
-		super("createReply.html", template, "Page.CreateReply.Title", webInterface);
+		super("createReply.html", template, "Page.CreateReply.Title", webInterface, true);
 	}
 
 	//
@@ -66,18 +66,6 @@ public class CreateReplyPage extends SoneTemplatePage {
 		template.set("postId", postId);
 		template.set("text", text);
 		template.set("returnPage", returnPage);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

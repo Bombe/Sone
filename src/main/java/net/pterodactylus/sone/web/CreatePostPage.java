@@ -38,7 +38,7 @@ public class CreatePostPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public CreatePostPage(Template template, WebInterface webInterface) {
-		super("createPost.html", template, "Page.CreatePost.Title", webInterface);
+		super("createPost.html", template, "Page.CreatePost.Title", webInterface, true);
 	}
 
 	//
@@ -62,18 +62,6 @@ public class CreatePostPage extends SoneTemplatePage {
 			template.set("errorTextEmpty", true);
 		}
 		template.set("returnPage", returnPage);
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

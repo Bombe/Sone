@@ -39,7 +39,7 @@ public class BackupProfilePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public BackupProfilePage(Template template, WebInterface webInterface) {
-		super("backupProfile.html", template, "Page.BackupProfile.Title", webInterface);
+		super("backupProfile.html", template, "Page.BackupProfile.Title", webInterface, true);
 	}
 
 	//
@@ -62,18 +62,6 @@ public class BackupProfilePage extends SoneTemplatePage {
 		Response response = new Response(200, "OK", "text/xml; charset=utf-8", stringWriter.toString());
 		response.setHeader("Content-Disposition", "attachment; filename=Sone_" + getCurrentSone(request.getToadletContext()).getName() + ".xml");
 		return response;
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

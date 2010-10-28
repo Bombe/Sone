@@ -48,7 +48,7 @@ public class ImportSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public ImportSonePage(Template template, WebInterface webInterface) {
-		super("importSone.html", template, "Page.ImportSone.Title", webInterface);
+		super("importSone.html", template, "Page.ImportSone.Title", webInterface, false);
 	}
 
 	//

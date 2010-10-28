@@ -38,7 +38,7 @@ public class UnlikePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public UnlikePage(Template template, WebInterface webInterface) {
-		super("unlike.html", template, "Page.UnlikePost.Title", webInterface);
+		super("unlike.html", template, "Page.UnlikePost.Title", webInterface, true);
 	}
 
 	//
@@ -63,18 +63,6 @@ public class UnlikePage extends SoneTemplatePage {
 			}
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return true;
 	}
 
 }

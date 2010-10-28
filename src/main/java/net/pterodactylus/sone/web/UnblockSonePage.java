@@ -36,7 +36,7 @@ public class UnblockSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public UnblockSonePage(Template template, WebInterface webInterface) {
-		super("unblockSone.html", template, "Page.UnblockSone.Title", webInterface);
+		super("unblockSone.html", template, "Page.UnblockSone.Title", webInterface, true);
 	}
 
 	//
@@ -57,19 +57,6 @@ public class UnblockSonePage extends SoneTemplatePage {
 			}
 			throw new RedirectException(returnPage);
 		}
-	}
-
-	//
-	// SONETEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		// TODO Auto-generated method stub
-		return super.requiresLogin();
 	}
 
 }

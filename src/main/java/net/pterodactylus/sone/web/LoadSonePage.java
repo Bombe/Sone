@@ -37,7 +37,7 @@ public class LoadSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public LoadSonePage(Template template, WebInterface webInterface) {
-		super("loadSone.html", template, "Page.LoadSone.Title", webInterface);
+		super("loadSone.html", template, "Page.LoadSone.Title", webInterface, false);
 	}
 
 	//
