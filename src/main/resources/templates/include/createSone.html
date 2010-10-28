@@ -38,12 +38,12 @@
 	</div>
 	<div class="advanced">
 		<div<%if errorUri> class="error"<%/if>>
-			<label for="insert-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
+			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
 			<input type="text" name="insert-uri" value="<% insertUri|html>" />
 		</div>
 		<div<%if errorUri> class="error"<%/if>>
-			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
-			<input type="text" name="insert-uri" value="<% requestUri|html>" />
+			<label for="request-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
+			<input type="text" name="request-uri" value="<% requestUri|html>" />
 		</div>
 		<div>
 			<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
