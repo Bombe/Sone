@@ -643,8 +643,8 @@ public class Core extends AbstractService {
 	 *            The post to check for
 	 * @return All Sones that like the post
 	 */
-	public Set<Sone> getLikes(final Post post) {
-		return Filters.filteredSet(getSones(), new Filter<Sone>() {
+	public Collection<Sone> getLikes(final Post post) {
+		return Filters.filteredCollection(getKnownSones(), new Filter<Sone>() {
 
 			@Override
 			public boolean filterObject(Sone sone) {
@@ -660,8 +660,8 @@ public class Core extends AbstractService {
 	 *            The reply to check for
 	 * @return All Sones that like the reply
 	 */
-	public Set<Sone> getLikes(final Reply reply) {
-		return Filters.filteredSet(getSones(), new Filter<Sone>() {
+	public Collection<Sone> getLikes(final Reply reply) {
+		return Filters.filteredCollection(getKnownSones(), new Filter<Sone>() {
 
 			@Override
 			public boolean filterObject(Sone sone) {
