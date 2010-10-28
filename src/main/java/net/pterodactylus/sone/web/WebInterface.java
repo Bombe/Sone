@@ -222,6 +222,7 @@ public class WebInterface extends AbstractService {
 		Template blacklistSoneTemplate = templateFactory.createTemplate(createReader("/templates/blacklistSone.html"));
 		Template unblacklistSoneTemplate = templateFactory.createTemplate(createReader("/templates/unblacklistSone.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
+		Template helpTemplate = templateFactory.createTemplate(createReader("/templates/help.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
@@ -252,6 +253,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlacklistSonePage(blacklistSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblacklistSonePage(unblacklistSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("help.html", helpTemplate, "Page.Help.Title", this), "Help"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
