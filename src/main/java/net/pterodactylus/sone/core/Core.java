@@ -56,6 +56,16 @@ import freenet.keys.FreenetURI;
  */
 public class Core extends AbstractService {
 
+	/** The default Sones. */
+	private static final Set<String> defaultSones = new HashSet<String>();
+
+	static {
+		/* Sone of Sone. */
+		defaultSones.add("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/3");
+		/* Sone of Bombe. */
+		defaultSones.add("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/24");
+	}
+
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
 	 *
@@ -715,10 +725,9 @@ public class Core extends AbstractService {
 	 * Adds some default Sones.
 	 */
 	private void addDefaultSones() {
-		/* Sone’s Sone. */
-		loadSone("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/0");
-		/* Bombe’s Sone. */
-		loadSone("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/15");
+		for (String soneUri : defaultSones) {
+			loadSone(soneUri);
+		}
 	}
 
 	/**
