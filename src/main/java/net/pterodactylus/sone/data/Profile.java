@@ -26,25 +26,25 @@ package net.pterodactylus.sone.data;
 public class Profile {
 
 	/** Whether the profile was modified. */
-	private boolean modified;
+	private volatile boolean modified;
 
 	/** The first name. */
-	private String firstName;
+	private volatile String firstName;
 
 	/** The middle name(s). */
-	private String middleName;
+	private volatile String middleName;
 
 	/** The last name. */
-	private String lastName;
+	private volatile String lastName;
 
 	/** The day of the birth date. */
-	private Integer birthDay;
+	private volatile Integer birthDay;
 
 	/** The month of the birth date. */
-	private Integer birthMonth;
+	private volatile Integer birthMonth;
 
 	/** The year of the birth date. */
-	private Integer birthYear;
+	private volatile Integer birthYear;
 
 	/**
 	 * Creates a new empty profile.

@@ -151,7 +151,7 @@ public class FreenetInterface {
 				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
 					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", new Object[] { sone, key, newKnownGood, newSlotToo });
 					if (newKnownGood) {
-						sone.updateUris(key.getURI());
+						sone.updateUris(key.suggestedEdition);
 						soneDownloader.fetchSone(sone);
 					}
 				}

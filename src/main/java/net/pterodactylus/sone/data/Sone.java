@@ -49,38 +49,38 @@ public class Sone {
 	private final UUID id;
 
 	/** The name of this Sone. */
-	private String name;
+	private volatile String name;
 
 	/** The URI under which the Sone is stored in Freenet. */
-	private FreenetURI requestUri;
+	private volatile FreenetURI requestUri;
 
 	/** The URI used to insert a new version of this Sone. */
 	/* This will be null for remote Sones! */
-	private FreenetURI insertUri;
+	private volatile FreenetURI insertUri;
 
 	/** The time of the last inserted update. */
-	private long time;
+	private volatile long time;
 
 	/** The profile of this Sone. */
-	private Profile profile;
+	private volatile Profile profile;
 
 	/** All friend Sones. */
-	private final Set<Sone> friendSones = new HashSet<Sone>();
+	private final Set<Sone> friendSones = Collections.synchronizedSet(new HashSet<Sone>());
 
 	/** All posts. */
-	private final Set<Post> posts = new HashSet<Post>();
+	private final Set<Post> posts = Collections.synchronizedSet(new HashSet<Post>());
 
 	/** All replies. */
-	private final Set<Reply> replies = new HashSet<Reply>();
+	private final Set<Reply> replies = Collections.synchronizedSet(new HashSet<Reply>());
 
 	/** The IDs of all blocked Sones. */
-	private final Set<String> blockedSoneIds = new HashSet<String>();
+	private final Set<String> blockedSoneIds = Collections.synchronizedSet(new HashSet<String>());
 
 	/** The IDs of all liked posts. */
-	private final Set<String> likedPostIds = new HashSet<String>();
+	private final Set<String> likedPostIds = Collections.synchronizedSet(new HashSet<String>());
 
 	/** The IDs of all liked replies. */
-	private final Set<String> likedReplyIds = new HashSet<String>();
+	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
 
 	/** Modification count. */
 	private volatile long modificationCounter = 0;
@@ -146,7 +146,19 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setRequestUri(FreenetURI requestUri) {
-		this.requestUri = requestUri;
+		if (this.requestUri == null) {
+			this.requestUri = requestUri;
+			updateEditions();
+			return this;
+		}
+		if (!this.requestUri.equalsKeypair(requestUri)) {
+			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { requestUri, this.requestUri });
+			return this;
+		}
+		long latestEdition = requestUri.getEdition();
+		if ((latestEdition > this.requestUri.getEdition()) || (latestEdition > this.requestUri.getSuggestedEdition())) {
+			this.requestUri.setSuggestedEdition(latestEdition);
+		}
 		return this;
 	}
 
@@ -167,7 +179,19 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setInsertUri(FreenetURI insertUri) {
-		this.insertUri = insertUri;
+		if (this.insertUri == null) {
+			this.insertUri = insertUri;
+			updateEditions();
+			return this;
+		}
+		if (!this.insertUri.equalsKeypair(insertUri)) {
+			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { insertUri, this.insertUri });
+			return this;
+		}
+		long latestEdition = insertUri.getEdition();
+		if ((latestEdition > this.insertUri.getEdition()) || (latestEdition > this.insertUri.getSuggestedEdition())) {
+			this.insertUri.setSuggestedEdition(latestEdition);
+		}
 		return this;
 	}
 
@@ -589,16 +613,36 @@ public class Sone {
 	/**
 	 * Updates the suggested edition in both the request URI and the insert URI.
 	 *
-	 * @param requestUri
-	 *            The request URI that resulted from an insert
+	 * @param latestEdition
+	 *            The latest edition to update the URIs to
 	 */
-	public void updateUris(FreenetURI requestUri) {
-		/* TODO - check for the correct URI. */
-		long latestEdition = requestUri.getSuggestedEdition();
-		this.requestUri = this.requestUri.setSuggestedEdition(latestEdition);
-		if (this.insertUri != null) {
-			this.insertUri = this.insertUri.setSuggestedEdition(latestEdition);
+	public void updateUris(long latestEdition) {
+		if ((requestUri != null) && (requestUri.getEdition() < latestEdition)) {
+			requestUri = requestUri.setSuggestedEdition(latestEdition);
 		}
+		if ((insertUri != null) && (insertUri.getEdition() < latestEdition)) {
+			insertUri = insertUri.setSuggestedEdition(latestEdition);
+		}
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Updates the editions of the request URI and the insert URI (if latter is
+	 * not {@code null}) with the greater edition of either one.
+	 */
+	private void updateEditions() {
+		long requestEdition = 0;
+		if (requestUri != null) {
+			requestEdition = requestUri.getEdition();
+		}
+		long insertEdition = 0;
+		if (insertUri != null) {
+			insertEdition = insertUri.getEdition();
+		}
+		updateUris(Math.max(requestEdition, insertEdition));
 	}
 
 	//

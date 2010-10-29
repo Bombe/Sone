@@ -31,13 +31,13 @@ public class Post {
 	private final UUID id;
 
 	/** The Sone this post belongs to. */
-	private Sone sone;
+	private volatile Sone sone;
 
 	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
-	private long time;
+	private volatile long time;
 
 	/** The text of the post. */
-	private String text;
+	private volatile String text;
 
 	/**
 	 * Creates a new post.
