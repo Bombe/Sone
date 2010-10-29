@@ -30,6 +30,9 @@ import java.util.Set;
  */
 public class Identity {
 
+	/** The Web of Trust connector. */
+	protected final WebOfTrustConnector webOfTrustConnector;
+
 	/** The ID of the identity. */
 	private final String id;
 
@@ -48,6 +51,8 @@ public class Identity {
 	/**
 	 * Creates a new identity.
 	 *
+	 * @param webOfTrustConnector
+	 *            The Web of Trust connector
 	 * @param id
 	 *            The ID of the identity
 	 * @param nickname
@@ -55,7 +60,8 @@ public class Identity {
 	 * @param requestUri
 	 *            The request URI of the identity
 	 */
-	public Identity(String id, String nickname, String requestUri) {
+	public Identity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri) {
+		this.webOfTrustConnector = webOfTrustConnector;
 		this.id = id;
 		this.nickname = nickname;
 		this.requestUri = requestUri;
@@ -96,8 +102,30 @@ public class Identity {
 	 * Returns the contexts of the identity.
 	 *
 	 * @return The contexts of the identity
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public Set<String> getContexts() {
+	public Set<String> getContexts() throws PluginException {
+		return getContexts(false);
+	}
+
+	/**
+	 * Returns the contexts of the identity.
+	 *
+	 * @param forceReload
+	 *            {@code true} to force a reload of the contexts
+	 * @return The contexts of the identity
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
+	 */
+	public Set<String> getContexts(boolean forceReload) throws PluginException {
+		if (contexts.isEmpty() || forceReload) {
+			Set<String> contexts = webOfTrustConnector.loadIdentityContexts(this);
+			this.contexts.clear();
+			this.contexts.addAll(contexts);
+		}
 		return Collections.unmodifiableSet(contexts);
 	}
 

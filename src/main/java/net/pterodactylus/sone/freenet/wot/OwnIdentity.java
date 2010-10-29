@@ -31,6 +31,8 @@ public class OwnIdentity extends Identity {
 	/**
 	 * Creates a new own identity.
 	 *
+	 * @param webOfTrustConnector
+	 *            The Web of Trust connector
 	 * @param id
 	 *            The ID of the identity
 	 * @param nickname
@@ -40,8 +42,8 @@ public class OwnIdentity extends Identity {
 	 * @param insertUri
 	 *            The insert URI of the identity
 	 */
-	public OwnIdentity(String id, String nickname, String requestUri, String insertUri) {
-		super(id, nickname, requestUri);
+	public OwnIdentity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri, String insertUri) {
+		super(webOfTrustConnector, id, nickname, requestUri);
 		this.insertUri = insertUri;
 	}
 

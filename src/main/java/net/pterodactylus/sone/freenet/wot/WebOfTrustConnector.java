@@ -87,10 +87,34 @@ public class WebOfTrustConnector implements ConnectorListener {
 			String requestUri = fields.get("RequestURI" + ownIdentityCounter);
 			String insertUri = fields.get("InsertURI" + ownIdentityCounter);
 			String nickname = fields.get("Nickname" + ownIdentityCounter);
-			OwnIdentity ownIdentity = new OwnIdentity(id, nickname, requestUri, insertUri);
+			OwnIdentity ownIdentity = new OwnIdentity(this, id, nickname, requestUri, insertUri);
 			ownIdentities.add(ownIdentity);
 		}
 		return ownIdentities;
+	}
+
+	/**
+	 * Loads the contexts of the given identity.
+	 *
+	 * @param identity
+	 *            The identity to load the contexts for
+	 * @return The contexts of the identity
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public Set<String> loadIdentityContexts(Identity identity) throws PluginException {
+		Reply reply = performRequest("Identity", SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", identity.getId()).put("Identity", identity.getId()).get());
+		SimpleFieldSet fields = reply.getFields();
+		int contextCounter = -1;
+		Set<String> contexts = new HashSet<String>();
+		while (true) {
+			String context = fields.get("Context" + ++contextCounter);
+			if (context == null) {
+				break;
+			}
+			contexts.add(context);
+		}
+		return contexts;
 	}
 
 	//
