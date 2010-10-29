@@ -61,9 +61,9 @@ public class Core extends AbstractService {
 
 	static {
 		/* Sone of Sone. */
-		defaultSones.add("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/3");
+		defaultSones.add("USK@eRHt0ceFsHjRZ11j6dd68RSdIvfd8f9YjJLZ9lnhEyo,iJWjIWh6TkMZm1NY8qBranKTIuwsCPkVPG6T6c6ft-I,AQACAAE/Sone/4");
 		/* Sone of Bombe. */
-		defaultSones.add("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/24");
+		defaultSones.add("USK@RuW~uAO35Ipne896-1OmaVJNPuYE4ZIB5oZ5ziaU57A,7rV3uiyztXBDt03DCoRiNwiGjgFCJuznM9Okc1opURU,AQACAAE/Sone/29");
 	}
 
 	/**
