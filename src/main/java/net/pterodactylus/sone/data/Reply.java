@@ -31,16 +31,16 @@ public class Reply {
 	private final UUID id;
 
 	/** The Sone that posted this reply. */
-	private Sone sone;
+	private volatile Sone sone;
 
 	/** The Post this reply refers to. */
-	private Post post;
+	private volatile Post post;
 
 	/** The time of the reply. */
-	private long time;
+	private volatile long time;
 
 	/** The text of the reply. */
-	private String text;
+	private volatile String text;
 
 	/**
 	 * Creates a new reply.
