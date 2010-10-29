@@ -102,15 +102,18 @@ public class Identity {
 	}
 
 	/**
-	 * Returns the contexts of the identity.
+	 * Returns the contexts of the identity. If the contexts have not been
+	 * loaded yet, they will be loaded. If loading the contexts fails, an empty
+	 * set is returned.
 	 *
 	 * @return The contexts of the identity
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
 	 */
-	public Set<String> getContexts() throws PluginException {
-		return getContexts(false);
+	public Set<String> getContexts() {
+		try {
+			return getContexts(false);
+		} catch (PluginException pe1) {
+			return Collections.emptySet();
+		}
 	}
 
 	/**
@@ -142,7 +145,7 @@ public class Identity {
 	 *         {@code false} otherwise
 	 */
 	public boolean hasContext(String context) {
-		return contexts.contains(context);
+		return getContexts().contains(context);
 	}
 
 	/**
