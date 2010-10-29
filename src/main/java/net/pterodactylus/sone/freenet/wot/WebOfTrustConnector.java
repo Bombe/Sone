@@ -117,6 +117,49 @@ public class WebOfTrustConnector implements ConnectorListener {
 		return contexts;
 	}
 
+	/**
+	 * Loads all identities that the given identities trusts with a score of
+	 * more than 0.
+	 *
+	 * @param ownIdentity
+	 *            The own identity
+	 * @return All trusted identities
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity) throws PluginException {
+		return loadTrustedIdentities(ownIdentity, null);
+	}
+
+	/**
+	 * Loads all identities that the given identities trusts with a score of
+	 * more than 0 and the (optional) given context.
+	 *
+	 * @param ownIdentity
+	 *            The own identity
+	 * @param context
+	 *            The context to filter, or {@code null}
+	 * @return All trusted identities
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
+		Reply reply = performRequest("Identities", SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("TreeOwner", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).get());
+		SimpleFieldSet fields = reply.getFields();
+		Set<Identity> identities = new HashSet<Identity>();
+		int identityCounter = -1;
+		while (true) {
+			String id = fields.get("Identity" + ++identityCounter);
+			if (id == null) {
+				break;
+			}
+			String nickname = fields.get("Nickname" + identityCounter);
+			String requestUri = fields.get("RequestURI" + identityCounter);
+			identities.add(new Identity(this, id, nickname, requestUri));
+		}
+		return identities;
+	}
+
 	//
 	// PRIVATE ACTIONS
 	//
