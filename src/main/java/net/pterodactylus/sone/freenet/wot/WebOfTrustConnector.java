@@ -160,6 +160,34 @@ public class WebOfTrustConnector implements ConnectorListener {
 		return identities;
 	}
 
+	/**
+	 * Adds the given context to the given identity.
+	 *
+	 * @param ownIdentity
+	 *            The identity to add the context to
+	 * @param context
+	 *            The context to add
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public void addContext(OwnIdentity ownIdentity, String context) throws PluginException {
+		performRequest("ContextAdded", SimpleFieldSetConstructor.create().put("Message", "AddContext").put("Identity", ownIdentity.getId()).put("Context", context).get());
+	}
+
+	/**
+	 * Removes the given context from the given identity.
+	 *
+	 * @param ownIdentity
+	 *            The identity to remove the context from
+	 * @param context
+	 *            The context to remove
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public void removeContext(OwnIdentity ownIdentity, String context) throws PluginException {
+		performRequest("ContextRemoved", SimpleFieldSetConstructor.create().put("Message", "RemoveContext").put("Identity", ownIdentity.getId()).put("Context", context).get());
+	}
+
 	//
 	// PRIVATE ACTIONS
 	//
