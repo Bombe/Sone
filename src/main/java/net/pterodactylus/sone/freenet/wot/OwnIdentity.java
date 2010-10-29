@@ -84,6 +84,30 @@ public class OwnIdentity extends Identity {
 		}
 	}
 
+	/**
+	 * Sets the property with the given name to the given value.
+	 *
+	 * @param name
+	 *            The name of the property to set
+	 * @param value
+	 *            The new value of the property
+	 */
+	public void setProperty(String name, String value) {
+		properties.put(name, value);
+		/* TODO - set property. */
+	}
+
+	/**
+	 * Removes the property with the given name.
+	 *
+	 * @param name
+	 *            The name of the property to remove
+	 */
+	public void removeProperty(String name) {
+		properties.remove(name);
+		/* TODO - remove property. */
+	}
+
 	//
 	// OBJECT METHODS
 	//
