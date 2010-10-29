@@ -257,9 +257,10 @@ public class SoneDownloader extends AbstractService {
 		}
 
 		String soneInsertUri = soneXml.getValue("insert-uri", null);
-		if (soneInsertUri != null) {
+		if ((soneInsertUri != null) && (sone.getInsertUri() == null)) {
 			try {
 				sone.setInsertUri(new FreenetURI(soneInsertUri));
+				sone.updateUris(Math.max(sone.getRequestUri().getSuggestedEdition(), sone.getInsertUri().getSuggestedEdition()));
 			} catch (MalformedURLException mue1) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone " + sone + " has invalid insert URI: " + soneInsertUri, mue1);
