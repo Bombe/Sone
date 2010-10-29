@@ -67,7 +67,7 @@ public class OwnIdentity extends Identity {
 	 *            The context to add
 	 */
 	public void addContext(String context) {
-		if (contexts.add(context)) {
+		if (getContexts().add(context)) {
 			/* TODO - add. */
 		}
 	}
@@ -79,7 +79,7 @@ public class OwnIdentity extends Identity {
 	 *            The context to remove
 	 */
 	public void removeContext(String context) {
-		if (contexts.remove(context)) {
+		if (getContexts().remove(context)) {
 			/* TODO - remove */
 		}
 	}
