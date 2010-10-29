@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
+import net.pterodactylus.sone.freenet.wot.PluginConnector;
+import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -158,6 +160,10 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		/* create freenet interface. */
 		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode(), pluginRespirator.getHLSimpleClient());
 
+		/* create web of trust connector. */
+		PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
+		WebOfTrustConnector webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
+
 		/* create the web interface. */
 		webInterface = new WebInterface(this);
 
@@ -165,6 +171,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		core = new Core();
 		core.configuration(configuration);
 		core.freenetInterface(freenetInterface);
+		core.setWebOfTrustConnector(webOfTrustConnector);
 
 		/* start core! */
 		boolean startupFailed = true;

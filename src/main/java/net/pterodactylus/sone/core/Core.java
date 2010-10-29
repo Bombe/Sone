@@ -40,6 +40,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.filter.Filter;
@@ -97,6 +98,9 @@ public class Core extends AbstractService {
 
 	/** Interface to freenet. */
 	private FreenetInterface freenetInterface;
+
+	/** The WoT connector. */
+	private WebOfTrustConnector webOfTrustConnector;
 
 	/** The Sone downloader. */
 	private SoneDownloader soneDownloader;
@@ -167,6 +171,27 @@ public class Core extends AbstractService {
 		this.freenetInterface = freenetInterface;
 		soneDownloader = new SoneDownloader(this, freenetInterface);
 		soneDownloader.start();
+		return this;
+	}
+
+	/**
+	 * Returns the Web of Trust connector.
+	 *
+	 * @return The Web of Trust connector
+	 */
+	public WebOfTrustConnector getWebOfTrustConnector() {
+		return webOfTrustConnector;
+	}
+
+	/**
+	 * Sets the Web of Trust connector.
+	 *
+	 * @param webOfTrustConnector
+	 *            The Web of Trust connector
+	 * @return This core (for method chaining)
+	 */
+	public Core setWebOfTrustConnector(WebOfTrustConnector webOfTrustConnector) {
+		this.webOfTrustConnector = webOfTrustConnector;
 		return this;
 	}
 
