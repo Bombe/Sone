@@ -65,10 +65,13 @@ public class OwnIdentity extends Identity {
 	 *
 	 * @param context
 	 *            The context to add
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public void addContext(String context) {
+	public void addContext(String context) throws PluginException {
 		if (getContexts().add(context)) {
-			/* TODO - add. */
+			webOfTrustConnector.addContext(this, context);
 		}
 	}
 
@@ -77,10 +80,13 @@ public class OwnIdentity extends Identity {
 	 *
 	 * @param context
 	 *            The context to remove
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public void removeContext(String context) {
+	public void removeContext(String context) throws PluginException {
 		if (getContexts().remove(context)) {
-			/* TODO - remove */
+			webOfTrustConnector.removeContext(this, context);
 		}
 	}
 
