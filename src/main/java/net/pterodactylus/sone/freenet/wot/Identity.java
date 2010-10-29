@@ -45,6 +45,9 @@ public class Identity {
 	/** The contexts of the identity. */
 	protected final Set<String> contexts = Collections.synchronizedSet(new HashSet<String>());
 
+	/** Whether the contexts have already been loaded. */
+	private volatile boolean contextsLoaded = false;
+
 	/** The properties of the identity. */
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
@@ -121,8 +124,9 @@ public class Identity {
 	 *             plugin
 	 */
 	public Set<String> getContexts(boolean forceReload) throws PluginException {
-		if (contexts.isEmpty() || forceReload) {
+		if (!contextsLoaded || forceReload) {
 			Set<String> contexts = webOfTrustConnector.loadIdentityContexts(this);
+			contextsLoaded = true;
 			this.contexts.clear();
 			this.contexts.addAll(contexts);
 		}
