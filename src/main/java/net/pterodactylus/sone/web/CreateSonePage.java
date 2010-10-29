@@ -65,7 +65,7 @@ public class CreateSonePage extends SoneTemplatePage {
 		String insertUri = null;
 		if (request.getMethod() == Method.POST) {
 			name = request.getHttpRequest().getPartAsStringFailsafe("name", 100);
-			if (request.getHttpRequest().getParam("create-from-uri").length() > 0) {
+			if (request.getHttpRequest().isPartSet("create-from-uri")) {
 				requestUri = request.getHttpRequest().getPartAsStringFailsafe("request-uri", 256);
 				insertUri = request.getHttpRequest().getPartAsStringFailsafe("insert-uri", 256);
 			}
