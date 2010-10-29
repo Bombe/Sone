@@ -70,9 +70,7 @@ public class OwnIdentity extends Identity {
 	 *             plugin
 	 */
 	public void addContext(String context) throws PluginException {
-		if (getContexts().add(context)) {
-			webOfTrustConnector.addContext(this, context);
-		}
+		webOfTrustConnector.addContext(this, context);
 	}
 
 	/**
@@ -85,9 +83,7 @@ public class OwnIdentity extends Identity {
 	 *             plugin
 	 */
 	public void removeContext(String context) throws PluginException {
-		if (getContexts().remove(context)) {
-			webOfTrustConnector.removeContext(this, context);
-		}
+		webOfTrustConnector.removeContext(this, context);
 	}
 
 	/**

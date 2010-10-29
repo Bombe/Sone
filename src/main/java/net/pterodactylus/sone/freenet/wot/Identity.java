@@ -19,7 +19,6 @@ package net.pterodactylus.sone.freenet.wot;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,12 +40,6 @@ public class Identity {
 
 	/** The request URI of the identity. */
 	private final String requestUri;
-
-	/** The contexts of the identity. */
-	protected final Set<String> contexts = Collections.synchronizedSet(new HashSet<String>());
-
-	/** Whether the contexts have already been loaded. */
-	private volatile boolean contextsLoaded = false;
 
 	/** The properties of the identity. */
 	protected final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
@@ -107,33 +100,12 @@ public class Identity {
 	 * set is returned.
 	 *
 	 * @return The contexts of the identity
-	 */
-	public Set<String> getContexts() {
-		try {
-			return getContexts(false);
-		} catch (PluginException pe1) {
-			return Collections.emptySet();
-		}
-	}
-
-	/**
-	 * Returns the contexts of the identity.
-	 *
-	 * @param forceReload
-	 *            {@code true} to force a reload of the contexts
-	 * @return The contexts of the identity
 	 * @throws PluginException
 	 *             if an error occured communicating with the Web of Trust
 	 *             plugin
 	 */
-	public Set<String> getContexts(boolean forceReload) throws PluginException {
-		if (!contextsLoaded || forceReload) {
-			Set<String> contexts = webOfTrustConnector.loadIdentityContexts(this);
-			contextsLoaded = true;
-			this.contexts.clear();
-			this.contexts.addAll(contexts);
-		}
-		return Collections.unmodifiableSet(contexts);
+	public Set<String> getContexts() throws PluginException {
+		return webOfTrustConnector.loadIdentityContexts(this);
 	}
 
 	/**
@@ -143,8 +115,11 @@ public class Identity {
 	 *            The context to check for
 	 * @return {@code true} if this identity has the given context,
 	 *         {@code false} otherwise
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public boolean hasContext(String context) {
+	public boolean hasContext(String context) throws PluginException {
 		return getContexts().contains(context);
 	}
 
