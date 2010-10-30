@@ -24,7 +24,6 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,8 +44,8 @@ public class Sone {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Sone.class);
 
-	/** A GUID for this Sone. */
-	private final UUID id;
+	/** The ID of this Sone. */
+	private final String id;
 
 	/** The name of this Sone. */
 	private volatile String name;
@@ -92,7 +91,7 @@ public class Sone {
 	 *            The ID of this Sone
 	 */
 	public Sone(String id) {
-		this.id = UUID.fromString(id);
+		this.id = id;
 	}
 
 	//
@@ -105,7 +104,7 @@ public class Sone {
 	 * @return The ID of this Sone
 	 */
 	public String getId() {
-		return id.toString();
+		return id;
 	}
 
 	/**
