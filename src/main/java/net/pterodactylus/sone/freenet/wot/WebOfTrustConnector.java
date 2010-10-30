@@ -75,7 +75,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if the own identities can not be loaded
 	 */
 	public Set<OwnIdentity> loadAllOwnIdentities() throws PluginException {
-		Reply reply = performRequest("OwnIdentities", SimpleFieldSetConstructor.create().put("Message", "GetOwnIdentities").get());
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetOwnIdentities").get(), "OwnIdentities");
 		SimpleFieldSet fields = reply.getFields();
 		int ownIdentityCounter = -1;
 		Set<OwnIdentity> ownIdentities = new HashSet<OwnIdentity>();
@@ -103,7 +103,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<String> loadIdentityContexts(Identity identity) throws PluginException {
-		Reply reply = performRequest("Identity", SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", identity.getId()).put("Identity", identity.getId()).get());
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", identity.getId()).put("Identity", identity.getId()).get(), "Identity");
 		SimpleFieldSet fields = reply.getFields();
 		int contextCounter = -1;
 		Set<String> contexts = new HashSet<String>();
@@ -144,7 +144,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
-		Reply reply = performRequest("Identities", SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("TreeOwner", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).get());
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("TreeOwner", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).get(), "Identities");
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<Identity>();
 		int identityCounter = -1;
@@ -171,7 +171,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public void addContext(OwnIdentity ownIdentity, String context) throws PluginException {
-		performRequest("ContextAdded", SimpleFieldSetConstructor.create().put("Message", "AddContext").put("Identity", ownIdentity.getId()).put("Context", context).get());
+		performRequest(SimpleFieldSetConstructor.create().put("Message", "AddContext").put("Identity", ownIdentity.getId()).put("Context", context).get(), "ContextAdded");
 	}
 
 	/**
@@ -185,7 +185,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public void removeContext(OwnIdentity ownIdentity, String context) throws PluginException {
-		performRequest("ContextRemoved", SimpleFieldSetConstructor.create().put("Message", "RemoveContext").put("Identity", ownIdentity.getId()).put("Context", context).get());
+		performRequest(SimpleFieldSetConstructor.create().put("Message", "RemoveContext").put("Identity", ownIdentity.getId()).put("Context", context).get(), "ContextRemoved");
 	}
 
 	//
@@ -196,36 +196,38 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * Sends a request containing the given fields and waits for the target
 	 * message.
 	 *
-	 * @param targetMessage
-	 *            The message of the reply to wait for
 	 * @param fields
 	 *            The fields of the message
+	 * @param targetMessages
+	 *            The messages of the reply to wait for
 	 * @return The reply message
 	 * @throws PluginException
 	 *             if the request could not be sent
 	 */
-	private Reply performRequest(String targetMessage, SimpleFieldSet fields) throws PluginException {
-		return performRequest(targetMessage, fields, null);
+	private Reply performRequest(SimpleFieldSet fields, String... targetMessages) throws PluginException {
+		return performRequest(fields, null, targetMessages);
 	}
 
 	/**
 	 * Sends a request containing the given fields and waits for the target
 	 * message.
 	 *
-	 * @param targetMessage
-	 *            The message of the reply to wait for
 	 * @param fields
 	 *            The fields of the message
 	 * @param data
 	 *            The payload of the message
+	 * @param targetMessages
+	 *            The messages of the reply to wait for
 	 * @return The reply message
 	 * @throws PluginException
 	 *             if the request could not be sent
 	 */
-	private Reply performRequest(String targetMessage, SimpleFieldSet fields, Bucket data) throws PluginException {
+	private Reply performRequest(SimpleFieldSet fields, Bucket data, String... targetMessages) throws PluginException {
 		@SuppressWarnings("synthetic-access")
 		Reply reply = new Reply();
-		replies.put(targetMessage, reply);
+		for (String targetMessage : targetMessages) {
+			replies.put(targetMessage, reply);
+		}
 		synchronized (reply) {
 			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
 			try {
@@ -233,6 +235,9 @@ public class WebOfTrustConnector implements ConnectorListener {
 			} catch (InterruptedException ie1) {
 				logger.log(Level.WARNING, "Got interrupted while waiting for reply on GetOwnIdentities.", ie1);
 			}
+		}
+		for (String targetMessage : targetMessages) {
+			replies.remove(targetMessage);
 		}
 		return reply;
 	}
