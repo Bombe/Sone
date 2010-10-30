@@ -93,10 +93,12 @@ public class OwnIdentity extends Identity {
 	 *            The name of the property to set
 	 * @param value
 	 *            The new value of the property
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public void setProperty(String name, String value) {
-		properties.put(name, value);
-		/* TODO - set property. */
+	public void setProperty(String name, String value) throws PluginException {
+		webOfTrustConnector.setProperty(this, name, value);
 	}
 
 	/**
@@ -104,10 +106,12 @@ public class OwnIdentity extends Identity {
 	 *
 	 * @param name
 	 *            The name of the property to remove
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public void removeProperty(String name) {
-		properties.remove(name);
-		/* TODO - remove property. */
+	public void removeProperty(String name) throws PluginException {
+		webOfTrustConnector.removeProperty(this, name);
 	}
 
 	//

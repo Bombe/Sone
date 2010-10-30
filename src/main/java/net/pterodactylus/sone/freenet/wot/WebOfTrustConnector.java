@@ -188,6 +188,52 @@ public class WebOfTrustConnector implements ConnectorListener {
 		performRequest(SimpleFieldSetConstructor.create().put("Message", "RemoveContext").put("Identity", ownIdentity.getId()).put("Context", context).get(), "ContextRemoved");
 	}
 
+	/**
+	 * Returns the value of the property with the given name.
+	 *
+	 * @param identity
+	 *            The identity whose properties to check
+	 * @param name
+	 *            The name of the property to return
+	 * @return The value of the property, or {@code null} if there is no value
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public String getProperty(Identity identity, String name) throws PluginException {
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetProperty").put("Identity", identity.getId()).put("Property", name).get(), "PropertyValue", "Error");
+		return reply.getFields().get("Property");
+	}
+
+	/**
+	 * Sets the property with the given name to the given value.
+	 *
+	 * @param ownIdentity
+	 *            The identity to set the property on
+	 * @param name
+	 *            The name of the property to set
+	 * @param value
+	 *            The value to set
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public void setProperty(OwnIdentity ownIdentity, String name, String value) throws PluginException {
+		performRequest(SimpleFieldSetConstructor.create().put("Message", "SetProperty").put("Identity", ownIdentity.getId()).put("Property", name).put("Value", value).get(), "PropertyAdded");
+	}
+
+	/**
+	 * Removes the property with the given name.
+	 *
+	 * @param ownIdentity
+	 *            The identity to remove the property from
+	 * @param name
+	 *            The name of the property to remove
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public void removeProperty(OwnIdentity ownIdentity, String name) throws PluginException {
+		performRequest(SimpleFieldSetConstructor.create().put("Message", "RemoveProperty").put("Identity", ownIdentity.getId()).put("Property", name).get(), "PropertyRemoved");
+	}
+
 	//
 	// PRIVATE ACTIONS
 	//

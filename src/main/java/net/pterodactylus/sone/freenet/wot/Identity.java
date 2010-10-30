@@ -17,9 +17,6 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -40,9 +37,6 @@ public class Identity {
 
 	/** The request URI of the identity. */
 	private final String requestUri;
-
-	/** The properties of the identity. */
-	protected final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
 	/**
 	 * Creates a new identity.
@@ -124,24 +118,18 @@ public class Identity {
 	}
 
 	/**
-	 * Returns the properties of the identity.
-	 *
-	 * @return The properties of the identity
-	 */
-	public Map<String, String> getProperties() {
-		return Collections.unmodifiableMap(properties);
-	}
-
-	/**
 	 * Returns the value of the property with the given name.
 	 *
 	 * @param name
 	 *            The name of the property
 	 * @return The value of the property, or {@code null} if there is no such
 	 *         property
+	 * @throws PluginException
+	 *             if an error occured communicating with the Web of Trust
+	 *             plugin
 	 */
-	public String getProperty(String name) {
-		return properties.get(name);
+	public String getProperty(String name) throws PluginException {
+		return webOfTrustConnector.getProperty(this, name);
 	}
 
 	//
