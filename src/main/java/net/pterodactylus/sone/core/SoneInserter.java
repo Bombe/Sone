@@ -25,7 +25,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -201,7 +200,6 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", new ArrayList<Post>(sone.getPosts()));
 			soneProperties.put("replies", new HashSet<Reply>(sone.getReplies()));
-			soneProperties.put("blockedSoneIds", new HashSet<String>(sone.getBlockedSoneIds()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likeReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 		}
@@ -267,8 +265,6 @@ public class SoneInserter extends AbstractService {
 			} finally {
 				Closer.close(templateInputStreamReader);
 			}
-			@SuppressWarnings("unchecked")
-			final Set<String> blockedSoneIds = (Set<String>) soneProperties.get("blockedSoneIds");
 			Collection<Sone> knownSones = Filters.filteredCollection(core.getKnownSones(), new Filter<Sone>() {
 
 				/**
@@ -276,7 +272,7 @@ public class SoneInserter extends AbstractService {
 				 */
 				@Override
 				public boolean filterObject(Sone object) {
-					return !blockedSoneIds.contains(object.getId()) && !object.getId().equals(soneProperties.get("id"));
+					return !object.getId().equals(soneProperties.get("id"));
 				}
 			});
 

@@ -73,11 +73,6 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("current")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return (currentSone != null) && currentSone.equals(sone);
-		} else if (member.equals("blocked")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return (currentSone != null) && currentSone.isSoneBlocked(sone.getId());
-		} else if (member.equals("blacklisted")) {
-			return core.isBlacklistedSone(sone);
 		} else if (member.equals("modified")) {
 			return sone.getModificationCounter() > 0;
 		} else if (member.equals("status")) {

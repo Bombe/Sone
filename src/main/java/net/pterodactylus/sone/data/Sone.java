@@ -73,9 +73,6 @@ public class Sone {
 	/** All replies. */
 	private final Set<Reply> replies = Collections.synchronizedSet(new HashSet<Reply>());
 
-	/** The IDs of all blocked Sones. */
-	private final Set<String> blockedSoneIds = Collections.synchronizedSet(new HashSet<String>());
-
 	/** The IDs of all liked posts. */
 	private final Set<String> likedPostIds = Collections.synchronizedSet(new HashSet<String>());
 
@@ -415,52 +412,6 @@ public class Sone {
 	 */
 	public synchronized void removeReply(Reply reply) {
 		if (reply.getSone().equals(this) && replies.remove(reply)) {
-			modificationCounter++;
-		}
-	}
-
-	/**
-	 * Returns the IDs of all blocked Sones. These Sones will not propagated
-	 * using the “known Sones” mechanism.
-	 *
-	 * @return The IDs of all blocked Sones
-	 */
-	public Set<String> getBlockedSoneIds() {
-		return Collections.unmodifiableSet(blockedSoneIds);
-	}
-
-	/**
-	 * Returns whether the given Sone ID is blocked.
-	 *
-	 * @param soneId
-	 *            The Sone ID to check
-	 * @return {@code true} if the given Sone ID is blocked, {@code false}
-	 *         otherwise
-	 */
-	public boolean isSoneBlocked(String soneId) {
-		return blockedSoneIds.contains(soneId);
-	}
-
-	/**
-	 * Adds the given ID to the list of blocked IDs.
-	 *
-	 * @param soneId
-	 *            The Sone ID to block
-	 */
-	public synchronized void addBlockedSoneId(String soneId) {
-		if (blockedSoneIds.add(soneId)) {
-			modificationCounter++;
-		}
-	}
-
-	/**
-	 * Removes the given ID from the list of blocked IDs.
-	 *
-	 * @param soneId
-	 *            The Sone ID to unblock
-	 */
-	public synchronized void removeBlockedSoneId(String soneId) {
-		if (blockedSoneIds.remove(soneId)) {
 			modificationCounter++;
 		}
 	}

@@ -10,45 +10,18 @@
 	<div class="short-request-uri"><% sone.requestUri|substring start=4 length=43|html></div>
 	<div class="hidden"><% sone.blacklisted></div>
 	<%if ! sone.current>
-		<%if ! sone.blacklisted>
-			<form class="blacklist" action="blacklistSone.html" method="post">
+		<%ifnull ! currentSone>
+			<form class="unfollow<%if ! sone.friend> hidden<%/if>" action="unfollowSone.html" method="post">
 				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 				<input type="hidden" name="sone" value="<% sone.id|html>" />
 				<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-				<button type="submit"><%= View.Sone.Button.BlacklistSone|l10n|html></button>
+				<button type="submit"><%= View.Sone.Button.UnfollowSone|l10n|html></button>
 			</form>
-			<%ifnull ! currentSone>
-				<form class="unfollow<%if ! sone.friend> hidden<%/if>" action="unfollowSone.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="sone" value="<% sone.id|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<button type="submit"><%= View.Sone.Button.UnfollowSone|l10n|html></button>
-				</form>
-				<form class="follow<%if sone.friend> hidden<%/if>" action="followSone.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="sone" value="<% sone.id|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<button type="submit"><%= View.Sone.Button.FollowSone|l10n|html></button>
-				</form>
-				<form class="unblock<%if ! sone.blocked> hidden<%/if>" action="unblockSone.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="sone" value="<% sone.id|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<button type="submit"><%= View.Sone.Button.UnblockSone|l10n|html></button>
-				</form>
-				<form class="block<%if sone.blocked> hidden<%/if>" action="blockSone.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="sone" value="<% sone.id|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<button type="submit"><%= View.Sone.Button.BlockSone|l10n|html></button>
-				</form>
-			<%/if>
-		<%else>
-			<form class="unblacklist" action="unblacklistSone.html" method="post">
+			<form class="follow<%if sone.friend> hidden<%/if>" action="followSone.html" method="post">
 				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 				<input type="hidden" name="sone" value="<% sone.id|html>" />
 				<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-				<button type="submit"><%= View.Sone.Button.UnblacklistSone|l10n|html></button>
+				<button type="submit"><%= View.Sone.Button.FollowSone|l10n|html></button>
 			</form>
 		<%/if>
 	<%/if>

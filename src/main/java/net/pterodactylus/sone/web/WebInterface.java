@@ -40,8 +40,6 @@ import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
-import net.pterodactylus.sone.web.ajax.BlacklistSoneAjaxPage;
-import net.pterodactylus.sone.web.ajax.BlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
@@ -49,8 +47,6 @@ import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetSoneStatusPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
-import net.pterodactylus.sone.web.ajax.UnblacklistSoneAjaxPage;
-import net.pterodactylus.sone.web.ajax.UnblockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
@@ -205,8 +201,6 @@ public class WebInterface extends AbstractService {
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
 		Template backupProfileTemplate = templateFactory.createTemplate(createReader("/templates/backup.xml"));
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
-		Template blockSoneTemplate = templateFactory.createTemplate(createReader("/templates/blockSone.html"));
-		Template unblockSoneTemplate = templateFactory.createTemplate(createReader("/templates/unblockSone.html"));
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
 		Template likePostTemplate = templateFactory.createTemplate(createReader("/templates/like.html"));
 		Template unlikePostTemplate = templateFactory.createTemplate(createReader("/templates/unlike.html"));
@@ -218,9 +212,6 @@ public class WebInterface extends AbstractService {
 		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
-		Template blacklistTemplate = templateFactory.createTemplate(createReader("/templates/blacklist.html"));
-		Template blacklistSoneTemplate = templateFactory.createTemplate(createReader("/templates/blacklistSone.html"));
-		Template unblacklistSoneTemplate = templateFactory.createTemplate(createReader("/templates/unblacklistSone.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
 		Template helpTemplate = templateFactory.createTemplate(createReader("/templates/help.html"));
 
@@ -236,8 +227,6 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlockSonePage(blockSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblockSonePage(unblockSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewPostPage(viewPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikePage(likePostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikePage(unlikePostTemplate, this)));
@@ -249,9 +238,6 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(logoutTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlacklistPage(blacklistTemplate, this), "Blacklist"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlacklistSonePage(blacklistSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblacklistSonePage(unblacklistSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("help.html", helpTemplate, "Page.Help.Title", this), "Help"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
@@ -264,10 +250,6 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlockSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblockSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BlacklistSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnblacklistSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLikesAjaxPage(this)));

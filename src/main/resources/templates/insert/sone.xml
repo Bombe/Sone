@@ -47,14 +47,4 @@
 		<%/foreach>
 	</reply-likes>
 
-	<known-sones>
-		<%foreach knownSones sone>
-		<known-sone>
-			<sone-id><% sone.id|xml></sone-id>
-			<sone-key><% sone.requestUri|xml></sone-key>
-			<sone-name><% sone.name|xml></sone-name>
-		</known-sone>
-		<%/foreach>
-	</known-sones>
-
 </sone>
