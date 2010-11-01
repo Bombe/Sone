@@ -17,13 +17,11 @@
 
 package net.pterodactylus.sone.template;
 
-import java.util.Collections;
 import java.util.Set;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.freenet.wot.PluginException;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -59,11 +57,7 @@ public class IdentityAccessor extends ReflectionAccessor {
 			int minLength = -1;
 			boolean found = false;
 			Set<OwnIdentity> ownIdentities = null;
-			try {
-				ownIdentities = core.getWebOfTrustConnector().loadAllOwnIdentities();
-			} catch (PluginException e) {
-				ownIdentities = Collections.emptySet();
-			}
+			ownIdentities = core.getIdentityManager().getAllOwnIdentities();
 			do {
 				boolean unique = true;
 				String abbreviatedWantedNickname = getAbbreviatedNickname(identity, ++minLength);
