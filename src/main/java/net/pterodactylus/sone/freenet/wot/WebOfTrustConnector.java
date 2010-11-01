@@ -215,6 +215,17 @@ public class WebOfTrustConnector implements ConnectorListener {
 		performRequest(SimpleFieldSetConstructor.create().put("Message", "RemoveProperty").put("Identity", ownIdentity.getId()).put("Property", name).get(), "PropertyRemoved");
 	}
 
+	/**
+	 * Pings the Web of Trust plugin. If the plugin can not be reached, a
+	 * {@link PluginException} is thrown.
+	 *
+	 * @throws PluginException
+	 *             if the plugin is not loaded
+	 */
+	public void ping() throws PluginException {
+		performRequest(SimpleFieldSetConstructor.create().put("Message", "Ping").get(), "Pong");
+	}
+
 	//
 	// PRIVATE ACTIONS
 	//
