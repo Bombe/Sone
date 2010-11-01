@@ -41,6 +41,20 @@ import freenet.keys.FreenetURI;
  */
 public class Sone {
 
+	/** comparator that sorts Sones by their nice name. */
+	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
+
+		@Override
+		public int compare(Sone leftSone, Sone rightSone) {
+			int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
+			if (diff != 0) {
+				return diff;
+			}
+			return leftSone.getId().compareToIgnoreCase(rightSone.getId());
+		}
+
+	};
+
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Sone.class);
 
