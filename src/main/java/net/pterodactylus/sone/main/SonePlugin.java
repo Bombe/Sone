@@ -20,12 +20,12 @@ package net.pterodactylus.sone.main;
 import java.io.File;
 import java.util.Collections;
 import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
+import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.PluginConnector;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.web.WebInterface;
@@ -34,7 +34,6 @@ import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
 import net.pterodactylus.util.config.XMLConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
 import freenet.client.async.DatabaseDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
@@ -58,30 +57,34 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	static {
 		/* initialize logging. */
 		Logging.setup("sone");
-		Logging.addLoggingListener(new LoggingListener() {
-
-			@Override
-			public void logged(LogRecord logRecord) {
-				Class<?> loggerClass = Logging.getLoggerClass(logRecord.getLoggerName());
-				int recordLevel = logRecord.getLevel().intValue();
-				if (recordLevel < Level.FINE.intValue()) {
-					freenet.support.Logger.debug(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
-				} else if (recordLevel < Level.INFO.intValue()) {
-					freenet.support.Logger.minor(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
-				} else if (recordLevel < Level.WARNING.intValue()) {
-					freenet.support.Logger.normal(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
-				} else if (recordLevel < Level.SEVERE.intValue()) {
-					freenet.support.Logger.warning(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
-				} else {
-					freenet.support.Logger.error(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
-				}
-			}
-
-		});
+		Logging.setupConsoleLogging();
+		/*
+		 * Logging.addLoggingListener(new LoggingListener() {
+		 * @Override public void logged(LogRecord logRecord) { Class<?>
+		 * loggerClass = Logging.getLoggerClass(logRecord.getLoggerName()); int
+		 * recordLevel = logRecord.getLevel().intValue(); if (recordLevel <
+		 * Level.FINE.intValue()) { freenet.support.Logger.debug(loggerClass,
+		 * String.format(logRecord.getMessage(), logRecord.getParameters()),
+		 * logRecord.getThrown()); } else if (recordLevel <
+		 * Level.INFO.intValue()) { freenet.support.Logger.minor(loggerClass,
+		 * String.format(logRecord.getMessage(), logRecord.getParameters()),
+		 * logRecord.getThrown()); } else if (recordLevel <
+		 * Level.WARNING.intValue()) {
+		 * freenet.support.Logger.normal(loggerClass,
+		 * String.format(logRecord.getMessage(), logRecord.getParameters()),
+		 * logRecord.getThrown()); } else if (recordLevel <
+		 * Level.SEVERE.intValue()) {
+		 * freenet.support.Logger.warning(loggerClass,
+		 * String.format(logRecord.getMessage(), logRecord.getParameters()),
+		 * logRecord.getThrown()); } else {
+		 * freenet.support.Logger.error(loggerClass,
+		 * String.format(logRecord.getMessage(), logRecord.getParameters()),
+		 * logRecord.getThrown()); } } });
+		 */
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version("RC3", 0, 1);
+	public static final Version VERSION = new Version("RC1", 0, 2);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);
@@ -100,6 +103,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 	/** The plugin store. */
 	private PluginStore pluginStore;
+
+	/** The identity manager. */
+	private IdentityManager identityManager;
 
 	//
 	// ACCESSORS
@@ -163,21 +169,24 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		/* create web of trust connector. */
 		PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
 		WebOfTrustConnector webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
+		identityManager = new IdentityManager(webOfTrustConnector);
+		identityManager.setContext("Sone");
 
 		/* create the web interface. */
 		webInterface = new WebInterface(this);
 
 		/* create core. */
-		core = new Core();
-		core.configuration(configuration);
-		core.freenetInterface(freenetInterface);
-		core.setWebOfTrustConnector(webOfTrustConnector);
+		core = new Core(configuration, freenetInterface, identityManager);
+
+		/* create the identity manager. */
+		identityManager.addIdentityListener(core);
 
 		/* start core! */
 		boolean startupFailed = true;
 		try {
 			core.start();
 			webInterface.start();
+			identityManager.start();
 			startupFailed = false;
 		} finally {
 			if (startupFailed) {
@@ -202,6 +211,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 			/* stop the core. */
 			core.stop();
+
+			/* stop the identity manager. */
+			identityManager.stop();
 
 			/* TODO wait for core to stop? */
 			try {

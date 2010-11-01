@@ -127,7 +127,7 @@ public class SoneDownloader extends AbstractService {
 			logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
 			Sone parsedSone = parseSone(sone, fetchResult, requestUri);
 			if (parsedSone != null) {
-				core.addSone(parsedSone);
+				core.updateSone(parsedSone);
 			}
 		} finally {
 			core.setSoneStatus(sone, (sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
@@ -166,29 +166,17 @@ public class SoneDownloader extends AbstractService {
 	}
 
 	/**
-	 * Parses a Sone from the given input stream.
-	 *
-	 * @param soneInputStream
-	 *            The input stream to parse the Sone from
-	 * @return The parsed Sone
-	 */
-	public Sone parseSone(InputStream soneInputStream) {
-		return parseSone(null, soneInputStream);
-	}
-
-	/**
 	 * Parses a Sone from the given input stream and updates the given Sone, or
 	 * creates a new Sone.
 	 *
-	 * @param originalSone
-	 *            The Sone to update (may be {@code null})
+	 * @param sone
+	 *            The Sone to update
 	 * @param soneInputStream
 	 *            The input stream to parse the Sone from
 	 * @return The parsed Sone
 	 */
-	public Sone parseSone(Sone originalSone, InputStream soneInputStream) {
+	public Sone parseSone(Sone sone, InputStream soneInputStream) {
 		/* TODO - impose a size limit? */
-		Sone sone;
 
 		Document document;
 		/* XML parsing is not thread-safe. */
@@ -197,7 +185,7 @@ public class SoneDownloader extends AbstractService {
 		}
 		if (document == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Could not parse XML for Sone %s!", new Object[] { originalSone });
+			logger.log(Level.WARNING, "Could not parse XML for Sone %s!", new Object[] { sone });
 			return null;
 		}
 		SimpleXML soneXml;
@@ -205,31 +193,9 @@ public class SoneDownloader extends AbstractService {
 			soneXml = SimpleXML.fromDocument(document);
 		} catch (NullPointerException npe1) {
 			/* for some reason, invalid XML can cause NPEs. */
-			logger.log(Level.WARNING, "XML for Sone " + originalSone + " can not be parsed!", npe1);
+			logger.log(Level.WARNING, "XML for Sone " + sone + " can not be parsed!", npe1);
 			return null;
 		}
-
-		/* check ID. */
-		String soneId = soneXml.getValue("id", null);
-		if ((originalSone != null) && !originalSone.getId().equals(soneId)) {
-			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded ID for Sone %s (%s) does not match known ID (%s)!", new Object[] { originalSone, originalSone.getId(), soneId });
-			return null;
-		}
-
-		/* load Sone from core. */
-		sone = originalSone;
-		if (sone == null) {
-			sone = core.getSone(soneId);
-		}
-
-		String soneName = soneXml.getValue("name", null);
-		if (soneName == null) {
-			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded name for Sone %s was null!", new Object[] { sone });
-			return null;
-		}
-		sone.setName(soneName);
 
 		String soneTime = soneXml.getValue("time", null);
 		if (soneTime == null) {
@@ -364,32 +330,6 @@ public class SoneDownloader extends AbstractService {
 			}
 		}
 
-		/* parse known Sones. */
-		SimpleXML knownSonesXml = soneXml.getNode("known-sones");
-		Set<Sone> knownSones = new HashSet<Sone>();
-		if (knownSonesXml == null) {
-			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s has no known Sones!", new Object[] { sone });
-		} else {
-			for (SimpleXML knownSoneXml : knownSonesXml.getNodes("known-sone")) {
-				String knownSoneId = knownSoneXml.getValue("sone-id", null);
-				String knownSoneKey = knownSoneXml.getValue("sone-key", null);
-				String knownSoneName = knownSoneXml.getValue("sone-name", null);
-				if ((knownSoneId == null) || (knownSoneKey == null) || (knownSoneName == null)) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with missing data! ID: %s, Key: %s, Name: %s", new Object[] { sone, knownSoneId, knownSoneKey, knownSoneName });
-					return null;
-				}
-				try {
-					knownSones.add(core.getSone(knownSoneId).setRequestUri(new FreenetURI(knownSoneKey)).setName(knownSoneName));
-				} catch (MalformedURLException mue1) {
-					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded known Sone for Sone %s with invalid key: %s", new Object[] { sone, knownSoneKey });
-					return null;
-				}
-			}
-		}
-
 		/* okay, apparently everything was parsed correctly. Now import. */
 		/* atomic setter operation on the Sone. */
 		synchronized (sone) {
@@ -400,10 +340,6 @@ public class SoneDownloader extends AbstractService {
 			sone.setModificationCounter(0);
 		}
 
-		/* add all known Sones to core for downloading. */
-		for (Sone knownSone : knownSones) {
-			core.addSone(knownSone);
-		}
 		return sone;
 	}
 

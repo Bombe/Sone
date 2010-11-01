@@ -125,6 +125,12 @@
 
 	<div id="main">
 
+		<%if !webInterface.core.identityManager.connected>
+			<div id="plugin-warning">
+				<%= Warning.PluginNotConnected.Text|l10n|html|replace needle="{link}" replacement="<a href=\"/plugins/\">"|replace needle="{/link}" replacement="</a>">
+			</div>
+		<%/if>
+
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
 			<a class="picture" href="index.html">&nbsp;</a>
 			<%ifnull ! currentSone>

@@ -19,12 +19,13 @@ package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.ToadletContext;
 
@@ -34,6 +35,10 @@ import freenet.clients.http.ToadletContext;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class LoginPage extends SoneTemplatePage {
+
+	/** The logger. */
+	@SuppressWarnings("unused")
+	private static final Logger logger = Logging.getLogger(LoginPage.class);
 
 	/**
 	 * Creates a new login page.
@@ -57,19 +62,9 @@ public class LoginPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		List<Sone> localSones = new ArrayList<Sone>(webInterface.core().getSones());
-		Collections.sort(localSones, new Comparator<Sone>() {
-
-			@Override
-			public int compare(Sone leftSone, Sone rightSone) {
-				int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
-				if (diff != 0) {
-					return diff;
-				}
-				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightSone.getTime() - leftSone.getTime()));
-			}
-
-		});
+		/* get all own identities. */
+		List<Sone> localSones = new ArrayList<Sone>(webInterface.core().getLocalSones());
+		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);
 		template.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
@@ -85,6 +80,8 @@ public class LoginPage extends SoneTemplatePage {
 				throw new RedirectException("index.html");
 			}
 		}
+		List<OwnIdentity> ownIdentitiesWithoutSone = CreateSonePage.getOwnIdentitiesWithoutSone(webInterface.core());
+		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 	}
 
 	//

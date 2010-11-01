@@ -7,14 +7,6 @@
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 		<div>
-			<label><%= Page.DeleteSone.Label.RequestURI|l10n|html></label>
-			<input type="text" readonly="readonly" value="<% currentSone.requestUri|html>" />
-		</div>
-		<div>
-			<label><%= Page.DeleteSone.Label.InsertURI|l10n|html></label>
-			<input type="text" readonly="readonly" value="<% currentSone.insertUri|html>" />
-		</div>
-		<div>
 			<button type="submit" name="deleteSone" value="1"><%= Page.DeleteSone.Button.Yes|l10n|html></button>
 		</div>
 		<div>

@@ -1,0 +1,9 @@
+<%include include/head.html>
+
+	<h1><%= Page.WotPluginMissing.Page.Title|l10n|html></h1>
+
+	<p><%= Page.WotPluginMissing.Text.WotRequired|l10n|html></p>
+
+	<p><%= Page.WotPluginMissing.Text.LoadPlugin|l10n|html|replace needle="{link}" replacement='<a href="/plugins/">'|replace needle="{/link}" replacement='</a>'></p>
+
+<%include include/tail.html>

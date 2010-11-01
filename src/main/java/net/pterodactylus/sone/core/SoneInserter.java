@@ -21,7 +21,6 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -33,8 +32,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
-import net.pterodactylus.util.filter.Filter;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -147,6 +145,8 @@ public class SoneInserter extends AbstractService {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
 					sone.updateUris(finalUri.getEdition());
+					/* TODO - better encapsulation? */
+					core.getIdentityManager().setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(finalUri.getEdition()));
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {
@@ -265,19 +265,8 @@ public class SoneInserter extends AbstractService {
 			} finally {
 				Closer.close(templateInputStreamReader);
 			}
-			Collection<Sone> knownSones = Filters.filteredCollection(core.getKnownSones(), new Filter<Sone>() {
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				public boolean filterObject(Sone object) {
-					return !object.getId().equals(soneProperties.get("id"));
-				}
-			});
 
 			template.set("currentSone", soneProperties);
-			template.set("knownSones", knownSones);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
 			try {

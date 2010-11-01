@@ -2,7 +2,6 @@
 <sone>
 
 	<id><% currentSone.id|xml></id>
-	<name><% currentSone.name|xml></name>
 	<time><% currentSone.time|xml></time>
 	<request-uri><% currentSone.requestUri|xml></request-uri>
 	<insert-uri><% currentSone.insertUri|xml></insert-uri>

@@ -17,12 +17,17 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.SoneException;
-import net.pterodactylus.sone.core.SoneException.Type;
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
@@ -51,6 +56,36 @@ public class CreateSonePage extends SoneTemplatePage {
 	}
 
 	//
+	// STATIC ACCESSORS
+	//
+
+	/**
+	 * Returns a sorted list of all own identities that do not have the “Sone”
+	 * context.
+	 *
+	 * @param core
+	 *            The core
+	 * @return The list of own identities without the “Sone” context
+	 */
+	public static List<OwnIdentity> getOwnIdentitiesWithoutSone(Core core) {
+		List<OwnIdentity> identitiesWithoutSone = new ArrayList<OwnIdentity>();
+		Set<OwnIdentity> allOwnIdentity = core.getIdentityManager().getAllOwnIdentities();
+		for (OwnIdentity ownIdentity : allOwnIdentity) {
+			if (!ownIdentity.hasContext("Sone")) {
+				identitiesWithoutSone.add(ownIdentity);
+			}
+		}
+		Collections.sort(identitiesWithoutSone, new Comparator<OwnIdentity>() {
+
+			@Override
+			public int compare(OwnIdentity leftIdentity, OwnIdentity rightIdentity) {
+				return (leftIdentity.getNickname() + "@" + leftIdentity.getId()).compareToIgnoreCase(rightIdentity.getNickname() + "@" + rightIdentity.getId());
+			}
+		});
+		return identitiesWithoutSone;
+	}
+
+	//
 	// TEMPLATEPAGE METHODS
 	//
 
@@ -60,34 +95,33 @@ public class CreateSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		String name = "";
-		String requestUri = null;
-		String insertUri = null;
+		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.core());
+		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 		if (request.getMethod() == Method.POST) {
-			name = request.getHttpRequest().getPartAsStringFailsafe("name", 100);
-			if (request.getHttpRequest().isPartSet("create-from-uri")) {
-				requestUri = request.getHttpRequest().getPartAsStringFailsafe("request-uri", 256);
-				insertUri = request.getHttpRequest().getPartAsStringFailsafe("insert-uri", 256);
-			}
-			try {
-				/* create Sone. */
-				Sone sone = webInterface.core().createSone(name, "Sone", requestUri, insertUri);
-
-				/* log in the new Sone. */
-				setCurrentSone(request.getToadletContext(), sone);
-				throw new RedirectException("index.html");
-			} catch (SoneException se1) {
-				logger.log(Level.FINE, "Could not create Sone “%s” at (“%s”, “%s”), %s!", new Object[] { name, requestUri, insertUri, se1.getType() });
-				if (se1.getType() == Type.INVALID_SONE_NAME) {
-					template.set("errorName", true);
-				} else if (se1.getType() == Type.INVALID_URI) {
-					template.set("errorUri", true);
+			String id = request.getHttpRequest().getPartAsStringFailsafe("identity", 44);
+			OwnIdentity selectedIdentity = null;
+			for (OwnIdentity ownIdentity : ownIdentitiesWithoutSone) {
+				if (ownIdentity.getId().equals(id)) {
+					selectedIdentity = ownIdentity;
+					break;
 				}
 			}
+			if (selectedIdentity == null) {
+				template.set("errorNoIdentity", true);
+				return;
+			}
+			/* create Sone. */
+			webInterface.core().getIdentityManager().addContext(selectedIdentity, "Sone");
+			Sone sone = webInterface.core().createSone(selectedIdentity);
+			if (sone == null) {
+				logger.log(Level.SEVERE, "Could not create Sone for OwnIdentity: %s", selectedIdentity);
+				/* TODO - go somewhere else */
+			}
+
+			/* log in the new Sone. */
+			setCurrentSone(request.getToadletContext(), sone);
+			throw new RedirectException("index.html");
 		}
-		template.set("name", name);
-		template.set("requestUri", requestUri);
-		template.set("insertUri", insertUri);
 	}
 
 	/**

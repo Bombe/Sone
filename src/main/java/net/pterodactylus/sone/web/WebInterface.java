@@ -33,8 +33,10 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
+import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.template.GetPagePlugin;
+import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
@@ -178,6 +180,7 @@ public class WebInterface extends AbstractService {
 		templateFactory.addAccessor(Sone.class, new SoneAccessor(core()));
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
 		templateFactory.addAccessor(Reply.class, new ReplyAccessor(core()));
+		templateFactory.addAccessor(Identity.class, new IdentityAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
 		templateFactory.addFilter("substring", new SubstringFilter());
@@ -191,11 +194,8 @@ public class WebInterface extends AbstractService {
 
 		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
 		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
-		Template addSoneTemplate = templateFactory.createTemplate(createReader("/templates/addSone.html"));
-		Template loadSoneTemplate = templateFactory.createTemplate(createReader("/templates/loadSone.html"));
 		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
 		Template createSoneTemplate = templateFactory.createTemplate(createReader("/templates/createSone.html"));
-		Template importSoneTemplate = templateFactory.createTemplate(createReader("/templates/importSone.html"));
 		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
 		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
@@ -210,6 +210,7 @@ public class WebInterface extends AbstractService {
 		Template unfollowSoneTemplate = templateFactory.createTemplate(createReader("/templates/unfollowSone.html"));
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
 		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
+		Template wotPluginMissingTemplate = templateFactory.createTemplate(createReader("/templates/wotPluginMissing.html"));
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
@@ -218,9 +219,6 @@ public class WebInterface extends AbstractService {
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImportSonePage(importSoneTemplate, this), "ImportSone"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoadSonePage(loadSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new AddSonePage(addSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BackupProfilePage(backupProfileTemplate, this)));
@@ -241,6 +239,7 @@ public class WebInterface extends AbstractService {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("help.html", helpTemplate, "Page.Help.Title", this), "Help"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("wotPluginMissing.html", wotPluginMissingTemplate, "Page.WotPluginMissing.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));

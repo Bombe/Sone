@@ -49,6 +49,12 @@ textarea {
 	color: rgb(255, 172, 0);
 }
 
+#sone #plugin-warning {
+	border: solid 0.5em red;
+	padding: 0.5em;
+	margin-bottom: 1em;
+}
+
 #sone #profile {
 	height: 80px;
 	margin-bottom: 1ex;

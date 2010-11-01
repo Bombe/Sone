@@ -55,7 +55,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		List<Sone> knownSones = new ArrayList<Sone>(webInterface.core().getKnownSones());
+		List<Sone> knownSones = new ArrayList<Sone>(webInterface.core().getSones());
 		Collections.sort(knownSones, new Comparator<Sone>() {
 
 			@Override

@@ -1,52 +1,26 @@
-<script language="javascript">
-	$(document).ready(function() {
-		registerInputTextareaSwap("#sone #create-sone input[name=name]", "WebInterface.DefaultText.CreateSoneName", "name", false, true);
-		registerInputTextareaSwap("#sone #create-sone input[name=insert-uri]", "WebInterface.DefaultText.CreateSoneInsertURI", "insert-uri", true, true);
-		registerInputTextareaSwap("#sone #create-sone input[name=request-uri]", "WebInterface.DefaultText.CreateSoneRequestURI", "request-uri", true, true);
+<%if !identitiesWithoutSone.empty>
+	<h1><%= Page.Login.CreateSone.Title|l10n|html></h1>
 
-		/* hide all the labels. */
-		$("#sone #create-sone label").hide();
+	<p><%= View.CreateSone.Text.WotIdentityRequired|l10n|html|replace needle="{link}" replacement='<a href="/WoT/">'|replace needle="{/link}" replacement='</a>'></p>
 
-		/* now hide the “advanced” section. */
-		advancedSection = $("#sone #create-sone .advanced");
-		advancedSection.hide();
+	<form id="create-sone" action="createSone.html" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 
-		/* show a checkbox instead. */
-		checkboxSection = $("<div></div>");
-		checkbox = $("<input type=\"checkbox\" />").click(function() {
-			if (this.checked) {
-				advancedSection.show();
-				$("#sone #create-sone button[name=create-random]").hide();
-			} else {
-				advancedSection.hide();
-				$("#sone #create-sone button[name=create-random]").show();
-			}
-		})
-		checkboxSection.append(checkbox).append("Show advanced settings");
-		advancedSection.before(checkboxSection);
-	});
-</script>
+		<%if errorNoIdentity><p><%= View.CreateSone.Text.Error.NoIdentity|l10n|html></p><%/if>
 
-<form id="create-sone" action="createSone.html" method="post">
-	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-	<div<%if errorName> class="error"<%/if>>
-		<label for="name"><%= Page.Login.CreateSone.Label.Name|l10n|html></label>
-		<input type="text" name="name" value="<% name|html>"/>
-	</div>
-	<div>
-		<button type="submit" name="create-random" value="1"><%= Page.Login.CreateSone.Button.CreateRandom|l10n|html></button>
-	</div>
-	<div class="advanced">
-		<div<%if errorUri> class="error"<%/if>>
-			<label for="insert-uri"><%= Page.Login.CreateSone.Label.InsertURI|l10n|html></label>
-			<input type="text" name="insert-uri" value="<% insertUri|html>" />
-		</div>
-		<div<%if errorUri> class="error"<%/if>>
-			<label for="request-uri"><%= Page.Login.CreateSone.Label.RequestURI|l10n|html></label>
-			<input type="text" name="request-uri" value="<% requestUri|html>" />
-		</div>
-		<div>
-			<button type="submit" name="create-from-uri" value="1"><%= Page.Login.CreateSone.Button.CreateFromURI|l10n|html></button>
-		</div>
-	</div>
-</form>
+		<%foreach identitiesWithoutSone identity>
+			<%first>
+				<select name="identity">
+					<option disabled="disabled"><%= View.CreateSone.Select.Default|l10n|html></option>
+			<%/first>
+				<option value="<% identity.id|html>"><% identity.uniqueNickname|html></option>
+			<%last>
+				</select>
+				<button type="submit"><%= View.CreateSone.Button.Create|l10n|html></button>
+			<%/last>
+		<%/foreach>
+
+	</form>
+<%else>
+	<p><%= View.CreateSone.Text.NoIdentities|l10n|html|replace needle="{link}" replacement='<a href="/WoT/OwnIdentities">'|replace needle="{/link}" replacement="</a>"></p>
+<%/if>
