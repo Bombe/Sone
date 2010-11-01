@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
@@ -58,11 +59,8 @@ public class Sone {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Sone.class);
 
-	/** The ID of this Sone. */
-	private final String id;
-
-	/** The name of this Sone. */
-	private volatile String name;
+	/** The identity of this Sone. */
+	private final Identity identity;
 
 	/** The URI under which the Sone is stored in Freenet. */
 	private volatile FreenetURI requestUri;
@@ -98,11 +96,11 @@ public class Sone {
 	/**
 	 * Creates a new Sone.
 	 *
-	 * @param id
-	 *            The ID of this Sone
+	 * @param identity
+	 *            The identity of the Sone
 	 */
-	public Sone(String id) {
-		this.id = id;
+	public Sone(Identity identity) {
+		this.identity = identity;
 	}
 
 	//
@@ -110,12 +108,21 @@ public class Sone {
 	//
 
 	/**
-	 * Returns the ID of this Sone.
+	 * Returns the identity of this Sone.
 	 *
-	 * @return The ID of this Sone
+	 * @return The identity of this Sone
 	 */
 	public String getId() {
-		return id;
+		return identity.getId();
+	}
+
+	/**
+	 * Returns the identity of this Sone.
+	 *
+	 * @return The identity of this Sone
+	 */
+	public Identity getIdentity() {
+		return identity;
 	}
 
 	/**
@@ -124,19 +131,7 @@ public class Sone {
 	 * @return The name of this Sone
 	 */
 	public String getName() {
-		return name;
-	}
-
-	/**
-	 * Sets the name of this Sone.
-	 *
-	 * @param name
-	 *            The name of this Sone
-	 * @return This sone (for method chaining)
-	 */
-	public Sone setName(String name) {
-		this.name = name;
-		return this;
+		return identity.getNickname();
 	}
 
 	/**
@@ -618,7 +613,7 @@ public class Sone {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return identity.getId().hashCode();
 	}
 
 	/**
@@ -629,7 +624,7 @@ public class Sone {
 		if (!(object instanceof Sone)) {
 			return false;
 		}
-		return ((Sone) object).id.equals(id);
+		return ((Sone) object).identity.getId().equals(identity.getId());
 	}
 
 	/**
@@ -637,7 +632,7 @@ public class Sone {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + id + ",name=" + name + ",requestUri=" + requestUri + ",insertUri=" + insertUri + ",friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + ")]";
+		return getClass().getName() + "[identity=" + identity + ",requestUri=" + requestUri + ",insertUri=" + insertUri + ",friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + ")]";
 	}
 
 }
