@@ -84,7 +84,6 @@ public class RequestChangeFilter implements Filter {
 				questionMark = oldUri.length();
 			}
 			URI u = new URI(oldUri.substring(0, questionMark) + query.toString());
-			System.out.println("u: " + u);
 			return u;
 		} catch (UnsupportedEncodingException uee1) {
 			/* UTF-8 not supported? I don’t think so. */
