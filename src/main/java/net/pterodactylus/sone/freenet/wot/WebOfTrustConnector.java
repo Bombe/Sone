@@ -258,7 +258,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 			if (propertyName == null) {
 				break;
 			}
-			String propertyValue = fields.get(prefix + "Property" + ++propertiesCounter + "Value");
+			String propertyValue = fields.get(prefix + "Property" + propertiesCounter + "Value");
 			properties.put(propertyName, propertyValue);
 		}
 		return properties;
