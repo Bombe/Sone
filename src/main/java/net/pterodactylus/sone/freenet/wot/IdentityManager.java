@@ -55,9 +55,6 @@ public class IdentityManager extends AbstractService {
 	/** The context to filter for. */
 	private volatile String context;
 
-	/** Whether the Web of Trust plugin is connected. */
-	private volatile boolean wotPluginConnected = false;
-
 	/**
 	 * Creates a new identity manager.
 	 *
@@ -115,7 +112,13 @@ public class IdentityManager extends AbstractService {
 	 *         {@code false} otherwise
 	 */
 	public boolean isConnected() {
-		return wotPluginConnected;
+		try {
+			webOfTrustConnector.ping();
+			return true;
+		} catch (PluginException pe1) {
+			/* not connected, ignore. */
+			return false;
+		}
 	}
 
 	/**
@@ -142,12 +145,9 @@ public class IdentityManager extends AbstractService {
 	 */
 	public Set<OwnIdentity> getAllOwnIdentities() {
 		try {
-			Set<OwnIdentity> allOwnIdentities = webOfTrustConnector.loadAllOwnIdentities();
-			wotPluginConnected = true;
-			return allOwnIdentities;
+			return webOfTrustConnector.loadAllOwnIdentities();
 		} catch (PluginException pe1) {
 			logger.log(Level.WARNING, "Could not load all own identities!", pe1);
-			wotPluginConnected = false;
 			return Collections.emptySet();
 		}
 	}
@@ -170,11 +170,9 @@ public class IdentityManager extends AbstractService {
 		}
 		try {
 			webOfTrustConnector.addContext(ownIdentity, context);
-			wotPluginConnected = true;
 			ownIdentity.addContext(context);
 		} catch (PluginException pe1) {
 			logger.log(Level.WARNING, "Could not add context " + context + " to OwnIdentity " + ownIdentity + ".", pe1);
-			wotPluginConnected = false;
 		}
 	}
 
@@ -192,11 +190,9 @@ public class IdentityManager extends AbstractService {
 		}
 		try {
 			webOfTrustConnector.removeContext(ownIdentity, context);
-			wotPluginConnected = true;
 			ownIdentity.removeContext(context);
 		} catch (PluginException pe1) {
 			logger.log(Level.WARNING, "Could not remove context " + context + " from OwnIdentity " + ownIdentity + ".", pe1);
-			wotPluginConnected = false;
 		}
 	}
 
@@ -213,11 +209,9 @@ public class IdentityManager extends AbstractService {
 	public void setProperty(OwnIdentity ownIdentity, String name, String value) {
 		try {
 			webOfTrustConnector.setProperty(ownIdentity, name, value);
-			wotPluginConnected = true;
 			ownIdentity.setProperty(name, value);
 		} catch (PluginException pe1) {
 			logger.log(Level.WARNING, "Could not set property “" + name + "” to “" + value + "” for OwnIdentity: " + ownIdentity, pe1);
-			wotPluginConnected = false;
 		}
 	}
 
@@ -232,11 +226,9 @@ public class IdentityManager extends AbstractService {
 	public void removeProperty(OwnIdentity ownIdentity, String name) {
 		try {
 			webOfTrustConnector.removeProperty(ownIdentity, name);
-			wotPluginConnected = true;
 			ownIdentity.removeProperty(name);
 		} catch (PluginException pe1) {
 			logger.log(Level.WARNING, "Could not remove property “" + name + "” from OwnIdentity: " + ownIdentity, pe1);
-			wotPluginConnected = false;
 		}
 	}
 
