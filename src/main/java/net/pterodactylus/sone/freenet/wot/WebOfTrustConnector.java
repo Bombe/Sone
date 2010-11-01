@@ -87,34 +87,12 @@ public class WebOfTrustConnector implements ConnectorListener {
 			String requestUri = fields.get("RequestURI" + ownIdentityCounter);
 			String insertUri = fields.get("InsertURI" + ownIdentityCounter);
 			String nickname = fields.get("Nickname" + ownIdentityCounter);
-			OwnIdentity ownIdentity = new OwnIdentity(this, id, nickname, requestUri, insertUri);
+			OwnIdentity ownIdentity = new OwnIdentity(id, nickname, requestUri, insertUri);
+			ownIdentity.setContexts(parseContexts("Contexts" + ownIdentityCounter, fields));
+			ownIdentity.setProperties(parseProperties("Properties" + ownIdentityCounter, fields));
 			ownIdentities.add(ownIdentity);
 		}
 		return ownIdentities;
-	}
-
-	/**
-	 * Loads the contexts of the given identity.
-	 *
-	 * @param identity
-	 *            The identity to load the contexts for
-	 * @return The contexts of the identity
-	 * @throws PluginException
-	 *             if an error occured talking to the Web of Trust plugin
-	 */
-	public Set<String> loadIdentityContexts(Identity identity) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", identity.getId()).put("Identity", identity.getId()).get(), "Identity");
-		SimpleFieldSet fields = reply.getFields();
-		int contextCounter = -1;
-		Set<String> contexts = new HashSet<String>();
-		while (true) {
-			String context = fields.get("Context" + ++contextCounter);
-			if (context == null) {
-				break;
-			}
-			contexts.add(context);
-		}
-		return contexts;
 	}
 
 	/**
@@ -155,7 +133,10 @@ public class WebOfTrustConnector implements ConnectorListener {
 			}
 			String nickname = fields.get("Nickname" + identityCounter);
 			String requestUri = fields.get("RequestURI" + identityCounter);
-			identities.add(new Identity(this, id, nickname, requestUri));
+			Identity identity = new Identity(id, nickname, requestUri);
+			identity.setContexts(parseContexts("Contexts" + identityCounter, fields));
+			identity.setProperties(parseProperties("Properties" + identityCounter, fields));
+			identities.add(identity);
 		}
 		return identities;
 	}
@@ -200,7 +181,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public String getProperty(Identity identity, String name) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetProperty").put("Identity", identity.getId()).put("Property", name).get(), "PropertyValue", "Error");
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetProperty").put("Identity", identity.getId()).put("Property", name).get(), "PropertyValue");
 		return reply.getFields().get("Property");
 	}
 
@@ -239,6 +220,51 @@ public class WebOfTrustConnector implements ConnectorListener {
 	//
 
 	/**
+	 * Parses the contexts from the given fields.
+	 *
+	 * @param prefix
+	 *            The prefix to use to access the contexts
+	 * @param fields
+	 *            The fields to parse the contexts from
+	 * @return The parsed contexts
+	 */
+	private Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
+		Set<String> contexts = new HashSet<String>();
+		int contextCounter = -1;
+		while (true) {
+			String context = fields.get(prefix + "Context" + ++contextCounter);
+			if (context == null) {
+				break;
+			}
+			contexts.add(context);
+		}
+		return contexts;
+	}
+
+	/**
+	 * Parses the properties from the given fields.
+	 *
+	 * @param prefix
+	 *            The prefix to use to access the properties
+	 * @param fields
+	 *            The fields to parse the properties from
+	 * @return The parsed properties
+	 */
+	private Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
+		Map<String, String> properties = new HashMap<String, String>();
+		int propertiesCounter = -1;
+		while (true) {
+			String propertyName = fields.get(prefix + "Property" + ++propertiesCounter + "Name");
+			if (propertyName == null) {
+				break;
+			}
+			String propertyValue = fields.get(prefix + "Property" + ++propertiesCounter + "Value");
+			properties.put(propertyName, propertyValue);
+		}
+		return properties;
+	}
+
+	/**
 	 * Sends a request containing the given fields and waits for the target
 	 * message.
 	 *
@@ -274,6 +300,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 		for (String targetMessage : targetMessages) {
 			replies.put(targetMessage, reply);
 		}
+		replies.put("Error", reply);
 		synchronized (reply) {
 			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
 			try {
@@ -284,6 +311,10 @@ public class WebOfTrustConnector implements ConnectorListener {
 		}
 		for (String targetMessage : targetMessages) {
 			replies.remove(targetMessage);
+		}
+		replies.remove("Error");
+		if ((reply.getFields() != null) && reply.getFields().get("Message").equals("Error")) {
+			throw new PluginException("Could not perform request for " + targetMessages[0]);
 		}
 		return reply;
 	}

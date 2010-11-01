@@ -31,8 +31,6 @@ public class OwnIdentity extends Identity {
 	/**
 	 * Creates a new own identity.
 	 *
-	 * @param webOfTrustConnector
-	 *            The Web of Trust connector
 	 * @param id
 	 *            The ID of the identity
 	 * @param nickname
@@ -42,8 +40,8 @@ public class OwnIdentity extends Identity {
 	 * @param insertUri
 	 *            The insert URI of the identity
 	 */
-	public OwnIdentity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri, String insertUri) {
-		super(webOfTrustConnector, id, nickname, requestUri);
+	public OwnIdentity(String id, String nickname, String requestUri, String insertUri) {
+		super(id, nickname, requestUri);
 		this.insertUri = insertUri;
 	}
 
@@ -58,72 +56,6 @@ public class OwnIdentity extends Identity {
 	 */
 	public String getInsertUri() {
 		return insertUri;
-	}
-
-	/**
-	 * Adds the given context to this identity.
-	 *
-	 * @param context
-	 *            The context to add
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
-	 */
-	public void addContext(String context) throws PluginException {
-		webOfTrustConnector.addContext(this, context);
-	}
-
-	/**
-	 * Removes the given context from this identity.
-	 *
-	 * @param context
-	 *            The context to remove
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
-	 */
-	public void removeContext(String context) throws PluginException {
-		webOfTrustConnector.removeContext(this, context);
-	}
-
-	/**
-	 * Sets the property with the given name to the given value.
-	 *
-	 * @param name
-	 *            The name of the property to set
-	 * @param value
-	 *            The new value of the property
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
-	 */
-	public void setProperty(String name, String value) throws PluginException {
-		webOfTrustConnector.setProperty(this, name, value);
-	}
-
-	/**
-	 * Removes the property with the given name.
-	 *
-	 * @param name
-	 *            The name of the property to remove
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
-	 */
-	public void removeProperty(String name) throws PluginException {
-		webOfTrustConnector.removeProperty(this, name);
-	}
-
-	//
-	// OBJECT METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[id=" + getId() + ",nickname=" + getNickname() + ",requestUri=" + getRequestUri() + ",insertUri=" + insertUri + "]";
 	}
 
 }

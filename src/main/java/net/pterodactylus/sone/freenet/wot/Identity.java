@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -25,9 +29,6 @@ import java.util.Set;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Identity {
-
-	/** The Web of Trust connector. */
-	protected final WebOfTrustConnector webOfTrustConnector;
 
 	/** The ID of the identity. */
 	private final String id;
@@ -38,11 +39,15 @@ public class Identity {
 	/** The request URI of the identity. */
 	private final String requestUri;
 
+	/** The contexts of the identity. */
+	private final Set<String> contexts = Collections.synchronizedSet(new HashSet<String>());
+
+	/** The properties of the identity. */
+	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
+
 	/**
 	 * Creates a new identity.
 	 *
-	 * @param webOfTrustConnector
-	 *            The Web of Trust connector
 	 * @param id
 	 *            The ID of the identity
 	 * @param nickname
@@ -50,8 +55,7 @@ public class Identity {
 	 * @param requestUri
 	 *            The request URI of the identity
 	 */
-	public Identity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri) {
-		this.webOfTrustConnector = webOfTrustConnector;
+	public Identity(String id, String nickname, String requestUri) {
 		this.id = id;
 		this.nickname = nickname;
 		this.requestUri = requestUri;
@@ -89,32 +93,103 @@ public class Identity {
 	}
 
 	/**
-	 * Returns the contexts of the identity. If the contexts have not been
-	 * loaded yet, they will be loaded. If loading the contexts fails, an empty
-	 * set is returned.
+	 * Returns all contexts of this identity.
 	 *
-	 * @return The contexts of the identity
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
+	 * @return All contexts of this identity
 	 */
-	public Set<String> getContexts() throws PluginException {
-		return webOfTrustConnector.loadIdentityContexts(this);
+	public Set<String> getContexts() {
+		return Collections.unmodifiableSet(contexts);
 	}
 
 	/**
-	 * Returns whether the identity contains the given context.
+	 * Sets all contexts of this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param contexts
+	 *            All contexts of the identity
+	 */
+	void setContexts(Set<String> contexts) {
+		this.contexts.clear();
+		this.contexts.addAll(contexts);
+	}
+
+	/**
+	 * Returns whether this identity has the given context.
 	 *
 	 * @param context
 	 *            The context to check for
 	 * @return {@code true} if this identity has the given context,
 	 *         {@code false} otherwise
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
 	 */
-	public boolean hasContext(String context) throws PluginException {
-		return getContexts().contains(context);
+	public boolean hasContext(String context) {
+		return contexts.contains(context);
+	}
+
+	/**
+	 * Adds the given context to this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param context
+	 *            The context to add
+	 */
+	void addContext(String context) {
+		contexts.add(context);
+	}
+
+	/**
+	 * Removes the given context from this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param context
+	 *            The context to remove
+	 */
+	void removeContext(String context) {
+		contexts.remove(context);
+	}
+
+	/**
+	 * Returns all properties of this identity.
+	 *
+	 * @return All properties of this identity
+	 */
+	public Map<String, String> getProperties() {
+		synchronized (properties) {
+			return Collections.unmodifiableMap(properties);
+		}
+	}
+
+	/**
+	 * Sets all properties of this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param properties
+	 *            The new properties of this identity
+	 */
+	void setProperties(Map<String, String> properties) {
+		synchronized (this.properties) {
+			this.properties.clear();
+			this.properties.putAll(properties);
+		}
+	}
+
+	/**
+	 * Sets the property with the given name to the given value.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param name
+	 *            The name of the property
+	 * @param value
+	 *            The value of the property
+	 */
+	void setProperty(String name, String value) {
+		synchronized (properties) {
+			properties.put(name, value);
+		}
 	}
 
 	/**
@@ -122,14 +197,26 @@ public class Identity {
 	 *
 	 * @param name
 	 *            The name of the property
-	 * @return The value of the property, or {@code null} if there is no such
-	 *         property
-	 * @throws PluginException
-	 *             if an error occured communicating with the Web of Trust
-	 *             plugin
+	 * @return The value of the property
 	 */
-	public String getProperty(String name) throws PluginException {
-		return webOfTrustConnector.getProperty(this, name);
+	public String getProperty(String name) {
+		synchronized (properties) {
+			return properties.get(name);
+		}
+	}
+
+	/**
+	 * Removes the property with the given name.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param name
+	 *            The name of the property to remove
+	 */
+	void removeProperty(String name) {
+		synchronized (properties) {
+			properties.remove(name);
+		}
 	}
 
 	//
@@ -154,6 +241,14 @@ public class Identity {
 		}
 		Identity identity = (Identity) object;
 		return identity.id.equals(id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[id=" + id + ",nickname=" + nickname + ",contexts=" + contexts + ",properties=" + properties + "]";
 	}
 
 }
