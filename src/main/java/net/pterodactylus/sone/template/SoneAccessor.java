@@ -76,7 +76,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("modified")) {
 			return sone.getModificationCounter() > 0;
 		} else if (member.equals("status")) {
-			return core.getSoneStatus(sone).toString();
+			return core.getSoneStatus(sone);
 		} else if (member.equals("unknown")) {
 			return core.getSoneStatus(sone) == SoneStatus.unknown;
 		} else if (member.equals("idle")) {
