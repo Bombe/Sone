@@ -408,13 +408,22 @@ public class Core implements IdentityListener {
 				return localSones.get(ownIdentity.getId());
 			}
 			String latestEdition = ownIdentity.getProperty("Sone.LatestEdition");
-			Sone sone = new Sone(ownIdentity).setInsertUri(getSoneUri(ownIdentity.getInsertUri(), latestEdition)).setRequestUri(getSoneUri(ownIdentity.getRequestUri(), latestEdition));
+			final Sone sone = new Sone(ownIdentity).setInsertUri(getSoneUri(ownIdentity.getInsertUri(), latestEdition)).setRequestUri(getSoneUri(ownIdentity.getRequestUri(), latestEdition));
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserters.put(sone, soneInserter);
 			soneInserter.start();
 			setSoneStatus(sone, SoneStatus.idle);
+			new Thread(new Runnable() {
+
+				@Override
+				@SuppressWarnings("synthetic-access")
+				public void run() {
+					soneDownloader.fetchSone(sone);
+				}
+
+			}, "Sone Downloader").start();
 			return sone;
 		}
 	}
