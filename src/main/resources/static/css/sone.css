@@ -356,7 +356,7 @@ textarea {
 
 }
 
-#sone #tail .import-key, #sone #import-key .import-key {
+#sone #tail {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;
 	padding-top: 1em;
