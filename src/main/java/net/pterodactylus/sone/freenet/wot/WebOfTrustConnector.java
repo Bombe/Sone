@@ -316,6 +316,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
 			try {
 				reply.wait(60000);
+				throw new PluginException("Timeout waiting for " + targetMessages[0] + "!");
 			} catch (InterruptedException ie1) {
 				logger.log(Level.WARNING, "Got interrupted while waiting for reply on GetOwnIdentities.", ie1);
 			}
