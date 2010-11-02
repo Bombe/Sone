@@ -69,6 +69,9 @@ public class Sone {
 	/* This will be null for remote Sones! */
 	private volatile FreenetURI insertUri;
 
+	/** The latest edition of the Sone. */
+	private volatile long latestEdition;
+
 	/** The time of the last inserted update. */
 	private volatile long time;
 
@@ -140,7 +143,7 @@ public class Sone {
 	 * @return The request URI of this Sone
 	 */
 	public FreenetURI getRequestUri() {
-		return requestUri;
+		return requestUri.setSuggestedEdition(latestEdition);
 	}
 
 	/**
@@ -153,17 +156,13 @@ public class Sone {
 	public Sone setRequestUri(FreenetURI requestUri) {
 		if (this.requestUri == null) {
 			this.requestUri = requestUri;
-			updateEditions();
 			return this;
 		}
 		if (!this.requestUri.equalsKeypair(requestUri)) {
 			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { requestUri, this.requestUri });
 			return this;
 		}
-		long latestEdition = requestUri.getEdition();
-		if ((latestEdition > this.requestUri.getEdition()) || (latestEdition > this.requestUri.getSuggestedEdition())) {
-			this.requestUri.setSuggestedEdition(latestEdition);
-		}
+		setLatestEdition(requestUri.getEdition());
 		return this;
 	}
 
@@ -173,7 +172,7 @@ public class Sone {
 	 * @return The insert URI of this Sone
 	 */
 	public FreenetURI getInsertUri() {
-		return insertUri;
+		return insertUri.setSuggestedEdition(latestEdition);
 	}
 
 	/**
@@ -186,18 +185,39 @@ public class Sone {
 	public Sone setInsertUri(FreenetURI insertUri) {
 		if (this.insertUri == null) {
 			this.insertUri = insertUri;
-			updateEditions();
 			return this;
 		}
 		if (!this.insertUri.equalsKeypair(insertUri)) {
 			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { insertUri, this.insertUri });
 			return this;
 		}
-		long latestEdition = insertUri.getEdition();
-		if ((latestEdition > this.insertUri.getEdition()) || (latestEdition > this.insertUri.getSuggestedEdition())) {
-			this.insertUri.setSuggestedEdition(latestEdition);
-		}
+		setLatestEdition(insertUri.getEdition());
 		return this;
+	}
+
+	/**
+	 * Returns the latest edition of this Sone.
+	 *
+	 * @return The latest edition of this Sone
+	 */
+	public long getLatestEdition() {
+		return latestEdition;
+	}
+
+	/**
+	 * Sets the latest edition of this Sone. If the given latest edition is not
+	 * greater than the current latest edition, the latest edition of this Sone
+	 * is not changed.
+	 *
+	 * @param latestEdition
+	 *            The latest edition of this Sone
+	 */
+	public void setLatestEdition(long latestEdition) {
+		if (!(latestEdition > this.latestEdition)) {
+			logger.log(Level.INFO, "New latest edition %d is not greater than current latest edition %d!", new Object[] { latestEdition, this.latestEdition });
+			return;
+		}
+		this.latestEdition = latestEdition;
 	}
 
 	/**
@@ -567,41 +587,6 @@ public class Sone {
 	 */
 	public synchronized void setModificationCounter(long modificationCounter) {
 		this.modificationCounter = modificationCounter;
-	}
-
-	/**
-	 * Updates the suggested edition in both the request URI and the insert URI.
-	 *
-	 * @param latestEdition
-	 *            The latest edition to update the URIs to
-	 */
-	public void updateUris(long latestEdition) {
-		if ((requestUri != null) && (requestUri.getEdition() < latestEdition)) {
-			requestUri = requestUri.setSuggestedEdition(latestEdition);
-		}
-		if ((insertUri != null) && (insertUri.getEdition() < latestEdition)) {
-			insertUri = insertUri.setSuggestedEdition(latestEdition);
-		}
-	}
-
-	//
-	// PRIVATE METHODS
-	//
-
-	/**
-	 * Updates the editions of the request URI and the insert URI (if latter is
-	 * not {@code null}) with the greater edition of either one.
-	 */
-	private void updateEditions() {
-		long requestEdition = 0;
-		if (requestUri != null) {
-			requestEdition = requestUri.getEdition();
-		}
-		long insertEdition = 0;
-		if (insertUri != null) {
-			insertEdition = insertUri.getEdition();
-		}
-		updateUris(Math.max(requestEdition, insertEdition));
 	}
 
 	//

@@ -32,7 +32,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -144,9 +143,9 @@ public class SoneInserter extends AbstractService {
 				try {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
-					sone.updateUris(finalUri.getEdition());
+					sone.setLatestEdition(finalUri.getEdition());
 					/* TODO - better encapsulation? */
-					core.getIdentityManager().setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(finalUri.getEdition()));
+					core.saveSone(sone);
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {

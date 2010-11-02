@@ -507,7 +507,7 @@ public class Core implements IdentityListener {
 				storedSone.setReplies(sone.getReplies());
 				storedSone.setLikePostIds(sone.getLikedPostIds());
 				storedSone.setLikeReplyIds(sone.getLikedReplyIds());
-				storedSone.updateUris(sone.getRequestUri().getEdition());
+				storedSone.setLatestEdition(sone.getRequestUri().getEdition());
 			}
 			saveSone(storedSone);
 		}
@@ -547,7 +547,13 @@ public class Core implements IdentityListener {
 	public void saveSone(Sone sone) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
+			return;
 		}
+		if (!(sone.getIdentity() instanceof OwnIdentity)) {
+			logger.log(Level.WARNING, "Local Sone without OwnIdentity found, refusing to save: %s", sone);
+			return;
+		}
+		identityManager.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 		/* TODO - implement saving. */
 	}
 
