@@ -49,7 +49,7 @@ public class FollowSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		if (request.getMethod() == Method.POST) {
-			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 36);
+			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			Sone sone = webInterface.core().getSone(soneId);
