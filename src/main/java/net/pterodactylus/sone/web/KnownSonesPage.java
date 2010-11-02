@@ -19,11 +19,9 @@ package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -56,18 +54,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		List<Sone> knownSones = new ArrayList<Sone>(webInterface.core().getSones());
-		Collections.sort(knownSones, new Comparator<Sone>() {
-
-			@Override
-			public int compare(Sone leftSone, Sone rightSone) {
-				int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
-				if (diff != 0) {
-					return diff;
-				}
-				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightSone.getTime() - leftSone.getTime()));
-			}
-
-		});
+		Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
 		template.set("knownSones", knownSones);
 	}
 
