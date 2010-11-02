@@ -155,7 +155,7 @@ public class Sone {
 	 */
 	public Sone setRequestUri(FreenetURI requestUri) {
 		if (this.requestUri == null) {
-			this.requestUri = requestUri;
+			this.requestUri = requestUri.setDocName("Sone").setMetaString(new String[0]);
 			return this;
 		}
 		if (!this.requestUri.equalsKeypair(requestUri)) {
@@ -184,7 +184,7 @@ public class Sone {
 	 */
 	public Sone setInsertUri(FreenetURI insertUri) {
 		if (this.insertUri == null) {
-			this.insertUri = insertUri;
+			this.insertUri = insertUri.setDocName("Sone").setMetaString(new String[0]);
 			return this;
 		}
 		if (!this.insertUri.equalsKeypair(insertUri)) {
