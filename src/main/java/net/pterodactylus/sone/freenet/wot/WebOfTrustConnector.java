@@ -315,8 +315,13 @@ public class WebOfTrustConnector implements ConnectorListener {
 		synchronized (reply) {
 			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
 			try {
-				reply.wait(60000);
-				throw new PluginException("Timeout waiting for " + targetMessages[0] + "!");
+				long now = System.currentTimeMillis();
+				while ((reply.getFields() == null) && ((System.currentTimeMillis() - now) < 60000)) {
+					reply.wait(60000 - (System.currentTimeMillis() - now));
+				}
+				if (reply.getFields() == null) {
+					throw new PluginException("Timeout waiting for " + targetMessages[0] + "!");
+				}
 			} catch (InterruptedException ie1) {
 				logger.log(Level.WARNING, "Got interrupted while waiting for reply on " + targetMessages[0] + ".", ie1);
 			}
