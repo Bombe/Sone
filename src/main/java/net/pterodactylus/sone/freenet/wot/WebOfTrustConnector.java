@@ -318,7 +318,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 				reply.wait(60000);
 				throw new PluginException("Timeout waiting for " + targetMessages[0] + "!");
 			} catch (InterruptedException ie1) {
-				logger.log(Level.WARNING, "Got interrupted while waiting for reply on GetOwnIdentities.", ie1);
+				logger.log(Level.WARNING, "Got interrupted while waiting for reply on " + targetMessages[0] + ".", ie1);
 			}
 		}
 		for (String targetMessage : targetMessages) {
@@ -341,6 +341,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	@Override
 	public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
 		String messageName = fields.get("Message");
+		logger.log(Level.FINEST, "Received Reply from Plugin: " + messageName);
 		Reply reply = replies.remove(messageName);
 		if (reply == null) {
 			logger.log(Level.FINE, "Not waiting for a “%s” message.", messageName);
