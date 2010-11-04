@@ -454,15 +454,7 @@ public class Core implements IdentityListener {
 			soneInserters.put(sone, soneInserter);
 			soneInserter.start();
 			setSoneStatus(sone, SoneStatus.idle);
-			new Thread(new Runnable() {
-
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public void run() {
-					soneDownloader.fetchSone(sone);
-				}
-
-			}, "Sone Downloader").start();
+			loadSone(sone);
 			return sone;
 		}
 	}
