@@ -32,6 +32,7 @@ import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -559,8 +560,62 @@ public class Core implements IdentityListener {
 			logger.log(Level.WARNING, "Local Sone without OwnIdentity found, refusing to save: %s", sone);
 			return;
 		}
+
+		logger.log(Level.INFO, "Saving Sone: %s", sone);
 		identityManager.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
-		/* TODO - implement saving. */
+		try {
+			/* save Sone into configuration. */
+			String sonePrefix = "Sone/" + sone.getId();
+			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
+
+			/* save profile. */
+			Profile profile = sone.getProfile();
+			configuration.getStringValue(sonePrefix + "/Profile/FirstName").setValue(profile.getFirstName());
+			configuration.getStringValue(sonePrefix + "/Profile/MiddleName").setValue(profile.getMiddleName());
+			configuration.getStringValue(sonePrefix + "/Profile/LastName").setValue(profile.getLastName());
+			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
+			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
+			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
+
+			/* save posts. */
+			int postCounter = 0;
+			for (Post post : sone.getPosts()) {
+				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
+				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
+				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
+				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
+			}
+			configuration.getStringValue(sonePrefix + "/Posts/" + postCounter + "/ID").setValue(null);
+
+			/* save replies. */
+			int replyCounter = 0;
+			for (Reply reply : sone.getReplies()) {
+				String replyPrefix = sonePrefix + "/Replies/" + replyCounter++;
+				configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
+				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPost().getId());
+				configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
+				configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
+			}
+			configuration.getStringValue(sonePrefix + "/Replies/" + replyCounter + "/ID").setValue(null);
+
+			/* save post likes. */
+			int postLikeCounter = 0;
+			for (String postId : sone.getLikedPostIds()) {
+				configuration.getStringValue(sonePrefix + "/Likes/Post/" + postLikeCounter++ + "/ID").setValue(postId);
+			}
+			configuration.getStringValue(sonePrefix + "/Likes/Post/" + postLikeCounter + "/ID").setValue(null);
+
+			/* save reply likes. */
+			int replyLikeCounter = 0;
+			for (String replyId : sone.getLikedReplyIds()) {
+				configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter++ + "/ID").setValue(replyId);
+			}
+			configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter + "/ID").setValue(null);
+
+			logger.log(Level.INFO, "Sone %s saved.", sone);
+		} catch (ConfigurationException ce1) {
+			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
+		}
 	}
 
 	/**
