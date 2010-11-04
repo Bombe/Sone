@@ -55,6 +55,7 @@ public class UnfollowSonePage extends SoneTemplatePage {
 			Sone sone = webInterface.core().getSone(soneId);
 			if (!sone.equals(currentSone)) {
 				currentSone.removeFriend(sone);
+				webInterface.core().saveSone(currentSone);
 			}
 			throw new RedirectException(returnPage);
 		}
