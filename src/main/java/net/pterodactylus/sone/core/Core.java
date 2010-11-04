@@ -577,6 +577,116 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Loads and updates the given Sone from the configuration. If any error is
+	 * encountered, loading is aborted and the given Sone is not changed.
+	 *
+	 * @param sone
+	 *            The Sone to load and update
+	 */
+	public void loadSone(Sone sone) {
+		if (!isLocalSone(sone)) {
+			logger.log(Level.FINE, "Tried to load non-local Sone: %s", sone);
+			return;
+		}
+
+		/* load Sone. */
+		String sonePrefix = "Sone/" + sone.getId();
+		long soneTime = configuration.getLongValue(sonePrefix + "/Time").getValue((long) 0);
+		long soneModificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
+
+		/* load profile. */
+		Profile profile = new Profile();
+		profile.setFirstName(configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null));
+		profile.setMiddleName(configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null));
+		profile.setLastName(configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null));
+		profile.setBirthDay(configuration.getIntValue(sonePrefix + "/Profile/BirthDay").getValue(null));
+		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
+		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
+
+		/* load posts. */
+		Set<Post> posts = new HashSet<Post>();
+		while (true) {
+			String postPrefix = sonePrefix + "/Posts/" + posts.size();
+			String postId = configuration.getStringValue(postPrefix + "/ID").getValue(null);
+			if (postId == null) {
+				break;
+			}
+			long postTime = configuration.getLongValue(postPrefix + "/Time").getValue((long) 0);
+			String postText = configuration.getStringValue(postPrefix + "/Text").getValue(null);
+			if ((postTime == 0) || (postText == null)) {
+				logger.log(Level.WARNING, "Invalid post found, aborting load!");
+				return;
+			}
+			posts.add(getPost(postId).setSone(sone).setTime(postTime).setText(postText));
+		}
+
+		/* load replies. */
+		Set<Reply> replies = new HashSet<Reply>();
+		while (true) {
+			String replyPrefix = sonePrefix + "/Replies/" + replies.size();
+			String replyId = configuration.getStringValue(replyPrefix + "/ID").getValue(null);
+			if (replyId == null) {
+				break;
+			}
+			String postId = configuration.getStringValue(replyPrefix + "/Post/ID").getValue(null);
+			long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue((long) 0);
+			String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
+			if ((postId == null) || (replyTime == 0) || (replyText == null)) {
+				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
+				return;
+			}
+			replies.add(getReply(replyId).setSone(sone).setPost(getPost(postId)).setTime(replyTime).setText(replyText));
+		}
+
+		/* load post likes. */
+		Set<String> likedPostIds = new HashSet<String>();
+		while (true) {
+			String likedPostId = configuration.getStringValue(sonePrefix + "/Likes/Post/" + likedPostIds.size() + "/ID").getValue(null);
+			if (likedPostId == null) {
+				break;
+			}
+			likedPostIds.add(likedPostId);
+		}
+
+		/* load reply likes. */
+		Set<String> likedReplyIds = new HashSet<String>();
+		while (true) {
+			String likedReplyId = configuration.getStringValue(sonePrefix + "/Likes/Reply/" + likedReplyIds.size() + "/ID").getValue(null);
+			if (likedReplyId == null) {
+				break;
+			}
+			likedReplyIds.add(likedReplyId);
+		}
+
+		/* load friends. */
+		Set<Sone> friends = new HashSet<Sone>();
+		while (true) {
+			String friendId = configuration.getStringValue(sonePrefix + "/Friends/" + friends.size() + "/ID").getValue(null);
+			if (friendId == null) {
+				break;
+			}
+			Boolean friendLocal = configuration.getBooleanValue(sonePrefix + "/Friends/" + friends.size() + "/Local").getValue(null);
+			if (friendLocal == null) {
+				logger.log(Level.WARNING, "Invalid friend found, aborting load!");
+				return;
+			}
+			friends.add(friendLocal ? getLocalSone(friendId) : getRemoteSone(friendId));
+		}
+
+		/* if we’re still here, Sone was loaded successfully. */
+		synchronized (sone) {
+			sone.setTime(soneTime);
+			sone.setProfile(profile);
+			sone.setPosts(posts);
+			sone.setReplies(replies);
+			sone.setLikePostIds(likedPostIds);
+			sone.setLikeReplyIds(likedReplyIds);
+			sone.setFriends(friends);
+			sone.setModificationCounter(soneModificationCounter);
+		}
+	}
+
+	/**
 	 * Saves the given Sone. This will persist all local settings for the given
 	 * Sone, such as the friends list and similar, private options.
 	 *
