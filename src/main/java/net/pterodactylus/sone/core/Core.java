@@ -599,6 +599,7 @@ public class Core implements IdentityListener {
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
 			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
+			configuration.getLongValue(sonePrefix + "/ModificationCounter").setValue(sone.getModificationCounter());
 
 			/* save profile. */
 			Profile profile = sone.getProfile();
