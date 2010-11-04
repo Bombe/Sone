@@ -107,7 +107,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		String lastName = profile.getLastName();
 		if (firstName == null) {
 			if (lastName == null) {
-				return sone.getName();
+				return String.valueOf(sone.getName());
 			}
 			return lastName;
 		}
