@@ -310,7 +310,12 @@ public class Core implements IdentityListener {
 	 */
 	public Reply getReply(String replyId) {
 		synchronized (replies) {
-			return replies.get(replyId);
+			Reply reply = replies.get(replyId);
+			if (reply == null) {
+				reply = new Reply(replyId);
+				replies.put(replyId, reply);
+			}
+			return reply;
 		}
 	}
 
