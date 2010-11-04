@@ -17,9 +17,17 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -55,10 +63,12 @@ public class GetLikesAjaxPage extends JsonPage {
 		}
 		if ("post".equals(type)) {
 			Post post = webInterface.core().getPost(id);
-			return new JsonObject().put("success", true).put("likes", webInterface.core().getLikes(post).size());
+			Set<Sone> sones = webInterface.core().getLikes(post);
+			return new JsonObject().put("success", true).put("likes", sones.size()).put("sones", getSones(sones));
 		} else if ("reply".equals(type)) {
 			Reply reply = webInterface.core().getReply(id);
-			return new JsonObject().put("success", true).put("likes", webInterface.core().getLikes(reply).size());
+			Set<Sone> sones = webInterface.core().getLikes(reply);
+			return new JsonObject().put("success", true).put("likes", sones.size()).put("sones", getSones(sones));
 		}
 		return new JsonObject().put("success", false).put("error", "invalid-type");
 	}
@@ -69,6 +79,28 @@ public class GetLikesAjaxPage extends JsonPage {
 	@Override
 	protected boolean needsFormPassword() {
 		return false;
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Creates a JSON array (containing the IDs and the nice names) from the
+	 * given Sones, after sorting them by name.
+	 *
+	 * @param sones
+	 *            The Sones to convert to an array
+	 * @return The Sones, sorted by name
+	 */
+	private JsonArray getSones(Set<Sone> sones) {
+		JsonArray soneArray = new JsonArray();
+		List<Sone> sortedSones = new ArrayList<Sone>(sones);
+		Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);
+		for (Sone sone : sortedSones) {
+			soneArray.add(new JsonObject().put("id", sone.getId()).put("name", SoneAccessor.getNiceName(sone)));
+		}
+		return soneArray;
 	}
 
 }
