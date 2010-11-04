@@ -436,10 +436,6 @@ public class Core implements IdentityListener {
 			return null;
 		}
 		synchronized (localSones) {
-			if (localSones.containsKey(ownIdentity.getId())) {
-				logger.log(Level.FINE, "Tried to add known local Sone: %s", ownIdentity);
-				return localSones.get(ownIdentity.getId());
-			}
 			final Sone sone;
 			try {
 				sone = getLocalSone(ownIdentity.getId()).setIdentity(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
@@ -490,10 +486,6 @@ public class Core implements IdentityListener {
 		}
 		synchronized (remoteSones) {
 			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
-			if (remoteSones.containsKey(identity.getId())) {
-				logger.log(Level.FINE, "Identity already exists: %s", identity);
-				return remoteSones.get(identity.getId());
-			}
 			sone.setRequestUri(getSoneUri(identity.getRequestUri(), identity.getProperty("Sone.LatestEdition")));
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
