@@ -489,14 +489,23 @@ public class Core implements IdentityListener {
 			return null;
 		}
 		synchronized (remoteSones) {
+			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
 			if (remoteSones.containsKey(identity.getId())) {
 				logger.log(Level.FINE, "Identity already exists: %s", identity);
 				return remoteSones.get(identity.getId());
 			}
-			Sone sone = new Sone(identity);
 			sone.setRequestUri(getSoneUri(identity.getRequestUri(), identity.getProperty("Sone.LatestEdition")));
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
+			new Thread(new Runnable() {
+
+				@Override
+				@SuppressWarnings("synthetic-access")
+				public void run() {
+					soneDownloader.fetchSone(sone);
+				}
+
+			}, "Sone Downloader").start();
 			setSoneStatus(sone, SoneStatus.idle);
 			return sone;
 		}
