@@ -59,8 +59,11 @@ public class Sone {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Sone.class);
 
+	/** The ID of this Sone. */
+	private final String id;
+
 	/** The identity of this Sone. */
-	private final Identity identity;
+	private Identity identity;
 
 	/** The URI under which the Sone is stored in Freenet. */
 	private volatile FreenetURI requestUri;
@@ -99,11 +102,11 @@ public class Sone {
 	/**
 	 * Creates a new Sone.
 	 *
-	 * @param identity
-	 *            The identity of the Sone
+	 * @param id
+	 *            The ID of the Sone
 	 */
-	public Sone(Identity identity) {
-		this.identity = identity;
+	public Sone(String id) {
+		this.id = id;
 	}
 
 	//
@@ -116,7 +119,7 @@ public class Sone {
 	 * @return The identity of this Sone
 	 */
 	public String getId() {
-		return identity.getId();
+		return id;
 	}
 
 	/**
@@ -129,12 +132,30 @@ public class Sone {
 	}
 
 	/**
+	 * Sets the identity of this Sone. The {@link Identity#getId() ID} of the
+	 * identity has to match this Sone’s {@link #getId()}.
+	 *
+	 * @param identity
+	 *            The identity of this Sone
+	 * @return This Sone (for method chaining)
+	 * @throws IllegalArgumentException
+	 *             if the ID of the identity does not match this Sone’s ID
+	 */
+	public Sone setIdentity(Identity identity) throws IllegalArgumentException {
+		if (!identity.getId().equals(id)) {
+			throw new IllegalArgumentException("Identity’s ID does not match Sone’s ID!");
+		}
+		this.identity = identity;
+		return this;
+	}
+
+	/**
 	 * Returns the name of this Sone.
 	 *
 	 * @return The name of this Sone
 	 */
 	public String getName() {
-		return identity.getNickname();
+		return (identity != null) ? identity.getNickname() : null;
 	}
 
 	/**
@@ -598,7 +619,7 @@ public class Sone {
 	 */
 	@Override
 	public int hashCode() {
-		return identity.getId().hashCode();
+		return id.hashCode();
 	}
 
 	/**
@@ -609,7 +630,7 @@ public class Sone {
 		if (!(object instanceof Sone)) {
 			return false;
 		}
-		return ((Sone) object).identity.getId().equals(identity.getId());
+		return ((Sone) object).id.equals(id);
 	}
 
 	/**

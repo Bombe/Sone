@@ -200,12 +200,10 @@ public class Core implements IdentityListener {
 	 *         Sone
 	 */
 	public Sone getSone(String id) {
-		Sone sone = getRemoteSone(id);
-		if (sone != null) {
-			return sone;
+		if (isLocalSone(id)) {
+			return getLocalSone(id);
 		}
-		sone = getLocalSone(id);
-		return sone;
+		return getRemoteSone(id);
 	}
 
 	/**
@@ -218,6 +216,20 @@ public class Core implements IdentityListener {
 	public boolean isLocalSone(Sone sone) {
 		synchronized (localSones) {
 			return localSones.containsKey(sone.getId());
+		}
+	}
+
+	/**
+	 * Returns whether the given ID is the ID of a local Sone.
+	 *
+	 * @param id
+	 *            The Sone ID to check for its locality
+	 * @return {@code true} if the given ID is a local Sone, {@code false}
+	 *         otherwise
+	 */
+	public boolean isLocalSone(String id) {
+		synchronized (localSones) {
+			return localSones.containsKey(id);
 		}
 	}
 
@@ -237,11 +249,16 @@ public class Core implements IdentityListener {
 	 *
 	 * @param id
 	 *            The ID of the Sone to get
-	 * @return The Sone, or {@code null} if there is no Sone with the given ID
+	 * @return The Sone with the given ID
 	 */
 	public Sone getLocalSone(String id) {
 		synchronized (localSones) {
-			return localSones.get(id);
+			Sone sone = localSones.get(id);
+			if (sone == null) {
+				sone = new Sone(id);
+				localSones.put(id, sone);
+			}
+			return sone;
 		}
 	}
 
@@ -261,11 +278,16 @@ public class Core implements IdentityListener {
 	 *
 	 * @param id
 	 *            The ID of the remote Sone to get
-	 * @return The Sone, or {@code null} if there is no such Sone
+	 * @return The Sone with the given ID
 	 */
 	public Sone getRemoteSone(String id) {
 		synchronized (remoteSones) {
-			return remoteSones.get(id);
+			Sone sone = remoteSones.get(id);
+			if (sone == null) {
+				sone = new Sone(id);
+				remoteSones.put(id, sone);
+			}
+			return sone;
 		}
 	}
 
@@ -420,7 +442,7 @@ public class Core implements IdentityListener {
 			}
 			final Sone sone;
 			try {
-				sone = new Sone(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
+				sone = getLocalSone(ownIdentity.getId()).setIdentity(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
 				sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.SEVERE, "Could not convert the Identity’s URIs to Freenet URIs: " + ownIdentity.getInsertUri() + ", " + ownIdentity.getRequestUri(), mue1);
