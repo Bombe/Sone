@@ -193,7 +193,7 @@ public class Sone {
 	 * @return The insert URI of this Sone
 	 */
 	public FreenetURI getInsertUri() {
-		return insertUri.setSuggestedEdition(latestEdition);
+		return (insertUri != null) ? insertUri.setSuggestedEdition(latestEdition) : null;
 	}
 
 	/**
