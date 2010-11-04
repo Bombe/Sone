@@ -292,7 +292,12 @@ public class Core implements IdentityListener {
 	 */
 	public Post getPost(String postId) {
 		synchronized (posts) {
-			return posts.get(postId);
+			Post post = posts.get(postId);
+			if (post == null) {
+				post = new Post(postId);
+				posts.put(postId, post);
+			}
+			return post;
 		}
 	}
 
