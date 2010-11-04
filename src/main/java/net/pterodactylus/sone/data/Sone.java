@@ -422,7 +422,6 @@ public class Sone {
 	 * @return All replies this Sone made
 	 */
 	public Set<Reply> getReplies() {
-		logger.log(Level.FINEST, "Friends of %s: %s", new Object[] { this, friendSones });
 		return Collections.unmodifiableSet(replies);
 	}
 
