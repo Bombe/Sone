@@ -24,6 +24,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +36,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.PostAccessor;
@@ -177,6 +179,7 @@ public class WebInterface extends AbstractService {
 	private void registerToadlets() {
 		DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
 		templateFactory.addAccessor(Sone.class, new SoneAccessor(core()));
 		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
 		templateFactory.addAccessor(Reply.class, new ReplyAccessor(core()));
