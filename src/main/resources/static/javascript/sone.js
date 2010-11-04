@@ -250,6 +250,25 @@ function getSoneElement(element) {
 }
 
 /**
+ * Generates a list of Sones by concatening the names of the given sones with a
+ * new line character (“\n”).
+ *
+ * @param sones
+ *            The sones to format
+ * @returns {String} The created string
+ */
+function generateSoneList(sones) {
+	var soneList = "";
+	$.each(sones, function() {
+		if (soneList != "") {
+			soneList += "\n";
+		}
+		soneList += this.name;
+	});
+	return soneList;
+}
+
+/**
  * Returns the ID of the Sone that this element belongs to.
  *
  * @param element
@@ -297,6 +316,7 @@ function updatePostLikes(postId) {
 		if (data.success) {
 			$("#sone .post#" + postId + " > .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .post#" + postId + " > .status-line .likes span.like-count").text(data.likes);
+			$("#sone .post#" + postId + " > .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	});
 }
@@ -322,6 +342,7 @@ function updateReplyLikes(replyId) {
 		if (data.success) {
 			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
+			$("#sone .reply#" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	});
 }
