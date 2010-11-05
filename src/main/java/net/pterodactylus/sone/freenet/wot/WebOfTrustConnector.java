@@ -265,11 +265,11 @@ public class WebOfTrustConnector implements ConnectorListener {
 		Map<String, String> properties = new HashMap<String, String>();
 		int propertiesCounter = -1;
 		while (true) {
-			String propertyName = fields.get(prefix + "Property" + ++propertiesCounter + "Name");
+			String propertyName = fields.get(prefix + "PropertyName" + ++propertiesCounter);
 			if (propertyName == null) {
 				break;
 			}
-			String propertyValue = fields.get(prefix + "Property" + propertiesCounter + "Value");
+			String propertyValue = fields.get(prefix + "PropertyValue" + propertiesCounter);
 			properties.put(propertyName, propertyValue);
 		}
 		return properties;
