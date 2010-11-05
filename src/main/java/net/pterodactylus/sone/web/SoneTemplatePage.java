@@ -73,7 +73,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            Whether this page requires a login
 	 */
 	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface, boolean requireLogin) {
-		super(path, template, webInterface.l10n(), pageTitleKey, "noPermission.html");
+		super(path, template, webInterface.getL10n(), pageTitleKey, "noPermission.html");
 		this.webInterface = webInterface;
 		this.requireLogin = requireLogin;
 		template.set("webInterface", webInterface);

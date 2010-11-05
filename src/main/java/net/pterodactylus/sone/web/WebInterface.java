@@ -120,7 +120,7 @@ public class WebInterface {
 	 *
 	 * @return The node’s l10n helper
 	 */
-	public BaseL10n l10n() {
+	public BaseL10n getL10n() {
 		return sonePlugin.l10n().getBase();
 	}
 
@@ -181,7 +181,7 @@ public class WebInterface {
 		templateFactory.addAccessor(Reply.class, new ReplyAccessor(core()));
 		templateFactory.addAccessor(Identity.class, new IdentityAccessor(core()));
 		templateFactory.addFilter("date", new DateFilter());
-		templateFactory.addFilter("l10n", new L10nFilter(l10n()));
+		templateFactory.addFilter("l10n", new L10nFilter(getL10n()));
 		templateFactory.addFilter("substring", new SubstringFilter());
 		templateFactory.addFilter("xml", new XmlFilter());
 		templateFactory.addFilter("change", new RequestChangeFilter());
