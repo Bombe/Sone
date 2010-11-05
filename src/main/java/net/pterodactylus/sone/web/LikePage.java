@@ -38,7 +38,7 @@ public class LikePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public LikePage(Template template, WebInterface webInterface) {
-		super("like.html", template, "Page.LikePost.Title", webInterface, true);
+		super("like.html", template, "Page.Like.Title", webInterface, true);
 	}
 
 	//

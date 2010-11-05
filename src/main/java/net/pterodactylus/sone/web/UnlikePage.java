@@ -38,7 +38,7 @@ public class UnlikePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public UnlikePage(Template template, WebInterface webInterface) {
-		super("unlike.html", template, "Page.UnlikePost.Title", webInterface, true);
+		super("unlike.html", template, "Page.Unlike.Title", webInterface, true);
 	}
 
 	//
