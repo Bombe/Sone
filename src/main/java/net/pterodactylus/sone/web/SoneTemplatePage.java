@@ -110,9 +110,9 @@ public class SoneTemplatePage extends TemplatePage {
 	 */
 	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
 		try {
-			Session session = webInterface.sessionManager().useSession(toadletContenxt);
+			Session session = webInterface.getSessionManager().useSession(toadletContenxt);
 			if (create && (session == null)) {
-				session = webInterface.sessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
+				session = webInterface.getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
 			}
 			return session;
 		} catch (freenet.clients.http.RedirectException re1) {

@@ -129,7 +129,7 @@ public class WebInterface {
 	 *
 	 * @return The node’s session manager
 	 */
-	public SessionManager sessionManager() {
+	public SessionManager getSessionManager() {
 		try {
 			return sonePlugin.pluginRespirator().getSessionManager(new URI("/"));
 		} catch (URISyntaxException use1) {
