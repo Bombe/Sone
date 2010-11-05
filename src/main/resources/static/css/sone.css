@@ -270,12 +270,12 @@ textarea {
 
 #sone .post .create-reply input[type=text] {
 	margin-left: 0.5ex;
-	width: 50em;
+	width: 45em;
 }
 
 #sone .post .create-reply textarea {
 	margin-left: 0.5ex;
-	width: 50em;
+	width: 45em;
 	height: 4em;
 }
 
