@@ -389,7 +389,7 @@ public class Core implements IdentityListener {
 	public Set<Sone> getLikes(Reply reply) {
 		Set<Sone> sones = new HashSet<Sone>();
 		for (Sone sone : getSones()) {
-			if (sone.getLikedPostIds().contains(reply.getId())) {
+			if (sone.getLikedReplyIds().contains(reply.getId())) {
 				sones.add(sone);
 			}
 		}
