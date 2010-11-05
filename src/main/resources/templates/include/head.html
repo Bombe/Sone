@@ -34,7 +34,7 @@
 		$(document).ready(function() {
 			$("#sone .post").each(function() {
 				postId = $(this).attr("id");
-				enhanceDeletePostButton("#sone .post#" + postId + " > .status-line .delete button", postId);
+				enhanceDeletePostButton("#sone .post#" + postId + " > .inner-part > .status-line .delete button", postId);
 				(function(postId) {
 					$("#sone .post#" + postId + " .reply").each(function() {
 						replyId = $(this).attr("id");
@@ -104,11 +104,11 @@
 	<script language="javascript">
 		/* convert all “like” buttons to javascript functions. */
 		$(document).ready(function() {
-			$("#sone .post > .status-line .like").submit(function() {
+			$("#sone .post > .inner-part > .status-line .like").submit(function() {
 				likePost(getPostId(this));
 				return false;
 			});
-			$("#sone .post > .status-line .unlike").submit(function() {
+			$("#sone .post > .inner-part > .status-line .unlike").submit(function() {
 				unlikePost(getPostId(this));
 				return false;
 			});

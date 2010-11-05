@@ -297,16 +297,16 @@ function getReplyId(element) {
 
 function likePost(postId) {
 	$.getJSON("ajax/like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function() {
-		$("#sone .post#" + postId + " > .status-line .like").addClass("hidden");
-		$("#sone .post#" + postId + " > .status-line .unlike").removeClass("hidden");
+		$("#sone .post#" + postId + " > .inner-part > .status-line .like").addClass("hidden");
+		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
 	});
 }
 
 function unlikePost(postId) {
 	$.getJSON("ajax/unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function() {
-		$("#sone .post#" + postId + " > .status-line .unlike").addClass("hidden");
-		$("#sone .post#" + postId + " > .status-line .like").removeClass("hidden");
+		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
+		$("#sone .post#" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
 	});
 }
@@ -314,9 +314,9 @@ function unlikePost(postId) {
 function updatePostLikes(postId) {
 	$.getJSON("ajax/getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if (data.success) {
-			$("#sone .post#" + postId + " > .status-line .likes").toggleClass("hidden", data.likes == 0)
-			$("#sone .post#" + postId + " > .status-line .likes span.like-count").text(data.likes);
-			$("#sone .post#" + postId + " > .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0)
+			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
+			$("#sone .post#" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	});
 }

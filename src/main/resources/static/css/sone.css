@@ -138,6 +138,16 @@ textarea {
 	border-bottom: none;
 }
 
+#sone .post > .avatar {
+	position: absolute;
+}
+
+#sone .post > .inner-part {
+	margin-left: 48px;
+	padding-left: 0.5em;
+	min-height: 48px;
+}
+
 #sone .post .author {
 	display: inline;
 	font-weight: bold;
@@ -149,7 +159,6 @@ textarea {
 }
 
 #sone .post .status-line {
-	clear: both;
 	margin-top: 0.5ex;
 	font-size: 85%;
 }
@@ -199,6 +208,16 @@ textarea {
 #sone .post .replies {
 	clear: both;
 	padding-top: 0.2ex;
+}
+
+#sone .post .reply > .avatar {
+	position: absolute;
+}
+
+#sone .post .reply > .inner-part {
+	margin-left: 36px;
+	padding-left: 0.5em;
+	min-height: 36px;
 }
 
 #sone .post .reply {

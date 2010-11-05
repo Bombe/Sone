@@ -1,4 +1,8 @@
 <div id="<% post.id|html>" class="post<%if loop.last> last<%/if>">
+	<div class="avatar">
+		<img src="/WoT/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
+	</div>
+	<div class="inner-part">
 	<div>
 		<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a></div>
 		<div class="text"><% post.text|html></div>
@@ -34,6 +38,10 @@
 	<div class="replies">
 		<%foreach post.replies reply>
 			<div id="<% reply.id|html>" class="reply">
+				<div class="avatar">
+					<img src="/WoT/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
+				</div>
+				<div class="inner-part">
 				<div>
 					<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id|html>"><% reply.sone.niceName|html></a></div>
 					<div class="text"><% reply.text|html></div>
@@ -66,6 +74,7 @@
 						</form>
 					<%/if>
 				</div>
+				</div>
 			</div>
 		<%/foreach>
 		<%ifnull ! currentSone>
@@ -79,5 +88,6 @@
 				</form>
 			</div>
 		<%/if>
+	</div>
 	</div>
 </div>
