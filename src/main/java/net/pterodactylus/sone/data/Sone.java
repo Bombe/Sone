@@ -291,17 +291,7 @@ public class Sone {
 	 */
 	public List<Sone> getFriends() {
 		List<Sone> friends = new ArrayList<Sone>(friendSones);
-		Collections.sort(friends, new Comparator<Sone>() {
-
-			@Override
-			public int compare(Sone leftSone, Sone rightSone) {
-				int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
-				if (diff != 0) {
-					return diff;
-				}
-				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightSone.getTime() - leftSone.getTime()));
-			}
-		});
+		Collections.sort(friends, NICE_NAME_COMPARATOR);
 		return friends;
 	}
 
