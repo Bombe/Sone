@@ -67,16 +67,10 @@ textarea {
 
 #sone #profile.online .picture {
 	position: absolute;
-	background-image: url("../images/sone.png");
-	width: 80px;
-	height: 80px;
 }
 
 #sone #profile.offline .picture {
 	position: absolute;
-	background-image: url("../images/sone-offline.png");
-	width: 80px;
-	height: 80px;
 }
 
 #sone #profile.offline .edit-profile-link, #sone #profile.offline .profile-link {
