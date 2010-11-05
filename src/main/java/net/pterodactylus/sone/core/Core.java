@@ -568,6 +568,11 @@ public class Core implements IdentityListener {
 		}
 		identityManager.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
 		identityManager.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
+		try {
+			configuration.getStringValue("Sone/" + sone.getId() + "/Time").setValue(null);
+		} catch (ConfigurationException ce1) {
+			logger.log(Level.WARNING, "Could not remove Sone from configuration!", ce1);
+		}
 	}
 
 	/**
@@ -585,7 +590,11 @@ public class Core implements IdentityListener {
 
 		/* load Sone. */
 		String sonePrefix = "Sone/" + sone.getId();
-		long soneTime = configuration.getLongValue(sonePrefix + "/Time").getValue((long) 0);
+		Long soneTime = configuration.getLongValue(sonePrefix + "/Time").getValue(null);
+		if (soneTime == null) {
+			logger.log(Level.INFO, "Could not load Sone because there is no Sone has been saved.");
+			return;
+		}
 		long soneModificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
 
 		/* load profile. */
