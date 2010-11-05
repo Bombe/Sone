@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
@@ -83,13 +84,13 @@ public class FreenetInterface {
 	 *            The URI to fetch
 	 * @return The result of the fetch, or {@code null} if an error occured
 	 */
-	public FetchResult fetchUri(FreenetURI uri) {
+	public Pair<FreenetURI, FetchResult> fetchUri(FreenetURI uri) {
 		FetchResult fetchResult = null;
 		FreenetURI currentUri = new FreenetURI(uri);
 		while (true) {
 			try {
 				fetchResult = client.fetch(currentUri);
-				return fetchResult;
+				return new Pair<FreenetURI, FetchResult>(currentUri, fetchResult);
 			} catch (FetchException fe1) {
 				if (fe1.getMode() == FetchException.PERMANENT_REDIRECT) {
 					currentUri = fe1.newURI;

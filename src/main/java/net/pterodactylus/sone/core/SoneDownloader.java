@@ -30,6 +30,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
@@ -119,13 +120,13 @@ public class SoneDownloader extends AbstractService {
 		FreenetURI requestUri = sone.getRequestUri().setMetaString(new String[] { "sone.xml" });
 		core.setSoneStatus(sone, SoneStatus.downloading);
 		try {
-			FetchResult fetchResult = freenetInterface.fetchUri(requestUri);
-			if (fetchResult == null) {
+			Pair<FreenetURI, FetchResult> fetchResults = freenetInterface.fetchUri(requestUri);
+			if (fetchResults == null) {
 				/* TODO - mark Sone as bad. */
 				return;
 			}
-			logger.log(Level.FINEST, "Got %d bytes back.", fetchResult.size());
-			Sone parsedSone = parseSone(sone, fetchResult, requestUri);
+			logger.log(Level.FINEST, "Got %d bytes back.", fetchResults.getRight().size());
+			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
 			if (parsedSone != null) {
 				core.updateSone(parsedSone);
 			}
