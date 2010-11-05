@@ -362,15 +362,11 @@ public class Sone {
 	 * @return All posts of this Sone
 	 */
 	public List<Post> getPosts() {
-		List<Post> sortedPosts = new ArrayList<Post>(posts);
-		Collections.sort(sortedPosts, new Comparator<Post>() {
-
-			@Override
-			public int compare(Post leftPost, Post rightPost) {
-				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
-			}
-
-		});
+		List<Post> sortedPosts;
+		synchronized (this) {
+			sortedPosts = new ArrayList<Post>(posts);
+		}
+		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 		return sortedPosts;
 	}
 
