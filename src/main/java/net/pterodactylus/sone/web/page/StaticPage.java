@@ -69,7 +69,7 @@ public class StaticPage implements Page {
 		String filename = path.substring(lastSlash + 1);
 		InputStream fileInputStream = getClass().getResourceAsStream(resourcePathPrefix + filename);
 		if (fileInputStream == null) {
-			return new Response(404, "Not found.", null, (String) null);
+			return new Response(404, "Not found.", null, "");
 		}
 		return new Response(200, "OK", mimeType, null, fileInputStream);
 	}
