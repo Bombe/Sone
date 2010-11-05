@@ -592,7 +592,7 @@ public class Core implements IdentityListener {
 		String sonePrefix = "Sone/" + sone.getId();
 		Long soneTime = configuration.getLongValue(sonePrefix + "/Time").getValue(null);
 		if (soneTime == null) {
-			logger.log(Level.INFO, "Could not load Sone because there is no Sone has been saved.");
+			logger.log(Level.INFO, "Could not load Sone because no Sone has been saved.");
 			return;
 		}
 		long soneModificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
