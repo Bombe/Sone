@@ -183,7 +183,6 @@ public class Sone {
 			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { requestUri, this.requestUri });
 			return this;
 		}
-		setLatestEdition(requestUri.getEdition());
 		return this;
 	}
 
@@ -212,7 +211,6 @@ public class Sone {
 			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { insertUri, this.insertUri });
 			return this;
 		}
-		setLatestEdition(insertUri.getEdition());
 		return this;
 	}
 
