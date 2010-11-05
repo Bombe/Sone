@@ -88,8 +88,8 @@ public class WebOfTrustConnector implements ConnectorListener {
 			String insertUri = fields.get("InsertURI" + ownIdentityCounter);
 			String nickname = fields.get("Nickname" + ownIdentityCounter);
 			OwnIdentity ownIdentity = new OwnIdentity(id, nickname, requestUri, insertUri);
-			ownIdentity.setContexts(parseContexts("Contexts" + ownIdentityCounter, fields));
-			ownIdentity.setProperties(parseProperties("Properties" + ownIdentityCounter, fields));
+			ownIdentity.setContexts(parseContexts("Contexts" + ownIdentityCounter + ".", fields));
+			ownIdentity.setProperties(parseProperties("Properties" + ownIdentityCounter + ".", fields));
 			ownIdentities.add(ownIdentity);
 		}
 		return ownIdentities;
@@ -134,8 +134,8 @@ public class WebOfTrustConnector implements ConnectorListener {
 			String nickname = fields.get("Nickname" + identityCounter);
 			String requestUri = fields.get("RequestURI" + identityCounter);
 			Identity identity = new Identity(id, nickname, requestUri);
-			identity.setContexts(parseContexts("Contexts" + identityCounter, fields));
-			identity.setProperties(parseProperties("Properties" + identityCounter, fields));
+			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
+			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
 			identities.add(identity);
 		}
 		return identities;
@@ -265,11 +265,11 @@ public class WebOfTrustConnector implements ConnectorListener {
 		Map<String, String> properties = new HashMap<String, String>();
 		int propertiesCounter = -1;
 		while (true) {
-			String propertyName = fields.get(prefix + "PropertyName" + ++propertiesCounter);
+			String propertyName = fields.get(prefix + "Property" + ++propertiesCounter + ".Name");
 			if (propertyName == null) {
 				break;
 			}
-			String propertyValue = fields.get(prefix + "PropertyValue" + propertiesCounter);
+			String propertyValue = fields.get(prefix + "Property" + propertiesCounter + ".Value");
 			properties.put(propertyName, propertyValue);
 		}
 		return properties;
