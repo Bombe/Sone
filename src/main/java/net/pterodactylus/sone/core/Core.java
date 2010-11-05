@@ -569,7 +569,7 @@ public class Core implements IdentityListener {
 		identityManager.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
 		identityManager.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
 		try {
-			configuration.getStringValue("Sone/" + sone.getId() + "/Time").setValue(null);
+			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not remove Sone from configuration!", ce1);
 		}
