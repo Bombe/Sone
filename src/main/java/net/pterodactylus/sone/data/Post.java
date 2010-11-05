@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.Comparator;
 import java.util.UUID;
 
 /**
@@ -26,6 +27,16 @@ import java.util.UUID;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Post {
+
+	/** Comparator for posts, sorts descending by time. */
+	public static final Comparator<Post> TIME_COMPARATOR = new Comparator<Post>() {
+
+		@Override
+		public int compare(Post leftPost, Post rightPost) {
+			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
+		}
+
+	};
 
 	/** The GUID of the post. */
 	private final UUID id;
