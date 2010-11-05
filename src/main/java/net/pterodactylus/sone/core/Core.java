@@ -567,6 +567,7 @@ public class Core implements IdentityListener {
 			soneInserters.remove(sone).stop();
 		}
 		identityManager.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
+		identityManager.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
 	}
 
 	/**
