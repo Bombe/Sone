@@ -57,7 +57,6 @@ import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.MatchFilter;
@@ -78,7 +77,7 @@ import freenet.l10n.BaseL10n;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebInterface extends AbstractService {
+public class WebInterface {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebInterface.class);
@@ -99,7 +98,6 @@ public class WebInterface extends AbstractService {
 	 *            The Sone plugin
 	 */
 	public WebInterface(SonePlugin sonePlugin) {
-		super("Sone Web Interface", false);
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 	}
@@ -150,22 +148,20 @@ public class WebInterface extends AbstractService {
 	}
 
 	//
-	// SERVICE METHODS
+	// ACTIONS
 	//
 
 	/**
-	 * {@inheritDoc}
+	 * Starts the web interface and registers all toadlets.
 	 */
-	@Override
-	protected void serviceStart() {
+	public void start() {
 		registerToadlets();
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Stops the web interface and unregisters all toadlets.
 	 */
-	@Override
-	protected void serviceStop() {
+	public void stop() {
 		unregisterToadlets();
 	}
 
