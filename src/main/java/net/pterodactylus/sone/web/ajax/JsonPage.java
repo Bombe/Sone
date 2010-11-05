@@ -164,7 +164,7 @@ public abstract class JsonPage implements Page {
 	public Response handleRequest(Request request) {
 		if (needsFormPassword()) {
 			String formPassword = request.getHttpRequest().getParam("formPassword");
-			if (!webInterface.formPassword().equals(formPassword)) {
+			if (!webInterface.getFormPassword().equals(formPassword)) {
 				return new Response(401, "Not authorized", "application/json", JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
 			}
 		}

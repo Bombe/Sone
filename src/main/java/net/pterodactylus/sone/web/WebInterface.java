@@ -143,7 +143,7 @@ public class WebInterface {
 	 *
 	 * @return The form password
 	 */
-	public String formPassword() {
+	public String getFormPassword() {
 		return formPassword;
 	}
 
