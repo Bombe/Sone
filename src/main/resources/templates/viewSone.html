@@ -12,10 +12,6 @@
 			<%include include/viewSone.html>
 		<%/if>
 
-		<div id="import-key">
-			<div class="import-key"><% sone.requestUri|html></div>
-		</div>
-
 		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
 
 		<div id="posts">

@@ -378,10 +378,6 @@ textarea {
 	color: #888;
 }
 
-#sone #import-key .import-key {
-	border-top: none;
-}
-
 #sone #add-sone textarea, #sone #create-sone textarea, #sone #load-sone textarea, #sone #edit-profile textarea {
 	height: 1.5em;
 }
