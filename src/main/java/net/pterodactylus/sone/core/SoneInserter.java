@@ -143,6 +143,11 @@ public class SoneInserter extends AbstractService {
 				try {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
+					/* at this point we might already be stopped. */
+					if (shouldStop()) {
+						/* if so, bail out, don’t change anything. */
+						break;
+					}
 					sone.setLatestEdition(finalUri.getEdition());
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
