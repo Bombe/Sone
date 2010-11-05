@@ -52,7 +52,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		String replyId = request.getHttpRequest().getPartAsStringFailsafe("reply", 36);
-		Reply reply = webInterface.core().getReply(replyId);
+		Reply reply = webInterface.getCore().getReply(replyId);
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
 		if (request.getMethod() == Method.POST) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
@@ -60,7 +60,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {
-				webInterface.core().deleteReply(reply);
+				webInterface.getCore().deleteReply(reply);
 				throw new RedirectException(returnPage);
 			} else if (request.getHttpRequest().isPartSet("abortDelete")) {
 				throw new RedirectException(returnPage);

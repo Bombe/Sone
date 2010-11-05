@@ -111,7 +111,7 @@ public class WebInterface {
 	 *
 	 * @return The Sone core
 	 */
-	public Core core() {
+	public Core getCore() {
 		return sonePlugin.core();
 	}
 
@@ -176,10 +176,10 @@ public class WebInterface {
 		DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
 		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateFactory.addAccessor(Sone.class, new SoneAccessor(core()));
-		templateFactory.addAccessor(Post.class, new PostAccessor(core()));
-		templateFactory.addAccessor(Reply.class, new ReplyAccessor(core()));
-		templateFactory.addAccessor(Identity.class, new IdentityAccessor(core()));
+		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
+		templateFactory.addAccessor(Post.class, new PostAccessor(getCore()));
+		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
+		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateFactory.addFilter("date", new DateFilter());
 		templateFactory.addFilter("l10n", new L10nFilter(getL10n()));
 		templateFactory.addFilter("substring", new SubstringFilter());

@@ -52,10 +52,10 @@ public class FollowSonePage extends SoneTemplatePage {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			Sone sone = webInterface.core().getSone(soneId);
+			Sone sone = webInterface.getCore().getSone(soneId);
 			if (!sone.equals(currentSone)) {
 				currentSone.addFriend(sone);
-				webInterface.core().saveSone(currentSone);
+				webInterface.getCore().saveSone(currentSone);
 			}
 			throw new RedirectException(returnPage);
 		}

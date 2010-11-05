@@ -53,7 +53,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		List<Sone> knownSones = new ArrayList<Sone>(webInterface.core().getSones());
+		List<Sone> knownSones = new ArrayList<Sone>(webInterface.getCore().getSones());
 		Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
 		template.set("knownSones", knownSones);
 	}

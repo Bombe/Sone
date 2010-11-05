@@ -55,7 +55,7 @@ public class DeleteSonePage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().isPartSet("deleteSone")) {
 				Sone currentSone = getCurrentSone(request.getToadletContext());
-				webInterface.core().deleteSone(currentSone);
+				webInterface.getCore().deleteSone(currentSone);
 			}
 			throw new RedirectException("index.html");
 		}

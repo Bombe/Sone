@@ -44,7 +44,7 @@ public class FollowSoneAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(Request request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.core().getSone(soneId);
+		Sone sone = webInterface.getCore().getSone(soneId);
 		if (sone == null) {
 			return new JsonObject().put("success", false).put("error", "invalid-sone-id");
 		}
@@ -53,7 +53,7 @@ public class FollowSoneAjaxPage extends JsonPage {
 			return new JsonObject().put("success", false).put("error", "auth-required");
 		}
 		currentSone.addFriend(sone);
-		webInterface.core().saveSone(currentSone);
+		webInterface.getCore().saveSone(currentSone);
 		return new JsonObject().put("success", true);
 	}
 

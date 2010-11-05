@@ -51,7 +51,7 @@ public class OptionsPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		Options options = webInterface.core().getOptions();
+		Options options = webInterface.getCore().getOptions();
 		if (request.getMethod() == Method.POST) {
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);

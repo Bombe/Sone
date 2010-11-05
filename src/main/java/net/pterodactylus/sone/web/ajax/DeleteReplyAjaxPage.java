@@ -49,7 +49,7 @@ public class DeleteReplyAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(Request request) {
 		String replyId = request.getHttpRequest().getParam("reply");
-		Reply reply = webInterface.core().getReply(replyId);
+		Reply reply = webInterface.getCore().getReply(replyId);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (reply == null) {
 			return new JsonObject().put("success", false).put("error", "invalid-reply-id");
@@ -60,7 +60,7 @@ public class DeleteReplyAjaxPage extends JsonPage {
 		if (!reply.getSone().equals(currentSone)) {
 			return new JsonObject().put("success", false).put("error", "not-authorized");
 		}
-		webInterface.core().deleteReply(reply);
+		webInterface.getCore().deleteReply(reply);
 		return new JsonObject().put("success", true);
 	}
 

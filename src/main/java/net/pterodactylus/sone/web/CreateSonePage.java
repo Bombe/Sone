@@ -95,7 +95,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.core());
+		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.getCore());
 		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 		if (request.getMethod() == Method.POST) {
 			String id = request.getHttpRequest().getPartAsStringFailsafe("identity", 44);
@@ -111,8 +111,8 @@ public class CreateSonePage extends SoneTemplatePage {
 				return;
 			}
 			/* create Sone. */
-			webInterface.core().getIdentityManager().addContext(selectedIdentity, "Sone");
-			Sone sone = webInterface.core().createSone(selectedIdentity);
+			webInterface.getCore().getIdentityManager().addContext(selectedIdentity, "Sone");
+			Sone sone = webInterface.getCore().createSone(selectedIdentity);
 			if (sone == null) {
 				logger.log(Level.SEVERE, "Could not create Sone for OwnIdentity: %s", selectedIdentity);
 				/* TODO - go somewhere else */

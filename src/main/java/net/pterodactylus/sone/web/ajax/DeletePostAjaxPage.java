@@ -49,7 +49,7 @@ public class DeletePostAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(Request request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.core().getPost(postId);
+		Post post = webInterface.getCore().getPost(postId);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (post == null) {
 			return new JsonObject().put("success", false).put("error", "invalid-post-id");

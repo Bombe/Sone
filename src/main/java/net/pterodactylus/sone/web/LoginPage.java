@@ -63,13 +63,13 @@ public class LoginPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		/* get all own identities. */
-		List<Sone> localSones = new ArrayList<Sone>(webInterface.core().getLocalSones());
+		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
 		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);
 		template.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
 			Sone selectedSone = null;
-			for (Sone sone : webInterface.core().getSones()) {
+			for (Sone sone : webInterface.getCore().getSones()) {
 				if (sone.getId().equals(soneId)) {
 					selectedSone = sone;
 					break;
@@ -80,7 +80,7 @@ public class LoginPage extends SoneTemplatePage {
 				throw new RedirectException("index.html");
 			}
 		}
-		List<OwnIdentity> ownIdentitiesWithoutSone = CreateSonePage.getOwnIdentitiesWithoutSone(webInterface.core());
+		List<OwnIdentity> ownIdentitiesWithoutSone = CreateSonePage.getOwnIdentitiesWithoutSone(webInterface.getCore());
 		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 	}
 

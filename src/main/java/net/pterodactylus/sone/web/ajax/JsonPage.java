@@ -112,7 +112,7 @@ public abstract class JsonPage implements Page {
 		if (soneId == null) {
 			return null;
 		}
-		for (Sone sone : webInterface.core().getSones()) {
+		for (Sone sone : webInterface.getCore().getSones()) {
 			if (sone.getId().equals(soneId)) {
 				return sone;
 			}
