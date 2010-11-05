@@ -144,7 +144,6 @@ public class SoneInserter extends AbstractService {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
 					sone.setLatestEdition(finalUri.getEdition());
-					core.saveSone(sone);
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {
@@ -162,6 +161,7 @@ public class SoneInserter extends AbstractService {
 						if (sone.getModificationCounter() == modificationCounter) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
 							sone.setModificationCounter(0);
+							core.saveSone(sone);
 							modificationCounter = 0;
 							lastModificationTime = 0;
 						}
