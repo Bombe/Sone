@@ -25,8 +25,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.util.filter.Filter;
-import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
@@ -43,6 +41,11 @@ import net.pterodactylus.util.service.AbstractService;
  */
 public class IdentityManager extends AbstractService {
 
+	/** Object used for synchronization. */
+	private final Object syncObject = new Object() {
+		/* inner class for better lock names. */
+	};
+
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(IdentityManager.class);
 
@@ -54,6 +57,10 @@ public class IdentityManager extends AbstractService {
 
 	/** The context to filter for. */
 	private volatile String context;
+
+	/** The currently known own identities. */
+	/* synchronize access on syncObject. */
+	private Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
 	/**
 	 * Creates a new identity manager.
@@ -145,7 +152,13 @@ public class IdentityManager extends AbstractService {
 	 */
 	public Set<OwnIdentity> getAllOwnIdentities() {
 		try {
-			return webOfTrustConnector.loadAllOwnIdentities();
+			Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
+			Map<String, OwnIdentity> newOwnIdentities = new HashMap<String, OwnIdentity>();
+			for (OwnIdentity ownIdentity : ownIdentities) {
+				newOwnIdentities.put(ownIdentity.getId(), ownIdentity);
+			}
+			checkOwnIdentities(newOwnIdentities);
+			return ownIdentities;
 		} catch (PluginException pe1) {
 			logger.log(Level.WARNING, "Could not load all own identities!", pe1);
 			return Collections.emptySet();
@@ -242,7 +255,6 @@ public class IdentityManager extends AbstractService {
 	@Override
 	protected void serviceRun() {
 		Map<String, Identity> oldIdentities = Collections.emptyMap();
-		Map<String, OwnIdentity> oldOwnIdentities = Collections.emptyMap();
 		while (!shouldStop()) {
 			Map<String, Identity> currentIdentities = new HashMap<String, Identity>();
 			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
@@ -250,35 +262,18 @@ public class IdentityManager extends AbstractService {
 			/* get all identities with the wanted context from WoT. */
 			Set<OwnIdentity> ownIdentities;
 			try {
-				ownIdentities = Filters.filteredSet(webOfTrustConnector.loadAllOwnIdentities(), new Filter<OwnIdentity>() {
-
-					@Override
-					@SuppressWarnings("synthetic-access")
-					public boolean filterObject(OwnIdentity ownIdentity) {
-						return (context == null) || ownIdentity.hasContext(context);
-					}
-
-				});
+				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
 				for (OwnIdentity ownIdentity : ownIdentities) {
+					if ((context != null) && !ownIdentity.hasContext(context)) {
+						continue;
+					}
 					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
 					for (Identity identity : webOfTrustConnector.loadTrustedIdentities(ownIdentity, context)) {
 						currentIdentities.put(identity.getId(), identity);
 					}
 				}
 
-				/* find removed own identities: */
-				for (OwnIdentity oldOwnIdentity : oldOwnIdentities.values()) {
-					if (!currentOwnIdentities.containsKey(oldOwnIdentity.getId())) {
-						identityListenerManager.fireOwnIdentityRemoved(oldOwnIdentity);
-					}
-				}
-
-				/* find added own identities. */
-				for (OwnIdentity currentOwnIdentity : currentOwnIdentities.values()) {
-					if (!oldOwnIdentities.containsKey(currentOwnIdentity.getId())) {
-						identityListenerManager.fireOwnIdentityAdded(currentOwnIdentity);
-					}
-				}
+				checkOwnIdentities(currentOwnIdentities);
 
 				/* find removed identities. */
 				for (Identity oldIdentity : oldIdentities.values()) {
@@ -316,7 +311,6 @@ public class IdentityManager extends AbstractService {
 
 				/* remember the current set of identities. */
 				oldIdentities = currentIdentities;
-				oldOwnIdentities = currentOwnIdentities;
 
 			} catch (PluginException pe1) {
 				logger.log(Level.WARNING, "WoT has disappeared!", pe1);
@@ -324,6 +318,39 @@ public class IdentityManager extends AbstractService {
 
 			/* wait a minute before checking again. */
 			sleep(60 * 1000);
+		}
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Checks the given new list of own identities for added or removed own
+	 * identities, as compared to {@link #currentOwnIdentities}.
+	 *
+	 * @param newOwnIdentities
+	 *            The new own identities
+	 */
+	private void checkOwnIdentities(Map<String, OwnIdentity> newOwnIdentities) {
+		synchronized (syncObject) {
+
+			/* find removed own identities: */
+			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
+				if (!newOwnIdentities.containsKey(oldOwnIdentity.getId())) {
+					identityListenerManager.fireOwnIdentityRemoved(oldOwnIdentity);
+				}
+			}
+
+			/* find added own identities. */
+			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
+				if (!currentOwnIdentities.containsKey(currentOwnIdentity.getId())) {
+					identityListenerManager.fireOwnIdentityAdded(currentOwnIdentity);
+				}
+			}
+
+			currentOwnIdentities.clear();
+			currentOwnIdentities.putAll(newOwnIdentities);
 		}
 	}
 
