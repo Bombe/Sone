@@ -405,7 +405,7 @@ public class Sone {
 	 *
 	 * @return All replies this Sone made
 	 */
-	public Set<Reply> getReplies() {
+	public synchronized Set<Reply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
 
