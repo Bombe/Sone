@@ -991,7 +991,7 @@ public class Core implements IdentityListener {
 	 */
 	@Override
 	public void ownIdentityRemoved(OwnIdentity ownIdentity) {
-		/* TODO */
+		logger.log(Level.FINEST, "Removing OwnIdentity: " + ownIdentity);
 	}
 
 	/**
