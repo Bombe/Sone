@@ -59,7 +59,6 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	static {
 		/* initialize logging. */
 		Logging.setup("sone");
-		Logging.setupConsoleLogging();
 		Logging.addLoggingListener(new LoggingListener() {
 
 			@Override
