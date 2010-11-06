@@ -289,6 +289,26 @@ public class IdentityManager extends AbstractService {
 					}
 				}
 
+				/* check for changes in the contexts. */
+				for (Identity oldIdentity : oldIdentities.values()) {
+					if (!currentIdentities.containsKey(oldIdentity.getId())) {
+						continue;
+					}
+					Identity newIdentity = currentIdentities.get(oldIdentity.getId());
+					Set<String> oldContexts = oldIdentity.getContexts();
+					Set<String> newContexts = newIdentity.getContexts();
+					if (oldContexts.size() != newContexts.size()) {
+						identityListenerManager.fireIdentityUpdated(newIdentity);
+						continue;
+					}
+					for (String oldContext : oldContexts) {
+						if (!newContexts.contains(oldContext)) {
+							identityListenerManager.fireIdentityUpdated(newIdentity);
+							break;
+						}
+					}
+				}
+
 				/* check for changes in the properties. */
 				for (Identity oldIdentity : oldIdentities.values()) {
 					if (!currentIdentities.containsKey(oldIdentity.getId())) {
