@@ -1007,8 +1007,16 @@ public class Core implements IdentityListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityUpdated(Identity identity) {
-		/* TODO */
+	public void identityUpdated(final Identity identity) {
+		new Thread(new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				Sone sone = getRemoteSone(identity.getId());
+				soneDownloader.fetchSone(sone);
+			}
+		}).start();
 	}
 
 	/**
