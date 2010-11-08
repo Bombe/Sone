@@ -153,7 +153,13 @@ public class FreenetInterface {
 					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", new Object[] { sone, key, newKnownGood, newSlotToo });
 					if (newKnownGood) {
 						sone.setLatestEdition(key.suggestedEdition);
-						soneDownloader.fetchSone(sone);
+						new Thread(new Runnable() {
+
+							@Override
+							public void run() {
+								soneDownloader.fetchSone(sone);
+							}
+						}, "Sone Downloader").start();
 					}
 				}
 
