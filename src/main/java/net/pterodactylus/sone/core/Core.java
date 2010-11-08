@@ -106,6 +106,9 @@ public class Core implements IdentityListener {
 	/* synchronize access on this on itself. */
 	private Map<String, Sone> remoteSones = new HashMap<String, Sone>();
 
+	/** All new Sones. */
+	private Set<Sone> newSones = new HashSet<Sone>();
+
 	/** All posts. */
 	private Map<String, Post> posts = new HashMap<String, Post>();
 
@@ -508,9 +511,15 @@ public class Core implements IdentityListener {
 			return null;
 		}
 		synchronized (remoteSones) {
+			boolean newSone = !isRemoteSone(identity.getId());
 			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
+			if (newSone) {
+				synchronized (newSones) {
+					newSones.add(sone);
+				}
+			}
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
 			setSoneStatus(sone, SoneStatus.unknown);
