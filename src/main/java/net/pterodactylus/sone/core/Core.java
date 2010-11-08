@@ -306,6 +306,20 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Returns whether the Sone with the given ID is a remote Sone.
+	 *
+	 * @param id
+	 *            The ID of the Sone to check
+	 * @return {@code true} if the Sone with the given ID is a remote Sone,
+	 *         {@code false} otherwise
+	 */
+	public boolean isRemoteSone(String id) {
+		synchronized (remoteSones) {
+			return remoteSones.containsKey(id);
+		}
+	}
+
+	/**
 	 * Returns the post with the given ID.
 	 *
 	 * @param postId
