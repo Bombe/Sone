@@ -486,7 +486,8 @@ public class Core implements IdentityListener {
 		}
 		synchronized (remoteSones) {
 			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
-			sone.setRequestUri(getSoneUri(identity.getRequestUri(), identity.getProperty("Sone.LatestEdition")));
+			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
+			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
 			new Thread(new Runnable() {
@@ -957,13 +958,11 @@ public class Core implements IdentityListener {
 	 *
 	 * @param uriString
 	 *            The URI to derive the Sone URI from
-	 * @param latestEditionString
-	 *            The latest edition as a {@link String}, or {@code null}
 	 * @return The derived URI
 	 */
-	private FreenetURI getSoneUri(String uriString, String latestEditionString) {
+	private FreenetURI getSoneUri(String uriString) {
 		try {
-			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]).setSuggestedEdition(Numbers.safeParseLong(latestEditionString, (long) 0));
+			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
 			return uri;
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, "Could not create Sone URI from URI: " + uriString, mue1);
