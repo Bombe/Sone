@@ -109,6 +109,10 @@ public class Core implements IdentityListener {
 	/** All new Sones. */
 	private Set<Sone> newSones = new HashSet<Sone>();
 
+	/** All known Sones. */
+	/* synchronize access on {@link #newSones}. */
+	private Set<Sone> knownSones = new HashSet<Sone>();
+
 	/** All posts. */
 	private Map<String, Post> posts = new HashMap<String, Post>();
 
@@ -333,7 +337,9 @@ public class Core implements IdentityListener {
 	 */
 	public boolean isNewSone(Sone sone) {
 		synchronized (newSones) {
-			return newSones.remove(sone);
+			boolean isNew = !knownSones.contains(sone) && newSones.remove(sone);
+			knownSones.add(sone);
+			return isNew;
 		}
 	}
 
@@ -735,6 +741,11 @@ public class Core implements IdentityListener {
 			sone.setFriends(friends);
 			sone.setModificationCounter(soneModificationCounter);
 		}
+		synchronized (newSones) {
+			for (Sone friend : friends) {
+				knownSones.add(friend);
+			}
+		}
 	}
 
 	/**
@@ -984,6 +995,17 @@ public class Core implements IdentityListener {
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
 
+		/* load known Sones. */
+		int soneCounter = 0;
+		while (true) {
+			String knownSoneId = configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").getValue(null);
+			if (knownSoneId == null) {
+				break;
+			}
+			synchronized (newSones) {
+				knownSones.add(getRemoteSone(knownSoneId));
+			}
+		}
 	}
 
 	/**
@@ -995,6 +1017,16 @@ public class Core implements IdentityListener {
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
+
+			/* save known Sones. */
+			int soneCounter = 0;
+			synchronized (newSones) {
+				for (Sone knownSone : knownSones) {
+					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSone.getId());
+				}
+				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
+			}
+
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
 		}
