@@ -320,6 +320,10 @@ public class WebOfTrustConnector implements ConnectorListener {
 					reply.wait(60000 - (System.currentTimeMillis() - now));
 				}
 				if (reply.getFields() == null) {
+					for (String targetMessage : targetMessages) {
+						replies.remove(targetMessage);
+					}
+					replies.remove("Error");
 					throw new PluginException("Timeout waiting for " + targetMessages[0] + "!");
 				}
 			} catch (InterruptedException ie1) {
