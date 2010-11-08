@@ -528,6 +528,7 @@ public class Core implements IdentityListener {
 		synchronized (remoteSones) {
 			boolean newSone = !isRemoteSone(identity.getId());
 			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
+			newSone &= sone.getRequestUri() == null;
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
