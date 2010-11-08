@@ -323,6 +323,21 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Returns whether the given Sone is a new Sone. After this check, the Sone
+	 * is marked as known, i.e. a second call with the same parameters will
+	 * always yield {@code false}.
+	 *
+	 * @param sone
+	 *            The sone to check for
+	 * @return {@code true} if the given Sone is new, false otherwise
+	 */
+	public boolean isNewSone(Sone sone) {
+		synchronized (newSones) {
+			return newSones.remove(sone);
+		}
+	}
+
+	/**
 	 * Returns the post with the given ID.
 	 *
 	 * @param postId
