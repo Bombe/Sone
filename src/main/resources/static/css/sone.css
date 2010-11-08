@@ -296,6 +296,10 @@ textarea {
 	background-color: #f0fff0;
 }
 
+#sone .sone.new {
+	background-color: #ffffa0;
+}
+
 #sone .sone .id {
 	display: none;
 }
