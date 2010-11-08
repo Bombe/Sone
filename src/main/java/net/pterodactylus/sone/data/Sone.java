@@ -164,7 +164,7 @@ public class Sone {
 	 * @return The request URI of this Sone
 	 */
 	public FreenetURI getRequestUri() {
-		return requestUri.setSuggestedEdition(latestEdition);
+		return (requestUri != null) ? requestUri.setSuggestedEdition(latestEdition) : null;
 	}
 
 	/**
