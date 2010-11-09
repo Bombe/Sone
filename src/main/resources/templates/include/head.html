@@ -93,36 +93,6 @@
 				});
 				return false;
 			});
-			$("#sone .block").submit(function() {
-				var blockElement = this;
-				$.getJSON("ajax/blockSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-					$(blockElement).addClass("hidden");
-					$(blockElement).parent().find(".unblock").removeClass("hidden");
-				});
-				return false;
-			});
-			$("#sone .unblock").submit(function() {
-				var unblockElement = this;
-				$.getJSON("ajax/unblockSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-					$(unblockElement).addClass("hidden");
-					$(unblockElement).parent().find(".block").removeClass("hidden");
-				});
-				return false;
-			});
-			$("#sone .blacklist").submit(function() {
-				var blacklistElement = this;
-				$.getJSON("ajax/blacklistSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-					$(getSoneElement(blacklistElement)).slideUp();
-				});
-				return false;
-			});
-			$("#sone .unblacklist").submit(function() {
-				var unblacklistElement = this;
-				$.getJSON("ajax/unblacklistSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-					$(getSoneElement(unblacklistElement)).slideUp();
-				});
-				return false;
-			});
 		});
 	</script>
 
