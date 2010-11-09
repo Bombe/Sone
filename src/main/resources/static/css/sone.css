@@ -383,7 +383,7 @@ textarea {
 #sone #tail {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;
-	padding-top: 1em;
+	padding-top: 2em;
 	text-align: center;
 	font-size: 75%;
 	color: #888;
