@@ -263,6 +263,15 @@ public class IdentityManager extends AbstractService {
 			Set<OwnIdentity> ownIdentities;
 			try {
 				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
+
+				/* check for changes. */
+				for (OwnIdentity ownIdentity : ownIdentities) {
+					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
+				}
+				checkOwnIdentities(currentOwnIdentities);
+
+				/* now filter for context and get all identities. */
+				currentOwnIdentities.clear();
 				for (OwnIdentity ownIdentity : ownIdentities) {
 					if ((context != null) && !ownIdentity.hasContext(context)) {
 						continue;
@@ -272,8 +281,6 @@ public class IdentityManager extends AbstractService {
 						currentIdentities.put(identity.getId(), identity);
 					}
 				}
-
-				checkOwnIdentities(currentOwnIdentities);
 
 				/* find removed identities. */
 				for (Identity oldIdentity : oldIdentities.values()) {
