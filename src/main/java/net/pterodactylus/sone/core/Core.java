@@ -207,10 +207,27 @@ public class Core implements IdentityListener {
 	 *         Sone
 	 */
 	public Sone getSone(String id) {
+		return getSone(id, true);
+	}
+
+	/**
+	 * Returns the Sone with the given ID, regardless whether it’s local or
+	 * remote.
+	 *
+	 * @param id
+	 *            The ID of the Sone to get
+	 * @param create
+	 *            {@code true} to create a new Sone if none exists,
+	 *            {@code false} to return {@code null} if a Sone with the given
+	 *            ID does not exist
+	 * @return The Sone with the given ID, or {@code null} if there is no such
+	 *         Sone
+	 */
+	public Sone getSone(String id, boolean create) {
 		if (isLocalSone(id)) {
 			return getLocalSone(id);
 		}
-		return getRemoteSone(id);
+		return getRemoteSone(id, create);
 	}
 
 	/**
@@ -288,9 +305,23 @@ public class Core implements IdentityListener {
 	 * @return The Sone with the given ID
 	 */
 	public Sone getRemoteSone(String id) {
+		return getRemoteSone(id, true);
+	}
+
+	/**
+	 * Returns the remote Sone with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the remote Sone to get
+	 * @param create
+	 *            {@code true} to always create a Sone, {@code false} to return
+	 *            {@code null} if no Sone with the given ID exists
+	 * @return The Sone with the given ID
+	 */
+	public Sone getRemoteSone(String id, boolean create) {
 		synchronized (remoteSones) {
 			Sone sone = remoteSones.get(id);
-			if (sone == null) {
+			if ((sone == null) && create) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
 			}
