@@ -20,8 +20,11 @@ package net.pterodactylus.sone.web.page;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
@@ -35,6 +38,9 @@ import freenet.l10n.BaseL10n;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TemplatePage implements Page, LinkEnabledCallback {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(TemplatePage.class);
 
 	/** The path of the page. */
 	private final String path;
@@ -111,7 +117,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 		}
 
 		try {
+			long start = System.nanoTime();
 			processTemplate(request, template);
+			long finish = System.nanoTime();
+			logger.log(Level.FINEST, "Template was rendered in " + ((finish - start) / 1000) / 1000.0 + "ms.");
 		} catch (RedirectException re1) {
 			return new RedirectResponse(re1.getTarget());
 		}
