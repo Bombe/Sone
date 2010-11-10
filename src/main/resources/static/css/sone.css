@@ -204,6 +204,13 @@ textarea {
 	padding-top: 0.2ex;
 }
 
+#sone .post .replies .click-to-show {
+	background-color: #f0f0ff;
+	font-size: 85%;
+	padding: 0.5em;
+	cursor: pointer;
+}
+
 #sone .post .reply > .avatar {
 	position: absolute;
 }

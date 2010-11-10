@@ -50,6 +50,31 @@
 	</script>
 
 	<script language="javascript">
+		/* hides all replies but the latest two. */
+		$(document).ready(function() {
+			$("#sone .post .replies").each(function() {
+				allReplies = $(this).find(".reply");
+				if (allReplies.length > 2) {
+					for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
+						$(allReplies[replyIndex]).addClass("hidden");
+					}
+					clickToShowElement = $("<div></div>").addClass("click-to-show");
+					(function(clickToShowElement, allReplies) {
+						getTranslation("WebInterface.ClickToShow.Replies", function(text) {
+							clickToShowElement.text(text);
+						});
+						clickToShowElement.click(function() {
+							allReplies.removeClass("hidden");
+							clickToShowElement.addClass("hidden");
+						});
+					})(clickToShowElement, allReplies);
+					$(allReplies[0]).before(clickToShowElement);
+				}
+			});
+		});
+	</script>
+
+	<script language="javascript">
 		/* convert all “follow”, “unfollow”, “block”, and “unblock” links to something nicer. */
 		$(document).ready(function() {
 			$("#sone .follow").submit(function() {
