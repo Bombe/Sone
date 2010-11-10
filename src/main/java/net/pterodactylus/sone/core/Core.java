@@ -499,6 +499,7 @@ public class Core implements IdentityListener {
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
+			setSoneStatus(sone, SoneStatus.unknown);
 			new Thread(new Runnable() {
 
 				@Override
@@ -508,7 +509,6 @@ public class Core implements IdentityListener {
 				}
 
 			}, "Sone Downloader").start();
-			setSoneStatus(sone, SoneStatus.idle);
 			return sone;
 		}
 	}
