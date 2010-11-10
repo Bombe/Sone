@@ -231,6 +231,18 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Checks whether the core knows a Sone with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the Sone
+	 * @return {@code true} if there is a Sone with the given ID, {@code false}
+	 *         otherwise
+	 */
+	public boolean hasSone(String id) {
+		return isLocalSone(id) || isRemoteSone(id);
+	}
+
+	/**
 	 * Returns whether the given Sone is a local Sone.
 	 *
 	 * @param sone
