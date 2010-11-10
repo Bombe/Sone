@@ -112,6 +112,17 @@ function getSoneStatus(soneId) {
 }
 
 /**
+ * Filters the given Sone ID, replacing all “~” characters by an underscore.
+ *
+ * @param soneId
+ *            The Sone ID to filter
+ * @returns The filtered Sone ID
+ */
+function filterSoneId(soneId) {
+	return soneId.replace(/[^a-zA-Z0-9-]/g, "_");
+}
+
+/**
  * Updates the status of the given Sone.
  *
  * @param soneId
@@ -125,14 +136,14 @@ function getSoneStatus(soneId) {
  *            The date and time of the last update (formatted for display)
  */
 function updateSoneStatus(soneId, name, status, modified, lastUpdated) {
-	$("#sone .sone." + soneId).
+	$("#sone .sone." + filterSoneId(soneId)).
 		toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
 		toggleClass("inserting", status == "inserting").
 		toggleClass("downloading", status == "downloading").
 		toggleClass("modified", modified);
-	$("#sone .sone." + soneId + " .last-update span.time").text(lastUpdated);
-	$("#sone .sone." + soneId + " .profile-link a").text(name);
+	$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
 }
 
 var watchedSones = {};
