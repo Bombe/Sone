@@ -552,7 +552,6 @@ public class Core implements IdentityListener {
 				storedSone.setLatestEdition(sone.getRequestUri().getEdition());
 				storedSone.setModificationCounter(0);
 			}
-			saveSone(storedSone);
 		}
 	}
 
