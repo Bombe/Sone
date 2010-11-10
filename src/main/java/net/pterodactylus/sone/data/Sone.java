@@ -82,7 +82,7 @@ public class Sone {
 	private volatile Profile profile;
 
 	/** All friend Sones. */
-	private final Set<Sone> friendSones = Collections.synchronizedSet(new HashSet<Sone>());
+	private final Set<String> friendSones = Collections.synchronizedSet(new HashSet<String>());
 
 	/** All posts. */
 	private final Set<Post> posts = Collections.synchronizedSet(new HashSet<Post>());
@@ -289,9 +289,8 @@ public class Sone {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	public List<Sone> getFriends() {
-		List<Sone> friends = new ArrayList<Sone>(friendSones);
-		Collections.sort(friends, NICE_NAME_COMPARATOR);
+	public List<String> getFriends() {
+		List<String> friends = new ArrayList<String>(friendSones);
 		return friends;
 	}
 
@@ -302,7 +301,7 @@ public class Sone {
 	 *            The new (and only) friends of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone setFriends(Collection<Sone> friends) {
+	public Sone setFriends(Collection<String> friends) {
 		friendSones.clear();
 		friendSones.addAll(friends);
 		return this;
@@ -327,8 +326,8 @@ public class Sone {
 	 *            The friend Sone to add
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone addFriend(Sone friendSone) {
-		if (!friendSone.equals(this)) {
+	public Sone addFriend(String friendSone) {
+		if (!friendSone.equals(id)) {
 			friendSones.add(friendSone);
 		}
 		return this;

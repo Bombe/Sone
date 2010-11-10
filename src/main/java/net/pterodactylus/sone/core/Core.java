@@ -107,11 +107,11 @@ public class Core implements IdentityListener {
 	private Map<String, Sone> remoteSones = new HashMap<String, Sone>();
 
 	/** All new Sones. */
-	private Set<Sone> newSones = new HashSet<Sone>();
+	private Set<String> newSones = new HashSet<String>();
 
 	/** All known Sones. */
 	/* synchronize access on {@link #newSones}. */
-	private Set<Sone> knownSones = new HashSet<Sone>();
+	private Set<String> knownSones = new HashSet<String>();
 
 	/** All posts. */
 	private Map<String, Post> posts = new HashMap<String, Post>();
@@ -380,8 +380,8 @@ public class Core implements IdentityListener {
 	 */
 	public boolean isNewSone(Sone sone) {
 		synchronized (newSones) {
-			boolean isNew = !knownSones.contains(sone) && newSones.remove(sone);
-			knownSones.add(sone);
+			boolean isNew = !knownSones.contains(sone.getId()) && newSones.remove(sone.getId());
+			knownSones.add(sone.getId());
 			return isNew;
 		}
 	}
@@ -581,7 +581,7 @@ public class Core implements IdentityListener {
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
 				synchronized (newSones) {
-					newSones.add(sone);
+					newSones.add(sone.getId());
 				}
 			}
 			remoteSones.put(identity.getId(), sone);
@@ -759,18 +759,13 @@ public class Core implements IdentityListener {
 		}
 
 		/* load friends. */
-		Set<Sone> friends = new HashSet<Sone>();
+		Set<String> friends = new HashSet<String>();
 		while (true) {
 			String friendId = configuration.getStringValue(sonePrefix + "/Friends/" + friends.size() + "/ID").getValue(null);
 			if (friendId == null) {
 				break;
 			}
-			Boolean friendLocal = configuration.getBooleanValue(sonePrefix + "/Friends/" + friends.size() + "/Local").getValue(null);
-			if (friendLocal == null) {
-				logger.log(Level.WARNING, "Invalid friend found, aborting load!");
-				return;
-			}
-			friends.add(friendLocal ? getLocalSone(friendId) : getRemoteSone(friendId));
+			friends.add(friendId);
 		}
 
 		/* if we’re still here, Sone was loaded successfully. */
@@ -785,7 +780,7 @@ public class Core implements IdentityListener {
 			sone.setModificationCounter(soneModificationCounter);
 		}
 		synchronized (newSones) {
-			for (Sone friend : friends) {
+			for (String friend : friends) {
 				knownSones.add(friend);
 			}
 		}
@@ -862,9 +857,8 @@ public class Core implements IdentityListener {
 
 			/* save friends. */
 			int friendCounter = 0;
-			for (Sone friend : sone.getFriends()) {
-				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(friend.getId());
-				configuration.getBooleanValue(sonePrefix + "/Friends/" + friendCounter++ + "/Local").setValue(friend.getInsertUri() != null);
+			for (String friend : sone.getFriends()) {
+				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(friend);
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
@@ -1046,7 +1040,7 @@ public class Core implements IdentityListener {
 				break;
 			}
 			synchronized (newSones) {
-				knownSones.add(getRemoteSone(knownSoneId));
+				knownSones.add(knownSoneId);
 			}
 		}
 	}
@@ -1064,8 +1058,8 @@ public class Core implements IdentityListener {
 			/* save known Sones. */
 			int soneCounter = 0;
 			synchronized (newSones) {
-				for (Sone knownSone : knownSones) {
-					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSone.getId());
+				for (String knownSoneId : knownSones) {
+					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSoneId);
 				}
 				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
 			}

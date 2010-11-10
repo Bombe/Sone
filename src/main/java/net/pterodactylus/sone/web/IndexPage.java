@@ -19,7 +19,6 @@ package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
@@ -57,17 +56,13 @@ public class IndexPage extends SoneTemplatePage {
 		Sone sone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(sone.getPosts());
-		for (Sone friendSone : sone.getFriends()) {
-			allPosts.addAll(friendSone.getPosts());
-		}
-		Collections.sort(allPosts, new Comparator<Post>() {
-
-			@Override
-			public int compare(Post leftPost, Post rightPost) {
-				return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
+		for (String friendSoneId : sone.getFriends()) {
+			if (!webInterface.getCore().hasSone(friendSoneId)) {
+				continue;
 			}
-
-		});
+			allPosts.addAll(webInterface.getCore().getSone(friendSoneId).getPosts());
+		}
+		Collections.sort(allPosts, Post.TIME_COMPARATOR);
 		template.set("posts", allPosts);
 	}
 
