@@ -167,16 +167,16 @@ public class SoneDownloader extends AbstractService {
 	}
 
 	/**
-	 * Parses a Sone from the given input stream and updates the given Sone, or
-	 * creates a new Sone.
+	 * Parses a Sone from the given input stream and creates a new Sone from the
+	 * parsed data.
 	 *
-	 * @param sone
+	 * @param originalSone
 	 *            The Sone to update
 	 * @param soneInputStream
 	 *            The input stream to parse the Sone from
 	 * @return The parsed Sone
 	 */
-	public Sone parseSone(Sone sone, InputStream soneInputStream) {
+	public Sone parseSone(Sone originalSone, InputStream soneInputStream) {
 		/* TODO - impose a size limit? */
 
 		Document document;
@@ -186,9 +186,12 @@ public class SoneDownloader extends AbstractService {
 		}
 		if (document == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Could not parse XML for Sone %s!", new Object[] { sone });
+			logger.log(Level.WARNING, "Could not parse XML for Sone %s!", new Object[] { originalSone });
 			return null;
 		}
+
+		Sone sone = new Sone(originalSone.getId());
+
 		SimpleXML soneXml;
 		try {
 			soneXml = SimpleXML.fromDocument(document);
