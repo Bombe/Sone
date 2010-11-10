@@ -149,7 +149,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		/* create a configuration. */
 		Configuration configuration;
 		try {
-			configuration = new Configuration(new PluginStoreConfigurationBackend(pluginStore = pluginRespirator.getStore()));
+			configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
 		} catch (DatabaseDisabledException dde1) {
 			logger.log(Level.WARNING, "Could not load plugin store, using XML files.");
 			try {

@@ -17,10 +17,16 @@
 
 package net.pterodactylus.sone.freenet;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.pterodactylus.util.config.AttributeNotFoundException;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.ExtendedConfigurationBackend;
+import net.pterodactylus.util.logging.Logging;
+import freenet.client.async.DatabaseDisabledException;
+import freenet.pluginmanager.PluginRespirator;
 import freenet.pluginmanager.PluginStore;
 
 /**
@@ -30,17 +36,26 @@ import freenet.pluginmanager.PluginStore;
  */
 public class PluginStoreConfigurationBackend implements ExtendedConfigurationBackend {
 
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(PluginStoreConfigurationBackend.class);
+
+	/** The plugin respirator. */
+	private final PluginRespirator pluginRespirator;
+
 	/** The backing plugin store. */
 	private final PluginStore pluginStore;
 
 	/**
 	 * Creates a new configuration backend based on a plugin store.
 	 *
-	 * @param pluginStore
-	 *            The backing plugin store
+	 * @param pluginRespirator
+	 *            The plugin respirator
+	 * @throws DatabaseDisabledException
+	 *             if the plugin store is not available
 	 */
-	public PluginStoreConfigurationBackend(PluginStore pluginStore) {
-		this.pluginStore = pluginStore;
+	public PluginStoreConfigurationBackend(PluginRespirator pluginRespirator) throws DatabaseDisabledException {
+		this.pluginRespirator = pluginRespirator;
+		this.pluginStore = pluginRespirator.getStore();
 	}
 
 	/**
@@ -60,6 +75,7 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	@Override
 	public void putValue(String attribute, String value) throws ConfigurationException {
 		pluginStore.strings.put(attribute, value);
+		save();
 	}
 
 	/**
@@ -79,6 +95,7 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	@Override
 	public void setBooleanValue(String attribute, Boolean value) throws ConfigurationException {
 		pluginStore.booleans.put(attribute, value);
+		save();
 	}
 
 	/**
@@ -106,6 +123,7 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	@Override
 	public void setDoubleValue(String attribute, Double value) throws ConfigurationException {
 		pluginStore.strings.put(attribute, String.valueOf(value));
+		save();
 	}
 
 	/**
@@ -125,6 +143,7 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	@Override
 	public void setIntegerValue(String attribute, Integer value) throws ConfigurationException {
 		pluginStore.integers.put(attribute, value);
+		save();
 	}
 
 	/**
@@ -144,6 +163,22 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	@Override
 	public void setLongValue(String attribute, Long value) throws ConfigurationException {
 		pluginStore.longs.put(attribute, value);
+		save();
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Saves the configuration to the plugin store.
+	 */
+	private void save() {
+		try {
+			pluginRespirator.putStore(pluginStore);
+		} catch (DatabaseDisabledException dde1) {
+			logger.log(Level.WARNING, "Could not store plugin store, database is disabled.", dde1);
+		}
 	}
 
 }
