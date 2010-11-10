@@ -147,7 +147,7 @@ public class SoneDownloader extends AbstractService {
 	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
 	 */
 	public Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
-		logger.log(Level.FINEST, "Persing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), originalSone });
+		logger.log(Level.FINEST, "Parsing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), originalSone });
 		Bucket soneBucket = fetchResult.asBucket();
 		InputStream soneInputStream = null;
 		try {
