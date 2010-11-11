@@ -127,6 +127,11 @@ textarea {
 	clear: both;
 }
 
+#sone .post.new {
+	background-color: #ffffa0;
+	padding-left: 1ex;
+}
+
 #sone .post.last {
 	padding: 1ex 0px;
 	border-bottom: none;

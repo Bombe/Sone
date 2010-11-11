@@ -113,6 +113,13 @@ public class Core implements IdentityListener {
 	/* synchronize access on {@link #newSones}. */
 	private Set<String> knownSones = new HashSet<String>();
 
+	/** All new posts. */
+	private Set<String> newPosts = new HashSet<String>();
+
+	/** All known posts. */
+	/* synchronize access on {@link #newPosts}. */
+	private Set<String> knownPosts = new HashSet<String>();
+
 	/** All posts. */
 	private Map<String, Post> posts = new HashMap<String, Post>();
 
@@ -405,6 +412,23 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Returns whether the given post ID is new. After this method returns it is
+	 * marked a known post ID.
+	 *
+	 * @param postId
+	 *            The post ID
+	 * @return {@code true} if the post is considered to be new, {@code false}
+	 *         otherwise
+	 */
+	public boolean isNewPost(String postId) {
+		synchronized (newPosts) {
+			boolean isNew = !knownPosts.contains(postId) && newPosts.remove(postId);
+			knownPosts.add(postId);
+			return isNew;
+		}
+	}
+
+	/**
 	 * Returns the reply with the given ID.
 	 *
 	 * @param replyId
@@ -617,8 +641,13 @@ public class Core implements IdentityListener {
 				for (Post post : storedSone.getPosts()) {
 					posts.remove(post.getId());
 				}
-				for (Post post : sone.getPosts()) {
-					posts.put(post.getId(), post);
+				synchronized (newPosts) {
+					for (Post post : sone.getPosts()) {
+						if (!storedSone.getPosts().contains(post) && !knownSones.contains(post.getId())) {
+							newPosts.add(post.getId());
+						}
+						posts.put(post.getId(), post);
+					}
 				}
 			}
 			synchronized (replies) {
@@ -782,6 +811,11 @@ public class Core implements IdentityListener {
 		synchronized (newSones) {
 			for (String friend : friends) {
 				knownSones.add(friend);
+			}
+		}
+		synchronized (newPosts) {
+			for (Post post : posts) {
+				knownPosts.add(post.getId());
 			}
 		}
 	}
@@ -1043,6 +1077,19 @@ public class Core implements IdentityListener {
 				knownSones.add(knownSoneId);
 			}
 		}
+
+		/* load known posts. */
+		int postCounter = 0;
+		while (true) {
+			String knownPostId = configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").getValue(null);
+			if (knownPostId == null) {
+				break;
+			}
+			synchronized (newPosts) {
+				knownPosts.add(knownPostId);
+			}
+		}
+
 	}
 
 	/**
@@ -1062,6 +1109,15 @@ public class Core implements IdentityListener {
 					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSoneId);
 				}
 				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
+			}
+
+			/* save known posts. */
+			int postCounter = 0;
+			synchronized (newPosts) {
+				for (String knownPostId : knownPosts) {
+					configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
+				}
+				configuration.getStringValue("KnownPosts/" + postCounter + "/ID").setValue(null);
 			}
 
 		} catch (ConfigurationException ce1) {
