@@ -933,6 +933,9 @@ public class Core implements IdentityListener {
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}
+		synchronized (newPosts) {
+			knownPosts.add(post.getId());
+		}
 		sone.addPost(post);
 		saveSone(sone);
 	}
