@@ -44,15 +44,14 @@ public class UnfollowSoneAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(Request request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId);
-		if (sone == null) {
+		if (!webInterface.getCore().hasSone(soneId)) {
 			return new JsonObject().put("success", false).put("error", "invalid-sone-id");
 		}
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (currentSone == null) {
 			return new JsonObject().put("success", false).put("error", "auth-required");
 		}
-		currentSone.removeFriend(sone);
+		currentSone.removeFriend(soneId);
 		webInterface.getCore().saveSone(currentSone);
 		return new JsonObject().put("success", true);
 	}

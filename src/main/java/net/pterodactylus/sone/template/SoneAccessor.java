@@ -69,7 +69,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			return sone.getInsertUri() != null;
 		} else if (member.equals("friend")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return (currentSone != null) && currentSone.hasFriend(sone);
+			return (currentSone != null) && currentSone.hasFriend(sone.getId());
 		} else if (member.equals("current")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return (currentSone != null) && currentSone.equals(sone);

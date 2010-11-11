@@ -310,13 +310,13 @@ public class Sone {
 	/**
 	 * Returns whether this Sone has the given Sone as a friend Sone.
 	 *
-	 * @param friendSone
-	 *            The friend Sone to check for
+	 * @param friendSoneId
+	 *            The ID of the Sone to check for
 	 * @return {@code true} if this Sone has the given Sone as a friend,
 	 *         {@code false} otherwise
 	 */
-	public boolean hasFriend(Sone friendSone) {
-		return friendSones.contains(friendSone);
+	public boolean hasFriend(String friendSoneId) {
+		return friendSones.contains(friendSoneId);
 	}
 
 	/**
@@ -336,12 +336,12 @@ public class Sone {
 	/**
 	 * Removes the given Sone as a friend Sone.
 	 *
-	 * @param friendSone
-	 *            The friend Sone to remove
+	 * @param friendSoneId
+	 *            The ID of the friend Sone to remove
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone removeFriend(Sone friendSone) {
-		friendSones.remove(friendSone);
+	public Sone removeFriend(String friendSoneId) {
+		friendSones.remove(friendSoneId);
 		return this;
 	}
 
