@@ -857,8 +857,8 @@ public class Core implements IdentityListener {
 
 			/* save friends. */
 			int friendCounter = 0;
-			for (String friend : sone.getFriends()) {
-				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(friend);
+			for (String friendId : sone.getFriends()) {
+				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter++ + "/ID").setValue(friendId);
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
