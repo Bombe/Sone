@@ -126,6 +126,12 @@ public class Core implements IdentityListener {
 	/** All replies. */
 	private Map<String, Reply> replies = new HashMap<String, Reply>();
 
+	/** All new replies. */
+	private Set<String> newReplies = new HashSet<String>();
+
+	/** All known replies. */
+	private Set<String> knownReplies = new HashSet<String>();
+
 	/**
 	 * Creates a new core.
 	 *
@@ -468,6 +474,22 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Returns whether the reply with the given ID is new.
+	 *
+	 * @param replyId
+	 *            The ID of the reply to check
+	 * @return {@code true} if the reply is considered to be new, {@code false}
+	 *         otherwise
+	 */
+	public boolean isNewReply(String replyId) {
+		synchronized (newReplies) {
+			boolean isNew = !knownReplies.contains(replyId) && newReplies.remove(replyId);
+			knownReplies.add(replyId);
+			return isNew;
+		}
+	}
+
+	/**
 	 * Returns all Sones that have liked the given post.
 	 *
 	 * @param post
@@ -654,8 +676,13 @@ public class Core implements IdentityListener {
 				for (Reply reply : storedSone.getReplies()) {
 					replies.remove(reply.getId());
 				}
-				for (Reply reply : sone.getReplies()) {
-					replies.put(reply.getId(), reply);
+				synchronized (newReplies) {
+					for (Reply reply : sone.getReplies()) {
+						if (!storedSone.getReplies().contains(reply) && !knownSones.contains(reply.getId())) {
+							newReplies.add(reply.getId());
+						}
+						replies.put(reply.getId(), reply);
+					}
 				}
 			}
 			synchronized (storedSone) {
@@ -816,6 +843,11 @@ public class Core implements IdentityListener {
 		synchronized (newPosts) {
 			for (Post post : posts) {
 				knownPosts.add(post.getId());
+			}
+		}
+		synchronized (newReplies) {
+			for (Reply reply : replies) {
+				knownReplies.add(reply.getId());
 			}
 		}
 	}
@@ -993,6 +1025,9 @@ public class Core implements IdentityListener {
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
+		synchronized (newReplies) {
+			knownReplies.add(reply.getId());
+		}
 		sone.addReply(reply);
 		saveSone(sone);
 	}
@@ -1093,6 +1128,18 @@ public class Core implements IdentityListener {
 			}
 		}
 
+		/* load known replies. */
+		int replyCounter = 0;
+		while (true) {
+			String knownReplyId = configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").getValue(null);
+			if (knownReplyId == null) {
+				break;
+			}
+			synchronized (newReplies) {
+				knownReplies.add(knownReplyId);
+			}
+		}
+
 	}
 
 	/**
@@ -1121,6 +1168,15 @@ public class Core implements IdentityListener {
 					configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
 				}
 				configuration.getStringValue("KnownPosts/" + postCounter + "/ID").setValue(null);
+			}
+
+			/* save known replies. */
+			int replyCounter = 0;
+			synchronized (newReplies) {
+				for (String knownReplyId : knownReplies) {
+					configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
+				}
+				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
 			}
 
 		} catch (ConfigurationException ce1) {

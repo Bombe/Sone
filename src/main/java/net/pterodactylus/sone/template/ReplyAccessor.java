@@ -56,6 +56,8 @@ public class ReplyAccessor extends ReflectionAccessor {
 		} else if (member.equals("liked")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return (currentSone != null) && (currentSone.isLikedReplyId(reply.getId()));
+		} else if (member.equals("new")) {
+			return core.isNewReply(reply.getId());
 		}
 		return super.get(dataProvider, object, member);
 	}

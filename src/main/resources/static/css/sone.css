@@ -234,6 +234,10 @@ textarea {
 	padding: 1ex;
 }
 
+#sone .post .reply.new {
+	background-color: #ffffa0;
+}
+
 #sone .post .reply .time {
 	float: none;
 	display: inline;

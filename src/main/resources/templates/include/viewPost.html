@@ -37,7 +37,7 @@
 		</div>
 		<div class="replies">
 			<%foreach post.replies reply>
-				<div id="<% reply.id|html>" class="reply">
+				<div id="<% reply.id|html>" class="reply<%if reply.new> new<%/if>">
 					<div class="avatar">
 						<img src="/WoT/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
 					</div>
