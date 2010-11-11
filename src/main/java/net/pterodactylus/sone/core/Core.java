@@ -113,15 +113,15 @@ public class Core implements IdentityListener {
 	/* synchronize access on {@link #newSones}. */
 	private Set<String> knownSones = new HashSet<String>();
 
+	/** All posts. */
+	private Map<String, Post> posts = new HashMap<String, Post>();
+
 	/** All new posts. */
 	private Set<String> newPosts = new HashSet<String>();
 
 	/** All known posts. */
 	/* synchronize access on {@link #newPosts}. */
 	private Set<String> knownPosts = new HashSet<String>();
-
-	/** All posts. */
-	private Map<String, Post> posts = new HashMap<String, Post>();
 
 	/** All replies. */
 	private Map<String, Reply> replies = new HashMap<String, Reply>();
