@@ -55,10 +55,15 @@
 			$("#sone .post .replies").each(function() {
 				allReplies = $(this).find(".reply");
 				if (allReplies.length > 2) {
+					newHidden = false;
 					for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
 						$(allReplies[replyIndex]).addClass("hidden");
+						newHidden |= $(allReplies[replyIndex]).hasClass("new");
 					}
 					clickToShowElement = $("<div></div>").addClass("click-to-show");
+					if (newHidden) {
+						clickToShowElement.addClass("new");
+					}
 					(function(clickToShowElement, allReplies) {
 						getTranslation("WebInterface.ClickToShow.Replies", function(text) {
 							clickToShowElement.text(text);

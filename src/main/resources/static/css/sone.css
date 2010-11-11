@@ -216,6 +216,10 @@ textarea {
 	cursor: pointer;
 }
 
+#sone .post .replies .click-to-show.new {
+	background-color: #ffffa0;
+}
+
 #sone .post .reply > .avatar {
 	position: absolute;
 }
