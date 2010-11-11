@@ -607,8 +607,8 @@ public class Core implements IdentityListener {
 	 *            The updated Sone
 	 */
 	public void updateSone(Sone sone) {
-		if (isRemoteSone(sone)) {
-			Sone storedSone = getRemoteSone(sone.getId());
+		if (hasSone(sone.getId())) {
+			Sone storedSone = getSone(sone.getId());
 			if (!(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
 				return;
