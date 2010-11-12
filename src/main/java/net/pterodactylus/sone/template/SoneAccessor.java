@@ -74,7 +74,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return (currentSone != null) && currentSone.equals(sone);
 		} else if (member.equals("modified")) {
-			return sone.getModificationCounter() > 0;
+			return core.isModifiedSone(sone);
 		} else if (member.equals("status")) {
 			return core.getSoneStatus(sone);
 		} else if (member.equals("unknown")) {

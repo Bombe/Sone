@@ -341,7 +341,6 @@ public class SoneDownloader extends AbstractService {
 			sone.setPosts(posts);
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
-			sone.setModificationCounter(0);
 		}
 
 		return sone;

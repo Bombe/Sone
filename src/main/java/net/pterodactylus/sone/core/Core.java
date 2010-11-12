@@ -400,6 +400,18 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Returns whether the given Sone has been modified.
+	 *
+	 * @param sone
+	 *            The Sone to check for modifications
+	 * @return {@code true} if a modification has been detected in the Sone,
+	 *         {@code false} otherwise
+	 */
+	public boolean isModifiedSone(Sone sone) {
+		return (soneInserters.containsKey(sone)) ? soneInserters.get(sone).isModified() : false;
+	}
+
+	/**
 	 * Returns the post with the given ID.
 	 *
 	 * @param postId
@@ -601,10 +613,6 @@ public class Core implements IdentityListener {
 	public Sone createSone(OwnIdentity ownIdentity) {
 		identityManager.addContext(ownIdentity, "Sone");
 		Sone sone = addLocalSone(ownIdentity);
-		synchronized (sone) {
-			/* mark as modified so that it gets inserted immediately. */
-			sone.setModificationCounter(sone.getModificationCounter() + 1);
-		}
 		return sone;
 	}
 
@@ -693,7 +701,6 @@ public class Core implements IdentityListener {
 				storedSone.setLikePostIds(sone.getLikedPostIds());
 				storedSone.setLikeReplyIds(sone.getLikedReplyIds());
 				storedSone.setLatestEdition(sone.getRequestUri().getEdition());
-				storedSone.setModificationCounter(0);
 			}
 		}
 	}
@@ -748,7 +755,7 @@ public class Core implements IdentityListener {
 			logger.log(Level.INFO, "Could not load Sone because no Sone has been saved.");
 			return;
 		}
-		long soneModificationCounter = configuration.getLongValue(sonePrefix + "/ModificationCounter").getValue((long) 0);
+		String lastInsertFingerprint = configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").getValue("");
 
 		/* load profile. */
 		Profile profile = new Profile();
@@ -833,7 +840,7 @@ public class Core implements IdentityListener {
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
 			sone.setFriends(friends);
-			sone.setModificationCounter(soneModificationCounter);
+			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
 		synchronized (newSones) {
 			for (String friend : friends) {
@@ -875,7 +882,7 @@ public class Core implements IdentityListener {
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
 			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
-			configuration.getLongValue(sonePrefix + "/ModificationCounter").setValue(sone.getModificationCounter());
+			configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").setValue(soneInserters.get(sone).getLastInsertFingerprint());
 
 			/* save profile. */
 			Profile profile = sone.getProfile();

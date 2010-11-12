@@ -76,6 +76,12 @@ public class SoneInserter extends AbstractService {
 	/** The Sone to insert. */
 	private final Sone sone;
 
+	/** Whether a modification has been detected. */
+	private volatile boolean modified = false;
+
+	/** The fingerprint of the last insert. */
+	private volatile String lastInsertFingerprint;
+
 	/**
 	 * Creates a new Sone inserter.
 	 *
@@ -108,6 +114,36 @@ public class SoneInserter extends AbstractService {
 		SoneInserter.insertionDelay = insertionDelay;
 	}
 
+	/**
+	 * Returns the fingerprint of the last insert.
+	 *
+	 * @return The fingerprint of the last insert
+	 */
+	public String getLastInsertFingerprint() {
+		return lastInsertFingerprint;
+	}
+
+	/**
+	 * Sets the fingerprint of the last insert.
+	 *
+	 * @param lastInsertFingerprint
+	 *            The fingerprint of the last insert
+	 */
+	public void setLastInsertFingerprint(String lastInsertFingerprint) {
+		this.lastInsertFingerprint = lastInsertFingerprint;
+	}
+
+	/**
+	 * Returns whether the Sone inserter has detected a modification of the
+	 * Sone.
+	 *
+	 * @return {@code true} if the Sone has been modified, {@code false}
+	 *         otherwise
+	 */
+	public boolean isModified() {
+		return modified;
+	}
+
 	//
 	// SERVICE METHODS
 	//
@@ -117,21 +153,30 @@ public class SoneInserter extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		long modificationCounter = 0;
 		long lastModificationTime = 0;
+		String lastFingerprint = "";
 		while (!shouldStop()) {
 			/* check every seconds. */
 			sleep(1000);
 
 			InsertInformation insertInformation = null;
 			synchronized (sone) {
-				if (sone.getModificationCounter() > modificationCounter) {
-					modificationCounter = sone.getModificationCounter();
-					lastModificationTime = System.currentTimeMillis();
-					sone.setTime(lastModificationTime);
-					logger.log(Level.FINE, "Sone %s has been modified, waiting %d seconds before inserting.", new Object[] { sone.getName(), insertionDelay });
+				String fingerprint = sone.getFingerprint();
+				if (!fingerprint.equals(lastFingerprint)) {
+					if (fingerprint.equals(lastInsertFingerprint)) {
+						modified = false;
+						lastModificationTime = 0;
+						logger.log(Level.FINE, "Sone %s has been reverted to last insert state.", sone);
+					} else {
+						lastModificationTime = System.currentTimeMillis();
+						modified = true;
+						sone.setTime(lastModificationTime);
+						logger.log(Level.FINE, "Sone %s has been modified, waiting %d seconds before inserting.", new Object[] { sone.getName(), insertionDelay });
+					}
+					lastFingerprint = fingerprint;
 				}
-				if ((lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
+				if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
+					lastInsertFingerprint = fingerprint;
 					insertInformation = new InsertInformation(sone);
 				}
 			}
@@ -163,12 +208,11 @@ public class SoneInserter extends AbstractService {
 				 */
 				if (success) {
 					synchronized (sone) {
-						if (sone.getModificationCounter() == modificationCounter) {
+						if (lastInsertFingerprint.equals(sone.getFingerprint())) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
-							sone.setModificationCounter(0);
 							core.saveSone(sone);
-							modificationCounter = 0;
 							lastModificationTime = 0;
+							modified = false;
 						}
 					}
 				}

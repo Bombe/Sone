@@ -96,9 +96,6 @@ public class Sone {
 	/** The IDs of all liked replies. */
 	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
 
-	/** Modification count. */
-	private volatile long modificationCounter = 0;
-
 	/**
 	 * Creates a new Sone.
 	 *
@@ -267,7 +264,7 @@ public class Sone {
 	 *
 	 * @return A copy of the profile
 	 */
-	public Profile getProfile() {
+	public synchronized Profile getProfile() {
 		return new Profile(profile);
 	}
 
@@ -281,7 +278,6 @@ public class Sone {
 	 */
 	public synchronized void setProfile(Profile profile) {
 		this.profile = new Profile(profile);
-		modificationCounter++;
 	}
 
 	/**
@@ -369,7 +365,6 @@ public class Sone {
 	public synchronized Sone setPosts(Collection<Post> posts) {
 		this.posts.clear();
 		this.posts.addAll(posts);
-		modificationCounter++;
 		return this;
 	}
 
@@ -383,7 +378,6 @@ public class Sone {
 	public synchronized void addPost(Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
 			logger.log(Level.FINEST, "Adding %s to “%s”.", new Object[] { post, getName() });
-			modificationCounter++;
 		}
 	}
 
@@ -394,8 +388,8 @@ public class Sone {
 	 *            The post to remove
 	 */
 	public synchronized void removePost(Post post) {
-		if (post.getSone().equals(this) && posts.remove(post)) {
-			modificationCounter++;
+		if (post.getSone().equals(this)) {
+			posts.remove(post);
 		}
 	}
 
@@ -418,7 +412,6 @@ public class Sone {
 	public synchronized Sone setReplies(Collection<Reply> replies) {
 		this.replies.clear();
 		this.replies.addAll(replies);
-		modificationCounter++;
 		return this;
 	}
 
@@ -430,8 +423,8 @@ public class Sone {
 	 *            The reply to add
 	 */
 	public synchronized void addReply(Reply reply) {
-		if (reply.getSone().equals(this) && replies.add(reply)) {
-			modificationCounter++;
+		if (reply.getSone().equals(this)) {
+			replies.add(reply);
 		}
 	}
 
@@ -442,8 +435,8 @@ public class Sone {
 	 *            The reply to remove
 	 */
 	public synchronized void removeReply(Reply reply) {
-		if (reply.getSone().equals(this) && replies.remove(reply)) {
-			modificationCounter++;
+		if (reply.getSone().equals(this)) {
+			replies.remove(reply);
 		}
 	}
 
@@ -466,7 +459,6 @@ public class Sone {
 	public synchronized Sone setLikePostIds(Set<String> likedPostIds) {
 		this.likedPostIds.clear();
 		this.likedPostIds.addAll(likedPostIds);
-		modificationCounter++;
 		return this;
 	}
 
@@ -490,9 +482,7 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone addLikedPostId(String postId) {
-		if (likedPostIds.add(postId)) {
-			modificationCounter++;
-		}
+		likedPostIds.add(postId);
 		return this;
 	}
 
@@ -504,9 +494,7 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone removeLikedPostId(String postId) {
-		if (likedPostIds.remove(postId)) {
-			modificationCounter++;
-		}
+		likedPostIds.remove(postId);
 		return this;
 	}
 
@@ -529,7 +517,6 @@ public class Sone {
 	public synchronized Sone setLikeReplyIds(Set<String> likedReplyIds) {
 		this.likedReplyIds.clear();
 		this.likedReplyIds.addAll(likedReplyIds);
-		modificationCounter++;
 		return this;
 	}
 
@@ -553,9 +540,7 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone addLikedReplyId(String replyId) {
-		if (likedReplyIds.add(replyId)) {
-			modificationCounter++;
-		}
+		likedReplyIds.add(replyId);
 		return this;
 	}
 
@@ -567,29 +552,72 @@ public class Sone {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone removeLikedReplyId(String replyId) {
-		if (likedReplyIds.remove(replyId)) {
-			modificationCounter++;
-		}
+		likedReplyIds.remove(replyId);
 		return this;
 	}
 
 	/**
-	 * Returns the modification counter.
+	 * Returns a fingerprint of this Sone. The fingerprint only depends on data
+	 * that is actually stored when a Sone is inserted. The fingerprint can be
+	 * used to detect changes in Sone data and can also be used to detect if
+	 * previous changes are reverted.
 	 *
-	 * @return The modification counter
+	 * @return The fingerprint of this Sone
 	 */
-	public synchronized long getModificationCounter() {
-		return modificationCounter;
-	}
+	public synchronized String getFingerprint() {
+		StringBuilder fingerprint = new StringBuilder();
+		fingerprint.append("Profile(");
+		if (profile.getFirstName() != null) {
+			fingerprint.append("FirstName(").append(profile.getFirstName()).append(')');
+		}
+		if (profile.getMiddleName() != null) {
+			fingerprint.append("MiddleName(").append(profile.getMiddleName()).append(')');
+		}
+		if (profile.getLastName() != null) {
+			fingerprint.append("LastName(").append(profile.getLastName()).append(')');
+		}
+		if (profile.getBirthDay() != null) {
+			fingerprint.append("BirthDay(").append(profile.getBirthDay()).append(')');
+		}
+		if (profile.getBirthMonth() != null) {
+			fingerprint.append("BirthMonth(").append(profile.getBirthMonth()).append(')');
+		}
+		if (profile.getBirthYear() != null) {
+			fingerprint.append("BirthYear(").append(profile.getBirthYear()).append(')');
+		}
+		fingerprint.append(")");
 
-	/**
-	 * Sets the modification counter.
-	 *
-	 * @param modificationCounter
-	 *            The new modification counter
-	 */
-	public synchronized void setModificationCounter(long modificationCounter) {
-		this.modificationCounter = modificationCounter;
+		fingerprint.append("Posts(");
+		for (Post post : getPosts()) {
+			fingerprint.append("Post(").append(post.getId()).append(')');
+		}
+		fingerprint.append(")");
+
+		List<Reply> replies = new ArrayList<Reply>(getReplies());
+		Collections.sort(replies, Reply.TIME_COMPARATOR);
+		fingerprint.append("Replies(");
+		for (Reply reply : replies) {
+			fingerprint.append("Reply(").append(reply.getId()).append(')');
+		}
+		fingerprint.append(')');
+
+		List<String> likedPostIds = new ArrayList<String>(getLikedPostIds());
+		Collections.sort(likedPostIds);
+		fingerprint.append("LikedPosts(");
+		for (String likedPostId : likedPostIds) {
+			fingerprint.append("Post(").append(likedPostId).append(')');
+		}
+		fingerprint.append(')');
+
+		List<String> likedReplyIds = new ArrayList<String>(getLikedReplyIds());
+		Collections.sort(likedReplyIds);
+		fingerprint.append("LikedReplies(");
+		for (String likedReplyId : likedReplyIds) {
+			fingerprint.append("Reply(").append(likedReplyId).append(')');
+		}
+		fingerprint.append(')');
+
+		return fingerprint.toString();
 	}
 
 	//

@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web.ajax;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
@@ -28,7 +29,7 @@ import net.pterodactylus.util.json.JsonObject;
 
 /**
  * AJAX page that reeturns the status of a sone, as a) a {@link SoneStatus} name
- * and b) a “modified” boolean (as per {@link Sone#getModificationCounter()}).
+ * and b) a “modified” boolean (as per {@link Core#isModifiedSone(Sone)}).
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -56,7 +57,7 @@ public class GetSoneStatusPage extends JsonPage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId);
 		SoneStatus soneStatus = webInterface.getCore().getSoneStatus(sone);
-		return new JsonObject().put("status", soneStatus.name()).put("name", SoneAccessor.getNiceName(sone)).put("modified", sone.getModificationCounter() > 0).put("lastUpdated", new SimpleDateFormat("MMM d, yyyy, HH:mm:ss").format(new Date(sone.getTime()))).put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
+		return new JsonObject().put("status", soneStatus.name()).put("name", SoneAccessor.getNiceName(sone)).put("modified", webInterface.getCore().isModifiedSone(sone)).put("lastUpdated", new SimpleDateFormat("MMM d, yyyy, HH:mm:ss").format(new Date(sone.getTime()))).put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
 	}
 
 	/**
