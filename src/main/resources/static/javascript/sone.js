@@ -11,11 +11,7 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, o
 				$(this).hide();
 				inputField = $(this).data("inputField");
 				inputField.show().removeAttr("disabled").addClass("default");
-				(function(inputField) {
-					getTranslation(defaultText, function(translation) {
-						inputField.val(translation);
-					});
-				})(inputField);
+				inputField.val(defaultText);
 			}
 		}).hide().data("inputField", $(this)).val($(this).val());
 		$(this).after(textarea);
@@ -26,11 +22,7 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, o
 			});
 			if (inputField.val() == "") {
 				inputField.addClass("default");
-				(function(inputField) {
-					getTranslation(defaultText, function(translation) {
-						inputField.val(translation);
-					});
-				})(inputField);
+				inputField.val(defaultText);
 			} else {
 				inputField.hide().attr("disabled", "disabled");
 				textarea.show();
