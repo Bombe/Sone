@@ -2,7 +2,9 @@
 
 	<script language="javascript">
 		$(document).ready(function() {
-			registerInputTextareaSwap("#sone #options input[name=insertion-delay]", "WebInterface.DefaultText.Option.InsertionDelay", "insertion-delay", true, true);
+			getTranslation("WebInterface.DefaultText.Option.InsertionDelay", function(insertionDelayDefaultText) {
+				registerInputTextareaSwap("#sone #options input[name=insertion-delay]", insertionDelayDefaultText, "insertion-delay", true, true);
+			});
 		});
 	</script>
 

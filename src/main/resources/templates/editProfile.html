@@ -2,12 +2,24 @@
 
 	<script language="javascript">
 		$(document).ready(function() {
-			registerInputTextareaSwap("#sone #edit-profile input[name=first-name]", "WebInterface.DefaultText.FirstName", "first-name", true, true);
-			registerInputTextareaSwap("#sone #edit-profile input[name=middle-name]", "WebInterface.DefaultText.MiddleName", "middle-name", true, true);
-			registerInputTextareaSwap("#sone #edit-profile input[name=last-name]", "WebInterface.DefaultText.LastName", "last-name", true, true);
-			registerInputTextareaSwap("#sone #edit-profile input[name=birth-day]", "WebInterface.DefaultText.BirthDay", "birth-day", true, true);
-			registerInputTextareaSwap("#sone #edit-profile input[name=birth-month]", "WebInterface.DefaultText.BirthMonth", "birth-month", true, true);
-			registerInputTextareaSwap("#sone #edit-profile input[name=birth-year]", "WebInterface.DefaultText.BirthYear", "birth-year", true, true);
+			getTranslation("WebInterface.DefaultText.FirstName", function(firstNameDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=first-name]", firstNameDefaultText, "first-name", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.MiddleName", function(middleNameDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=middle-name]", middleNameDefaultText, "middle-name", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.LastName", function(lastNameDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=last-name]", lastNameDefaultText, "last-name", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.BirthDay", function(birthDayDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=birth-day]", birthDayDefaultText, "birth-day", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.BirthMonth", function(birthMonthDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=birth-month]", birthMonthDefaultText, "birth-month", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.BirthYear", function(birthYearDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=birth-year]", birthYearDefaultText, "birth-year", true, true);
+			});
 
 			/* hide all the labels. */
 			$("#sone #edit-profile label").hide();
