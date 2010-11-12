@@ -50,6 +50,7 @@ import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetSoneStatusPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
@@ -244,6 +245,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetSoneStatusPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
