@@ -363,3 +363,41 @@ function updateReplyLikes(replyId) {
 		}
 	});
 }
+
+/**
+ * Posts a reply and calls the given callback when the request finishes.
+ *
+ * @param postId
+ *            The ID of the post the reply refers to
+ * @param text
+ *            The text to post
+ * @param callbackFunction
+ *            The callback function to call when the request finishes (takes 3
+ *            parameters: success, error, replyId)
+ */
+function postReply(postId, text, callbackFunction) {
+	$.getJSON("ajax/createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+		if (data.success) {
+			callbackFunction(true, null, data.reply);
+		} else {
+			callbackFunction(false, data.error);
+		}
+	});
+}
+
+/**
+ * Requests information about the reply with the given ID.
+ *
+ * @param replyId
+ *            The ID of the reply
+ * @param callbackFunction
+ *            A callback function (parameters soneId, soneName, replyTime,
+ *            replyDisplayTime, text, html)
+ */
+function getReply(replyId, callbackFunction) {
+	$.getJSON("ajax/getReply.ajax", { "reply" : replyId }, function(data, textStatus) {
+		if (data.success) {
+			callbackFunction(data.soneId, data.soneName, data.time, data.displayTime, data.text, data.html);
+		}
+	});
+}
