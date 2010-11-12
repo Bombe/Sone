@@ -1,0 +1,40 @@
+<a name="reply-<% reply.id|html>"></a>
+<div id="<% reply.id|html>" class="reply<%if reply.new> new<%/if>">
+	<div class="avatar">
+		<img src="/WoT/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
+	</div>
+	<div class="inner-part">
+		<div>
+			<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id|html>"><% reply.sone.niceName|html></a></div>
+			<div class="text"><% reply.text|html></div>
+		</div>
+		<div class="status-line">
+			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>"><span title="<% reply.likes.soneNames|html>">⬆<span class="like-count"><% reply.likes.size></span></span></div>
+			<%ifnull ! currentSone>
+				<form class="like<%if reply.liked> hidden<%/if>" action="like.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="type" value="reply" />
+					<input type="hidden" name="reply" value="<% reply.id|html>" />
+					<button type="submit" value="1"><%= View.Post.LikeLink|l10n|html></button>
+				</form>
+				<form class="unlike<%if ! reply.liked> hidden<%/if>" action="unlike.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="type" value="reply" />
+					<input type="hidden" name="reply" value="<% reply.id|html>" />
+					<button type="submit" value="1"><%= View.Post.UnlikeLink|l10n|html></button>
+				</form>
+			<%/if>
+			<%if reply.sone.current>
+				<form class="delete" action="deleteReply.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="reply" value="<% reply.id|html>" />
+					<button type="submit"><%= View.Post.Reply.DeleteLink|l10n|html></button>
+				</form>
+			<%/if>
+		</div>
+	</div>
+</div>
