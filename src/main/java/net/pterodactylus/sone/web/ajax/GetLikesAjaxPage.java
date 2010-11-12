@@ -59,7 +59,7 @@ public class GetLikesAjaxPage extends JsonPage {
 		String type = request.getHttpRequest().getParam("type", null);
 		String id = request.getHttpRequest().getParam(type, null);
 		if ((id == null) || (id.length() == 0)) {
-			return new JsonObject().put("success", false).put("error", "invalid-" + type + "-id");
+			return createErrorJsonObject("invalid-" + type + "-id");
 		}
 		if ("post".equals(type)) {
 			Post post = webInterface.getCore().getPost(id);
@@ -70,7 +70,7 @@ public class GetLikesAjaxPage extends JsonPage {
 			Set<Sone> sones = webInterface.getCore().getLikes(reply);
 			return new JsonObject().put("success", true).put("likes", sones.size()).put("sones", getSones(sones));
 		}
-		return new JsonObject().put("success", false).put("error", "invalid-type");
+		return createErrorJsonObject("invalid-type");
 	}
 
 	/**

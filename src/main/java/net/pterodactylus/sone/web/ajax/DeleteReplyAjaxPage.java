@@ -52,13 +52,13 @@ public class DeleteReplyAjaxPage extends JsonPage {
 		Reply reply = webInterface.getCore().getReply(replyId);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (reply == null) {
-			return new JsonObject().put("success", false).put("error", "invalid-reply-id");
+			return createErrorJsonObject("invalid-reply-id");
 		}
 		if (currentSone == null) {
-			return new JsonObject().put("success", false).put("error", "auth-required");
+			return createErrorJsonObject("auth-required");
 		}
 		if (!reply.getSone().equals(currentSone)) {
-			return new JsonObject().put("success", false).put("error", "not-authorized");
+			return createErrorJsonObject("not-authorized");
 		}
 		webInterface.getCore().deleteReply(reply);
 		return new JsonObject().put("success", true);

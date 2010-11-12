@@ -47,18 +47,18 @@ public class UnlikeAjaxPage extends JsonPage {
 		String type = request.getHttpRequest().getParam("type", null);
 		String id = request.getHttpRequest().getParam(type, null);
 		if ((id == null) || (id.length() == 0)) {
-			return new JsonObject().put("success", false).put("error", "invalid-" + type + "-id");
+			return createErrorJsonObject("invalid-" + type + "-id");
 		}
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (currentSone == null) {
-			return new JsonObject().put("success", false).put("error", "auth-required");
+			return createErrorJsonObject("auth-required");
 		}
 		if ("post".equals(type)) {
 			currentSone.removeLikedPostId(id);
 		} else if ("reply".equals(type)) {
 			currentSone.removeLikedReplyId(id);
 		} else {
-			return new JsonObject().put("success", false).put("error", "invalid-type");
+			return createErrorJsonObject("invalid-type");
 		}
 		return new JsonObject().put("success", true);
 	}

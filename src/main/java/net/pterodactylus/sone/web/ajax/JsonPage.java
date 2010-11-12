@@ -146,6 +146,21 @@ public abstract class JsonPage implements Page {
 	}
 
 	//
+	// PROTECTED METHODS
+	//
+
+	/**
+	 * Creates an error reply.
+	 *
+	 * @param error
+	 *            The error that has occured
+	 * @return The JSON object, signalling failure and the error code
+	 */
+	protected JsonObject createErrorJsonObject(String error) {
+		return new JsonObject().put("success", false).put("error", error);
+	}
+
+	//
 	// PAGE METHODS
 	//
 

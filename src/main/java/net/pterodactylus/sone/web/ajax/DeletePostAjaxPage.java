@@ -52,13 +52,13 @@ public class DeletePostAjaxPage extends JsonPage {
 		Post post = webInterface.getCore().getPost(postId);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (post == null) {
-			return new JsonObject().put("success", false).put("error", "invalid-post-id");
+			return createErrorJsonObject("invalid-post-id");
 		}
 		if (currentSone == null) {
-			return new JsonObject().put("success", false).put("error", "auth-required");
+			return createErrorJsonObject("auth-required");
 		}
 		if (!post.getSone().equals(currentSone)) {
-			return new JsonObject().put("success", false).put("error", "not-authorized");
+			return createErrorJsonObject("not-authorized");
 		}
 		currentSone.removePost(post);
 		return new JsonObject().put("success", true);
