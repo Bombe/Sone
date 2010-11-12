@@ -43,28 +43,40 @@ function addCommentLinks() {
 	}
 	$("#sone .post").each(function() {
 		postId = $(this).attr("id");
-		commentElement = (function(postId) {
-			var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
-				replyElement = $("#sone .post#" + postId + " .create-reply");
-				replyElement.removeClass("hidden");
-				replyElement.removeClass("light");
-				(function(replyElement) {
-					replyElement.find("input.reply-input").blur(function() {
-						if ($(this).hasClass("default")) {
-							replyElement.addClass("light");
-						}
-					}).focus(function() {
-						replyElement.removeClass("light");
-					});
-				})(replyElement);
-				replyElement.find("input.reply-input").focus();
-			});
-			return commentElement;
-		})(postId);
-		$(this).find(".create-reply").addClass("hidden");
-		$(this).find(".status-line .time").each(function() {
-			$(this).after(commentElement.clone(true));
+		addCommentLink(postId, $(this));
+	});
+}
+
+/**
+ * Adds a “comment” link to all status lines contained in the given element.
+ *
+ * @param postId
+ *            The ID of the post
+ * @param element
+ *            The element to add a “comment” link to
+ */
+function addCommentLink(postId, element) {
+	commentElement = (function(postId) {
+		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
+			replyElement = $("#sone .post#" + postId + " .create-reply");
+			replyElement.removeClass("hidden");
+			replyElement.removeClass("light");
+			(function(replyElement) {
+				replyElement.find("input.reply-input").blur(function() {
+					if ($(this).hasClass("default")) {
+						replyElement.addClass("light");
+					}
+				}).focus(function() {
+					replyElement.removeClass("light");
+				});
+			})(replyElement);
+			replyElement.find("input.reply-input").focus();
 		});
+		return commentElement;
+	})(postId);
+	element.find(".create-reply").addClass("hidden");
+	element.find(".status-line .time").each(function() {
+		$(this).after(commentElement.clone(true));
 	});
 }
 
