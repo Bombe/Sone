@@ -1006,9 +1006,10 @@ public class Core implements IdentityListener {
 	 *            The post that this reply refers to
 	 * @param text
 	 *            The text of the reply
+	 * @return The created reply
 	 */
-	public void createReply(Sone sone, Post post, String text) {
-		createReply(sone, post, System.currentTimeMillis(), text);
+	public Reply createReply(Sone sone, Post post, String text) {
+		return createReply(sone, post, System.currentTimeMillis(), text);
 	}
 
 	/**
@@ -1022,11 +1023,12 @@ public class Core implements IdentityListener {
 	 *            The time of the reply
 	 * @param text
 	 *            The text of the reply
+	 * @return The created reply
 	 */
-	public void createReply(Sone sone, Post post, long time, String text) {
+	public Reply createReply(Sone sone, Post post, long time, String text) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
-			return;
+			return null;
 		}
 		Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
 		synchronized (replies) {
@@ -1037,6 +1039,7 @@ public class Core implements IdentityListener {
 		}
 		sone.addReply(reply);
 		saveSone(sone);
+		return reply;
 	}
 
 	/**
