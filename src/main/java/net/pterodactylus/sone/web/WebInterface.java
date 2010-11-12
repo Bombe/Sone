@@ -216,6 +216,7 @@ public class WebInterface {
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
+		Template replyTemplate = templateFactory.createTemplate(createReader("/templates/include/viewReply.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
@@ -245,7 +246,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetSoneStatusPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
