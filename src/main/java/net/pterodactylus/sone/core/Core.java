@@ -575,9 +575,9 @@ public class Core implements IdentityListener {
 			localSones.put(ownIdentity.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserters.put(sone, soneInserter);
-			soneInserter.start();
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
+			soneInserter.start();
 			new Thread(new Runnable() {
 
 				@Override
