@@ -49,6 +49,10 @@ textarea {
 	color: rgb(255, 172, 0);
 }
 
+#sone #notification-area {
+	margin-bottom: 1em;
+}
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;
