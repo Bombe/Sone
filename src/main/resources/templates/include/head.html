@@ -133,6 +133,31 @@
 		});
 	</script>
 
+	<script language="javascript">
+		/* display large notification about new replies and posts. */
+		$(document).ready(function() {
+			newPostCount = $("#sone .post.new").length;
+			newReplyCount = $("#sone .reply.new").length;
+			if ((newPostCount + newReplyCount) == 0) {
+				return;
+			}
+			if (newPostCount > 0) {
+				postNotification = $("<div></div>").addClass("notification");
+				getTranslation("WebInterface.Notification.NewPostCount", function(text) {
+					postNotification.append($("<div></div>").text(text)).append($("<div></div>").addClass("post-count").text(newPostCount));
+				});
+				postNotification.appendTo("#sone #notification-area");
+			}
+			if (newReplyCount > 0) {
+				replyNotification = $("<div></div>").addClass("notification");
+				getTranslation("WebInterface.Notification.NewReplyCount", function(text) {
+					replyNotification.append($("<div></div>").text(text)).append($("<div></div>").addClass("post-count").text(newReplyCount));
+				});
+				replyNotification.appendTo("#sone #notification-area");
+			}
+		});
+	</script>
+
 	<div id="main">
 
 		<%if !webInterface.core.identityManager.connected>

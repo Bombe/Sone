@@ -53,6 +53,21 @@ textarea {
 	margin-bottom: 1em;
 }
 
+#sone #notification-area .notification {
+	padding: 1ex;
+	border: solid 1px #ccc;
+	background-color: #ffffa0;
+	margin-bottom: 1ex;
+}
+
+#sone #notification-area .notification > div {
+	display: inline;
+}
+
+#sone #notification-area .notification .post-count {
+	margin-left: 1ex;
+}
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;
