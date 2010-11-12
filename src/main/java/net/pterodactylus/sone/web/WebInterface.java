@@ -45,6 +45,7 @@ import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
+import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
@@ -242,6 +243,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetSoneStatusPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
