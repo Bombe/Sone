@@ -34,6 +34,44 @@
 	</script>
 
 	<script language="javascript">
+		/* replaces all “post reply!” forms with AJAX. */
+		$(document).ready(function() {
+			$("#sone .create-reply button:submit").click(function() {
+				$(this.form).submit(function() {
+					return false;
+				});
+				inputField = $(this.form).find(":input:enabled").get(0);
+				postId = getPostId($(inputField));
+				text = $(inputField).val();
+				$(inputField).val("");
+				postReply(postId, text, function(success, error, replyId) {
+					if (success) {
+						getReply(replyId, function(soneId, soneName, replyTime, replyDisplayTime, text, html) {
+							newReply = $(html).insertBefore("#sone .post#" + postId + " .create-reply");
+							$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+							getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(deleteReplyText) {
+								enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId, deleteReplyText);
+							});
+							newReply.find(".status-line .like").submit(function() {
+								likeReply(getReplyId(this));
+								return false;
+							});
+							newReply.find(".status-line .unlike").submit(function() {
+								unlikeReply(getReplyId(this));
+								return false;
+							});
+							addCommentLink(postId, newReply);
+						});
+					} else {
+						alert(error);
+					}
+				});
+				return false;
+			});
+		});
+	</script>
+
+	<script language="javascript">
 		/* replace all “delete” buttons with javascript. */
 		$(document).ready(function() {
 			getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
