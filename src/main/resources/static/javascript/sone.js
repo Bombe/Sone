@@ -171,36 +171,34 @@ function watchSone(soneId) {
  *
  * @param buttonId
  *            The selector of the button
- * @param translationKey
- *            The translation key of the text to show on the button
+ * @param text
+ *            The text to show on the button
  * @param deleteCallback
  *            The callback that actually deletes something
  */
-function enhanceDeleteButton(buttonId, translationKey, deleteCallback) {
+function enhanceDeleteButton(buttonId, text, deleteCallback) {
 	button = $(buttonId);
 	(function(button) {
-		getTranslation(translationKey, function(translation) {
-			newButton = $("<button></button>").addClass("confirm").hide().text(translation).click(function() {
-				$(this).fadeOut("slow");
-				deleteCallback();
-				return false;
-			}).insertAfter(button);
-			(function(button, newButton) {
-				button.click(function() {
-					button.fadeOut("slow", function() {
-						newButton.fadeIn("slow");
-						$(document).one("click", function() {
-							if (this != newButton.get(0)) {
-								newButton.fadeOut(function() {
-									button.fadeIn();
-								});
-							}
-						});
+		newButton = $("<button></button>").addClass("confirm").hide().text(text).click(function() {
+			$(this).fadeOut("slow");
+			deleteCallback();
+			return false;
+		}).insertAfter(button);
+		(function(button, newButton) {
+			button.click(function() {
+				button.fadeOut("slow", function() {
+					newButton.fadeIn("slow");
+					$(document).one("click", function() {
+						if (this != newButton.get(0)) {
+							newButton.fadeOut(function() {
+								button.fadeIn();
+							});
+						}
 					});
-					return false;
 				});
-			})(button, newButton);
-		});
+				return false;
+			});
+		})(button, newButton);
 	})(button);
 }
 
@@ -211,9 +209,11 @@ function enhanceDeleteButton(buttonId, translationKey, deleteCallback) {
  *            The selector of the button
  * @param postId
  *            The ID of the post to delete
+ * @param text
+ *            The text to replace the button with
  */
-function enhanceDeletePostButton(buttonId, postId) {
-	enhanceDeleteButton(buttonId, "WebInterface.Confirmation.DeletePostButton", function() {
+function enhanceDeletePostButton(buttonId, postId, text) {
+	enhanceDeleteButton(buttonId, text, function() {
 		$.getJSON("ajax/deletePost.ajax", { "post": postId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
 			if (data.success) {
 				$("#sone .post#" + postId).slideUp();
@@ -235,9 +235,11 @@ function enhanceDeletePostButton(buttonId, postId) {
  *            The selector of the button
  * @param replyId
  *            The ID of the reply to delete
+ * @param text
+ *            The text to replace the button with
  */
-function enhanceDeleteReplyButton(buttonId, replyId) {
-	enhanceDeleteButton(buttonId, "WebInterface.Confirmation.DeleteReplyButton", function() {
+function enhanceDeleteReplyButton(buttonId, replyId, text) {
+	enhanceDeleteButton(buttonId, text, function() {
 		$.getJSON("ajax/deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
 			if (data.success) {
 				$("#sone .reply#" + replyId).slideUp();

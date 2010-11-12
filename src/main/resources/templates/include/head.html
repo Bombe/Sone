@@ -32,19 +32,25 @@
 	<script language="javascript">
 		/* replace all “delete” buttons with javascript. */
 		$(document).ready(function() {
-			$("#sone .post").each(function() {
-				postId = $(this).attr("id");
-				enhanceDeletePostButton("#sone .post#" + postId + " > .inner-part > .status-line .delete button", postId);
-				(function(postId) {
-					$("#sone .post#" + postId + " .reply").each(function() {
-						replyId = $(this).attr("id");
-						(function(postId, reply, replyId) {
-							reply.find(".delete button").each(function() {
-								enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId);
-							})
-						})(postId, $(this), replyId);
+			getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
+				deletePostText = text;
+				getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
+					deleteReplyText = text;
+					$("#sone .post").each(function() {
+						postId = $(this).attr("id");
+						enhanceDeletePostButton("#sone .post#" + postId + " > .inner-part > .status-line .delete button", postId, deletePostText);
+						(function(postId) {
+							$("#sone .post#" + postId + " .reply").each(function() {
+								replyId = $(this).attr("id");
+								(function(postId, reply, replyId) {
+									reply.find(".delete button").each(function() {
+										enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId, deleteReplyText);
+									})
+								})(postId, $(this), replyId);
+							});
+						})(postId);
 					});
-				})(postId);
+				});
 			});
 		});
 	</script>
