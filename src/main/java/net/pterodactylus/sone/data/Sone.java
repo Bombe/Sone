@@ -79,7 +79,7 @@ public class Sone {
 	private volatile long time;
 
 	/** The profile of this Sone. */
-	private volatile Profile profile;
+	private volatile Profile profile = new Profile();
 
 	/** All friend Sones. */
 	private final Set<String> friendSones = Collections.synchronizedSet(new HashSet<String>());
