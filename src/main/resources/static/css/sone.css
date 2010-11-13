@@ -204,6 +204,7 @@ textarea {
 	background: none;
 	padding: 0px;
 	color: rgb(28, 131, 191);
+	font: inherit;
 }
 
 #sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover {
