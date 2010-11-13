@@ -301,9 +301,23 @@ public class Core implements IdentityListener {
 	 * @return The Sone with the given ID
 	 */
 	public Sone getLocalSone(String id) {
+		return getLocalSone(id, true);
+	}
+
+	/**
+	 * Returns the local Sone with the given ID, optionally creating a new Sone.
+	 *
+	 * @param id
+	 *            The ID of the Sone
+	 * @param create
+	 *            {@code true} to create a new Sone if none exists,
+	 *            {@code false} to return null if none exists
+	 * @return The Sone with the given ID, or {@code null}
+	 */
+	public Sone getLocalSone(String id, boolean create) {
 		synchronized (localSones) {
 			Sone sone = localSones.get(id);
-			if (sone == null) {
+			if ((sone == null) && create) {
 				sone = new Sone(id);
 				localSones.put(id, sone);
 			}
