@@ -287,15 +287,6 @@ textarea {
 	content: ' ‧ ';
 }
 
-#sone .post .reply .status-line .delete {
-	float: none;
-	display: inline;
-}
-
-#sone .post .reply .status-line .delete:before {
-	content: ' · ';
-}
-
 #sone .post .create-reply {
 	clear: both;
 	background-color: #f0f0ff;
