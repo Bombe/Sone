@@ -137,7 +137,7 @@ public class SoneTemplatePage extends TemplatePage {
 		if (soneId == null) {
 			return null;
 		}
-		return webInterface.getCore().getLocalSone(soneId);
+		return webInterface.getCore().getLocalSone(soneId, false);
 	}
 
 	/**
