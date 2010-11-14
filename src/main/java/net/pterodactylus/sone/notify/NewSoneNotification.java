@@ -26,29 +26,36 @@ import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.Template;
 
 /**
- * TODO
+ * Notification that signals that new Sones have been discovered.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class NewSoneNotification extends TemplateNotification {
 
+	/** The new Sones. */
 	private List<Sone> newSones = Collections.synchronizedList(new ArrayList<Sone>());
 
 	/**
-	 * TODO
+	 * Creates a new “new Sone discovered” notification.
+	 *
+	 * @param template
+	 *            The template to render
 	 */
 	public NewSoneNotification(Template template) {
 		super(template);
+		template.set("sones", newSones);
 	}
 
 	//
 	// ACCESSORS
 	//
 
-	public boolean isEmpty() {
-		return newSones.isEmpty();
-	}
-
+	/**
+	 * Adds a discovered Sone.
+	 *
+	 * @param sone
+	 *            The new Sone
+	 */
 	public void addSone(Sone sone) {
 		newSones.add(sone);
 		touch();
