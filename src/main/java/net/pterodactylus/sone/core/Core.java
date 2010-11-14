@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
@@ -39,6 +40,7 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -597,6 +599,7 @@ public class Core implements IdentityListener {
 				return null;
 			}
 			sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
+			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
 			SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
