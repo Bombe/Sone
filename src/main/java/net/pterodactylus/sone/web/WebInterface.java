@@ -37,6 +37,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.notify.NewPostNotification;
 import net.pterodactylus.sone.notify.NewSoneNotification;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
@@ -110,6 +111,9 @@ public class WebInterface implements CoreListener {
 	/** The “new Sone” notification. */
 	private final NewSoneNotification newSoneNotification;
 
+	/** The “new post” notification. */
+	private final NewPostNotification newPostNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -143,6 +147,9 @@ public class WebInterface implements CoreListener {
 		/* create notifications. */
 		Template newSoneNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newSoneNotification.html"));
 		newSoneNotification = new NewSoneNotification(newSoneNotificationTemplate);
+
+		Template newPostNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newPostNotification.html"));
+		newPostNotification = new NewPostNotification(newPostNotificationTemplate);
 	}
 
 	//
@@ -359,7 +366,8 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newPostFound(Post post) {
-		/* TODO */
+		newPostNotification.addPost(post);
+		notificationManager.addNotification(newPostNotification);
 	}
 
 	/**
@@ -386,7 +394,10 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void markPostKnown(Post post) {
-		/* TODO */
+		newPostNotification.removePost(post);
+		if (newPostNotification.isEmpty()) {
+			newPostNotification.dismiss();
+		}
 	}
 
 	/**
