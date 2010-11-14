@@ -94,6 +94,9 @@ public class WebInterface {
 	/** The form password. */
 	private final String formPassword;
 
+	/** The template factory. */
+	private DefaultTemplateFactory templateFactory;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -103,6 +106,25 @@ public class WebInterface {
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
+
+		templateFactory = new DefaultTemplateFactory();
+		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
+		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
+		templateFactory.addAccessor(Post.class, new PostAccessor(getCore()));
+		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
+		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
+		templateFactory.addFilter("date", new DateFilter());
+		templateFactory.addFilter("l10n", new L10nFilter(getL10n()));
+		templateFactory.addFilter("substring", new SubstringFilter());
+		templateFactory.addFilter("xml", new XmlFilter());
+		templateFactory.addFilter("change", new RequestChangeFilter());
+		templateFactory.addFilter("match", new MatchFilter());
+		templateFactory.addFilter("css", new CssClassNameFilter());
+		templateFactory.addPlugin("getpage", new GetPagePlugin());
+		templateFactory.addPlugin("paginate", new PaginationPlugin());
+		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
+		templateFactory.addTemplateObject("formPassword", formPassword);
 	}
 
 	//
@@ -176,25 +198,6 @@ public class WebInterface {
 	 * Register all toadlets.
 	 */
 	private void registerToadlets() {
-		DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
-		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
-		templateFactory.addAccessor(Post.class, new PostAccessor(getCore()));
-		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
-		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
-		templateFactory.addFilter("date", new DateFilter());
-		templateFactory.addFilter("l10n", new L10nFilter(getL10n()));
-		templateFactory.addFilter("substring", new SubstringFilter());
-		templateFactory.addFilter("xml", new XmlFilter());
-		templateFactory.addFilter("change", new RequestChangeFilter());
-		templateFactory.addFilter("match", new MatchFilter());
-		templateFactory.addFilter("css", new CssClassNameFilter());
-		templateFactory.addPlugin("getpage", new GetPagePlugin());
-		templateFactory.addPlugin("paginate", new PaginationPlugin());
-		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
-		templateFactory.addTemplateObject("formPassword", formPassword);
-
 		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
 		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
 		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
@@ -304,6 +307,7 @@ public class WebInterface {
 	private class ClassPathTemplateProvider implements TemplateProvider {
 
 		/** The template factory. */
+		@SuppressWarnings("hiding")
 		private final TemplateFactory templateFactory;
 
 		/**
