@@ -438,6 +438,9 @@ public class Core implements IdentityListener {
 		synchronized (newSones) {
 			boolean isNew = !knownSones.contains(sone.getId()) && newSones.remove(sone.getId());
 			knownSones.add(sone.getId());
+			if (isNew) {
+				coreListenerManager.fireMarkSoneKnown(sone);
+			}
 			return isNew;
 		}
 	}
