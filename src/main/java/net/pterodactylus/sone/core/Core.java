@@ -679,7 +679,13 @@ public class Core implements IdentityListener {
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
 				synchronized (newSones) {
-					newSones.add(sone.getId());
+					newSone = !knownSones.contains(sone.getId());
+					if (newSone) {
+						newSones.add(sone.getId());
+					}
+				}
+				if (newSone) {
+					coreListenerManager.fireNewSoneFound(sone);
 				}
 			}
 			remoteSones.put(identity.getId(), sone);
