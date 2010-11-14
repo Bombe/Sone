@@ -80,6 +80,9 @@ public class Core implements IdentityListener {
 	/** The options. */
 	private final Options options = new Options();
 
+	/** The core listener manager. */
+	private final CoreListenerManager coreListenerManager = new CoreListenerManager(this);
+
 	/** The configuration. */
 	private final Configuration configuration;
 
@@ -149,6 +152,30 @@ public class Core implements IdentityListener {
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
+	}
+
+	//
+	// LISTENER MANAGEMENT
+	//
+
+	/**
+	 * Adds a new core listener.
+	 *
+	 * @param coreListener
+	 *            The listener to add
+	 */
+	public void addCoreListener(CoreListener coreListener) {
+		coreListenerManager.addListener(coreListener);
+	}
+
+	/**
+	 * Removes a core listener.
+	 *
+	 * @param coreListener
+	 *            The listener to remove
+	 */
+	public void removeCoreListener(CoreListener coreListener) {
+		coreListenerManager.removeListener(coreListener);
 	}
 
 	//
