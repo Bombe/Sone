@@ -81,6 +81,9 @@ public class Sone {
 	/** The profile of this Sone. */
 	private volatile Profile profile = new Profile();
 
+	/** The client used by the Sone. */
+	private volatile Client client;
+
 	/** All friend Sones. */
 	private final Set<String> friendSones = Collections.synchronizedSet(new HashSet<String>());
 
@@ -278,6 +281,27 @@ public class Sone {
 	 */
 	public synchronized void setProfile(Profile profile) {
 		this.profile = new Profile(profile);
+	}
+
+	/**
+	 * Returns the client used by this Sone.
+	 *
+	 * @return The client used by this Sone, or {@code null}
+	 */
+	public Client getClient() {
+		return client;
+	}
+
+	/**
+	 * Sets the client used by this Sone.
+	 *
+	 * @param client
+	 *            The client used by this Sone, or {@code null}
+	 * @return This Sone (for method chaining)
+	 */
+	public Sone setClient(Client client) {
+		this.client = client;
+		return this;
 	}
 
 	/**
