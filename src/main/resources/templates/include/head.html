@@ -196,6 +196,15 @@
 		});
 	</script>
 
+	<script language="javascript">
+		/* process all existing notifications, ajaxify dismiss buttons. */
+		$(document).ready(function() {
+			$("#sone #notification-area .notification").each(function() {
+				ajaxifyNotificationArea($(this));
+			});
+		});
+	</script>
+
 	<div id="main">
 
 		<%if !webInterface.core.identityManager.connected>
