@@ -64,6 +64,7 @@ import net.pterodactylus.sone.web.page.StaticPage;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
+import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.MatchFilter;
@@ -74,6 +75,7 @@ import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateFactory;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
+import net.pterodactylus.util.thread.Ticker;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.ToadletContainer;
 import freenet.l10n.BaseL10n;
@@ -187,6 +189,20 @@ public class WebInterface {
 	 */
 	public void start() {
 		registerToadlets();
+
+		/* notification templates. */
+		Template startupNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/startupNotification.html"));
+
+		final TemplateNotification startupNotification = new TemplateNotification(startupNotificationTemplate);
+		getCore().getNotifications().addNotification(startupNotification);
+
+		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (120 * 1000), new Runnable() {
+
+			@Override
+			public void run() {
+				getCore().getNotifications().removeNotification(startupNotification);
+			}
+		}, "Sone Startup Notification Remover");
 	}
 
 	/**
