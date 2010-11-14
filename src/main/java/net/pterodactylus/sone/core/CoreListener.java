@@ -55,4 +55,12 @@ public interface CoreListener extends EventListener {
 	 */
 	public void newReplyFound(Reply reply);
 
+	/**
+	 * Notifies a listener that the given Sone is now marked as known.
+	 *
+	 * @param sone
+	 *            The known Sone
+	 */
+	public void markSoneKnown(Sone sone);
+
 }

@@ -82,4 +82,17 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 		}
 	}
 
+	/**
+	 * Notifies all listeners that the given Sone is now marked as known.
+	 *
+	 * @see CoreListener#markSoneKnown(Sone)
+	 * @param sone
+	 *            The known Sone
+	 */
+	void fireMarkSoneKnown(Sone sone) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.markSoneKnown(sone);
+		}
+	}
+
 }

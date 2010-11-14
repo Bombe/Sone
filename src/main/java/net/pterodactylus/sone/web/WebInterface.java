@@ -371,6 +371,17 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void markSoneKnown(Sone sone) {
+		newSoneNotification.removeSone(sone);
+		if (newSoneNotification.isEmpty()) {
+			newSoneNotification.dismiss();
+		}
+	}
+
+	/**
 	 * Template provider implementation that uses
 	 * {@link WebInterface#createReader(String)} to load templates for
 	 * inclusion.
