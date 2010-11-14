@@ -44,6 +44,7 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.number.Numbers;
 import freenet.keys.FreenetURI;
 
@@ -88,6 +89,9 @@ public class Core implements IdentityListener {
 
 	/** Interface to freenet. */
 	private final FreenetInterface freenetInterface;
+
+	/** The notification manager. */
+	private final NotificationManager notificationManager = new NotificationManager();
 
 	/** The Sone downloader. */
 	private final SoneDownloader soneDownloader;
@@ -171,6 +175,15 @@ public class Core implements IdentityListener {
 	 */
 	public IdentityManager getIdentityManager() {
 		return identityManager;
+	}
+
+	/**
+	 * Returns the notification manager.
+	 *
+	 * @return The notification manager
+	 */
+	public NotificationManager getNotifications() {
+		return notificationManager;
 	}
 
 	/**
