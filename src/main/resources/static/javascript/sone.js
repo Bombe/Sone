@@ -100,17 +100,20 @@ function getTranslation(key, callback) {
  *
  * @param soneId
  *            The ID of the Sone
+ * @param local
+ *            <code>true</code> if the Sone is local, <code>false</code>
+ *            otherwise
  */
-function getSoneStatus(soneId) {
+function getSoneStatus(soneId, local) {
 	$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
 		updateSoneStatus(soneId, data.name, data.status, data.modified, data.lastUpdated);
 		/* seconds! */
 		updateInterval = 60;
-		if (data.modified || (data.status == "downloading") || (data.status == "inserting")) {
+		if (local || data.modified || (data.status == "downloading") || (data.status == "inserting")) {
 			updateInterval = 5;
 		}
 		setTimeout(function() {
-			getSoneStatus(soneId);
+			getSoneStatus(soneId, local);
 		}, updateInterval * 1000);
 	});
 }
@@ -157,15 +160,18 @@ var watchedSones = {};
  *
  * @param soneId
  *            The ID of the Sone to watch
+ * @param local
+ *            <code>true</code> if the Sone is local, <code>false</code>
+ *            otherwise
  */
-function watchSone(soneId) {
+function watchSone(soneId, local) {
 	if (watchedSones[soneId]) {
 		return;
 	}
 	watchedSones[soneId] = true;
 	(function(soneId) {
 		setTimeout(function() {
-			getSoneStatus(soneId);
+			getSoneStatus(soneId, local);
 		}, 5000);
 	})(soneId);
 }
