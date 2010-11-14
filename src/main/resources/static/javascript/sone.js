@@ -420,9 +420,7 @@ function ajaxifyNotification(notification) {
 	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("ajax/dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
-			if (data.success) {
-				notification.slideUp();
-			}
+			notification.slideUp();
 		});
 	});
 }
