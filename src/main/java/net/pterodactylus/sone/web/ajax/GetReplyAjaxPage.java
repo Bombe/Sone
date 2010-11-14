@@ -81,7 +81,7 @@ public class GetReplyAjaxPage extends JsonPage {
 			Closer.close(templateWriter);
 		}
 		synchronized (dateFormat) {
-			return new JsonObject().put("success", true).put("soneId", reply.getSone().getId()).put("soneName", SoneAccessor.getNiceName(reply.getSone())).put("time", reply.getTime()).put("displayTime", dateFormat.format(new Date(reply.getTime()))).put("text", reply.getText()).put("html", templateWriter.toString());
+			return createSuccessJsonObject().put("soneId", reply.getSone().getId()).put("soneName", SoneAccessor.getNiceName(reply.getSone())).put("time", reply.getTime()).put("displayTime", dateFormat.format(new Date(reply.getTime()))).put("text", reply.getText()).put("html", templateWriter.toString());
 		}
 	}
 

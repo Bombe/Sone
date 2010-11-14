@@ -48,7 +48,7 @@ public class GetTranslationPage extends JsonPage {
 	protected JsonObject createJsonObject(Request request) {
 		String key = request.getHttpRequest().getParam("key");
 		String translation = webInterface.getL10n().getString(key);
-		return new JsonObject().put("value", translation);
+		return createSuccessJsonObject().put("value", translation);
 	}
 
 	/**

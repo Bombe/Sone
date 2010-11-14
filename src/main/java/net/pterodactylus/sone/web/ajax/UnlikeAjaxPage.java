@@ -60,7 +60,7 @@ public class UnlikeAjaxPage extends JsonPage {
 		} else {
 			return createErrorJsonObject("invalid-type");
 		}
-		return new JsonObject().put("success", true);
+		return createSuccessJsonObject();
 	}
 
 }

@@ -53,7 +53,7 @@ public class UnfollowSoneAjaxPage extends JsonPage {
 		}
 		currentSone.removeFriend(soneId);
 		webInterface.getCore().saveSone(currentSone);
-		return new JsonObject().put("success", true);
+		return createSuccessJsonObject();
 	}
 
 }

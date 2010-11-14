@@ -145,6 +145,15 @@ public abstract class JsonPage implements Page {
 	//
 
 	/**
+	 * Creates a success reply.
+	 *
+	 * @return A reply signaling success
+	 */
+	protected JsonObject createSuccessJsonObject() {
+		return new JsonObject().put("success", true);
+	}
+
+	/**
 	 * Creates an error reply.
 	 *
 	 * @param error

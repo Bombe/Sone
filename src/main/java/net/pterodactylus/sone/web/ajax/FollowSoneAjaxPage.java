@@ -53,7 +53,7 @@ public class FollowSoneAjaxPage extends JsonPage {
 		}
 		currentSone.addFriend(soneId);
 		webInterface.getCore().saveSone(currentSone);
-		return new JsonObject().put("success", true);
+		return createSuccessJsonObject();
 	}
 
 }

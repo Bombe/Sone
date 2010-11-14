@@ -61,7 +61,7 @@ public class DeleteReplyAjaxPage extends JsonPage {
 			return createErrorJsonObject("not-authorized");
 		}
 		webInterface.getCore().deleteReply(reply);
-		return new JsonObject().put("success", true);
+		return createSuccessJsonObject();
 	}
 
 }
