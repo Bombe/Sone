@@ -26,6 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core.SoneStatus;
+import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
@@ -213,6 +214,17 @@ public class SoneDownloader extends AbstractService {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, "Downloaded Sone %s with invalid time: %s", new Object[] { sone, soneTime });
 			return null;
+		}
+
+		SimpleXML clientXml = soneXml.getNode("client");
+		if (clientXml != null) {
+			String clientName = clientXml.getValue("name", null);
+			String clientVersion = clientXml.getValue("version", null);
+			if ((clientName == null) || (clientVersion == null)) {
+				logger.log(Level.WARNING, "Download Sone %s with client XML but missing name or version!", sone);
+				return null;
+			}
+			sone.setClient(new Client(clientName, clientVersion));
 		}
 
 		String soneRequestUri = soneXml.getValue("request-uri", null);
