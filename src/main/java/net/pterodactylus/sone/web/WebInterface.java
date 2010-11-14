@@ -382,6 +382,9 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newReplyFound(Reply reply) {
+		if (reply.getPost().getSone() == null) {
+			return;
+		}
 		newReplyNotification.addReply(reply);
 		notificationManager.addNotification(newReplyNotification);
 	}
