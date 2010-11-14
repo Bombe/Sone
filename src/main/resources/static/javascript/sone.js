@@ -407,3 +407,22 @@ function getReply(replyId, callbackFunction) {
 		}
 	});
 }
+
+/**
+ * Ajaxifies the given notification by replacing the form with AJAX.
+ *
+ * @param notification
+ *            jQuery object representing the notification.
+ */
+function ajaxifyNotificationArea(notification) {
+	notification.find("form.dismiss").submit(function() {
+		return false;
+	});
+	notification.find("form.dismiss button").click(function() {
+		$.getJSON("ajax/dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
+			if (data.success) {
+				notification.slideUp();
+			}
+		});
+	});
+}
