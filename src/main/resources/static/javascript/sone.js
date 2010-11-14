@@ -414,7 +414,7 @@ function getReply(replyId, callbackFunction) {
  * @param notification
  *            jQuery object representing the notification.
  */
-function ajaxifyNotificationArea(notification) {
+function ajaxifyNotification(notification) {
 	notification.find("form.dismiss").submit(function() {
 		return false;
 	});
