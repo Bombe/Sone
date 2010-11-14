@@ -1,0 +1,6 @@
+<div class="text">
+	<%= Notification.NewReply.Text|l10n|html>
+	<%foreach replies reply>
+		<a href="viewPost.html?post=<% reply.post.id|html>"><% reply.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
+	<%/foreach>
+</div>

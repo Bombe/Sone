@@ -38,6 +38,7 @@ import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.NewPostNotification;
+import net.pterodactylus.sone.notify.NewReplyNotification;
 import net.pterodactylus.sone.notify.NewSoneNotification;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
@@ -114,6 +115,9 @@ public class WebInterface implements CoreListener {
 	/** The “new post” notification. */
 	private final NewPostNotification newPostNotification;
 
+	/** The “new reply” notification. */
+	private final NewReplyNotification newReplyNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -150,6 +154,9 @@ public class WebInterface implements CoreListener {
 
 		Template newPostNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new NewPostNotification(newPostNotificationTemplate);
+
+		Template newReplyNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newReplyNotification.html"));
+		newReplyNotification = new NewReplyNotification(newReplyNotificationTemplate);
 	}
 
 	//
@@ -375,7 +382,8 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newReplyFound(Reply reply) {
-		/* TODO */
+		newReplyNotification.addReply(reply);
+		notificationManager.addNotification(newReplyNotification);
 	}
 
 	/**
@@ -405,7 +413,10 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void markReplyKnown(Reply reply) {
-		/* TODO */
+		newReplyNotification.removeReply(reply);
+		if (newReplyNotification.isEmpty()) {
+			newReplyNotification.dismiss();
+		}
 	}
 
 	/**
