@@ -732,7 +732,7 @@ public class Core implements IdentityListener {
 				}
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
-						if (!storedSone.getPosts().contains(post) && !knownSones.contains(post.getId())) {
+						if (!storedSone.getPosts().contains(post) && !knownPosts.contains(post.getId())) {
 							newPosts.add(post.getId());
 						}
 						posts.put(post.getId(), post);
@@ -745,7 +745,7 @@ public class Core implements IdentityListener {
 				}
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
-						if (!storedSone.getReplies().contains(reply) && !knownSones.contains(reply.getId())) {
+						if (!storedSone.getReplies().contains(reply) && !knownReplies.contains(reply.getId())) {
 							newReplies.add(reply.getId());
 						}
 						replies.put(reply.getId(), reply);
