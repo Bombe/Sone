@@ -51,6 +51,16 @@ public class NewSoneNotification extends TemplateNotification {
 	//
 
 	/**
+	 * Returns whether there are any new Sones.
+	 *
+	 * @return {@code true} if there are no new Sones, {@code false} if there
+	 *         are new Sones
+	 */
+	public boolean isEmpty() {
+		return newSones.isEmpty();
+	}
+
+	/**
 	 * Adds a discovered Sone.
 	 *
 	 * @param sone
@@ -58,6 +68,17 @@ public class NewSoneNotification extends TemplateNotification {
 	 */
 	public void addSone(Sone sone) {
 		newSones.add(sone);
+		touch();
+	}
+
+	/**
+	 * Removes the given Sone from the list of new Sones.
+	 *
+	 * @param sone
+	 *            The Sone to remove
+	 */
+	public void removeSone(Sone sone) {
+		newSones.remove(sone);
 		touch();
 	}
 
