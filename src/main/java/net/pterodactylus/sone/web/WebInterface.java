@@ -90,6 +90,9 @@ public class WebInterface {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebInterface.class);
 
+	/** The notification manager. */
+	private final NotificationManager notificationManager = new NotificationManager();
+
 	/** The Sone plugin. */
 	private final SonePlugin sonePlugin;
 
@@ -147,6 +150,15 @@ public class WebInterface {
 	}
 
 	/**
+	 * Returns the notification manager.
+	 *
+	 * @return The notification manager
+	 */
+	public NotificationManager getNotifications() {
+		return notificationManager;
+	}
+
+	/**
 	 * Returns the l10n helper of the node.
 	 *
 	 * @return The node’s l10n helper
@@ -192,13 +204,13 @@ public class WebInterface {
 		Template startupNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/startupNotification.html"));
 
 		final TemplateNotification startupNotification = new TemplateNotification(startupNotificationTemplate);
-		getCore().getNotifications().addNotification(startupNotification);
+		notificationManager.addNotification(startupNotification);
 
 		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (120 * 1000), new Runnable() {
 
 			@Override
 			public void run() {
-				getCore().getNotifications().removeNotification(startupNotification);
+				startupNotification.dismiss();
 			}
 		}, "Sone Startup Notification Remover");
 	}
