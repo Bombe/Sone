@@ -32,6 +32,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
+import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -314,6 +315,7 @@ public class SoneInserter extends AbstractService {
 			}
 
 			template.set("currentSone", soneProperties);
+			template.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
 			try {

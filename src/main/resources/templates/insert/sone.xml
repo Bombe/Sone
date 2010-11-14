@@ -3,6 +3,11 @@
 
 	<time><% currentSone.time></time>
 
+	<client>
+		<name>Sone</name>
+		<version><% version|xml></version>
+	</client>
+
 	<profile>
 		<first-name><% currentSone.profile.firstName|xml></first-name>
 		<middle-name><% currentSone.profile.middleName|xml></middle-name>
