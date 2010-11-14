@@ -30,6 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -85,7 +86,7 @@ import freenet.l10n.BaseL10n;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebInterface {
+public class WebInterface implements CoreListener {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebInterface.class);
@@ -330,6 +331,35 @@ public class WebInterface {
 		} catch (UnsupportedEncodingException uee1) {
 			return null;
 		}
+	}
+
+	//
+	// CORELISTENER METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void newSoneFound(Sone sone) {
+		newSoneNotification.addSone(sone);
+		notificationManager.addNotification(newSoneNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void newPostFound(Post post) {
+		/* TODO */
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void newReplyFound(Reply reply) {
+		/* TODO */
 	}
 
 	/**
