@@ -44,14 +44,14 @@ public class DismissNotificationAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(Request request) {
 		String notificationId = request.getHttpRequest().getParam("notification");
-		Notification notification = webInterface.getCore().getNotifications().getNotification(notificationId);
+		Notification notification = webInterface.getNotifications().getNotification(notificationId);
 		if (notification == null) {
 			return createErrorJsonObject("invalid-notification-id");
 		}
 		if (!notification.isDismissable()) {
 			return createErrorJsonObject("not-dismissable");
 		}
-		webInterface.getCore().getNotifications().removeNotification(notification);
+		notification.dismiss();
 		return createSuccessJsonObject();
 	}
 

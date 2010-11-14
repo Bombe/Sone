@@ -214,7 +214,7 @@
 		<%/if>
 
 		<div id="notification-area">
-			<%foreach webInterface.core.notifications.all notification>
+			<%foreach webInterface.notifications.all notification>
 				<div class="notification" id="<% notification.id|html>">
 					<%if notification.dismissable>
 						<form class="dismiss" action="dismissNotification.html" method="post">

@@ -50,9 +50,9 @@ public class DismissNotificationPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		String notificationId = request.getHttpRequest().getPartAsStringFailsafe("notification", 36);
-		Notification notification = webInterface.getCore().getNotifications().getNotification(notificationId);
+		Notification notification = webInterface.getNotifications().getNotification(notificationId);
 		if ((notification != null) && notification.isDismissable()) {
-			webInterface.getCore().getNotifications().removeNotification(notification);
+			notification.dismiss();
 		}
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
 		throw new RedirectException(returnPage);
