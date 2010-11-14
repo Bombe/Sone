@@ -58,6 +58,7 @@ textarea {
 	border: solid 1px #ccc;
 	background-color: #ffffa0;
 	margin-bottom: 1ex;
+	min-height: 3.5ex;
 }
 
 #sone #notification-area .notification .dismiss {
