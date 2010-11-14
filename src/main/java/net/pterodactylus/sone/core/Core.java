@@ -734,6 +734,7 @@ public class Core implements IdentityListener {
 					for (Post post : sone.getPosts()) {
 						if (!storedSone.getPosts().contains(post) && !knownPosts.contains(post.getId())) {
 							newPosts.add(post.getId());
+							coreListenerManager.fireNewPostFound(post);
 						}
 						posts.put(post.getId(), post);
 					}
@@ -747,6 +748,7 @@ public class Core implements IdentityListener {
 					for (Reply reply : sone.getReplies()) {
 						if (!storedSone.getReplies().contains(reply) && !knownReplies.contains(reply.getId())) {
 							newReplies.add(reply.getId());
+							coreListenerManager.fireNewReplyFound(reply);
 						}
 						replies.put(reply.getId(), reply);
 					}
