@@ -37,6 +37,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.notify.NewSoneNotification;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
@@ -106,6 +107,9 @@ public class WebInterface implements CoreListener {
 	/** The template factory. */
 	private DefaultTemplateFactory templateFactory;
 
+	/** The “new Sone” notification. */
+	private final NewSoneNotification newSoneNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -135,6 +139,10 @@ public class WebInterface implements CoreListener {
 		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
 		templateFactory.addTemplateObject("formPassword", formPassword);
+
+		/* create notifications. */
+		Template newSoneNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newSoneNotification.html"));
+		newSoneNotification = new NewSoneNotification(newSoneNotificationTemplate);
 	}
 
 	//
