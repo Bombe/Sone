@@ -204,7 +204,21 @@
 			</div>
 		<%/if>
 
-		<div id="notification-area"></div>
+		<div id="notification-area">
+			<%foreach webInterface.core.notifications.all notification>
+				<div class="notification">
+					<%if notification.dismissable>
+						<form class="dismiss" action="dismissNotification.html" method="post">
+							<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+							<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+							<input type="hidden" name="notification" value="<% notification.id|html>" />
+							<button type="submit"><%= Notification.Button.Dismiss|l10n|html></button>
+						</form>
+					<%/if>
+					<% notification.render>
+				</div>
+			<%/foreach>
+		</div>
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
 			<a class="picture" href="index.html">

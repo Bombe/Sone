@@ -60,6 +60,10 @@ textarea {
 	margin-bottom: 1ex;
 }
 
+#sone #notification-area .notification .dismiss {
+	float: right;
+}
+
 #sone #notification-area .notification > div {
 	display: inline;
 }
