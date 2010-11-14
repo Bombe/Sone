@@ -488,6 +488,9 @@ public class Core implements IdentityListener {
 		synchronized (newPosts) {
 			boolean isNew = !knownPosts.contains(postId) && newPosts.remove(postId);
 			knownPosts.add(postId);
+			if (isNew) {
+				coreListenerManager.fireMarkPostKnown(getPost(postId));
+			}
 			return isNew;
 		}
 	}
@@ -543,6 +546,9 @@ public class Core implements IdentityListener {
 		synchronized (newReplies) {
 			boolean isNew = !knownReplies.contains(replyId) && newReplies.remove(replyId);
 			knownReplies.add(replyId);
+			if (isNew) {
+				coreListenerManager.fireMarkReplyKnown(getReply(replyId));
+			}
 			return isNew;
 		}
 	}

@@ -63,4 +63,20 @@ public interface CoreListener extends EventListener {
 	 */
 	public void markSoneKnown(Sone sone);
 
+	/**
+	 * Notifies a listener that the given post is now marked as known.
+	 *
+	 * @param post
+	 *            The known post
+	 */
+	public void markPostKnown(Post post);
+
+	/**
+	 * Notifies a listener that the given reply is now marked as known.
+	 *
+	 * @param reply
+	 *            The known reply
+	 */
+	public void markReplyKnown(Reply reply);
+
 }
