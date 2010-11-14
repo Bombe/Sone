@@ -169,11 +169,12 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		identityManager = new IdentityManager(webOfTrustConnector);
 		identityManager.setContext("Sone");
 
-		/* create the web interface. */
-		webInterface = new WebInterface(this);
-
 		/* create core. */
 		core = new Core(configuration, freenetInterface, identityManager);
+
+		/* create the web interface. */
+		webInterface = new WebInterface(this);
+		core.addCoreListener(webInterface);
 
 		/* create the identity manager. */
 		identityManager.addIdentityListener(core);
