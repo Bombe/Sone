@@ -227,7 +227,7 @@ public class WebInterface implements CoreListener {
 		/* notification templates. */
 		Template startupNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/startupNotification.html"));
 
-		final TemplateNotification startupNotification = new TemplateNotification(startupNotificationTemplate);
+		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
 		notificationManager.addNotification(startupNotification);
 
 		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (120 * 1000), new Runnable() {
