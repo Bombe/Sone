@@ -443,6 +443,9 @@ function getNotifications() {
 				}
 				notification.slideDown();
 			});
+			$.each(data.removedNotifications, function(index, value) {
+				$("#sone #notification-area .notification#" + value.id).slideUp();
+			});
 		}
 		setTimeout(getNotifications, 5000);
 	});
