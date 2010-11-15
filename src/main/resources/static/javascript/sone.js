@@ -91,7 +91,9 @@ function addCommentLink(postId, element) {
  */
 function getTranslation(key, callback) {
 	$.getJSON("ajax/getTranslation.ajax", {"key": key}, function(data, textStatus) {
-		callback(data.value);
+		if (data != null) {
+			callback(data.value);
+		}
 	});
 }
 
@@ -106,10 +108,12 @@ function getTranslation(key, callback) {
  */
 function getSoneStatus(soneId, local) {
 	$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
-		updateSoneStatus(soneId, data.name, data.status, data.modified, data.lastUpdated);
+		if ((data != null) && data.success) {
+			updateSoneStatus(soneId, data.name, data.status, data.modified, data.lastUpdated);
+		}
 		/* seconds! */
 		updateInterval = 60;
-		if (local || data.modified || (data.status == "downloading") || (data.status == "inserting")) {
+		if (local || (data!= null) && (data.modified || (data.status == "downloading") || (data.status == "inserting"))) {
 			updateInterval = 5;
 		}
 		setTimeout(function() {
@@ -225,6 +229,9 @@ function enhanceDeleteButton(buttonId, text, deleteCallback) {
 function enhanceDeletePostButton(buttonId, postId, text) {
 	enhanceDeleteButton(buttonId, text, function() {
 		$.getJSON("ajax/deletePost.ajax", { "post": postId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+			if (data == null) {
+				return;
+			}
 			if (data.success) {
 				$("#sone .post#" + postId).slideUp();
 			} else if (data.error == "invalid-post-id") {
@@ -251,6 +258,9 @@ function enhanceDeletePostButton(buttonId, postId, text) {
 function enhanceDeleteReplyButton(buttonId, replyId, text) {
 	enhanceDeleteButton(buttonId, text, function() {
 		$.getJSON("ajax/deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+			if (data == null) {
+				return;
+			}
 			if (data.success) {
 				$("#sone .reply#" + replyId).slideUp();
 			} else if (data.error == "invalid-reply-id") {
@@ -319,7 +329,10 @@ function getReplyId(element) {
 }
 
 function likePost(postId) {
-	$.getJSON("ajax/like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function() {
+	$.getJSON("ajax/like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		if ((data == null) || !data.success) {
+			return;
+		}
 		$("#sone .post#" + postId + " > .inner-part > .status-line .like").addClass("hidden");
 		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
@@ -327,7 +340,10 @@ function likePost(postId) {
 }
 
 function unlikePost(postId) {
-	$.getJSON("ajax/unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function() {
+	$.getJSON("ajax/unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		if ((data == null) || !data.success) {
+			return;
+		}
 		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
 		$("#sone .post#" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
@@ -336,7 +352,7 @@ function unlikePost(postId) {
 
 function updatePostLikes(postId) {
 	$.getJSON("ajax/getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
-		if (data.success) {
+		if ((data != null) && data.success) {
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
@@ -345,7 +361,10 @@ function updatePostLikes(postId) {
 }
 
 function likeReply(replyId) {
-	$.getJSON("ajax/like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function() {
+	$.getJSON("ajax/like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		if ((data == null) || !data.success) {
+			return;
+		}
 		$("#sone .reply#" + replyId + " .status-line .like").addClass("hidden");
 		$("#sone .reply#" + replyId + " .status-line .unlike").removeClass("hidden");
 		updateReplyLikes(replyId);
@@ -353,7 +372,10 @@ function likeReply(replyId) {
 }
 
 function unlikeReply(replyId) {
-	$.getJSON("ajax/unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function() {
+	$.getJSON("ajax/unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		if ((data == null) || !data.success) {
+			return;
+		}
 		$("#sone .reply#" + replyId + " .status-line .unlike").addClass("hidden");
 		$("#sone .reply#" + replyId + " .status-line .like").removeClass("hidden");
 		updateReplyLikes(replyId);
@@ -362,7 +384,7 @@ function unlikeReply(replyId) {
 
 function updateReplyLikes(replyId) {
 	$.getJSON("ajax/getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
-		if (data.success) {
+		if ((data != null) && data.success) {
 			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
 			$("#sone .reply#" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
@@ -383,6 +405,10 @@ function updateReplyLikes(replyId) {
  */
 function postReply(postId, text, callbackFunction) {
 	$.getJSON("ajax/createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+		if (data == null) {
+			/* TODO - show error */
+			return;
+		}
 		if (data.success) {
 			callbackFunction(true, null, data.reply);
 		} else {
@@ -402,7 +428,7 @@ function postReply(postId, text, callbackFunction) {
  */
 function getReply(replyId, callbackFunction) {
 	$.getJSON("ajax/getReply.ajax", { "reply" : replyId }, function(data, textStatus) {
-		if (data.success) {
+		if ((data != null) && data.success) {
 			callbackFunction(data.soneId, data.soneName, data.time, data.displayTime, data.text, data.html);
 		}
 	});
@@ -420,6 +446,7 @@ function ajaxifyNotification(notification) {
 	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("ajax/dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
+			/* dismiss in case of error, too. */
 			notification.slideUp();
 		});
 	});
@@ -431,7 +458,7 @@ function ajaxifyNotification(notification) {
  */
 function getNotifications() {
 	$.getJSON("ajax/getNotifications.ajax", {}, function(data, textStatus) {
-		if (data.success) {
+		if ((data != null) && data.success) {
 			$.each(data.notifications, function(index, value) {
 				oldNotification = $("#sone #notification-area .notification#" + value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
