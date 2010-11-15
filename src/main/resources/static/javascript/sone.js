@@ -423,4 +423,5 @@ function ajaxifyNotification(notification) {
 			notification.slideUp();
 		});
 	});
+	return notification;
 }
