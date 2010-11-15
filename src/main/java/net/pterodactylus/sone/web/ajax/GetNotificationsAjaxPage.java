@@ -56,13 +56,7 @@ public class GetNotificationsAjaxPage extends JsonPage {
 		JsonObject result = createSuccessJsonObject();
 		JsonArray jsonNotifications = new JsonArray();
 		for (Notification notification : notifications) {
-			JsonObject jsonNotification = new JsonObject();
-			jsonNotification.put("id", notification.getId());
-			jsonNotification.put("text", notification.toString());
-			jsonNotification.put("createdTime", notification.getCreatedTime());
-			jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
-			jsonNotification.put("dismissable", notification.isDismissable());
-			jsonNotifications.add(jsonNotification);
+			jsonNotifications.add(createJsonNotification(notification));
 		}
 		return result.put("notifications", jsonNotifications);
 	}
@@ -73,6 +67,27 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	@Override
 	protected boolean needsFormPassword() {
 		return false;
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Creates a JSON object from the given notification.
+	 *
+	 * @param notification
+	 *            The notification to create a JSON object
+	 * @return The JSON object
+	 */
+	private static JsonObject createJsonNotification(Notification notification) {
+		JsonObject jsonNotification = new JsonObject();
+		jsonNotification.put("id", notification.getId());
+		jsonNotification.put("text", notification.toString());
+		jsonNotification.put("createdTime", notification.getCreatedTime());
+		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
+		jsonNotification.put("dismissable", notification.isDismissable());
+		return jsonNotification;
 	}
 
 }
