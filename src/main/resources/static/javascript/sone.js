@@ -1,5 +1,24 @@
 /* Sone JavaScript functions. */
 
+/* jQuery overrides. */
+oldGetJson = jQuery.prototype.getJSON;
+jQuery.prototype.getJSON = function(url, data, successCallback, errorCallback) {
+	if (typeof errorCallback == "undefined") {
+		return oldGetJson(url, data, successCallback);
+	}
+	if (jQuery.isFunction(data)) {
+		errorCallback = successCallback;
+		successCallback = data;
+		data = null;
+	}
+	return jQuery.ajax({
+		data: data,
+		error: errorCallback,
+		success: successCallback,
+		url: url
+	});
+}
+
 function isOnline() {
 	return $("#sone").hasClass("online");
 }
@@ -94,6 +113,8 @@ function getTranslation(key, callback) {
 		if (data != null) {
 			callback(data.value);
 		}
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -119,6 +140,8 @@ function getSoneStatus(soneId, local) {
 		setTimeout(function() {
 			getSoneStatus(soneId, local);
 		}, updateInterval * 1000);
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -241,6 +264,8 @@ function enhanceDeletePostButton(buttonId, postId, text) {
 			} else if (data.error == "not-authorized") {
 				alert("You are not allowed to delete this post.");
 			}
+		}, function(xmlHttpRequest, textStatus, error) {
+			/* ignore error. */
 		});
 	});
 }
@@ -270,6 +295,8 @@ function enhanceDeleteReplyButton(buttonId, replyId, text) {
 			} else if (data.error == "not-authorized") {
 				alert("You are not allowed to delete this reply.");
 			}
+		}, function(xmlHttpRequest, textStatus, error) {
+			/* ignore error. */
 		});
 	});
 }
@@ -336,6 +363,8 @@ function likePost(postId) {
 		$("#sone .post#" + postId + " > .inner-part > .status-line .like").addClass("hidden");
 		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -347,6 +376,8 @@ function unlikePost(postId) {
 		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
 		$("#sone .post#" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -357,6 +388,8 @@ function updatePostLikes(postId) {
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -368,6 +401,8 @@ function likeReply(replyId) {
 		$("#sone .reply#" + replyId + " .status-line .like").addClass("hidden");
 		$("#sone .reply#" + replyId + " .status-line .unlike").removeClass("hidden");
 		updateReplyLikes(replyId);
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -379,6 +414,8 @@ function unlikeReply(replyId) {
 		$("#sone .reply#" + replyId + " .status-line .unlike").addClass("hidden");
 		$("#sone .reply#" + replyId + " .status-line .like").removeClass("hidden");
 		updateReplyLikes(replyId);
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -389,6 +426,8 @@ function updateReplyLikes(replyId) {
 			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
 			$("#sone .reply#" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -414,6 +453,8 @@ function postReply(postId, text, callbackFunction) {
 		} else {
 			callbackFunction(false, data.error);
 		}
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -431,6 +472,8 @@ function getReply(replyId, callbackFunction) {
 		if ((data != null) && data.success) {
 			callbackFunction(data.soneId, data.soneName, data.time, data.displayTime, data.text, data.html);
 		}
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
@@ -448,6 +491,8 @@ function ajaxifyNotification(notification) {
 		$.getJSON("ajax/dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
 			/* dismiss in case of error, too. */
 			notification.slideUp();
+		}, function(xmlHttpRequest, textStatus, error) {
+			/* ignore error. */
 		});
 	});
 	return notification;
@@ -477,6 +522,8 @@ function getNotifications() {
 		} else {
 			setTimeout(getNotifications, 30000);
 		}
+	}, function(xmlHttpRequest, textStatus, error) {
+		/* ignore error. */
 	});
 }
 
