@@ -473,8 +473,10 @@ function getNotifications() {
 			$.each(data.removedNotifications, function(index, value) {
 				$("#sone #notification-area .notification#" + value.id).slideUp();
 			});
+			setTimeout(getNotifications, 5000);
+		} else {
+			setTimeout(getNotifications, 30000);
 		}
-		setTimeout(getNotifications, 5000);
 	});
 }
 
