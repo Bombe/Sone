@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web.ajax;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonArray;
@@ -52,13 +53,18 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(Request request) {
 		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications().getChangedNotifications());
+		Set<Notification> removedNotifications = webInterface.getNotifications().getRemovedNotifications();
 		Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
 		JsonObject result = createSuccessJsonObject();
 		JsonArray jsonNotifications = new JsonArray();
 		for (Notification notification : notifications) {
 			jsonNotifications.add(createJsonNotification(notification));
 		}
-		return result.put("notifications", jsonNotifications);
+		JsonArray jsonRemovedNotifications = new JsonArray();
+		for (Notification notification : removedNotifications) {
+			jsonRemovedNotifications.add(createJsonNotification(notification));
+		}
+		return result.put("notifications", jsonNotifications).put("removedNotifications", jsonRemovedNotifications);
 	}
 
 	/**
