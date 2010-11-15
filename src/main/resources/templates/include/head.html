@@ -180,6 +180,13 @@
 		});
 	</script>
 
+	<script language="javascript">
+		/* activate notification polling. */
+		$(document).ready(function() {
+			setTimeout(getNotifications, 5000);
+		});
+	</script>
+
 	<div id="main">
 
 		<%if !webInterface.core.identityManager.connected>
