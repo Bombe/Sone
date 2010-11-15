@@ -35,9 +35,10 @@ import net.pterodactylus.util.notify.Notification;
 public class GetNotificationsAjaxPage extends JsonPage {
 
 	/**
-	 * TODO
+	 * Creates a new “get notifications” AJAX handler.
 	 *
 	 * @param webInterface
+	 *            The Sone web interface
 	 */
 	public GetNotificationsAjaxPage(WebInterface webInterface) {
 		super("ajax/getNotifications.ajax", webInterface);
