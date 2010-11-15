@@ -425,3 +425,47 @@ function ajaxifyNotification(notification) {
 	});
 	return notification;
 }
+
+/**
+ * Retrieves all changed notifications.
+ */
+function getNotifications() {
+	$.getJSON("ajax/getNotifications.ajax", {}, function(data, textStatus) {
+		if (data.success) {
+			$.each(data.notifications, function(index, value) {
+				oldNotification = $("#sone #notification-area .notification#" + value.id);
+				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
+				if (oldNotification.length != 0) {
+					oldNotification.slideUp();
+					notification.insertBefore(oldNotification);
+				} else {
+					$("#sone #notification-area").append(notification);
+				}
+				notification.slideDown();
+			});
+		}
+		setTimeout(getNotifications, 5000);
+	});
+}
+
+/**
+ * Creates a new notification.
+ *
+ * @param id
+ *            The ID of the notificaiton
+ * @param text
+ *            The text of the notification
+ * @param dismissable
+ *            <code>true</code> if the notification can be dismissed by the
+ *            user
+ */
+function createNotification(id, text, dismissable) {
+	notification = $("<div></div>").addClass("notification").attr("id", id);
+	if (dismissable) {
+		dismissForm = $("#sone #notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id")
+		dismissForm.find("input[name=notification]").val(id);
+		notification.append(dismissForm);
+	}
+	notification.append(text);
+	return notification;
+}
