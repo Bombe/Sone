@@ -189,6 +189,14 @@
 		<%/if>
 
 		<div id="notification-area">
+
+			<form id="notification-dismiss-template" class="hidden dismiss" action="dismissNotification.html" method="post">
+				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+				<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+				<input type="hidden" name="notification" value="" />
+				<button type="submit"><%= Notification.Button.Dismiss|l10n|html></button>
+			</form>
+
 			<%foreach webInterface.notifications.all notification>
 				<div class="notification" id="<% notification.id|html>">
 					<%if notification.dismissable>
