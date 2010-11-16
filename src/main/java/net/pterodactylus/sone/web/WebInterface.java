@@ -244,6 +244,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void stop() {
 		unregisterToadlets();
+		Ticker.getInstance().stop();
 	}
 
 	//
