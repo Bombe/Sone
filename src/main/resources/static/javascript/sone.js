@@ -110,7 +110,7 @@ function addCommentLink(postId, element) {
  */
 function getTranslation(key, callback) {
 	$.getJSON("ajax/getTranslation.ajax", {"key": key}, function(data, textStatus) {
-		if (data != null) {
+		if ((data != null) && data.success) {
 			callback(data.value);
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
