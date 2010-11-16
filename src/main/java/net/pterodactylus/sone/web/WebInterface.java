@@ -237,6 +237,23 @@ public class WebInterface implements CoreListener {
 				startupNotification.dismiss();
 			}
 		}, "Sone Startup Notification Remover");
+
+		Template wotMissingNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/wotMissingNotification.html"));
+		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
+		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				if (getCore().getIdentityManager().isConnected()) {
+					wotMissingNotification.dismiss();
+				} else {
+					notificationManager.addNotification(wotMissingNotification);
+				}
+				Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), this, "Sone WoT Connector Checker");
+			}
+
+		}, "Sone WoT Connector Checker");
 	}
 
 	/**
