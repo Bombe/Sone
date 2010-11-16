@@ -272,7 +272,6 @@ public class WebInterface implements CoreListener {
 		Template unfollowSoneTemplate = templateFactory.createTemplate(createReader("/templates/unfollowSone.html"));
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
 		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
-		Template wotPluginMissingTemplate = templateFactory.createTemplate(createReader("/templates/wotPluginMissing.html"));
 		Template dismissNotificationTemplate = templateFactory.createTemplate(createReader("/templates/dismissNotification.html"));
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
@@ -300,7 +299,6 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("wotPluginMissing.html", wotPluginMissingTemplate, "Page.WotPluginMissing.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(dismissNotificationTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));

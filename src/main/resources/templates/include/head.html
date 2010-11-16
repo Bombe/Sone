@@ -189,12 +189,6 @@
 
 	<div id="main">
 
-		<%if !webInterface.core.identityManager.connected>
-			<div id="plugin-warning">
-				<%= Warning.PluginNotConnected.Text|l10n|html|replace needle="{link}" replacement="<a href=\"/plugins/\">"|replace needle="{/link}" replacement="</a>">
-			</div>
-		<%/if>
-
 		<div id="notification-area">
 
 			<form id="notification-dismiss-template" class="hidden dismiss" action="dismissNotification.html" method="post">
