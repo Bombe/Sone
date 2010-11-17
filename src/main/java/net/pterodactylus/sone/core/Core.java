@@ -807,6 +807,7 @@ public class Core implements IdentityListener {
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
 						if (!storedSone.getPosts().contains(post) && !knownPosts.contains(post.getId())) {
+							post.setSone(getSone(post.getSone().getId()));
 							newPosts.add(post.getId());
 							coreListenerManager.fireNewPostFound(post);
 						}
