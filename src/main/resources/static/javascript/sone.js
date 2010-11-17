@@ -508,12 +508,11 @@ function getNotifications() {
 				oldNotification = $("#sone #notification-area .notification#" + value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
-					oldNotification.slideUp();
-					notification.insertBefore(oldNotification);
+					oldNotification.replaceWith(notification.show());
 				} else {
 					$("#sone #notification-area").append(notification);
+					notification.slideDown();
 				}
-				notification.slideDown();
 			});
 			$.each(data.removedNotifications, function(index, value) {
 				$("#sone #notification-area .notification#" + value.id).slideUp();
