@@ -712,6 +712,7 @@ public class Core implements IdentityListener {
 						return;
 					}
 					logger.log(Level.INFO, "Trying to restore Sone from Freenet…");
+					lockSone(sone);
 					long edition = sone.getLatestEdition();
 					while (!stopped && (edition >= 0) && isSoneRescueMode()) {
 						logger.log(Level.FINE, "Downloading edition " + edition + "…");
