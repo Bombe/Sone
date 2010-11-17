@@ -195,6 +195,16 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Returns whether the “Sone rescue mode” is currently activated.
+	 *
+	 * @return {@code true} if the “Sone rescue mode” is currently activated,
+	 *         {@code false} if it is not
+	 */
+	public boolean isSoneRescueMode() {
+		return options.getBooleanOption("SoneRescueMode").get();
+	}
+
+	/**
 	 * Returns the identity manager used by the core.
 	 *
 	 * @return The identity manager
@@ -1164,6 +1174,7 @@ public class Core implements IdentityListener {
 			}
 
 		}));
+		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
 
@@ -1179,6 +1190,7 @@ public class Core implements IdentityListener {
 		}
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
 		int soneCounter = 0;
@@ -1225,6 +1237,7 @@ public class Core implements IdentityListener {
 		/* store the options first. */
 		try {
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
 

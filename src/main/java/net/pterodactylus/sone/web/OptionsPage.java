@@ -55,6 +55,8 @@ public class OptionsPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
+			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
 			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
 			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
@@ -62,6 +64,7 @@ public class OptionsPage extends SoneTemplatePage {
 			throw new RedirectException(getPath());
 		}
 		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
+		template.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
 		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
 		template.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
 	}
