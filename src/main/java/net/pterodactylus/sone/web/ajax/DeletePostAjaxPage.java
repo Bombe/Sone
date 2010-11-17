@@ -60,7 +60,7 @@ public class DeletePostAjaxPage extends JsonPage {
 		if (!post.getSone().equals(currentSone)) {
 			return createErrorJsonObject("not-authorized");
 		}
-		currentSone.removePost(post);
+		webInterface.getCore().deletePost(post);
 		return createSuccessJsonObject();
 	}
 
