@@ -37,9 +37,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.notify.NewPostNotification;
-import net.pterodactylus.sone.notify.NewReplyNotification;
-import net.pterodactylus.sone.notify.NewSoneNotification;
+import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
@@ -113,13 +111,13 @@ public class WebInterface implements CoreListener {
 	private DefaultTemplateFactory templateFactory;
 
 	/** The “new Sone” notification. */
-	private final NewSoneNotification newSoneNotification;
+	private final ListNotification<Sone> newSoneNotification;
 
 	/** The “new post” notification. */
-	private final NewPostNotification newPostNotification;
+	private final ListNotification<Post> newPostNotification;
 
 	/** The “new reply” notification. */
-	private final NewReplyNotification newReplyNotification;
+	private final ListNotification<Reply> newReplyNotification;
 
 	/**
 	 * Creates a new web interface.
@@ -153,13 +151,13 @@ public class WebInterface implements CoreListener {
 
 		/* create notifications. */
 		Template newSoneNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newSoneNotification.html"));
-		newSoneNotification = new NewSoneNotification(newSoneNotificationTemplate);
+		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate);
 
 		Template newPostNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newPostNotification.html"));
-		newPostNotification = new NewPostNotification(newPostNotificationTemplate);
+		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate);
 
 		Template newReplyNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newReplyNotification.html"));
-		newReplyNotification = new NewReplyNotification(newReplyNotificationTemplate);
+		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate);
 	}
 
 	//
@@ -390,7 +388,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newSoneFound(Sone sone) {
-		newSoneNotification.addSone(sone);
+		newSoneNotification.add(sone);
 		notificationManager.addNotification(newSoneNotification);
 	}
 
@@ -399,7 +397,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newPostFound(Post post) {
-		newPostNotification.addPost(post);
+		newPostNotification.add(post);
 		notificationManager.addNotification(newPostNotification);
 	}
 
@@ -411,7 +409,7 @@ public class WebInterface implements CoreListener {
 		if (reply.getPost().getSone() == null) {
 			return;
 		}
-		newReplyNotification.addReply(reply);
+		newReplyNotification.add(reply);
 		notificationManager.addNotification(newReplyNotification);
 	}
 
@@ -420,7 +418,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void markSoneKnown(Sone sone) {
-		newSoneNotification.removeSone(sone);
+		newSoneNotification.remove(sone);
 		if (newSoneNotification.isEmpty()) {
 			newSoneNotification.dismiss();
 		}
@@ -431,7 +429,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void markPostKnown(Post post) {
-		newPostNotification.removePost(post);
+		newPostNotification.remove(post);
 		if (newPostNotification.isEmpty()) {
 			newPostNotification.dismiss();
 		}
@@ -442,7 +440,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void markReplyKnown(Reply reply) {
-		newReplyNotification.removeReply(reply);
+		newReplyNotification.remove(reply);
 		if (newReplyNotification.isEmpty()) {
 			newReplyNotification.dismiss();
 		}
