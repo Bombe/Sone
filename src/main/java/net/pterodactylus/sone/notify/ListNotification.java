@@ -84,6 +84,9 @@ public class ListNotification<T> extends TemplateNotification {
 	 */
 	public void remove(T element) {
 		elements.remove(element);
+		if (elements.isEmpty()) {
+			dismiss();
+		}
 		touch();
 	}
 

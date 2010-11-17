@@ -419,9 +419,6 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markSoneKnown(Sone sone) {
 		newSoneNotification.remove(sone);
-		if (newSoneNotification.isEmpty()) {
-			newSoneNotification.dismiss();
-		}
 	}
 
 	/**
@@ -430,9 +427,6 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markPostKnown(Post post) {
 		newPostNotification.remove(post);
-		if (newPostNotification.isEmpty()) {
-			newPostNotification.dismiss();
-		}
 	}
 
 	/**
@@ -441,9 +435,6 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markReplyKnown(Reply reply) {
 		newReplyNotification.remove(reply);
-		if (newReplyNotification.isEmpty()) {
-			newReplyNotification.dismiss();
-		}
 	}
 
 	/**
