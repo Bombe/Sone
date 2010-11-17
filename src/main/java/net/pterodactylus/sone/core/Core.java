@@ -735,6 +735,7 @@ public class Core implements IdentityListener {
 						--edition;
 					}
 					logger.log(Level.INFO, "Finished restoring Sone from Freenet, starting Inserter…");
+					saveSone(sone);
 					coreListenerManager.fireRescuedSone(sone);
 					soneInserter.start();
 				}
