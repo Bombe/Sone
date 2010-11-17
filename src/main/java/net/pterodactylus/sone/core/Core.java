@@ -95,6 +95,9 @@ public class Core implements IdentityListener {
 	/** The Sone downloader. */
 	private final SoneDownloader soneDownloader;
 
+	/** Whether the core has been stopped. */
+	private volatile boolean stopped;
+
 	/** The Sones’ statuses. */
 	/* synchronize access on itself. */
 	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
@@ -1140,6 +1143,7 @@ public class Core implements IdentityListener {
 			}
 		}
 		saveConfiguration();
+		stopped = true;
 	}
 
 	//
