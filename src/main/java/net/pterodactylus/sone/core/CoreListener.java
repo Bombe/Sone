@@ -32,6 +32,22 @@ import net.pterodactylus.sone.data.Sone;
 public interface CoreListener extends EventListener {
 
 	/**
+	 * Notifies a listener that a Sone is now being rescued.
+	 *
+	 * @param sone
+	 *            The Sone that is rescued
+	 */
+	public void rescuingSone(Sone sone);
+
+	/**
+	 * Notifies a listener that the Sone was rescued and can now be unlocked.
+	 *
+	 * @param sone
+	 *            The Sone that was rescued
+	 */
+	public void rescuedSone(Sone sone);
+
+	/**
 	 * Notifies a listener that a new Sone has been discovered.
 	 *
 	 * @param sone

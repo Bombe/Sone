@@ -119,6 +119,12 @@ public class WebInterface implements CoreListener {
 	/** The “new reply” notification. */
 	private final ListNotification<Reply> newReplyNotification;
 
+	/** The “rescuing Sone” notification. */
+	private final ListNotification<Sone> rescuingSonesNotification;
+
+	/** The “Sone rescued” notification. */
+	private final ListNotification<Sone> sonesRescuedNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -158,6 +164,12 @@ public class WebInterface implements CoreListener {
 
 		Template newReplyNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newReplyNotification.html"));
 		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate);
+
+		Template rescuingSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/rescuingSonesNotification.html"));
+		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
+
+		Template sonesRescuedTemplate = templateFactory.createTemplate(createReader("/templates/notify/sonesRescuedNotification.html"));
+		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
 	}
 
 	//
@@ -382,6 +394,25 @@ public class WebInterface implements CoreListener {
 	//
 	// CORELISTENER METHODS
 	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void rescuingSone(Sone sone) {
+		rescuingSonesNotification.add(sone);
+		notificationManager.addNotification(rescuingSonesNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void rescuedSone(Sone sone) {
+		rescuingSonesNotification.remove(sone);
+		sonesRescuedNotification.add(sone);
+		notificationManager.addNotification(sonesRescuedNotification);
+	}
 
 	/**
 	 * {@inheritDoc}

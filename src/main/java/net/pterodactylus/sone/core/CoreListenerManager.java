@@ -44,6 +44,32 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
+	 * Notifies all listeners that the given Sone is now being rescued.
+	 *
+	 * @see CoreListener#rescuingSone(Sone)
+	 * @param sone
+	 *            The Sone that is being rescued
+	 */
+	void fireRescuingSone(Sone sone) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.rescuingSone(sone);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the given Sone was rescued.
+	 *
+	 * @see CoreListener#rescuedSone(Sone)
+	 * @param sone
+	 *            The Sone that was rescued
+	 */
+	void fireRescuedSone(Sone sone) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.rescuedSone(sone);
+		}
+	}
+
+	/**
 	 * Notifies all listeners that a new Sone has been discovered.
 	 *
 	 * @see CoreListener#newSoneFound(Sone)
