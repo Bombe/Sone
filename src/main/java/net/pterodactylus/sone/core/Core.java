@@ -495,9 +495,23 @@ public class Core implements IdentityListener {
 	 * @return The post, or {@code null} if there is no such post
 	 */
 	public Post getPost(String postId) {
+		return getPost(postId, true);
+	}
+
+	/**
+	 * Returns the post with the given ID, optionally creating a new post.
+	 *
+	 * @param postId
+	 *            The ID of the post to get
+	 * @param create
+	 *            {@code true} it create a new post if no post with the given ID
+	 *            exists, {@code false} to return {@code null}
+	 * @return The post, or {@code null} if there is no such post
+	 */
+	public Post getPost(String postId, boolean create) {
 		synchronized (posts) {
 			Post post = posts.get(postId);
-			if (post == null) {
+			if ((post == null) && create) {
 				post = new Post(postId);
 				posts.put(postId, post);
 			}
