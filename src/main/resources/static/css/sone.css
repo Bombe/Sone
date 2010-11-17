@@ -50,7 +50,7 @@ textarea {
 }
 
 #sone #notification-area {
-	margin-bottom: 1em;
+	margin-top: 1em;
 }
 
 #sone #notification-area .notification {
@@ -81,6 +81,7 @@ textarea {
 
 #sone #profile {
 	height: 80px;
+	margin-top: 1em;
 	margin-bottom: 1ex;
 }
 
@@ -133,6 +134,7 @@ textarea {
 
 #sone #main {
 	padding: 1em;
+	padding-top: 0px;
 }
 
 #sone #edit-profile #birth-day, #sone #edit-profile #birth-month, #sone #edit-profile #birth-year {
