@@ -130,7 +130,7 @@ function getTranslation(key, callback) {
 function getSoneStatus(soneId, local) {
 	$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			updateSoneStatus(soneId, data.name, data.status, data.modified, data.lastUpdated);
+			updateSoneStatus(soneId, data.name, data.status, data.modified, data.locked, data.lastUpdated);
 		}
 		/* seconds! */
 		updateInterval = 60;
@@ -166,16 +166,20 @@ function filterSoneId(soneId) {
  *            “downloading”)
  * @param modified
  *            Whether the Sone is modified
+ * @param locked
+ *            Whether the Sone is locked
  * @param lastUpdated
  *            The date and time of the last update (formatted for display)
  */
-function updateSoneStatus(soneId, name, status, modified, lastUpdated) {
+function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 	$("#sone .sone." + filterSoneId(soneId)).
 		toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
 		toggleClass("inserting", status == "inserting").
 		toggleClass("downloading", status == "downloading").
 		toggleClass("modified", modified);
+	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
+	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
 	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
 }
