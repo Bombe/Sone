@@ -841,6 +841,7 @@ public class Core implements IdentityListener {
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
 						if (!storedSone.getReplies().contains(reply) && !knownReplies.contains(reply.getId())) {
+							reply.setSone(getSone(reply.getSone().getId()));
 							newReplies.add(reply.getId());
 							coreListenerManager.fireNewReplyFound(reply);
 						}
