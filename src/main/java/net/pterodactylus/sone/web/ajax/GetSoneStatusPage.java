@@ -57,7 +57,7 @@ public class GetSoneStatusPage extends JsonPage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId);
 		SoneStatus soneStatus = webInterface.getCore().getSoneStatus(sone);
-		return createSuccessJsonObject().put("status", soneStatus.name()).put("name", SoneAccessor.getNiceName(sone)).put("modified", webInterface.getCore().isModifiedSone(sone)).put("lastUpdated", new SimpleDateFormat("MMM d, yyyy, HH:mm:ss").format(new Date(sone.getTime()))).put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
+		return createSuccessJsonObject().put("status", soneStatus.name()).put("name", SoneAccessor.getNiceName(sone)).put("modified", webInterface.getCore().isModifiedSone(sone)).put("locked", webInterface.getCore().isLocked(sone)).put("lastUpdated", new SimpleDateFormat("MMM d, yyyy, HH:mm:ss").format(new Date(sone.getTime()))).put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
 	}
 
 	/**
