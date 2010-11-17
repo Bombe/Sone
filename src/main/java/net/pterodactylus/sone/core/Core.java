@@ -102,6 +102,10 @@ public class Core implements IdentityListener {
 	/* synchronize access on itself. */
 	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
 
+	/** Locked local Sones. */
+	/* synchronize on itself. */
+	private final Set<Sone> lockedSones = new HashSet<Sone>();
+
 	/** Sone inserters. */
 	/* synchronize access on this on localSones. */
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
@@ -237,6 +241,19 @@ public class Core implements IdentityListener {
 	public void setSoneStatus(Sone sone, SoneStatus soneStatus) {
 		synchronized (soneStatuses) {
 			soneStatuses.put(sone, soneStatus);
+		}
+	}
+
+	/**
+	 * Returns whether the given Sone is currently locked.
+	 *
+	 * @param sone
+	 *            The sone to check
+	 * @return {@code true} if the Sone is locked, {@code false} if it is not
+	 */
+	public boolean isLocked(Sone sone) {
+		synchronized (lockedSones) {
+			return lockedSones.contains(sone);
 		}
 	}
 
@@ -603,6 +620,33 @@ public class Core implements IdentityListener {
 	//
 	// ACTIONS
 	//
+
+	/**
+	 * Locks the given Sone. A locked Sone will not be inserted by
+	 * {@link SoneInserter} until it is {@link #unlockSone(Sone) unlocked}
+	 * again.
+	 *
+	 * @param sone
+	 *            The sone to lock
+	 */
+	public void lockSone(Sone sone) {
+		synchronized (lockedSones) {
+			lockedSones.add(sone);
+		}
+	}
+
+	/**
+	 * Unlocks the given Sone.
+	 *
+	 * @see #lockSone(Sone)
+	 * @param sone
+	 *            The sone to unlock
+	 */
+	public void unlockSone(Sone sone) {
+		synchronized (lockedSones) {
+			lockedSones.remove(sone);
+		}
+	}
 
 	/**
 	 * Adds a local Sone from the given ID which has to be the ID of an own
