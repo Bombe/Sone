@@ -372,7 +372,7 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .sone form {
+#sone .sone form.follow, #sone .sone form.unfollow, #sone .sone form.lock, #sone .sone form.unlock {
 	display: inline;
 	border: solid 1px #ccc;
 	border-left: none;
@@ -383,11 +383,7 @@ textarea {
 	bottom: -0.5ex
 }
 
-#sone .sone form.hidden {
-	display: none;
-}
-
-#sone .sone form.follow button, #sone .sone form.unfollow button {
+#sone .sone form.follow button, #sone .sone form.unfollow button, #sone .sone form.lock button, #sone .sone form.unlock button {
 	display: inline;
 	color: rgb(28, 131, 191);
 	background: none;
@@ -396,9 +392,17 @@ textarea {
 	padding: 0px;
 }
 
-#sone .sone form.follow button:hover, #sone .sone form.unfollow button:hover {
+#sone .sone form.follow button:hover, #sone .sone form.unfollow button:hover, #sone .sone form.lock button:hover, #sone .sone form.unlock button:hover {
 	display: inline;
 	color: rgb(255, 172, 0);
+}
+
+#sone .sone.locked form.lock, #sone .sone.unlocked form.unlock {
+	display: none;
+}
+
+#sone .sone form.hidden {
+	display: none;
 }
 
 #sone .sone .spacer {

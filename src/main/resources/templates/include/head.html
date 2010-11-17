@@ -128,7 +128,7 @@
 	</script>
 
 	<script language="javascript">
-		/* convert all “follow”, “unfollow”, “block”, and “unblock” links to something nicer. */
+		/* convert all “follow”, “unfollow”, “lock”, and “unlock” links to something nicer. */
 		$(document).ready(function() {
 			$("#sone .follow").submit(function() {
 				var followElement = this;
@@ -143,6 +143,22 @@
 				$.getJSON("ajax/unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 					$(unfollowElement).addClass("hidden");
 					$(unfollowElement).parent().find(".follow").removeClass("hidden");
+				});
+				return false;
+			});
+			$("#sone .lock").submit(function() {
+				var lockElement = this;
+				$.getJSON("ajax/lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+					$(lockElement).addClass("hidden");
+					$(lockElement).parent().find(".unlock").removeClass("hidden");
+				});
+				return false;
+			});
+			$("#sone .unlock").submit(function() {
+				var unlockElement = this;
+				$.getJSON("ajax/unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+					$(unlockElement).addClass("hidden");
+					$(unlockElement).parent().find(".lock").removeClass("hidden");
 				});
 				return false;
 			});

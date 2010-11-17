@@ -9,6 +9,20 @@
 	<div class="profile-link"><a href="viewSone.html?sone=<% sone.id|html>" title="<% sone.requestUri|html>"><% sone.niceName|html></a></div>
 	<div class="short-request-uri"><% sone.requestUri|substring start=4 length=43|html></div>
 	<div class="hidden"><% sone.blacklisted></div>
+	<%if sone.local>
+		<form class="lock<%if sone.locked> hidden<%/if>" action="lockSone.html" method="post">
+			<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+			<input type="hidden" name="sone" value="<% sone.id|html>" />
+			<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+			<button type="submit"><%= View.Sone.Button.LockSone|l10n|html></button>
+		</form>
+		<form class="unlock<%if !sone.locked> hidden<%/if>" action="unlockSone.html" method="post">
+			<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+			<input type="hidden" name="sone" value="<% sone.id|html>" />
+			<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+			<button type="submit"><%= View.Sone.Button.UnlockSone|l10n|html></button>
+		</form>
+	<%/if>
 	<%if ! sone.current>
 		<%ifnull ! currentSone>
 			<form class="unfollow<%if ! sone.friend> hidden<%/if>" action="unfollowSone.html" method="post">

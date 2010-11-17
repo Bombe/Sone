@@ -61,8 +61,10 @@ import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetSoneStatusPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
+import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
+import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
@@ -285,6 +287,8 @@ public class WebInterface implements CoreListener {
 		Template unlikePostTemplate = templateFactory.createTemplate(createReader("/templates/unlike.html"));
 		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
 		Template deleteReplyTemplate = templateFactory.createTemplate(createReader("/templates/deleteReply.html"));
+		Template lockSoneTemplate = templateFactory.createTemplate(createReader("/templates/lockSone.html"));
+		Template unlockSoneTemplate = templateFactory.createTemplate(createReader("/templates/unlockSone.html"));
 		Template followSoneTemplate = templateFactory.createTemplate(createReader("/templates/followSone.html"));
 		Template unfollowSoneTemplate = templateFactory.createTemplate(createReader("/templates/unfollowSone.html"));
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
@@ -308,6 +312,8 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikePage(unlikePostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostPage(deletePostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyPage(deleteReplyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSonePage(lockSoneTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSonePage(unlockSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(followSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(unfollowSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
@@ -328,6 +334,8 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikeAjaxPage(this)));
