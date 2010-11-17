@@ -651,17 +651,31 @@ public class Core implements IdentityListener {
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
-			SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
+			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserters.put(sone, soneInserter);
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
-			soneInserter.start();
+			if (!isSoneRescueMode()) {
+				soneInserter.start();
+			}
 			new Thread(new Runnable() {
 
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void run() {
-					soneDownloader.fetchSone(sone);
+					if (!isSoneRescueMode()) {
+						soneDownloader.fetchSone(sone);
+						return;
+					}
+					logger.log(Level.INFO, "Trying to restore Sone from Freenet…");
+					long edition = sone.getLatestEdition();
+					while (!stopped && (edition >= 0) && isSoneRescueMode()) {
+						logger.log(Level.FINE, "Downloading edition " + edition + "…");
+						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
+						--edition;
+					}
+					logger.log(Level.INFO, "Finished restoring Sone from Freenet, starting Inserter…");
+					soneInserter.start();
 				}
 
 			}, "Sone Downloader").start();
@@ -734,14 +748,17 @@ public class Core implements IdentityListener {
 	 */
 	public void updateSone(Sone sone) {
 		if (hasSone(sone.getId())) {
+			boolean soneRescueMode = isLocalSone(sone) && isSoneRescueMode();
 			Sone storedSone = getSone(sone.getId());
-			if (!(sone.getTime() > storedSone.getTime())) {
+			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
 				return;
 			}
 			synchronized (posts) {
-				for (Post post : storedSone.getPosts()) {
-					posts.remove(post.getId());
+				if (!soneRescueMode) {
+					for (Post post : storedSone.getPosts()) {
+						posts.remove(post.getId());
+					}
 				}
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
@@ -754,8 +771,10 @@ public class Core implements IdentityListener {
 				}
 			}
 			synchronized (replies) {
-				for (Reply reply : storedSone.getReplies()) {
-					replies.remove(reply.getId());
+				if (!soneRescueMode) {
+					for (Reply reply : storedSone.getReplies()) {
+						replies.remove(reply.getId());
+					}
 				}
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
@@ -771,10 +790,25 @@ public class Core implements IdentityListener {
 				storedSone.setTime(sone.getTime());
 				storedSone.setClient(sone.getClient());
 				storedSone.setProfile(sone.getProfile());
-				storedSone.setPosts(sone.getPosts());
-				storedSone.setReplies(sone.getReplies());
-				storedSone.setLikePostIds(sone.getLikedPostIds());
-				storedSone.setLikeReplyIds(sone.getLikedReplyIds());
+				if (soneRescueMode) {
+					for (Post post : sone.getPosts()) {
+						storedSone.addPost(post);
+					}
+					for (Reply reply : sone.getReplies()) {
+						storedSone.addReply(reply);
+					}
+					for (String likedPostId : sone.getLikedPostIds()) {
+						storedSone.addLikedPostId(likedPostId);
+					}
+					for (String likedReplyId : sone.getLikedReplyIds()) {
+						storedSone.addLikedReplyId(likedReplyId);
+					}
+				} else {
+					storedSone.setPosts(sone.getPosts());
+					storedSone.setReplies(sone.getReplies());
+					storedSone.setLikePostIds(sone.getLikedPostIds());
+					storedSone.setLikeReplyIds(sone.getLikedReplyIds());
+				}
 				storedSone.setLatestEdition(sone.getRequestUri().getEdition());
 			}
 		}
