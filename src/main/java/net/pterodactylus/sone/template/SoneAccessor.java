@@ -87,6 +87,8 @@ public class SoneAccessor extends ReflectionAccessor {
 			return core.getSoneStatus(sone) == SoneStatus.downloading;
 		} else if (member.equals("new")) {
 			return core.isNewSone(sone);
+		} else if (member.equals("locked")) {
+			return core.isLocked(sone);
 		}
 		return super.get(dataProvider, object, member);
 	}
