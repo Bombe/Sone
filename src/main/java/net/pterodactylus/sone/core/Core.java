@@ -851,7 +851,9 @@ public class Core implements IdentityListener {
 				}
 			}
 			synchronized (storedSone) {
-				storedSone.setTime(sone.getTime());
+				if (!soneRescueMode || (sone.getTime() > storedSone.getTime())) {
+					storedSone.setTime(sone.getTime());
+				}
 				storedSone.setClient(sone.getClient());
 				storedSone.setProfile(sone.getProfile());
 				if (soneRescueMode) {
