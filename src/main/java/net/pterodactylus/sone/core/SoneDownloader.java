@@ -114,11 +114,25 @@ public class SoneDownloader extends AbstractService {
 	 *            The Sone to fetch
 	 */
 	public void fetchSone(Sone sone) {
+		fetchSone(sone, sone.getRequestUri());
+	}
+
+	/**
+	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
+	 * specific URI (which happens when {@link Core#isSoneRescueMode() „Sone
+	 * rescue mode“} is active).
+	 *
+	 * @param sone
+	 *            The Sone to fetch
+	 * @param soneUri
+	 *            The URI to fetch the Sone from
+	 */
+	public void fetchSone(Sone sone, FreenetURI soneUri) {
 		if (core.getSoneStatus(sone) == SoneStatus.downloading) {
 			return;
 		}
-		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" }) });
-		FreenetURI requestUri = sone.getRequestUri().setMetaString(new String[] { "sone.xml" });
+		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
+		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		core.setSoneStatus(sone, SoneStatus.downloading);
 		try {
 			Pair<FreenetURI, FetchResult> fetchResults = freenetInterface.fetchUri(requestUri);
