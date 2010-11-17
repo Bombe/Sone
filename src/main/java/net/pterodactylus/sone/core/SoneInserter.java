@@ -163,6 +163,9 @@ public class SoneInserter extends AbstractService {
 			/* don’t insert locked Sones. */
 			if (core.isLocked(sone)) {
 				/* trigger redetection when the Sone is unlocked. */
+				synchronized (sone) {
+					modified = !sone.getFingerprint().equals(lastInsertFingerprint);
+				}
 				lastFingerprint = "";
 				lastModificationTime = 0;
 				continue;
