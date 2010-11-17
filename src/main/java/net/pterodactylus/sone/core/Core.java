@@ -823,8 +823,8 @@ public class Core implements IdentityListener {
 				}
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
+						post.setSone(getSone(post.getSone().getId()));
 						if (!storedSone.getPosts().contains(post) && !knownPosts.contains(post.getId())) {
-							post.setSone(getSone(post.getSone().getId()));
 							newPosts.add(post.getId());
 							coreListenerManager.fireNewPostFound(post);
 						}
@@ -840,8 +840,8 @@ public class Core implements IdentityListener {
 				}
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
+						reply.setSone(getSone(reply.getSone().getId()));
 						if (!storedSone.getReplies().contains(reply) && !knownReplies.contains(reply.getId())) {
-							reply.setSone(getSone(reply.getSone().getId()));
 							newReplies.add(reply.getId());
 							coreListenerManager.fireNewReplyFound(reply);
 						}
