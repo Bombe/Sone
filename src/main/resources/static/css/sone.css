@@ -49,6 +49,10 @@ textarea {
 	color: rgb(255, 172, 0);
 }
 
+#sone a img {
+	border: none;
+}
+
 #sone #notification-area {
 	margin-top: 1em;
 }
