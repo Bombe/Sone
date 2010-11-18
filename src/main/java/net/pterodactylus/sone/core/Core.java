@@ -875,7 +875,7 @@ public class Core implements IdentityListener {
 					storedSone.setLikePostIds(sone.getLikedPostIds());
 					storedSone.setLikeReplyIds(sone.getLikedReplyIds());
 				}
-				storedSone.setLatestEdition(sone.getRequestUri().getEdition());
+				storedSone.setLatestEdition(sone.getLatestEdition());
 			}
 		}
 	}
