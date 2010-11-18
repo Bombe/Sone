@@ -169,6 +169,7 @@ public class SoneDownloader extends AbstractService {
 			soneInputStream = soneBucket.getInputStream();
 			Sone parsedSone = parseSone(originalSone, soneInputStream);
 			if (parsedSone != null) {
+				parsedSone.setLatestEdition(requestUri.getEdition());
 				if (requestUri.getKeyType().equals("USK")) {
 					parsedSone.setRequestUri(requestUri.setMetaString(new String[0]));
 				} else {
