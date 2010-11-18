@@ -551,3 +551,171 @@ function createNotification(id, text, dismissable) {
 	notification.append(text);
 	return notification;
 }
+
+//
+// EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
+//
+
+$(document).ready(function() {
+
+	/* this initializes the status update input field. */
+	getTranslation("WebInterface.DefaultText.StatusUpdate", function(text) {
+		registerInputTextareaSwap("#sone #update-status .status-input", text, "text", false, false);
+	})
+
+	/* these functions are necessary for updating Sone statuses. */
+	$("#sone .sone").each(function() {
+		watchSone($(this).find(".id").text(), $(this).hasClass("local"));
+	});
+
+	/* this initializes all reply input fields. */
+	getTranslation("WebInterface.DefaultText.Reply", function(text) {
+		registerInputTextareaSwap("#sone input.reply-input", text, "text", false, false);
+		addCommentLinks();
+	})
+
+	/* replaces all “post reply!” forms with AJAX. */
+	$("#sone .create-reply button:submit").click(function() {
+		$(this.form).submit(function() {
+			return false;
+		});
+		inputField = $(this.form).find(":input:enabled").get(0);
+		postId = getPostId($(inputField));
+		text = $(inputField).val();
+		$(inputField).val("");
+		postReply(postId, text, function(success, error, replyId) {
+			if (success) {
+				getReply(replyId, function(soneId, soneName, replyTime, replyDisplayTime, text, html) {
+					newReply = $(html).insertBefore("#sone .post#" + postId + " .create-reply");
+					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+					getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(deleteReplyText) {
+						enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId, deleteReplyText);
+					});
+					newReply.find(".status-line .like").submit(function() {
+						likeReply(getReplyId(this));
+						return false;
+					});
+					newReply.find(".status-line .unlike").submit(function() {
+						unlikeReply(getReplyId(this));
+						return false;
+					});
+					addCommentLink(postId, newReply);
+				});
+			} else {
+				alert(error);
+			}
+		});
+		return false;
+	});
+
+	/* replace all “delete” buttons with javascript. */
+	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
+		deletePostText = text;
+		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
+			deleteReplyText = text;
+			$("#sone .post").each(function() {
+				postId = $(this).attr("id");
+				enhanceDeletePostButton("#sone .post#" + postId + " > .inner-part > .status-line .delete button", postId, deletePostText);
+				(function(postId) {
+					$("#sone .post#" + postId + " .reply").each(function() {
+						replyId = $(this).attr("id");
+						(function(postId, reply, replyId) {
+							reply.find(".delete button").each(function() {
+								enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId, deleteReplyText);
+							})
+						})(postId, $(this), replyId);
+					});
+				})(postId);
+			});
+		});
+	});
+
+	/* hides all replies but the latest two. */
+	getTranslation("WebInterface.ClickToShow.Replies", function(text) {
+		$("#sone .post .replies").each(function() {
+			allReplies = $(this).find(".reply");
+			if (allReplies.length > 2) {
+				newHidden = false;
+				for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
+					$(allReplies[replyIndex]).addClass("hidden");
+					newHidden |= $(allReplies[replyIndex]).hasClass("new");
+				}
+				clickToShowElement = $("<div></div>").addClass("click-to-show");
+				if (newHidden) {
+					clickToShowElement.addClass("new");
+				}
+				(function(clickToShowElement, allReplies, text) {
+					clickToShowElement.text(text);
+					clickToShowElement.click(function() {
+						allReplies.removeClass("hidden");
+						clickToShowElement.addClass("hidden");
+					});
+				})(clickToShowElement, allReplies, text);
+				$(allReplies[0]).before(clickToShowElement);
+			}
+		});
+	});
+
+	/*
+	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
+	 * nicer.
+	 */
+	$("#sone .follow").submit(function() {
+		var followElement = this;
+		$.getJSON("ajax/followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(followElement).addClass("hidden");
+			$(followElement).parent().find(".unfollow").removeClass("hidden");
+		});
+		return false;
+	});
+	$("#sone .unfollow").submit(function() {
+		var unfollowElement = this;
+		$.getJSON("ajax/unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(unfollowElement).addClass("hidden");
+			$(unfollowElement).parent().find(".follow").removeClass("hidden");
+		});
+		return false;
+	});
+	$("#sone .lock").submit(function() {
+		var lockElement = this;
+		$.getJSON("ajax/lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(lockElement).addClass("hidden");
+			$(lockElement).parent().find(".unlock").removeClass("hidden");
+		});
+		return false;
+	});
+	$("#sone .unlock").submit(function() {
+		var unlockElement = this;
+		$.getJSON("ajax/unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(unlockElement).addClass("hidden");
+			$(unlockElement).parent().find(".lock").removeClass("hidden");
+		});
+		return false;
+	});
+
+	/* convert all “like” buttons to javascript functions. */
+	$("#sone .post > .inner-part > .status-line .like").submit(function() {
+		likePost(getPostId(this));
+		return false;
+	});
+	$("#sone .post > .inner-part > .status-line .unlike").submit(function() {
+		unlikePost(getPostId(this));
+		return false;
+	});
+	$("#sone .post .reply .status-line .like").submit(function() {
+		likeReply(getReplyId(this));
+		return false;
+	});
+	$("#sone .post .reply .status-line .unlike").submit(function() {
+		unlikeReply(getReplyId(this));
+		return false;
+	});
+
+	/* process all existing notifications, ajaxify dismiss buttons. */
+	$("#sone #notification-area .notification").each(function() {
+		ajaxifyNotification($(this));
+	});
+
+	/* activate notification polling. */
+	setTimeout(getNotifications, 5000);
+});
