@@ -14,13 +14,13 @@
 			<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 			<input type="hidden" name="sone" value="<% sone.id|html>" />
 			<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-			<button type="submit"><%= View.Sone.Button.LockSone|l10n|html></button>
+			<button type="submit" title="<%= View.Sone.Button.LockSone.Tooltip|l10n|html>"><%= View.Sone.Button.LockSone|l10n|html></button>
 		</form>
 		<form class="unlock<%if !sone.locked> hidden<%/if>" action="unlockSone.html" method="post">
 			<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 			<input type="hidden" name="sone" value="<% sone.id|html>" />
 			<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-			<button type="submit"><%= View.Sone.Button.UnlockSone|l10n|html></button>
+			<button type="submit" title="<%= View.Sone.Button.UnlockSone.Tooltip|l10n|html>"><%= View.Sone.Button.UnlockSone|l10n|html></button>
 		</form>
 	<%/if>
 	<%if ! sone.current>
