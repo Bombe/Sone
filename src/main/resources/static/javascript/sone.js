@@ -119,33 +119,6 @@ function getTranslation(key, callback) {
 }
 
 /**
- * Fires off an AJAX request to retrieve the current status of a Sone.
- *
- * @param soneId
- *            The ID of the Sone
- * @param local
- *            <code>true</code> if the Sone is local, <code>false</code>
- *            otherwise
- */
-function getSoneStatus(soneId, local) {
-	$.getJSON("ajax/getSoneStatus.ajax", {"sone": soneId}, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			updateSoneStatus(soneId, data.name, data.status, data.modified, data.locked, data.lastUpdated);
-		}
-		/* seconds! */
-		updateInterval = 60;
-		if (local || (data!= null) && (data.modified || (data.status == "downloading") || (data.status == "inserting"))) {
-			updateInterval = 5;
-		}
-		setTimeout(function() {
-			getSoneStatus(soneId, local);
-		}, updateInterval * 1000);
-	}, function(xmlHttpRequest, textStatus, error) {
-		/* ignore error. */
-	});
-}
-
-/**
  * Filters the given Sone ID, replacing all “~” characters by an underscore.
  *
  * @param soneId
@@ -182,29 +155,6 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
 	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
-}
-
-var watchedSones = {};
-
-/**
- * Watches this Sone for updates to its status.
- *
- * @param soneId
- *            The ID of the Sone to watch
- * @param local
- *            <code>true</code> if the Sone is local, <code>false</code>
- *            otherwise
- */
-function watchSone(soneId, local) {
-	if (watchedSones[soneId]) {
-		return;
-	}
-	watchedSones[soneId] = true;
-	(function(soneId) {
-		setTimeout(function() {
-			getSoneStatus(soneId, local);
-		}, 5000);
-	})(soneId);
 }
 
 /**
@@ -502,12 +452,14 @@ function ajaxifyNotification(notification) {
 	return notification;
 }
 
-/**
- * Retrieves all changed notifications.
- */
-function getNotifications() {
-	$.getJSON("ajax/getNotifications.ajax", {}, function(data, textStatus) {
+function getStatus() {
+	$.getJSON("ajax/getStatus.ajax", {}, function(data, textStatus) {
 		if ((data != null) && data.success) {
+			/* process Sone information. */
+			$.each(data.sones, function(index, value) {
+				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdated);
+			});
+			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
 				oldNotification = $("#sone #notification-area .notification#" + value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
@@ -521,13 +473,16 @@ function getNotifications() {
 			$.each(data.removedNotifications, function(index, value) {
 				$("#sone #notification-area .notification#" + value.id).slideUp();
 			});
-			setTimeout(getNotifications, 5000);
+			/* do it again in 5 seconds. */
+			setTimeout(getStatus, 5000);
 		} else {
-			setTimeout(getNotifications, 30000);
+			/* data.success was false, wait 30 seconds. */
+			setTimeout(getStatus, 30000);
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
-		/* ignore error. */
-	});
+		/* something really bad happend, wait a minute. */
+		setTimeout(getStatus, 60000);
+	})
 }
 
 /**
@@ -562,11 +517,6 @@ $(document).ready(function() {
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(text) {
 		registerInputTextareaSwap("#sone #update-status .status-input", text, "text", false, false);
 	})
-
-	/* these functions are necessary for updating Sone statuses. */
-	$("#sone .sone").each(function() {
-		watchSone($(this).find(".id").text(), $(this).hasClass("local"));
-	});
 
 	/* this initializes all reply input fields. */
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
@@ -716,6 +666,6 @@ $(document).ready(function() {
 		ajaxifyNotification($(this));
 	});
 
-	/* activate notification polling. */
-	setTimeout(getNotifications, 5000);
+	/* activate status polling. */
+	setTimeout(getStatus, 5000);
 });
