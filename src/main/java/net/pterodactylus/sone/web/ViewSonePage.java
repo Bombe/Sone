@@ -50,7 +50,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId);
+		Sone sone = webInterface.getCore().getSone(soneId, false);
 		template.set("sone", sone);
 	}
 

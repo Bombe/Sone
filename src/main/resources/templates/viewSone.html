@@ -1,6 +1,12 @@
 <%include include/head.html>
 
-	<%ifnull sone.name>
+	<%ifnull sone>
+
+		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
+
+		<p><%= Page.ViewSone.NoSone.Description|l10n|insert needle="{sone}" key=sone.id|html></p>
+
+	<%elseifnull sone.name>
 
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
 
