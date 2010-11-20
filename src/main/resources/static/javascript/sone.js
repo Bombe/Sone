@@ -99,6 +99,8 @@ function addCommentLink(postId, element) {
 	});
 }
 
+var translations = {};
+
 /**
  * Retrieves the translation for the given key and calls the callback function.
  * The callback function takes a single parameter, the translated string.
@@ -109,8 +111,13 @@ function addCommentLink(postId, element) {
  *            The callback function
  */
 function getTranslation(key, callback) {
+	if (key in translations) {
+		callback(translations[key]);
+		return;
+	}
 	$.getJSON("ajax/getTranslation.ajax", {"key": key}, function(data, textStatus) {
 		if ((data != null) && data.success) {
+			translations[key] = data.value;
 			callback(data.value);
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
