@@ -50,7 +50,7 @@ public class FollowSonePage extends SoneTemplatePage {
 		super.processTemplate(request, template);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
-			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			currentSone.addFriend(soneId);
 			webInterface.getCore().saveSone(currentSone);

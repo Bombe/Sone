@@ -54,7 +54,7 @@ public class DismissNotificationPage extends SoneTemplatePage {
 		if ((notification != null) && notification.isDismissable()) {
 			notification.dismiss();
 		}
-		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		throw new RedirectException(returnPage);
 	}
 

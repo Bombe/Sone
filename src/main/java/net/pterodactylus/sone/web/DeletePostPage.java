@@ -60,7 +60,7 @@ public class DeletePostPage extends SoneTemplatePage {
 			return;
 		} else if (request.getMethod() == Method.POST) {
 			String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
-			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Post post = webInterface.getCore().getPost(postId);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			if (!post.getSone().equals(currentSone)) {

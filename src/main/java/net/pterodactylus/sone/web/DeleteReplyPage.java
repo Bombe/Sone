@@ -53,7 +53,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 		super.processTemplate(request, template);
 		String replyId = request.getHttpRequest().getPartAsStringFailsafe("reply", 36);
 		Reply reply = webInterface.getCore().getReply(replyId);
-		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			if (!reply.getSone().equals(currentSone)) {

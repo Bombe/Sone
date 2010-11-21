@@ -51,7 +51,7 @@ public class CreatePostPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
 			String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 			if (text.length() != 0) {

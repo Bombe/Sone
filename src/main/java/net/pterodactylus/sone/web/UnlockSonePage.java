@@ -54,7 +54,7 @@ public class UnlockSonePage extends SoneTemplatePage {
 		if (sone != null) {
 			webInterface.getCore().unlockSone(sone);
 		}
-		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 64);
+		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		throw new RedirectException(returnPage);
 	}
 
