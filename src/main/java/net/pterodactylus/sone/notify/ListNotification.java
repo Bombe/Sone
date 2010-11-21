@@ -56,6 +56,15 @@ public class ListNotification<T> extends TemplateNotification {
 	//
 
 	/**
+	 * Returns the current list of elements.
+	 *
+	 * @return The current list of elements
+	 */
+	public List<T> getElements() {
+		return new ArrayList<T>(elements);
+	}
+
+	/**
 	 * Returns whether there are any new elements.
 	 *
 	 * @return {@code true} if there are no new elements, {@code false} if there
