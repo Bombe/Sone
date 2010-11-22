@@ -61,7 +61,7 @@ public class CollectionAccessor extends ReflectionAccessor {
 			StringBuilder soneNames = new StringBuilder();
 			for (Sone sone : sones) {
 				if (soneNames.length() > 0) {
-					soneNames.append('\n');
+					soneNames.append(", ");
 				}
 				soneNames.append(SoneAccessor.getNiceName(sone));
 			}

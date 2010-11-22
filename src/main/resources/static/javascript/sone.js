@@ -282,7 +282,7 @@ function generateSoneList(sones) {
 	var soneList = "";
 	$.each(sones, function() {
 		if (soneList != "") {
-			soneList += "\n";
+			soneList += ", ";
 		}
 		soneList += this.name;
 	});
