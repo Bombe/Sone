@@ -148,14 +148,20 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 		/* create a configuration. */
 		Configuration configuration;
+		Configuration xmlConfiguration = null;
 		try {
-			configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
-		} catch (DatabaseDisabledException dde1) {
-			logger.log(Level.WARNING, "Could not load plugin store, using XML files.");
+			configuration = new Configuration(new XMLConfigurationBackend(new File("sone.xml"), false));
+			xmlConfiguration = configuration;
+		} catch (ConfigurationException ce1) {
 			try {
-				configuration = new Configuration(new XMLConfigurationBackend(new File("sone.xml"), true));
-			} catch (ConfigurationException ce1) {
-				logger.log(Level.SEVERE, "Could not load or create the “sone.xml” configuration file!");
+				xmlConfiguration = new Configuration(new XMLConfigurationBackend(new File("sone.xml"), true));
+			} catch (ConfigurationException ce2) {
+				logger.log(Level.SEVERE, "Could not create XML file, using Plugin Store!");
+			}
+			try {
+				configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
+			} catch (DatabaseDisabledException dde1) {
+				logger.log(Level.SEVERE, "Could not load any configuration, using in-memory configuration!");
 				configuration = new Configuration(new MapConfigurationBackend(Collections.<String, String> emptyMap()));
 			}
 		}
@@ -183,6 +189,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		boolean startupFailed = true;
 		try {
 			core.start();
+			if ((xmlConfiguration != null) && (configuration != xmlConfiguration)) {
+				core.setConfiguration(xmlConfiguration);
+			}
 			webInterface.start();
 			identityManager.start();
 			startupFailed = false;
