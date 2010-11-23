@@ -84,15 +84,11 @@ public abstract class JsonPage implements Page {
 	 *         session
 	 */
 	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
-		try {
-			Session session = webInterface.getSessionManager().useSession(toadletContenxt);
-			if (create && (session == null)) {
-				session = webInterface.getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
-			}
-			return session;
-		} catch (freenet.clients.http.RedirectException re1) {
-			return null;
+		Session session = webInterface.getSessionManager().useSession(toadletContenxt);
+		if (create && (session == null)) {
+			session = webInterface.getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
 		}
+		return session;
 	}
 
 	/**
