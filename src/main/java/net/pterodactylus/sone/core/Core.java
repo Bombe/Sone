@@ -1380,6 +1380,9 @@ public class Core implements IdentityListener {
 				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
 			}
 
+			/* now save it. */
+			configuration.save();
+
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
 		}
