@@ -154,6 +154,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…");
 			try {
 				newConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), true));
+				logger.log(Level.INFO, "Created new configuration file.");
 			} catch (ConfigurationException ce2) {
 				logger.log(Level.SEVERE, "Could not create configuration file, using Plugin Store!");
 			}
@@ -161,7 +162,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 				oldConfiguration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
 				logger.log(Level.INFO, "Plugin store loaded.");
 			} catch (DatabaseDisabledException dde1) {
-				logger.log(Level.SEVERE, "Could not load any configuration, using in-memory configuration!");
+				logger.log(Level.SEVERE, "Could not load any configuration, using empty configuration!");
 				oldConfiguration = new Configuration(new MapConfigurationBackend());
 			}
 		}
