@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.main;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -33,7 +32,6 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
-import net.pterodactylus.util.config.XMLConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
@@ -150,11 +148,11 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		Configuration configuration;
 		Configuration xmlConfiguration = null;
 		try {
-			configuration = new Configuration(new XMLConfigurationBackend(new File("sone.xml"), false));
+			configuration = new Configuration(new MapConfigurationBackend(new File("sone.xml"), false));
 			xmlConfiguration = configuration;
 		} catch (ConfigurationException ce1) {
 			try {
-				xmlConfiguration = new Configuration(new XMLConfigurationBackend(new File("sone.xml"), true));
+				xmlConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.xml"), true));
 			} catch (ConfigurationException ce2) {
 				logger.log(Level.SEVERE, "Could not create XML file, using Plugin Store!");
 			}
@@ -162,7 +160,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 				configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
 			} catch (DatabaseDisabledException dde1) {
 				logger.log(Level.SEVERE, "Could not load any configuration, using in-memory configuration!");
-				configuration = new Configuration(new MapConfigurationBackend(Collections.<String, String> emptyMap()));
+				configuration = new Configuration(new MapConfigurationBackend());
 			}
 		}
 
