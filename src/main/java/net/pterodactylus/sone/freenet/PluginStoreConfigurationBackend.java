@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.freenet;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.util.config.AttributeNotFoundException;
@@ -37,6 +36,7 @@ import freenet.pluginmanager.PluginStore;
 public class PluginStoreConfigurationBackend implements ExtendedConfigurationBackend {
 
 	/** The logger. */
+	@SuppressWarnings("unused")
 	private static final Logger logger = Logging.getLogger(PluginStoreConfigurationBackend.class);
 
 	/** The plugin respirator. */
@@ -169,18 +169,15 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 		save();
 	}
 
-	//
-	// PRIVATE METHODS
-	//
-
 	/**
-	 * Saves the configuration to the plugin store.
+	 * {@inheritDoc}
 	 */
-	private void save() {
+	@Override
+	public void save() throws ConfigurationException {
 		try {
 			pluginRespirator.putStore(pluginStore);
 		} catch (DatabaseDisabledException dde1) {
-			logger.log(Level.WARNING, "Could not store plugin store, database is disabled.", dde1);
+			throw new ConfigurationException("Could not store plugin store, database is disabled.", dde1);
 		}
 	}
 
