@@ -145,22 +145,24 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		this.pluginRespirator = pluginRespirator;
 
 		/* create a configuration. */
-		Configuration configuration;
-		Configuration xmlConfiguration = null;
+		Configuration oldConfiguration;
+		Configuration newConfiguration = null;
 		try {
-			configuration = new Configuration(new MapConfigurationBackend(new File("sone.xml"), false));
-			xmlConfiguration = configuration;
+			oldConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), false));
+			newConfiguration = oldConfiguration;
 		} catch (ConfigurationException ce1) {
+			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…");
 			try {
-				xmlConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.xml"), true));
+				newConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), true));
 			} catch (ConfigurationException ce2) {
-				logger.log(Level.SEVERE, "Could not create XML file, using Plugin Store!");
+				logger.log(Level.SEVERE, "Could not create configuration file, using Plugin Store!");
 			}
 			try {
-				configuration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
+				oldConfiguration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
+				logger.log(Level.INFO, "Plugin store loaded.");
 			} catch (DatabaseDisabledException dde1) {
 				logger.log(Level.SEVERE, "Could not load any configuration, using in-memory configuration!");
-				configuration = new Configuration(new MapConfigurationBackend());
+				oldConfiguration = new Configuration(new MapConfigurationBackend());
 			}
 		}
 
@@ -174,7 +176,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		identityManager.setContext("Sone");
 
 		/* create core. */
-		core = new Core(configuration, freenetInterface, identityManager);
+		core = new Core(oldConfiguration, freenetInterface, identityManager);
 
 		/* create the web interface. */
 		webInterface = new WebInterface(this);
@@ -187,8 +189,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		boolean startupFailed = true;
 		try {
 			core.start();
-			if ((xmlConfiguration != null) && (configuration != xmlConfiguration)) {
-				core.setConfiguration(xmlConfiguration);
+			if ((newConfiguration != null) && (oldConfiguration != newConfiguration)) {
+				logger.log(Level.INFO, "Setting configuration to file-based configuration.");
+				core.setConfiguration(newConfiguration);
 			}
 			webInterface.start();
 			identityManager.start();
