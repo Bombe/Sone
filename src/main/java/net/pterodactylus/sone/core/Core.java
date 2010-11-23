@@ -84,7 +84,7 @@ public class Core implements IdentityListener {
 	private final CoreListenerManager coreListenerManager = new CoreListenerManager(this);
 
 	/** The configuration. */
-	private final Configuration configuration;
+	private Configuration configuration;
 
 	/** The identity manager. */
 	private final IdentityManager identityManager;
@@ -188,6 +188,18 @@ public class Core implements IdentityListener {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Sets the configuration to use. This will automatically save the current
+	 * configuration to the given configuration.
+	 *
+	 * @param configuration
+	 *            The new configuration to use
+	 */
+	public void setConfiguration(Configuration configuration) {
+		this.configuration = configuration;
+		saveConfiguration();
+	}
 
 	/**
 	 * Returns the options used by the core.
