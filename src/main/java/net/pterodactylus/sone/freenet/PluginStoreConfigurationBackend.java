@@ -56,6 +56,9 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	public PluginStoreConfigurationBackend(PluginRespirator pluginRespirator) throws DatabaseDisabledException {
 		this.pluginRespirator = pluginRespirator;
 		this.pluginStore = pluginRespirator.getStore();
+		if (this.pluginStore == null) {
+			throw new DatabaseDisabledException();
+		}
 	}
 
 	/**
