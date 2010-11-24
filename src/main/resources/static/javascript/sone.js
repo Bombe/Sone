@@ -301,7 +301,7 @@ function getSoneId(element) {
 }
 
 function getPostElement(element) {
-	return $(element).parents(".post");
+	return $(element).hasClass("post") ? $(element) : $(element).parents(".post");
 }
 
 function getPostId(element) {
