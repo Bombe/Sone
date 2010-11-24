@@ -308,12 +308,20 @@ function getPostId(element) {
 	return getPostElement(element).attr("id");
 }
 
+function getPostTime(element) {
+	return getPostElement(element).find(".storage-time").text();
+}
+
 function getReplyElement(element) {
 	return $(element).parents(".reply");
 }
 
 function getReplyId(element) {
 	return getReplyElement(element).attr("id");
+}
+
+function getReplyTime(element) {
+	return getReplyElement(element).find(".storage-time").text();
 }
 
 function likePost(postId) {
