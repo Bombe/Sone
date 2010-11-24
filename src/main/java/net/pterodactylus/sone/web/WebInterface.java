@@ -23,7 +23,9 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -216,6 +218,26 @@ public class WebInterface implements CoreListener {
 	 */
 	public String getFormPassword() {
 		return formPassword;
+	}
+
+	/**
+	 * Returns the posts that have been announced as new in the
+	 * {@link #newPostNotification}.
+	 *
+	 * @return The new posts
+	 */
+	public Set<Post> getNewPosts() {
+		return new HashSet<Post>(newPostNotification.getElements());
+	}
+
+	/**
+	 * Returns the replies that have been announced as new in the
+	 * {@link #newReplyNotification}.
+	 *
+	 * @return The new replies
+	 */
+	public Set<Reply> getNewReplies() {
+		return new HashSet<Reply>(newReplyNotification.getElements());
 	}
 
 	//
