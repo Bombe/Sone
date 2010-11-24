@@ -1268,6 +1268,52 @@ public class Core implements IdentityListener {
 		stopped = true;
 	}
 
+	/**
+	 * Saves the current options.
+	 */
+	public void saveConfiguration() {
+		/* store the options first. */
+		try {
+			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
+			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
+			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
+
+			/* save known Sones. */
+			int soneCounter = 0;
+			synchronized (newSones) {
+				for (String knownSoneId : knownSones) {
+					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSoneId);
+				}
+				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
+			}
+
+			/* save known posts. */
+			int postCounter = 0;
+			synchronized (newPosts) {
+				for (String knownPostId : knownPosts) {
+					configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
+				}
+				configuration.getStringValue("KnownPosts/" + postCounter + "/ID").setValue(null);
+			}
+
+			/* save known replies. */
+			int replyCounter = 0;
+			synchronized (newReplies) {
+				for (String knownReplyId : knownReplies) {
+					configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
+				}
+				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
+			}
+
+			/* now save it. */
+			configuration.save();
+
+		} catch (ConfigurationException ce1) {
+			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
+		}
+	}
+
 	//
 	// PRIVATE METHODS
 	//
@@ -1340,52 +1386,6 @@ public class Core implements IdentityListener {
 			}
 		}
 
-	}
-
-	/**
-	 * Saves the current options.
-	 */
-	private void saveConfiguration() {
-		/* store the options first. */
-		try {
-			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
-			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
-			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
-			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
-
-			/* save known Sones. */
-			int soneCounter = 0;
-			synchronized (newSones) {
-				for (String knownSoneId : knownSones) {
-					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSoneId);
-				}
-				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
-			}
-
-			/* save known posts. */
-			int postCounter = 0;
-			synchronized (newPosts) {
-				for (String knownPostId : knownPosts) {
-					configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
-				}
-				configuration.getStringValue("KnownPosts/" + postCounter + "/ID").setValue(null);
-			}
-
-			/* save known replies. */
-			int replyCounter = 0;
-			synchronized (newReplies) {
-				for (String knownReplyId : knownReplies) {
-					configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
-				}
-				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
-			}
-
-			/* now save it. */
-			configuration.save();
-
-		} catch (ConfigurationException ce1) {
-			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
-		}
 	}
 
 	/**
