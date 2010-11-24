@@ -321,6 +321,7 @@ public class WebInterface implements CoreListener {
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
+		Template postTemplate = templateFactory.createTemplate(createReader("/templates/include/viewPost.html"));
 		Template replyTemplate = templateFactory.createTemplate(createReader("/templates/include/viewReply.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
@@ -351,7 +352,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, postTemplate, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
