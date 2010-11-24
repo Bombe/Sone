@@ -13,14 +13,14 @@
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
 			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>"><span title="<% reply.likes.soneNames|html>">⬆<span class="like-count"><% reply.likes.size></span></span></div>
 			<%ifnull ! currentSone>
-				<form class="like<%if reply.liked> hidden<%/if>" action="like.html" method="post">
+				<form class="like like-reply<%if reply.liked> hidden<%/if>" action="like.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="type" value="reply" />
 					<input type="hidden" name="reply" value="<% reply.id|html>" />
 					<button type="submit" value="1"><%= View.Post.LikeLink|l10n|html></button>
 				</form>
-				<form class="unlike<%if ! reply.liked> hidden<%/if>" action="unlike.html" method="post">
+				<form class="unlike unlike-reply<%if ! reply.liked> hidden<%/if>" action="unlike.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="type" value="reply" />
@@ -29,7 +29,7 @@
 				</form>
 			<%/if>
 			<%if reply.sone.current>
-				<form class="delete" action="deleteReply.html" method="post">
+				<form class="delete delete-reply" action="deleteReply.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="reply" value="<% reply.id|html>" />

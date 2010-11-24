@@ -13,14 +13,14 @@
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
 			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>"><span title="<% post.likes.soneNames|html>">⬆<span class="like-count"><% post.likes.size></span></span></div>
 			<%ifnull ! currentSone>
-				<form class="like<%if post.liked> hidden<%/if>" action="like.html" method="post">
+				<form class="like like-post<%if post.liked> hidden<%/if>" action="like.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="type" value="post" />
 					<input type="hidden" name="post" value="<% post.id|html>" />
 					<button type="submit" value="1"><%= View.Post.LikeLink|l10n|html></button>
 				</form>
-				<form class="unlike<%if ! post.liked> hidden<%/if>" action="unlike.html" method="post">
+				<form class="unlike unlike-post<%if ! post.liked> hidden<%/if>" action="unlike.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="type" value="post" />
@@ -29,7 +29,7 @@
 				</form>
 			<%/if>
 			<%if post.sone.current>
-				<form class="delete" action="deletePost.html" method="post">
+				<form class="delete delete-post" action="deletePost.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="post" value="<% post.id|html>" />
