@@ -125,7 +125,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			return new RedirectResponse(re1.getTarget());
 		}
 
-		postProcess(request);
+		postProcess(request, template);
 
 		StringWriter stringWriter = new StringWriter();
 		template.render(stringWriter);
@@ -178,8 +178,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *
 	 * @param request
 	 *            The request being processed
+	 * @param template
+	 *            The template that was rendered
 	 */
-	protected void postProcess(Request request) {
+	protected void postProcess(Request request, Template template) {
 		/* do nothing. */
 	}
 
