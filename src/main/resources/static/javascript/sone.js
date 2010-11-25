@@ -598,7 +598,7 @@ function loadNewPost(postId) {
 	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			var firstOlderPost = null;
-			$("#sone #posts .post").each(function() {
+			$("#sone .post").each(function() {
 				if (getPostTime(this) < data.post.time) {
 					firstOlderPost = $(this);
 					return false;
@@ -608,7 +608,7 @@ function loadNewPost(postId) {
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
-				$("#sone #posts .post:last").after(newPost);
+				$("#sone #posts").append(newPost);
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
