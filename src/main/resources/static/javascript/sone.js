@@ -634,7 +634,7 @@ function loadNewReply(replyId) {
 				});
 				newReply = $(data.reply.html).addClass("hidden");
 				if (firstNewerReply != null) {
-					newReply.insertAfter(firstNewerReply);
+					newReply.insertBefore(firstNewerReply);
 				} else {
 					if ($(this).find(".replies .create-reply")) {
 						$(this).find(".replies .create-reply").before(newReply);
