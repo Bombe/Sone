@@ -454,6 +454,8 @@ function ajaxifyPost(postElement) {
 		postReply(postId, text, function(success, error, replyId) {
 			if (success) {
 				loadNewReply(replyId);
+				markPostAsKnown(postElement);
+				markReplyAsKnown($(postElement).find(".reply"));
 				$("#sone .post#" + postId + " .create-reply").addClass("hidden");
 			} else {
 				alert(error);
