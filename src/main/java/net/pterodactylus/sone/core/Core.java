@@ -1203,6 +1203,22 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Marks the given post as known, if it is currently a new post (according
+	 * to {@link #isNewPost(String)}).
+	 *
+	 * @param post
+	 *            The post to mark as known
+	 */
+	public void markPostKnown(Post post) {
+		synchronized (newPosts) {
+			if (newPosts.remove(post.getId())) {
+				knownPosts.add(post.getId());
+				coreListenerManager.fireMarkPostKnown(post);
+			}
+		}
+	}
+
+	/**
 	 * Creates a new reply.
 	 *
 	 * @param sone
@@ -1249,6 +1265,22 @@ public class Core implements IdentityListener {
 		}
 		sone.removeReply(reply);
 		saveSone(sone);
+	}
+
+	/**
+	 * Marks the given reply as known, if it is currently a new reply (according
+	 * to {@link #isNewReply(String)}).
+	 *
+	 * @param reply
+	 *            The reply to mark as known
+	 */
+	public void markReplyKnown(Reply reply) {
+		synchronized (newReplies) {
+			if (newReplies.remove(reply.getId())) {
+				knownReplies.add(reply.getId());
+				coreListenerManager.fireMarkReplyKnown(reply);
+			}
+		}
 	}
 
 	/**
