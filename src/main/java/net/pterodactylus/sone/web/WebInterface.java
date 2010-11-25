@@ -61,6 +61,8 @@ import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
+import net.pterodactylus.sone.web.ajax.MarkPostAsKnownPage;
+import net.pterodactylus.sone.web.ajax.MarkReplyAsKnownPage;
 import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
@@ -360,6 +362,8 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkPostAsKnownPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkReplyAsKnownPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSoneAjaxPage(this)));
