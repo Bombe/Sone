@@ -453,11 +453,8 @@ function ajaxifyPost(postElement) {
 		$(inputField).val("");
 		postReply(postId, text, function(success, error, replyId) {
 			if (success) {
-				getReply(replyId, function(soneId, soneName, replyTime, replyDisplayTime, text, html) {
-					newReply = $(html).insertBefore("#sone .post#" + postId + " .create-reply");
-					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
-					ajaxifyReply(newReply);
-				});
+				loadNewReply(replyId);
+				$("#sone .post#" + postId + " .create-reply").addClass("hidden");
 			} else {
 				alert(error);
 			}
