@@ -541,11 +541,31 @@ public class Core implements IdentityListener {
 	 *         otherwise
 	 */
 	public boolean isNewPost(String postId) {
+		return isNewPost(postId, true);
+	}
+
+	/**
+	 * Returns whether the given post ID is new. If {@code markAsKnown} is
+	 * {@code true} then after this method returns the post ID is marked a known
+	 * post ID.
+	 *
+	 * @param postId
+	 *            The post ID
+	 * @param markAsKnown
+	 *            {@code true} to mark the post ID as known, {@code false} to
+	 *            not to mark it as known
+	 * @return {@code true} if the post is considered to be new, {@code false}
+	 *         otherwise
+	 */
+	public boolean isNewPost(String postId, boolean markAsKnown) {
 		synchronized (newPosts) {
-			boolean isNew = !knownPosts.contains(postId) && newPosts.remove(postId);
-			knownPosts.add(postId);
-			if (isNew) {
-				coreListenerManager.fireMarkPostKnown(getPost(postId));
+			boolean isNew = !knownPosts.contains(postId) && newPosts.contains(postId);
+			if (markAsKnown) {
+				newPosts.remove(postId);
+				knownPosts.add(postId);
+				if (isNew) {
+					coreListenerManager.fireMarkPostKnown(getPost(postId));
+				}
 			}
 			return isNew;
 		}
@@ -599,11 +619,29 @@ public class Core implements IdentityListener {
 	 *         otherwise
 	 */
 	public boolean isNewReply(String replyId) {
+		return isNewReply(replyId, true);
+	}
+
+	/**
+	 * Returns whether the reply with the given ID is new.
+	 *
+	 * @param replyId
+	 *            The ID of the reply to check
+	 * @param markAsKnown
+	 *            {@code true} to mark the reply as known, {@code false} to not
+	 *            to mark it as known
+	 * @return {@code true} if the reply is considered to be new, {@code false}
+	 *         otherwise
+	 */
+	public boolean isNewReply(String replyId, boolean markAsKnown) {
 		synchronized (newReplies) {
-			boolean isNew = !knownReplies.contains(replyId) && newReplies.remove(replyId);
-			knownReplies.add(replyId);
-			if (isNew) {
-				coreListenerManager.fireMarkReplyKnown(getReply(replyId));
+			boolean isNew = !knownReplies.contains(replyId) && newReplies.contains(replyId);
+			if (markAsKnown) {
+				newReplies.remove(replyId);
+				knownReplies.add(replyId);
+				if (isNew) {
+					coreListenerManager.fireMarkReplyKnown(getReply(replyId));
+				}
 			}
 			return isNew;
 		}
