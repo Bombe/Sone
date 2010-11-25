@@ -1226,21 +1226,6 @@ public class Core implements IdentityListener {
 	}
 
 	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The Sone that creates the reply
-	 * @param post
-	 *            The post that this reply refers to
-	 * @param text
-	 *            The text of the reply
-	 * @return The created reply
-	 */
-	public Reply createReply(Sone sone, Post post, String text) {
-		return createReply(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
 	 * Marks the given post as known, if it is currently a new post (according
 	 * to {@link #isNewPost(String)}).
 	 *
@@ -1254,6 +1239,21 @@ public class Core implements IdentityListener {
 				coreListenerManager.fireMarkPostKnown(post);
 			}
 		}
+	}
+
+	/**
+	 * Creates a new reply.
+	 *
+	 * @param sone
+	 *            The Sone that creates the reply
+	 * @param post
+	 *            The post that this reply refers to
+	 * @param text
+	 *            The text of the reply
+	 * @return The created reply
+	 */
+	public Reply createReply(Sone sone, Post post, String text) {
+		return createReply(sone, post, System.currentTimeMillis(), text);
 	}
 
 	/**
