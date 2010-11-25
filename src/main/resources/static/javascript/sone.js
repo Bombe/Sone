@@ -484,6 +484,9 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* add “comment” link. */
+	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
+
 	/* process all replies. */
 	$(postElement).find(".reply").each(function() {
 		ajaxifyReply(this);
@@ -495,9 +498,6 @@ function ajaxifyPost(postElement) {
 			registerInputTextareaSwap(this, text, "text", false, false);
 		});
 	});
-
-	/* add “comment” link. */
-	addCommentLink(getPostId(postElement), postElement);
 
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
