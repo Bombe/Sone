@@ -63,7 +63,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  * @param element
  *            The element to add a “comment” link to
  */
-function addCommentLink(postId, element) {
+function addCommentLink(postId, element, insertAfterThisElement) {
 	if ($(element).find(".show-reply-form").length > 0) {
 		return;
 	}
@@ -86,9 +86,7 @@ function addCommentLink(postId, element) {
 		});
 		return commentElement;
 	})(postId);
-	$(element).find(".status-line .time").each(function() {
-		$(this).after(commentElement.clone(true));
-	});
+	$(insertAfterThisElement).after(commentElement.clone(true));
 }
 
 var translations = {};
@@ -527,7 +525,7 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
-	addCommentLink(getPostId(replyElement), replyElement);
+	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
 }
 
 /**

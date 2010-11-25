@@ -9,7 +9,7 @@
 			<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a></div>
 			<div class="text"><% post.text|html></div>
 		</div>
-		<div class="status-line">
+		<div class="post-status-line status-line">
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
 			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>"><span title="<% post.likes.soneNames|html>">⬆<span class="like-count"><% post.likes.size></span></span></div>
 			<%ifnull ! currentSone>
