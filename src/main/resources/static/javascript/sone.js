@@ -569,6 +569,7 @@ function getStatus() {
 					$("#sone #notification-area").append(notification);
 					notification.slideDown();
 				}
+				setActivity();
 			});
 			$.each(data.removedNotifications, function(index, value) {
 				$("#sone #notification-area .notification#" + value.id).slideUp();
@@ -618,6 +619,7 @@ function loadNewPost(postId) {
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
+			setActivity();
 		}
 	});
 }
@@ -650,6 +652,7 @@ function loadNewReply(replyId) {
 				}
 				ajaxifyReply(newReply);
 				newReply.slideDown();
+				setActivity();
 			});
 		}
 	});
@@ -680,6 +683,20 @@ function markReplyAsKnown(replyElements) {
 			})(replyElement);
 		}
 	});
+}
+
+function resetActivity() {
+	title = document.title;
+	if (title.indexOf('(') == 0) {
+		document.title = title.substr(title.indexOf(' ') + 1);
+	}
+}
+
+function setActivity() {
+	title = document.title;
+	if (title.indexOf('(') != 0) {
+		document.title = "(!) " + title;
+	}
 }
 
 /**
@@ -807,4 +824,10 @@ $(document).ready(function() {
 
 	/* activate status polling. */
 	setTimeout(getStatus, 5000);
+
+	/* reset activity counter when the page has focus. */
+	$(window).focus(function() {
+		resetActivity();
+	});
+
 });
