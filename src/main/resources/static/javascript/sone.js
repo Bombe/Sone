@@ -658,6 +658,7 @@ function markPostAsKnown(postElements) {
 			$(postElement).removeClass("new");
 		});
 	});
+	markReplyAsKnown($(postElements).find(".reply"));
 }
 
 function markReplyAsKnown(replyElements) {
