@@ -69,6 +69,7 @@ function addCommentLink(postId, element) {
 	}
 	commentElement = (function(postId) {
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
+			markPostAsKnown(getPostElement(this));
 			replyElement = $("#sone .post#" + postId + " .create-reply");
 			replyElement.removeClass("hidden");
 			replyElement.removeClass("light");
