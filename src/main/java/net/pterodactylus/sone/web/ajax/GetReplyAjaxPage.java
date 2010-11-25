@@ -18,12 +18,8 @@
 package net.pterodactylus.sone.web.ajax;
 
 import java.io.StringWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import net.pterodactylus.sone.data.Reply;
-import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
@@ -36,9 +32,6 @@ import net.pterodactylus.util.template.TemplateException;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetReplyAjaxPage extends JsonPage {
-
-	/** Date formatter. */
-	private static final DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy, HH:mm:ss");
 
 	/** The template to render. */
 	private final Template replyTemplate;
@@ -70,19 +63,8 @@ public class GetReplyAjaxPage extends JsonPage {
 		if ((reply == null) || (reply.getSone() == null)) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		replyTemplate.set("reply", reply);
 		replyTemplate.set("currentSone", getCurrentSone(request.getToadletContext()));
-		StringWriter templateWriter = new StringWriter();
-		try {
-			replyTemplate.render(templateWriter);
-		} catch (TemplateException te1) {
-			/* TODO - shouldn’t happen. */
-		} finally {
-			Closer.close(templateWriter);
-		}
-		synchronized (dateFormat) {
-			return createSuccessJsonObject().put("soneId", reply.getSone().getId()).put("soneName", SoneAccessor.getNiceName(reply.getSone())).put("time", reply.getTime()).put("displayTime", dateFormat.format(new Date(reply.getTime()))).put("text", reply.getText()).put("html", templateWriter.toString());
-		}
+		return createSuccessJsonObject().put("reply", createJsonReply(reply));
 	}
 
 	/**
@@ -91,6 +73,35 @@ public class GetReplyAjaxPage extends JsonPage {
 	@Override
 	protected boolean needsFormPassword() {
 		return false;
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Creates a JSON representation of the given reply.
+	 *
+	 * @param reply
+	 *            The reply to convert
+	 * @return The JSON representation of the reply
+	 */
+	private JsonObject createJsonReply(Reply reply) {
+		JsonObject jsonReply = new JsonObject();
+		jsonReply.put("id", reply.getId());
+		jsonReply.put("postId", reply.getPost().getId());
+		jsonReply.put("soneId", reply.getSone().getId());
+		jsonReply.put("time", reply.getTime());
+		replyTemplate.set("reply", reply);
+		StringWriter stringWriter = new StringWriter();
+		try {
+			replyTemplate.render(stringWriter);
+		} catch (TemplateException te1) {
+			/* TODO - shouldn’t happen. */
+		} finally {
+			Closer.close(stringWriter);
+		}
+		return jsonReply.put("html", stringWriter.toString());
 	}
 
 }
