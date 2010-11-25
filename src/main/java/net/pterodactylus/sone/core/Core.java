@@ -572,16 +572,33 @@ public class Core implements IdentityListener {
 	}
 
 	/**
-	 * Returns the reply with the given ID.
+	 * Returns the reply with the given ID. If there is no reply with the given
+	 * ID yet, a new one is created.
 	 *
 	 * @param replyId
 	 *            The ID of the reply to get
-	 * @return The reply, or {@code null} if there is no such reply
+	 * @return The reply
 	 */
 	public Reply getReply(String replyId) {
+		return getReply(replyId, true);
+	}
+
+	/**
+	 * Returns the reply with the given ID. If there is no reply with the given
+	 * ID yet, a new one is created, unless {@code create} is false in which
+	 * case {@code null} is returned.
+	 *
+	 * @param replyId
+	 *            The ID of the reply to get
+	 * @param create
+	 *            {@code true} to always return a {@link Reply}, {@code false}
+	 *            to return {@code null} if no reply can be found
+	 * @return The reply, or {@code null} if there is no such reply
+	 */
+	public Reply getReply(String replyId, boolean create) {
 		synchronized (replies) {
 			Reply reply = replies.get(replyId);
-			if (reply == null) {
+			if (create && (reply == null)) {
 				reply = new Reply(replyId);
 				replies.put(replyId, reply);
 			}
