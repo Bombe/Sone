@@ -61,7 +61,7 @@ public class PostAccessor extends ReflectionAccessor {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
 			return (currentSone != null) && (currentSone.isLikedPostId(post.getId()));
 		} else if (member.equals("new")) {
-			return core.isNewPost(post.getId());
+			return core.isNewPost(post.getId(), false);
 		}
 		return super.get(dataProvider, object, member);
 	}
