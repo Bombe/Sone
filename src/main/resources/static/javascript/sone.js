@@ -649,6 +649,24 @@ function loadNewReply(replyId) {
 	});
 }
 
+function markPostAsKnown(postElements) {
+	$(postElements).each(function() {
+		postElement = this;
+		$.getJSON("ajax/markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function() {
+			$(postElement).removeClass("new");
+		});
+	});
+}
+
+function markReplyAsKnown(replyElements) {
+	$(replyElements).each(function() {
+		replyElement = this;
+		$.getJSON("ajax/markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function() {
+			$(replyElement).removeClass("new");
+		});
+	});
+}
+
 /**
  * Creates a new notification.
  *
