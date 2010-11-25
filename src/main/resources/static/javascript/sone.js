@@ -23,8 +23,8 @@ function isOnline() {
 	return $("#sone").hasClass("online");
 }
 
-function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, optional, dontUseTextarea) {
-	$(inputSelector).each(function() {
+function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, optional, dontUseTextarea) {
+	$(inputElement).each(function() {
 		textarea = $(dontUseTextarea ? "<input type=\"text\" name=\"" + inputFieldName + "\">" : "<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
 			if ($(this).val() == "") {
 				$(this).hide();
@@ -55,17 +55,6 @@ function registerInputTextareaSwap(inputSelector, defaultText, inputFieldName, o
 	});
 }
 
-/* hide all the “create reply” forms until a link is clicked. */
-function addCommentLinks() {
-	if (!isOnline()) {
-		return;
-	}
-	$("#sone .post").each(function() {
-		postId = $(this).attr("id");
-		addCommentLink(postId, $(this));
-	});
-}
-
 /**
  * Adds a “comment” link to all status lines contained in the given element.
  *
@@ -75,6 +64,9 @@ function addCommentLinks() {
  *            The element to add a “comment” link to
  */
 function addCommentLink(postId, element) {
+	if ($(element).find(".show-reply-form").length > 0) {
+		return;
+	}
 	commentElement = (function(postId) {
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 			replyElement = $("#sone .post#" + postId + " .create-reply");
@@ -93,8 +85,7 @@ function addCommentLink(postId, element) {
 		});
 		return commentElement;
 	})(postId);
-	element.find(".create-reply").addClass("hidden");
-	element.find(".status-line .time").each(function() {
+	$(element).find(".status-line .time").each(function() {
 		$(this).after(commentElement.clone(true));
 	});
 }
@@ -167,15 +158,14 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 /**
  * Enhances a “delete” button so that the confirmation is done on the same page.
  *
- * @param buttonId
- *            The selector of the button
+ * @param button
+ *            The button element
  * @param text
  *            The text to show on the button
  * @param deleteCallback
  *            The callback that actually deletes something
  */
-function enhanceDeleteButton(buttonId, text, deleteCallback) {
-	button = $(buttonId);
+function enhanceDeleteButton(button, text, deleteCallback) {
 	(function(button) {
 		newButton = $("<button></button>").addClass("confirm").hide().text(text).click(function() {
 			$(this).fadeOut("slow");
@@ -197,22 +187,22 @@ function enhanceDeleteButton(buttonId, text, deleteCallback) {
 				return false;
 			});
 		})(button, newButton);
-	})(button);
+	})($(button));
 }
 
 /**
  * Enhances a post’s “delete” button.
  *
- * @param buttonId
- *            The selector of the button
+ * @param button
+ *            The button element
  * @param postId
  *            The ID of the post to delete
  * @param text
  *            The text to replace the button with
  */
-function enhanceDeletePostButton(buttonId, postId, text) {
-	enhanceDeleteButton(buttonId, text, function() {
-		$.getJSON("ajax/deletePost.ajax", { "post": postId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+function enhanceDeletePostButton(button, postId, text) {
+	enhanceDeleteButton(button, text, function() {
+		$.getJSON("ajax/deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 			if (data == null) {
 				return;
 			}
@@ -234,15 +224,15 @@ function enhanceDeletePostButton(buttonId, postId, text) {
 /**
  * Enhances a reply’s “delete” button.
  *
- * @param buttonId
- *            The selector of the button
+ * @param button
+ *            The button element
  * @param replyId
  *            The ID of the reply to delete
  * @param text
  *            The text to replace the button with
  */
-function enhanceDeleteReplyButton(buttonId, replyId, text) {
-	enhanceDeleteButton(buttonId, text, function() {
+function enhanceDeleteReplyButton(button, replyId, text) {
+	enhanceDeleteButton(button, text, function() {
 		$.getJSON("ajax/deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
 			if (data == null) {
 				return;
@@ -301,7 +291,7 @@ function getSoneId(element) {
 }
 
 function getPostElement(element) {
-	return $(element).hasClass("post") ? $(element) : $(element).parents(".post");
+	return $(element).closest(".post");
 }
 
 function getPostId(element) {
@@ -313,7 +303,7 @@ function getPostTime(element) {
 }
 
 function getReplyElement(element) {
-	return $(element).parents(".reply");
+	return $(element).closest(".reply");
 }
 
 function getReplyId(element) {
@@ -447,6 +437,98 @@ function getReply(replyId, callbackFunction) {
 }
 
 /**
+ * Ajaxifies the given post by enhancing all eligible elements with AJAX.
+ *
+ * @param postElement
+ *            The post element to ajaxify
+ */
+function ajaxifyPost(postElement) {
+	$(postElement).find("form").submit(function() {
+		return false;
+	});
+	$(postElement).find(".create-reply button:submit").click(function() {
+		inputField = $(this.form).find(":input:enabled").get(0);
+		postId = getPostId(this);
+		text = $(inputField).val();
+		$(inputField).val("");
+		postReply(postId, text, function(success, error, replyId) {
+			if (success) {
+				getReply(replyId, function(soneId, soneName, replyTime, replyDisplayTime, text, html) {
+					newReply = $(html).insertBefore("#sone .post#" + postId + " .create-reply");
+					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+					ajaxifyReply(newReply);
+				});
+			} else {
+				alert(error);
+			}
+		});
+		return false;
+	});
+
+	/* replace all “delete” buttons with javascript. */
+	(function(postElement) {
+		getTranslation("WebInterface.Confirmation.DeletePostButton", function(deletePostText) {
+			postId = getPostId(postElement);
+			enhanceDeletePostButton($(postElement).find(".delete-post button"), postId, deletePostText);
+		});
+	})(postElement);
+
+	/* convert all “like” buttons to javascript functions. */
+	$(postElement).find(".like-post").submit(function() {
+		likePost(getPostId(this));
+		return false;
+	});
+	$(postElement).find(".unlike-post").submit(function() {
+		unlikePost(getPostId(this));
+		return false;
+	});
+
+	/* process all replies. */
+	$(postElement).find(".reply").each(function() {
+		ajaxifyReply(this);
+	});
+
+	/* process reply input fields. */
+	getTranslation("WebInterface.DefaultText.Reply", function(text) {
+		$(postElement).find("input.reply-input").each(function() {
+			registerInputTextareaSwap(this, text, "text", false, false);
+			addCommentLink(getPostId(postElement), postElement);
+		});
+	});
+
+	/* add “comment” link. */
+	addCommentLink(getPostId(postElement), postElement);
+
+	/* hide reply input field. */
+	$(postElement).find(".create-reply").addClass("hidden");
+}
+
+/**
+ * Ajaxifies the given reply element.
+ *
+ * @param replyElement
+ *            The reply element to ajaxify
+ */
+function ajaxifyReply(replyElement) {
+	$(replyElement).find(".like-reply").submit(function() {
+		likeReply(getReplyId(this));
+		return false;
+	});
+	$(replyElement).find(".unlike-reply").submit(function() {
+		unlikeReply(getReplyId(this));
+		return false;
+	});
+	(function(replyElement) {
+		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(deleteReplyText) {
+			$(replyElement).find(".delete-reply button").each(function() {
+				enhanceDeleteReplyButton(this, getReplyId(replyElement), deleteReplyText);
+			});
+		});
+	})(replyElement);
+	addCommentLink(getPostId(replyElement), replyElement);
+}
+
+/**
  * Ajaxifies the given notification by replacing the form with AJAX.
  *
  * @param notification
@@ -488,6 +570,14 @@ function getStatus() {
 			$.each(data.removedNotifications, function(index, value) {
 				$("#sone #notification-area .notification#" + value.id).slideUp();
 			});
+			/* process new posts. */
+			$.each(data.newPosts, function(index, value) {
+				loadNewPost(value);
+			});
+			/* process new replies. */
+			$.each(data.newReplies, function(index, value) {
+				loadNewReply(value);
+			});
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
 		} else {
@@ -498,6 +588,61 @@ function getStatus() {
 		/* something really bad happend, wait a minute. */
 		setTimeout(getStatus, 60000);
 	})
+}
+
+var loadedPosts = {};
+var loadedReplies = {};
+
+function loadNewPost(postId) {
+	if (postId in loadedPosts) {
+		return;
+	}
+	loadedPosts[postId] = true;
+	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			var firstOlderPost = null;
+			$("#sone #posts .post").each(function() {
+				if (getPostTime(this) < data.post.time) {
+					firstOlderPost = $(this);
+					return false;
+				}
+			});
+			newPost = $(data.post.html).addClass("hidden");
+			if (firstOlderPost != null) {
+				newPost.insertBefore(firstOlderPost);
+			} else {
+				$("#sone #posts .post:last").after(newPost);
+			}
+			ajaxifyPost(newPost);
+			newPost.slideDown();
+		}
+	});
+}
+
+function loadNewReply(replyId) {
+	if (replyId in loadedReplies) {
+		return;
+	}
+	loadedReplies[replyId] = true;
+	$.getJSON("ajax/getReply.ajax", { "reply": replyId }, function(data, textStatus) {
+		/* find post. */
+		$("#sone #posts .post#" + data.reply.postId).each(function() {
+			var firstNewerReply = null;
+			$(this).find(".replies .reply").each(function() {
+				if (getReplyTime(this) > data.reply.time) {
+					firstNewerReply = $(this);
+					return false;
+				}
+			});
+			newReply = $(data.reply.html);
+			if (firstNewerReply != null) {
+				newReply.insertAfter(firstNewerReply);
+			} else {
+				$(this).find(".replies .reply:last").after(newReply);
+			}
+			ajaxifyReply(newReply);
+		});
+	});
 }
 
 /**
@@ -529,68 +674,28 @@ function createNotification(id, text, dismissable) {
 $(document).ready(function() {
 
 	/* this initializes the status update input field. */
-	getTranslation("WebInterface.DefaultText.StatusUpdate", function(text) {
-		registerInputTextareaSwap("#sone #update-status .status-input", text, "text", false, false);
-	})
-
-	/* this initializes all reply input fields. */
-	getTranslation("WebInterface.DefaultText.Reply", function(text) {
-		registerInputTextareaSwap("#sone input.reply-input", text, "text", false, false);
-		addCommentLinks();
-	})
-
-	/* replaces all “post reply!” forms with AJAX. */
-	$("#sone .create-reply button:submit").click(function() {
-		$(this.form).submit(function() {
+	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
+		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
+		$("#sone #update-status").submit(function() {
+			text = $(this).find(":input:enabled").val();
+			$.getJSON("ajax/createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
+				if ((data != null) && data.success) {
+					loadNewPost(data.postId);
+				}
+			});
+			$(this).find(":input:enabled").val("").blur();
 			return false;
 		});
-		inputField = $(this.form).find(":input:enabled").get(0);
-		postId = getPostId($(inputField));
-		text = $(inputField).val();
-		$(inputField).val("");
-		postReply(postId, text, function(success, error, replyId) {
-			if (success) {
-				getReply(replyId, function(soneId, soneName, replyTime, replyDisplayTime, text, html) {
-					newReply = $(html).insertBefore("#sone .post#" + postId + " .create-reply");
-					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
-					getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(deleteReplyText) {
-						enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId, deleteReplyText);
-					});
-					newReply.find(".status-line .like").submit(function() {
-						likeReply(getReplyId(this));
-						return false;
-					});
-					newReply.find(".status-line .unlike").submit(function() {
-						unlikeReply(getReplyId(this));
-						return false;
-					});
-					addCommentLink(postId, newReply);
-				});
-			} else {
-				alert(error);
-			}
-		});
-		return false;
 	});
 
-	/* replace all “delete” buttons with javascript. */
+	/* Ajaxifies all posts. */
+	/* calling getTranslation here will cache the necessary values. */
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
-		deletePostText = text;
 		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
-			deleteReplyText = text;
-			$("#sone .post").each(function() {
-				postId = $(this).attr("id");
-				enhanceDeletePostButton("#sone .post#" + postId + " > .inner-part > .status-line .delete button", postId, deletePostText);
-				(function(postId) {
-					$("#sone .post#" + postId + " .reply").each(function() {
-						replyId = $(this).attr("id");
-						(function(postId, reply, replyId) {
-							reply.find(".delete button").each(function() {
-								enhanceDeleteReplyButton("#sone .post#" + postId + " .reply#" + replyId + " .delete button", replyId, deleteReplyText);
-							})
-						})(postId, $(this), replyId);
-					});
-				})(postId);
+			getTranslation("WebInterface.DefaultText.Reply", function(text) {
+				$("#sone .post").each(function() {
+					ajaxifyPost(this);
+				});
 			});
 		});
 	});
@@ -655,24 +760,6 @@ $(document).ready(function() {
 			$(unlockElement).addClass("hidden");
 			$(unlockElement).parent().find(".lock").removeClass("hidden");
 		});
-		return false;
-	});
-
-	/* convert all “like” buttons to javascript functions. */
-	$("#sone .post > .inner-part > .status-line .like").submit(function() {
-		likePost(getPostId(this));
-		return false;
-	});
-	$("#sone .post > .inner-part > .status-line .unlike").submit(function() {
-		unlikePost(getPostId(this));
-		return false;
-	});
-	$("#sone .post .reply .status-line .like").submit(function() {
-		likeReply(getReplyId(this));
-		return false;
-	});
-	$("#sone .post .reply .status-line .unlike").submit(function() {
-		unlikeReply(getReplyId(this));
 		return false;
 	});
 
