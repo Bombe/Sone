@@ -125,6 +125,8 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			return new RedirectResponse(re1.getTarget());
 		}
 
+		postProcess(request);
+
 		StringWriter stringWriter = new StringWriter();
 		template.render(stringWriter);
 		pageNode.content.addChild("%", stringWriter.toString());
@@ -163,6 +165,21 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *             if the processing page wants to redirect after processing
 	 */
 	protected void processTemplate(Request request, Template template) throws RedirectException {
+		/* do nothing. */
+	}
+
+	/**
+	 * This method will be called after
+	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, Template)}
+	 * has processed the template and the template was rendered. This method
+	 * will not be called if
+	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, Template)}
+	 * throws a {@link RedirectException}!
+	 *
+	 * @param request
+	 *            The request being processed
+	 */
+	protected void postProcess(Request request) {
 		/* do nothing. */
 	}
 
