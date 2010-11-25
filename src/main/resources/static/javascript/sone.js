@@ -299,7 +299,7 @@ function getPostId(element) {
 }
 
 function getPostTime(element) {
-	return getPostElement(element).find(".storage-time").text();
+	return getPostElement(element).find(".post-time").text();
 }
 
 function getReplyElement(element) {
@@ -311,7 +311,7 @@ function getReplyId(element) {
 }
 
 function getReplyTime(element) {
-	return getReplyElement(element).find(".storage-time").text();
+	return getReplyElement(element).find(".reply-time").text();
 }
 
 function likePost(postId) {
