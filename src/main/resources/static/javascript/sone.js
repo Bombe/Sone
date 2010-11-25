@@ -623,22 +623,29 @@ function loadNewReply(replyId) {
 	loadedReplies[replyId] = true;
 	$.getJSON("ajax/getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
-		$("#sone #posts .post#" + data.reply.postId).each(function() {
-			var firstNewerReply = null;
-			$(this).find(".replies .reply").each(function() {
-				if (getReplyTime(this) > data.reply.time) {
-					firstNewerReply = $(this);
-					return false;
+		if ((data != null) && data.success) {
+			$("#sone .post#" + data.reply.postId).each(function() {
+				var firstNewerReply = null;
+				$(this).find(".replies .reply").each(function() {
+					if (getReplyTime(this) > data.reply.time) {
+						firstNewerReply = $(this);
+						return false;
+					}
+				});
+				newReply = $(data.reply.html).addClass("hidden");
+				if (firstNewerReply != null) {
+					newReply.insertAfter(firstNewerReply);
+				} else {
+					if ($(this).find(".replies .create-reply")) {
+						$(this).find(".replies .create-reply").before(newReply);
+					} else {
+						$(this).find(".replies").append(newReply);
+					}
 				}
+				ajaxifyReply(newReply);
+				newReply.slideDown();
 			});
-			newReply = $(data.reply.html);
-			if (firstNewerReply != null) {
-				newReply.insertAfter(firstNewerReply);
-			} else {
-				$(this).find(".replies .reply:last").after(newReply);
-			}
-			ajaxifyReply(newReply);
-		});
+		}
 	});
 }
 
