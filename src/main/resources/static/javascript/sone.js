@@ -493,7 +493,6 @@ function ajaxifyPost(postElement) {
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
 		$(postElement).find("input.reply-input").each(function() {
 			registerInputTextareaSwap(this, text, "text", false, false);
-			addCommentLink(getPostId(postElement), postElement);
 		});
 	});
 
