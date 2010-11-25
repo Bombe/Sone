@@ -654,9 +654,11 @@ function loadNewReply(replyId) {
 function markPostAsKnown(postElements) {
 	$(postElements).each(function() {
 		postElement = this;
-		$.getJSON("ajax/markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function() {
-			$(postElement).removeClass("new");
-		});
+		if ($(postElement).hasClass("new")) {
+			$.getJSON("ajax/markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
+				$(postElement).removeClass("new");
+			});
+		}
 	});
 	markReplyAsKnown($(postElements).find(".reply"));
 }
@@ -664,9 +666,11 @@ function markPostAsKnown(postElements) {
 function markReplyAsKnown(replyElements) {
 	$(replyElements).each(function() {
 		replyElement = this;
-		$.getJSON("ajax/markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function() {
-			$(replyElement).removeClass("new");
-		});
+		if ($(replyElement).hasClass("new")) {
+			$.getJSON("ajax/markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function(data, textStatus) {
+				$(replyElement).removeClass("new");
+			});
+		}
 	});
 }
 
