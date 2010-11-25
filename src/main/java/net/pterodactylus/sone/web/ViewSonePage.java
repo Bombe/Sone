@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.List;
+
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Template;
 
@@ -52,6 +56,21 @@ public class ViewSonePage extends SoneTemplatePage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);
 		template.set("sone", sone);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void postProcess(Request request, Template template) {
+		Sone sone = (Sone) template.get("sone");
+		List<Post> posts = sone.getPosts();
+		for (Post post : posts) {
+			webInterface.getCore().markPostKnown(post);
+			for (Reply reply : webInterface.getCore().getReplies(post)) {
+				webInterface.getCore().markReplyKnown(reply);
+			}
+		}
 	}
 
 }

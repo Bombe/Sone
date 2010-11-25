@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Template;
 
@@ -64,6 +65,21 @@ public class IndexPage extends SoneTemplatePage {
 		}
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
 		template.set("posts", allPosts);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected void postProcess(Request request, Template template) {
+		@SuppressWarnings("unchecked")
+		List<Post> posts = (List<Post>) template.get("posts");
+		for (Post post : posts) {
+			webInterface.getCore().markPostKnown(post);
+			for (Reply reply : webInterface.getCore().getReplies(post)) {
+				webInterface.getCore().markReplyKnown(reply);
+			}
+		}
 	}
 
 }
