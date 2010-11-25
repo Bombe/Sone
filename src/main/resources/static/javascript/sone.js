@@ -690,9 +690,11 @@ function resetActivity() {
 }
 
 function setActivity() {
-	title = document.title;
-	if (title.indexOf('(') != 0) {
-		document.title = "(!) " + title;
+	if (!focus) {
+		title = document.title;
+		if (title.indexOf('(') != 0) {
+			document.title = "(!) " + title;
+		}
 	}
 }
 
