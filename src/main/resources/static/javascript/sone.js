@@ -722,6 +722,8 @@ function createNotification(id, text, dismissable) {
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
 
+var focus = true;
+
 $(document).ready(function() {
 
 	/* this initializes the status update input field. */
@@ -824,7 +826,10 @@ $(document).ready(function() {
 
 	/* reset activity counter when the page has focus. */
 	$(window).focus(function() {
+		focus = true;
 		resetActivity();
-	});
+	}).blur(function() {
+		focus = false;
+	})
 
 });
