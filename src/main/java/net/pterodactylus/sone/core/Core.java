@@ -1135,9 +1135,10 @@ public class Core implements IdentityListener {
 	 *            The Sone that creates the post
 	 * @param text
 	 *            The text of the post
+	 * @return The created post
 	 */
-	public void createPost(Sone sone, String text) {
-		createPost(sone, System.currentTimeMillis(), text);
+	public Post createPost(Sone sone, String text) {
+		return createPost(sone, System.currentTimeMillis(), text);
 	}
 
 	/**
@@ -1149,11 +1150,12 @@ public class Core implements IdentityListener {
 	 *            The time of the post
 	 * @param text
 	 *            The text of the post
+	 * @return The created post
 	 */
-	public void createPost(Sone sone, long time, String text) {
+	public Post createPost(Sone sone, long time, String text) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
-			return;
+			return null;
 		}
 		Post post = new Post(sone, time, text);
 		synchronized (posts) {
@@ -1164,6 +1166,7 @@ public class Core implements IdentityListener {
 		}
 		sone.addPost(post);
 		saveSone(sone);
+		return post;
 	}
 
 	/**
