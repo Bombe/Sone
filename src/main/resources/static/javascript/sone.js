@@ -475,10 +475,12 @@ function ajaxifyPost(postElement) {
 	/* convert all “like” buttons to javascript functions. */
 	$(postElement).find(".like-post").submit(function() {
 		likePost(getPostId(this));
+		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	$(postElement).find(".unlike-post").submit(function() {
 		unlikePost(getPostId(this));
+		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 
@@ -511,10 +513,12 @@ function ajaxifyPost(postElement) {
 function ajaxifyReply(replyElement) {
 	$(replyElement).find(".like-reply").submit(function() {
 		likeReply(getReplyId(this));
+		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	$(replyElement).find(".unlike-reply").submit(function() {
 		unlikeReply(getReplyId(this));
+		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	(function(replyElement) {
