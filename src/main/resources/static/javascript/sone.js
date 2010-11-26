@@ -63,7 +63,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  * @param element
  *            The element to add a “comment” link to
  */
-function addCommentLink(postId, element) {
+function addCommentLink(postId, element, insertAfterThisElement) {
 	if ($(element).find(".show-reply-form").length > 0) {
 		return;
 	}
@@ -86,9 +86,7 @@ function addCommentLink(postId, element) {
 		});
 		return commentElement;
 	})(postId);
-	$(element).find(".status-line .time").each(function() {
-		$(this).after(commentElement.clone(true));
-	});
+	$(insertAfterThisElement).after(commentElement.clone(true));
 }
 
 var translations = {};
@@ -484,6 +482,9 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* add “comment” link. */
+	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
+
 	/* process all replies. */
 	$(postElement).find(".reply").each(function() {
 		ajaxifyReply(this);
@@ -493,12 +494,13 @@ function ajaxifyPost(postElement) {
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
 		$(postElement).find("input.reply-input").each(function() {
 			registerInputTextareaSwap(this, text, "text", false, false);
-			addCommentLink(getPostId(postElement), postElement);
 		});
 	});
 
-	/* add “comment” link. */
-	addCommentLink(getPostId(postElement), postElement);
+	/* mark everything as known on click. */
+	$(postElement).click(function() {
+		markPostAsKnown(this);
+	});
 
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
@@ -528,7 +530,12 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
-	addCommentLink(getPostId(replyElement), replyElement);
+	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+
+	/* mark post and all replies as known on click. */
+	$(replyElement).click(function() {
+		markPostAsKnown(getPostElement(replyElement));
+	});
 }
 
 /**
@@ -604,6 +611,10 @@ function loadNewPost(postId) {
 	loadedPosts[postId] = true;
 	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
+			/* maybe weird timing stuff ensues. */
+			if (data.post.id in loadedPosts) {
+				return;
+			}
 			var firstOlderPost = null;
 			$("#sone .post").each(function() {
 				if (getPostTime(this) < data.post.time) {
@@ -611,7 +622,6 @@ function loadNewPost(postId) {
 					return false;
 				}
 			});
-			newPost = $(data.post.html).addClass("hidden");
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
@@ -632,6 +642,10 @@ function loadNewReply(replyId) {
 	$.getJSON("ajax/getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
+			/* maybe weird timing stuff ensues. */
+			if (data.reply.id in loadedReplies) {
+				return;
+			}
 			$("#sone .post#" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
@@ -640,7 +654,6 @@ function loadNewReply(replyId) {
 						return false;
 					}
 				});
-				newReply = $(data.reply.html).addClass("hidden");
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
@@ -693,9 +706,11 @@ function resetActivity() {
 }
 
 function setActivity() {
-	title = document.title;
-	if (title.indexOf('(') != 0) {
-		document.title = "(!) " + title;
+	if (!focus) {
+		title = document.title;
+		if (title.indexOf('(') != 0) {
+			document.title = "(!) " + title;
+		}
 	}
 }
 
@@ -724,6 +739,8 @@ function createNotification(id, text, dismissable) {
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
+
+var focus = true;
 
 $(document).ready(function() {
 
@@ -827,7 +844,10 @@ $(document).ready(function() {
 
 	/* reset activity counter when the page has focus. */
 	$(window).focus(function() {
+		focus = true;
 		resetActivity();
-	});
+	}).blur(function() {
+		focus = false;
+	})
 
 });
