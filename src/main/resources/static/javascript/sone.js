@@ -664,7 +664,7 @@ function loadNewPost(postId) {
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
-				$("#sone #posts").append(newPost);
+				$("#sone .post:last").append(newPost);
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
