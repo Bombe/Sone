@@ -55,8 +55,10 @@ public class CreatePostPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 			if (text.length() != 0) {
+				String recipientId = request.getHttpRequest().getPartAsStringFailsafe("recipient", 43);
+				Sone recipient = webInterface.getCore().getSone(recipientId, false);
 				Sone currentSone = getCurrentSone(request.getToadletContext());
-				webInterface.getCore().createPost(currentSone, System.currentTimeMillis(), text);
+				webInterface.getCore().createPost(currentSone, recipient, System.currentTimeMillis(), text);
 				throw new RedirectException(returnPage);
 			}
 			template.set("errorTextEmpty", true);
