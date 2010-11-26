@@ -497,6 +497,11 @@ function ajaxifyPost(postElement) {
 		});
 	});
 
+	/* mark everything as known on click. */
+	$(postElement).click(function() {
+		markPostAsKnown(this);
+	});
+
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
 }
@@ -526,6 +531,11 @@ function ajaxifyReply(replyElement) {
 		});
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+
+	/* mark post and all replies as known on click. */
+	$(replyElement).click(function() {
+		markPostAsKnown(getPostElement(replyElement));
+	});
 }
 
 /**
