@@ -611,6 +611,10 @@ function loadNewPost(postId) {
 	loadedPosts[postId] = true;
 	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
+			/* maybe weird timing stuff ensues. */
+			if (data.post.id in loadedPosts) {
+				return;
+			}
 			var firstOlderPost = null;
 			$("#sone .post").each(function() {
 				if (getPostTime(this) < data.post.time) {
@@ -638,6 +642,10 @@ function loadNewReply(replyId) {
 	$.getJSON("ajax/getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
+			/* maybe weird timing stuff ensues. */
+			if (data.reply.id in loadedReplies) {
+				return;
+			}
 			$("#sone .post#" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
