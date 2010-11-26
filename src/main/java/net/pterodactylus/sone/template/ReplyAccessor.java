@@ -17,12 +17,17 @@
 
 package net.pterodactylus.sone.template;
 
+import java.io.IOException;
+import java.io.StringReader;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.text.FreenetLinkParser;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateFactory;
 
 /**
  * {@link Accessor} implementation that adds a couple of properties to
@@ -32,6 +37,9 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  */
 public class ReplyAccessor extends ReflectionAccessor {
 
+	/** Parser for Freenet links. */
+	private final FreenetLinkParser linkParser;
+
 	/** The core. */
 	private final Core core;
 
@@ -40,9 +48,12 @@ public class ReplyAccessor extends ReflectionAccessor {
 	 *
 	 * @param core
 	 *            The core
+	 * @param templateFactory
+	 *            The template factory for the text parser
 	 */
-	public ReplyAccessor(Core core) {
+	public ReplyAccessor(Core core, TemplateFactory templateFactory) {
 		this.core = core;
+		linkParser = new FreenetLinkParser(templateFactory);
 	}
 
 	/**
@@ -58,6 +69,13 @@ public class ReplyAccessor extends ReflectionAccessor {
 			return (currentSone != null) && (currentSone.isLikedReplyId(reply.getId()));
 		} else if (member.equals("new")) {
 			return core.isNewReply(reply.getId(), false);
+		} else if (member.equals("text")) {
+			String text = reply.getText();
+			try {
+				return linkParser.parse(new StringReader(text));
+			} catch (IOException ioe1) {
+				/* ignore. */
+			}
 		}
 		return super.get(dataProvider, object, member);
 	}

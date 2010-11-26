@@ -7,7 +7,7 @@
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils</artifactId>
-			<version>0.7</version>
+			<version>0.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -30,9 +30,15 @@
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils.json</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>pterodactylus</id>
+			<url>http://maven.pterodactylus.net/</url>
+		</repository>
+	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -86,4 +92,19 @@
 			</plugin>
 		</plugins>
 	</build>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://download.oracle.com/javase/6/docs/api/</link>
+						<link>http://java.pterodactylus.net/utils/apidocs/</link>
+						<link>http://java.pterodactylus.net/utils.json/apidocs/</link>
+					</links>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
