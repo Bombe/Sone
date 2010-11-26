@@ -601,6 +601,45 @@ function getStatus() {
 	})
 }
 
+/**
+ * Returns the content of the page-id attribute.
+ *
+ * @returns The page ID
+ */
+function getPageId() {
+	return $("#sone .page-id").text();
+}
+
+/**
+ * Returns whether the current page is the index page.
+ *
+ * @returns {Boolean} <code>true</code> if the current page is the index page,
+ *          <code>false</code> otherwise
+ */
+function isIndexPage() {
+	return getPageId() == "index";
+}
+
+/**
+ * Returns whether the current page is a “view Sone” page.
+ *
+ * @returns {Boolean} <code>true</code> if the current page is a “view Sone”
+ *          page, <code>false</code> otherwise
+ */
+function isViewSonePage() {
+	return getPageId() == "view-sone";
+}
+
+/**
+ * Returns the ID of the currently shown Sone. This will only return a sensible
+ * value if isViewSonePage() returns <code>true</code>.
+ *
+ * @returns The ID of the currently shown Sone
+ */
+function getSoneId() {
+	return $("#sone .sone-id").text();
+}
+
 var loadedPosts = {};
 var loadedReplies = {};
 
@@ -611,6 +650,9 @@ function loadNewPost(postId) {
 	loadedPosts[postId] = true;
 	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
+			if (!isIndexPage() && !(isViewSonePage() && (getSoneId() == data.post.sone))) {
+				return;
+			}
 			var firstOlderPost = null;
 			$("#sone .post").each(function() {
 				if (getPostTime(this) < data.post.time) {
@@ -622,7 +664,7 @@ function loadNewPost(postId) {
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
-				$("#sone #posts").append(newPost);
+				$("#sone .post:last").append(newPost);
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
