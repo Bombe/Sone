@@ -177,7 +177,7 @@ textarea {
 	min-height: 48px;
 }
 
-#sone .post .author {
+#sone .post .author, #sone .post .recipient {
 	display: inline;
 	font-weight: bold;
 }

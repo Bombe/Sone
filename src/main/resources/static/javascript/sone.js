@@ -742,6 +742,21 @@ $(document).ready(function() {
 		});
 	});
 
+	/* ajaxify input field on “view Sone” page. */
+	getTranslation("WebInterface.DefaultText.Message", function(defaultText) {
+		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
+		$("#sone #post-message").submit(function() {
+			text = $(this).find(":input:enabled").val();
+			$.getJSON("ajax/createPost.ajax", { "formPassword": getFormPassword(), "recipient": $("#sone #sone-id").text(), "text": text }, function(data, textStatus) {
+				if ((data != null) && data.success) {
+					loadNewPost(data.postId);
+				}
+			});
+			$(this).find(":input:enabled").val("").blur();
+			return false;
+		});
+	});
+
 	/* Ajaxifies all posts. */
 	/* calling getTranslation here will cache the necessary values. */
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
