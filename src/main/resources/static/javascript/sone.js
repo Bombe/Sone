@@ -618,6 +618,7 @@ function loadNewPost(postId) {
 					return false;
 				}
 			});
+			newPost = $(data.post.html).addClass("hidden");
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
@@ -646,6 +647,7 @@ function loadNewReply(replyId) {
 						return false;
 					}
 				});
+				newReply = $(data.reply.html).addClass("hidden");
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
