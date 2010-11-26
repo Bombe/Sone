@@ -620,6 +620,26 @@ function isIndexPage() {
 	return getPageId() == "index";
 }
 
+/**
+ * Returns whether the current page is a “view Sone” page.
+ *
+ * @returns {Boolean} <code>true</code> if the current page is a “view Sone”
+ *          page, <code>false</code> otherwise
+ */
+function isViewSonePage() {
+	return getPageId() == "view-sone";
+}
+
+/**
+ * Returns the ID of the currently shown Sone. This will only return a sensible
+ * value if isViewSonePage() returns <code>true</code>.
+ *
+ * @returns The ID of the currently shown Sone
+ */
+function getSoneId() {
+	return $("#sone .sone-id").text();
+}
+
 var loadedPosts = {};
 var loadedReplies = {};
 
