@@ -1216,11 +1216,48 @@ public class Core implements IdentityListener {
 	 * @return The created post
 	 */
 	public Post createPost(Sone sone, long time, String text) {
+		return createPost(sone, null, time, text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param recipient
+	 *            The recipient Sone, or {@code null} if this post does not have
+	 *            a recipient
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, Sone recipient, String text) {
+		return createPost(sone, recipient, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param recipient
+	 *            The recipient Sone, or {@code null} if this post does not have
+	 *            a recipient
+	 * @param time
+	 *            The time of the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, Sone recipient, long time, String text) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
 			return null;
 		}
 		Post post = new Post(sone, time, text);
+		if (recipient != null) {
+			post.setRecipient(recipient);
+		}
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}
