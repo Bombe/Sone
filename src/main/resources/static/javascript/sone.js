@@ -611,10 +611,6 @@ function loadNewPost(postId) {
 	loadedPosts[postId] = true;
 	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			/* maybe weird timing stuff ensues. */
-			if (data.post.id in loadedPosts) {
-				return;
-			}
 			var firstOlderPost = null;
 			$("#sone .post").each(function() {
 				if (getPostTime(this) < data.post.time) {
@@ -622,6 +618,7 @@ function loadNewPost(postId) {
 					return false;
 				}
 			});
+			newPost = $(data.post.html).addClass("hidden");
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
@@ -642,10 +639,6 @@ function loadNewReply(replyId) {
 	$.getJSON("ajax/getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
-			/* maybe weird timing stuff ensues. */
-			if (data.reply.id in loadedReplies) {
-				return;
-			}
 			$("#sone .post#" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
@@ -654,6 +647,7 @@ function loadNewReply(replyId) {
 						return false;
 					}
 				});
+				newReply = $(data.reply.html).addClass("hidden");
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
