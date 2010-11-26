@@ -1,5 +1,7 @@
 <%include include/head.html>
 
+	<div id="sone-id" class="hidden"><% sone.id|html></div>
+
 	<%ifnull sone>
 
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
