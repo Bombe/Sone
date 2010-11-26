@@ -21,6 +21,7 @@
 		<%foreach currentSone.posts post>
 		<post>
 			<id><% post.id|xml></id>
+			<recipient><%ifnull !post.recipient><% post.recipient.id|xml><%/if></recipient>
 			<time><% post.time></time>
 			<text><% post.text|xml></text>
 		</post>

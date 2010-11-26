@@ -1016,13 +1016,18 @@ public class Core implements IdentityListener {
 			if (postId == null) {
 				break;
 			}
+			String postRecipientId = configuration.getStringValue(postPrefix + "/Recipient").getValue(null);
 			long postTime = configuration.getLongValue(postPrefix + "/Time").getValue((long) 0);
 			String postText = configuration.getStringValue(postPrefix + "/Text").getValue(null);
 			if ((postTime == 0) || (postText == null)) {
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			posts.add(getPost(postId).setSone(sone).setTime(postTime).setText(postText));
+			Post post = getPost(postId).setSone(sone).setTime(postTime).setText(postText);
+			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
+				post.setRecipient(getSone(postRecipientId));
+			}
+			posts.add(post);
 		}
 
 		/* load replies. */
@@ -1140,6 +1145,9 @@ public class Core implements IdentityListener {
 			for (Post post : sone.getPosts()) {
 				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
 				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
+				if (post.getRecipient() != null) {
+					configuration.getStringValue(postPrefix + "/Recipient").setValue(post.getRecipient().getId());
+				}
 				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
 				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
 			}

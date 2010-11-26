@@ -295,6 +295,7 @@ public class SoneDownloader extends AbstractService {
 		} else {
 			for (SimpleXML postXml : postsXml.getNodes("post")) {
 				String postId = postXml.getValue("id", null);
+				String postRecipientId = postXml.getValue("recipient", null);
 				String postTime = postXml.getValue("time", null);
 				String postText = postXml.getValue("text", null);
 				if ((postId == null) || (postTime == null) || (postText == null)) {
@@ -303,7 +304,11 @@ public class SoneDownloader extends AbstractService {
 					return null;
 				}
 				try {
-					posts.add(core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText));
+					Post post = core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText);
+					if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
+						post.setRecipient(core.getSone(postRecipientId));
+					}
+					posts.add(post);
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
