@@ -7,7 +7,7 @@
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils</artifactId>
-			<version>0.7</version>
+			<version>0.7.1</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils.json</artifactId>
-			<version>0.1-SNAPSHOT</version>
+			<version>0.1</version>
 		</dependency>
 	</dependencies>
 	<repositories>
