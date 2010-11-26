@@ -601,6 +601,25 @@ function getStatus() {
 	})
 }
 
+/**
+ * Returns the content of the page-id attribute.
+ *
+ * @returns The page ID
+ */
+function getPageId() {
+	return $("#sone .page-id").text();
+}
+
+/**
+ * Returns whether the current page is the index page.
+ *
+ * @returns {Boolean} <code>true</code> if the current page is the index page,
+ *          <code>false</code> otherwise
+ */
+function isIndexPage() {
+	return getPageId() == "index";
+}
+
 var loadedPosts = {};
 var loadedReplies = {};
 
