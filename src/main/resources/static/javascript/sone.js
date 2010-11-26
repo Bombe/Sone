@@ -608,7 +608,9 @@ function loadNewPost(postId) {
 					return false;
 				}
 			});
-			newPost = $(data.post.html).addClass("hidden");
+			newPost = $(data.post.html).addClass("hidden").click(function() {
+				markPostAsKnown(this);
+			});
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			} else {
@@ -637,7 +639,9 @@ function loadNewReply(replyId) {
 						return false;
 					}
 				});
-				newReply = $(data.reply.html).addClass("hidden");
+				newReply = $(data.reply.html).addClass("hidden").click(function() {
+					markPostAsKnown(getPostElement(this));
+				});
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
