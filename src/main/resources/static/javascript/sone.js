@@ -640,6 +640,26 @@ function getSoneId() {
 	return $("#sone .sone-id").text();
 }
 
+/**
+ * Returns whether the current page is a “view post” page.
+ *
+ * @returns {Boolean} <code>true</code> if the current page is a “view post”
+ *          page, <code>false</code> otherwise
+ */
+function isViewPostPage() {
+	return getPageId() == "view-post";
+}
+
+/**
+ * Returns the ID of the currently shown post. This will only return a sensible
+ * value if isViewPostPage() returns <code>true</code>.
+ *
+ * @returns The ID of the currently shown post
+ */
+function getPostId() {
+	return $("#sone .post-id").text();
+}
+
 var loadedPosts = {};
 var loadedReplies = {};
 

@@ -1,5 +1,8 @@
 <%include include/head.html>
 
+	<div class="page-id hidden">view-post</div>
+	<div class="post-id hidden"><% post.id|html></div>
+
 	<h1><%= Page.ViewPost.Page.Title|l10n|insert needle="{sone}" key=post.sone.niceName|html></h1>
 
 	<%include include/viewPost.html>
