@@ -335,10 +335,6 @@ textarea {
 	background-color: #ffffa0;
 }
 
-#sone .sone .id {
-	display: none;
-}
-
 #sone .sone .profile-link {
 	display: block;
 }
