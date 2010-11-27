@@ -35,7 +35,7 @@ public class FollowSoneAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public FollowSoneAjaxPage(WebInterface webInterface) {
-		super("ajax/followSone.ajax", webInterface);
+		super("followSone.ajax", webInterface);
 	}
 
 	/**

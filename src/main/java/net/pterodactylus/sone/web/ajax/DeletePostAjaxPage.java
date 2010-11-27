@@ -36,7 +36,7 @@ public class DeletePostAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public DeletePostAjaxPage(WebInterface webInterface) {
-		super("ajax/deletePost.ajax", webInterface);
+		super("deletePost.ajax", webInterface);
 	}
 
 	//

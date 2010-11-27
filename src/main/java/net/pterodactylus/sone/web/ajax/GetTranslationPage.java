@@ -34,7 +34,7 @@ public class GetTranslationPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public GetTranslationPage(WebInterface webInterface) {
-		super("ajax/getTranslation.ajax", webInterface);
+		super("getTranslation.ajax", webInterface);
 	}
 
 	//

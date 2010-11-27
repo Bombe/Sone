@@ -46,7 +46,7 @@ public class GetPostAjaxPage extends JsonPage {
 	 *            The template to render for posts
 	 */
 	public GetPostAjaxPage(WebInterface webInterface, Template postTemplate) {
-		super("ajax/getPost.ajax", webInterface);
+		super("getPost.ajax", webInterface);
 		this.postTemplate = postTemplate;
 	}
 

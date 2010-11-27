@@ -52,7 +52,7 @@ public class GetStatusAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public GetStatusAjaxPage(WebInterface webInterface) {
-		super("ajax/getStatus.ajax", webInterface);
+		super("getStatus.ajax", webInterface);
 	}
 
 	/**

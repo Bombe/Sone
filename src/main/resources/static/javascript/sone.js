@@ -105,7 +105,7 @@ function getTranslation(key, callback) {
 		callback(translations[key]);
 		return;
 	}
-	$.getJSON("ajax/getTranslation.ajax", {"key": key}, function(data, textStatus) {
+	$.getJSON("getTranslation.ajax", {"key": key}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			translations[key] = data.value;
 			callback(data.value);
@@ -201,7 +201,7 @@ function enhanceDeleteButton(button, text, deleteCallback) {
  */
 function enhanceDeletePostButton(button, postId, text) {
 	enhanceDeleteButton(button, text, function() {
-		$.getJSON("ajax/deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		$.getJSON("deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 			if (data == null) {
 				return;
 			}
@@ -232,7 +232,7 @@ function enhanceDeletePostButton(button, postId, text) {
  */
 function enhanceDeleteReplyButton(button, replyId, text) {
 	enhanceDeleteButton(button, text, function() {
-		$.getJSON("ajax/deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+		$.getJSON("deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
 			if (data == null) {
 				return;
 			}
@@ -314,7 +314,7 @@ function getReplyTime(element) {
 }
 
 function likePost(postId) {
-	$.getJSON("ajax/like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	$.getJSON("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -327,7 +327,7 @@ function likePost(postId) {
 }
 
 function unlikePost(postId) {
-	$.getJSON("ajax/unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	$.getJSON("unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -340,7 +340,7 @@ function unlikePost(postId) {
 }
 
 function updatePostLikes(postId) {
-	$.getJSON("ajax/getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
+	$.getJSON("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
@@ -352,7 +352,7 @@ function updatePostLikes(postId) {
 }
 
 function likeReply(replyId) {
-	$.getJSON("ajax/like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	$.getJSON("like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -365,7 +365,7 @@ function likeReply(replyId) {
 }
 
 function unlikeReply(replyId) {
-	$.getJSON("ajax/unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	$.getJSON("unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -378,7 +378,7 @@ function unlikeReply(replyId) {
 }
 
 function updateReplyLikes(replyId) {
-	$.getJSON("ajax/getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
+	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0)
 			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
@@ -401,7 +401,7 @@ function updateReplyLikes(replyId) {
  *            parameters: success, error, replyId)
  */
 function postReply(postId, text, callbackFunction) {
-	$.getJSON("ajax/createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
@@ -426,7 +426,7 @@ function postReply(postId, text, callbackFunction) {
  *            replyDisplayTime, text, html)
  */
 function getReply(replyId, callbackFunction) {
-	$.getJSON("ajax/getReply.ajax", { "reply" : replyId }, function(data, textStatus) {
+	$.getJSON("getReply.ajax", { "reply" : replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			callbackFunction(data.soneId, data.soneName, data.time, data.displayTime, data.text, data.html);
 		}
@@ -549,7 +549,7 @@ function ajaxifyNotification(notification) {
 		return false;
 	});
 	notification.find("form.dismiss button").click(function() {
-		$.getJSON("ajax/dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
+		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
 			/* dismiss in case of error, too. */
 			notification.slideUp();
 		}, function(xmlHttpRequest, textStatus, error) {
@@ -560,7 +560,7 @@ function ajaxifyNotification(notification) {
 }
 
 function getStatus() {
-	$.getJSON("ajax/getStatus.ajax", {}, function(data, textStatus) {
+	$.getJSON("getStatus.ajax", {}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
@@ -668,7 +668,7 @@ function loadNewPost(postId) {
 		return;
 	}
 	loadedPosts[postId] = true;
-	$.getJSON("ajax/getPost.ajax", { "post" : postId }, function(data, textStatus) {
+	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			if (!isIndexPage() && !(isViewSonePage() && (getSoneId() == data.post.sone))) {
 				return;
@@ -698,7 +698,7 @@ function loadNewReply(replyId) {
 		return;
 	}
 	loadedReplies[replyId] = true;
-	$.getJSON("ajax/getReply.ajax", { "reply": replyId }, function(data, textStatus) {
+	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
 			$("#sone .post#" + data.reply.postId).each(function() {
@@ -732,7 +732,7 @@ function markPostAsKnown(postElements) {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
-				$.getJSON("ajax/markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
+				$.getJSON("markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
 					$(postElement).removeClass("new");
 				});
 			})(postElement);
@@ -746,7 +746,7 @@ function markReplyAsKnown(replyElements) {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
-				$.getJSON("ajax/markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function(data, textStatus) {
+				$.getJSON("markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function(data, textStatus) {
 					$(replyElement).removeClass("new");
 				});
 			})(replyElement);
@@ -805,7 +805,7 @@ $(document).ready(function() {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
 		$("#sone #update-status").submit(function() {
 			text = $(this).find(":input:enabled").val();
-			$.getJSON("ajax/createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
 					loadNewPost(data.postId);
 				}
@@ -861,7 +861,7 @@ $(document).ready(function() {
 	 */
 	$("#sone .follow").submit(function() {
 		var followElement = this;
-		$.getJSON("ajax/followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 			$(followElement).addClass("hidden");
 			$(followElement).parent().find(".unfollow").removeClass("hidden");
 		});
@@ -869,7 +869,7 @@ $(document).ready(function() {
 	});
 	$("#sone .unfollow").submit(function() {
 		var unfollowElement = this;
-		$.getJSON("ajax/unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 			$(unfollowElement).addClass("hidden");
 			$(unfollowElement).parent().find(".follow").removeClass("hidden");
 		});
@@ -877,7 +877,7 @@ $(document).ready(function() {
 	});
 	$("#sone .lock").submit(function() {
 		var lockElement = this;
-		$.getJSON("ajax/lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
 			$(lockElement).addClass("hidden");
 			$(lockElement).parent().find(".unlock").removeClass("hidden");
 		});
@@ -885,7 +885,7 @@ $(document).ready(function() {
 	});
 	$("#sone .unlock").submit(function() {
 		var unlockElement = this;
-		$.getJSON("ajax/unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
 			$(unlockElement).addClass("hidden");
 			$(unlockElement).parent().find(".lock").removeClass("hidden");
 		});

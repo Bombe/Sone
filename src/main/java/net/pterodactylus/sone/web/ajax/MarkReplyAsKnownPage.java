@@ -35,7 +35,7 @@ public class MarkReplyAsKnownPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public MarkReplyAsKnownPage(WebInterface webInterface) {
-		super("ajax/markReplyAsKnown.ajax", webInterface);
+		super("markReplyAsKnown.ajax", webInterface);
 	}
 
 	/**

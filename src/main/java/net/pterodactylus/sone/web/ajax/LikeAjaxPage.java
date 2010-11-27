@@ -36,7 +36,7 @@ public class LikeAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public LikeAjaxPage(WebInterface webInterface) {
-		super("ajax/like.ajax", webInterface);
+		super("like.ajax", webInterface);
 	}
 
 	/**

@@ -36,7 +36,7 @@ public class CreatePostAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public CreatePostAjaxPage(WebInterface webInterface) {
-		super("ajax/createPost.ajax", webInterface);
+		super("createPost.ajax", webInterface);
 	}
 
 	/**

@@ -45,7 +45,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	 *            The template to render
 	 */
 	public GetReplyAjaxPage(WebInterface webInterface, Template replyTemplate) {
-		super("ajax/getReply.ajax", webInterface);
+		super("getReply.ajax", webInterface);
 		this.replyTemplate = replyTemplate;
 	}
 

@@ -36,7 +36,7 @@ public class UnlockSoneAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public UnlockSoneAjaxPage(WebInterface webInterface) {
-		super("ajax/unlockSone.ajax", webInterface);
+		super("unlockSone.ajax", webInterface);
 	}
 
 	/**

@@ -36,7 +36,7 @@ public class UnlikeAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public UnlikeAjaxPage(WebInterface webInterface) {
-		super("ajax/unlike.ajax", webInterface);
+		super("unlike.ajax", webInterface);
 	}
 
 	/**

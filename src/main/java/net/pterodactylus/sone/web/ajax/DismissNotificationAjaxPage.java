@@ -35,7 +35,7 @@ public class DismissNotificationAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public DismissNotificationAjaxPage(WebInterface webInterface) {
-		super("ajax/dismissNotification.ajax", webInterface);
+		super("dismissNotification.ajax", webInterface);
 	}
 
 	/**

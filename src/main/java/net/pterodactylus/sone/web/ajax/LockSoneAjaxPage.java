@@ -36,7 +36,7 @@ public class LockSoneAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public LockSoneAjaxPage(WebInterface webInterface) {
-		super("ajax/lockSone.ajax", webInterface);
+		super("lockSone.ajax", webInterface);
 	}
 
 	/**

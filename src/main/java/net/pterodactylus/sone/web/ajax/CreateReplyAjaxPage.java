@@ -37,7 +37,7 @@ public class CreateReplyAjaxPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public CreateReplyAjaxPage(WebInterface webInterface) {
-		super("ajax/createReply.ajax", webInterface);
+		super("createReply.ajax", webInterface);
 	}
 
 	//

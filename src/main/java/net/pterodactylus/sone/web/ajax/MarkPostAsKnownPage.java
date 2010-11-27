@@ -35,7 +35,7 @@ public class MarkPostAsKnownPage extends JsonPage {
 	 *            The Sone web interface
 	 */
 	public MarkPostAsKnownPage(WebInterface webInterface) {
-		super("ajax/markPostAsKnown.ajax", webInterface);
+		super("markPostAsKnown.ajax", webInterface);
 	}
 
 	/**
