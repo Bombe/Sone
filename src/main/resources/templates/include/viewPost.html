@@ -10,7 +10,7 @@
 			<%ifnull !post.recipient>
 				<span class="recipient-to">→</span>
 				<%ifnull post.recipient.identity>
-					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% View.Post.UnknownAuthor|l10n|html></a></div>
+					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><%= View.Post.UnknownAuthor|l10n|html></a></div>
 				<%else>
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
 				<%/if>
