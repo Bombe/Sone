@@ -48,11 +48,13 @@ public class CreatePostAjaxPage extends JsonPage {
 		if (sone == null) {
 			return createErrorJsonObject("auth-required");
 		}
+		String recipientId = request.getHttpRequest().getParam("recipient");
+		Sone recipient = webInterface.getCore().getSone(recipientId, false);
 		String text = request.getHttpRequest().getParam("text");
 		if ((text == null) || (text.trim().length() == 0)) {
 			return createErrorJsonObject("text-required");
 		}
-		Post newPost = webInterface.getCore().createPost(sone, text);
+		Post newPost = webInterface.getCore().createPost(sone, recipient, text);
 		return createSuccessJsonObject().put("postId", newPost.getId());
 	}
 

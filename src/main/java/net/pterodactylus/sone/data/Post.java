@@ -44,6 +44,9 @@ public class Post {
 	/** The Sone this post belongs to. */
 	private volatile Sone sone;
 
+	/** The Sone of the recipient. */
+	private volatile Sone recipient;
+
 	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
 	private volatile long time;
 
@@ -136,6 +139,27 @@ public class Post {
 	 */
 	public Post setSone(Sone sone) {
 		this.sone = sone;
+		return this;
+	}
+
+	/**
+	 * Returns the recipient of this post, if any.
+	 *
+	 * @return The recipient of this post, or {@code null}
+	 */
+	public Sone getRecipient() {
+		return recipient;
+	}
+
+	/**
+	 * Sets the recipient of this post.
+	 *
+	 * @param recipient
+	 *            The recipient of this post, or {@code null}
+	 * @return This post (for method chaining)
+	 */
+	public Post setRecipient(Sone recipient) {
+		this.recipient = recipient;
 		return this;
 	}
 

@@ -1016,13 +1016,18 @@ public class Core implements IdentityListener {
 			if (postId == null) {
 				break;
 			}
+			String postRecipientId = configuration.getStringValue(postPrefix + "/Recipient").getValue(null);
 			long postTime = configuration.getLongValue(postPrefix + "/Time").getValue((long) 0);
 			String postText = configuration.getStringValue(postPrefix + "/Text").getValue(null);
 			if ((postTime == 0) || (postText == null)) {
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			posts.add(getPost(postId).setSone(sone).setTime(postTime).setText(postText));
+			Post post = getPost(postId).setSone(sone).setTime(postTime).setText(postText);
+			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
+				post.setRecipient(getSone(postRecipientId));
+			}
+			posts.add(post);
 		}
 
 		/* load replies. */
@@ -1140,6 +1145,9 @@ public class Core implements IdentityListener {
 			for (Post post : sone.getPosts()) {
 				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
 				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
+				if (post.getRecipient() != null) {
+					configuration.getStringValue(postPrefix + "/Recipient").setValue(post.getRecipient().getId());
+				}
 				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
 				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
 			}
@@ -1208,11 +1216,48 @@ public class Core implements IdentityListener {
 	 * @return The created post
 	 */
 	public Post createPost(Sone sone, long time, String text) {
+		return createPost(sone, null, time, text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param recipient
+	 *            The recipient Sone, or {@code null} if this post does not have
+	 *            a recipient
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, Sone recipient, String text) {
+		return createPost(sone, recipient, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param recipient
+	 *            The recipient Sone, or {@code null} if this post does not have
+	 *            a recipient
+	 * @param time
+	 *            The time of the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, Sone recipient, long time, String text) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
 			return null;
 		}
 		Post post = new Post(sone, time, text);
+		if (recipient != null) {
+			post.setRecipient(recipient);
+		}
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}

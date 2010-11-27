@@ -19,7 +19,18 @@
 
 		<%if ! sone.current>
 			<%include include/viewSone.html>
+
+			<p><%= Page.ViewSone.WriteAMessage|l10n|html></p>
+
+			<form action="createPost.html" id="post-message" method="post">
+				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+				<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+				<input type="hidden" name="recipient" value="<% sone.id|html>" />
+				<input type="text" name="text" value="" />
+				<button type="submit"><%= Page.CreatePost.Button.Post|l10n|html></button>
+			</form>
 		<%/if>
+
 
 		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
 
