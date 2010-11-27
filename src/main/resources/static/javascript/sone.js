@@ -636,7 +636,7 @@ function isViewSonePage() {
  *
  * @returns The ID of the currently shown Sone
  */
-function getSoneId() {
+function getShownSoneId() {
 	return $("#sone .sone-id").text();
 }
 
@@ -656,7 +656,7 @@ function isViewPostPage() {
  *
  * @returns The ID of the currently shown post
  */
-function getPostId() {
+function getShownPostId() {
 	return $("#sone .post-id").text();
 }
 
@@ -670,7 +670,7 @@ function loadNewPost(postId) {
 	loadedPosts[postId] = true;
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			if (!isIndexPage() && !(isViewSonePage() && (getSoneId() == data.post.sone))) {
+			if (!isIndexPage() && !(isViewSonePage() && (getShownSoneId() == data.post.sone))) {
 				return;
 			}
 			var firstOlderPost = null;
