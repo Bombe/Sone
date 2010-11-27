@@ -23,7 +23,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.freenetproject</groupId>
-			<artifactId>fred-ext</artifactId>
+			<artifactId>freenet-ext</artifactId>
 			<version>26</version>
 			<scope>provided</scope>
 		</dependency>
