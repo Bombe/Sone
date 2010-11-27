@@ -828,30 +828,32 @@ $(document).ready(function() {
 	});
 
 	/* hides all replies but the latest two. */
-	getTranslation("WebInterface.ClickToShow.Replies", function(text) {
-		$("#sone .post .replies").each(function() {
-			allReplies = $(this).find(".reply");
-			if (allReplies.length > 2) {
-				newHidden = false;
-				for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
-					$(allReplies[replyIndex]).addClass("hidden");
-					newHidden |= $(allReplies[replyIndex]).hasClass("new");
+	if (!isViewPostPage()) {
+		getTranslation("WebInterface.ClickToShow.Replies", function(text) {
+			$("#sone .post .replies").each(function() {
+				allReplies = $(this).find(".reply");
+				if (allReplies.length > 2) {
+					newHidden = false;
+					for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
+						$(allReplies[replyIndex]).addClass("hidden");
+						newHidden |= $(allReplies[replyIndex]).hasClass("new");
+					}
+					clickToShowElement = $("<div></div>").addClass("click-to-show");
+					if (newHidden) {
+						clickToShowElement.addClass("new");
+					}
+					(function(clickToShowElement, allReplies, text) {
+						clickToShowElement.text(text);
+						clickToShowElement.click(function() {
+							allReplies.removeClass("hidden");
+							clickToShowElement.addClass("hidden");
+						});
+					})(clickToShowElement, allReplies, text);
+					$(allReplies[0]).before(clickToShowElement);
 				}
-				clickToShowElement = $("<div></div>").addClass("click-to-show");
-				if (newHidden) {
-					clickToShowElement.addClass("new");
-				}
-				(function(clickToShowElement, allReplies, text) {
-					clickToShowElement.text(text);
-					clickToShowElement.click(function() {
-						allReplies.removeClass("hidden");
-						clickToShowElement.addClass("hidden");
-					});
-				})(clickToShowElement, allReplies, text);
-				$(allReplies[0]).before(clickToShowElement);
-			}
+			});
 		});
-	});
+	}
 
 	/*
 	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
