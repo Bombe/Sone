@@ -560,7 +560,7 @@ function ajaxifyNotification(notification) {
 }
 
 function getStatus() {
-	$.getJSON("getStatus.ajax", {}, function(data, textStatus) {
+	$.getJSON("getStatus.ajax", {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
