@@ -117,6 +117,10 @@ public class FreenetLinkParser implements Parser {
 					next = nextUsk;
 					linkType = LinkType.USK;
 				}
+				if ((next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
+					next -= 8;
+					line = line.substring(0, next) + line.substring(next + 8);
+				}
 				Matcher matcher = whitespacePattern.matcher(line);
 				int nextSpace = matcher.find(next) ? matcher.start() : line.length();
 				if (nextSpace > (next + 4)) {
