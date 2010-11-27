@@ -42,6 +42,27 @@ public class FreenetLinkParser implements Parser {
 	/** Pattern to detect whitespace. */
 	private static final Pattern whitespacePattern = Pattern.compile("[\\p{javaWhitespace}]");
 
+	/**
+	 * Enumeration for all recognized link types.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private enum LinkType {
+
+		/** Link is a KSK. */
+		KSK,
+
+		/** Link is a CHK. */
+		CHK,
+
+		/** Link is an SSK. */
+		SSK,
+
+		/** Link is a USK. */
+		USK
+
+	}
+
 	/** The template factory. */
 	private final TemplateFactory templateFactory;
 
@@ -79,17 +100,22 @@ public class FreenetLinkParser implements Parser {
 					break;
 				}
 				int next = Integer.MAX_VALUE;
+				LinkType linkType = null;
 				if ((nextKsk > -1) && (nextKsk < next)) {
 					next = nextKsk;
+					linkType = LinkType.KSK;
 				}
 				if ((nextChk > -1) && (nextChk < next)) {
 					next = nextChk;
+					linkType = LinkType.CHK;
 				}
 				if ((nextSsk > -1) && (nextSsk < next)) {
 					next = nextSsk;
+					linkType = LinkType.SSK;
 				}
 				if ((nextUsk > -1) && (nextUsk < next)) {
 					next = nextUsk;
+					linkType = LinkType.USK;
 				}
 				Matcher matcher = whitespacePattern.matcher(line);
 				int nextSpace = matcher.find(next) ? matcher.start() : line.length();
@@ -99,7 +125,7 @@ public class FreenetLinkParser implements Parser {
 					String name = link;
 					logger.log(Level.FINER, "Found link: " + link);
 					logger.log(Level.FINEST, "Next: %d, CHK: %d, SSK: %d, USK: %d", new Object[] { next, nextChk, nextSsk, nextUsk });
-					if (((next == nextChk) || (next == nextSsk) || (next == nextUsk)) && (link.length() > 98) && (link.charAt(47) == ',') && (link.charAt(91) == ',') && (link.charAt(99) == '/')) {
+					if (((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (link.length() > 98) && (link.charAt(47) == ',') && (link.charAt(91) == ',') && (link.charAt(99) == '/')) {
 						name = link.substring(0, 47) + "…" + link.substring(99);
 					}
 					parts.add(createLinkPart(link, name));
