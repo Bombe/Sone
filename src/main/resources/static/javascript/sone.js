@@ -660,6 +660,16 @@ function getShownPostId() {
 	return $("#sone .post-id").text();
 }
 
+/**
+ * Returns whether the current page is the “known Sones” page.
+ *
+ * @returns {Boolean} <code>true</code> if the current page is the “known
+ *          Sones” page, <code>false</code> otherwise
+ */
+function isKnownSonesPage() {
+	return getPageId() == "known-sones";
+}
+
 var loadedPosts = {};
 var loadedReplies = {};
 
