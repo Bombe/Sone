@@ -830,7 +830,7 @@ $(document).ready(function() {
 		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
 		$("#sone #post-message").submit(function() {
 			text = $(this).find(":input:enabled").val();
-			$.getJSON("ajax/createPost.ajax", { "formPassword": getFormPassword(), "recipient": $("#sone #sone-id").text(), "text": text }, function(data, textStatus) {
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": $("#sone #sone-id").text(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
 					loadNewPost(data.postId);
 				}
