@@ -68,7 +68,7 @@ public class StringBucket implements Bucket {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Bucket createShadow() throws IOException {
+	public Bucket createShadow() {
 		return new StringBucket(string);
 	}
 
