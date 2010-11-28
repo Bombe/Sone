@@ -680,7 +680,7 @@ function loadNewPost(postId) {
 	loadedPosts[postId] = true;
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			if (!isIndexPage() && !(isViewSonePage() && (getShownSoneId() == data.post.sone))) {
+			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
 			var firstOlderPost = null;
