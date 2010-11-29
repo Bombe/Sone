@@ -732,6 +732,7 @@ function loadNewReply(replyId) {
 				ajaxifyReply(newReply);
 				newReply.slideDown();
 				setActivity();
+				return false;
 			});
 		}
 	});
