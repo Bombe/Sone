@@ -125,11 +125,11 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			return new RedirectResponse(re1.getTarget());
 		}
 
-		postProcess(request, template);
-
 		StringWriter stringWriter = new StringWriter();
 		template.render(stringWriter);
 		pageNode.content.addChild("%", stringWriter.toString());
+
+		postProcess(request, template);
 
 		return new Response(200, "OK", "text/html", pageNode.outer.generate());
 	}
