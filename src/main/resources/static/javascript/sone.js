@@ -449,9 +449,9 @@ function ajaxifyPost(postElement) {
 		inputField = $(this.form).find(":input:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		$(inputField).val("");
 		postReply(postId, text, function(success, error, replyId) {
 			if (success) {
+				$(inputField).val("");
 				loadNewReply(replyId);
 				markPostAsKnown(getPostElement(inputField));
 				$("#sone .post#" + postId + " .create-reply").addClass("hidden");
