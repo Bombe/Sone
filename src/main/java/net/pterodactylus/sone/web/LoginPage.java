@@ -78,6 +78,17 @@ public class LoginPage extends SoneTemplatePage {
 		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getRedirectTarget(Request request) {
+		if (getCurrentSone(request.getToadletContext()) != null) {
+			return "index.html";
+		}
+		return null;
+	}
+
 	//
 	// SONETEMPLATEPAGE METHODS
 	//
