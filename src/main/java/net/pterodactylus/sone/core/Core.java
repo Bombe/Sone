@@ -1143,9 +1143,7 @@ public class Core implements IdentityListener {
 			for (Post post : sone.getPosts()) {
 				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
 				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
-				if (post.getRecipient() != null) {
-					configuration.getStringValue(postPrefix + "/Recipient").setValue(post.getRecipient().getId());
-				}
+				configuration.getStringValue(postPrefix + "/Recipient").setValue((post.getRecipient() != null) ? post.getRecipient().getId() : null);
 				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
 				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
 			}
