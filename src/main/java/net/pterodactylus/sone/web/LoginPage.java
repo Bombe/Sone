@@ -68,13 +68,7 @@ public class LoginPage extends SoneTemplatePage {
 		template.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
-			Sone selectedSone = null;
-			for (Sone sone : webInterface.getCore().getSones()) {
-				if (sone.getId().equals(soneId)) {
-					selectedSone = sone;
-					break;
-				}
-			}
+			Sone selectedSone = webInterface.getCore().getLocalSone(soneId);
 			if (selectedSone != null) {
 				setCurrentSone(request.getToadletContext(), selectedSone);
 				throw new RedirectException("index.html");
