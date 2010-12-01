@@ -19,7 +19,6 @@ package net.pterodactylus.sone.web;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.UUID;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page;
@@ -93,7 +92,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *         session
 	 */
 	protected Session getCurrentSession(ToadletContext toadletContenxt) {
-		return getCurrentSession(toadletContenxt, true);
+		return webInterface.getCurrentSession(toadletContenxt);
 	}
 
 	/**
@@ -109,11 +108,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *         session
 	 */
 	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
-		Session session = webInterface.getSessionManager().useSession(toadletContenxt);
-		if (create && (session == null)) {
-			session = webInterface.getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
-		}
-		return session;
+		return webInterface.getCurrentSession(toadletContenxt, create);
 	}
 
 	/**
@@ -125,15 +120,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *         currently logged in
 	 */
 	protected Sone getCurrentSone(ToadletContext toadletContext) {
-		Session session = getCurrentSession(toadletContext);
-		if (session == null) {
-			return null;
-		}
-		String soneId = (String) session.getAttribute("Sone.CurrentSone");
-		if (soneId == null) {
-			return null;
-		}
-		return webInterface.getCore().getLocalSone(soneId, false);
+		return webInterface.getCurrentSone(toadletContext);
 	}
 
 	/**
@@ -145,12 +132,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            The Sone to set as currently logged in
 	 */
 	protected void setCurrentSone(ToadletContext toadletContext, Sone sone) {
-		Session session = getCurrentSession(toadletContext);
-		if (sone == null) {
-			session.removeAttribute("Sone.CurrentSone");
-		} else {
-			session.setAttribute("Sone.CurrentSone", sone.getId());
-		}
+		webInterface.setCurrentSone(toadletContext, sone);
 	}
 
 	//

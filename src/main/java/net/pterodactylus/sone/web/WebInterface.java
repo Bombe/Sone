@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -84,7 +85,9 @@ import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import freenet.clients.http.SessionManager;
+import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
+import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
 
 /**
@@ -186,6 +189,87 @@ public class WebInterface implements CoreListener {
 	 */
 	public Core getCore() {
 		return sonePlugin.core();
+	}
+
+	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session.
+	 *
+	 * @param toadletContenxt
+	 *            The toadlet context
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	public Session getCurrentSession(ToadletContext toadletContenxt) {
+		return getCurrentSession(toadletContenxt, true);
+	}
+
+	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session and {@code create} is {@code true}.
+	 *
+	 * @param toadletContenxt
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if there is no current
+	 *            session, {@code false} otherwise
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	public Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
+		Session session = getSessionManager().useSession(toadletContenxt);
+		if (create && (session == null)) {
+			session = getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
+		}
+		return session;
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	public Sone getCurrentSone(ToadletContext toadletContext) {
+		return getCurrentSone(getCurrentSession(toadletContext));
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param session
+	 *            The session
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	public Sone getCurrentSone(Session session) {
+		if (session == null) {
+			return null;
+		}
+		String soneId = (String) session.getAttribute("Sone.CurrentSone");
+		if (soneId == null) {
+			return null;
+		}
+		return getCore().getLocalSone(soneId, false);
+	}
+
+	/**
+	 * Sets the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @param sone
+	 *            The Sone to set as currently logged in
+	 */
+	public void setCurrentSone(ToadletContext toadletContext, Sone sone) {
+		Session session = getCurrentSession(toadletContext);
+		if (sone == null) {
+			session.removeAttribute("Sone.CurrentSone");
+		} else {
+			session.setAttribute("Sone.CurrentSone", sone.getId());
+		}
 	}
 
 	/**
