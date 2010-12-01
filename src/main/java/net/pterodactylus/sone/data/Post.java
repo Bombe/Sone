@@ -159,7 +159,9 @@ public class Post {
 	 * @return This post (for method chaining)
 	 */
 	public Post setRecipient(Sone recipient) {
-		this.recipient = recipient;
+		if (!sone.equals(recipient)) {
+			this.recipient = recipient;
+		}
 		return this;
 	}
 
