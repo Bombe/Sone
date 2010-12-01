@@ -707,8 +707,11 @@ function loadNewReply(replyId) {
 	if (replyId in loadedReplies) {
 		return;
 	}
-	loadedReplies[replyId] = true;
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
+		if (replyId in loadedReplies) {
+			return;
+		}
+		loadedReplies[replyId] = true;
 		/* find post. */
 		if ((data != null) && data.success) {
 			$("#sone .post#" + data.reply.postId).each(function() {
