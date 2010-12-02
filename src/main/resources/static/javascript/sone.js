@@ -677,8 +677,11 @@ function loadNewPost(postId) {
 	if (postId in loadedPosts) {
 		return;
 	}
-	loadedPosts[postId] = true;
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
+		if (postId in loadedPosts) {
+			return;
+		}
+		loadedPosts[postId] = true;
 		if ((data != null) && data.success) {
 			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
