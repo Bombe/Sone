@@ -127,7 +127,7 @@ public class FreenetLinkParser implements Parser {
 					parts.add(createPlainTextPart(line.substring(0, next)));
 					String link = line.substring(next, nextSpace);
 					String name = link;
-					logger.log(Level.FINER, "Found link: " + link);
+					logger.log(Level.FINER, "Found link: %s", link);
 					logger.log(Level.FINEST, "Next: %d, CHK: %d, SSK: %d, USK: %d", new Object[] { next, nextChk, nextSsk, nextUsk });
 					if (((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (link.length() > 98) && (link.charAt(47) == ',') && (link.charAt(91) == ',') && (link.charAt(99) == '/')) {
 						name = link.substring(0, 47) + "…" + link.substring(99);
