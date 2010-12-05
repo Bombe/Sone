@@ -678,11 +678,11 @@ function loadNewPost(postId) {
 		return;
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
-		if (postId in loadedPosts) {
-			return;
-		}
-		loadedPosts[postId] = true;
 		if ((data != null) && data.success) {
+			if (data.post.id in loadedPosts) {
+				return;
+			}
+			loadedPosts[data.post.id] = true;
 			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
@@ -711,12 +711,12 @@ function loadNewReply(replyId) {
 		return;
 	}
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
-		if (replyId in loadedReplies) {
-			return;
-		}
-		loadedReplies[replyId] = true;
 		/* find post. */
 		if ((data != null) && data.success) {
+			if (data.reply.id in loadedReplies) {
+				return;
+			}
+			loadedReplies[data.reply.id] = true;
 			$("#sone .post#" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
