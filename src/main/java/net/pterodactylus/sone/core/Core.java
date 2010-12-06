@@ -886,7 +886,7 @@ public class Core implements IdentityListener {
 					for (Post post : storedSone.getPosts()) {
 						posts.remove(post.getId());
 						if (!sone.getPosts().contains(post)) {
-							markPostKnown(post);
+							coreListenerManager.firePostRemoved(post);
 						}
 					}
 				}
@@ -906,7 +906,7 @@ public class Core implements IdentityListener {
 					for (Reply reply : storedSone.getReplies()) {
 						replies.remove(reply.getId());
 						if (!sone.getReplies().contains(reply)) {
-							markReplyKnown(reply);
+							coreListenerManager.fireReplyRemoved(reply);
 						}
 					}
 				}
