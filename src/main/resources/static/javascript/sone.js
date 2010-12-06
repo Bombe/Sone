@@ -534,7 +534,7 @@ function ajaxifyReply(replyElement) {
 
 	/* mark post and all replies as known on click. */
 	$(replyElement).click(function() {
-		markPostAsKnown(getPostElement(replyElement));
+		markPostAsKnown(getPostElement(this));
 	});
 }
 
