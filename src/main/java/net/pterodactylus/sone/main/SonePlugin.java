@@ -151,12 +151,12 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 			oldConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), false));
 			newConfiguration = oldConfiguration;
 		} catch (ConfigurationException ce1) {
-			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…");
+			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…", ce1);
 			try {
 				newConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), true));
 				logger.log(Level.INFO, "Created new configuration file.");
 			} catch (ConfigurationException ce2) {
-				logger.log(Level.SEVERE, "Could not create configuration file, using Plugin Store!");
+				logger.log(Level.SEVERE, "Could not create configuration file, using Plugin Store!", ce2);
 			}
 			try {
 				oldConfiguration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
