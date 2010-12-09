@@ -449,16 +449,18 @@ function ajaxifyPost(postElement) {
 		inputField = $(this.form).find(":input:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		postReply(postId, text, function(success, error, replyId) {
-			if (success) {
-				$(inputField).val("");
-				loadNewReply(replyId);
-				markPostAsKnown(getPostElement(inputField));
-				$("#sone .post#" + postId + " .create-reply").addClass("hidden");
-			} else {
-				alert(error);
-			}
-		});
+		(function(postId, text, inputField) {
+			postReply(postId, text, function(success, error, replyId) {
+				if (success) {
+					$(inputField).val("");
+					loadNewReply(replyId);
+					markPostAsKnown(getPostElement(inputField));
+					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+				} else {
+					alert(error);
+				}
+			});
+		})(postId, text, inputField);
 		return false;
 	});
 
