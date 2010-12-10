@@ -95,4 +95,20 @@ public interface CoreListener extends EventListener {
 	 */
 	public void markReplyKnown(Reply reply);
 
+	/**
+	 * Notifies a listener that the given post was removed.
+	 *
+	 * @param post
+	 *            The removed post
+	 */
+	public void postRemoved(Post post);
+
+	/**
+	 * Notifies a listener that the given reply was removed.
+	 *
+	 * @param reply
+	 *            The removed reply
+	 */
+	public void replyRemoved(Reply reply);
+
 }

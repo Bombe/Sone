@@ -449,16 +449,18 @@ function ajaxifyPost(postElement) {
 		inputField = $(this.form).find(":input:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		postReply(postId, text, function(success, error, replyId) {
-			if (success) {
-				$(inputField).val("");
-				loadNewReply(replyId);
-				markPostAsKnown(getPostElement(inputField));
-				$("#sone .post#" + postId + " .create-reply").addClass("hidden");
-			} else {
-				alert(error);
-			}
-		});
+		(function(postId, text, inputField) {
+			postReply(postId, text, function(success, error, replyId) {
+				if (success) {
+					$(inputField).val("");
+					loadNewReply(replyId);
+					markPostAsKnown(getPostElement(inputField));
+					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+				} else {
+					alert(error);
+				}
+			});
+		})(postId, text, inputField);
 		return false;
 	});
 
@@ -534,7 +536,7 @@ function ajaxifyReply(replyElement) {
 
 	/* mark post and all replies as known on click. */
 	$(replyElement).click(function() {
-		markPostAsKnown(getPostElement(replyElement));
+		markPostAsKnown(getPostElement(this));
 	});
 }
 
@@ -677,9 +679,12 @@ function loadNewPost(postId) {
 	if (postId in loadedPosts) {
 		return;
 	}
-	loadedPosts[postId] = true;
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
+			if (data.post.id in loadedPosts) {
+				return;
+			}
+			loadedPosts[data.post.id] = true;
 			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
@@ -707,10 +712,13 @@ function loadNewReply(replyId) {
 	if (replyId in loadedReplies) {
 		return;
 	}
-	loadedReplies[replyId] = true;
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
+			if (data.reply.id in loadedReplies) {
+				return;
+			}
+			loadedReplies[data.reply.id] = true;
 			$("#sone .post#" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {

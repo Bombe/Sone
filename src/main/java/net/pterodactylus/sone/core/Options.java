@@ -2,6 +2,7 @@ package net.pterodactylus.sone.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -93,7 +94,7 @@ public class Options {
 		private final T defaultValue;
 
 		/** The current value. */
-		private T value;
+		private volatile T value;
 
 		/** The option watcher. */
 		private final List<OptionWatcher<T>> optionWatchers = new ArrayList<OptionWatcher<T>>();
@@ -155,10 +156,10 @@ public class Options {
 	}
 
 	/** Holds all {@link Boolean} {@link Option}s. */
-	private final Map<String, Option<Boolean>> booleanOptions = new HashMap<String, Option<Boolean>>();
+	private final Map<String, Option<Boolean>> booleanOptions = Collections.synchronizedMap(new HashMap<String, Option<Boolean>>());
 
 	/** Holds all {@link Integer} {@link Option}s. */
-	private final Map<String, Option<Integer>> integerOptions = new HashMap<String, Option<Integer>>();
+	private final Map<String, Option<Integer>> integerOptions = Collections.synchronizedMap(new HashMap<String, Option<Integer>>());
 
 	/**
 	 * Adds a boolean option.

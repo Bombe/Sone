@@ -885,6 +885,9 @@ public class Core implements IdentityListener {
 				if (!soneRescueMode) {
 					for (Post post : storedSone.getPosts()) {
 						posts.remove(post.getId());
+						if (!sone.getPosts().contains(post)) {
+							coreListenerManager.firePostRemoved(post);
+						}
 					}
 				}
 				synchronized (newPosts) {
@@ -902,6 +905,9 @@ public class Core implements IdentityListener {
 				if (!soneRescueMode) {
 					for (Reply reply : storedSone.getReplies()) {
 						replies.remove(reply.getId());
+						if (!sone.getReplies().contains(reply)) {
+							coreListenerManager.fireReplyRemoved(reply);
+						}
 					}
 				}
 				synchronized (newReplies) {

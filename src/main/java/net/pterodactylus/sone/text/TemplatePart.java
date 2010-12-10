@@ -55,7 +55,7 @@ public class TemplatePart implements Part {
 	 *            The value of the variable
 	 * @return This template part (for method chaining)
 	 */
-	public TemplatePart set(String key, String value) {
+	public TemplatePart set(String key, Object value) {
 		template.set(key, value);
 		return this;
 	}

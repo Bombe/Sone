@@ -40,7 +40,7 @@ public class FreenetLinkParser implements Parser {
 	private static final Logger logger = Logging.getLogger(FreenetLinkParser.class);
 
 	/** Pattern to detect whitespace. */
-	private static final Pattern whitespacePattern = Pattern.compile("[\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]");
+	private static final Pattern whitespacePattern = Pattern.compile("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]");
 
 	/**
 	 * Enumeration for all recognized link types.
@@ -50,16 +50,46 @@ public class FreenetLinkParser implements Parser {
 	private enum LinkType {
 
 		/** Link is a KSK. */
-		KSK,
+		KSK(true),
 
 		/** Link is a CHK. */
-		CHK,
+		CHK(true),
 
 		/** Link is an SSK. */
-		SSK,
+		SSK(true),
 
 		/** Link is a USK. */
-		USK
+		USK(true),
+
+		/** Link is HTTP. */
+		HTTP(false),
+
+		/** Link is HTTPS. */
+		HTTPS(false);
+
+		/** Whether this link type links to freenet. */
+		private final boolean anonymous;
+
+		/**
+		 * Creates a new link type.
+		 *
+		 * @param anonymous
+		 *            {@code true} if this link type links to freenet,
+		 *            {@code false} otherwise
+		 */
+		private LinkType(boolean anonymous) {
+			this.anonymous = anonymous;
+		}
+
+		/**
+		 * Returns whether this link type links anonymously to within freenet.
+		 *
+		 * @return {@code true} if this link type links to within freenet,
+		 *         {@code false} otherwise
+		 */
+		public boolean isAnonymous() {
+			return anonymous;
+		}
 
 	}
 
@@ -84,6 +114,7 @@ public class FreenetLinkParser implements Parser {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("null")
 	public Part parse(Reader source) throws IOException {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = (source instanceof BufferedReader) ? (BufferedReader) source : new BufferedReader(source);
@@ -95,7 +126,9 @@ public class FreenetLinkParser implements Parser {
 				int nextChk = line.indexOf("CHK@");
 				int nextSsk = line.indexOf("SSK@");
 				int nextUsk = line.indexOf("USK@");
-				if ((nextKsk == -1) && (nextChk == -1) && (nextSsk == -1) && (nextUsk == -1)) {
+				int nextHttp = line.indexOf("http://");
+				int nextHttps = line.indexOf("https://");
+				if ((nextKsk == -1) && (nextChk == -1) && (nextSsk == -1) && (nextUsk == -1) && (nextHttp == -1) && (nextHttps == -1)) {
 					parts.add(createPlainTextPart(line));
 					break;
 				}
@@ -117,6 +150,14 @@ public class FreenetLinkParser implements Parser {
 					next = nextUsk;
 					linkType = LinkType.USK;
 				}
+				if ((nextHttp > -1) && (nextHttp < next)) {
+					next = nextHttp;
+					linkType = LinkType.HTTP;
+				}
+				if ((nextHttps > -1) && (nextHttps < next)) {
+					next = nextHttps;
+					linkType = LinkType.HTTPS;
+				}
 				if ((next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
 					next -= 8;
 					line = line.substring(0, next) + line.substring(next + 8);
@@ -127,12 +168,26 @@ public class FreenetLinkParser implements Parser {
 					parts.add(createPlainTextPart(line.substring(0, next)));
 					String link = line.substring(next, nextSpace);
 					String name = link;
-					logger.log(Level.FINER, "Found link: " + link);
+					logger.log(Level.FINER, "Found link: %s", link);
 					logger.log(Level.FINEST, "Next: %d, CHK: %d, SSK: %d, USK: %d", new Object[] { next, nextChk, nextSsk, nextUsk });
 					if (((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (link.length() > 98) && (link.charAt(47) == ',') && (link.charAt(91) == ',') && (link.charAt(99) == '/')) {
 						name = link.substring(0, 47) + "…" + link.substring(99);
+					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
+						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
+						int firstSlash = name.indexOf('/');
+						int lastSlash = name.lastIndexOf('/');
+						if ((lastSlash - firstSlash) > 3) {
+							name = name.substring(0, firstSlash + 1) + "…" + name.substring(lastSlash);
+						}
+						if (name.endsWith("/")) {
+							name = name.substring(0, name.length() - 1);
+						}
+						if (((name.indexOf('/') > -1) && (name.indexOf('.') < name.lastIndexOf('.', name.indexOf('/'))) || ((name.indexOf('/') == -1) && (name.indexOf('.') < name.lastIndexOf('.')))) && name.startsWith("www.")) {
+							name = name.substring(4);
+						}
+						link = "?_CHECKED_HTTP_=" + link;
 					}
-					parts.add(createLinkPart(link, name));
+					parts.add(createLinkPart(linkType.isAnonymous(), link, name));
 					line = line.substring(nextSpace);
 				} else {
 					parts.add(createPlainTextPart(line.substring(0, next + 4)));
@@ -161,14 +216,17 @@ public class FreenetLinkParser implements Parser {
 	/**
 	 * Creates a new link part based on a template.
 	 *
+	 * @param anonymous
+	 *            {@code true} if this link points to within freenet,
+	 *            {@code false} if it points to the internet
 	 * @param link
 	 *            The target of the link
 	 * @param name
 	 *            The name of the link
 	 * @return The part that displays the link
 	 */
-	private Part createLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a href=\"/<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+	private Part createLinkPart(boolean anonymous, String link, String name) {
+		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a <%if !anonymous>class=\"internet\" <%/if>href=\"<% link|html>\"><% name|html></a>"))).set("anonymous", anonymous).set("link", "/" + link).set("name", name);
 	}
 
 }

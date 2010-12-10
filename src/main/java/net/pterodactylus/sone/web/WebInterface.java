@@ -575,6 +575,22 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void postRemoved(Post post) {
+		/* TODO */
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void replyRemoved(Reply reply) {
+		/* TODO */
+	}
+
+	/**
 	 * Template provider implementation that uses
 	 * {@link WebInterface#createReader(String)} to load templates for
 	 * inclusion.

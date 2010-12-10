@@ -75,6 +75,9 @@ public class PostAccessor extends ReflectionAccessor {
 			return core.isNewPost(post.getId(), false);
 		} else if (member.equals("text")) {
 			String text = post.getText();
+			if (text == null) {
+				return null;
+			}
 			try {
 				return linkParser.parse(new StringReader(text));
 			} catch (IOException ioe1) {

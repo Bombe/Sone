@@ -145,4 +145,30 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 		}
 	}
 
+	/**
+	 * Notifies all listener that the given post was removed.
+	 *
+	 * @see CoreListener#postRemoved(Post)
+	 * @param post
+	 *            The removed post
+	 */
+	void firePostRemoved(Post post) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.postRemoved(post);
+		}
+	}
+
+	/**
+	 * Notifies all listener that the given reply was removed.
+	 *
+	 * @see CoreListener#replyRemoved(Reply)
+	 * @param reply
+	 *            The removed reply
+	 */
+	void fireReplyRemoved(Reply reply) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.replyRemoved(reply);
+		}
+	}
+
 }
