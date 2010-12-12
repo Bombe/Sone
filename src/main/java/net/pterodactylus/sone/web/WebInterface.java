@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -70,6 +71,7 @@ import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
@@ -84,7 +86,9 @@ import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import freenet.clients.http.SessionManager;
+import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
+import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
 
 /**
@@ -189,6 +193,87 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session.
+	 *
+	 * @param toadletContenxt
+	 *            The toadlet context
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	public Session getCurrentSession(ToadletContext toadletContenxt) {
+		return getCurrentSession(toadletContenxt, true);
+	}
+
+	/**
+	 * Returns the current session, creating a new session if there is no
+	 * current session and {@code create} is {@code true}.
+	 *
+	 * @param toadletContenxt
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if there is no current
+	 *            session, {@code false} otherwise
+	 * @return The current session, or {@code null} if there is no current
+	 *         session
+	 */
+	public Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
+		Session session = getSessionManager().useSession(toadletContenxt);
+		if (create && (session == null)) {
+			session = getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
+		}
+		return session;
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	public Sone getCurrentSone(ToadletContext toadletContext) {
+		return getCurrentSone(getCurrentSession(toadletContext));
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param session
+	 *            The session
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	public Sone getCurrentSone(Session session) {
+		if (session == null) {
+			return null;
+		}
+		String soneId = (String) session.getAttribute("Sone.CurrentSone");
+		if (soneId == null) {
+			return null;
+		}
+		return getCore().getLocalSone(soneId, false);
+	}
+
+	/**
+	 * Sets the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @param sone
+	 *            The Sone to set as currently logged in
+	 */
+	public void setCurrentSone(ToadletContext toadletContext, Sone sone) {
+		Session session = getCurrentSession(toadletContext);
+		if (sone == null) {
+			session.removeAttribute("Sone.CurrentSone");
+		} else {
+			session.setAttribute("Sone.CurrentSone", sone.getId());
+		}
+	}
+
+	/**
 	 * Returns the notification manager.
 	 *
 	 * @return The notification manager
@@ -242,6 +327,51 @@ public class WebInterface implements CoreListener {
 	 */
 	public Set<Reply> getNewReplies() {
 		return new HashSet<Reply>(newReplyNotification.getElements());
+	}
+
+	/**
+	 * Sets whether the current start of the plugin is the first start. It is
+	 * considered a first start if the configuration file does not exist.
+	 *
+	 * @param firstStart
+	 *            {@code true} if no configuration file existed when Sone was
+	 *            loaded, {@code false} otherwise
+	 */
+	public void setFirstStart(boolean firstStart) {
+		if (firstStart) {
+			Template firstStartNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/firstStartNotification.html"));
+			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
+			notificationManager.addNotification(firstStartNotification);
+		}
+	}
+
+	/**
+	 * Sets whether Sone was started with a fresh configuration file.
+	 *
+	 * @param newConfig
+	 *            {@code true} if Sone was started with a fresh configuration,
+	 *            {@code false} if the existing configuration could be read
+	 */
+	public void setNewConfig(boolean newConfig) {
+		if (newConfig && !hasFirstStartNotification()) {
+			Template configNotReadNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/configNotReadNotification.html"));
+			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
+			notificationManager.addNotification(configNotReadNotification);
+		}
+	}
+
+	//
+	// PRIVATE ACCESSORS
+	//
+
+	/**
+	 * Returns whether the first start notification is currently displayed.
+	 *
+	 * @return {@code true} if the first-start notification is currently
+	 *         displayed, {@code false} otherwise
+	 */
+	private boolean hasFirstStartNotification() {
+		return notificationManager.getNotification("first-start-notification") != null;
 	}
 
 	//
@@ -442,7 +572,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newSoneFound(Sone sone) {
 		newSoneNotification.add(sone);
-		notificationManager.addNotification(newSoneNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newSoneNotification);
+		}
 	}
 
 	/**
@@ -451,7 +583,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newPostFound(Post post) {
 		newPostNotification.add(post);
-		notificationManager.addNotification(newPostNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newPostNotification);
+		}
 	}
 
 	/**
@@ -463,7 +597,9 @@ public class WebInterface implements CoreListener {
 			return;
 		}
 		newReplyNotification.add(reply);
-		notificationManager.addNotification(newReplyNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newReplyNotification);
+		}
 	}
 
 	/**
