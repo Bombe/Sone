@@ -70,6 +70,7 @@ import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
@@ -242,6 +243,22 @@ public class WebInterface implements CoreListener {
 	 */
 	public Set<Reply> getNewReplies() {
 		return new HashSet<Reply>(newReplyNotification.getElements());
+	}
+
+	/**
+	 * Sets whether the current start of the plugin is the first start. It is
+	 * considered a first start if the configuration file does not exist.
+	 *
+	 * @param firstStart
+	 *            {@code true} if no configuration file existed when Sone was
+	 *            loaded, {@code false} otherwise
+	 */
+	public void setFirstStart(boolean firstStart) {
+		if (firstStart) {
+			Template firstStartNotificationTemplate = new Template(createReader("/templates/notify/firstStartNotification.html"));
+			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
+			notificationManager.addNotification(firstStartNotification);
+		}
 	}
 
 	//
