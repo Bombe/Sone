@@ -255,7 +255,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void setFirstStart(boolean firstStart) {
 		if (firstStart) {
-			Template firstStartNotificationTemplate = new Template(createReader("/templates/notify/firstStartNotification.html"));
+			Template firstStartNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/firstStartNotification.html"));
 			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
 			notificationManager.addNotification(firstStartNotification);
 		}
@@ -270,7 +270,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void setNewConfig(boolean newConfig) {
 		if (newConfig && !hasFirstStartNotification()) {
-			Template configNotReadNotificationTemplate = new Template(createReader("/templates/notify/configNotReadNotification.html"));
+			Template configNotReadNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/configNotReadNotification.html"));
 			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
 			notificationManager.addNotification(configNotReadNotification);
 		}
