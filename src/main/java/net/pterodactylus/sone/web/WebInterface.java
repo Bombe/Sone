@@ -488,7 +488,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newSoneFound(Sone sone) {
 		newSoneNotification.add(sone);
-		notificationManager.addNotification(newSoneNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newSoneNotification);
+		}
 	}
 
 	/**
@@ -497,7 +499,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newPostFound(Post post) {
 		newPostNotification.add(post);
-		notificationManager.addNotification(newPostNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newPostNotification);
+		}
 	}
 
 	/**
@@ -509,7 +513,9 @@ public class WebInterface implements CoreListener {
 			return;
 		}
 		newReplyNotification.add(reply);
-		notificationManager.addNotification(newReplyNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newReplyNotification);
+		}
 	}
 
 	/**
