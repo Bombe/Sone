@@ -148,10 +148,12 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		Configuration oldConfiguration;
 		Configuration newConfiguration = null;
 		boolean firstStart = !new File("sone.properties").exists();
+		boolean newConfig = false;
 		try {
 			oldConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), false));
 			newConfiguration = oldConfiguration;
 		} catch (ConfigurationException ce1) {
+			newConfig = true;
 			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…", ce1);
 			try {
 				newConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), true));
@@ -183,6 +185,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		/* create the web interface. */
 		webInterface = new WebInterface(this);
 		webInterface.setFirstStart(firstStart);
+		webInterface.setNewConfig(newConfig);
 		core.addCoreListener(webInterface);
 
 		/* create the identity manager. */

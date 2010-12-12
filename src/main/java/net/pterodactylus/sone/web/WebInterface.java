@@ -261,6 +261,21 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
+	/**
+	 * Sets whether Sone was started with a fresh configuration file.
+	 *
+	 * @param newConfig
+	 *            {@code true} if Sone was started with a fresh configuration,
+	 *            {@code false} if the existing configuration could be read
+	 */
+	public void setNewConfig(boolean newConfig) {
+		if (newConfig && (notificationManager.getNotification("first-start-notification") == null)) {
+			Template configNotReadNotificationTemplate = new Template(createReader("/templates/notify/configNotReadNotification.html"));
+			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
+			notificationManager.addNotification(configNotReadNotification);
+		}
+	}
+
 	//
 	// ACTIONS
 	//
