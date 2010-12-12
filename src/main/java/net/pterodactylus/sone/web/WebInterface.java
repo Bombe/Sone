@@ -269,7 +269,7 @@ public class WebInterface implements CoreListener {
 	 *            {@code false} if the existing configuration could be read
 	 */
 	public void setNewConfig(boolean newConfig) {
-		if (newConfig && (notificationManager.getNotification("first-start-notification") == null)) {
+		if (newConfig && hasFirstStartNotification()) {
 			Template configNotReadNotificationTemplate = new Template(createReader("/templates/notify/configNotReadNotification.html"));
 			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
 			notificationManager.addNotification(configNotReadNotification);
