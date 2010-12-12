@@ -71,6 +71,7 @@ import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
@@ -328,6 +329,51 @@ public class WebInterface implements CoreListener {
 		return new HashSet<Reply>(newReplyNotification.getElements());
 	}
 
+	/**
+	 * Sets whether the current start of the plugin is the first start. It is
+	 * considered a first start if the configuration file does not exist.
+	 *
+	 * @param firstStart
+	 *            {@code true} if no configuration file existed when Sone was
+	 *            loaded, {@code false} otherwise
+	 */
+	public void setFirstStart(boolean firstStart) {
+		if (firstStart) {
+			Template firstStartNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/firstStartNotification.html"));
+			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
+			notificationManager.addNotification(firstStartNotification);
+		}
+	}
+
+	/**
+	 * Sets whether Sone was started with a fresh configuration file.
+	 *
+	 * @param newConfig
+	 *            {@code true} if Sone was started with a fresh configuration,
+	 *            {@code false} if the existing configuration could be read
+	 */
+	public void setNewConfig(boolean newConfig) {
+		if (newConfig && !hasFirstStartNotification()) {
+			Template configNotReadNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/configNotReadNotification.html"));
+			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
+			notificationManager.addNotification(configNotReadNotification);
+		}
+	}
+
+	//
+	// PRIVATE ACCESSORS
+	//
+
+	/**
+	 * Returns whether the first start notification is currently displayed.
+	 *
+	 * @return {@code true} if the first-start notification is currently
+	 *         displayed, {@code false} otherwise
+	 */
+	private boolean hasFirstStartNotification() {
+		return notificationManager.getNotification("first-start-notification") != null;
+	}
+
 	//
 	// ACTIONS
 	//
@@ -526,7 +572,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newSoneFound(Sone sone) {
 		newSoneNotification.add(sone);
-		notificationManager.addNotification(newSoneNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newSoneNotification);
+		}
 	}
 
 	/**
@@ -535,7 +583,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newPostFound(Post post) {
 		newPostNotification.add(post);
-		notificationManager.addNotification(newPostNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newPostNotification);
+		}
 	}
 
 	/**
@@ -547,7 +597,9 @@ public class WebInterface implements CoreListener {
 			return;
 		}
 		newReplyNotification.add(reply);
-		notificationManager.addNotification(newReplyNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newReplyNotification);
+		}
 	}
 
 	/**
