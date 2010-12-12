@@ -92,14 +92,16 @@ public class GetReplyAjaxPage extends JsonPage {
 		jsonReply.put("postId", reply.getPost().getId());
 		jsonReply.put("soneId", reply.getSone().getId());
 		jsonReply.put("time", reply.getTime());
-		replyTemplate.set("reply", reply);
 		StringWriter stringWriter = new StringWriter();
-		try {
-			replyTemplate.render(stringWriter);
-		} catch (TemplateException te1) {
-			/* TODO - shouldn’t happen. */
-		} finally {
-			Closer.close(stringWriter);
+		synchronized (replyTemplate) {
+			replyTemplate.set("reply", reply);
+			try {
+				replyTemplate.render(stringWriter);
+			} catch (TemplateException te1) {
+				/* TODO - shouldn’t happen. */
+			} finally {
+				Closer.close(stringWriter);
+			}
 		}
 		return jsonReply.put("html", stringWriter.toString());
 	}

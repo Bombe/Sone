@@ -90,14 +90,16 @@ public class GetPostAjaxPage extends JsonPage {
 		jsonPost.put("sone", post.getSone().getId());
 		jsonPost.put("recipient", (post.getRecipient() == null) ? null : post.getRecipient().getId());
 		jsonPost.put("time", post.getTime());
-		postTemplate.set("post", post);
 		StringWriter stringWriter = new StringWriter();
-		try {
-			postTemplate.render(stringWriter);
-		} catch (TemplateException te1) {
-			/* TODO - shouldn’t happen. */
-		} finally {
-			Closer.close(stringWriter);
+		synchronized (postTemplate) {
+			postTemplate.set("post", post);
+			try {
+				postTemplate.render(stringWriter);
+			} catch (TemplateException te1) {
+				/* TODO - shouldn’t happen. */
+			} finally {
+				Closer.close(stringWriter);
+			}
 		}
 		jsonPost.put("html", stringWriter.toString());
 		return jsonPost;
