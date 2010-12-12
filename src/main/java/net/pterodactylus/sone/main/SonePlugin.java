@@ -184,8 +184,6 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 		/* create the web interface. */
 		webInterface = new WebInterface(this);
-		webInterface.setFirstStart(firstStart);
-		webInterface.setNewConfig(newConfig);
 		core.addCoreListener(webInterface);
 
 		/* create the identity manager. */
@@ -200,6 +198,8 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 				core.setConfiguration(newConfiguration);
 			}
 			webInterface.start();
+			webInterface.setFirstStart(firstStart);
+			webInterface.setNewConfig(newConfig);
 			identityManager.start();
 			startupFailed = false;
 		} finally {
