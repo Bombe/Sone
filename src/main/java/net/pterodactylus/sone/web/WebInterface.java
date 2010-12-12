@@ -277,6 +277,20 @@ public class WebInterface implements CoreListener {
 	}
 
 	//
+	// PRIVATE ACCESSORS
+	//
+
+	/**
+	 * Returns whether the first start notification is currently displayed.
+	 *
+	 * @return {@code true} if the first-start notification is currently
+	 *         displayed, {@code false} otherwise
+	 */
+	private boolean hasFirstStartNotification() {
+		return notificationManager.getNotification("first-start-notification") != null;
+	}
+
+	//
 	// ACTIONS
 	//
 
