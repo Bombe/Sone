@@ -145,6 +145,9 @@ public class Core implements IdentityListener {
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
 
+	/** Trusted identities, sorted by own identities. */
+	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+
 	/**
 	 * Creates a new core.
 	 *
@@ -498,6 +501,19 @@ public class Core implements IdentityListener {
 	 */
 	public boolean isModifiedSone(Sone sone) {
 		return (soneInserters.containsKey(sone)) ? soneInserters.get(sone).isModified() : false;
+	}
+
+	/**
+	 * Returns whether the target Sone is trusted by the origin Sone.
+	 *
+	 * @param origin
+	 *            The origin Sone
+	 * @param target
+	 *            The target Sone
+	 * @return {@code true} if the target Sone is trusted by the origin Sone
+	 */
+	public boolean isSoneTrusted(Sone origin, Sone target) {
+		return trustedIdentities.containsKey(origin) && trustedIdentities.get(origin.getIdentity()).contains(target);
 	}
 
 	/**
@@ -1566,6 +1582,7 @@ public class Core implements IdentityListener {
 	public void ownIdentityAdded(OwnIdentity ownIdentity) {
 		logger.log(Level.FINEST, "Adding OwnIdentity: " + ownIdentity);
 		if (ownIdentity.hasContext("Sone")) {
+			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			addLocalSone(ownIdentity);
 		}
 	}
@@ -1576,6 +1593,7 @@ public class Core implements IdentityListener {
 	@Override
 	public void ownIdentityRemoved(OwnIdentity ownIdentity) {
 		logger.log(Level.FINEST, "Removing OwnIdentity: " + ownIdentity);
+		trustedIdentities.remove(ownIdentity);
 	}
 
 	/**
@@ -1584,6 +1602,7 @@ public class Core implements IdentityListener {
 	@Override
 	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
 		logger.log(Level.FINEST, "Adding Identity: " + identity);
+		trustedIdentities.get(ownIdentity).add(identity);
 		addRemoteSone(identity);
 	}
 
@@ -1608,7 +1627,7 @@ public class Core implements IdentityListener {
 	 */
 	@Override
 	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
-		/* TODO */
+		trustedIdentities.get(ownIdentity).remove(identity);
 	}
 
 }
