@@ -1582,7 +1582,7 @@ public class Core implements IdentityListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityAdded(Identity identity) {
+	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
 		logger.log(Level.FINEST, "Adding Identity: " + identity);
 		addRemoteSone(identity);
 	}
@@ -1591,7 +1591,7 @@ public class Core implements IdentityListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityUpdated(final Identity identity) {
+	public void identityUpdated(OwnIdentity ownIdentity, final Identity identity) {
 		new Thread(new Runnable() {
 
 			@Override
@@ -1607,7 +1607,7 @@ public class Core implements IdentityListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityRemoved(Identity identity) {
+	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
 		/* TODO */
 	}
 
