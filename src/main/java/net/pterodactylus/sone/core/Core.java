@@ -1117,7 +1117,7 @@ public class Core implements IdentityListener {
 	 * @param sone
 	 *            The Sone to save
 	 */
-	public void saveSone(Sone sone) {
+	public synchronized void saveSone(Sone sone) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
 			return;
@@ -1409,7 +1409,7 @@ public class Core implements IdentityListener {
 	/**
 	 * Saves the current options.
 	 */
-	public void saveConfiguration() {
+	public synchronized void saveConfiguration() {
 		/* store the options first. */
 		try {
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
