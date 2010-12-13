@@ -585,6 +585,8 @@ public class WebInterface implements CoreListener {
 		newPostNotification.add(post);
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newPostNotification);
+		} else {
+			getCore().markPostKnown(post);
 		}
 	}
 
@@ -599,6 +601,8 @@ public class WebInterface implements CoreListener {
 		newReplyNotification.add(reply);
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newReplyNotification);
+		} else {
+			getCore().markReplyKnown(reply);
 		}
 	}
 
