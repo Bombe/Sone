@@ -710,7 +710,9 @@ public class Core implements IdentityListener {
 	 */
 	public void lockSone(Sone sone) {
 		synchronized (lockedSones) {
-			lockedSones.add(sone);
+			if (lockedSones.add(sone)) {
+				coreListenerManager.fireSoneLocked(sone);
+			}
 		}
 	}
 
@@ -723,7 +725,9 @@ public class Core implements IdentityListener {
 	 */
 	public void unlockSone(Sone sone) {
 		synchronized (lockedSones) {
-			lockedSones.remove(sone);
+			if (lockedSones.remove(sone)) {
+				coreListenerManager.fireSoneUnlocked(sone);
+			}
 		}
 	}
 
