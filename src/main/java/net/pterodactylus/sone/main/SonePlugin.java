@@ -224,6 +224,8 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 			/* stop the identity manager. */
 			identityManager.stop();
+		} catch (Throwable t1) {
+			logger.log(Level.SEVERE, "Error while shutting down!", t1);
 		} finally {
 			/* shutdown logger. */
 			Logging.shutdown();
