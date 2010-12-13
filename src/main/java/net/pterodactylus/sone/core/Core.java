@@ -1187,6 +1187,7 @@ public class Core implements IdentityListener {
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
+			configuration.save();
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
