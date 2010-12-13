@@ -90,9 +90,9 @@ public class WebOfTrustConnector implements ConnectorListener {
 			String requestUri = fields.get("RequestURI" + ownIdentityCounter);
 			String insertUri = fields.get("InsertURI" + ownIdentityCounter);
 			String nickname = fields.get("Nickname" + ownIdentityCounter);
-			OwnIdentity ownIdentity = new OwnIdentity(id, nickname, requestUri, insertUri);
-			ownIdentity.setContexts(parseContexts("Contexts" + ownIdentityCounter + ".", fields));
-			ownIdentity.setProperties(parseProperties("Properties" + ownIdentityCounter + ".", fields));
+			DefaultOwnIdentity ownIdentity = new DefaultOwnIdentity(this, id, nickname, requestUri, insertUri);
+			ownIdentity.setContextsPrivate(parseContexts("Contexts" + ownIdentityCounter + ".", fields));
+			ownIdentity.setPropertiesPrivate(parseProperties("Properties" + ownIdentityCounter + ".", fields));
 			ownIdentities.add(ownIdentity);
 		}
 		return ownIdentities;
@@ -136,9 +136,9 @@ public class WebOfTrustConnector implements ConnectorListener {
 			}
 			String nickname = fields.get("Nickname" + identityCounter);
 			String requestUri = fields.get("RequestURI" + identityCounter);
-			Identity identity = new Identity(id, nickname, requestUri);
-			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
-			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
+			DefaultIdentity identity = new DefaultIdentity(id, nickname, requestUri);
+			identity.setContextsPrivate(parseContexts("Contexts" + identityCounter + ".", fields));
+			identity.setPropertiesPrivate(parseProperties("Properties" + identityCounter + ".", fields));
 			identities.add(identity);
 		}
 		return identities;

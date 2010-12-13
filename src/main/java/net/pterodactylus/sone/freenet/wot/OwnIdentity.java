@@ -17,45 +17,95 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import java.util.Map;
+import java.util.Set;
+
 /**
- * An own identity is an identity that the owner of the node has full control
- * over.
+ * Defines a local identity, an own identity.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class OwnIdentity extends Identity {
-
-	/** The insert URI of the identity. */
-	private final String insertUri;
-
-	/**
-	 * Creates a new own identity.
-	 *
-	 * @param id
-	 *            The ID of the identity
-	 * @param nickname
-	 *            The nickname of the identity
-	 * @param requestUri
-	 *            The request URI of the identity
-	 * @param insertUri
-	 *            The insert URI of the identity
-	 */
-	public OwnIdentity(String id, String nickname, String requestUri, String insertUri) {
-		super(id, nickname, requestUri);
-		this.insertUri = insertUri;
-	}
-
-	//
-	// ACCESSORS
-	//
+public interface OwnIdentity extends Identity {
 
 	/**
 	 * Returns the insert URI of the identity.
 	 *
 	 * @return The insert URI of the identity
 	 */
-	public String getInsertUri() {
-		return insertUri;
-	}
+	public String getInsertUri();
+
+	/**
+	 * Adds the given context to this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param context
+	 *            The context to add
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void addContext(String context) throws WebOfTrustException;
+
+	/**
+	 * Sets all contexts of this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param contexts
+	 *            All contexts of the identity
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void setContexts(Set<String> contexts) throws WebOfTrustException;
+
+	/**
+	 * Removes the given context from this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param context
+	 *            The context to remove
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void removeContext(String context) throws WebOfTrustException;
+
+	/**
+	 * Sets the property with the given name to the given value.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param name
+	 *            The name of the property
+	 * @param value
+	 *            The value of the property
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void setProperty(String name, String value) throws WebOfTrustException;
+
+	/**
+	 * Sets all properties of this identity.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param properties
+	 *            The new properties of this identity
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void setProperties(Map<String, String> properties) throws WebOfTrustException;
+
+	/**
+	 * Removes the property with the given name.
+	 * <p>
+	 * This method is only called by the {@link IdentityManager}.
+	 *
+	 * @param name
+	 *            The name of the property to remove
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void removeProperty(String name) throws WebOfTrustException;
 
 }

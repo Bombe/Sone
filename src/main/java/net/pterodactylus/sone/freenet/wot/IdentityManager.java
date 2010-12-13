@@ -160,89 +160,9 @@ public class IdentityManager extends AbstractService {
 			}
 			checkOwnIdentities(newOwnIdentities);
 			return ownIdentities;
-		} catch (PluginException pe1) {
-			logger.log(Level.WARNING, "Could not load all own identities!", pe1);
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not load all own identities!", wote1);
 			return Collections.emptySet();
-		}
-	}
-
-	//
-	// ACTIONS
-	//
-
-	/**
-	 * Adds a context to the given own identity.
-	 *
-	 * @param ownIdentity
-	 *            The own identity
-	 * @param context
-	 *            The context to add
-	 */
-	public void addContext(OwnIdentity ownIdentity, String context) {
-		if (ownIdentity.hasContext(context)) {
-			return;
-		}
-		try {
-			webOfTrustConnector.addContext(ownIdentity, context);
-			ownIdentity.addContext(context);
-		} catch (PluginException pe1) {
-			logger.log(Level.WARNING, "Could not add context " + context + " to OwnIdentity " + ownIdentity + ".", pe1);
-		}
-	}
-
-	/**
-	 * Removes a context from the given own identity.
-	 *
-	 * @param ownIdentity
-	 *            The own identity
-	 * @param context
-	 *            The context to remove
-	 */
-	public void removeContext(OwnIdentity ownIdentity, String context) {
-		if (!ownIdentity.hasContext(context)) {
-			return;
-		}
-		try {
-			webOfTrustConnector.removeContext(ownIdentity, context);
-			ownIdentity.removeContext(context);
-		} catch (PluginException pe1) {
-			logger.log(Level.WARNING, "Could not remove context " + context + " from OwnIdentity " + ownIdentity + ".", pe1);
-		}
-	}
-
-	/**
-	 * Sets the property with the given name to the given value.
-	 *
-	 * @param ownIdentity
-	 *            The own identity
-	 * @param name
-	 *            The name of the property
-	 * @param value
-	 *            The value of the property
-	 */
-	public void setProperty(OwnIdentity ownIdentity, String name, String value) {
-		try {
-			webOfTrustConnector.setProperty(ownIdentity, name, value);
-			ownIdentity.setProperty(name, value);
-		} catch (PluginException pe1) {
-			logger.log(Level.WARNING, "Could not set property “" + name + "” to “" + value + "” for OwnIdentity: " + ownIdentity, pe1);
-		}
-	}
-
-	/**
-	 * Removes the property with the given name.
-	 *
-	 * @param ownIdentity
-	 *            The own identity
-	 * @param name
-	 *            The name of the property to remove
-	 */
-	public void removeProperty(OwnIdentity ownIdentity, String name) {
-		try {
-			webOfTrustConnector.removeProperty(ownIdentity, name);
-			ownIdentity.removeProperty(name);
-		} catch (PluginException pe1) {
-			logger.log(Level.WARNING, "Could not remove property “" + name + "” from OwnIdentity: " + ownIdentity, pe1);
 		}
 	}
 
@@ -255,15 +175,14 @@ public class IdentityManager extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		Map<String, Identity> oldIdentities = Collections.emptyMap();
+		Map<OwnIdentity, Map<String, Identity>> oldIdentities = Collections.emptyMap();
 		while (!shouldStop()) {
-			Map<String, Identity> currentIdentities = new HashMap<String, Identity>();
+			Map<OwnIdentity, Map<String, Identity>> currentIdentities = new HashMap<OwnIdentity, Map<String, Identity>>();
 			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
-			/* get all identities with the wanted context from WoT. */
-			Set<OwnIdentity> ownIdentities;
 			try {
-				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
+				/* get all identities with the wanted context from WoT. */
+				Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
 
 				/* check for changes. */
 				for (OwnIdentity ownIdentity : ownIdentities) {
@@ -272,76 +191,80 @@ public class IdentityManager extends AbstractService {
 				checkOwnIdentities(currentOwnIdentities);
 
 				/* now filter for context and get all identities. */
-				currentOwnIdentities.clear();
 				for (OwnIdentity ownIdentity : ownIdentities) {
 					if ((context != null) && !ownIdentity.hasContext(context)) {
 						continue;
 					}
-					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
-					for (Identity identity : webOfTrustConnector.loadTrustedIdentities(ownIdentity, context)) {
-						currentIdentities.put(identity.getId(), identity);
-					}
-				}
 
-				/* find removed identities. */
-				for (Identity oldIdentity : oldIdentities.values()) {
-					if (!currentIdentities.containsKey(oldIdentity.getId())) {
-						identityListenerManager.fireIdentityRemoved(oldIdentity);
+					Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context);
+					Map<String, Identity> identities = new HashMap<String, Identity>();
+					currentIdentities.put(ownIdentity, identities);
+					for (Identity identity : trustedIdentities) {
+						identities.put(identity.getId(), identity);
 					}
-				}
 
-				/* find new identities. */
-				for (Identity currentIdentity : currentIdentities.values()) {
-					if (!oldIdentities.containsKey(currentIdentity.getId())) {
-						identityListenerManager.fireIdentityAdded(currentIdentity);
-					}
-				}
-
-				/* check for changes in the contexts. */
-				for (Identity oldIdentity : oldIdentities.values()) {
-					if (!currentIdentities.containsKey(oldIdentity.getId())) {
-						continue;
-					}
-					Identity newIdentity = currentIdentities.get(oldIdentity.getId());
-					Set<String> oldContexts = oldIdentity.getContexts();
-					Set<String> newContexts = newIdentity.getContexts();
-					if (oldContexts.size() != newContexts.size()) {
-						identityListenerManager.fireIdentityUpdated(newIdentity);
-						continue;
-					}
-					for (String oldContext : oldContexts) {
-						if (!newContexts.contains(oldContext)) {
-							identityListenerManager.fireIdentityUpdated(newIdentity);
-							break;
+					/* find new identities. */
+					for (Identity currentIdentity : currentIdentities.get(ownIdentities).values()) {
+						if (!oldIdentities.containsKey(currentIdentity.getId())) {
+							identityListenerManager.fireIdentityAdded(ownIdentity, currentIdentity);
 						}
 					}
-				}
 
-				/* check for changes in the properties. */
-				for (Identity oldIdentity : oldIdentities.values()) {
-					if (!currentIdentities.containsKey(oldIdentity.getId())) {
-						continue;
-					}
-					Identity newIdentity = currentIdentities.get(oldIdentity.getId());
-					Map<String, String> oldProperties = oldIdentity.getProperties();
-					Map<String, String> newProperties = newIdentity.getProperties();
-					if (oldProperties.size() != newProperties.size()) {
-						identityListenerManager.fireIdentityUpdated(newIdentity);
-						continue;
-					}
-					for (Entry<String, String> oldProperty : oldProperties.entrySet()) {
-						if (!newProperties.containsKey(oldProperty.getKey()) || !newProperties.get(oldProperty.getKey()).equals(oldProperty.getValue())) {
-							identityListenerManager.fireIdentityUpdated(newIdentity);
-							break;
+					/* find removed identities. */
+					if (oldIdentities.containsKey(ownIdentity)) {
+						for (Identity oldIdentity : oldIdentities.get(ownIdentities).values()) {
+							if (!currentIdentities.containsKey(oldIdentity.getId())) {
+								identityListenerManager.fireIdentityRemoved(ownIdentity, oldIdentity);
+							}
+						}
+
+						/* check for changes in the contexts. */
+						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
+							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
+								continue;
+							}
+							Identity newIdentity = currentIdentities.get(ownIdentity).get(oldIdentity.getId());
+							Set<String> oldContexts = oldIdentity.getContexts();
+							Set<String> newContexts = newIdentity.getContexts();
+							if (oldContexts.size() != newContexts.size()) {
+								identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+								continue;
+							}
+							for (String oldContext : oldContexts) {
+								if (!newContexts.contains(oldContext)) {
+									identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+									break;
+								}
+							}
+						}
+
+						/* check for changes in the properties. */
+						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
+							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
+								continue;
+							}
+							Identity newIdentity = currentIdentities.get(ownIdentity).get(oldIdentity.getId());
+							Map<String, String> oldProperties = oldIdentity.getProperties();
+							Map<String, String> newProperties = newIdentity.getProperties();
+							if (oldProperties.size() != newProperties.size()) {
+								identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+								continue;
+							}
+							for (Entry<String, String> oldProperty : oldProperties.entrySet()) {
+								if (!newProperties.containsKey(oldProperty.getKey()) || !newProperties.get(oldProperty.getKey()).equals(oldProperty.getValue())) {
+									identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+									break;
+								}
+							}
 						}
 					}
+
+					/* remember the current set of identities. */
+					oldIdentities = currentIdentities;
 				}
 
-				/* remember the current set of identities. */
-				oldIdentities = currentIdentities;
-
-			} catch (PluginException pe1) {
-				logger.log(Level.WARNING, "WoT has disappeared!", pe1);
+			} catch (WebOfTrustException wote1) {
+				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
 			}
 
 			/* wait a minute before checking again. */
