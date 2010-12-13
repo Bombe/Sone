@@ -229,7 +229,6 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 			/* stop the identity manager. */
 			identityManager.stop();
 
-			/* TODO wait for core to stop? */
 			try {
 				pluginRespirator.putStore(pluginStore);
 			} catch (DatabaseDisabledException dde1) {
