@@ -15,9 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.wot;
+package net.pterodactylus.sone.freenet.plugin;
 
 import java.util.EventListener;
+
 
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;

@@ -25,6 +25,9 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.freenet.plugin.ConnectorListener;
+import net.pterodactylus.sone.freenet.plugin.PluginConnector;
+import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.logging.Logging;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
@@ -71,10 +74,10 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * Loads all own identities from the Web of Trust plugin.
 	 *
 	 * @return All own identity
-	 * @throws PluginException
+	 * @throws WebOfTrustException
 	 *             if the own identities can not be loaded
 	 */
-	public Set<OwnIdentity> loadAllOwnIdentities() throws PluginException {
+	public Set<OwnIdentity> loadAllOwnIdentities() throws WebOfTrustException {
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetOwnIdentities").get(), "OwnIdentities");
 		SimpleFieldSet fields = reply.getFields();
 		int ownIdentityCounter = -1;
