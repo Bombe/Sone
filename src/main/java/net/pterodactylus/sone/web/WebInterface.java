@@ -647,6 +647,22 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneLocked(Sone sone) {
+		/* TODO */
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneUnlocked(Sone sone) {
+		/* TODO */
+	}
+
+	/**
 	 * Template provider implementation that uses
 	 * {@link WebInterface#createReader(String)} to load templates for
 	 * inclusion.
