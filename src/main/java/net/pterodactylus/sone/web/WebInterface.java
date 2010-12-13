@@ -23,8 +23,11 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -132,6 +135,12 @@ public class WebInterface implements CoreListener {
 	/** The “Sone rescued” notification. */
 	private final ListNotification<Sone> sonesRescuedNotification;
 
+	/** Sone locked notification ticker objects. */
+	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
+
+	/** The “Sone locked” notification. */
+	private final ListNotification<Sone> lockedSonesNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -177,6 +186,9 @@ public class WebInterface implements CoreListener {
 
 		Template sonesRescuedTemplate = templateFactory.createTemplate(createReader("/templates/notify/sonesRescuedNotification.html"));
 		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
+
+		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
+		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
 	}
 
 	//
@@ -650,8 +662,17 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void soneLocked(Sone sone) {
-		/* TODO */
+	public void soneLocked(final Sone sone) {
+		Object tickerObject = Ticker.getInstance().registerEvent(System.currentTimeMillis() + (5 * 60) * 1000, new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				lockedSonesNotification.add(sone);
+				notificationManager.addNotification(lockedSonesNotification);
+			}
+		}, "Sone Locked Notification");
+		lockedSonesTickerObjects.put(sone, tickerObject);
 	}
 
 	/**
@@ -659,7 +680,12 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void soneUnlocked(Sone sone) {
-		/* TODO */
+		Object tickerObject = lockedSonesTickerObjects.remove(sone);
+		if (tickerObject == null) {
+			return;
+		}
+		lockedSonesNotification.remove(sone);
+		Ticker.getInstance().deregisterEvent(tickerObject);
 	}
 
 	/**
