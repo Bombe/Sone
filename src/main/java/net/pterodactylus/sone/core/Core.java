@@ -40,6 +40,7 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -818,7 +819,12 @@ public class Core implements IdentityListener {
 	 * @return The created Sone
 	 */
 	public Sone createSone(OwnIdentity ownIdentity) {
-		identityManager.addContext(ownIdentity, "Sone");
+		try {
+			ownIdentity.addContext("Sone");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.SEVERE, "Could not add “Sone” context to own identity: " + ownIdentity, wote1);
+			return null;
+		}
 		Sone sone = addLocalSone(ownIdentity);
 		return sone;
 	}
@@ -972,8 +978,12 @@ public class Core implements IdentityListener {
 			localSones.remove(sone.getId());
 			soneInserters.remove(sone).stop();
 		}
-		identityManager.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
-		identityManager.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
+		try {
+			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
+			((OwnIdentity) sone.getIdentity()).removeProperty("Sone.LatestEdition");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not remove context and properties from Sone: " + sone, wote1);
+		}
 		try {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
@@ -1128,8 +1138,9 @@ public class Core implements IdentityListener {
 		}
 
 		logger.log(Level.INFO, "Saving Sone: %s", sone);
-		identityManager.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 		try {
+			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
 			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
@@ -1190,6 +1201,8 @@ public class Core implements IdentityListener {
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set WoT property for Sone: " + sone, wote1);
 		}
 	}
 
