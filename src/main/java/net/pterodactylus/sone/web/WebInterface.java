@@ -647,7 +647,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void postRemoved(Post post) {
-		/* TODO */
+		newPostNotification.remove(post);
 	}
 
 	/**
@@ -655,7 +655,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void replyRemoved(Reply reply) {
-		/* TODO */
+		newReplyNotification.remove(reply);
 	}
 
 	/**
