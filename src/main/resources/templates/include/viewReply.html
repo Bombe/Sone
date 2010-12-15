@@ -3,6 +3,12 @@
 	<div class="reply-time hidden"><% reply.time|html></div>
 	<div class="avatar">
 		<img src="/WoT/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
+		<%if !reply.sone.current>
+			<br />
+			<%ifnull !post.sone.trust.explicit><span class="trust"><% post.sone.trust.explicit></span><%/if>
+			<%ifnull !post.sone.trust.implicit><span class="score"><% post.sone.trust.implicit></span><%/if>
+			<%ifnull !post.sone.trust.distance><span class="rank"><% post.sone.trust.distance></span><%/if>
+		<%/if>
 	</div>
 	<div class="inner-part">
 		<div>
