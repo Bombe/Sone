@@ -40,6 +40,7 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
@@ -886,6 +887,28 @@ public class Core implements IdentityListener {
 
 			}, "Sone Downloader").start();
 			return sone;
+		}
+	}
+
+	/**
+	 * Retrieves the trust relationship from the origin to the target.
+	 *
+	 * @param origin
+	 *            The origin of the trust tree
+	 * @param target
+	 *            The target of the trust
+	 * @return The trust relationship
+	 */
+	public Trust getTrust(Sone origin, Sone target) {
+		if (!isLocalSone(origin)) {
+			logger.log(Level.WARNING, "Tried to get trust from remote Sone: %s", origin);
+			return null;
+		}
+		try {
+			return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not get trust for Sone: " + target, wote1);
+			return null;
 		}
 	}
 
