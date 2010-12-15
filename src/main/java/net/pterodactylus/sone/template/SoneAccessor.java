@@ -89,6 +89,9 @@ public class SoneAccessor extends ReflectionAccessor {
 			return core.isNewSone(sone);
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
+		} else if (member.equals("trust")) {
+			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			return core.getTrust(currentSone, sone);
 		}
 		return super.get(dataProvider, object, member);
 	}
