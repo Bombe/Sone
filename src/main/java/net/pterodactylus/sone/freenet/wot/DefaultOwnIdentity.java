@@ -50,7 +50,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	 *            The insert URI of the identity
 	 */
 	public DefaultOwnIdentity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri, String insertUri) {
-		super(id, nickname, requestUri);
+		super(webOfTrustConnector, id, nickname, requestUri);
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.insertUri = insertUri;
 	}

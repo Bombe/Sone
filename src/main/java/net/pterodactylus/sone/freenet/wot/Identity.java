@@ -83,4 +83,15 @@ public interface Identity {
 	 */
 	public String getProperty(String name);
 
+	/**
+	 * Retrieves the trust that this identity receives from the given own
+	 * identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to get the trust for
+	 * @return The trust assigned to this identity
+	 * @throws WebOfTrustException
+	 */
+	public Trust getTrust(OwnIdentity ownIdentity) throws WebOfTrustException;
+
 }

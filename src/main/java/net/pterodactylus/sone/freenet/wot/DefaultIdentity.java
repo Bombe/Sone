@@ -23,12 +23,23 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.pterodactylus.sone.freenet.plugin.PluginException;
+import net.pterodactylus.util.cache.Cache;
+import net.pterodactylus.util.cache.CacheException;
+import net.pterodactylus.util.cache.CacheItem;
+import net.pterodactylus.util.cache.DefaultCacheItem;
+import net.pterodactylus.util.cache.MemoryCache;
+import net.pterodactylus.util.cache.ValueRetriever;
+
 /**
  * A Web of Trust identity.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultIdentity implements Identity {
+
+	/** The web of trust connector. */
+	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The ID of the identity. */
 	private final String id;
@@ -45,9 +56,26 @@ public class DefaultIdentity implements Identity {
 	/** The properties of the identity. */
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
+	/** Cached trust. */
+	private final Cache<OwnIdentity, Trust> trustCache = new MemoryCache<OwnIdentity, Trust>(new ValueRetriever<OwnIdentity, Trust>() {
+
+		@Override
+		@SuppressWarnings("synthetic-access")
+		public CacheItem<Trust> retrieve(OwnIdentity ownIdentity) throws CacheException {
+			try {
+				return new DefaultCacheItem<Trust>(webOfTrustConnector.getTrust(ownIdentity, DefaultIdentity.this));
+			} catch (PluginException pe1) {
+				throw new CacheException("Could not retrieve trust for OwnIdentity: " + ownIdentity, pe1);
+			}
+		}
+
+	});
+
 	/**
 	 * Creates a new identity.
 	 *
+	 * @param webOfTrustConnector
+	 *            The web of trust connector
 	 * @param id
 	 *            The ID of the identity
 	 * @param nickname
@@ -55,7 +83,8 @@ public class DefaultIdentity implements Identity {
 	 * @param requestUri
 	 *            The request URI of the identity
 	 */
-	public DefaultIdentity(String id, String nickname, String requestUri) {
+	public DefaultIdentity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri) {
+		this.webOfTrustConnector = webOfTrustConnector;
 		this.id = id;
 		this.nickname = nickname;
 		this.requestUri = requestUri;
@@ -204,6 +233,18 @@ public class DefaultIdentity implements Identity {
 	void removePropertyPrivate(String name) {
 		synchronized (properties) {
 			properties.remove(name);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Trust getTrust(OwnIdentity ownIdentity) throws WebOfTrustException {
+		try {
+			return trustCache.get(ownIdentity);
+		} catch (CacheException ce1) {
+			throw new WebOfTrustException("Could not get trust for OwnIdentity: " + ownIdentity, ce1);
 		}
 	}
 

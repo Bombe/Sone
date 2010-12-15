@@ -136,7 +136,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 			}
 			String nickname = fields.get("Nickname" + identityCounter);
 			String requestUri = fields.get("RequestURI" + identityCounter);
-			DefaultIdentity identity = new DefaultIdentity(id, nickname, requestUri);
+			DefaultIdentity identity = new DefaultIdentity(this, id, nickname, requestUri);
 			identity.setContextsPrivate(parseContexts("Contexts" + identityCounter + ".", fields));
 			identity.setPropertiesPrivate(parseProperties("Properties" + identityCounter + ".", fields));
 			identities.add(identity);
@@ -216,6 +216,40 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 */
 	public void removeProperty(OwnIdentity ownIdentity, String name) throws PluginException {
 		performRequest(SimpleFieldSetConstructor.create().put("Message", "RemoveProperty").put("Identity", ownIdentity.getId()).put("Property", name).get(), "PropertyRemoved");
+	}
+
+	/**
+	 * Returns the trust for the given identity assigned to it by the given own
+	 * identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity
+	 * @param identity
+	 *            The identity to get the trust for
+	 * @return The trust for the given identity
+	 * @throws PluginException
+	 *             if an error occured talking to the Web of Trust plugin
+	 */
+	public Trust getTrust(OwnIdentity ownIdentity, Identity identity) throws PluginException {
+		Reply getTrustReply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", ownIdentity.getId()).put("Identity", identity.getId()).get(), "Identity");
+		String trust = getTrustReply.getFields().get("Trust");
+		String score = getTrustReply.getFields().get("Score");
+		String rank = getTrustReply.getFields().get("Rank");
+		Integer explicit = null;
+		Integer implicit = null;
+		Integer distance = null;
+		try {
+			explicit = Integer.valueOf(trust);
+		} catch (NumberFormatException nfe1) {
+			/* ignore. */
+		}
+		try {
+			implicit = Integer.valueOf(score);
+			distance = Integer.valueOf(rank);
+		} catch (NumberFormatException nfe1) {
+			/* ignore. */
+		}
+		return new Trust(explicit, implicit, distance);
 	}
 
 	/**
