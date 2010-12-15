@@ -181,6 +181,19 @@ textarea {
 	min-height: 48px;
 }
 
+#sone .trust {
+	font-size: 85%;
+	text-align: center;
+}
+
+#sone .trust .explicit {
+	color: rgb(0, 128, 0);
+}
+
+#sone .trust .implicit {
+	color: rgb(128, 128, 128);
+}
+
 #sone .post .author, #sone .post .recipient {
 	display: inline;
 	font-weight: bold;
