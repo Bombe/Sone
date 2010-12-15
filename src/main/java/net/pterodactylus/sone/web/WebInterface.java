@@ -23,8 +23,11 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -71,6 +74,7 @@ import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
@@ -131,6 +135,12 @@ public class WebInterface implements CoreListener {
 	/** The “Sone rescued” notification. */
 	private final ListNotification<Sone> sonesRescuedNotification;
 
+	/** Sone locked notification ticker objects. */
+	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
+
+	/** The “Sone locked” notification. */
+	private final ListNotification<Sone> lockedSonesNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -176,6 +186,9 @@ public class WebInterface implements CoreListener {
 
 		Template sonesRescuedTemplate = templateFactory.createTemplate(createReader("/templates/notify/sonesRescuedNotification.html"));
 		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
+
+		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
+		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
 	}
 
 	//
@@ -326,6 +339,51 @@ public class WebInterface implements CoreListener {
 	 */
 	public Set<Reply> getNewReplies() {
 		return new HashSet<Reply>(newReplyNotification.getElements());
+	}
+
+	/**
+	 * Sets whether the current start of the plugin is the first start. It is
+	 * considered a first start if the configuration file does not exist.
+	 *
+	 * @param firstStart
+	 *            {@code true} if no configuration file existed when Sone was
+	 *            loaded, {@code false} otherwise
+	 */
+	public void setFirstStart(boolean firstStart) {
+		if (firstStart) {
+			Template firstStartNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/firstStartNotification.html"));
+			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
+			notificationManager.addNotification(firstStartNotification);
+		}
+	}
+
+	/**
+	 * Sets whether Sone was started with a fresh configuration file.
+	 *
+	 * @param newConfig
+	 *            {@code true} if Sone was started with a fresh configuration,
+	 *            {@code false} if the existing configuration could be read
+	 */
+	public void setNewConfig(boolean newConfig) {
+		if (newConfig && !hasFirstStartNotification()) {
+			Template configNotReadNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/configNotReadNotification.html"));
+			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
+			notificationManager.addNotification(configNotReadNotification);
+		}
+	}
+
+	//
+	// PRIVATE ACCESSORS
+	//
+
+	/**
+	 * Returns whether the first start notification is currently displayed.
+	 *
+	 * @return {@code true} if the first-start notification is currently
+	 *         displayed, {@code false} otherwise
+	 */
+	private boolean hasFirstStartNotification() {
+		return notificationManager.getNotification("first-start-notification") != null;
 	}
 
 	//
@@ -526,7 +584,9 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newSoneFound(Sone sone) {
 		newSoneNotification.add(sone);
-		notificationManager.addNotification(newSoneNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newSoneNotification);
+		}
 	}
 
 	/**
@@ -535,7 +595,11 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void newPostFound(Post post) {
 		newPostNotification.add(post);
-		notificationManager.addNotification(newPostNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newPostNotification);
+		} else {
+			getCore().markPostKnown(post);
+		}
 	}
 
 	/**
@@ -547,7 +611,11 @@ public class WebInterface implements CoreListener {
 			return;
 		}
 		newReplyNotification.add(reply);
-		notificationManager.addNotification(newReplyNotification);
+		if (!hasFirstStartNotification()) {
+			notificationManager.addNotification(newReplyNotification);
+		} else {
+			getCore().markReplyKnown(reply);
+		}
 	}
 
 	/**
@@ -579,7 +647,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void postRemoved(Post post) {
-		/* TODO */
+		newPostNotification.remove(post);
 	}
 
 	/**
@@ -587,7 +655,37 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void replyRemoved(Reply reply) {
-		/* TODO */
+		newReplyNotification.remove(reply);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneLocked(final Sone sone) {
+		Object tickerObject = Ticker.getInstance().registerEvent(System.currentTimeMillis() + (5 * 60) * 1000, new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				lockedSonesNotification.add(sone);
+				notificationManager.addNotification(lockedSonesNotification);
+			}
+		}, "Sone Locked Notification");
+		lockedSonesTickerObjects.put(sone, tickerObject);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneUnlocked(Sone sone) {
+		Object tickerObject = lockedSonesTickerObjects.remove(sone);
+		if (tickerObject == null) {
+			return;
+		}
+		lockedSonesNotification.remove(sone);
+		Ticker.getInstance().deregisterEvent(tickerObject);
 	}
 
 	/**

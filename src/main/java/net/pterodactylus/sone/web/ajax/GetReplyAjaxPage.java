@@ -20,9 +20,11 @@ package net.pterodactylus.sone.web.ajax;
 import java.io.StringWriter;
 
 import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateException;
 
@@ -63,8 +65,7 @@ public class GetReplyAjaxPage extends JsonPage {
 		if ((reply == null) || (reply.getSone() == null)) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		replyTemplate.set("currentSone", getCurrentSone(request.getToadletContext()));
-		return createSuccessJsonObject().put("reply", createJsonReply(reply));
+		return createSuccessJsonObject().put("reply", createJsonReply(reply, getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -84,18 +85,22 @@ public class GetReplyAjaxPage extends JsonPage {
 	 *
 	 * @param reply
 	 *            The reply to convert
+	 * @param currentSone
+	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the reply
 	 */
-	private JsonObject createJsonReply(Reply reply) {
+	private JsonObject createJsonReply(Reply reply, Sone currentSone) {
 		JsonObject jsonReply = new JsonObject();
 		jsonReply.put("id", reply.getId());
 		jsonReply.put("postId", reply.getPost().getId());
 		jsonReply.put("soneId", reply.getSone().getId());
 		jsonReply.put("time", reply.getTime());
-		replyTemplate.set("reply", reply);
 		StringWriter stringWriter = new StringWriter();
+		DataProvider dataProvider = replyTemplate.createDataProvider();
+		dataProvider.setData("reply", reply);
+		dataProvider.setData("currentSone", currentSone);
 		try {
-			replyTemplate.render(stringWriter);
+			replyTemplate.render(dataProvider, stringWriter);
 		} catch (TemplateException te1) {
 			/* TODO - shouldn’t happen. */
 		} finally {

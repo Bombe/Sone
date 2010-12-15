@@ -20,9 +20,11 @@ package net.pterodactylus.sone.web.ajax;
 import java.io.StringWriter;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateException;
 
@@ -60,8 +62,7 @@ public class GetPostAjaxPage extends JsonPage {
 		if (post == null) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		postTemplate.set("currentSone", getCurrentSone(request.getToadletContext()));
-		return createSuccessJsonObject().put("post", createJsonPost(post));
+		return createSuccessJsonObject().put("post", createJsonPost(post, getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -82,18 +83,22 @@ public class GetPostAjaxPage extends JsonPage {
 	 *
 	 * @param post
 	 *            The post to create a JSON object from
+	 * @param currentSone
+	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the post
 	 */
-	private JsonObject createJsonPost(Post post) {
+	private JsonObject createJsonPost(Post post, Sone currentSone) {
 		JsonObject jsonPost = new JsonObject();
 		jsonPost.put("id", post.getId());
 		jsonPost.put("sone", post.getSone().getId());
 		jsonPost.put("recipient", (post.getRecipient() == null) ? null : post.getRecipient().getId());
 		jsonPost.put("time", post.getTime());
-		postTemplate.set("post", post);
 		StringWriter stringWriter = new StringWriter();
+		DataProvider dataProvider = postTemplate.createDataProvider();
+		dataProvider.setData("post", post);
+		dataProvider.setData("currentSone", currentSone);
 		try {
-			postTemplate.render(stringWriter);
+			postTemplate.render(dataProvider, stringWriter);
 		} catch (TemplateException te1) {
 			/* TODO - shouldn’t happen. */
 		} finally {
