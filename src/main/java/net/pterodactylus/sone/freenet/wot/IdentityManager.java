@@ -204,15 +204,15 @@ public class IdentityManager extends AbstractService {
 					}
 
 					/* find new identities. */
-					for (Identity currentIdentity : currentIdentities.get(ownIdentities).values()) {
-						if (!oldIdentities.containsKey(currentIdentity.getId())) {
+					for (Identity currentIdentity : currentIdentities.get(ownIdentity).values()) {
+						if (!oldIdentities.containsKey(ownIdentity) || !oldIdentities.get(ownIdentity).containsKey(currentIdentity.getId())) {
 							identityListenerManager.fireIdentityAdded(ownIdentity, currentIdentity);
 						}
 					}
 
 					/* find removed identities. */
 					if (oldIdentities.containsKey(ownIdentity)) {
-						for (Identity oldIdentity : oldIdentities.get(ownIdentities).values()) {
+						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
 							if (!currentIdentities.containsKey(oldIdentity.getId())) {
 								identityListenerManager.fireIdentityRemoved(ownIdentity, oldIdentity);
 							}
