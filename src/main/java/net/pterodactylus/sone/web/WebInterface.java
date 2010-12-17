@@ -246,7 +246,22 @@ public class WebInterface implements CoreListener {
 	 *         currently logged in
 	 */
 	public Sone getCurrentSone(ToadletContext toadletContext) {
-		return getCurrentSone(getCurrentSession(toadletContext));
+		return getCurrentSone(toadletContext, true);
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if no session exists,
+	 *            {@code false} to not create a new session
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+		return getCurrentSone(getCurrentSession(toadletContext, create));
 	}
 
 	/**

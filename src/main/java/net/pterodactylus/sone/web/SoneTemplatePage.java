@@ -124,6 +124,21 @@ public class SoneTemplatePage extends TemplatePage {
 	}
 
 	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if no session exists,
+	 *            {@code false} to not create a new session
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	protected Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+		return webInterface.getCurrentSone(toadletContext, create);
+	}
+
+	/**
 	 * Sets the currently logged in Sone.
 	 *
 	 * @param toadletContext
