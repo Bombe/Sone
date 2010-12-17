@@ -207,7 +207,7 @@ public class SoneTemplatePage extends TemplatePage {
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
 		if (requiresLogin()) {
-			return getCurrentSone(toadletContext) != null;
+			return getCurrentSone(toadletContext, false) != null;
 		}
 		return true;
 	}
