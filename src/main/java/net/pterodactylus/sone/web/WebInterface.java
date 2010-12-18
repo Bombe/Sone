@@ -696,12 +696,8 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void soneUnlocked(Sone sone) {
-		Object tickerObject = lockedSonesTickerObjects.remove(sone);
-		if (tickerObject == null) {
-			return;
-		}
 		lockedSonesNotification.remove(sone);
-		Ticker.getInstance().deregisterEvent(tickerObject);
+		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
 	}
 
 	/**
