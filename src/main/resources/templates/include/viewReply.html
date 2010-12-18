@@ -3,16 +3,6 @@
 	<div class="reply-time hidden"><% reply.time|html></div>
 	<div class="avatar">
 		<img src="/WoT/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
-		<%if !reply.sone.current>
-			<br />
-			<div class="trust">
-				<%if reply.sone.trust.assigned>
-					<span class="explicit"><% reply.sone.trust.explicit></span>
-				<%else>
-					<span class="implicit"><% reply.sone.trust.implicit></span>
-				<%/if>
-			</div>
-		<%/if>
 	</div>
 	<div class="inner-part">
 		<div>
@@ -37,6 +27,30 @@
 					<input type="hidden" name="reply" value="<% reply.id|html>" />
 					<button type="submit" value="1"><%= View.Post.UnlikeLink|l10n|html></button>
 				</form>
+			<%/if>
+			<%if !reply.sone.current>
+				<div class="trust">
+					<%= View.Trust.Label|l10n|html>
+					<%if reply.sone.trust.assigned>
+						<div class="explicit"><% reply.sone.trust.explicit></div>
+					<%else>
+						<div class="implicit"><% reply.sone.trust.implicit><%if reply.sone.trust.hasDistance> (<% reply.sone.trust.distance>)<%/if></div>
+					<%/if>
+					<%if !reply.sone.trust.maximum>
+						<form class="increase-trust increase-reply-trust" action="increaseTrust.html" method="post">
+							<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+							<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+							<input type="hidden" name="identity" value="<% reply.sone.id|html>" />
+							<button type="submit"><%= View.Trust.IncreaseTrustLink|l10n|html></button>
+						</form>
+					<%/if>
+					<form class="decrease-trust decrease-reply-trust" action="decreaseTrust.html" method="post">
+						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+						<input type="hidden" name="identity" value="<% reply.sone.id|html>" />
+						<button type="submit"><%= View.Trust.DecreaseTrustLink|l10n|html></button>
+					</form>
+				</div>
 			<%/if>
 			<%if reply.sone.current>
 				<form class="delete delete-reply" action="deleteReply.html" method="post">

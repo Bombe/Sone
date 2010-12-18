@@ -214,9 +214,10 @@ textarea {
 	color: #666;
 }
 
-#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike {
+#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .increase-trust, #sone .post .decrease-trust {
 	display: inline;
 	font: inherit;
+	margin: 0px;
 }
 
 #sone .post .likes.hidden {
@@ -227,15 +228,16 @@ textarea {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .increase-trust button, #sone .post .decrease-trust button {
 	border: 0px;
 	background: none;
 	padding: 0px;
 	color: rgb(28, 131, 191);
 	font: inherit;
+	margin: 0px;
 }
 
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover {
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .increase-trust button:hover, #sone .post .decrease-trust button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -250,6 +252,19 @@ textarea {
 #sone .post .likes span {
 	font: inherit;
 	color: green;
+}
+
+#sone .post .trust {
+	display: inline;
+}
+
+#sone .post .trust:before {
+	content: ' · ';
+}
+
+#sone .trust .explicit, #sone .trust .implicit {
+	font: inherit;
+	display: inline;
 }
 
 #sone .post .replies {
