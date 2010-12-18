@@ -43,6 +43,8 @@ public class TrustAccessor extends ReflectionAccessor {
 		Trust trust = (Trust) object;
 		if ("assigned".equals(member)) {
 			return trust.getExplicit() != null;
+		} else if ("maximum".equals(member)) {
+			return ((trust.getExplicit() != null) && (trust.getExplicit() >= 100)) || ((trust.getImplicit() != null) && (trust.getImplicit() >= 100));
 		} else if ("hasDistance".equals(member)) {
 			return (trust.getDistance() != null) && (trust.getDistance() != Integer.MAX_VALUE);
 		}
