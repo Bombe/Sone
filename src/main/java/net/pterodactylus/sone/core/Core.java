@@ -710,7 +710,9 @@ public class Core implements IdentityListener {
 	 */
 	public void lockSone(Sone sone) {
 		synchronized (lockedSones) {
-			lockedSones.add(sone);
+			if (lockedSones.add(sone)) {
+				coreListenerManager.fireSoneLocked(sone);
+			}
 		}
 	}
 
@@ -723,7 +725,9 @@ public class Core implements IdentityListener {
 	 */
 	public void unlockSone(Sone sone) {
 		synchronized (lockedSones) {
-			lockedSones.remove(sone);
+			if (lockedSones.remove(sone)) {
+				coreListenerManager.fireSoneUnlocked(sone);
+			}
 		}
 	}
 
@@ -1117,7 +1121,7 @@ public class Core implements IdentityListener {
 	 * @param sone
 	 *            The Sone to save
 	 */
-	public void saveSone(Sone sone) {
+	public synchronized void saveSone(Sone sone) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
 			return;
@@ -1187,6 +1191,7 @@ public class Core implements IdentityListener {
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
+			configuration.save();
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
@@ -1408,7 +1413,7 @@ public class Core implements IdentityListener {
 	/**
 	 * Saves the current options.
 	 */
-	public void saveConfiguration() {
+	public synchronized void saveConfiguration() {
 		/* store the options first. */
 		try {
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());

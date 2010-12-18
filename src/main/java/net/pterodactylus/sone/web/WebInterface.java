@@ -23,8 +23,11 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -132,6 +135,12 @@ public class WebInterface implements CoreListener {
 	/** The “Sone rescued” notification. */
 	private final ListNotification<Sone> sonesRescuedNotification;
 
+	/** Sone locked notification ticker objects. */
+	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
+
+	/** The “Sone locked” notification. */
+	private final ListNotification<Sone> lockedSonesNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -177,6 +186,9 @@ public class WebInterface implements CoreListener {
 
 		Template sonesRescuedTemplate = templateFactory.createTemplate(createReader("/templates/notify/sonesRescuedNotification.html"));
 		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
+
+		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
+		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
 	}
 
 	//
@@ -234,7 +246,22 @@ public class WebInterface implements CoreListener {
 	 *         currently logged in
 	 */
 	public Sone getCurrentSone(ToadletContext toadletContext) {
-		return getCurrentSone(getCurrentSession(toadletContext));
+		return getCurrentSone(toadletContext, true);
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if no session exists,
+	 *            {@code false} to not create a new session
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+		return getCurrentSone(getCurrentSession(toadletContext, create));
 	}
 
 	/**
@@ -585,6 +612,8 @@ public class WebInterface implements CoreListener {
 		newPostNotification.add(post);
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newPostNotification);
+		} else {
+			getCore().markPostKnown(post);
 		}
 	}
 
@@ -599,6 +628,8 @@ public class WebInterface implements CoreListener {
 		newReplyNotification.add(reply);
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newReplyNotification);
+		} else {
+			getCore().markReplyKnown(reply);
 		}
 	}
 
@@ -631,7 +662,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void postRemoved(Post post) {
-		/* TODO */
+		newPostNotification.remove(post);
 	}
 
 	/**
@@ -639,7 +670,34 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void replyRemoved(Reply reply) {
-		/* TODO */
+		newReplyNotification.remove(reply);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneLocked(final Sone sone) {
+		Object tickerObject = Ticker.getInstance().registerEvent(System.currentTimeMillis() + (5 * 60) * 1000, new Runnable() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void run() {
+				lockedSonesNotification.add(sone);
+				lockedSonesTickerObjects.remove(sone);
+				notificationManager.addNotification(lockedSonesNotification);
+			}
+		}, "Sone Locked Notification");
+		lockedSonesTickerObjects.put(sone, tickerObject);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneUnlocked(Sone sone) {
+		lockedSonesNotification.remove(sone);
+		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
 	}
 
 	/**

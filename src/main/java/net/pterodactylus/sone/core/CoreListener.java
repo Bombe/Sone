@@ -111,4 +111,20 @@ public interface CoreListener extends EventListener {
 	 */
 	public void replyRemoved(Reply reply);
 
+	/**
+	 * Notifies a listener when a Sone was locked.
+	 *
+	 * @param sone
+	 *            The Sone that was locked
+	 */
+	public void soneLocked(Sone sone);
+
+	/**
+	 * Notifies a listener that a Sone was unlocked.
+	 *
+	 * @param sone
+	 *            The Sone that was unlocked
+	 */
+	public void soneUnlocked(Sone sone);
+
 }

@@ -44,7 +44,6 @@ import freenet.pluginmanager.FredPluginL10n;
 import freenet.pluginmanager.FredPluginThreadless;
 import freenet.pluginmanager.FredPluginVersioned;
 import freenet.pluginmanager.PluginRespirator;
-import freenet.pluginmanager.PluginStore;
 
 /**
  * This class interfaces with Freenet. It is the class that is loaded by the
@@ -95,9 +94,6 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 	/** The l10n helper. */
 	private PluginL10n l10n;
-
-	/** The plugin store. */
-	private PluginStore pluginStore;
 
 	/** The identity manager. */
 	private IdentityManager identityManager;
@@ -228,14 +224,8 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 			/* stop the identity manager. */
 			identityManager.stop();
-
-			/* TODO wait for core to stop? */
-			try {
-				pluginRespirator.putStore(pluginStore);
-			} catch (DatabaseDisabledException dde1) {
-				logger.log(Level.WARNING, "Could not store plugin store, database is disabled.", dde1);
-			}
-
+		} catch (Throwable t1) {
+			logger.log(Level.SEVERE, "Error while shutting down!", t1);
 		} finally {
 			/* shutdown logger. */
 			Logging.shutdown();
