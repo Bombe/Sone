@@ -684,6 +684,7 @@ public class WebInterface implements CoreListener {
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				lockedSonesNotification.add(sone);
+				lockedSonesTickerObjects.remove(sone);
 				notificationManager.addNotification(lockedSonesNotification);
 			}
 		}, "Sone Locked Notification");
