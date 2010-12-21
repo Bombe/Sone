@@ -1458,6 +1458,7 @@ public class Core implements IdentityListener {
 				soneInserter.stop();
 			}
 		}
+		soneDownloader.stop();
 		saveConfiguration();
 		stopped = true;
 	}
