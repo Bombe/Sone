@@ -1306,6 +1306,7 @@ public class Core implements IdentityListener {
 			if (newPosts.remove(post.getId())) {
 				knownPosts.add(post.getId());
 				coreListenerManager.fireMarkPostKnown(post);
+				saveConfiguration();
 			}
 		}
 	}
@@ -1386,6 +1387,7 @@ public class Core implements IdentityListener {
 			if (newReplies.remove(reply.getId())) {
 				knownReplies.add(reply.getId());
 				coreListenerManager.fireMarkReplyKnown(reply);
+				saveConfiguration();
 			}
 		}
 	}
