@@ -65,12 +65,10 @@ public class FreenetInterface {
 	 *
 	 * @param node
 	 *            The node to interact with
-	 * @param client
-	 *            The high-level client
 	 */
-	public FreenetInterface(Node node, HighLevelSimpleClient client) {
+	public FreenetInterface(Node node) {
 		this.node = node;
-		this.client = client;
+		this.client = node.clientCore.makeClient(RequestStarter.INTERACTIVE_PRIORITY_CLASS, false, true);
 	}
 
 	//
