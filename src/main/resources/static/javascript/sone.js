@@ -672,19 +672,39 @@ function isKnownSonesPage() {
 	return getPageId() == "known-sones";
 }
 
-var loadedPosts = {};
-var loadedReplies = {};
+/**
+ * Returns whether a post with the given ID exists on the current page.
+ *
+ * @param postId
+ *            The post ID to check for
+ * @returns {Boolean} <code>true</code> if a post with the given ID already
+ *          exists on the page, <code>false</code> otherwise
+ */
+function hasPost(postId) {
+	return $(".post#" + postId).length > 0;
+}
+
+/**
+ * Returns whether a reply with the given ID exists on the current page.
+ *
+ * @param replyId
+ *            The reply ID to check for
+ * @returns {Boolean} <code>true</code> if a reply with the given ID already
+ *          exists on the page, <code>false</code> otherwise
+ */
+function hasReply(replyId) {
+	return $("#sone .reply#" + replyId).length > 0;
+}
 
 function loadNewPost(postId) {
-	if (postId in loadedPosts) {
+	if (hasPost(postId)) {
 		return;
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			if (data.post.id in loadedPosts) {
+			if (hasPost(data.post.id)) {
 				return;
 			}
-			loadedPosts[data.post.id] = true;
 			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
@@ -709,16 +729,15 @@ function loadNewPost(postId) {
 }
 
 function loadNewReply(replyId) {
-	if (replyId in loadedReplies) {
+	if (hasReply(replyId)) {
 		return;
 	}
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
-			if (data.reply.id in loadedReplies) {
+			if (hasReply(data.reply.id)) {
 				return;
 			}
-			loadedReplies[data.reply.id] = true;
 			$("#sone .post#" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
