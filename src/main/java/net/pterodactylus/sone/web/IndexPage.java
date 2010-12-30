@@ -63,6 +63,13 @@ public class IndexPage extends SoneTemplatePage {
 			}
 			allPosts.addAll(webInterface.getCore().getSone(friendSoneId).getPosts());
 		}
+		for (Sone sone : webInterface.getCore().getSones()) {
+			for (Post post : sone.getPosts()) {
+				if (currentSone.equals(post.getRecipient()) && !allPosts.contains(post)) {
+					allPosts.add(post);
+				}
+			}
+		}
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
 		template.set("posts", allPosts);
 	}
