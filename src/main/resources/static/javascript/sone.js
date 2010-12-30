@@ -823,6 +823,9 @@ $(document).ready(function() {
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
 		$("#sone #update-status").submit(function() {
+			if ($(this).find(":input").hasClass("default")) {
+				return false;
+			}
 			text = $(this).find(":input:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
