@@ -88,6 +88,9 @@ public class Core implements IdentityListener {
 	/** The configuration. */
 	private Configuration configuration;
 
+	/** Whether we’re currently saving the configuration. */
+	private boolean storingConfiguration = false;
+
 	/** The identity manager. */
 	private final IdentityManager identityManager;
 
@@ -1468,7 +1471,15 @@ public class Core implements IdentityListener {
 	/**
 	 * Saves the current options.
 	 */
-	public synchronized void saveConfiguration() {
+	public void saveConfiguration() {
+		synchronized (configuration) {
+			if (storingConfiguration) {
+				logger.log(Level.FINE, "Already storing configuration…");
+				return;
+			}
+			storingConfiguration = true;
+		}
+
 		/* store the options first. */
 		try {
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
@@ -1508,6 +1519,10 @@ public class Core implements IdentityListener {
 
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
+		} finally {
+			synchronized (configuration) {
+				storingConfiguration = false;
+			}
 		}
 	}
 

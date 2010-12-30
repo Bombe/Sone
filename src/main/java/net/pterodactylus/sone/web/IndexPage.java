@@ -54,14 +54,21 @@ public class IndexPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		Sone sone = getCurrentSone(request.getToadletContext());
+		Sone currentSone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();
-		allPosts.addAll(sone.getPosts());
-		for (String friendSoneId : sone.getFriends()) {
+		allPosts.addAll(currentSone.getPosts());
+		for (String friendSoneId : currentSone.getFriends()) {
 			if (!webInterface.getCore().hasSone(friendSoneId)) {
 				continue;
 			}
 			allPosts.addAll(webInterface.getCore().getSone(friendSoneId).getPosts());
+		}
+		for (Sone sone : webInterface.getCore().getSones()) {
+			for (Post post : sone.getPosts()) {
+				if (currentSone.equals(post.getRecipient()) && !allPosts.contains(post)) {
+					allPosts.add(post);
+				}
+			}
 		}
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
 		template.set("posts", allPosts);
