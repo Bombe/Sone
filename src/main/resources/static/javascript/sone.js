@@ -842,7 +842,7 @@ $(document).ready(function() {
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
 		$("#sone #update-status").submit(function() {
-			if (!$(this).find(":input.default").hasAttr("disabled")) {
+			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
 			text = $(this).find(":input:enabled").val();
