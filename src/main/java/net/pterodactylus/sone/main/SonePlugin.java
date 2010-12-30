@@ -167,7 +167,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 		}
 
 		/* create freenet interface. */
-		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode(), pluginRespirator.getHLSimpleClient());
+		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
 
 		/* create web of trust connector. */
 		PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
