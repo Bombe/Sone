@@ -954,7 +954,7 @@ $(document).ready(function() {
 	});
 
 	/* activate status polling. */
-	if (getPageId() != "login") {
+	if ((getPageId() != undefined) && (getPageId() != "login")) {
 		setTimeout(getStatus, 5000);
 	}
 
