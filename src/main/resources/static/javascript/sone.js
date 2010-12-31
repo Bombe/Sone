@@ -954,7 +954,9 @@ $(document).ready(function() {
 	});
 
 	/* activate status polling. */
-	setTimeout(getStatus, 5000);
+	if (getPageId() != "login") {
+		setTimeout(getStatus, 5000);
+	}
 
 	/* reset activity counter when the page has focus. */
 	$(window).focus(function() {
