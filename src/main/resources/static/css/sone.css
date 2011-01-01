@@ -73,10 +73,6 @@ textarea {
 	float: right;
 }
 
-#sone #notification-area .notification > div {
-	display: inline;
-}
-
 #sone #notification-area .notification .post-count {
 	margin-left: 1ex;
 }
