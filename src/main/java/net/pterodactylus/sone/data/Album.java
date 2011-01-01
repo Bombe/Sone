@@ -36,6 +36,9 @@ public class Album {
 	/** The name of this album. */
 	private String name;
 
+	/** The description of this album. */
+	private String description;
+
 	//
 	// ACCESSORS
 	//
@@ -76,6 +79,27 @@ public class Album {
 	 */
 	public Album setName(String name) {
 		this.name = name;
+		return this;
+	}
+
+	/**
+	 * Returns the description of this album.
+	 *
+	 * @return The description of this album
+	 */
+	public String getDescription() {
+		return description;
+	}
+
+	/**
+	 * Sets the description of this album.
+	 *
+	 * @param description
+	 *            The description of this album
+	 * @return This album
+	 */
+	public Album setDescription(String description) {
+		this.description = description;
 		return this;
 	}
 
