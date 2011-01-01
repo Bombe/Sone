@@ -186,7 +186,7 @@ public class SoneTemplatePage extends TemplatePage {
 	@Override
 	protected void processTemplate(Request request, Template template) throws RedirectException {
 		super.processTemplate(request, template);
-		template.set("currentSone", getCurrentSone(request.getToadletContext()));
+		template.set("currentSone", getCurrentSone(request.getToadletContext(), false));
 		template.set("request", request);
 	}
 
@@ -195,7 +195,7 @@ public class SoneTemplatePage extends TemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(Page.Request request) {
-		if (requiresLogin() && (getCurrentSone(request.getToadletContext()) == null)) {
+		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
 			return "login.html";
 		}
 		return null;

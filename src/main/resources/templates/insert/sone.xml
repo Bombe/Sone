@@ -2,6 +2,7 @@
 <sone>
 
 	<time><% currentSone.time></time>
+	<protocol-version>0</protocol-version>
 
 	<client>
 		<name>Sone</name>
