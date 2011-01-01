@@ -26,7 +26,7 @@ import net.pterodactylus.util.validation.Validation;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Image {
+public class Image implements Fingerprintable {
 
 	/** The ID of the image. */
 	private final String id;
@@ -197,6 +197,24 @@ public class Image {
 		Validation.begin().isNotNull("Image Description", description).check();
 		this.description = description;
 		return this;
+	}
+
+	//
+	// FINGERPRINTABLE METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getFingerprint() {
+		StringBuilder fingerprint = new StringBuilder();
+		fingerprint.append("Image(");
+		fingerprint.append("ID(").append(id).append(')');
+		fingerprint.append("Title(").append(title).append(')');
+		fingerprint.append("Description(").append(description).append(')');
+		fingerprint.append(')');
+		return fingerprint.toString();
 	}
 
 }
