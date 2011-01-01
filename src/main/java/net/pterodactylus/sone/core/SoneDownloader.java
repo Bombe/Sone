@@ -55,6 +55,9 @@ public class SoneDownloader extends AbstractService {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SoneDownloader.class);
 
+	/** The maximum protocol version. */
+	private static final int MAX_PROTOCOL_VERSION = 0;
+
 	/** The core. */
 	private final Core core;
 
@@ -218,6 +221,27 @@ public class SoneDownloader extends AbstractService {
 		} catch (NullPointerException npe1) {
 			/* for some reason, invalid XML can cause NPEs. */
 			logger.log(Level.WARNING, "XML for Sone " + sone + " can not be parsed!", npe1);
+			return null;
+		}
+
+		Integer protocolVersion = null;
+		String soneProtocolVersion = soneXml.getValue("protocol-version", null);
+		if (soneProtocolVersion != null) {
+			protocolVersion = Numbers.safeParseInteger(soneProtocolVersion);
+		}
+		if (protocolVersion == null) {
+			logger.log(Level.INFO, "No protocol version found, assuming 0.");
+			protocolVersion = 0;
+		}
+
+		if (protocolVersion < 0) {
+			logger.log(Level.WARNING, "Invalid protocol version: " + protocolVersion + "! Not parsing Sone.");
+			return null;
+		}
+
+		/* check for valid versions. */
+		if (protocolVersion > MAX_PROTOCOL_VERSION) {
+			logger.log(Level.WARNING, "Unknown protocol version: " + protocolVersion + "! Not parsing Sone.");
 			return null;
 		}
 
