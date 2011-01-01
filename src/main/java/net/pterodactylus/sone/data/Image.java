@@ -29,6 +29,9 @@ public class Image {
 	/** The ID of the image. */
 	private final String id;
 
+	/** The Sone the image belongs to. */
+	private final Sone sone;
+
 	/** The key of the image. */
 	private final String key;
 
@@ -50,6 +53,8 @@ public class Image {
 	/**
 	 * Creates a new image.
 	 *
+	 * @param sone
+	 *            The Sone the image belongs to
 	 * @param key
 	 *            The key of the image
 	 * @param creationTime
@@ -59,8 +64,8 @@ public class Image {
 	 * @param height
 	 *            The height of the image
 	 */
-	public Image(String key, long creationTime, int width, int height) {
-		this(UUID.randomUUID().toString(), key, creationTime, width, height);
+	public Image(Sone sone, String key, long creationTime, int width, int height) {
+		this(UUID.randomUUID().toString(), sone, key, creationTime, width, height);
 	}
 
 	/**
@@ -68,6 +73,8 @@ public class Image {
 	 *
 	 * @param id
 	 *            The ID of the image
+	 * @param sone
+	 *            The Sone the image belongs to
 	 * @param key
 	 *            The key of the image
 	 * @param creationTime
@@ -77,8 +84,9 @@ public class Image {
 	 * @param height
 	 *            The height of the image
 	 */
-	public Image(String id, String key, long creationTime, int width, int height) {
+	public Image(String id, Sone sone, String key, long creationTime, int width, int height) {
 		this.id = id;
+		this.sone = sone;
 		this.key = key;
 		this.creationTime = creationTime;
 		this.width = width;
@@ -96,6 +104,15 @@ public class Image {
 	 */
 	public String getId() {
 		return id;
+	}
+
+	/**
+	 * Returns the Sone this image belongs to.
+	 *
+	 * @return The Sone this image belongs to
+	 */
+	public Sone getSone() {
+		return sone;
 	}
 
 	/**
