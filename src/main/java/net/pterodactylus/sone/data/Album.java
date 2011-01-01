@@ -31,6 +31,9 @@ public class Album {
 	/** The ID of this album. */
 	private final String id;
 
+	/** The Sone this album belongs to. */
+	private final Sone sone;
+
 	/** Nested albums. */
 	private final List<Album> albums = new ArrayList<Album>();
 
@@ -45,9 +48,12 @@ public class Album {
 
 	/**
 	 * Creates a new album with a random ID.
+	 *
+	 * @param sone
+	 *            The Sone this album belongs to
 	 */
-	public Album() {
-		this(UUID.randomUUID().toString());
+	public Album(Sone sone) {
+		this(UUID.randomUUID().toString(), sone);
 	}
 
 	/**
@@ -55,9 +61,12 @@ public class Album {
 	 *
 	 * @param id
 	 *            The ID of the album
+	 * @param sone
+	 *            The Sone this album belongs to
 	 */
-	public Album(String id) {
+	public Album(String id, Sone sone) {
 		this.id = id;
+		this.sone = sone;
 	}
 
 	//
@@ -71,6 +80,15 @@ public class Album {
 	 */
 	public String getId() {
 		return id;
+	}
+
+	/**
+	 * Returns the Sone this album belongs to.
+	 *
+	 * @return The Sone this album belongs to
+	 */
+	public Sone getSone() {
+		return sone;
 	}
 
 	/**
@@ -146,7 +164,7 @@ public class Album {
 			return false;
 		}
 		Album album = (Album) object;
-		return id.equals(album.id);
+		return sone.equals(album.sone) && id.equals(album.id);
 	}
 
 }
