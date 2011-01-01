@@ -28,7 +28,7 @@ import net.pterodactylus.util.validation.Validation;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Album {
+public class Album implements Fingerprintable {
 
 	/** The ID of this album. */
 	private final String id;
@@ -237,6 +237,39 @@ public class Album {
 		Validation.begin().isNotNull("Album Description", description).check();
 		this.description = description;
 		return this;
+	}
+
+	//
+	// FINGERPRINTABLE METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getFingerprint() {
+		StringBuilder fingerprint = new StringBuilder();
+		fingerprint.append("Album(");
+		fingerprint.append("ID(").append(id).append(')');
+		fingerprint.append("Name(").append(name).append(')');
+		fingerprint.append("Description(").append(description).append(')');
+
+		/* add nested albums. */
+		fingerprint.append("Albums(");
+		for (Album album : albums) {
+			fingerprint.append(album.getFingerprint());
+		}
+		fingerprint.append(')');
+
+		/* add images. */
+		fingerprint.append("Images(");
+		for (Image image : images) {
+			fingerprint.append(image.getFingerprint());
+		}
+		fingerprint.append(')');
+
+		fingerprint.append(')');
+		return fingerprint.toString();
 	}
 
 	//
