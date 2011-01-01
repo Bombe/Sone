@@ -135,6 +135,28 @@ public class Album {
 	}
 
 	/**
+	 * Adds the given image to this album.
+	 *
+	 * @param image
+	 *            The image to add
+	 */
+	public void addImage(Image image) {
+		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
+		images.add(image);
+	}
+
+	/**
+	 * Removes the given image from this album.
+	 *
+	 * @param image
+	 *            The image to remove
+	 */
+	public void removeImage(Image image) {
+		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
+		images.remove(image);
+	}
+
+	/**
 	 * Returns the name of this album.
 	 *
 	 * @return The name of this album
