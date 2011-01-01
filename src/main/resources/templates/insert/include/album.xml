@@ -1,0 +1,23 @@
+<album>
+	<id><% album.id|xml></id>
+	<name><% album.name|xml></name>
+	<description><% album.description|xml></description>
+	<albums>
+		<%foreach album.albums album>
+		<%include insert/include/album.xml>
+		<%/foreach>
+	</albums>
+	<images>
+		<%foreach album.images image>
+		<image>
+			<id><% image.id|xml></id>
+			<creation-time><% image.creationTime|xml></creation-time>
+			<key><% image.key|xml></key>
+			<width><% image.width|xml></width>
+			<height><% image.height|xml></height>
+			<title><% image.title|xml></title>
+			<description><% image.description|xml></description>
+		</image>
+		<%/foreach>
+	</images>
+</album>
