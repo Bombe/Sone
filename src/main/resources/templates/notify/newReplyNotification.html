@@ -1,4 +1,8 @@
-<div class="text">
+<div class="short-text">
+	<%= Notification.NewReply.ShortText|l10n|html>
+	<a href="javascript:showNotificationDetails('<%notification.id|html>'); return false;"><%= Notification.ClickHereToRead|l10n|html></a>
+</div>
+<div class="text hidden">
 	<%= Notification.NewReply.Text|l10n|html>
 	<%foreach replies reply>
 		<a href="viewPost.html?post=<% reply.post.id|html>"><% reply.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
