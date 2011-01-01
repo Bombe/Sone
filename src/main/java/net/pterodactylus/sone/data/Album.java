@@ -104,6 +104,28 @@ public class Album {
 	}
 
 	/**
+	 * Adds an album to this album.
+	 *
+	 * @param album
+	 *            The album to add
+	 */
+	public void addAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).check();
+		albums.add(album);
+	}
+
+	/**
+	 * Removes an album from this album.
+	 *
+	 * @param album
+	 *            The album to remove
+	 */
+	public void removeAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).check();
+		albums.remove(album);
+	}
+
+	/**
 	 * Returns the images in this album.
 	 *
 	 * @return The images in this album
