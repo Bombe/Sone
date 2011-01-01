@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.validation.Validation;
 import freenet.keys.FreenetURI;
 
 /**
@@ -98,6 +99,9 @@ public class Sone implements Fingerprintable {
 
 	/** The IDs of all liked replies. */
 	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
+
+	/** The albums of this Sone. */
+	private final List<Album> albums = Collections.synchronizedList(new ArrayList<Album>());
 
 	/**
 	 * Creates a new Sone.
@@ -580,6 +584,37 @@ public class Sone implements Fingerprintable {
 		return this;
 	}
 
+	/**
+	 * Returns the albums of this Sone.
+	 *
+	 * @return The albums of this Sone
+	 */
+	public List<Album> getAlbums() {
+		return Collections.unmodifiableList(albums);
+	}
+
+	/**
+	 * Adds an album to this Sone.
+	 *
+	 * @param album
+	 *            The album to add
+	 */
+	public synchronized void addAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
+		albums.add(album);
+	}
+
+	/**
+	 * Removes an album from this Sone.
+	 *
+	 * @param album
+	 *            The album to remove
+	 */
+	public synchronized void removeAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
+		albums.remove(album);
+	}
+
 	//
 	// FINGERPRINTABLE METHODS
 	//
@@ -638,6 +673,12 @@ public class Sone implements Fingerprintable {
 		fingerprint.append("LikedReplies(");
 		for (String likedReplyId : likedReplyIds) {
 			fingerprint.append("Reply(").append(likedReplyId).append(')');
+		}
+		fingerprint.append(')');
+
+		fingerprint.append("Albums(");
+		for (Album album : albums) {
+			fingerprint.append(album.getFingerprint());
 		}
 		fingerprint.append(')');
 
