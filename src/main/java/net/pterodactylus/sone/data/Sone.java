@@ -40,7 +40,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Sone {
+public class Sone implements Fingerprintable {
 
 	/** comparator that sorts Sones by their nice name. */
 	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
@@ -580,14 +580,14 @@ public class Sone {
 		return this;
 	}
 
+	//
+	// FINGERPRINTABLE METHODS
+	//
+
 	/**
-	 * Returns a fingerprint of this Sone. The fingerprint only depends on data
-	 * that is actually stored when a Sone is inserted. The fingerprint can be
-	 * used to detect changes in Sone data and can also be used to detect if
-	 * previous changes are reverted.
-	 *
-	 * @return The fingerprint of this Sone
+	 * {@inheritDoc}
 	 */
+	@Override
 	public synchronized String getFingerprint() {
 		StringBuilder fingerprint = new StringBuilder();
 		fingerprint.append("Profile(");
