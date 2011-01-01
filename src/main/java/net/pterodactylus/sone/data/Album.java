@@ -42,6 +42,9 @@ public class Album {
 	/** The images in this album. */
 	private final List<Image> images = new ArrayList<Image>();
 
+	/** The parent album. */
+	private Album parent;
+
 	/** The name of this album. */
 	private String name;
 
@@ -110,8 +113,9 @@ public class Album {
 	 *            The album to add
 	 */
 	public void addAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).check();
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isNull("Album Parent", album.parent).check();
 		albums.add(album);
+		album.setParent(this);
 	}
 
 	/**
@@ -121,8 +125,9 @@ public class Album {
 	 *            The album to remove
 	 */
 	public void removeAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).check();
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEqual("Album Parent", album.parent, this).check();
 		albums.remove(album);
+		album.removeParent();
 	}
 
 	/**
@@ -154,6 +159,40 @@ public class Album {
 	public void removeImage(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
 		images.remove(image);
+	}
+
+	/**
+	 * Returns the parent album of this album.
+	 *
+	 * @return The parent album of this album, or {@code null} if this album
+	 *         does not have a parent
+	 */
+	public Album getParent() {
+		return parent;
+	}
+
+	/**
+	 * Sets the parent album of this album.
+	 *
+	 * @param parent
+	 *            The new parent album of this album
+	 * @return This album
+	 */
+	protected Album setParent(Album parent) {
+		Validation.begin().isNotNull("Album Parent", parent).check();
+		this.parent = parent;
+		return this;
+	}
+
+	/**
+	 * Removes the parent album of this album.
+	 *
+	 * @return This album
+	 */
+	protected Album removeParent() {
+		Validation.begin().isNotNull("Album Parent", parent).check();
+		this.parent = null;
+		return this;
 	}
 
 	/**
