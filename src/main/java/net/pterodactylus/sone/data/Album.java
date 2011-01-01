@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
@@ -26,6 +27,9 @@ import java.util.List;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Album {
+
+	/** The ID of this album. */
+	private final String id;
 
 	/** Nested albums. */
 	private final List<Album> albums = new ArrayList<Album>();
@@ -39,9 +43,35 @@ public class Album {
 	/** The description of this album. */
 	private String description;
 
+	/**
+	 * Creates a new album with a random ID.
+	 */
+	public Album() {
+		this(UUID.randomUUID().toString());
+	}
+
+	/**
+	 * Creates a new album with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the album
+	 */
+	public Album(String id) {
+		this.id = id;
+	}
+
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the ID of this album.
+	 *
+	 * @return The ID of this album
+	 */
+	public String getId() {
+		return id;
+	}
 
 	/**
 	 * Returns the nested albums.
@@ -101,6 +131,22 @@ public class Album {
 	public Album setDescription(String description) {
 		this.description = description;
 		return this;
+	}
+
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Album)) {
+			return false;
+		}
+		Album album = (Album) object;
+		return id.equals(album.id);
 	}
 
 }
