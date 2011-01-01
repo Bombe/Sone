@@ -19,6 +19,8 @@ package net.pterodactylus.sone.data;
 
 import java.util.UUID;
 
+import net.pterodactylus.util.validation.Validation;
+
 /**
  * Container for image metadata.
  *
@@ -85,6 +87,7 @@ public class Image {
 	 *            The height of the image
 	 */
 	public Image(String id, Sone sone, String key, long creationTime, int width, int height) {
+		Validation.begin().isNotNull("Image ID", id).isNotNull("Image Owner", sone).isNotNull("Image Key", key).isGreater("Image Creation Time", creationTime, 0).isGreater("Image Width", width, 0).isGreater("Image Height", height, 0).check();
 		this.id = id;
 		this.sone = sone;
 		this.key = key;
@@ -169,6 +172,7 @@ public class Image {
 	 * @return This image
 	 */
 	public Image setTitle(String title) {
+		Validation.begin().isNotNull("Image Title", title).check();
 		this.title = title;
 		return this;
 	}
@@ -190,6 +194,7 @@ public class Image {
 	 * @return This image
 	 */
 	public Image setDescription(String description) {
+		Validation.begin().isNotNull("Image Description", description).check();
 		this.description = description;
 		return this;
 	}
