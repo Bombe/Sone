@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import net.pterodactylus.util.validation.Validation;
+
 /**
  * Container for images that can also contain nested {@link Album}s.
  *
@@ -65,6 +67,7 @@ public class Album {
 	 *            The Sone this album belongs to
 	 */
 	public Album(String id, Sone sone) {
+		Validation.begin().isNotNull("Album ID", id).isNotNull("Album Owner", sone).check();
 		this.id = id;
 		this.sone = sone;
 	}
@@ -126,6 +129,7 @@ public class Album {
 	 * @return This album
 	 */
 	public Album setName(String name) {
+		Validation.begin().isNotNull("Album Name", name).check();
 		this.name = name;
 		return this;
 	}
@@ -147,6 +151,7 @@ public class Album {
 	 * @return This album
 	 */
 	public Album setDescription(String description) {
+		Validation.begin().isNotNull("Album Description", description).check();
 		this.description = description;
 		return this;
 	}
