@@ -34,19 +34,19 @@
 				<form class="trust reply-trust<%if reply.sone.trust.assigned> hidden<%/if>" action="trust.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<input type="hidden" name="identity" value="<% reply.sone.id|html>" />
+					<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
 					<button type="submit" title="<%= View.Trust.Tooltip.Trust|l10n|html>">✓</button>
 				</form>
 				<form class="distrust reply-distrust" action="distrust.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<input type="hidden" name="identity" value="<% reply.sone.id|html>" />
+					<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
 					<button type="submit" title="<%= View.Trust.Tooltip.Distrust|l10n|html>">✗</button>
 				</form>
 				<form class="untrust reply-untrust<%if !reply.sone.trust.assigned> hidden<%/if>" action="untrust.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<input type="hidden" name="identity" value="<% reply.sone.id|html>" />
+					<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
 					<button type="submit" title="<%= View.Trust.Tooltip.Untrust|l10n|html>">↶</button>
 				</form>
 			<%/if>
