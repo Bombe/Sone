@@ -108,4 +108,28 @@ public interface OwnIdentity extends Identity {
 	 */
 	public void removeProperty(String name) throws WebOfTrustException;
 
+	/**
+	 * Sets the trust for the given target identity.
+	 *
+	 * @param target
+	 *            The target to set the trust for
+	 * @param trustValue
+	 *            The new trust value (from {@code -100} or {@code 100})
+	 * @param comment
+	 *            The comment for the trust assignment
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void setTrust(Identity target, int trustValue, String comment) throws WebOfTrustException;
+
+	/**
+	 * Removes any trust assignment for the given target identity.
+	 *
+	 * @param target
+	 *            The targe to remove the trust assignment for
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void removeTrust(Identity target) throws WebOfTrustException;
+
 }

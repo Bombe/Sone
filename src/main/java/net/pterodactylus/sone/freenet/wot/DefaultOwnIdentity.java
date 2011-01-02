@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import net.pterodactylus.util.validation.Validation;
+
 /**
  * An own identity is an identity that the owner of the node has full control
  * over.
@@ -133,6 +135,24 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 				webOfTrustConnector.setProperty(this, newProperty.getKey(), newProperty.getValue());
 			}
 		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void setTrust(Identity target, int trustValue, String comment) throws WebOfTrustException {
+		Validation.begin().isNotNull("Trust Target", target).isNotNull("Trust Comment", comment).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
+		webOfTrustConnector.setTrust(this, target, trustValue, comment);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeTrust(Identity target) throws WebOfTrustException {
+		Validation.begin().isNotNull("Trust Target", target).check();
+		webOfTrustConnector.removeTrust(this, target);
 	}
 
 }
