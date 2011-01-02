@@ -957,6 +957,42 @@ public class Core implements IdentityListener {
 	}
 
 	/**
+	 * Assigns the configured positive trust value for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void trustSone(Sone origin, Sone target) {
+		setTrust(origin, target, options.getIntegerOption("PositiveTrust").get());
+	}
+
+	/**
+	 * Assigns the configured negative trust value for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void distrustSone(Sone origin, Sone target) {
+		setTrust(origin, target, options.getIntegerOption("NegativeTrust").get());
+	}
+
+	/**
+	 * Removes the trust assignment for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void untrustSone(Sone origin, Sone target) {
+		removeTrust(origin, target);
+	}
+
+	/**
 	 * Updates the stores Sone with the given Sone.
 	 *
 	 * @param sone
