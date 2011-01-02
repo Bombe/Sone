@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -462,6 +463,7 @@ public class WebInterface implements CoreListener {
 	 * Register all toadlets.
 	 */
 	private void registerToadlets() {
+		Template emptyTemplate = templateFactory.createTemplate(new StringReader(""));
 		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
 		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
 		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
@@ -471,18 +473,10 @@ public class WebInterface implements CoreListener {
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
-		Template likePostTemplate = templateFactory.createTemplate(createReader("/templates/like.html"));
-		Template unlikePostTemplate = templateFactory.createTemplate(createReader("/templates/unlike.html"));
 		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
 		Template deleteReplyTemplate = templateFactory.createTemplate(createReader("/templates/deleteReply.html"));
-		Template lockSoneTemplate = templateFactory.createTemplate(createReader("/templates/lockSone.html"));
-		Template unlockSoneTemplate = templateFactory.createTemplate(createReader("/templates/unlockSone.html"));
-		Template followSoneTemplate = templateFactory.createTemplate(createReader("/templates/followSone.html"));
-		Template unfollowSoneTemplate = templateFactory.createTemplate(createReader("/templates/unfollowSone.html"));
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
 		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
-		Template dismissNotificationTemplate = templateFactory.createTemplate(createReader("/templates/dismissNotification.html"));
-		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
 		Template postTemplate = templateFactory.createTemplate(createReader("/templates/include/viewPost.html"));
@@ -497,21 +491,21 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewPostPage(viewPostTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikePage(likePostTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikePage(unlikePostTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostPage(deletePostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyPage(deleteReplyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSonePage(lockSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSonePage(unlockSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(followSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(unfollowSoneTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSonePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSonePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(logoutTemplate, this), "Logout"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(dismissNotificationTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
