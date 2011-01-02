@@ -271,6 +271,21 @@ public class WebOfTrustConnector implements ConnectorListener {
 	}
 
 	/**
+	 * Removes any trust assignment of the given own identity for the given
+	 * identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity
+	 * @param identity
+	 *            The identity to remove all trust for
+	 * @throws WebOfTrustException
+	 *             if an error occurs
+	 */
+	public void removeTrust(OwnIdentity ownIdentity, Identity identity) throws WebOfTrustException {
+		performRequest(SimpleFieldSetConstructor.create().put("Message", "RemoveTrust").put("Truster", ownIdentity.getId()).put("Trustee", identity.getId()).get(), "TrustRemoved");
+	}
+
+	/**
 	 * Pings the Web of Trust plugin. If the plugin can not be reached, a
 	 * {@link PluginException} is thrown.
 	 *
