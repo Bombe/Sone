@@ -68,6 +68,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return;
 	}
 	commentElement = (function(postId) {
+		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 			markPostAsKnown(getPostElement(this));
 			replyElement = $("#sone .post#" + postId + " .create-reply");
@@ -87,6 +88,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return commentElement;
 	})(postId);
 	$(insertAfterThisElement).after(commentElement.clone(true));
+	$(insertAfterThisElement).after(separator);
 }
 
 var translations = {};

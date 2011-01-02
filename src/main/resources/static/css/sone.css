@@ -1,7 +1,7 @@
 /* Sone Main CSS File */
 
 /* first, override some fproxy rules. */
-#sone .post .reply div,#sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
+#sone div, #sone span, #sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
 	font: inherit;
 }
 
@@ -177,19 +177,6 @@ textarea {
 	min-height: 48px;
 }
 
-#sone .trust {
-	font-size: 85%;
-	text-align: center;
-}
-
-#sone .trust .explicit {
-	color: rgb(0, 128, 0);
-}
-
-#sone .trust .implicit {
-	color: rgb(128, 128, 128);
-}
-
 #sone .post .author, #sone .post .recipient {
 	display: inline;
 	font-weight: bold;
@@ -205,12 +192,17 @@ textarea {
 	font-size: 85%;
 }
 
+#sone .separator {
+	font: inherit;
+	color: rgb(28, 131, 191);
+}
+
 #sone .post .time {
 	display: inline;
 	color: #666;
 }
 
-#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .increase-trust, #sone .post .decrease-trust {
+#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .trust, #sone .post .distrust, #sone .post .untrust {
 	display: inline;
 	font: inherit;
 	margin: 0px;
@@ -220,11 +212,11 @@ textarea {
 	display: none;
 }
 
-#sone .post .like.hidden, #sone .post .unlike.hidden {
+#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .increase-trust button, #sone .post .decrease-trust button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -233,7 +225,19 @@ textarea {
 	margin: 0px;
 }
 
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .increase-trust button:hover, #sone .post .decrease-trust button:hover {
+#sone .post .trust button {
+	color: rgb(0, 128, 0);
+}
+
+#sone .post .distrust button {
+	color: rgb(255, 0, 0);
+}
+
+#sone .post .untrust button {
+	color: rgb(64, 64, 64);
+}
+
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -241,26 +245,9 @@ textarea {
 	cursor: pointer;
 }
 
-#sone .post .delete:before, #sone .post .likes:before, #sone .post .like:before, #sone .post .unlike:before {
-	content: ' ‧ ';
-}
-
 #sone .post .likes span {
 	font: inherit;
 	color: green;
-}
-
-#sone .post .trust {
-	display: inline;
-}
-
-#sone .post .trust:before {
-	content: ' · ';
-}
-
-#sone .trust .explicit, #sone .trust .implicit {
-	font: inherit;
-	display: inline;
 }
 
 #sone .post .replies {
@@ -320,10 +307,6 @@ textarea {
 
 #sone .post .show-reply-form span:hover {
 	color: rgb(255, 172, 0);
-}
-
-#sone .post .show-reply-form:before {
-	content: ' ‧ ';
 }
 
 #sone .post .create-reply {
