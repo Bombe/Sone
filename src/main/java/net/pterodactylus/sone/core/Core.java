@@ -47,6 +47,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.validation.Validation;
 import freenet.keys.FreenetURI;
 
 /**
@@ -916,6 +917,42 @@ public class Core implements IdentityListener {
 		} catch (WebOfTrustException wote1) {
 			logger.log(Level.WARNING, "Could not get trust for Sone: " + target, wote1);
 			return null;
+		}
+	}
+
+	/**
+	 * Sets the trust value of the given origin Sone for the target Sone.
+	 *
+	 * @param origin
+	 *            The origin Sone
+	 * @param target
+	 *            The target Sone
+	 * @param trustValue
+	 *            The trust value (from {@code -100} to {@code 100})
+	 */
+	public void setTrust(Sone origin, Sone target, int trustValue) {
+		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
+		try {
+			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, "Set from Sone Web Interface");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set trust for Sone: " + target, wote1);
+		}
+	}
+
+	/**
+	 * Removes any trust assignment for the given target Sone.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void removeTrust(Sone origin, Sone target) {
+		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
+		try {
+			((OwnIdentity) origin.getIdentity()).removeTrust(target.getIdentity());
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not remove trust for Sone: " + target, wote1);
 		}
 	}
 
