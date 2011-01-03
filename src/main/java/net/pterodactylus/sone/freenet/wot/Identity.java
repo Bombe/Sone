@@ -91,6 +91,7 @@ public interface Identity {
 	 *            The own identity to get the trust for
 	 * @return The trust assigned to this identity
 	 * @throws WebOfTrustException
+	 *             if an error occurs retrieving the trust
 	 */
 	public Trust getTrust(OwnIdentity ownIdentity) throws WebOfTrustException;
 
