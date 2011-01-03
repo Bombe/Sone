@@ -401,6 +401,67 @@ function unlikeReply(replyId) {
 	});
 }
 
+/**
+ * Trusts the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone to trust
+ */
+function trustSone(soneId) {
+	$.getJSON("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Distrusts the Sone with the given ID, i.e. assigns a negative trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to distrust
+ */
+function distrustSone(soneId) {
+	$.getJSON("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Untrusts the Sone with the given ID, i.e. removes any trust assignment.
+ *
+ * @param soneId
+ *            The ID of the Sone to untrust
+ */
+function untrustSone(soneId) {
+	$.getJSON("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Updates the trust controls for all posts and replies of the given Sone,
+ * according to the given trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to update all trust controls for
+ * @param trustValue
+ *            The trust value for the Sone
+ */
+function updateTrustControls(soneId, trustValue) {
+	$("#sone .post").each(function() {
+		if (getPostAuthor(this) == soneId) {
+			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
+			getPostElement(this).find(".post-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
+		}
+	});
+}
+
 function updateReplyLikes(replyId) {
 	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
