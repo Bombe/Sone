@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.Set;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
 import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
+import net.pterodactylus.util.cache.WritableCache;
 
 /**
  * A Web of Trust identity.
@@ -57,7 +57,7 @@ public class DefaultIdentity implements Identity {
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
 	/** Cached trust. */
-	private final Cache<OwnIdentity, Trust> trustCache = new MemoryCache<OwnIdentity, Trust>(new ValueRetriever<OwnIdentity, Trust>() {
+	private final WritableCache<OwnIdentity, Trust> trustCache = new MemoryCache<OwnIdentity, Trust>(new ValueRetriever<OwnIdentity, Trust>() {
 
 		@Override
 		@SuppressWarnings("synthetic-access")
