@@ -213,7 +213,7 @@ public class IdentityManager extends AbstractService {
 					/* find removed identities. */
 					if (oldIdentities.containsKey(ownIdentity)) {
 						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
-							if (!currentIdentities.containsKey(oldIdentity.getId())) {
+							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
 								identityListenerManager.fireIdentityRemoved(ownIdentity, oldIdentity);
 							}
 						}
