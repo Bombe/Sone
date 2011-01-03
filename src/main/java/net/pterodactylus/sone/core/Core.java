@@ -1742,6 +1742,7 @@ public class Core implements IdentityListener {
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
+				sone.setIdentity(identity);
 				soneDownloader.fetchSone(sone);
 			}
 		}).start();
