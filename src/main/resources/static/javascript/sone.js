@@ -640,6 +640,20 @@ function ajaxifyReply(replyElement) {
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
 
+	/* convert trust control buttons to javascript functions. */
+	$(replyElement).find(".reply-trust").submit(function() {
+		trustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-distrust").submit(function() {
+		distrustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-untrust").submit(function() {
+		untrustSone(getReplyAuthor(this));
+		return false;
+	});
+
 	/* mark post and all replies as known on click. */
 	$(replyElement).click(function() {
 		markPostAsKnown(getPostElement(this));
