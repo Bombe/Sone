@@ -59,6 +59,7 @@
 				</form>
 			<%/if>
 			<%if post.sone.current>
+				<span class='separator'>·</span>
 				<form class="delete delete-post" action="deletePost.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
