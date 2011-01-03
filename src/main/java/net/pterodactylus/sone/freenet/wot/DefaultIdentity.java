@@ -248,6 +248,18 @@ public class DefaultIdentity implements Identity {
 		}
 	}
 
+	/**
+	 * Sets the trust received for this identity by the given own identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity that gives the trust
+	 * @param trust
+	 *            The trust received for this identity
+	 */
+	void setTrustPrivate(OwnIdentity ownIdentity, Trust trust) {
+		trustCache.put(ownIdentity, trust);
+	}
+
 	//
 	// OBJECT METHODS
 	//
