@@ -75,6 +75,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	@Override
 	public void addContext(String context) throws WebOfTrustException {
 		webOfTrustConnector.addContext(this, context);
+		addContextPrivate(context);
 	}
 
 	/**
@@ -83,6 +84,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	@Override
 	public void removeContext(String context) throws WebOfTrustException {
 		webOfTrustConnector.removeContext(this, context);
+		removeContextPrivate(context);
 	}
 
 	/**
@@ -100,6 +102,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 				webOfTrustConnector.addContext(this, context);
 			}
 		}
+		setContextsPrivate(contexts);
 	}
 
 	/**
@@ -108,6 +111,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	@Override
 	public void setProperty(String name, String value) throws WebOfTrustException {
 		webOfTrustConnector.setProperty(this, name, value);
+		setPropertyPrivate(name, value);
 	}
 
 	/**
@@ -116,6 +120,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	@Override
 	public void removeProperty(String name) throws WebOfTrustException {
 		webOfTrustConnector.removeProperty(this, name);
+		removePropertyPrivate(name);
 	}
 
 	/**
@@ -135,6 +140,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 				webOfTrustConnector.setProperty(this, newProperty.getKey(), newProperty.getValue());
 			}
 		}
+		setPropertiesPrivate(properties);
 	}
 
 	/**
