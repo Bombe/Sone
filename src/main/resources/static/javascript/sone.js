@@ -569,6 +569,20 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* convert trust control buttons to javascript functions. */
+	$(postElement).find(".post-trust").submit(function() {
+		trustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-distrust").submit(function() {
+		distrustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-untrust").submit(function() {
+		untrustSone(getPostAuthor(this));
+		return false;
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
