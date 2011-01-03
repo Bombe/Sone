@@ -303,6 +303,17 @@ function getPostTime(element) {
 	return getPostElement(element).find(".post-time").text();
 }
 
+/**
+ * Returns the author of the post the given element belongs to.
+ *
+ * @param element
+ *            The element whose post to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getPostAuthor(element) {
+	return getPostElement(element).find(".post-author").text();
+}
+
 function getReplyElement(element) {
 	return $(element).closest(".reply");
 }
@@ -313,6 +324,17 @@ function getReplyId(element) {
 
 function getReplyTime(element) {
 	return getReplyElement(element).find(".reply-time").text();
+}
+
+/**
+ * Returns the author of the reply the given element belongs to.
+ *
+ * @param element
+ *            The element whose reply to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getReplyAuthor(element) {
+	return getReplyElement(element).find(".reply-author").text();
 }
 
 function likePost(postId) {
