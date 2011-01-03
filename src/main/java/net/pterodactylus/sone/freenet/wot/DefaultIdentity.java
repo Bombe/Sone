@@ -30,6 +30,7 @@ import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.cache.WritableCache;
+import net.pterodactylus.util.collection.TimedMap;
 
 /**
  * A Web of Trust identity.
@@ -69,7 +70,7 @@ public class DefaultIdentity implements Identity {
 			}
 		}
 
-	});
+	}, new TimedMap<OwnIdentity, CacheItem<Trust>>(60000));
 
 	/**
 	 * Creates a new identity.
