@@ -460,6 +460,13 @@ function updateTrustControls(soneId, trustValue) {
 			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
 		}
 	});
+	$(this).find("#sone .reply").each(function() {
+		if (getReplyAuthor(this) == soneId) {
+			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
+			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
+		}
+	});
 }
 
 function updateReplyLikes(replyId) {
