@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
@@ -55,7 +56,11 @@ public class UntrustAjaxPage extends JsonPage {
 			return createErrorJsonObject("invalid-sone-id");
 		}
 		webInterface.getCore().untrustSone(currentSone, sone);
-		return createSuccessJsonObject().put("trustValue", (String) null);
+		Trust trust = webInterface.getCore().getTrust(currentSone, sone);
+		if (trust == null) {
+			return createErrorJsonObject("wot-plugin");
+		}
+		return createSuccessJsonObject().put("trustValue", trust.getExplicit());
 	}
 
 }
