@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.cache.CacheException;
@@ -31,6 +33,7 @@ import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.cache.WritableCache;
 import net.pterodactylus.util.collection.TimedMap;
+import net.pterodactylus.util.logging.Logging;
 
 /**
  * A Web of Trust identity.
@@ -38,6 +41,9 @@ import net.pterodactylus.util.collection.TimedMap;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultIdentity implements Identity {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(DefaultIdentity.class);
 
 	/** The web of trust connector. */
 	private final WebOfTrustConnector webOfTrustConnector;
@@ -241,11 +247,12 @@ public class DefaultIdentity implements Identity {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Trust getTrust(OwnIdentity ownIdentity) throws WebOfTrustException {
+	public Trust getTrust(OwnIdentity ownIdentity) {
 		try {
 			return trustCache.get(ownIdentity);
 		} catch (CacheException ce1) {
-			throw new WebOfTrustException("Could not get trust for OwnIdentity: " + ownIdentity, ce1);
+			logger.log(Level.WARNING, "Could not get trust for OwnIdentity: " + ownIdentity, ce1);
+			return null;
 		}
 	}
 

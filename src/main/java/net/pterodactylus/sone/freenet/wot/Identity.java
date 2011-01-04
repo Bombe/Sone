@@ -85,14 +85,15 @@ public interface Identity {
 
 	/**
 	 * Retrieves the trust that this identity receives from the given own
-	 * identity.
+	 * identity. If this identity is not in the own identity’s trust tree, a
+	 * {@link Trust} is returned that has all its elements set to {@code null}.
+	 * If the trust can not be retrieved, {@code null} is returned.
 	 *
 	 * @param ownIdentity
 	 *            The own identity to get the trust for
-	 * @return The trust assigned to this identity
-	 * @throws WebOfTrustException
-	 *             if an error occurs retrieving the trust
+	 * @return The trust assigned to this identity, or {@code null} if the trust
+	 *         could not be retrieved
 	 */
-	public Trust getTrust(OwnIdentity ownIdentity) throws WebOfTrustException;
+	public Trust getTrust(OwnIdentity ownIdentity);
 
 }

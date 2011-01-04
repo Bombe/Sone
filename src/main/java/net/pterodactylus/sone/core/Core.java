@@ -899,8 +899,10 @@ public class Core implements IdentityListener {
 	}
 
 	/**
-	 * Retrieves the trust relationship from the origin to the target.
+	 * Retrieves the trust relationship from the origin to the target. If the
+	 * trust relationship can not be retrieved, {@code null} is returned.
 	 *
+	 * @see Identity#getTrust(OwnIdentity)
 	 * @param origin
 	 *            The origin of the trust tree
 	 * @param target
@@ -912,12 +914,7 @@ public class Core implements IdentityListener {
 			logger.log(Level.WARNING, "Tried to get trust from remote Sone: %s", origin);
 			return null;
 		}
-		try {
-			return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not get trust for Sone: " + target, wote1);
-			return null;
-		}
+		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
 	}
 
 	/**

@@ -21,6 +21,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -91,7 +92,10 @@ public class SoneAccessor extends ReflectionAccessor {
 			return core.isLocked(sone);
 		} else if (member.equals("trust")) {
 			Sone currentSone = (Sone) dataProvider.getData("currentSone");
-			return core.getTrust(currentSone, sone);
+			Trust trust = core.getTrust(currentSone, sone);
+			if (trust == null) {
+				return new Trust(null, null, null);
+			}
 		}
 		return super.get(dataProvider, object, member);
 	}
