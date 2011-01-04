@@ -446,6 +446,11 @@ public class WebOfTrustConnector implements ConnectorListener {
 		/** The payload of the reply. */
 		private Bucket data;
 
+		/** Empty constructor. */
+		public Reply() {
+			/* do nothing. */
+		}
+
 		/**
 		 * Returns the fields of the reply.
 		 *
