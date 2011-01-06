@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.web.ajax;
 
-import java.util.UUID;
-
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.Page;
@@ -68,7 +66,7 @@ public abstract class JsonPage implements Page {
 	 *         session
 	 */
 	protected Session getCurrentSession(ToadletContext toadletContenxt) {
-		return getCurrentSession(toadletContenxt, true);
+		return webInterface.getCurrentSession(toadletContenxt);
 	}
 
 	/**
@@ -84,11 +82,7 @@ public abstract class JsonPage implements Page {
 	 *         session
 	 */
 	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
-		Session session = webInterface.getSessionManager().useSession(toadletContenxt);
-		if (create && (session == null)) {
-			session = webInterface.getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
-		}
-		return session;
+		return webInterface.getCurrentSession(toadletContenxt, create);
 	}
 
 	/**
@@ -100,15 +94,22 @@ public abstract class JsonPage implements Page {
 	 *         currently logged in
 	 */
 	protected Sone getCurrentSone(ToadletContext toadletContext) {
-		Session session = getCurrentSession(toadletContext);
-		if (session == null) {
-			return null;
-		}
-		String soneId = (String) session.getAttribute("Sone.CurrentSone");
-		if (soneId == null) {
-			return null;
-		}
-		return webInterface.getCore().getLocalSone(soneId, false);
+		return webInterface.getCurrentSone(toadletContext);
+	}
+
+	/**
+	 * Returns the currently logged in Sone.
+	 *
+	 * @param toadletContext
+	 *            The toadlet context
+	 * @param create
+	 *            {@code true} to create a new session if no session exists,
+	 *            {@code false} to not create a new session
+	 * @return The currently logged in Sone, or {@code null} if no Sone is
+	 *         currently logged in
+	 */
+	protected Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+		return webInterface.getCurrentSone(toadletContext, create);
 	}
 
 	//

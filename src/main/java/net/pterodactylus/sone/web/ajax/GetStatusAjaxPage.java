@@ -63,12 +63,15 @@ public class GetStatusAjaxPage extends JsonPage {
 	protected JsonObject createJsonObject(Request request) {
 		/* load Sones. */
 		boolean loadAllSones = Boolean.parseBoolean(request.getHttpRequest().getParam("loadAllSones", "true"));
-		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSone(request.getToadletContext())));
+		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSone(request.getToadletContext(), false)));
 		if (loadAllSones) {
 			sones.addAll(webInterface.getCore().getSones());
 		}
 		JsonArray jsonSones = new JsonArray();
 		for (Sone sone : sones) {
+			if (sone == null) {
+				continue;
+			}
 			JsonObject jsonSone = createJsonSone(sone);
 			jsonSones.add(jsonSone);
 		}

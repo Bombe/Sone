@@ -53,6 +53,22 @@ textarea {
 	color: rgb(255, 0, 0);
 }
 
+#sone a.internet:before {
+	content: '⚠ ';
+}
+
+#sone a.freenet:before {
+	content: '» ';
+}
+
+#sone a.freenet-trusted {
+	color: rgb(0, 128, 0);
+}
+
+#sone a.freenet-trusted:before {
+	content: '★ ';
+}
+
 #sone a img {
 	border: none;
 }
@@ -71,10 +87,6 @@ textarea {
 
 #sone #notification-area .notification .dismiss {
 	float: right;
-}
-
-#sone #notification-area .notification > div {
-	display: inline;
 }
 
 #sone #notification-area .notification .post-count {

@@ -830,6 +830,17 @@ function createNotification(id, text, dismissable) {
 	return notification;
 }
 
+/**
+ * Shows the details of the notification with the given ID.
+ *
+ * @param notificationId
+ *            The ID of the notification
+ */
+function showNotificationDetails(notificationId) {
+	$("#sone .notification#" + notificationId + " .text").show();
+	$("#sone .notification#" + notificationId + " .short-text").hide();
+}
+
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
