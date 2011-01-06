@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -29,6 +30,7 @@ import java.util.regex.Pattern;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.TemplateFactory;
+import freenet.keys.FreenetURI;
 
 /**
  * {@link Parser} implementation that can recognize Freenet URIs.
@@ -185,9 +187,17 @@ public class FreenetLinkParser implements Parser {
 						}
 						boolean fromPostingSone = false;
 						if ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
-							fromPostingSone = link.substring(4, 47).equals(postingSone.getId());
+							try {
+								new FreenetURI(link);
+								fromPostingSone = link.substring(4, 47).equals(postingSone.getId());
+								parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
+							} catch (MalformedURLException mue1) {
+								/* it’s not a valid link. */
+								parts.add(createPlainTextPart(link));
+							}
+						} else {
+							parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
 						}
-						parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
 					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
 						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
 						int firstSlash = name.indexOf('/');
