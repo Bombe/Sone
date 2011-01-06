@@ -178,7 +178,7 @@ public class FreenetLinkParser implements Parser {
 									name = name.substring(name.lastIndexOf('/', name.lastIndexOf('/') - 1));
 								} else {
 									/* shorten to 5 chars. */
-									name = name.substring(4, 9);
+									name = name.substring(4, Math.min(9, name.length()));
 								}
 							}
 						}
