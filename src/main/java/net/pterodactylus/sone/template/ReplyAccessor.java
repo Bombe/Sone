@@ -72,7 +72,10 @@ public class ReplyAccessor extends ReflectionAccessor {
 		} else if (member.equals("text")) {
 			String text = reply.getText();
 			try {
-				return linkParser.parse(new StringReader(text));
+				synchronized (linkParser) {
+					linkParser.setPostingSone(reply.getSone());
+					return linkParser.parse(new StringReader(text));
+				}
 			} catch (IOException ioe1) {
 				/* ignore. */
 			}

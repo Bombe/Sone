@@ -79,7 +79,10 @@ public class PostAccessor extends ReflectionAccessor {
 				return null;
 			}
 			try {
-				return linkParser.parse(new StringReader(text));
+				synchronized (linkParser) {
+					linkParser.setPostingSone(post.getSone());
+					return linkParser.parse(new StringReader(text));
+				}
 			} catch (IOException ioe1) {
 				/* ignore. */
 			}
