@@ -169,7 +169,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 						if ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
 							try {
 								new FreenetURI(link);
-								fromPostingSone = link.substring(4, 47).equals(context.getPostingSone().getId());
+								fromPostingSone = link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
 								parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
 							} catch (MalformedURLException mue1) {
 								/* it’s not a valid link. */
