@@ -1,6 +1,6 @@
 <div class="short-text">
 	<%= Notification.NewPost.ShortText|l10n|html>
-	<a href="javascript:showNotificationDetails('<%notification.id|html>'); return false;"><%= Notification.ClickHereToRead|l10n|html></a>
+	<a class="link" onclick="showNotificationDetails('<%notification.id|html>'); return false;"><%= Notification.ClickHereToRead|l10n|html></a>
 </div>
 <div class="text hidden">
 	<%= Notification.NewPost.Text|l10n|html>

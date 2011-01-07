@@ -49,6 +49,10 @@ textarea {
 	color: rgb(255, 172, 0);
 }
 
+#sone a.link {
+	cursor: pointer;
+}
+
 #sone a.internet {
 	color: rgb(255, 0, 0);
 }
