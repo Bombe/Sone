@@ -1649,6 +1649,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 */
 	@Override
 	public void updateFound(Version version, long releaseTime) {
+		coreListenerManager.fireUpdateFound(version, releaseTime);
 	}
 
 }
