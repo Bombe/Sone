@@ -142,6 +142,9 @@ public class WebInterface implements CoreListener {
 	/** The “Sone locked” notification. */
 	private final ListNotification<Sone> lockedSonesNotification;
 
+	/** The “new version” notification. */
+	private final TemplateNotification newVersionNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -190,6 +193,9 @@ public class WebInterface implements CoreListener {
 
 		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
+
+		Template newVersionTemplate = templateFactory.createTemplate(createReader("/templates/notify/newVersionNotification.html"));
+		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 	}
 
 	//
@@ -706,6 +712,9 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void updateFound(Version version, long releaseTime) {
+		newVersionNotification.set("version", version);
+		newVersionNotification.set("releaseTime", releaseTime);
+		notificationManager.addNotification(newVersionNotification);
 	}
 
 	/**
