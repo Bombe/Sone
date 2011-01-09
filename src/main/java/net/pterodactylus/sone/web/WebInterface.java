@@ -88,6 +88,7 @@ import net.pterodactylus.util.template.TemplateFactory;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
+import net.pterodactylus.util.version.Version;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
@@ -698,6 +699,13 @@ public class WebInterface implements CoreListener {
 	public void soneUnlocked(Sone sone) {
 		lockedSonesNotification.remove(sone);
 		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updateFound(Version version, long releaseTime) {
 	}
 
 	/**
