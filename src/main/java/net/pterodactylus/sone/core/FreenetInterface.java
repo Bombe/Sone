@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -59,6 +60,9 @@ public class FreenetInterface {
 
 	/** The USK callbacks. */
 	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<String, USKCallback>();
+
+	/** The not-Sone-related USK callbacks. */
+	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
 
 	/**
 	 * Creates a new Freenet interface.
@@ -195,6 +199,85 @@ public class FreenetInterface {
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.FINE, "Could not unsubscribe USK “" + sone.getRequestUri() + "”!", mue1);
 		}
+	}
+
+	/**
+	 * Registers an arbitrary URI and calls the given callback if a new edition
+	 * is found.
+	 *
+	 * @param uri
+	 *            The URI to watch
+	 * @param callback
+	 *            The callback to call
+	 */
+	public void registerUsk(FreenetURI uri, final Callback callback) {
+		USKCallback uskCallback = new USKCallback() {
+
+			@Override
+			public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
+				callback.editionFound(key.getURI(), edition, newKnownGood, newSlotToo);
+			}
+
+			@Override
+			public short getPollingPriorityNormal() {
+				return RequestStarter.PREFETCH_PRIORITY_CLASS;
+			}
+
+			@Override
+			public short getPollingPriorityProgress() {
+				return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
+			}
+
+		};
+		try {
+			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (HighLevelSimpleClientImpl) client);
+			uriUskCallbacks.put(uri, uskCallback);
+		} catch (MalformedURLException mue1) {
+			logger.log(Level.WARNING, "Could not subscribe to USK: " + uri, uri);
+		}
+	}
+
+	/**
+	 * Unregisters the USK watcher for the given URI.
+	 *
+	 * @param uri
+	 *            The URI to unregister the USK watcher for
+	 */
+	public void unregisterUsk(FreenetURI uri) {
+		USKCallback uskCallback = uriUskCallbacks.remove(uri);
+		if (uskCallback == null) {
+			logger.log(Level.INFO, "Could not unregister unknown USK: " + uri);
+			return;
+		}
+		try {
+			node.clientCore.uskManager.unsubscribe(USK.create(uri), uskCallback);
+		} catch (MalformedURLException mue1) {
+			logger.log(Level.INFO, "Could not unregister invalid USK: " + uri);
+		}
+	}
+
+	/**
+	 * Callback for USK watcher events.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static interface Callback {
+
+		/**
+		 * Notifies a listener that a new edition was found for a URI.
+		 *
+		 * @param uri
+		 *            The URI that a new edition was found for
+		 * @param edition
+		 *            The found edition
+		 * @param newKnownGood
+		 *            Whether the found edition was actually fetched
+		 * @param newSlot
+		 *            Whether the found edition is higher than all previously
+		 *            found editions
+		 */
+		public void editionFound(FreenetURI uri, long edition, boolean newKnownGood, boolean newSlot);
+
 	}
 
 }
