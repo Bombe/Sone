@@ -1,5 +1,5 @@
 /*
- * Sone - Parser.java - Copyright © 2010 David Roden
+ * Sone - FreenetLinkParserContext.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,37 @@
 
 package net.pterodactylus.sone.text;
 
-import java.io.IOException;
-import java.io.Reader;
+import net.pterodactylus.sone.data.Sone;
 
 /**
- * Interface for parsers that can create {@link Part}s from a text source
- * (usually a {@link Reader}).
+ * {@link ParserContext} implementation for the {@link FreenetLinkParser}. It
+ * stores the {@link Sone} that provided the parsed text so that certain links
+ * can be marked in a different way.
  *
- * @param <C>
- *            The type of the parser context
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Parser<C extends ParserContext> {
+public class FreenetLinkParserContext implements ParserContext {
+
+	/** The posting Sone. */
+	private final Sone postingSone;
 
 	/**
-	 * Create a {@link Part} from the given text source.
+	 * Creates a new link parser context.
 	 *
-	 * @param context
-	 *            The parser context
-	 * @param source
-	 *            The text source
-	 * @return The parsed part
-	 * @throws IOException
-	 *             if an I/O error occurs
+	 * @param postingSone
+	 *            The posting Sone
 	 */
-	public Part parse(C context, Reader source) throws IOException;
+	public FreenetLinkParserContext(Sone postingSone) {
+		this.postingSone = postingSone;
+	}
+
+	/**
+	 * Returns the Sone that provided the text that is being parsed.
+	 *
+	 * @return The posting Sone
+	 */
+	public Sone getPostingSone() {
+		return postingSone;
+	}
 
 }

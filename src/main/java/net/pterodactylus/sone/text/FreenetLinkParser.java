@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.TemplateFactory;
 import freenet.keys.FreenetURI;
@@ -37,7 +36,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FreenetLinkParser implements Parser {
+public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FreenetLinkParser.class);
@@ -75,9 +74,6 @@ public class FreenetLinkParser implements Parser {
 	/** The template factory. */
 	private final TemplateFactory templateFactory;
 
-	/** The Sone that posted the currently parsed text. */
-	private Sone postingSone;
-
 	/**
 	 * Creates a new freenet link parser.
 	 *
@@ -89,22 +85,6 @@ public class FreenetLinkParser implements Parser {
 	}
 
 	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Sets the Sone that posted the text that will be parsed in the next call
-	 * to {@link #parse(Reader)}. You need to synchronize calling this method
-	 * and {@link #parse(Reader)}!
-	 *
-	 * @param sone
-	 *            The Sone that posted the text
-	 */
-	public void setPostingSone(Sone sone) {
-		postingSone = sone;
-	}
-
-	//
 	// PART METHODS
 	//
 
@@ -112,7 +92,7 @@ public class FreenetLinkParser implements Parser {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Part parse(Reader source) throws IOException {
+	public Part parse(FreenetLinkParserContext context, Reader source) throws IOException {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = (source instanceof BufferedReader) ? (BufferedReader) source : new BufferedReader(source);
 		String line;
@@ -189,7 +169,7 @@ public class FreenetLinkParser implements Parser {
 						if ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
 							try {
 								new FreenetURI(link);
-								fromPostingSone = link.substring(4, 47).equals(postingSone.getId());
+								fromPostingSone = link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
 								parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
 							} catch (MalformedURLException mue1) {
 								/* it’s not a valid link. */

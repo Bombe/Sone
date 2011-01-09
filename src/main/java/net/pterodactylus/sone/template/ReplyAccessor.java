@@ -24,6 +24,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.FreenetLinkParser;
+import net.pterodactylus.sone.text.FreenetLinkParserContext;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -72,10 +73,7 @@ public class ReplyAccessor extends ReflectionAccessor {
 		} else if (member.equals("text")) {
 			String text = reply.getText();
 			try {
-				synchronized (linkParser) {
-					linkParser.setPostingSone(reply.getSone());
-					return linkParser.parse(new StringReader(text));
-				}
+				return linkParser.parse(new FreenetLinkParserContext(reply.getSone()), new StringReader(text));
 			} catch (IOException ioe1) {
 				/* ignore. */
 			}
