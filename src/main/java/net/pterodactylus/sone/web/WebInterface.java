@@ -480,6 +480,7 @@ public class WebInterface implements CoreListener {
 		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
 		Template deleteReplyTemplate = templateFactory.createTemplate(createReader("/templates/deleteReply.html"));
 		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
+		Template imageBrowserTemplate = templateFactory.createTemplate(createReader("/templates/imageBrowser.html"));
 		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
@@ -504,6 +505,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImageBrowserPage(imageBrowserTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
