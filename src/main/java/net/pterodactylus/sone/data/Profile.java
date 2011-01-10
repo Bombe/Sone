@@ -17,6 +17,14 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import net.pterodactylus.util.validation.Validation;
+
 /**
  * A profile stores personal information about a {@link Sone}. All information
  * is optional and can be {@code null}.
@@ -46,6 +54,12 @@ public class Profile implements Fingerprintable {
 	/** The year of the birth date. */
 	private volatile Integer birthYear;
 
+	/** Additional fields in the profile. */
+	private final List<String> fields = Collections.synchronizedList(new ArrayList<String>());
+
+	/** The field values. */
+	private final Map<String, String> fieldValues = Collections.synchronizedMap(new HashMap<String, String>());
+
 	/**
 	 * Creates a new empty profile.
 	 */
@@ -69,6 +83,7 @@ public class Profile implements Fingerprintable {
 		this.birthDay = profile.birthDay;
 		this.birthMonth = profile.birthMonth;
 		this.birthYear = profile.birthYear;
+		this.fieldValues.putAll(profile.fieldValues);
 	}
 
 	//
@@ -219,6 +234,145 @@ public class Profile implements Fingerprintable {
 		return this;
 	}
 
+	/**
+	 * Appends a new field to the list of fields.
+	 *
+	 * @param field
+	 *            The field to add
+	 * @throws IllegalArgumentException
+	 *             if the name is not valid
+	 */
+	public void addField(String field) throws IllegalArgumentException {
+		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Unique", !fields.contains(field), true).check();
+		fields.add(field);
+	}
+
+	/**
+	 * Moves the field with the given index up one position in the field list.
+	 * The index of the field to move must be greater than {@code 0} (because
+	 * you obviously can not move the first field further up).
+	 *
+	 * @param fieldIndex
+	 *            The index of the field to move
+	 */
+	public void moveFieldUp(int fieldIndex) {
+		Validation.begin().isGreater("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).check();
+		String field = fields.remove(fieldIndex);
+		fields.add(fieldIndex - 1, field);
+	}
+
+	/**
+	 * Moves the field with the given name up one position in the field list.
+	 * The field must not be the first field (because you obviously can not move
+	 * the first field further up).
+	 *
+	 * @param field
+	 *            The name of the field to move
+	 */
+	public void moveFieldUp(String field) {
+		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
+		moveFieldUp(getFieldIndex(field));
+	}
+
+	/**
+	 * Moves the field with the given index down one position in the field list.
+	 * The index of the field to move must be less than the index of the last
+	 * field (because you obviously can not move the last field further down).
+	 *
+	 * @param fieldIndex
+	 *            The index of the field to move
+	 */
+	public void moveFieldDown(int fieldIndex) {
+		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size() - 1).check();
+		String field = fields.remove(fieldIndex);
+		fields.add(fieldIndex + 1, field);
+	}
+
+	/**
+	 * Moves the field with the given name down one position in the field list.
+	 * The field must not be the last field (because you obviously can not move
+	 * the last field further down).
+	 *
+	 * @param field
+	 *            The name of the field to move
+	 */
+	public void moveFieldDown(String field) {
+		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
+		moveFieldDown(getFieldIndex(field));
+	}
+
+	/**
+	 * Removes the field at the given index.
+	 *
+	 * @param fieldIndex
+	 *            The index of the field to remove
+	 */
+	public void removeField(int fieldIndex) {
+		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).check();
+		String field = fields.remove(fieldIndex);
+		fieldValues.remove(field);
+	}
+
+	/**
+	 * Removes the field with the given name.
+	 *
+	 * @param field
+	 *            The name of the field
+	 */
+	public void removeField(String field) {
+		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
+		removeField(getFieldIndex(field));
+	}
+
+	/**
+	 * Returns the value of the field with the given name.
+	 *
+	 * @param field
+	 *            The name of the field
+	 * @return The value of the field, or {@code null} if there is no such field
+	 */
+	public String getField(String field) {
+		return fieldValues.get(field);
+	}
+
+	/**
+	 * Sets the value of the field with the given name.
+	 *
+	 * @param field
+	 *            The name of the field
+	 * @param value
+	 *            The value of the field
+	 */
+	public void setField(String field, String value) {
+		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
+		fieldValues.put(field, value);
+	}
+
+	/**
+	 * Returns a list of all fields stored in this profile.
+	 *
+	 * @return The fields of this profile
+	 */
+	public List<String> getFields() {
+		return Collections.unmodifiableList(fields);
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Returns the index of the field with the given name.
+	 *
+	 * @param field
+	 *            The name of the field
+	 * @return The index of the field, or {@code -1} if there is no field with
+	 *         the given name
+	 */
+	private int getFieldIndex(String field) {
+		return fields.indexOf(field);
+	}
+
 	//
 	// INTERFACE Fingerprintable
 	//
@@ -248,6 +402,11 @@ public class Profile implements Fingerprintable {
 		if (birthYear != null) {
 			fingerprint.append("BirthYear(").append(birthYear).append(')');
 		}
+		fingerprint.append("ContactInformation(");
+		for (String field : fields) {
+			fingerprint.append(field).append('(').append(fieldValues.get(field)).append(')');
+		}
+		fingerprint.append(")");
 		fingerprint.append(")");
 
 		return fingerprint.toString();
