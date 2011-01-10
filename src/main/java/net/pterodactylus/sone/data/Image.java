@@ -32,19 +32,19 @@ public class Image implements Fingerprintable {
 	private final String id;
 
 	/** The Sone the image belongs to. */
-	private final Sone sone;
+	private Sone sone;
 
 	/** The key of the image. */
-	private final String key;
+	private String key;
 
 	/** The creation time of the image. */
-	private final long creationTime;
+	private long creationTime;
 
 	/** The width of the image. */
-	private final int width;
+	private int width;
 
 	/** The height of the image. */
-	private final int height;
+	private int height;
 
 	/** The title of the image. */
 	private String title;
@@ -53,21 +53,10 @@ public class Image implements Fingerprintable {
 	private String description;
 
 	/**
-	 * Creates a new image.
-	 *
-	 * @param sone
-	 *            The Sone the image belongs to
-	 * @param key
-	 *            The key of the image
-	 * @param creationTime
-	 *            The creation time of the image
-	 * @param width
-	 *            The width of the image
-	 * @param height
-	 *            The height of the image
+	 * Creates a new image with a random ID.
 	 */
-	public Image(Sone sone, String key, long creationTime, int width, int height) {
-		this(UUID.randomUUID().toString(), sone, key, creationTime, width, height);
+	public Image() {
+		this(UUID.randomUUID().toString());
 	}
 
 	/**
@@ -75,25 +64,10 @@ public class Image implements Fingerprintable {
 	 *
 	 * @param id
 	 *            The ID of the image
-	 * @param sone
-	 *            The Sone the image belongs to
-	 * @param key
-	 *            The key of the image
-	 * @param creationTime
-	 *            The creation time of the image
-	 * @param width
-	 *            The width of the image
-	 * @param height
-	 *            The height of the image
 	 */
-	public Image(String id, Sone sone, String key, long creationTime, int width, int height) {
-		Validation.begin().isNotNull("Image ID", id).isNotNull("Image Owner", sone).isNotNull("Image Key", key).isGreater("Image Creation Time", creationTime, 0).isGreater("Image Width", width, 0).isGreater("Image Height", height, 0).check();
+	public Image(String id) {
+		Validation.begin().isNotNull("Image ID", id).check();
 		this.id = id;
-		this.sone = sone;
-		this.key = key;
-		this.creationTime = creationTime;
-		this.width = width;
-		this.height = height;
 	}
 
 	//
@@ -119,12 +93,40 @@ public class Image implements Fingerprintable {
 	}
 
 	/**
+	 * Sets the owner of this image. The owner can only be set if no owner has
+	 * yet been set.
+	 *
+	 * @param sone
+	 *            The new owner of this image
+	 * @return This image
+	 */
+	public Image setSone(Sone sone) {
+		Validation.begin().isNull("Current Image Owner", this.sone).isNotNull("New Image Owner", sone);
+		this.sone = sone;
+		return this;
+	}
+
+	/**
 	 * Returns the key of this image.
 	 *
 	 * @return The key of this image
 	 */
 	public String getKey() {
 		return key;
+	}
+
+	/**
+	 * Sets the key of this image. The key can only be set as long as no key has
+	 * yet been set.
+	 *
+	 * @param key
+	 *            The new key of this image
+	 * @return This image
+	 */
+	public Image setKey(String key) {
+		Validation.begin().isNull("Current Image Key", this.key).isNotNull("New Image Key", key).check();
+		this.key = key;
+		return this;
 	}
 
 	/**
@@ -138,6 +140,20 @@ public class Image implements Fingerprintable {
 	}
 
 	/**
+	 * Sets the new creation time of this image. The creation time can only be
+	 * set as long as no creation time has been set yet.
+	 *
+	 * @param creationTime
+	 *            The new creation time of this image
+	 * @return This image
+	 */
+	public Image setCreationTime(long creationTime) {
+		Validation.begin().isEqual("Current Image Creation Time", this.creationTime, 0).isGreater("New Image Creation Time", creationTime, 0).check();
+		this.creationTime = creationTime;
+		return this;
+	}
+
+	/**
 	 * Returns the width of this image.
 	 *
 	 * @return The width of this image (in pixels)
@@ -147,12 +163,40 @@ public class Image implements Fingerprintable {
 	}
 
 	/**
+	 * Sets the width of this image. The width can only be set as long as no
+	 * width has been set yet.
+	 *
+	 * @param width
+	 *            The new width of this image
+	 * @return This image
+	 */
+	public Image setWidth(int width) {
+		Validation.begin().isEqual("Current Image Width", this.width, 0).isGreater("New Image Width", width, 0).check();
+		this.width = width;
+		return this;
+	}
+
+	/**
 	 * Returns the height of this image.
 	 *
 	 * @return The height of this image (in pixels)
 	 */
 	public int getHeight() {
 		return height;
+	}
+
+	/**
+	 * Sets the new height of this image. The height can only be set as long as
+	 * no height has yet been set.
+	 *
+	 * @param height
+	 *            The new height of this image
+	 * @return This image
+	 */
+	public Image setHeight(int height) {
+		Validation.begin().isEqual("Current Image Height", this.height, 0).isGreater("New Image Height", height, 0);
+		this.height = height;
+		return this;
 	}
 
 	/**
