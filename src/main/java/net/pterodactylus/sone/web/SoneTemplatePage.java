@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.sone.web.page.TemplatePage;
 import net.pterodactylus.util.template.Template;
@@ -188,6 +189,10 @@ public class SoneTemplatePage extends TemplatePage {
 		super.processTemplate(request, template);
 		template.set("currentSone", getCurrentSone(request.getToadletContext(), false));
 		template.set("request", request);
+		template.set("currentVersion", SonePlugin.VERSION);
+		template.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
+		template.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
+		template.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
 	}
 
 	/**

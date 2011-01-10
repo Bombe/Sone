@@ -1,5 +1,5 @@
 /*
- * Sone - Parser.java - Copyright © 2010 David Roden
+ * Sone - UpdateListener.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,32 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.text;
+package net.pterodactylus.sone.core;
 
-import java.io.IOException;
-import java.io.Reader;
+import java.util.EventListener;
+
+import net.pterodactylus.util.version.Version;
 
 /**
- * Interface for parsers that can create {@link Part}s from a text source
- * (usually a {@link Reader}).
+ * Listener interface for {@link UpdateChecker} events.
  *
- * @param <C>
- *            The type of the parser context
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Parser<C extends ParserContext> {
+public interface UpdateListener extends EventListener {
 
 	/**
-	 * Create a {@link Part} from the given text source.
+	 * Notifies a listener that a newer version than the current version was
+	 * found.
 	 *
-	 * @param context
-	 *            The parser context
-	 * @param source
-	 *            The text source
-	 * @return The parsed part
-	 * @throws IOException
-	 *             if an I/O error occurs
+	 * @param version
+	 *            The version that was found
+	 * @param releaseTime
+	 *            The release time of the version
 	 */
-	public Part parse(C context, Reader source) throws IOException;
+	public void updateFound(Version version, long releaseTime);
 
 }

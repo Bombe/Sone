@@ -24,6 +24,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.FreenetLinkParser;
+import net.pterodactylus.sone.text.FreenetLinkParserContext;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateFactory;
@@ -79,7 +80,7 @@ public class PostAccessor extends ReflectionAccessor {
 				return null;
 			}
 			try {
-				return linkParser.parse(new StringReader(text));
+				return linkParser.parse(new FreenetLinkParserContext(post.getSone()), new StringReader(text));
 			} catch (IOException ioe1) {
 				/* ignore. */
 			}

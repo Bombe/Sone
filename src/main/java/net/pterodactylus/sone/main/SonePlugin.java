@@ -78,7 +78,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 3, 6, 2);
+	public static final Version VERSION = new Version(0, 3, 6, 5);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);
@@ -166,28 +166,28 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 			}
 		}
 
-		/* create freenet interface. */
-		FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
-
-		/* create web of trust connector. */
-		PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
-		WebOfTrustConnector webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
-		identityManager = new IdentityManager(webOfTrustConnector);
-		identityManager.setContext("Sone");
-
-		/* create core. */
-		core = new Core(oldConfiguration, freenetInterface, identityManager);
-
-		/* create the web interface. */
-		webInterface = new WebInterface(this);
-		core.addCoreListener(webInterface);
-
-		/* create the identity manager. */
-		identityManager.addIdentityListener(core);
-
-		/* start core! */
 		boolean startupFailed = true;
 		try {
+			/* create freenet interface. */
+			FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
+
+			/* create web of trust connector. */
+			PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
+			WebOfTrustConnector webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
+			identityManager = new IdentityManager(webOfTrustConnector);
+			identityManager.setContext("Sone");
+
+			/* create core. */
+			core = new Core(oldConfiguration, freenetInterface, identityManager);
+
+			/* create the web interface. */
+			webInterface = new WebInterface(this);
+			core.addCoreListener(webInterface);
+
+			/* create the identity manager. */
+			identityManager.addIdentityListener(core);
+
+			/* start core! */
 			core.start();
 			if ((newConfiguration != null) && (oldConfiguration != newConfiguration)) {
 				logger.log(Level.INFO, "Setting configuration to file-based configuration.");

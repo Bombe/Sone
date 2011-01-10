@@ -7,6 +7,13 @@
 				<img src="images/flattr-badge-large.png" alt="Flattr Sone" title="Flattr Sone" />
 			</a>
 		</div>
+
+		<div id="version-information">
+			<div class="current-version"><%= WebInterface.VersionInformation.CurrentVersion|l10n|html> <b><% currentVersion|html></b></div>
+			<%if hasLatestVersion>
+				<div class="latest-version"><%= WebInterface.VersionInformation.LatestVersion|l10n|html> <b><% latestVersion|html></b></div>
+			<%/if>
+		</div>
 	</div>
 
 </div>

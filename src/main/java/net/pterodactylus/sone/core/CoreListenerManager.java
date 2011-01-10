@@ -21,6 +21,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.event.AbstractListenerManager;
+import net.pterodactylus.util.version.Version;
 
 /**
  * Manager for {@link CoreListener}s.
@@ -194,6 +195,21 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	void fireSoneUnlocked(Sone sone) {
 		for (CoreListener coreListener : getListeners()) {
 			coreListener.soneUnlocked(sone);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that a new version was found.
+	 *
+	 * @see CoreListener#updateFound(Version, long)
+	 * @param version
+	 *            The new version
+	 * @param releaseTime
+	 *            The release time of the new version
+	 */
+	void fireUpdateFound(Version version, long releaseTime) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.updateFound(version, releaseTime);
 		}
 	}
 

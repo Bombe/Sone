@@ -45,6 +45,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.version.Version;
 import freenet.keys.FreenetURI;
 
 /**
@@ -52,7 +53,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener {
+public class Core implements IdentityListener, UpdateListener {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -97,6 +98,9 @@ public class Core implements IdentityListener {
 
 	/** The Sone downloader. */
 	private final SoneDownloader soneDownloader;
+
+	/** The update checker. */
+	private final UpdateChecker updateChecker;
 
 	/** Whether the core has been stopped. */
 	private volatile boolean stopped;
@@ -162,6 +166,7 @@ public class Core implements IdentityListener {
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
+		this.updateChecker = new UpdateChecker(freenetInterface);
 	}
 
 	//
@@ -230,6 +235,15 @@ public class Core implements IdentityListener {
 	 */
 	public IdentityManager getIdentityManager() {
 		return identityManager;
+	}
+
+	/**
+	 * Returns the update checker.
+	 *
+	 * @return The update checker
+	 */
+	public UpdateChecker getUpdateChecker() {
+		return updateChecker;
 	}
 
 	/**
@@ -1400,6 +1414,8 @@ public class Core implements IdentityListener {
 	 */
 	public void start() {
 		loadConfiguration();
+		updateChecker.addUpdateListener(this);
+		updateChecker.start();
 	}
 
 	/**
@@ -1411,6 +1427,8 @@ public class Core implements IdentityListener {
 				soneInserter.stop();
 			}
 		}
+		updateChecker.stop();
+		updateChecker.removeUpdateListener(this);
 		soneDownloader.stop();
 		saveConfiguration();
 		stopped = true;
@@ -1430,6 +1448,7 @@ public class Core implements IdentityListener {
 
 		/* store the options first. */
 		try {
+			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
@@ -1619,6 +1638,18 @@ public class Core implements IdentityListener {
 	@Override
 	public void identityRemoved(Identity identity) {
 		/* TODO */
+	}
+
+	//
+	// INTERFACE UpdateListener
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updateFound(Version version, long releaseTime) {
+		coreListenerManager.fireUpdateFound(version, releaseTime);
 	}
 
 }

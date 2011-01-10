@@ -22,6 +22,7 @@ import java.util.EventListener;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.version.Version;
 
 /**
  * Listener interface for objects that want to be notified on certain
@@ -126,5 +127,15 @@ public interface CoreListener extends EventListener {
 	 *            The Sone that was unlocked
 	 */
 	public void soneUnlocked(Sone sone);
+
+	/**
+	 * Notifies a listener that a new version has been found.
+	 *
+	 * @param version
+	 *            The version that was found
+	 * @param releaseTime
+	 *            The release time of the new version
+	 */
+	public void updateFound(Version version, long releaseTime);
 
 }

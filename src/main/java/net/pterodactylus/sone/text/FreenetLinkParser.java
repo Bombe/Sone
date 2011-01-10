@@ -21,6 +21,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -28,13 +29,14 @@ import java.util.regex.Pattern;
 
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.TemplateFactory;
+import freenet.keys.FreenetURI;
 
 /**
  * {@link Parser} implementation that can recognize Freenet URIs.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FreenetLinkParser implements Parser {
+public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FreenetLinkParser.class);
@@ -50,46 +52,22 @@ public class FreenetLinkParser implements Parser {
 	private enum LinkType {
 
 		/** Link is a KSK. */
-		KSK(true),
+		KSK,
 
 		/** Link is a CHK. */
-		CHK(true),
+		CHK,
 
 		/** Link is an SSK. */
-		SSK(true),
+		SSK,
 
 		/** Link is a USK. */
-		USK(true),
+		USK,
 
 		/** Link is HTTP. */
-		HTTP(false),
+		HTTP,
 
 		/** Link is HTTPS. */
-		HTTPS(false);
-
-		/** Whether this link type links to freenet. */
-		private final boolean anonymous;
-
-		/**
-		 * Creates a new link type.
-		 *
-		 * @param anonymous
-		 *            {@code true} if this link type links to freenet,
-		 *            {@code false} otherwise
-		 */
-		private LinkType(boolean anonymous) {
-			this.anonymous = anonymous;
-		}
-
-		/**
-		 * Returns whether this link type links anonymously to within freenet.
-		 *
-		 * @return {@code true} if this link type links to within freenet,
-		 *         {@code false} otherwise
-		 */
-		public boolean isAnonymous() {
-			return anonymous;
-		}
+		HTTPS;
 
 	}
 
@@ -114,8 +92,7 @@ public class FreenetLinkParser implements Parser {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("null")
-	public Part parse(Reader source) throws IOException {
+	public Part parse(FreenetLinkParserContext context, Reader source) throws IOException {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = (source instanceof BufferedReader) ? (BufferedReader) source : new BufferedReader(source);
 		String line;
@@ -170,8 +147,37 @@ public class FreenetLinkParser implements Parser {
 					String name = link;
 					logger.log(Level.FINER, "Found link: %s", link);
 					logger.log(Level.FINEST, "Next: %d, CHK: %d, SSK: %d, USK: %d", new Object[] { next, nextChk, nextSsk, nextUsk });
-					if (((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (link.length() > 98) && (link.charAt(47) == ',') && (link.charAt(91) == ',') && (link.charAt(99) == '/')) {
-						name = link.substring(0, 47) + "…" + link.substring(99);
+					if (linkType == LinkType.KSK) {
+						name = link.substring(4);
+					} else if ((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
+						if (name.indexOf('/') > -1) {
+							if (!name.endsWith("/")) {
+								name = name.substring(name.lastIndexOf('/') + 1);
+							} else {
+								if (name.indexOf('/') != name.lastIndexOf('/')) {
+									name = name.substring(name.lastIndexOf('/', name.lastIndexOf('/') - 1));
+								} else {
+									/* shorten to 5 chars. */
+									name = name.substring(4, Math.min(9, name.length()));
+								}
+							}
+						}
+						if (name.indexOf('?') > -1) {
+							name = name.substring(0, name.indexOf('?'));
+						}
+						boolean fromPostingSone = false;
+						if ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
+							try {
+								new FreenetURI(link);
+								fromPostingSone = link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
+								parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
+							} catch (MalformedURLException mue1) {
+								/* it’s not a valid link. */
+								parts.add(createPlainTextPart(link));
+							}
+						} else {
+							parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
+						}
 					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
 						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
 						int firstSlash = name.indexOf('/');
@@ -185,9 +191,12 @@ public class FreenetLinkParser implements Parser {
 						if (((name.indexOf('/') > -1) && (name.indexOf('.') < name.lastIndexOf('.', name.indexOf('/'))) || ((name.indexOf('/') == -1) && (name.indexOf('.') < name.lastIndexOf('.')))) && name.startsWith("www.")) {
 							name = name.substring(4);
 						}
+						if (name.indexOf('?') > -1) {
+							name = name.substring(0, name.indexOf('?'));
+						}
 						link = "?_CHECKED_HTTP_=" + link;
+						parts.add(createInternetLinkPart(link, name));
 					}
-					parts.add(createLinkPart(linkType.isAnonymous(), link, name));
 					line = line.substring(nextSpace);
 				} else {
 					parts.add(createPlainTextPart(line.substring(0, next + 4)));
@@ -214,19 +223,45 @@ public class FreenetLinkParser implements Parser {
 	}
 
 	/**
-	 * Creates a new link part based on a template.
+	 * Creates a new part based on a template that links to a site within the
+	 * normal internet.
 	 *
-	 * @param anonymous
-	 *            {@code true} if this link points to within freenet,
-	 *            {@code false} if it points to the internet
 	 * @param link
 	 *            The target of the link
 	 * @param name
 	 *            The name of the link
 	 * @return The part that displays the link
 	 */
-	private Part createLinkPart(boolean anonymous, String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a <%if !anonymous>class=\"internet\" <%/if>href=\"<% link|html>\"><% name|html></a>"))).set("anonymous", anonymous).set("link", "/" + link).set("name", name);
+	private Part createInternetLinkPart(String link, String name) {
+		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"internet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+	}
+
+	/**
+	 * Creates a new part based on a template that links to a site within
+	 * freenet.
+	 *
+	 * @param link
+	 *            The target of the link
+	 * @param name
+	 *            The name of the link
+	 * @return The part that displays the link
+	 */
+	private Part createFreenetLinkPart(String link, String name) {
+		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"freenet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+	}
+
+	/**
+	 * Creates a new part based on a template that links to a page in the
+	 * poster’s keyspace.
+	 *
+	 * @param link
+	 *            The target of the link
+	 * @param name
+	 *            The name of the link
+	 * @return The part that displays the link
+	 */
+	private Part createTrustedFreenetLinkPart(String link, String name) {
+		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"freenet-trusted\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 }
