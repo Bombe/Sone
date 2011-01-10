@@ -33,6 +33,7 @@ import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
@@ -154,6 +155,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** All known albums. */
 	private Map<String, Album> albums = new HashMap<String, Album>();
+
+	/** All known images. */
+	private Map<String, Image> images = new HashMap<String, Image>();
 
 	/**
 	 * Creates a new core.
@@ -749,6 +753,40 @@ public class Core implements IdentityListener, UpdateListener {
 				albums.put(albumId, album);
 			}
 			return album;
+		}
+	}
+
+	/**
+	 * Returns the image with the given ID, creating it if necessary.
+	 *
+	 * @param imageId
+	 *            The ID of the image
+	 * @return The image with the given ID
+	 */
+	public Image getImage(String imageId) {
+		return getImage(imageId, true);
+	}
+
+	/**
+	 * Returns the image with the given ID, optionally creating it if it does
+	 * not exist.
+	 *
+	 * @param imageId
+	 *            The ID of the image
+	 * @param create
+	 *            {@code true} to create an image if none exists with the given
+	 *            ID
+	 * @return The image with the given ID, or {@code null} if none exists and
+	 *         none was created
+	 */
+	public Image getImage(String imageId, boolean create) {
+		synchronized (images) {
+			Image image = images.get(imageId);
+			if (create && (image == null)) {
+				image = new Image(imageId);
+				images.put(imageId, image);
+			}
+			return image;
 		}
 	}
 
