@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
@@ -150,6 +151,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
+
+	/** All known albums. */
+	private Map<String, Album> albums = new HashMap<String, Album>();
 
 	/**
 	 * Creates a new core.
@@ -711,6 +715,38 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 		return sones;
+	}
+
+	/**
+	 * Returns the album with the given ID, creating a new album if no album
+	 * with the given ID can be found.
+	 *
+	 * @param albumId
+	 *            The ID of the album
+	 * @return The album with the given ID
+	 */
+	public Album getAlbum(String albumId) {
+		return getAlbum(albumId, true);
+	}
+
+	/**
+	 * Returns the album with the given ID, optionally creating a new album if
+	 * an album with the given ID can not be found.
+	 *
+	 * @param albumId
+	 *            The ID of the album
+	 * @return The album with the given ID, or {@code null} if no album with the
+	 *         given ID exists and {@code create} is {@code false}
+	 */
+	public Album getAlbum(String albumId, boolean create) {
+		synchronized (albums) {
+			Album album = albums.get(albumId);
+			if (create && (album == null)) {
+				album = new Album(albumId);
+				albums.put(albumId, album);
+			}
+			return album;
+		}
 	}
 
 	//
