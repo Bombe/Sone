@@ -34,7 +34,7 @@ public class Album implements Fingerprintable {
 	private final String id;
 
 	/** The Sone this album belongs to. */
-	private final Sone sone;
+	private Sone sone;
 
 	/** Nested albums. */
 	private final List<Album> albums = new ArrayList<Album>();
@@ -53,12 +53,9 @@ public class Album implements Fingerprintable {
 
 	/**
 	 * Creates a new album with a random ID.
-	 *
-	 * @param sone
-	 *            The Sone this album belongs to
 	 */
-	public Album(Sone sone) {
-		this(UUID.randomUUID().toString(), sone);
+	public Album() {
+		this(UUID.randomUUID().toString());
 	}
 
 	/**
@@ -66,13 +63,10 @@ public class Album implements Fingerprintable {
 	 *
 	 * @param id
 	 *            The ID of the album
-	 * @param sone
-	 *            The Sone this album belongs to
 	 */
-	public Album(String id, Sone sone) {
-		Validation.begin().isNotNull("Album ID", id).isNotNull("Album Owner", sone).check();
+	public Album(String id) {
+		Validation.begin().isNotNull("Album ID", id).check();
 		this.id = id;
-		this.sone = sone;
 	}
 
 	//
@@ -95,6 +89,20 @@ public class Album implements Fingerprintable {
 	 */
 	public Sone getSone() {
 		return sone;
+	}
+
+	/**
+	 * Sets the owner of the album. The owner can only be set as long as the
+	 * current owner is {@code null}.
+	 *
+	 * @param sone
+	 *            The album owner
+	 * @return This album
+	 */
+	public Album setSone(Sone sone) {
+		Validation.begin().isNull("Current Album Owner", this.sone).isNotNull("New Album Owner", sone).check().isEqual("New Album Owner", sone, this.sone).check();
+		this.sone = sone;
+		return this;
 	}
 
 	/**
@@ -285,7 +293,7 @@ public class Album implements Fingerprintable {
 			return false;
 		}
 		Album album = (Album) object;
-		return sone.equals(album.sone) && id.equals(album.id);
+		return id.equals(album.id);
 	}
 
 }
