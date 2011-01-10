@@ -735,6 +735,9 @@ public class Core implements IdentityListener, UpdateListener {
 	 *
 	 * @param albumId
 	 *            The ID of the album
+	 * @param create
+	 *            {@code true} to create a new album if none exists for the
+	 *            given ID
 	 * @return The album with the given ID, or {@code null} if no album with the
 	 *         given ID exists and {@code create} is {@code false}
 	 */
