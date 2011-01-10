@@ -22,6 +22,7 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -51,19 +52,19 @@ public class ViewSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);
-		template.set("sone", sone);
+		dataProvider.set("sone", sone);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void postProcess(Request request, Template template) {
-		Sone sone = (Sone) template.get("sone");
+	protected void postProcess(Request request, DataProvider dataProvider) {
+		Sone sone = (Sone) dataProvider.get("sone");
 		List<Post> posts = sone.getPosts();
 		for (Post post : posts) {
 			webInterface.getCore().markPostKnown(post);

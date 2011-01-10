@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.ToadletContext;
 
@@ -45,9 +46,9 @@ public class LogoutPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
 		setCurrentSone(request.getToadletContext(), null);
-		super.processTemplate(request, template);
+		super.processTemplate(request, dataProvider);
 		throw new RedirectException("index.html");
 	}
 

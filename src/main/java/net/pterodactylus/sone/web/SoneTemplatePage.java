@@ -24,6 +24,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.sone.web.page.TemplatePage;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
@@ -185,14 +186,14 @@ public class SoneTemplatePage extends TemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
-		template.set("currentSone", getCurrentSone(request.getToadletContext(), false));
-		template.set("request", request);
-		template.set("currentVersion", SonePlugin.VERSION);
-		template.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
-		template.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
-		template.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
+		dataProvider.set("currentSone", getCurrentSone(request.getToadletContext(), false));
+		dataProvider.set("request", request);
+		dataProvider.set("currentVersion", SonePlugin.VERSION);
+		dataProvider.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
+		dataProvider.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
+		dataProvider.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
 	}
 
 	/**

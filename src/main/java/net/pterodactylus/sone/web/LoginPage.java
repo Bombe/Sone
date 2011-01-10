@@ -26,6 +26,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.ToadletContext;
 
@@ -60,12 +61,12 @@ public class LoginPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		/* get all own identities. */
 		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
 		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);
-		template.set("sones", localSones);
+		dataProvider.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
 			Sone selectedSone = webInterface.getCore().getLocalSone(soneId, false);
@@ -75,7 +76,7 @@ public class LoginPage extends SoneTemplatePage {
 			}
 		}
 		List<OwnIdentity> ownIdentitiesWithoutSone = CreateSonePage.getOwnIdentitiesWithoutSone(webInterface.getCore());
-		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
+		dataProvider.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 	}
 
 	/**
