@@ -590,26 +590,7 @@ public class Sone implements Fingerprintable {
 	@Override
 	public synchronized String getFingerprint() {
 		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Profile(");
-		if (profile.getFirstName() != null) {
-			fingerprint.append("FirstName(").append(profile.getFirstName()).append(')');
-		}
-		if (profile.getMiddleName() != null) {
-			fingerprint.append("MiddleName(").append(profile.getMiddleName()).append(')');
-		}
-		if (profile.getLastName() != null) {
-			fingerprint.append("LastName(").append(profile.getLastName()).append(')');
-		}
-		if (profile.getBirthDay() != null) {
-			fingerprint.append("BirthDay(").append(profile.getBirthDay()).append(')');
-		}
-		if (profile.getBirthMonth() != null) {
-			fingerprint.append("BirthMonth(").append(profile.getBirthMonth()).append(')');
-		}
-		if (profile.getBirthYear() != null) {
-			fingerprint.append("BirthYear(").append(profile.getBirthYear()).append(')');
-		}
-		fingerprint.append(")");
+		fingerprint.append(profile.getFingerprint());
 
 		fingerprint.append("Posts(");
 		for (Post post : getPosts()) {

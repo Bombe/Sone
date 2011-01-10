@@ -23,7 +23,7 @@ package net.pterodactylus.sone.data;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Profile {
+public class Profile implements Fingerprintable {
 
 	/** Whether the profile was modified. */
 	private volatile boolean modified;
@@ -217,6 +217,40 @@ public class Profile {
 		modified |= ((birthYear != null) && (!birthYear.equals(this.birthYear))) || (this.birthYear != null);
 		this.birthYear = birthYear;
 		return this;
+	}
+
+	//
+	// INTERFACE Fingerprintable
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getFingerprint() {
+		StringBuilder fingerprint = new StringBuilder();
+		fingerprint.append("Profile(");
+		if (firstName != null) {
+			fingerprint.append("FirstName(").append(firstName).append(')');
+		}
+		if (middleName != null) {
+			fingerprint.append("MiddleName(").append(middleName).append(')');
+		}
+		if (lastName != null) {
+			fingerprint.append("LastName(").append(lastName).append(')');
+		}
+		if (birthDay != null) {
+			fingerprint.append("BirthDay(").append(birthDay).append(')');
+		}
+		if (birthMonth != null) {
+			fingerprint.append("BirthMonth(").append(birthMonth).append(')');
+		}
+		if (birthYear != null) {
+			fingerprint.append("BirthYear(").append(birthYear).append(')');
+		}
+		fingerprint.append(")");
+
+		return fingerprint.toString();
 	}
 
 }
