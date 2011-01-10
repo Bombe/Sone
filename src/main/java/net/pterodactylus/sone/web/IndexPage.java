@@ -24,6 +24,7 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -52,8 +53,8 @@ public class IndexPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(currentSone.getPosts());
@@ -71,16 +72,16 @@ public class IndexPage extends SoneTemplatePage {
 			}
 		}
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
-		template.set("posts", allPosts);
+		dataProvider.set("posts", allPosts);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void postProcess(Request request, Template template) {
+	protected void postProcess(Request request, DataProvider dataProvider) {
 		@SuppressWarnings("unchecked")
-		List<Post> posts = (List<Post>) template.get("posts");
+		List<Post> posts = (List<Post>) dataProvider.get("posts");
 		for (Post post : posts) {
 			webInterface.getCore().markPostKnown(post);
 			for (Reply reply : webInterface.getCore().getReplies(post)) {

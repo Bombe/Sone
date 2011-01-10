@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.version.Version;
 
@@ -53,9 +54,9 @@ public class AboutPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
-		template.set("version", version);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
+		dataProvider.set("version", version);
 	}
 
 }

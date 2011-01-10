@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
@@ -46,7 +47,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	private final String path;
 
 	/** The template to render. */
-	protected final Template template;
+	private final Template template;
 
 	/** The L10n handler. */
 	private final BaseL10n l10n;
@@ -116,9 +117,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			pageNode.addForwardLink("icon", shortcutIcon);
 		}
 
+		DataProvider dataProvider = template.createDataProvider();
 		try {
 			long start = System.nanoTime();
-			processTemplate(request, template);
+			processTemplate(request, dataProvider);
 			long finish = System.nanoTime();
 			logger.log(Level.FINEST, "Template was rendered in " + ((finish - start) / 1000) / 1000.0 + "ms.");
 		} catch (RedirectException re1) {
@@ -126,10 +128,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 		}
 
 		StringWriter stringWriter = new StringWriter();
-		template.render(stringWriter);
+		template.render(dataProvider, stringWriter);
 		pageNode.content.addChild("%", stringWriter.toString());
 
-		postProcess(request, template);
+		postProcess(request, dataProvider);
 
 		return new Response(200, "OK", "text/html", pageNode.outer.generate());
 	}
@@ -159,29 +161,29 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *
 	 * @param request
 	 *            The request that is rendered
-	 * @param template
-	 *            The template to set variables in
+	 * @param dataProvider
+	 *            The data provider to set variables in
 	 * @throws RedirectException
 	 *             if the processing page wants to redirect after processing
 	 */
-	protected void processTemplate(Request request, Template template) throws RedirectException {
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
 		/* do nothing. */
 	}
 
 	/**
 	 * This method will be called after
-	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, Template)}
+	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, DataProvider)}
 	 * has processed the template and the template was rendered. This method
 	 * will not be called if
-	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, Template)}
+	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, DataProvider)}
 	 * throws a {@link RedirectException}!
 	 *
 	 * @param request
 	 *            The request being processed
-	 * @param template
-	 *            The template that was rendered
+	 * @param dataProvider
+	 *            The data provider that supplied the rendered data
 	 */
-	protected void postProcess(Request request, Template template) {
+	protected void postProcess(Request request, DataProvider dataProvider) {
 		/* do nothing. */
 	}
 
@@ -212,7 +214,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/**
 	 * Exception that can be thrown to signal that a subclassed {@link Page}
 	 * wants to redirect the user during the
-	 * {@link TemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, Template)}
+	 * {@link TemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, DataProvider)}
 	 * method call.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>

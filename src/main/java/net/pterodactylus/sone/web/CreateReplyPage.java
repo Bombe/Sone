@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -49,8 +50,8 @@ public class CreateReplyPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
@@ -61,11 +62,11 @@ public class CreateReplyPage extends SoneTemplatePage {
 				webInterface.getCore().createReply(currentSone, post, text);
 				throw new RedirectException(returnPage);
 			}
-			template.set("errorTextEmpty", true);
+			dataProvider.set("errorTextEmpty", true);
 		}
-		template.set("postId", postId);
-		template.set("text", text);
-		template.set("returnPage", returnPage);
+		dataProvider.set("postId", postId);
+		dataProvider.set("text", text);
+		dataProvider.set("returnPage", returnPage);
 	}
 
 }
