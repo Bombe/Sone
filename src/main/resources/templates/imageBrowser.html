@@ -31,6 +31,15 @@
 
 	<%elseif imageRequested>
 
+	<%else>
+
+		<form id="create-album" method="post" action="createAlbum.html">
+			<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+			<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+			<input type="file" name="image" />
+			<button type="submit" name="uploadImage" value="1"><%= Page.ImageBrowser.CreateAlbum.Button.CreateAlbum|l10n|html></button>
+		</form>
+
 	<%/if>
 
 <%include include/tail.html>
