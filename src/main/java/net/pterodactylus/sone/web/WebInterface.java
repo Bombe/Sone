@@ -36,6 +36,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -43,6 +44,7 @@ import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
+import net.pterodactylus.sone.template.AlbumAccessor;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
@@ -162,6 +164,7 @@ public class WebInterface implements CoreListener {
 		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
 		templateFactory.addAccessor(Post.class, new PostAccessor(getCore(), templateFactory));
 		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore(), templateFactory));
+		templateFactory.addAccessor(Album.class, new AlbumAccessor());
 		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
 		templateFactory.addFilter("date", new DateFilter());
