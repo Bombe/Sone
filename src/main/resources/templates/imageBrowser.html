@@ -2,4 +2,15 @@
 
 	<h1><%= Page.ImageBrowser.Page.Title|l10n|html></h1>
 
+	<%if albumRequested>
+
+		<%ifnull album>
+
+			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
+
+		<%else>
+		<%/if>
+
+	<%/if>
+
 <%include include/tail.html>
