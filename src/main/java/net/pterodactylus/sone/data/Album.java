@@ -110,7 +110,7 @@ public class Album implements Fingerprintable {
 	 *
 	 * @return The nested albums
 	 */
-	public List<Album> getNestedAlbums() {
+	public List<Album> getAlbums() {
 		return new ArrayList<Album>(albums);
 	}
 
