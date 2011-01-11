@@ -13,6 +13,20 @@
 			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
 
 		<%else>
+
+			<h2><% album.name|html></h2>
+
+			<div class="backlinks">
+				<%foreach album.backlinks backlink backlinks>
+					<div class="backlink">
+						<a href="<% backlink.target|html>"><% backlink.name|html></a>
+					</div>
+					<%if ! backlinks.last>
+						<div class="separator">&gt;</div>
+					<%/if>
+				<%/foreach>
+			</div>
+
 		<%/if>
 
 	<%/if>
