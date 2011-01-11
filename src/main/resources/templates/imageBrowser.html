@@ -8,6 +8,10 @@
 
 			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
 
+		<%elseifnull album.name>
+
+			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
+
 		<%else>
 		<%/if>
 
