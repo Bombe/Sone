@@ -54,14 +54,14 @@ public class ImageBrowserPage extends SoneTemplatePage {
 		String albumId = request.getHttpRequest().getParam("album", null);
 		if (albumId != null) {
 			Album album = webInterface.getCore().getAlbum(albumId, false);
-			dataProvider.set("wantedItem", "album");
+			dataProvider.set("albumRequested", true);
 			dataProvider.set("album", album);
 			return;
 		}
 		String imageId = request.getHttpRequest().getParam("image", null);
 		if (imageId != null) {
 			Image image = webInterface.getCore().getImage(imageId, false);
-			dataProvider.set("wantedItem", "image");
+			dataProvider.set("imageRequested", true);
 			dataProvider.set("image", image);
 		}
 	}
