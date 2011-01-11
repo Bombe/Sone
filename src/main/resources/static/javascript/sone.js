@@ -882,6 +882,13 @@ $(document).ready(function() {
 		});
 	});
 
+	/* ajaxify album creation input field. */
+	getTranslation("WebInterface.DefaultText.Reply", function(text) {
+		$("#create-album input[type=text]".each(function() {
+			registerInputTextareaSwap(this, text, "name", false, true);
+		});
+	});
+
 	/* Ajaxifies all posts. */
 	/* calling getTranslation here will cache the necessary values. */
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
