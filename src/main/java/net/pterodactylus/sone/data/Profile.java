@@ -318,6 +318,19 @@ public class Profile implements Fingerprintable {
 	/**
 	 * Sets the value of the field with the given name.
 	 *
+	 * @param fieldIndex
+	 *            The index of the field
+	 * @param value
+	 *            The value of the field
+	 */
+	public void setField(int fieldIndex, String value) {
+		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).check();
+		setField(fields.get(fieldIndex), value);
+	}
+
+	/**
+	 * Sets the value of the field with the given name.
+	 *
 	 * @param field
 	 *            The name of the field
 	 * @param value
