@@ -21,6 +21,7 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.ToadletContext;
 
@@ -51,8 +52,8 @@ public class EditProfilePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		ToadletContext toadletContenxt = request.getToadletContext();
 		Sone currentSone = getCurrentSone(toadletContenxt);
 		Profile profile = currentSone.getProfile();
@@ -78,12 +79,12 @@ public class EditProfilePage extends SoneTemplatePage {
 				throw new RedirectException("index.html");
 			}
 		}
-		template.set("firstName", firstName);
-		template.set("middleName", middleName);
-		template.set("lastName", lastName);
-		template.set("birthDay", birthDay);
-		template.set("birthMonth", birthMonth);
-		template.set("birthYear", birthYear);
+		dataProvider.set("firstName", firstName);
+		dataProvider.set("middleName", middleName);
+		dataProvider.set("lastName", lastName);
+		dataProvider.set("birthDay", birthDay);
+		dataProvider.set("birthMonth", birthMonth);
+		dataProvider.set("birthYear", birthYear);
 	}
 
 }

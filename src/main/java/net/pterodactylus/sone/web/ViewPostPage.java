@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -48,19 +49,19 @@ public class ViewPostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		String postId = request.getHttpRequest().getParam("post");
 		Post post = webInterface.getCore().getPost(postId);
-		template.set("post", post);
+		dataProvider.set("post", post);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void postProcess(Request request, Template template) {
-		Post post = (Post) template.get("post");
+	protected void postProcess(Request request, DataProvider dataProvider) {
+		Post post = (Post) dataProvider.get("post");
 		webInterface.getCore().markPostKnown(post);
 		for (Reply reply : webInterface.getCore().getReplies(post)) {
 			webInterface.getCore().markReplyKnown(reply);
