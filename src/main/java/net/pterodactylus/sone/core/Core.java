@@ -1487,6 +1487,40 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Creates a new top-level album for the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to create the album for
+	 * @return The new album
+	 */
+	public Album createAlbum(Sone sone) {
+		return createAlbum(sone, null);
+	}
+
+	/**
+	 * Creates a new album for the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to create the album for
+	 * @param parent
+	 *            The parent of the album (may be {@code null} to create a
+	 *            top-level album)
+	 * @return The new album
+	 */
+	public Album createAlbum(Sone sone, Album parent) {
+		Album album = new Album();
+		synchronized (albums) {
+			albums.put(album.getId(), album);
+		}
+		album.setSone(sone);
+		if (parent != null) {
+			parent.addAlbum(album);
+		}
+		sone.addAlbum(album);
+		return album;
+	}
+
+	/**
 	 * Starts the core.
 	 */
 	public void start() {
