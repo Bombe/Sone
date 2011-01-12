@@ -33,9 +33,6 @@ import net.pterodactylus.util.validation.Validation;
  */
 public class Profile implements Fingerprintable {
 
-	/** Whether the profile was modified. */
-	private volatile boolean modified;
-
 	/** The first name. */
 	private volatile String firstName;
 
@@ -91,18 +88,6 @@ public class Profile implements Fingerprintable {
 	//
 
 	/**
-	 * Returns whether this profile was modified after creation. To clear the
-	 * “is modified” flag you need to create a new profile from this one using
-	 * the {@link #Profile(Profile)} constructor.
-	 *
-	 * @return {@code true} if this profile was modified after creation,
-	 *         {@code false} otherwise
-	 */
-	public boolean isModified() {
-		return modified;
-	}
-
-	/**
 	 * Returns the first name.
 	 *
 	 * @return The first name
@@ -119,7 +104,6 @@ public class Profile implements Fingerprintable {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setFirstName(String firstName) {
-		modified |= ((firstName != null) && (!firstName.equals(this.firstName))) || (this.firstName != null);
 		this.firstName = firstName;
 		return this;
 	}
@@ -141,7 +125,6 @@ public class Profile implements Fingerprintable {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setMiddleName(String middleName) {
-		modified |= ((middleName != null) && (!middleName.equals(this.middleName))) || (this.middleName != null);
 		this.middleName = middleName;
 		return this;
 	}
@@ -163,7 +146,6 @@ public class Profile implements Fingerprintable {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setLastName(String lastName) {
-		modified |= ((lastName != null) && (!lastName.equals(this.lastName))) || (this.lastName != null);
 		this.lastName = lastName;
 		return this;
 	}
@@ -185,7 +167,6 @@ public class Profile implements Fingerprintable {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setBirthDay(Integer birthDay) {
-		modified |= ((birthDay != null) && (!birthDay.equals(this.birthDay))) || (this.birthDay != null);
 		this.birthDay = birthDay;
 		return this;
 	}
@@ -207,7 +188,6 @@ public class Profile implements Fingerprintable {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setBirthMonth(Integer birthMonth) {
-		modified |= ((birthMonth != null) && (!birthMonth.equals(this.birthMonth))) || (this.birthMonth != null);
 		this.birthMonth = birthMonth;
 		return this;
 	}
@@ -229,7 +209,6 @@ public class Profile implements Fingerprintable {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setBirthYear(Integer birthYear) {
-		modified |= ((birthYear != null) && (!birthYear.equals(this.birthYear))) || (this.birthYear != null);
 		this.birthYear = birthYear;
 		return this;
 	}

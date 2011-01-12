@@ -73,9 +73,7 @@ public class EditProfilePage extends SoneTemplatePage {
 			profile.setMiddleName(middleName.length() > 0 ? middleName : null);
 			profile.setLastName(lastName.length() > 0 ? lastName : null);
 			profile.setBirthDay(birthDay).setBirthMonth(birthMonth).setBirthYear(birthYear);
-			if (profile.isModified()) {
-				currentSone.setProfile(profile);
-			}
+			currentSone.setProfile(profile);
 			throw new RedirectException("index.html");
 		}
 		template.set("firstName", firstName);
