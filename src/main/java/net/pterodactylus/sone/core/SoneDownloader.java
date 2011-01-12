@@ -310,6 +310,26 @@ public class SoneDownloader extends AbstractService {
 		Profile profile = new Profile().setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
 		profile.setBirthDay(profileBirthDay).setBirthMonth(profileBirthMonth).setBirthYear(profileBirthYear);
 
+		/* parse profile fields. */
+		SimpleXML profileFieldsXml = profileXml.getNode("fields");
+		if (profileFieldsXml != null) {
+			for (SimpleXML fieldXml : profileFieldsXml.getNodes("field")) {
+				String fieldName = fieldXml.getValue("field-name", null);
+				String fieldValue = fieldXml.getValue("field-value", null);
+				if ((fieldName == null) || (fieldValue == null)) {
+					logger.log(Level.WARNING, "Downloaded profile field for Sone %s with missing data! Name: %s, Value: %s", new Object[] { sone, fieldName, fieldValue });
+					return null;
+				}
+				try {
+					profile.addField(fieldName);
+				} catch (IllegalArgumentException iae1) {
+					logger.log(Level.WARNING, "Duplicate field: " + fieldName, iae1);
+					return null;
+				}
+				profile.setField(fieldName, fieldValue);
+			}
+		}
+
 		/* parse posts. */
 		SimpleXML postsXml = soneXml.getNode("posts");
 		Set<Post> posts = new HashSet<Post>();
