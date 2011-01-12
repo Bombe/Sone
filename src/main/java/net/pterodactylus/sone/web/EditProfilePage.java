@@ -63,18 +63,20 @@ public class EditProfilePage extends SoneTemplatePage {
 		Integer birthMonth = profile.getBirthMonth();
 		Integer birthYear = profile.getBirthYear();
 		if (request.getMethod() == Method.POST) {
-			firstName = request.getHttpRequest().getPartAsStringFailsafe("first-name", 256).trim();
-			middleName = request.getHttpRequest().getPartAsStringFailsafe("middle-name", 256).trim();
-			lastName = request.getHttpRequest().getPartAsStringFailsafe("last-name", 256).trim();
-			birthDay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
-			birthMonth = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
-			birthYear = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
-			profile.setFirstName(firstName.length() > 0 ? firstName : null);
-			profile.setMiddleName(middleName.length() > 0 ? middleName : null);
-			profile.setLastName(lastName.length() > 0 ? lastName : null);
-			profile.setBirthDay(birthDay).setBirthMonth(birthMonth).setBirthYear(birthYear);
-			currentSone.setProfile(profile);
-			throw new RedirectException("index.html");
+			if (request.getHttpRequest().getPartAsStringFailsafe("saveProfile", 4).equals("true")) {
+				firstName = request.getHttpRequest().getPartAsStringFailsafe("first-name", 256).trim();
+				middleName = request.getHttpRequest().getPartAsStringFailsafe("middle-name", 256).trim();
+				lastName = request.getHttpRequest().getPartAsStringFailsafe("last-name", 256).trim();
+				birthDay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
+				birthMonth = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
+				birthYear = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
+				profile.setFirstName(firstName.length() > 0 ? firstName : null);
+				profile.setMiddleName(middleName.length() > 0 ? middleName : null);
+				profile.setLastName(lastName.length() > 0 ? lastName : null);
+				profile.setBirthDay(birthDay).setBirthMonth(birthMonth).setBirthYear(birthYear);
+				currentSone.setProfile(profile);
+				throw new RedirectException("index.html");
+			}
 		}
 		template.set("firstName", firstName);
 		template.set("middleName", middleName);
