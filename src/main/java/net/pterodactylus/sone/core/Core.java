@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -1033,6 +1034,22 @@ public class Core implements IdentityListener, UpdateListener {
 		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
 		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
 
+		/* load profile fields. */
+		while (true) {
+			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFieldNames().size();
+			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
+			if (fieldName == null) {
+				break;
+			}
+			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue(null);
+			if (fieldValue == null) {
+				logger.log(Level.WARNING, "Invalid profile field found, aborting load!");
+				return;
+			}
+			profile.addField(fieldName);
+			profile.setField(fieldName, fieldValue);
+		}
+
 		/* load posts. */
 		Set<Post> posts = new HashSet<Post>();
 		while (true) {
@@ -1164,6 +1181,15 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
+
+			/* save profile fields. */
+			int fieldCounter = 0;
+			for (Entry<String, String> profileField : profile.getFields().entrySet()) {
+				String fieldPrefix = sonePrefix + "/Profile/Fields/" + fieldCounter++;
+				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getKey());
+				configuration.getStringValue(fieldPrefix + "/Value").setValue(profileField.getValue());
+			}
+			configuration.getStringValue(sonePrefix + "/Profile/Fields/" + fieldCounter + "/Name").setValue(null);
 
 			/* save posts. */
 			int postCounter = 0;
