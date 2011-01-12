@@ -100,7 +100,7 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	public Album setSone(Sone sone) {
-		Validation.begin().isNull("Current Album Owner", this.sone).isNotNull("New Album Owner", sone).check().isEqual("New Album Owner", sone, this.sone).check();
+		Validation.begin().isNull("Current Album Owner", this.sone).isNotNull("New Album Owner", sone).check();
 		this.sone = sone;
 		return this;
 	}
