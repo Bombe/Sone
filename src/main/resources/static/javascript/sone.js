@@ -884,7 +884,7 @@ $(document).ready(function() {
 
 	/* ajaxify album creation input field. */
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
-		$("#create-album input[type=text]".each(function() {
+		$("#create-album input[type=text]").each(function() {
 			registerInputTextareaSwap(this, text, "name", false, true);
 		});
 	});
