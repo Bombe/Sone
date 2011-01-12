@@ -1,6 +1,7 @@
 <form id="create-album" method="post" action="createAlbum.html">
 	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 	<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+	<input type="hidden" name="parent" value="<%ifnull ! album><% album.id|html><%/if>" />
 	<input type="text" name="album" value="" />
 	<button type="submit" name="uploadImage" value="1"><%= Page.ImageBrowser.CreateAlbum.Button.CreateAlbum|l10n|html></button>
 </form>
