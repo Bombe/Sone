@@ -20,6 +20,7 @@ package net.pterodactylus.sone.data;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -332,8 +333,22 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The fields of this profile
 	 */
-	public List<String> getFields() {
+	public List<String> getFieldNames() {
 		return Collections.unmodifiableList(fields);
+	}
+
+	/**
+	 * Returns all field names and their values, ordered the same way
+	 * {@link #getFieldNames()} returns the names of the fields.
+	 *
+	 * @return All field names and values
+	 */
+	public Map<String, String> getFields() {
+		Map<String, String> fields = new LinkedHashMap<String, String>();
+		for (String field : getFieldNames()) {
+			fields.put(field, getField(field));
+		}
+		return fields;
 	}
 
 	//
