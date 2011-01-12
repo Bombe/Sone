@@ -81,6 +81,7 @@ public class Profile implements Fingerprintable {
 		this.birthDay = profile.birthDay;
 		this.birthMonth = profile.birthMonth;
 		this.birthYear = profile.birthYear;
+		this.fields.addAll(profile.fields);
 		this.fieldValues.putAll(profile.fieldValues);
 	}
 
