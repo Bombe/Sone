@@ -62,6 +62,7 @@ public class CreateAlbumPage extends SoneTemplatePage {
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
 			Album parent = webInterface.getCore().getAlbum(parentId, false);
 			Album album = webInterface.getCore().createAlbum(currentSone, parent);
+			album.setName(name);
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}
 	}
