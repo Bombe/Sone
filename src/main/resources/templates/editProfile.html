@@ -31,10 +31,6 @@
 	<p><%= Page.EditProfile.Page.Description|l10n|html></p>
 	<p><%= Page.EditProfile.Page.Hint.Optionality|l10n|html></p>
 
-	<%if changed>
-		<p><%= Page.EditProfile.Page.Status.Changed|l10n|html></p>
-	<%/if>
-
 	<form id="edit-profile" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 
