@@ -24,6 +24,8 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
@@ -72,7 +74,9 @@ public class IndexPage extends SoneTemplatePage {
 			}
 		}
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
-		dataProvider.set("posts", allPosts);
+		Pagination<Post> pagination = new Pagination<Post>(allPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		dataProvider.set("pagination", pagination);
+		dataProvider.set("posts", pagination.getItems());
 	}
 
 	/**
