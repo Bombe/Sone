@@ -453,7 +453,7 @@ function ajaxifyPost(postElement) {
 			postReply(postId, text, function(success, error, replyId) {
 				if (success) {
 					$(inputField).val("");
-					loadNewReply(replyId);
+					loadNewReply(replyId, getCurrentSoneId(), postId);
 					markPostAsKnown(getPostElement(inputField));
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
 				} else {
@@ -585,11 +585,11 @@ function getStatus() {
 			});
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value);
+				loadNewPost(value.id, value.sone, value.recipient);
 			});
 			/* process new replies. */
 			$.each(data.newReplies, function(index, value) {
-				loadNewReply(value);
+				loadNewReply(value.id, value.sone, value.post, value.postSone);
 			});
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
@@ -601,6 +601,16 @@ function getStatus() {
 		/* something really bad happend, wait a minute. */
 		setTimeout(getStatus, 60000);
 	})
+}
+
+/**
+ * Returns the ID of the currently logged in Sone.
+ *
+ * @return The ID of the current Sone, or an empty string if no Sone is logged
+ *         in
+ */
+function getCurrentSoneId() {
+	return $("#currentSoneId").text();
 }
 
 /**
@@ -696,9 +706,16 @@ function hasReply(replyId) {
 	return $("#sone .reply#" + replyId).length > 0;
 }
 
-function loadNewPost(postId) {
+function loadNewPost(postId, soneId, recipientId) {
 	if (hasPost(postId)) {
 		return;
+	}
+	if (!isIndexPage()) {
+		if (!isViewPostPage() || (getShownPostId() != postId)) {
+			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
+				return;
+			}
+		}
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
@@ -728,8 +745,11 @@ function loadNewPost(postId) {
 	});
 }
 
-function loadNewReply(replyId) {
+function loadNewReply(replyId, soneId, postId, postSoneId) {
 	if (hasReply(replyId)) {
+		return;
+	}
+	if (!hasPost(postId)) {
 		return;
 	}
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
@@ -859,7 +879,7 @@ $(document).ready(function() {
 			text = $(this).find(":input:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId);
+					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
 			$(this).find(":input:enabled").val("").blur();
@@ -874,7 +894,7 @@ $(document).ready(function() {
 			text = $(this).find(":input:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId);
+					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
 			$(this).find(":input:enabled").val("").blur();
