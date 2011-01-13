@@ -64,7 +64,7 @@ public class EditProfilePage extends SoneTemplatePage {
 		Integer birthMonth = profile.getBirthMonth();
 		Integer birthYear = profile.getBirthYear();
 		if (request.getMethod() == Method.POST) {
-			if (request.getHttpRequest().getPartAsStringFailsafe("saveProfile", 4).equals("true")) {
+			if (request.getHttpRequest().getPartAsStringFailsafe("save-profile", 4).equals("true")) {
 				firstName = request.getHttpRequest().getPartAsStringFailsafe("first-name", 256).trim();
 				middleName = request.getHttpRequest().getPartAsStringFailsafe("middle-name", 256).trim();
 				lastName = request.getHttpRequest().getPartAsStringFailsafe("last-name", 256).trim();
