@@ -604,6 +604,16 @@ function getStatus() {
 }
 
 /**
+ * Returns the ID of the currently logged in Sone.
+ *
+ * @return The ID of the current Sone, or an empty string if no Sone is logged
+ *         in
+ */
+function getCurrentSoneId() {
+	return $("#currentSoneId").text();
+}
+
+/**
  * Returns the content of the page-id attribute.
  *
  * @returns The page ID
