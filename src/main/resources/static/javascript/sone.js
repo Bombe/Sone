@@ -585,7 +585,7 @@ function getStatus() {
 			});
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value);
+				loadNewPost(value.id, value.sone, value.recipient);
 			});
 			/* process new replies. */
 			$.each(data.newReplies, function(index, value) {
