@@ -95,6 +95,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonPost.put("id", post.getId());
 			jsonPost.put("sone", post.getSone().getId());
 			jsonPost.put("recipient", (post.getRecipient() != null) ? post.getRecipient().getId() : null);
+			jsonPost.put("time", post.getTime());
 			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
