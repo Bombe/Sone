@@ -872,7 +872,7 @@ $(document).ready(function() {
 			text = $(this).find(":input:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId);
+					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
 			$(this).find(":input:enabled").val("").blur();
@@ -887,7 +887,7 @@ $(document).ready(function() {
 			text = $(this).find(":input:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId);
+					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
 			$(this).find(":input:enabled").val("").blur();
