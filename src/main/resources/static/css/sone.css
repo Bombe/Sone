@@ -438,10 +438,6 @@ textarea {
 	display: inline;
 }
 
-#sone #create-sone {
-
-}
-
 #sone #tail {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;
