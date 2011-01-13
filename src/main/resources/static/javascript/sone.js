@@ -716,9 +716,9 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				return;
 			}
 		}
-		if (getPostTime($("#sone .post").last()) > time) {
-			return;
-		}
+	}
+	if (getPostTime($("#sone .post").last()) > time) {
+		return;
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
