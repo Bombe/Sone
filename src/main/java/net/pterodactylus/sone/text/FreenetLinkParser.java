@@ -170,6 +170,12 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 						} catch (MalformedURLException mue1) {
 							/* not a valid link, insert as plain text. */
 							parts.add(createPlainTextPart(link));
+						} catch (NullPointerException npe1) {
+							/* FreenetURI sometimes throws these, too. */
+							parts.add(createPlainTextPart(link));
+						} catch (ArrayIndexOutOfBoundsException aioobe1) {
+							/* oh, and these, too. */
+							parts.add(createPlainTextPart(link));
 						}
 					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
 						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
