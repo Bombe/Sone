@@ -710,8 +710,12 @@ function loadNewPost(postId, soneId, recipientId) {
 	if (hasPost(postId)) {
 		return;
 	}
-	if (!isIndexPage() && (!isViewPostPage() || (getShownPostId() != postId))) {
-		return;
+	if (!isIndexPage()) {
+		if (!isViewPostPage() || (getShownPostId() != postId)) {
+			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
+				return;
+			}
+		}
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
