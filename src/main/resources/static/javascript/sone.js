@@ -585,7 +585,7 @@ function getStatus() {
 			});
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value.id, value.sone, value.recipient);
+				loadNewPost(value.id, value.sone, value.recipient, value.time);
 			});
 			/* process new replies. */
 			$.each(data.newReplies, function(index, value) {
@@ -706,7 +706,7 @@ function hasReply(replyId) {
 	return $("#sone .reply#" + replyId).length > 0;
 }
 
-function loadNewPost(postId, soneId, recipientId) {
+function loadNewPost(postId, soneId, recipientId, time) {
 	if (hasPost(postId)) {
 		return;
 	}
@@ -716,6 +716,9 @@ function loadNewPost(postId, soneId, recipientId) {
 				return;
 			}
 		}
+	}
+	if (getPostTime($("#sone .post").last()) > time) {
+		return;
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
@@ -735,8 +738,6 @@ function loadNewPost(postId, soneId, recipientId) {
 			newPost = $(data.post.html).addClass("hidden");
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
-			} else {
-				$("#sone #posts").append(newPost);
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
