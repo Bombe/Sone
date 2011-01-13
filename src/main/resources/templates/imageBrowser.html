@@ -29,6 +29,12 @@
 				<%/foreach>
 			</div>
 
+			<%foreach album.albums album>
+				<div class="album">
+					<div class="name"><% album.name|html></div>
+				</div>
+			<%/foreach>
+
 			<%include include/createAlbum.html>
 
 			<div id="description">
