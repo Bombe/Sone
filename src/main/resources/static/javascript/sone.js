@@ -706,7 +706,7 @@ function hasReply(replyId) {
 	return $("#sone .reply#" + replyId).length > 0;
 }
 
-function loadNewPost(postId) {
+function loadNewPost(postId, soneId, recipientId) {
 	if (hasPost(postId)) {
 		return;
 	}
