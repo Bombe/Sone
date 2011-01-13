@@ -735,8 +735,6 @@ function loadNewPost(postId, soneId, recipientId) {
 			newPost = $(data.post.html).addClass("hidden");
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
-			} else {
-				$("#sone #posts").append(newPost);
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
