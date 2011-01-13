@@ -20,6 +20,13 @@ textarea {
 	height: 4em;
 }
 
+#sone button {
+	background-color: #ddd;
+	border-width: 1px;
+	color: #444;
+	padding: 0.5ex 1.5ex;
+}
+
 #sone form {
 	margin: 0px;
 }
@@ -442,6 +449,10 @@ textarea {
 	text-align: center;
 	font-size: 75%;
 	color: #888;
+}
+
+#sone #tail #version-information {
+	margin-top: 1em;
 }
 
 #sone #add-sone textarea, #sone #create-sone textarea, #sone #load-sone textarea, #sone #edit-profile textarea {

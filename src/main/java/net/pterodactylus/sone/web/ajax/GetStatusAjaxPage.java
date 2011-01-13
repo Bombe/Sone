@@ -91,13 +91,23 @@ public class GetStatusAjaxPage extends JsonPage {
 		Set<Post> newPosts = webInterface.getNewPosts();
 		JsonArray jsonPosts = new JsonArray();
 		for (Post post : newPosts) {
-			jsonPosts.add(post.getId());
+			JsonObject jsonPost = new JsonObject();
+			jsonPost.put("id", post.getId());
+			jsonPost.put("sone", post.getSone().getId());
+			jsonPost.put("recipient", (post.getRecipient() != null) ? post.getRecipient().getId() : null);
+			jsonPost.put("time", post.getTime());
+			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
 		Set<Reply> newReplies = webInterface.getNewReplies();
 		JsonArray jsonReplies = new JsonArray();
 		for (Reply reply : newReplies) {
-			jsonReplies.add(reply.getId());
+			JsonObject jsonReply = new JsonObject();
+			jsonReply.put("id", reply.getId());
+			jsonReply.put("sone", reply.getSone().getId());
+			jsonReply.put("post", reply.getPost().getId());
+			jsonReply.put("postSone", reply.getPost().getSone().getId());
+			jsonReplies.add(jsonReply);
 		}
 		return createSuccessJsonObject().put("sones", jsonSones).put("notifications", jsonNotifications).put("removedNotifications", jsonRemovedNotifications).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}

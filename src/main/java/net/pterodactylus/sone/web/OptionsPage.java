@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -49,8 +50,8 @@ public class OptionsPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		Options options = webInterface.getCore().getOptions();
 		if (request.getMethod() == Method.POST) {
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
@@ -64,10 +65,10 @@ public class OptionsPage extends SoneTemplatePage {
 			webInterface.getCore().saveConfiguration();
 			throw new RedirectException(getPath());
 		}
-		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
-		template.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
-		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
-		template.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
+		dataProvider.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
+		dataProvider.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
+		dataProvider.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
+		dataProvider.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
 	}
 
 }

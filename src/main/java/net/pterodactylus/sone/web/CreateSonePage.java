@@ -30,6 +30,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 import freenet.clients.http.ToadletContext;
 
@@ -93,10 +94,10 @@ public class CreateSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.getCore());
-		template.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
+		dataProvider.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 		if (request.getMethod() == Method.POST) {
 			String id = request.getHttpRequest().getPartAsStringFailsafe("identity", 44);
 			OwnIdentity selectedIdentity = null;
@@ -107,7 +108,7 @@ public class CreateSonePage extends SoneTemplatePage {
 				}
 			}
 			if (selectedIdentity == null) {
-				template.set("errorNoIdentity", true);
+				dataProvider.set("errorNoIdentity", true);
 				return;
 			}
 			/* create Sone. */

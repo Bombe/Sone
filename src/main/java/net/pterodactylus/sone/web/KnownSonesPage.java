@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
@@ -51,11 +52,11 @@ public class KnownSonesPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, Template template) throws RedirectException {
-		super.processTemplate(request, template);
+	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+		super.processTemplate(request, dataProvider);
 		List<Sone> knownSones = new ArrayList<Sone>(webInterface.getCore().getSones());
 		Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
-		template.set("knownSones", knownSones);
+		dataProvider.set("knownSones", knownSones);
 	}
 
 }

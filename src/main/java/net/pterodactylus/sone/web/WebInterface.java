@@ -88,6 +88,7 @@ import net.pterodactylus.util.template.TemplateFactory;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
+import net.pterodactylus.util.version.Version;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
@@ -141,6 +142,9 @@ public class WebInterface implements CoreListener {
 	/** The “Sone locked” notification. */
 	private final ListNotification<Sone> lockedSonesNotification;
 
+	/** The “new version” notification. */
+	private final TemplateNotification newVersionNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -189,6 +193,9 @@ public class WebInterface implements CoreListener {
 
 		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
+
+		Template newVersionTemplate = templateFactory.createTemplate(createReader("/templates/notify/newVersionNotification.html"));
+		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 	}
 
 	//
@@ -698,6 +705,16 @@ public class WebInterface implements CoreListener {
 	public void soneUnlocked(Sone sone) {
 		lockedSonesNotification.remove(sone);
 		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void updateFound(Version version, long releaseTime) {
+		newVersionNotification.set("version", version);
+		newVersionNotification.set("releaseTime", releaseTime);
+		notificationManager.addNotification(newVersionNotification);
 	}
 
 	/**
