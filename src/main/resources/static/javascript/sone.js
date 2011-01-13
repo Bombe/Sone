@@ -453,7 +453,7 @@ function ajaxifyPost(postElement) {
 			postReply(postId, text, function(success, error, replyId) {
 				if (success) {
 					$(inputField).val("");
-					loadNewReply(replyId);
+					loadNewReply(replyId, getCurrentSoneId(), postId);
 					markPostAsKnown(getPostElement(inputField));
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
 				} else {
@@ -589,7 +589,7 @@ function getStatus() {
 			});
 			/* process new replies. */
 			$.each(data.newReplies, function(index, value) {
-				loadNewReply(value);
+				loadNewReply(value.id, value.sone, value.post, value.postSone);
 			});
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
@@ -745,8 +745,11 @@ function loadNewPost(postId, soneId, recipientId) {
 	});
 }
 
-function loadNewReply(replyId) {
+function loadNewReply(replyId, soneId, postId, postSoneId) {
 	if (hasReply(replyId)) {
+		return;
+	}
+	if (!hasPost(postId)) {
 		return;
 	}
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
