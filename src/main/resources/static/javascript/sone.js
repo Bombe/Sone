@@ -700,6 +700,9 @@ function loadNewPost(postId) {
 	if (hasPost(postId)) {
 		return;
 	}
+	if (!isIndexPage() && (!isViewPostPage() || (getShownPostId() != postId))) {
+		return;
+	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			if (hasPost(data.post.id)) {
