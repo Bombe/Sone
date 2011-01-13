@@ -147,36 +147,29 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 					String name = link;
 					logger.log(Level.FINER, "Found link: %s", link);
 					logger.log(Level.FINEST, "Next: %d, CHK: %d, SSK: %d, USK: %d", new Object[] { next, nextChk, nextSsk, nextUsk });
-					if (linkType == LinkType.KSK) {
-						name = link.substring(4);
-					} else if ((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
-						if (name.indexOf('/') > -1) {
-							if (!name.endsWith("/")) {
-								name = name.substring(name.lastIndexOf('/') + 1);
-							} else {
-								if (name.indexOf('/') != name.lastIndexOf('/')) {
-									name = name.substring(name.lastIndexOf('/', name.lastIndexOf('/') - 1));
-								} else {
-									/* shorten to 5 chars. */
-									name = name.substring(4, Math.min(9, name.length()));
-								}
-							}
-						}
+
+					if ((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
+						FreenetURI uri;
 						if (name.indexOf('?') > -1) {
 							name = name.substring(0, name.indexOf('?'));
 						}
-						boolean fromPostingSone = false;
-						if ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
-							try {
-								new FreenetURI(link);
-								fromPostingSone = link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
-								parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
-							} catch (MalformedURLException mue1) {
-								/* it’s not a valid link. */
-								parts.add(createPlainTextPart(link));
+						if (name.endsWith("/")) {
+							name = name.substring(0, name.length() - 1);
+						}
+						try {
+							uri = new FreenetURI(name);
+							name = uri.lastMetaString();
+							if (name == null) {
+								name = uri.getDocName();
 							}
-						} else {
+							if (name == null) {
+								name = link.substring(0, Math.min(9, link.length()));
+							}
+							boolean fromPostingSone = ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
 							parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
+						} catch (MalformedURLException mue1) {
+							/* not a valid link, insert as plain text. */
+							parts.add(createPlainTextPart(link));
 						}
 					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
 						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
