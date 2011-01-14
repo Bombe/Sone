@@ -56,6 +56,7 @@ import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
+import net.pterodactylus.sone.web.ajax.DeleteProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DismissNotificationAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
@@ -545,6 +546,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLikesAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldAjaxPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
