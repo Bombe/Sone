@@ -84,7 +84,7 @@ public class EditProfilePage extends SoneTemplatePage {
 				}
 				currentSone.setProfile(profile);
 				webInterface.getCore().saveSone(currentSone);
-				throw new RedirectException("index.html");
+				throw new RedirectException("editProfile.html");
 			} else if (request.getHttpRequest().getPartAsStringFailsafe("add-field", 4).equals("true")) {
 				String fieldName = request.getHttpRequest().getPartAsStringFailsafe("field-name", 256).trim();
 				try {
