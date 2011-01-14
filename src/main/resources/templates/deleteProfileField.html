@@ -1,0 +1,19 @@
+<%include include/head.html>
+
+	<h1><%= Page.DeleteProfileField.Page.Title|l10n|html></h1>
+
+	<p><%= Page.DeleteProfileField.Text|l10n|html></p>
+
+	<div class="profile-field">
+		<div class="name"><% fieldName|html></div>
+		<div class="value"><% fieldValue|html></div>
+	</div>
+
+	<form method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="field" value="<% fieldIndex>" />
+		<button type="submit" name="confirm" value="true"><%= Page.DeleteProfileField.Button.Yes|l10n|html></button>
+		<button type="submit" name="cancel" value="true"><%= Page.DeleteProfileField.Button.No|l10n|html></button>
+	</form>
+
+<%include include/tail.html>
