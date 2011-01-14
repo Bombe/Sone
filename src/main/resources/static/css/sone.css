@@ -438,7 +438,7 @@ textarea {
 	display: inline;
 }
 
-#sone .profile-field {
+#sone .profile-field, #sone #edit-profile button[type=submit], #sone #delete-profile-field {
 	margin-top: 1em;
 }
 

@@ -9,7 +9,7 @@
 		<div class="value"><% fieldValue|html></div>
 	</div>
 
-	<form method="post">
+	<form id="delete-profile-field" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 		<input type="hidden" name="field" value="<% fieldIndex>" />
 		<button type="submit" name="confirm" value="true"><%= Page.DeleteProfileField.Button.Yes|l10n|html></button>
