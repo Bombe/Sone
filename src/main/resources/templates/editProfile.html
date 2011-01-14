@@ -24,6 +24,10 @@
 				registerInputTextareaSwap("#sone #add-profile-field input[name=field-name]", fieldNameDefaultText, "field-name", true, true);
 			});
 
+			<%foreach fields field>
+				registerInputTextareaSwap("#sone #edit-profile input[name=field-<% loop.count>]", "<% field.key|html>", "field-<% loop.count>", true, true);
+			<%/foreach>
+
 			/* hide all the labels. */
 			$("#sone #edit-profile label, #sone #add-profile-field label").hide();
 		});
