@@ -19,10 +19,8 @@ package net.pterodactylus.sone.data;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 import net.pterodactylus.util.validation.Validation;
 
@@ -53,10 +51,7 @@ public class Profile implements Fingerprintable {
 	private volatile Integer birthYear;
 
 	/** Additional fields in the profile. */
-	private final List<String> fields = Collections.synchronizedList(new ArrayList<String>());
-
-	/** The field values. */
-	private final Map<String, String> fieldValues = Collections.synchronizedMap(new HashMap<String, String>());
+	private final List<Field> fields = Collections.synchronizedList(new ArrayList<Field>());
 
 	/**
 	 * Creates a new empty profile.
@@ -82,7 +77,6 @@ public class Profile implements Fingerprintable {
 		this.birthMonth = profile.birthMonth;
 		this.birthYear = profile.birthYear;
 		this.fields.addAll(profile.fields);
-		this.fieldValues.putAll(profile.fieldValues);
 	}
 
 	//
@@ -216,168 +210,116 @@ public class Profile implements Fingerprintable {
 	}
 
 	/**
-	 * Appends a new field to the list of fields.
+	 * Returns the fields of this profile.
 	 *
-	 * @param field
-	 *            The field to add
-	 * @throws IllegalArgumentException
-	 *             if the name is not valid
+	 * @return The fields of this profile
 	 */
-	public void addField(String field) throws IllegalArgumentException {
-		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Unique", !fields.contains(field), true).check();
-		fields.add(field);
+	public List<Field> getFields() {
+		return new ArrayList<Field>(fields);
 	}
 
 	/**
-	 * Moves the field with the given index up one position in the field list.
-	 * The index of the field to move must be greater than {@code 0} (because
-	 * you obviously can not move the first field further up).
+	 * Returns whether this profile contains the given field.
 	 *
-	 * @param fieldIndex
-	 *            The index of the field to move
+	 * @param field
+	 *            The field to check for
+	 * @return {@code true} if this profile contains the field, false otherwise
 	 */
-	public void moveFieldUp(int fieldIndex) {
-		Validation.begin().isGreater("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).check();
-		String field = fields.remove(fieldIndex);
+	public boolean hasField(Field field) {
+		return fields.contains(field);
+	}
+
+	/**
+	 * Returns the field with the given ID.
+	 *
+	 * @param fieldId
+	 *            The ID of the field to get
+	 * @return The field, or {@code null} if this profile does not contain a
+	 *         field with the given ID
+	 */
+	public Field getFieldById(String fieldId) {
+		Validation.begin().isNotNull("Field ID", fieldId).check();
+		for (Field field : fields) {
+			if (field.getId().equals(fieldId)) {
+				return field;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the field with the given name.
+	 *
+	 * @param fieldName
+	 *            The name of the field to get
+	 * @return The field, or {@code null} if this profile does not contain a
+	 *         field with the given name
+	 */
+	public Field getFieldByName(String fieldName) {
+		for (Field field : fields) {
+			if (field.getName().equals(fieldName)) {
+				return field;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Appends a new field to the list of fields.
+	 *
+	 * @param fieldName
+	 *            The name of the new field
+	 * @return The new field
+	 * @throws IllegalArgumentException
+	 *             if the name is not valid
+	 */
+	public Field addField(String fieldName) throws IllegalArgumentException {
+		Validation.begin().isNotNull("Field Name", fieldName).check().isGreater("Field Name Length", fieldName.length(), 0).isNull("Field Name Unique", getFieldByName(fieldName)).check();
+		@SuppressWarnings("synthetic-access")
+		Field field = new Field().setName(fieldName);
+		fields.add(field);
+		return field;
+	}
+
+	/**
+	 * Moves the given field up one position in the field list. The index of the
+	 * field to move must be greater than {@code 0} (because you obviously can
+	 * not move the first field further up).
+	 *
+	 * @param field
+	 *            The field to move up
+	 */
+	public void moveFieldUp(Field field) {
+		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isGreater("Field Index", getFieldIndex(field), 0).check();
+		int fieldIndex = getFieldIndex(field);
+		fields.remove(field);
 		fields.add(fieldIndex - 1, field);
 	}
 
 	/**
-	 * Moves the field with the given name up one position in the field list.
-	 * The field must not be the first field (because you obviously can not move
-	 * the first field further up).
+	 * Moves the given field down one position in the field list. The index of
+	 * the field to move must be less than the index of the last field (because
+	 * you obviously can not move the last field further down).
 	 *
 	 * @param field
-	 *            The name of the field to move
+	 *            The field to move down
 	 */
-	public void moveFieldUp(String field) {
-		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
-		moveFieldUp(getFieldIndex(field));
-	}
-
-	/**
-	 * Moves the field with the given index down one position in the field list.
-	 * The index of the field to move must be less than the index of the last
-	 * field (because you obviously can not move the last field further down).
-	 *
-	 * @param fieldIndex
-	 *            The index of the field to move
-	 */
-	public void moveFieldDown(int fieldIndex) {
-		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size() - 1).check();
-		String field = fields.remove(fieldIndex);
+	public void moveFieldDown(Field field) {
+		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isLess("Field Index", getFieldIndex(field), fields.size() - 1).check();
+		int fieldIndex = getFieldIndex(field);
+		fields.remove(field);
 		fields.add(fieldIndex + 1, field);
 	}
 
 	/**
-	 * Moves the field with the given name down one position in the field list.
-	 * The field must not be the last field (because you obviously can not move
-	 * the last field further down).
+	 * Removes the given field.
 	 *
 	 * @param field
-	 *            The name of the field to move
+	 *            The field to remove
 	 */
-	public void moveFieldDown(String field) {
-		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
-		moveFieldDown(getFieldIndex(field));
-	}
-
-	/**
-	 * Removes the field at the given index.
-	 *
-	 * @param fieldIndex
-	 *            The index of the field to remove
-	 */
-	public void removeField(int fieldIndex) {
-		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).check();
-		String field = fields.remove(fieldIndex);
-		fieldValues.remove(field);
-	}
-
-	/**
-	 * Removes the field with the given name.
-	 *
-	 * @param field
-	 *            The name of the field
-	 */
-	public void removeField(String field) {
-		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
-		removeField(getFieldIndex(field));
-	}
-
-	/**
-	 * Returns the value of the field with the given name.
-	 *
-	 * @param field
-	 *            The name of the field
-	 * @return The value of the field, or {@code null} if there is no such field
-	 */
-	public String getField(String field) {
-		return fieldValues.get(field);
-	}
-
-	/**
-	 * Sets the value of the field with the given name.
-	 *
-	 * @param fieldIndex
-	 *            The index of the field
-	 * @param value
-	 *            The value of the field
-	 */
-	public void setField(int fieldIndex, String value) {
-		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).check();
-		setField(fields.get(fieldIndex), value);
-	}
-
-	/**
-	 * Sets the value of the field with the given name.
-	 *
-	 * @param field
-	 *            The name of the field
-	 * @param value
-	 *            The value of the field
-	 */
-	public void setField(String field, String value) {
-		Validation.begin().isNotNull("Field Name", field).check().isGreater("Field Name Length", field.length(), 0).isEqual("Field Name Existing", fields.contains(field), true).check();
-		fieldValues.put(field, value);
-	}
-
-	/**
-	 * Returns a list of all fields stored in this profile.
-	 *
-	 * @return The fields of this profile
-	 */
-	public List<String> getFieldNames() {
-		return Collections.unmodifiableList(fields);
-	}
-
-	/**
-	 * Renames a fields.
-	 *
-	 * @param fieldIndex
-	 *            The index of the field to rename
-	 * @param fieldName
-	 *            The new name of the field
-	 */
-	public void setFieldName(int fieldIndex, String fieldName) {
-		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).isNotNull("Field Name", fieldName).isEqual("New Field Name Unique", !fields.contains(fieldName) || (getFieldIndex(fieldName) == fieldIndex), true).check();
-		String value = fieldValues.remove(fields.get(fieldIndex));
-		fields.set(fieldIndex, fieldName);
-		fieldValues.put(fieldName, value);
-	}
-
-	/**
-	 * Returns all field names and their values, ordered the same way
-	 * {@link #getFieldNames()} returns the names of the fields.
-	 *
-	 * @return All field names and values
-	 */
-	public Map<String, String> getFields() {
-		Map<String, String> fields = new LinkedHashMap<String, String>();
-		for (String field : getFieldNames()) {
-			fields.put(field, getField(field));
-		}
-		return fields;
+	public void removeField(Field field) {
+		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).check();
+		fields.remove(field);
 	}
 
 	//
@@ -392,7 +334,7 @@ public class Profile implements Fingerprintable {
 	 * @return The index of the field, or {@code -1} if there is no field with
 	 *         the given name
 	 */
-	private int getFieldIndex(String field) {
+	private int getFieldIndex(Field field) {
 		return fields.indexOf(field);
 	}
 
@@ -426,13 +368,129 @@ public class Profile implements Fingerprintable {
 			fingerprint.append("BirthYear(").append(birthYear).append(')');
 		}
 		fingerprint.append("ContactInformation(");
-		for (String field : fields) {
-			fingerprint.append(field).append('(').append(fieldValues.get(field)).append(')');
+		for (Field field : fields) {
+			fingerprint.append(field.getName()).append('(').append(field.getValue()).append(')');
 		}
 		fingerprint.append(")");
 		fingerprint.append(")");
 
 		return fingerprint.toString();
+	}
+
+	/**
+	 * Container for a profile field.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public class Field {
+
+		/** The ID of the field. */
+		private final String id;
+
+		/** The name of the field. */
+		private String name;
+
+		/** The value of the field. */
+		private String value;
+
+		/**
+		 * Creates a new field with a random ID.
+		 */
+		private Field() {
+			this(UUID.randomUUID().toString());
+		}
+
+		/**
+		 * Creates a new field with the given ID.
+		 *
+		 * @param id
+		 *            The ID of the field
+		 */
+		private Field(String id) {
+			Validation.begin().isNotNull("Field ID", id).check();
+			this.id = id;
+		}
+
+		/**
+		 * Returns the ID of this field.
+		 *
+		 * @return The ID of this field
+		 */
+		public String getId() {
+			return id;
+		}
+
+		/**
+		 * Returns the name of this field.
+		 *
+		 * @return The name of this field
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * Sets the name of this field. The name must not be {@code null} and
+		 * must not match any other fields in this profile but my match the name
+		 * of this field.
+		 *
+		 * @param name
+		 *            The new name of this field
+		 * @return This field
+		 */
+		public Field setName(String name) {
+			Validation.begin().isNotNull("Field Name", name).check().is("Field Unique", (getFieldByName(name) == null) || equals(getFieldByName(name))).check();
+			this.name = name;
+			return this;
+		}
+
+		/**
+		 * Returns the value of this field.
+		 *
+		 * @return The value of this field
+		 */
+		public String getValue() {
+			return value;
+		}
+
+		/**
+		 * Sets the value of this field. While {@code null} is allowed, no
+		 * guarantees are made that {@code null} values are correctly persisted
+		 * across restarts of the plugin!
+		 *
+		 * @param value
+		 *            The new value of this field
+		 * @return This field
+		 */
+		public Field setValue(String value) {
+			this.value = value;
+			return this;
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof Field)) {
+				return false;
+			}
+			Field field = (Field) object;
+			return id.equals(field.id);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return id.hashCode();
+		}
+
 	}
 
 }

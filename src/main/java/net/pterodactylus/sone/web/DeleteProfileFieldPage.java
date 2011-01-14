@@ -18,9 +18,9 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
@@ -55,29 +55,30 @@ public class DeleteProfileFieldPage extends SoneTemplatePage {
 		super.processTemplate(request, dataProvider);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Profile profile = currentSone.getProfile();
-		int fieldIndex = Numbers.safeParseInteger(request.getHttpRequest().getParam("field"), -1);
-		if (fieldIndex >= currentSone.getProfile().getFieldNames().size()) {
-			fieldIndex = -1;
+
+		/* get parameters from request. */
+		String fieldId = request.getHttpRequest().getParam("field");
+		Field field = profile.getFieldById(fieldId);
+		if (field == null) {
+			throw new RedirectException("invalid.html");
 		}
-		String fieldName = null;
-		String fieldValue = null;
-		if (fieldIndex > -1) {
-			fieldName = profile.getFieldNames().get(fieldIndex);
-			fieldValue = profile.getField(fieldName);
-		}
+
+		/* process POST request. */
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().getPartAsStringFailsafe("confirm", 4).equals("true")) {
-				fieldIndex = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("field", 11), -1);
-				if (fieldIndex > -1) {
-					profile.removeField(fieldIndex);
+				fieldId = request.getHttpRequest().getParam("field");
+				field = profile.getFieldById(fieldId);
+				if (field == null) {
+					throw new RedirectException("invalid.html");
 				}
+				profile.removeField(field);
 				currentSone.setProfile(profile);
 			}
 			throw new RedirectException("editProfile.html#profile-fields");
 		}
-		dataProvider.set("fieldIndex", fieldIndex);
-		dataProvider.set("fieldName", fieldName);
-		dataProvider.set("fieldValue", fieldValue);
+
+		/* set current values in template. */
+		dataProvider.set("field", field);
 	}
 
 }

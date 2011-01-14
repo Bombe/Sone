@@ -10,9 +10,9 @@
 
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<input type="hidden" name="field" value="<% fieldIndex>" />
+		<input type="hidden" name="field" value="<% field.id|html>" />
 		<div>
-			<input type="text" name="name" value="<% fieldName|html>" />
+			<input type="text" name="name" value="<% field.name|html>" />
 			<button type="submit" name="save" value="true"><%= Page.EditProfileField.Button.Save|l10n|html></button>
 		</div>
 		<p>

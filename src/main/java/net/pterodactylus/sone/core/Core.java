@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,6 +34,7 @@ import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -1036,14 +1036,13 @@ public class Core implements IdentityListener, UpdateListener {
 
 		/* load profile fields. */
 		while (true) {
-			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFieldNames().size();
+			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFields().size();
 			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
 			if (fieldName == null) {
 				break;
 			}
 			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
-			profile.addField(fieldName);
-			profile.setField(fieldName, fieldValue);
+			profile.addField(fieldName).setValue(fieldValue);
 		}
 
 		/* load posts. */
@@ -1180,9 +1179,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 			/* save profile fields. */
 			int fieldCounter = 0;
-			for (Entry<String, String> profileField : profile.getFields().entrySet()) {
+			for (Field profileField : profile.getFields()) {
 				String fieldPrefix = sonePrefix + "/Profile/Fields/" + fieldCounter++;
-				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getKey());
+				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getName());
 				configuration.getStringValue(fieldPrefix + "/Value").setValue(profileField.getValue());
 			}
 			configuration.getStringValue(sonePrefix + "/Profile/Fields/" + fieldCounter + "/Name").setValue(null);

@@ -5,13 +5,13 @@
 	<p><%= Page.DeleteProfileField.Text|l10n|html></p>
 
 	<div class="profile-field">
-		<div class="name"><% fieldName|html></div>
-		<div class="value"><% fieldValue|html></div>
+		<div class="name"><% field.name|html></div>
+		<div class="value"><% field.value|html></div>
 	</div>
 
 	<form id="delete-profile-field" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<input type="hidden" name="field" value="<% fieldIndex>" />
+		<input type="hidden" name="field" value="<% field.id|html>" />
 		<button type="submit" name="confirm" value="true"><%= Page.DeleteProfileField.Button.Yes|l10n|html></button>
 		<button type="submit" name="cancel" value="true"><%= Page.DeleteProfileField.Button.No|l10n|html></button>
 	</form>

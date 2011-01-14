@@ -82,13 +82,13 @@
 		<p><%= Page.EditProfile.Fields.Description|l10n|html></p>
 
 		<%foreach fields field fieldLoop>
-			<div class="profile-field">
-				<div class="name"><% field.key|html></div>
-				<div class="edit-field-name"><button type="submit" name="edit-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.Edit|l10n|html></button></div>
-				<div class="delete-field-name"><button type="submit" name="delete-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.Delete|l10n|html></button></div>
-				<div class="<%if fieldLoop.last>hidden <%/if>move-down-field"><button type="submit" name="move-down-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.MoveDown|l10n|html></button></div>
-				<div class="<%if fieldLoop.first>hidden <%/if>move-up-field"><button type="submit" name="move-up-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.MoveUp|l10n|html></button></div>
-				<div class="value"><input type="text" name="field-<% fieldLoop.count>" value="<% field.value|html>" /></div>
+			<div class="profile-field" id="<% field.id|html>">
+				<div class="name"><% field.name|html></div>
+				<div class="edit-field-name"><button type="submit" name="edit-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.Edit|l10n|html></button></div>
+				<div class="delete-field-name"><button type="submit" name="delete-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.Delete|l10n|html></button></div>
+				<div class="<%if fieldLoop.last>hidden <%/if>move-down-field"><button type="submit" name="move-down-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.MoveDown|l10n|html></button></div>
+				<div class="<%if fieldLoop.first>hidden <%/if>move-up-field"><button type="submit" name="move-up-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.MoveUp|l10n|html></button></div>
+				<div class="value"><input type="text" name="field-<% field.id|html>" value="<% field.value|html>" /></div>
 			</div>
 
 			<%if fieldLoop.last>

@@ -17,9 +17,10 @@
 
 package net.pterodactylus.sone.web;
 
-import java.util.Map;
+import java.util.List;
 
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
@@ -65,7 +66,7 @@ public class EditProfilePage extends SoneTemplatePage {
 		Integer birthDay = profile.getBirthDay();
 		Integer birthMonth = profile.getBirthMonth();
 		Integer birthYear = profile.getBirthYear();
-		Map<String, String> fields = profile.getFields();
+		List<Field> fields = profile.getFields();
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().getPartAsStringFailsafe("save-profile", 4).equals("true")) {
 				firstName = request.getHttpRequest().getPartAsStringFailsafe("first-name", 256).trim();
@@ -78,9 +79,9 @@ public class EditProfilePage extends SoneTemplatePage {
 				profile.setMiddleName(middleName.length() > 0 ? middleName : null);
 				profile.setLastName(lastName.length() > 0 ? lastName : null);
 				profile.setBirthDay(birthDay).setBirthMonth(birthMonth).setBirthYear(birthYear);
-				for (int fieldIndex = 0; fieldIndex < profile.getFieldNames().size(); ++fieldIndex) {
-					String value = request.getHttpRequest().getPartAsStringFailsafe("field-" + fieldIndex, 400);
-					profile.setField(fieldIndex, value);
+				for (Field field : fields) {
+					String value = request.getHttpRequest().getPartAsStringFailsafe("field-" + field.getId(), 400);
+					field.setValue(value);
 				}
 				currentSone.setProfile(profile);
 				webInterface.getCore().saveSone(currentSone);
@@ -98,25 +99,33 @@ public class EditProfilePage extends SoneTemplatePage {
 					dataProvider.set("duplicateFieldName", true);
 				}
 			} else {
-				int deleteFieldIndex = getFieldIndex(request, "delete-field-");
-				if (deleteFieldIndex > -1) {
-					throw new RedirectException("deleteProfileField.html?field=" + deleteFieldIndex);
+				String id = getFieldId(request, "delete-field-");
+				if (id != null) {
+					throw new RedirectException("deleteProfileField.html?field=" + id);
 				}
-				int moveUpFieldIndex = getFieldIndex(request, "move-up-field-");
-				if (moveUpFieldIndex > -1) {
-					profile.moveFieldUp(moveUpFieldIndex);
+				id = getFieldId(request, "move-up-field-");
+				if (id != null) {
+					Field field = profile.getFieldById(id);
+					if (field == null) {
+						throw new RedirectException("invalid.html");
+					}
+					profile.moveFieldUp(field);
 					currentSone.setProfile(profile);
 					throw new RedirectException("editProfile.html#profile-fields");
 				}
-				int moveDownFieldIndex = getFieldIndex(request, "move-down-field-");
-				if (moveDownFieldIndex > -1) {
-					profile.moveFieldDown(moveDownFieldIndex);
+				id = getFieldId(request, "move-down-field-");
+				if (id != null) {
+					Field field = profile.getFieldById(id);
+					if (field == null) {
+						throw new RedirectException("invalid.html");
+					}
+					profile.moveFieldDown(field);
 					currentSone.setProfile(profile);
 					throw new RedirectException("editProfile.html#profile-fields");
 				}
-				int editFieldIndex = getFieldIndex(request, "edit-field-");
-				if (editFieldIndex > -1) {
-					throw new RedirectException("editProfileField.html?field=" + editFieldIndex);
+				id = getFieldId(request, "edit-field-");
+				if (id != null) {
+					throw new RedirectException("editProfileField.html?field=" + id);
 				}
 			}
 		}
@@ -135,21 +144,21 @@ public class EditProfilePage extends SoneTemplatePage {
 
 	/**
 	 * Searches for a part whose names starts with the given {@code String} and
-	 * extracts the number from the located name.
+	 * extracts the ID from the located name.
 	 *
 	 * @param request
 	 *            The request to get the parts from
 	 * @param partNameStart
 	 *            The start of the name of the requested part
-	 * @return The parsed number, or {@code -1} if the number could not be
-	 *         parsed
+	 * @return The parsed ID, or {@code null} if there was no part matching the
+	 *         given string
 	 */
-	private int getFieldIndex(Request request, String partNameStart) {
+	private String getFieldId(Request request, String partNameStart) {
 		for (String partName : request.getHttpRequest().getParts()) {
 			if (partName.startsWith(partNameStart)) {
-				return Numbers.safeParseInteger(partName.substring(partNameStart.length()), -1);
+				return partName.substring(partNameStart.length());
 			}
 		}
-		return -1;
+		return null;
 	}
 }

@@ -18,9 +18,9 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
@@ -57,15 +57,10 @@ public class EditProfileFieldPage extends SoneTemplatePage {
 		Profile profile = currentSone.getProfile();
 
 		/* get parameters from request. */
-		int fieldIndex = Numbers.safeParseInteger(request.getHttpRequest().getParam("field"), -1);
-		if (fieldIndex >= currentSone.getProfile().getFieldNames().size()) {
-			fieldIndex = -1;
-		}
-		String fieldName = null;
-		String fieldValue = null;
-		if (fieldIndex > -1) {
-			fieldName = profile.getFieldNames().get(fieldIndex);
-			fieldValue = profile.getField(fieldName);
+		String fieldId = request.getHttpRequest().getParam("field");
+		Field field = profile.getFieldById(fieldId);
+		if (field == null) {
+			throw new RedirectException("invalid.html");
 		}
 
 		/* process the POST request. */
@@ -73,14 +68,15 @@ public class EditProfileFieldPage extends SoneTemplatePage {
 			if (request.getHttpRequest().getPartAsStringFailsafe("cancel", 4).equals("true")) {
 				throw new RedirectException("editProfile.html#profile-fields");
 			}
-			fieldIndex = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("field", 11), -1);
-			String name = request.getHttpRequest().getPartAsStringFailsafe("name", 256);
-			if (fieldIndex == -1) {
+			fieldId = request.getHttpRequest().getPartAsStringFailsafe("field", 36);
+			field = profile.getFieldById(fieldId);
+			if (field == null) {
 				throw new RedirectException("invalid.html");
 			}
-			int existingFieldIndex = profile.getFieldNames().indexOf(name);
-			if ((existingFieldIndex == -1) || (existingFieldIndex == fieldIndex)) {
-				profile.setFieldName(fieldIndex, name);
+			String name = request.getHttpRequest().getPartAsStringFailsafe("name", 256);
+			Field existingField = profile.getFieldByName(name);
+			if ((existingField == null) || (existingField.equals(field))) {
+				field.setName(name);
 				currentSone.setProfile(profile);
 				throw new RedirectException("editProfile.html#profile-fields");
 			}
@@ -88,9 +84,7 @@ public class EditProfileFieldPage extends SoneTemplatePage {
 		}
 
 		/* store current values in template. */
-		dataProvider.set("fieldIndex", fieldIndex);
-		dataProvider.set("fieldName", fieldName);
-		dataProvider.set("fieldValue", fieldValue);
+		dataProvider.set("field", field);
 	}
 
 }
