@@ -21,11 +21,11 @@
 				registerInputTextareaSwap("#sone #edit-profile input[name=birth-year]", birthYearDefaultText, "birth-year", true, true);
 			});
 			getTranslation("WebInterface.DefaultText.FieldName", function(fieldNameDefaultText) {
-				registerInputTextareaSwap("#sone #edit-profile input[name=field-name]", fieldNameDefaultText, "field-name", true, true);
+				registerInputTextareaSwap("#sone #add-profile-field input[name=field-name]", fieldNameDefaultText, "field-name", true, true);
 			});
 
 			/* hide all the labels. */
-			$("#sone #edit-profile label").hide();
+			$("#sone #edit-profile label, #sone #add-profile-field label").hide();
 		});
 	</script>
 
@@ -88,6 +88,15 @@
 			</div>
 		<%/foreach>
 
+		<div>
+			<button type="submit" name="save-profile" value="true"><%= Page.EditProfile.Button.Save|l10n|html></button>
+		</div>
+
+	</form>
+
+	<form id="add-profile-field" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+
 		<a name="profile-fields"></a>
 		<h2><%= Page.EditProfile.Fields.AddField.Title|l10n|html></h2>
 
@@ -99,10 +108,6 @@
 			<label for="new-field"><%= Page.EditProfile.Fields.AddField.Label.Name|l10n|html></label>
 			<input type="text" name="field-name" value="" />
 			<button type="submit" name="add-field" value="true"><%= Page.EditProfile.Fields.AddField.Button.AddField|l10n|html></button>
-		</div>
-
-		<div>
-			<button type="submit" name="save-profile" value="true"><%= Page.EditProfile.Button.Save|l10n|html></button>
 		</div>
 
 	</form>
