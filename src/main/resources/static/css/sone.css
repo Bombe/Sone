@@ -438,6 +438,28 @@ textarea {
 	display: inline;
 }
 
+#sone .profile-field {
+	margin-top: 1em;
+}
+
+#sone .profile-field .name {
+	display: inline;
+	font-weight: bold;
+}
+
+#sone .profile-field .value {
+	margin-left: 2em;
+}
+
+#sone #edit-profile .profile-field .value {
+	margin-left: inherit;
+}
+
+#sone .profile-field .edit-field-name, #sone .profile-field .move-up-field, #sone .profile-field .move-down-field, #sone .profile-field .delete-field-name {
+	float: right;
+	margin-top: -1ex;
+}
+
 #sone #tail {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;

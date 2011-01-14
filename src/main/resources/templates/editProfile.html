@@ -20,6 +20,9 @@
 			getTranslation("WebInterface.DefaultText.BirthYear", function(birthYearDefaultText) {
 				registerInputTextareaSwap("#sone #edit-profile input[name=birth-year]", birthYearDefaultText, "birth-year", true, true);
 			});
+			getTranslation("WebInterface.DefaultText.FieldName", function(fieldNameDefaultText) {
+				registerInputTextareaSwap("#sone #edit-profile input[name=field-name]", fieldNameDefaultText, "field-name", true, true);
+			});
 
 			/* hide all the labels. */
 			$("#sone #edit-profile label").hide();
@@ -64,6 +67,38 @@
 		<div id="birth-year">
 			<label for="birth-year"><%= Page.EditProfile.Birthday.Label.Year|l10n|html></label>
 			<input type="text" name="birth-year" value="<% birthYear|html>" />
+		</div>
+
+		<div>
+			<button type="submit" name="save-profile" value="true"><%= Page.EditProfile.Button.Save|l10n|html></button>
+		</div>
+
+		<h1><%= Page.EditProfile.Fields.Title|l10n|html></h1>
+
+		<p><%= Page.EditProfile.Fields.Description|l10n|html></p>
+
+		<%foreach fields field fieldLoop>
+			<div class="profile-field">
+				<div class="name"><% field.key|html></div>
+				<div class="edit-field-name"><button type="submit" name="edit-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.Edit|l10n|html></button></div>
+				<div class="delete-field-name"><button type="submit" name="delete-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.Delete|l10n|html></button></div>
+				<div class="<%if fieldLoop.last>hidden <%/if>move-down-field"><button type="submit" name="move-down-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.MoveDown|l10n|html></button></div>
+				<div class="<%if fieldLoop.first>hidden <%/if>move-up-field"><button type="submit" name="move-up-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.MoveUp|l10n|html></button></div>
+				<div class="value"><input type="text" name="field-<% fieldLoop.count>" value="<% field.value|html>" /></div>
+			</div>
+		<%/foreach>
+
+		<a name="profile-fields"></a>
+		<h2><%= Page.EditProfile.Fields.AddField.Title|l10n|html></h2>
+
+		<%if duplicateFieldName>
+			<p><%= Page.EditProfile.Error.DuplicateFieldName|l10n|replace needle="{fieldName}" replacementKey="fieldName"|html></p>
+		<%/if>
+
+		<div id="new-field">
+			<label for="new-field"><%= Page.EditProfile.Fields.AddField.Label.Name|l10n|html></label>
+			<input type="text" name="field-name" value="" />
+			<button type="submit" name="add-field" value="true"><%= Page.EditProfile.Fields.AddField.Button.AddField|l10n|html></button>
 		</div>
 
 		<div>
