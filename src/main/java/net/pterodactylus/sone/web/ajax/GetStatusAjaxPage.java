@@ -120,6 +120,14 @@ public class GetStatusAjaxPage extends JsonPage {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean requiresLogin() {
+		return false;
+	}
+
 	//
 	// PRIVATE METHODS
 	//
