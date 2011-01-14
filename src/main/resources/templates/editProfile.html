@@ -1,7 +1,7 @@
 <%include include/head.html>
 
 	<script language="javascript">
-		$(document).ready(function() {
+		$(function() {
 			getTranslation("WebInterface.DefaultText.FirstName", function(firstNameDefaultText) {
 				registerInputTextareaSwap("#sone #edit-profile input[name=first-name]", firstNameDefaultText, "first-name", true, true);
 			});
