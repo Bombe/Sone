@@ -86,11 +86,13 @@
 				<div class="<%if fieldLoop.first>hidden <%/if>move-up-field"><button type="submit" name="move-up-field-<% fieldLoop.count>" value="true"><%= Page.EditProfile.Fields.Button.MoveUp|l10n|html></button></div>
 				<div class="value"><input type="text" name="field-<% fieldLoop.count>" value="<% field.value|html>" /></div>
 			</div>
-		<%/foreach>
 
-		<div>
-			<button type="submit" name="save-profile" value="true"><%= Page.EditProfile.Button.Save|l10n|html></button>
-		</div>
+			<%if fieldLoop.last>
+				<div>
+					<button type="submit" name="save-profile" value="true"><%= Page.EditProfile.Button.Save|l10n|html></button>
+				</div>
+			<%/if>
+		<%/foreach>
 
 	</form>
 
