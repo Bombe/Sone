@@ -92,6 +92,7 @@ public class EditProfilePage extends SoneTemplatePage {
 					currentSone.setProfile(profile);
 					fields = profile.getFields();
 					webInterface.getCore().saveSone(currentSone);
+					throw new RedirectException("editProfile.html#profile-fields");
 				} catch (IllegalArgumentException iae1) {
 					dataProvider.set("fieldName", fieldName);
 					dataProvider.set("duplicateFieldName", true);
