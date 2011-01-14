@@ -31,6 +31,7 @@
 			/* hide all the labels. */
 			$("#sone #edit-profile label, #sone #add-profile-field label").hide();
 
+			/* ajaxify the delete buttons. */
 			getTranslation("Page.EditProfile.Fields.Button.ReallyDelete", function(reallyDeleteText) {
 				$("#sone #edit-profile .delete-field-name button").each(function() {
 					confirmButton = $(this).clone().addClass("hidden").addClass("confirm").text(reallyDeleteText).insertAfter(this);
