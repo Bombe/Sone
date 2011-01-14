@@ -862,6 +862,20 @@ function showNotificationDetails(notificationId) {
 	$("#sone .notification#" + notificationId + " .short-text").hide();
 }
 
+/**
+ * Deletes the field with the given ID from the profile.
+ *
+ * @param fieldId
+ *            The ID of the field to delete
+ */
+function deleteProfileField(fieldId) {
+	$.getJSON("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
+		if (data && data.success) {
+			$("#sone .profile-field#" + data.field.id).slideUp();
+		}
+	});
+}
+
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
