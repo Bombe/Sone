@@ -30,6 +30,35 @@
 
 			/* hide all the labels. */
 			$("#sone #edit-profile label, #sone #add-profile-field label").hide();
+
+			getTranslation("Page.EditProfile.Fields.Button.ReallyDelete", function(reallyDeleteText) {
+				$("#sone #edit-profile .delete-field-name button").each(function() {
+					confirmButton = $(this).clone().addClass("hidden").addClass("confirm").text(reallyDeleteText).insertAfter(this);
+					(function(deleteButton, confirmButton) {
+						deleteButton.click(function() {
+							deleteButton.fadeOut("slow", function() {
+								confirmButton.fadeIn("slow");
+								$(document).one("click", function() {
+									if (this != confirmButton.get(0)) {
+										confirmButton.fadeOut("slow", function() {
+											deleteButton.fadeIn("slow");
+										});
+									}
+									return false;
+								});
+							});
+							return false;
+						});
+						confirmButton.click(function() {
+							confirmButton.fadeOut("slow");
+							buttonName = confirmButton.attr("name");
+							fieldId = buttonName.substring("delete-field-".length);
+							deleteProfileField(fieldId);
+							return false;
+						});
+					})($(this), confirmButton);
+				});
+			});
 		});
 	</script>
 
