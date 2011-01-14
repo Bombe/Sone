@@ -25,7 +25,7 @@
 			});
 
 			<%foreach fields field>
-				registerInputTextareaSwap("#sone #edit-profile input[name=field-<% loop.count>]", "<% field.key|html>", "field-<% loop.count>", true, true);
+				registerInputTextareaSwap("#sone #edit-profile input[name=field-<% loop.count>]", <% field.key|js>, "field-<% loop.count>", true, true);
 			<%/foreach>
 
 			/* hide all the labels. */
