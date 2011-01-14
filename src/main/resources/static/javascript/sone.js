@@ -793,6 +793,7 @@ function markPostAsKnown(postElements) {
 			(function(postElement) {
 				$.getJSON("markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
 					$(postElement).removeClass("new");
+					$(".click-to-show", postElement).removeClass("new");
 				});
 			})(postElement);
 		}
