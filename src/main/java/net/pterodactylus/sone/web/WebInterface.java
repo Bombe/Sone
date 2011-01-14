@@ -473,6 +473,7 @@ public class WebInterface implements CoreListener {
 		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
 		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
+		Template editProfileFieldTemplate = templateFactory.createTemplate(createReader("/templates/editProfileField.html"));
 		Template deleteProfileFieldTemplate = templateFactory.createTemplate(createReader("/templates/deleteProfileField.html"));
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
@@ -499,6 +500,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldPage(editProfileFieldTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldPage(deleteProfileFieldTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));

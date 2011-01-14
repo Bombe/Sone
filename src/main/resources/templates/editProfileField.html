@@ -1,0 +1,24 @@
+<%include include/head.html>
+
+	<h1><%= Page.EditProfileField.Page.Title|l10n|html></h1>
+
+	<p><%= Page.EditProfileField.Text|l10n|html></p>
+
+	<%if duplicateFieldName>
+		<p><%= Page.EditProfileField.Error.DuplicateFieldName|l10n|html></p>
+	<%/if>
+
+	<form method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="field" value="<% fieldIndex>" />
+		<div>
+			<input type="text" name="name" value="<% fieldName|html>" />
+			<button type="submit" name="save" value="true"><%= Page.EditProfileField.Button.Save|l10n|html></button>
+		</div>
+		<div>
+			<button type="reset"><%= Page.EditProfileField.Button.Reset|l10n|html></button>
+			<button type="submit" name="cancel" value="true"><%= Page.EditProfileField.Button.Cancel|l10n|html></button>
+		</div>
+	</form>
+
+<%include include/tail.html>
