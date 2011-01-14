@@ -352,6 +352,21 @@ public class Profile implements Fingerprintable {
 	}
 
 	/**
+	 * Renames a fields.
+	 *
+	 * @param fieldIndex
+	 *            The index of the field to rename
+	 * @param fieldName
+	 *            The new name of the field
+	 */
+	public void setFieldName(int fieldIndex, String fieldName) {
+		Validation.begin().isGreaterOrEqual("Field Index", fieldIndex, 0).isLess("Field Index", fieldIndex, fields.size()).isNotNull("Field Name", fieldName).isEqual("New Field Name Unique", !fields.contains(fieldName) || (getFieldIndex(fieldName) == fieldIndex), true).check();
+		String value = fieldValues.remove(fields.get(fieldIndex));
+		fields.set(fieldIndex, fieldName);
+		fieldValues.put(fieldName, value);
+	}
+
+	/**
 	 * Returns all field names and their values, ordered the same way
 	 * {@link #getFieldNames()} returns the names of the fields.
 	 *
