@@ -1041,11 +1041,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if (fieldName == null) {
 				break;
 			}
-			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue(null);
-			if (fieldValue == null) {
-				logger.log(Level.WARNING, "Invalid profile field found, aborting load!");
-				return;
-			}
+			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
 			profile.addField(fieldName);
 			profile.setField(fieldName, fieldValue);
 		}
