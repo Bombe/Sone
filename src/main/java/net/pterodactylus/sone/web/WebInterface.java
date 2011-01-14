@@ -46,6 +46,7 @@ import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.NotificationManagerAccessor;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
@@ -170,6 +171,7 @@ public class WebInterface implements CoreListener {
 		templateFactory.addFilter("change", new RequestChangeFilter());
 		templateFactory.addFilter("match", new MatchFilter());
 		templateFactory.addFilter("css", new CssClassNameFilter());
+		templateFactory.addFilter("js", new JavascriptFilter());
 		templateFactory.addPlugin("getpage", new GetPagePlugin());
 		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
