@@ -25,7 +25,7 @@
 
 			<div class="profile-field">
 				<div class="name"><%= Page.ViewSone.Profile.Label.Name|l10n|html></div>
-				<div class="value"><% sone.niceName|html></div>
+				<div class="value"><a href="/WoT/ShowIdentity?id=<% sone.id|html>"><% sone.niceName|html></a></div>
 			</div>
 
 			<%foreach sone.profile.fields field>
