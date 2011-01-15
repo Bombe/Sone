@@ -70,6 +70,7 @@ import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.MarkPostAsKnownPage;
 import net.pterodactylus.sone.web.ajax.MarkReplyAsKnownPage;
+import net.pterodactylus.sone.web.ajax.MoveProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
@@ -549,6 +550,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLikesAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MoveProfileFieldAjaxPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
