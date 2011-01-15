@@ -68,6 +68,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return;
 	}
 	commentElement = (function(postId) {
+		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 			markPostAsKnown(getPostElement(this));
 			replyElement = $("#sone .post#" + postId + " .create-reply");
@@ -87,6 +88,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return commentElement;
 	})(postId);
 	$(insertAfterThisElement).after(commentElement.clone(true));
+	$(insertAfterThisElement).after(separator);
 }
 
 var translations = {};
@@ -301,6 +303,17 @@ function getPostTime(element) {
 	return getPostElement(element).find(".post-time").text();
 }
 
+/**
+ * Returns the author of the post the given element belongs to.
+ *
+ * @param element
+ *            The element whose post to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getPostAuthor(element) {
+	return getPostElement(element).find(".post-author").text();
+}
+
 function getReplyElement(element) {
 	return $(element).closest(".reply");
 }
@@ -311,6 +324,17 @@ function getReplyId(element) {
 
 function getReplyTime(element) {
 	return getReplyElement(element).find(".reply-time").text();
+}
+
+/**
+ * Returns the author of the reply the given element belongs to.
+ *
+ * @param element
+ *            The element whose reply to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getReplyAuthor(element) {
+	return getReplyElement(element).find(".reply-author").text();
 }
 
 function likePost(postId) {
@@ -374,6 +398,74 @@ function unlikeReply(replyId) {
 		updateReplyLikes(replyId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
+	});
+}
+
+/**
+ * Trusts the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone to trust
+ */
+function trustSone(soneId) {
+	$.getJSON("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Distrusts the Sone with the given ID, i.e. assigns a negative trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to distrust
+ */
+function distrustSone(soneId) {
+	$.getJSON("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Untrusts the Sone with the given ID, i.e. removes any trust assignment.
+ *
+ * @param soneId
+ *            The ID of the Sone to untrust
+ */
+function untrustSone(soneId) {
+	$.getJSON("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Updates the trust controls for all posts and replies of the given Sone,
+ * according to the given trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to update all trust controls for
+ * @param trustValue
+ *            The trust value for the Sone
+ */
+function updateTrustControls(soneId, trustValue) {
+	$("#sone .post").each(function() {
+		if (getPostAuthor(this) == soneId) {
+			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
+			getPostElement(this).find(".post-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
+		}
+	});
+	$("#sone .reply").each(function() {
+		if (getReplyAuthor(this) == soneId) {
+			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
+			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
+		}
 	});
 }
 
@@ -484,6 +576,20 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* convert trust control buttons to javascript functions. */
+	$(postElement).find(".post-trust").submit(function() {
+		trustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-distrust").submit(function() {
+		distrustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-untrust").submit(function() {
+		untrustSone(getPostAuthor(this));
+		return false;
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
@@ -536,6 +642,20 @@ function ajaxifyReply(replyElement) {
 		});
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+
+	/* convert trust control buttons to javascript functions. */
+	$(replyElement).find(".reply-trust").submit(function() {
+		trustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-distrust").submit(function() {
+		distrustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-untrust").submit(function() {
+		untrustSone(getReplyAuthor(this));
+		return false;
+	});
 
 	/* mark post and all replies as known on click. */
 	$(replyElement).click(function() {

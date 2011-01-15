@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.wot;
+package net.pterodactylus.sone.freenet.plugin;
 
 import java.util.Collections;
 import java.util.HashMap;

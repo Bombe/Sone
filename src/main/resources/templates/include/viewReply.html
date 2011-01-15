@@ -1,6 +1,7 @@
 <a name="reply-<% reply.id|html>"></a>
 <div id="<% reply.id|html>" class="reply<%if reply.new> new<%/if>">
 	<div class="reply-time hidden"><% reply.time|html></div>
+	<div class="reply-author hidden"><% reply.sone.id|html></div>
 	<div class="avatar">
 		<img src="/WoT/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
 	</div>
@@ -11,6 +12,7 @@
 		</div>
 		<div class="reply-status-line status-line">
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+			<span class='separator'>·</span>
 			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>"><span title="<% reply.likes.soneNames|html>">↑<span class="like-count"><% reply.likes.size></span></span></div>
 			<%ifnull ! currentSone>
 				<form class="like like-reply<%if reply.liked> hidden<%/if>" action="like.html" method="post">
@@ -28,7 +30,29 @@
 					<button type="submit" value="1"><%= View.Post.UnlikeLink|l10n|html></button>
 				</form>
 			<%/if>
+			<%if !reply.sone.current>
+				<span class='separator'>·</span>
+				<form class="trust reply-trust<%if reply.sone.trust.assigned> hidden<%/if>" action="trust.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
+					<button type="submit" title="<%= View.Trust.Tooltip.Trust|l10n|html>">✓</button>
+				</form>
+				<form class="distrust reply-distrust" action="distrust.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
+					<button type="submit" title="<%= View.Trust.Tooltip.Distrust|l10n|html>">✗</button>
+				</form>
+				<form class="untrust reply-untrust<%if !reply.sone.trust.assigned> hidden<%/if>" action="untrust.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
+					<button type="submit" title="<%= View.Trust.Tooltip.Untrust|l10n|html>">↶</button>
+				</form>
+			<%/if>
 			<%if reply.sone.current>
+				<span class='separator'>·</span>
 				<form class="delete delete-reply" action="deleteReply.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />

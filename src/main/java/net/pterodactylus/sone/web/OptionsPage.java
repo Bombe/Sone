@@ -56,6 +56,15 @@ public class OptionsPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3), options.getIntegerOption("PositiveTrust").getReal());
+			options.getIntegerOption("PositiveTrust").set(positiveTrust);
+			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 3), options.getIntegerOption("NegativeTrust").getReal());
+			options.getIntegerOption("NegativeTrust").set(negativeTrust);
+			String trustComment = request.getHttpRequest().getPartAsStringFailsafe("trust-comment", 256);
+			if (trustComment.trim().length() == 0) {
+				trustComment = null;
+			}
+			options.getStringOption("TrustComment").set(trustComment);
 			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
 			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
@@ -66,6 +75,9 @@ public class OptionsPage extends SoneTemplatePage {
 			throw new RedirectException(getPath());
 		}
 		dataProvider.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
+		dataProvider.set("positive-trust", options.getIntegerOption("PositiveTrust").get());
+		dataProvider.set("negative-trust", options.getIntegerOption("NegativeTrust").get());
+		dataProvider.set("trust-comment", options.getStringOption("TrustComment").get());
 		dataProvider.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
 		dataProvider.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
 		dataProvider.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());

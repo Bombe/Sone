@@ -1,7 +1,7 @@
 /* Sone Main CSS File */
 
 /* first, override some fproxy rules. */
-#sone .post .reply div,#sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
+#sone div, #sone span, #sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
 	font: inherit;
 }
 
@@ -223,42 +223,57 @@ textarea {
 	font-size: 85%;
 }
 
+#sone .separator {
+	font: inherit;
+	color: rgb(28, 131, 191);
+}
+
 #sone .post .time {
 	display: inline;
 	color: #666;
 }
 
-#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike {
+#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .trust, #sone .post .distrust, #sone .post .untrust {
 	display: inline;
 	font: inherit;
+	margin: 0px;
 }
 
 #sone .post .likes.hidden {
 	display: none;
 }
 
-#sone .post .like.hidden, #sone .post .unlike.hidden {
+#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button {
 	border: 0px;
 	background: none;
 	padding: 0px;
 	color: rgb(28, 131, 191);
 	font: inherit;
+	margin: 0px;
 }
 
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover {
+#sone .post .trust button {
+	color: rgb(0, 128, 0);
+}
+
+#sone .post .distrust button {
+	color: rgb(255, 0, 0);
+}
+
+#sone .post .untrust button {
+	color: rgb(64, 64, 64);
+}
+
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
 	color: rgb(255, 172, 0);
 	cursor: pointer;
-}
-
-#sone .post .delete:before, #sone .post .likes:before, #sone .post .like:before, #sone .post .unlike:before {
-	content: ' ‧ ';
 }
 
 #sone .post .likes span {
@@ -323,10 +338,6 @@ textarea {
 
 #sone .post .show-reply-form span:hover {
 	color: rgb(255, 172, 0);
-}
-
-#sone .post .show-reply-form:before {
-	content: ' ‧ ';
 }
 
 #sone .post .create-reply {

@@ -41,11 +41,14 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.Trust;
+import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
 import freenet.keys.FreenetURI;
 
@@ -151,6 +154,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
+
+	/** Trusted identities, sorted by own identities. */
+	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
 
 	/**
 	 * Creates a new core.
@@ -518,6 +524,19 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Returns whether the target Sone is trusted by the origin Sone.
+	 *
+	 * @param origin
+	 *            The origin Sone
+	 * @param target
+	 *            The target Sone
+	 * @return {@code true} if the target Sone is trusted by the origin Sone
+	 */
+	public boolean isSoneTrusted(Sone origin, Sone target) {
+		return trustedIdentities.containsKey(origin) && trustedIdentities.get(origin.getIdentity()).contains(target);
+	}
+
+	/**
 	 * Returns the post with the given ID.
 	 *
 	 * @param postId
@@ -840,7 +859,12 @@ public class Core implements IdentityListener, UpdateListener {
 	 * @return The created Sone
 	 */
 	public Sone createSone(OwnIdentity ownIdentity) {
-		identityManager.addContext(ownIdentity, "Sone");
+		try {
+			ownIdentity.addContext("Sone");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.SEVERE, "Could not add “Sone” context to own identity: " + ownIdentity, wote1);
+			return null;
+		}
 		Sone sone = addLocalSone(ownIdentity);
 		return sone;
 	}
@@ -887,6 +911,97 @@ public class Core implements IdentityListener, UpdateListener {
 			}, "Sone Downloader").start();
 			return sone;
 		}
+	}
+
+	/**
+	 * Retrieves the trust relationship from the origin to the target. If the
+	 * trust relationship can not be retrieved, {@code null} is returned.
+	 *
+	 * @see Identity#getTrust(OwnIdentity)
+	 * @param origin
+	 *            The origin of the trust tree
+	 * @param target
+	 *            The target of the trust
+	 * @return The trust relationship
+	 */
+	public Trust getTrust(Sone origin, Sone target) {
+		if (!isLocalSone(origin)) {
+			logger.log(Level.WARNING, "Tried to get trust from remote Sone: %s", origin);
+			return null;
+		}
+		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
+	}
+
+	/**
+	 * Sets the trust value of the given origin Sone for the target Sone.
+	 *
+	 * @param origin
+	 *            The origin Sone
+	 * @param target
+	 *            The target Sone
+	 * @param trustValue
+	 *            The trust value (from {@code -100} to {@code 100})
+	 */
+	public void setTrust(Sone origin, Sone target, int trustValue) {
+		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
+		try {
+			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, options.getStringOption("TrustComment").get());
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set trust for Sone: " + target, wote1);
+		}
+	}
+
+	/**
+	 * Removes any trust assignment for the given target Sone.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void removeTrust(Sone origin, Sone target) {
+		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
+		try {
+			((OwnIdentity) origin.getIdentity()).removeTrust(target.getIdentity());
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not remove trust for Sone: " + target, wote1);
+		}
+	}
+
+	/**
+	 * Assigns the configured positive trust value for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void trustSone(Sone origin, Sone target) {
+		setTrust(origin, target, options.getIntegerOption("PositiveTrust").get());
+	}
+
+	/**
+	 * Assigns the configured negative trust value for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void distrustSone(Sone origin, Sone target) {
+		setTrust(origin, target, options.getIntegerOption("NegativeTrust").get());
+	}
+
+	/**
+	 * Removes the trust assignment for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void untrustSone(Sone origin, Sone target) {
+		removeTrust(origin, target);
 	}
 
 	/**
@@ -994,8 +1109,12 @@ public class Core implements IdentityListener, UpdateListener {
 			localSones.remove(sone.getId());
 			soneInserters.remove(sone).stop();
 		}
-		identityManager.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
-		identityManager.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
+		try {
+			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
+			((OwnIdentity) sone.getIdentity()).removeProperty("Sone.LatestEdition");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not remove context and properties from Sone: " + sone, wote1);
+		}
 		try {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
@@ -1161,8 +1280,9 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		logger.log(Level.INFO, "Saving Sone: %s", sone);
-		identityManager.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 		try {
+			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
 			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
@@ -1233,6 +1353,8 @@ public class Core implements IdentityListener, UpdateListener {
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set WoT property for Sone: " + sone, wote1);
 		}
 	}
 
@@ -1471,6 +1593,9 @@ public class Core implements IdentityListener, UpdateListener {
 		try {
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
+			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
+			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1532,6 +1657,9 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 
 		}));
+		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-100));
+		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1548,6 +1676,9 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
+		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
+		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -1616,6 +1747,7 @@ public class Core implements IdentityListener, UpdateListener {
 	public void ownIdentityAdded(OwnIdentity ownIdentity) {
 		logger.log(Level.FINEST, "Adding OwnIdentity: " + ownIdentity);
 		if (ownIdentity.hasContext("Sone")) {
+			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			addLocalSone(ownIdentity);
 		}
 	}
@@ -1626,14 +1758,16 @@ public class Core implements IdentityListener, UpdateListener {
 	@Override
 	public void ownIdentityRemoved(OwnIdentity ownIdentity) {
 		logger.log(Level.FINEST, "Removing OwnIdentity: " + ownIdentity);
+		trustedIdentities.remove(ownIdentity);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityAdded(Identity identity) {
+	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
 		logger.log(Level.FINEST, "Adding Identity: " + identity);
+		trustedIdentities.get(ownIdentity).add(identity);
 		addRemoteSone(identity);
 	}
 
@@ -1641,13 +1775,14 @@ public class Core implements IdentityListener, UpdateListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityUpdated(final Identity identity) {
+	public void identityUpdated(OwnIdentity ownIdentity, final Identity identity) {
 		new Thread(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
+				sone.setIdentity(identity);
 				soneDownloader.fetchSone(sone);
 			}
 		}).start();
@@ -1657,8 +1792,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityRemoved(Identity identity) {
-		/* TODO */
+	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
+		trustedIdentities.get(ownIdentity).remove(identity);
 	}
 
 	//
