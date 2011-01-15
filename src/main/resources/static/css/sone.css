@@ -561,6 +561,6 @@ textarea {
 }
 
 #sone .confirm {
-	font-weight: bold !important;
-	color: red !important;
+	font-weight: bold;
+	color: red;
 }
