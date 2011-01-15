@@ -59,4 +59,12 @@ public class GetTranslationPage extends JsonPage {
 		return false;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean requiresLogin() {
+		return false;
+	}
+
 }

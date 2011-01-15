@@ -1,5 +1,5 @@
 /*
- * Sone - LockSoneAjaxPage.java - Copyright © 2010 David Roden
+ * Sone - TrustAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,24 +19,26 @@ package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
- * Lets the user {@link Core#lockSone(Sone) lock} a {@link Sone}.
+ * AJAX page that lets the user distrust a Sone.
  *
+ * @see Core#distrustSone(Sone, Sone)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class LockSoneAjaxPage extends JsonPage {
+public class DistrustAjaxPage extends JsonPage {
 
 	/**
-	 * Creates a new “lock Sone” AJAX handler.
+	 * Creates a new “distrust Sone” AJAX handler.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public LockSoneAjaxPage(WebInterface webInterface) {
-		super("lockSone.ajax", webInterface);
+	public DistrustAjaxPage(WebInterface webInterface) {
+		super("distrustSone.ajax", webInterface);
 	}
 
 	/**
@@ -44,21 +46,21 @@ public class LockSoneAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		if (currentSone == null) {
+			return createErrorJsonObject("auth-required");
+		}
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getLocalSone(soneId, false);
+		Sone sone = webInterface.getCore().getSone(soneId, false);
 		if (sone == null) {
 			return createErrorJsonObject("invalid-sone-id");
 		}
-		webInterface.getCore().lockSone(sone);
-		return createSuccessJsonObject();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return false;
+		webInterface.getCore().distrustSone(currentSone, sone);
+		Trust trust = webInterface.getCore().getTrust(currentSone, sone);
+		if (trust == null) {
+			return createErrorJsonObject("wot-plugin");
+		}
+		return createSuccessJsonObject().put("trustValue", trust.getExplicit());
 	}
 
 }

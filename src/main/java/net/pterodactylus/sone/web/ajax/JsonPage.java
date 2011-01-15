@@ -137,6 +137,16 @@ public abstract class JsonPage implements Page {
 		return true;
 	}
 
+	/**
+	 * Returns whether this page requires the user to be logged in.
+	 *
+	 * @return {@code true} if the user needs to be logged in to use this page,
+	 *         {@code false} otherwise
+	 */
+	protected boolean requiresLogin() {
+		return true;
+	}
+
 	//
 	// PROTECTED METHODS
 	//
@@ -182,6 +192,11 @@ public abstract class JsonPage implements Page {
 			String formPassword = request.getHttpRequest().getParam("formPassword");
 			if (!webInterface.getFormPassword().equals(formPassword)) {
 				return new Response(401, "Not authorized", "application/json", JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+			}
+		}
+		if (requiresLogin()) {
+			if (getCurrentSone(request.getToadletContext(), false) == null) {
+				return new Response(401, "Not authorized", "application/json", JsonUtils.format(createErrorJsonObject("auth-required")));
 			}
 		}
 		JsonObject jsonObject = createJsonObject(request);

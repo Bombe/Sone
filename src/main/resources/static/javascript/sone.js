@@ -47,6 +47,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 				textarea.show();
 			}
 			$(inputField.get(0).form).submit(function() {
+				inputField.attr("disabled", "disabled");
 				if (!optional && (textarea.val() == "")) {
 					return false;
 				}
@@ -68,6 +69,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return;
 	}
 	commentElement = (function(postId) {
+		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 			markPostAsKnown(getPostElement(this));
 			replyElement = $("#sone .post#" + postId + " .create-reply");
@@ -87,6 +89,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return commentElement;
 	})(postId);
 	$(insertAfterThisElement).after(commentElement.clone(true));
+	$(insertAfterThisElement).after(separator);
 }
 
 var translations = {};
@@ -301,6 +304,17 @@ function getPostTime(element) {
 	return getPostElement(element).find(".post-time").text();
 }
 
+/**
+ * Returns the author of the post the given element belongs to.
+ *
+ * @param element
+ *            The element whose post to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getPostAuthor(element) {
+	return getPostElement(element).find(".post-author").text();
+}
+
 function getReplyElement(element) {
 	return $(element).closest(".reply");
 }
@@ -311,6 +325,17 @@ function getReplyId(element) {
 
 function getReplyTime(element) {
 	return getReplyElement(element).find(".reply-time").text();
+}
+
+/**
+ * Returns the author of the reply the given element belongs to.
+ *
+ * @param element
+ *            The element whose reply to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getReplyAuthor(element) {
+	return getReplyElement(element).find(".reply-author").text();
 }
 
 function likePost(postId) {
@@ -374,6 +399,74 @@ function unlikeReply(replyId) {
 		updateReplyLikes(replyId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
+	});
+}
+
+/**
+ * Trusts the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone to trust
+ */
+function trustSone(soneId) {
+	$.getJSON("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Distrusts the Sone with the given ID, i.e. assigns a negative trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to distrust
+ */
+function distrustSone(soneId) {
+	$.getJSON("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Untrusts the Sone with the given ID, i.e. removes any trust assignment.
+ *
+ * @param soneId
+ *            The ID of the Sone to untrust
+ */
+function untrustSone(soneId) {
+	$.getJSON("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Updates the trust controls for all posts and replies of the given Sone,
+ * according to the given trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to update all trust controls for
+ * @param trustValue
+ *            The trust value for the Sone
+ */
+function updateTrustControls(soneId, trustValue) {
+	$("#sone .post").each(function() {
+		if (getPostAuthor(this) == soneId) {
+			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
+			getPostElement(this).find(".post-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
+		}
+	});
+	$("#sone .reply").each(function() {
+		if (getReplyAuthor(this) == soneId) {
+			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
+			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
+		}
 	});
 }
 
@@ -484,6 +577,20 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* convert trust control buttons to javascript functions. */
+	$(postElement).find(".post-trust").submit(function() {
+		trustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-distrust").submit(function() {
+		distrustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-untrust").submit(function() {
+		untrustSone(getPostAuthor(this));
+		return false;
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
@@ -500,7 +607,10 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* mark everything as known on click. */
-	$(postElement).click(function() {
+	$(postElement).click(function(event) {
+		if ($(event.target).hasClass("click-to-show")) {
+			return false;
+		}
 		markPostAsKnown(this);
 	});
 
@@ -533,6 +643,20 @@ function ajaxifyReply(replyElement) {
 		});
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+
+	/* convert trust control buttons to javascript functions. */
+	$(replyElement).find(".reply-trust").submit(function() {
+		trustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-distrust").submit(function() {
+		distrustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-untrust").submit(function() {
+		untrustSone(getReplyAuthor(this));
+		return false;
+	});
 
 	/* mark post and all replies as known on click. */
 	$(replyElement).click(function() {
@@ -793,6 +917,7 @@ function markPostAsKnown(postElements) {
 			(function(postElement) {
 				$.getJSON("markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
 					$(postElement).removeClass("new");
+					$(".click-to-show", postElement).removeClass("new");
 				});
 			})(postElement);
 		}
@@ -860,6 +985,80 @@ function createNotification(id, text, dismissable) {
 function showNotificationDetails(notificationId) {
 	$("#sone .notification#" + notificationId + " .text").show();
 	$("#sone .notification#" + notificationId + " .short-text").hide();
+}
+
+/**
+ * Deletes the field with the given ID from the profile.
+ *
+ * @param fieldId
+ *            The ID of the field to delete
+ */
+function deleteProfileField(fieldId) {
+	$.getJSON("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
+		if (data && data.success) {
+			$("#sone .profile-field#" + data.field.id).slideUp();
+		}
+	});
+}
+
+/**
+ * Renames a profile field.
+ *
+ * @param fieldId
+ *            The ID of the field to rename
+ * @param newName
+ *            The new name of the field
+ * @param successFunction
+ *            Called when the renaming was successful
+ */
+function editProfileField(fieldId, newName, successFunction) {
+	$.getJSON("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID one slot in the given direction.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param direction
+ *            The direction to move in (“up” or “down”)
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileField(fieldId, direction, successFunction) {
+	$.getJSON("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID up one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldUp(fieldId, successFunction) {
+	moveProfileField(fieldId, "up", successFunction);
+}
+
+/**
+ * Moves the profile field with the given ID down one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldDown(fieldId, successFunction) {
+	moveProfileField(fieldId, "down", successFunction);
 }
 
 //

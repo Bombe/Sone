@@ -1,5 +1,5 @@
 /*
- * Sone - ViewSonePage.java - Copyright © 2010 David Roden
+ * Sone - TrustPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,35 +17,35 @@
 
 package net.pterodactylus.sone.web;
 
-import java.util.List;
-
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
 
 /**
- * Lets the user browser another Sone.
+ * Page that lets the user trust another Sone. This will assign a configurable
+ * amount of trust to an identity.
  *
+ * @see Core#trustSone(Sone, Sone)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ViewSonePage extends SoneTemplatePage {
+public class TrustPage extends SoneTemplatePage {
 
 	/**
-	 * Creates a new “view Sone” page.
+	 * Creates a new “trust Sone” page.
 	 *
 	 * @param template
 	 *            The template to render
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public ViewSonePage(Template template, WebInterface webInterface) {
-		super("viewSone.html", template, "Page.ViewSone.Title", webInterface, false);
+	public TrustPage(Template template, WebInterface webInterface) {
+		super("trust.html", template, "Page.Trust.Title", webInterface, true);
 	}
 
 	//
-	// TEMPLATEPAGE METHODS
+	// SONETEMPLATEPAGE METHODS
 	//
 
 	/**
@@ -54,26 +54,15 @@ public class ViewSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
 		super.processTemplate(request, dataProvider);
-		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
-		dataProvider.set("sone", sone);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, DataProvider dataProvider) {
-		Sone sone = (Sone) dataProvider.get("sone");
-		if (sone == null) {
-			return;
-		}
-		List<Post> posts = sone.getPosts();
-		for (Post post : posts) {
-			webInterface.getCore().markPostKnown(post);
-			for (Reply reply : webInterface.getCore().getReplies(post)) {
-				webInterface.getCore().markReplyKnown(reply);
+		if (request.getMethod() == Method.POST) {
+			String returnPath = request.getHttpRequest().getPartAsStringFailsafe("returnPath", 256);
+			String identity = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
+			Sone currentSone = getCurrentSone(request.getToadletContext());
+			Sone sone = webInterface.getCore().getSone(identity, false);
+			if (sone != null) {
+				webInterface.getCore().trustSone(currentSone, sone);
 			}
+			throw new RedirectException(returnPath);
 		}
 	}
 

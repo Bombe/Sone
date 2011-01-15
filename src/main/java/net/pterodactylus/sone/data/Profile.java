@@ -17,16 +17,20 @@
 
 package net.pterodactylus.sone.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
+
+import net.pterodactylus.util.validation.Validation;
+
 /**
  * A profile stores personal information about a {@link Sone}. All information
  * is optional and can be {@code null}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Profile {
-
-	/** Whether the profile was modified. */
-	private volatile boolean modified;
+public class Profile implements Fingerprintable {
 
 	/** The first name. */
 	private volatile String firstName;
@@ -45,6 +49,9 @@ public class Profile {
 
 	/** The year of the birth date. */
 	private volatile Integer birthYear;
+
+	/** Additional fields in the profile. */
+	private final List<Field> fields = Collections.synchronizedList(new ArrayList<Field>());
 
 	/**
 	 * Creates a new empty profile.
@@ -69,23 +76,12 @@ public class Profile {
 		this.birthDay = profile.birthDay;
 		this.birthMonth = profile.birthMonth;
 		this.birthYear = profile.birthYear;
+		this.fields.addAll(profile.fields);
 	}
 
 	//
 	// ACCESSORS
 	//
-
-	/**
-	 * Returns whether this profile was modified after creation. To clear the
-	 * “is modified” flag you need to create a new profile from this one using
-	 * the {@link #Profile(Profile)} constructor.
-	 *
-	 * @return {@code true} if this profile was modified after creation,
-	 *         {@code false} otherwise
-	 */
-	public boolean isModified() {
-		return modified;
-	}
 
 	/**
 	 * Returns the first name.
@@ -104,7 +100,6 @@ public class Profile {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setFirstName(String firstName) {
-		modified |= ((firstName != null) && (!firstName.equals(this.firstName))) || (this.firstName != null);
 		this.firstName = firstName;
 		return this;
 	}
@@ -126,7 +121,6 @@ public class Profile {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setMiddleName(String middleName) {
-		modified |= ((middleName != null) && (!middleName.equals(this.middleName))) || (this.middleName != null);
 		this.middleName = middleName;
 		return this;
 	}
@@ -148,7 +142,6 @@ public class Profile {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setLastName(String lastName) {
-		modified |= ((lastName != null) && (!lastName.equals(this.lastName))) || (this.lastName != null);
 		this.lastName = lastName;
 		return this;
 	}
@@ -170,7 +163,6 @@ public class Profile {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setBirthDay(Integer birthDay) {
-		modified |= ((birthDay != null) && (!birthDay.equals(this.birthDay))) || (this.birthDay != null);
 		this.birthDay = birthDay;
 		return this;
 	}
@@ -192,7 +184,6 @@ public class Profile {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setBirthMonth(Integer birthMonth) {
-		modified |= ((birthMonth != null) && (!birthMonth.equals(this.birthMonth))) || (this.birthMonth != null);
 		this.birthMonth = birthMonth;
 		return this;
 	}
@@ -214,9 +205,292 @@ public class Profile {
 	 * @return This profile (for method chaining)
 	 */
 	public Profile setBirthYear(Integer birthYear) {
-		modified |= ((birthYear != null) && (!birthYear.equals(this.birthYear))) || (this.birthYear != null);
 		this.birthYear = birthYear;
 		return this;
+	}
+
+	/**
+	 * Returns the fields of this profile.
+	 *
+	 * @return The fields of this profile
+	 */
+	public List<Field> getFields() {
+		return new ArrayList<Field>(fields);
+	}
+
+	/**
+	 * Returns whether this profile contains the given field.
+	 *
+	 * @param field
+	 *            The field to check for
+	 * @return {@code true} if this profile contains the field, false otherwise
+	 */
+	public boolean hasField(Field field) {
+		return fields.contains(field);
+	}
+
+	/**
+	 * Returns the field with the given ID.
+	 *
+	 * @param fieldId
+	 *            The ID of the field to get
+	 * @return The field, or {@code null} if this profile does not contain a
+	 *         field with the given ID
+	 */
+	public Field getFieldById(String fieldId) {
+		Validation.begin().isNotNull("Field ID", fieldId).check();
+		for (Field field : fields) {
+			if (field.getId().equals(fieldId)) {
+				return field;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns the field with the given name.
+	 *
+	 * @param fieldName
+	 *            The name of the field to get
+	 * @return The field, or {@code null} if this profile does not contain a
+	 *         field with the given name
+	 */
+	public Field getFieldByName(String fieldName) {
+		for (Field field : fields) {
+			if (field.getName().equals(fieldName)) {
+				return field;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Appends a new field to the list of fields.
+	 *
+	 * @param fieldName
+	 *            The name of the new field
+	 * @return The new field
+	 * @throws IllegalArgumentException
+	 *             if the name is not valid
+	 */
+	public Field addField(String fieldName) throws IllegalArgumentException {
+		Validation.begin().isNotNull("Field Name", fieldName).check().isGreater("Field Name Length", fieldName.length(), 0).isNull("Field Name Unique", getFieldByName(fieldName)).check();
+		@SuppressWarnings("synthetic-access")
+		Field field = new Field().setName(fieldName);
+		fields.add(field);
+		return field;
+	}
+
+	/**
+	 * Moves the given field up one position in the field list. The index of the
+	 * field to move must be greater than {@code 0} (because you obviously can
+	 * not move the first field further up).
+	 *
+	 * @param field
+	 *            The field to move up
+	 */
+	public void moveFieldUp(Field field) {
+		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isGreater("Field Index", getFieldIndex(field), 0).check();
+		int fieldIndex = getFieldIndex(field);
+		fields.remove(field);
+		fields.add(fieldIndex - 1, field);
+	}
+
+	/**
+	 * Moves the given field down one position in the field list. The index of
+	 * the field to move must be less than the index of the last field (because
+	 * you obviously can not move the last field further down).
+	 *
+	 * @param field
+	 *            The field to move down
+	 */
+	public void moveFieldDown(Field field) {
+		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isLess("Field Index", getFieldIndex(field), fields.size() - 1).check();
+		int fieldIndex = getFieldIndex(field);
+		fields.remove(field);
+		fields.add(fieldIndex + 1, field);
+	}
+
+	/**
+	 * Removes the given field.
+	 *
+	 * @param field
+	 *            The field to remove
+	 */
+	public void removeField(Field field) {
+		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).check();
+		fields.remove(field);
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Returns the index of the field with the given name.
+	 *
+	 * @param field
+	 *            The name of the field
+	 * @return The index of the field, or {@code -1} if there is no field with
+	 *         the given name
+	 */
+	private int getFieldIndex(Field field) {
+		return fields.indexOf(field);
+	}
+
+	//
+	// INTERFACE Fingerprintable
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getFingerprint() {
+		StringBuilder fingerprint = new StringBuilder();
+		fingerprint.append("Profile(");
+		if (firstName != null) {
+			fingerprint.append("FirstName(").append(firstName).append(')');
+		}
+		if (middleName != null) {
+			fingerprint.append("MiddleName(").append(middleName).append(')');
+		}
+		if (lastName != null) {
+			fingerprint.append("LastName(").append(lastName).append(')');
+		}
+		if (birthDay != null) {
+			fingerprint.append("BirthDay(").append(birthDay).append(')');
+		}
+		if (birthMonth != null) {
+			fingerprint.append("BirthMonth(").append(birthMonth).append(')');
+		}
+		if (birthYear != null) {
+			fingerprint.append("BirthYear(").append(birthYear).append(')');
+		}
+		fingerprint.append("ContactInformation(");
+		for (Field field : fields) {
+			fingerprint.append(field.getName()).append('(').append(field.getValue()).append(')');
+		}
+		fingerprint.append(")");
+		fingerprint.append(")");
+
+		return fingerprint.toString();
+	}
+
+	/**
+	 * Container for a profile field.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public class Field {
+
+		/** The ID of the field. */
+		private final String id;
+
+		/** The name of the field. */
+		private String name;
+
+		/** The value of the field. */
+		private String value;
+
+		/**
+		 * Creates a new field with a random ID.
+		 */
+		private Field() {
+			this(UUID.randomUUID().toString());
+		}
+
+		/**
+		 * Creates a new field with the given ID.
+		 *
+		 * @param id
+		 *            The ID of the field
+		 */
+		private Field(String id) {
+			Validation.begin().isNotNull("Field ID", id).check();
+			this.id = id;
+		}
+
+		/**
+		 * Returns the ID of this field.
+		 *
+		 * @return The ID of this field
+		 */
+		public String getId() {
+			return id;
+		}
+
+		/**
+		 * Returns the name of this field.
+		 *
+		 * @return The name of this field
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/**
+		 * Sets the name of this field. The name must not be {@code null} and
+		 * must not match any other fields in this profile but my match the name
+		 * of this field.
+		 *
+		 * @param name
+		 *            The new name of this field
+		 * @return This field
+		 */
+		public Field setName(String name) {
+			Validation.begin().isNotNull("Field Name", name).check().is("Field Unique", (getFieldByName(name) == null) || equals(getFieldByName(name))).check();
+			this.name = name;
+			return this;
+		}
+
+		/**
+		 * Returns the value of this field.
+		 *
+		 * @return The value of this field
+		 */
+		public String getValue() {
+			return value;
+		}
+
+		/**
+		 * Sets the value of this field. While {@code null} is allowed, no
+		 * guarantees are made that {@code null} values are correctly persisted
+		 * across restarts of the plugin!
+		 *
+		 * @param value
+		 *            The new value of this field
+		 * @return This field
+		 */
+		public Field setValue(String value) {
+			this.value = value;
+			return this;
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof Field)) {
+				return false;
+			}
+			Field field = (Field) object;
+			return id.equals(field.id);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return id.hashCode();
+		}
+
 	}
 
 }
