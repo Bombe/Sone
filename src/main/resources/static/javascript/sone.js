@@ -500,7 +500,10 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* mark everything as known on click. */
-	$(postElement).click(function() {
+	$(postElement).click(function(event) {
+		if ($(event.target).hasClass("click-to-show")) {
+			return false;
+		}
 		markPostAsKnown(this);
 	});
 
