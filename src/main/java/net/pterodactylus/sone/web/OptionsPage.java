@@ -59,6 +59,11 @@ public class OptionsPage extends SoneTemplatePage {
 			options.getIntegerOption("PositiveTrust").set(positiveTrust);
 			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 3), options.getIntegerOption("NegativeTrust").getReal());
 			options.getIntegerOption("NegativeTrust").set(negativeTrust);
+			String trustComment = request.getHttpRequest().getPartAsStringFailsafe("trust-comment", 256);
+			if (trustComment.trim().length() == 0) {
+				trustComment = null;
+			}
+			options.getStringOption("TrustComment").set(trustComment);
 			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
 			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
@@ -71,6 +76,7 @@ public class OptionsPage extends SoneTemplatePage {
 		template.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
 		template.set("positive-trust", options.getIntegerOption("PositiveTrust").get());
 		template.set("negative-trust", options.getIntegerOption("NegativeTrust").get());
+		template.set("trust-comment", options.getStringOption("TrustComment").get());
 		template.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
 		template.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
 		template.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
