@@ -876,6 +876,24 @@ function deleteProfileField(fieldId) {
 	});
 }
 
+/**
+ * Renames a profile field.
+ *
+ * @param fieldId
+ *            The ID of the field to rename
+ * @param newName
+ *            The new name of the field
+ * @param successFunction
+ *            Called when the renaming was successful
+ */
+function editProfileField(fieldId, newName, successFunction) {
+	$.getJSON("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
