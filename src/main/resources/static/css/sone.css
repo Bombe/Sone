@@ -16,6 +16,10 @@ input[type=text], textarea {
 	outline: none;
 }
 
+input[type=text].short {
+	width: 25em;
+}
+
 textarea {
 	height: 4em;
 }
@@ -445,6 +449,20 @@ textarea {
 #sone .profile-field .name {
 	display: inline;
 	font-weight: bold;
+}
+
+#sone .profile-field .name.hidden {
+	display: none;
+}
+
+#sone .profile-field button.confirm {
+	font-weight: bold;
+	color: #080;
+}
+
+#sone .profile-field button.cancel {
+	font-weight: bold;
+	color: red;
 }
 
 #sone .profile-field .value {

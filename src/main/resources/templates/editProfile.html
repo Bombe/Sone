@@ -60,6 +60,55 @@
 					})($(this), confirmButton);
 				});
 			});
+
+			/* ajaxify the edit button. */
+			$("#sone #edit-profile .edit-field-name button").each(function() {
+				profileField = $(this).parents(".profile-field");
+				fieldNameElement = profileField.find(".name");
+				inputField = $("input[type=text].short", profileField);
+				confirmButton = $("button.confirm", profileField);
+				cancelButton = $("button.cancel", profileField);
+				(function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
+					cleanUp = function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
+						editButton.removeAttr("disabled");
+						inputField.addClass("hidden");
+						confirmButton.addClass("hidden");
+						cancelButton.addClass("hidden");
+						fieldNameElement.removeClass("hidden");
+					};
+					confirmButton.click(function() {
+						inputField.attr("disabled", "disabled");
+						confirmButton.attr("disabled", "disabled");
+						cancelButton.attr("disabled", "disabled");
+						editProfileField(confirmButton.parents(".profile-field").attr("id"), inputField.val(), function() {
+							fieldNameElement.text(inputField.val());
+							cleanUp(editButton, inputField, confirmButton, cancelButton, fieldNameElement);
+						});
+						return false;
+					});
+					cancelButton.click(function() {
+						cleanUp(editButton, inputField, confirmButton, cancelButton, fieldNameElement);
+						return false;
+					});
+					inputField.keypress(function(event) {
+						if (event.which == 13) {
+							confirmButton.click();
+							return false;
+						} else if (event.which == 27) {
+							cancelButton.click();
+							return false;
+						}
+					});
+					editButton.click(function() {
+						editButton.attr("disabled", "disabled");
+						fieldNameElement.addClass("hidden");
+						inputField.removeAttr("disabled").val(fieldNameElement.text()).removeClass("hidden").focus().select();
+						confirmButton.removeAttr("disabled").removeClass("hidden");
+						cancelButton.removeAttr("disabled").removeClass("hidden");
+						return false;
+					});
+				})($(this), inputField, confirmButton, cancelButton, fieldNameElement);
+			});
 		});
 	</script>
 
@@ -114,6 +163,7 @@
 		<%foreach fields field fieldLoop>
 			<div class="profile-field" id="<% field.id|html>">
 				<div class="name"><% field.name|html></div>
+				<input class="short hidden" type="text"><button class="confirm hidden" type="button">✔</button><button class="cancel hidden" type="button">✘</button>
 				<div class="edit-field-name"><button type="submit" name="edit-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.Edit|l10n|html></button></div>
 				<div class="delete-field-name"><button type="submit" name="delete-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.Delete|l10n|html></button></div>
 				<div class="<%if fieldLoop.last>hidden <%/if>move-down-field"><button type="submit" name="move-down-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.MoveDown|l10n|html></button></div>
