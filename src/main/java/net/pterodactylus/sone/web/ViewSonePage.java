@@ -65,6 +65,9 @@ public class ViewSonePage extends SoneTemplatePage {
 	@Override
 	protected void postProcess(Request request, DataProvider dataProvider) {
 		Sone sone = (Sone) dataProvider.get("sone");
+		if (sone == null) {
+			return;
+		}
 		List<Post> posts = sone.getPosts();
 		for (Post post : posts) {
 			webInterface.getCore().markPostKnown(post);
