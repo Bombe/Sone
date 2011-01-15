@@ -46,6 +46,7 @@ import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.NotificationManagerAccessor;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
@@ -55,8 +56,10 @@ import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
+import net.pterodactylus.sone.web.ajax.DeleteProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DismissNotificationAjaxPage;
+import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
@@ -67,6 +70,7 @@ import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.MarkPostAsKnownPage;
 import net.pterodactylus.sone.web.ajax.MarkReplyAsKnownPage;
+import net.pterodactylus.sone.web.ajax.MoveProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
@@ -170,6 +174,7 @@ public class WebInterface implements CoreListener {
 		templateFactory.addFilter("change", new RequestChangeFilter());
 		templateFactory.addFilter("match", new MatchFilter());
 		templateFactory.addFilter("css", new CssClassNameFilter());
+		templateFactory.addFilter("js", new JavascriptFilter());
 		templateFactory.addPlugin("getpage", new GetPagePlugin());
 		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
@@ -473,6 +478,8 @@ public class WebInterface implements CoreListener {
 		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
 		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
 		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
+		Template editProfileFieldTemplate = templateFactory.createTemplate(createReader("/templates/editProfileField.html"));
+		Template deleteProfileFieldTemplate = templateFactory.createTemplate(createReader("/templates/deleteProfileField.html"));
 		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
 		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
 		Template likePostTemplate = templateFactory.createTemplate(createReader("/templates/like.html"));
@@ -489,6 +496,7 @@ public class WebInterface implements CoreListener {
 		Template logoutTemplate = templateFactory.createTemplate(createReader("/templates/logout.html"));
 		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
 		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
+		Template invalidTemplate = templateFactory.createTemplate(createReader("/templates/invalid.html"));
 		Template postTemplate = templateFactory.createTemplate(createReader("/templates/include/viewPost.html"));
 		Template replyTemplate = templateFactory.createTemplate(createReader("/templates/include/viewReply.html"));
 
@@ -497,6 +505,8 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldPage(editProfileFieldTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldPage(deleteProfileFieldTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
@@ -516,6 +526,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(dismissNotificationTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
@@ -537,6 +548,9 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLikesAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MoveProfileFieldAjaxPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);

@@ -1,5 +1,5 @@
 /*
- * Sone - DismissNotificationAjaxPage.java - Copyright © 2010 David Roden
+ * Sone - DeleteProfileFieldAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,27 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
-import net.pterodactylus.util.notify.Notification;
 
 /**
- * AJAX page that lets the user dismiss a notification.
+ * AJAX page that lets the user delete a profile field.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class DismissNotificationAjaxPage extends JsonPage {
+public class DeleteProfileFieldAjaxPage extends JsonPage {
 
 	/**
-	 * Creates a new “dismiss notification” AJAX handler.
+	 * Creates a new “delete profile field” AJAX page.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public DismissNotificationAjaxPage(WebInterface webInterface) {
-		super("dismissNotification.ajax", webInterface);
+	public DeleteProfileFieldAjaxPage(WebInterface webInterface) {
+		super("deleteProfileField.ajax", webInterface);
 	}
 
 	/**
@@ -43,24 +45,17 @@ public class DismissNotificationAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
-		String notificationId = request.getHttpRequest().getParam("notification");
-		Notification notification = webInterface.getNotifications().getNotification(notificationId);
-		if (notification == null) {
-			return createErrorJsonObject("invalid-notification-id");
+		String fieldId = request.getHttpRequest().getParam("field");
+		Sone currentSone = getCurrentSone(request.getToadletContext());
+		Profile profile = currentSone.getProfile();
+		Field field = profile.getFieldById(fieldId);
+		if (field == null) {
+			return createErrorJsonObject("invalid-field-id");
 		}
-		if (!notification.isDismissable()) {
-			return createErrorJsonObject("not-dismissable");
-		}
-		notification.dismiss();
-		return createSuccessJsonObject();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected boolean requiresLogin() {
-		return false;
+		profile.removeField(field);
+		currentSone.setProfile(profile);
+		webInterface.getCore().saveSone(currentSone);
+		return createSuccessJsonObject().put("field", new JsonObject().put("id", field.getId()));
 	}
 
 }

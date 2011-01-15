@@ -34,6 +34,7 @@ import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -1033,6 +1034,17 @@ public class Core implements IdentityListener, UpdateListener {
 		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
 		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
 
+		/* load profile fields. */
+		while (true) {
+			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFields().size();
+			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
+			if (fieldName == null) {
+				break;
+			}
+			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
+			profile.addField(fieldName).setValue(fieldValue);
+		}
+
 		/* load posts. */
 		Set<Post> posts = new HashSet<Post>();
 		while (true) {
@@ -1164,6 +1176,15 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
+
+			/* save profile fields. */
+			int fieldCounter = 0;
+			for (Field profileField : profile.getFields()) {
+				String fieldPrefix = sonePrefix + "/Profile/Fields/" + fieldCounter++;
+				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getName());
+				configuration.getStringValue(fieldPrefix + "/Value").setValue(profileField.getValue());
+			}
+			configuration.getStringValue(sonePrefix + "/Profile/Fields/" + fieldCounter + "/Name").setValue(null);
 
 			/* save posts. */
 			int postCounter = 0;

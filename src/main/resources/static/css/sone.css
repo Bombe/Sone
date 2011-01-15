@@ -16,6 +16,10 @@ input[type=text], textarea {
 	outline: none;
 }
 
+input[type=text].short {
+	width: 25em;
+}
+
 textarea {
 	height: 4em;
 }
@@ -438,8 +442,40 @@ textarea {
 	display: inline;
 }
 
-#sone #create-sone {
+#sone .profile-field, #sone #edit-profile button[type=submit], #sone #delete-profile-field {
+	margin-top: 1em;
+}
 
+#sone .profile-field .name {
+	display: inline;
+	font-weight: bold;
+}
+
+#sone .profile-field .name.hidden {
+	display: none;
+}
+
+#sone .profile-field button.confirm {
+	font-weight: bold;
+	color: #080;
+}
+
+#sone .profile-field button.cancel {
+	font-weight: bold;
+	color: red;
+}
+
+#sone .profile-field .value {
+	margin-left: 2em;
+}
+
+#sone #edit-profile .profile-field .value {
+	margin-left: inherit;
+}
+
+#sone .profile-field .edit-field-name, #sone .profile-field .move-up-field, #sone .profile-field .move-down-field, #sone .profile-field .delete-field-name {
+	float: right;
+	margin-top: -1ex;
 }
 
 #sone #tail {
@@ -525,6 +561,6 @@ textarea {
 }
 
 #sone .confirm {
-	font-weight: bold !important;
-	color: red !important;
+	font-weight: bold;
+	color: red;
 }

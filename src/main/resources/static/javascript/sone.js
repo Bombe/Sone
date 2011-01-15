@@ -866,6 +866,80 @@ function showNotificationDetails(notificationId) {
 	$("#sone .notification#" + notificationId + " .short-text").hide();
 }
 
+/**
+ * Deletes the field with the given ID from the profile.
+ *
+ * @param fieldId
+ *            The ID of the field to delete
+ */
+function deleteProfileField(fieldId) {
+	$.getJSON("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
+		if (data && data.success) {
+			$("#sone .profile-field#" + data.field.id).slideUp();
+		}
+	});
+}
+
+/**
+ * Renames a profile field.
+ *
+ * @param fieldId
+ *            The ID of the field to rename
+ * @param newName
+ *            The new name of the field
+ * @param successFunction
+ *            Called when the renaming was successful
+ */
+function editProfileField(fieldId, newName, successFunction) {
+	$.getJSON("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID one slot in the given direction.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param direction
+ *            The direction to move in (“up” or “down”)
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileField(fieldId, direction, successFunction) {
+	$.getJSON("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID up one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldUp(fieldId, successFunction) {
+	moveProfileField(fieldId, "up", successFunction);
+}
+
+/**
+ * Moves the profile field with the given ID down one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldDown(fieldId, successFunction) {
+	moveProfileField(fieldId, "down", successFunction);
+}
+
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
