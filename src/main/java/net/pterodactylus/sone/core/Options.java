@@ -161,6 +161,9 @@ public class Options {
 	/** Holds all {@link Integer} {@link Option}s. */
 	private final Map<String, Option<Integer>> integerOptions = Collections.synchronizedMap(new HashMap<String, Option<Integer>>());
 
+	/** Holds all {@link String} {@link Option}s. */
+	private final Map<String, Option<String>> stringOptions = Collections.synchronizedMap(new HashMap<String, Option<String>>());
+
 	/**
 	 * Adds a boolean option.
 	 *
@@ -211,6 +214,32 @@ public class Options {
 	 */
 	public Option<Integer> getIntegerOption(String name) {
 		return integerOptions.get(name);
+	}
+
+	/**
+	 * Adds a {@link String} {@link Option}.
+	 *
+	 * @param name
+	 *            The name of the option
+	 * @param stringOption
+	 *            The option
+	 * @return The given option
+	 */
+	public Option<String> addStringOption(String name, Option<String> stringOption) {
+		stringOptions.put(name, stringOption);
+		return stringOption;
+	}
+
+	/**
+	 * Returns a {@link String} {@link Option}.
+	 *
+	 * @param name
+	 *            The name of the string option to get
+	 * @return The string option, or {@code null} if there is no option with the
+	 *         given name
+	 */
+	public Option<String> getStringOption(String name) {
+		return stringOptions.get(name);
 	}
 
 }
