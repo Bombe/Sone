@@ -256,6 +256,11 @@ textarea {
 	margin: 0px;
 }
 
+#sone .post .delete button.confirm {
+	color: red;
+	font-weight: bold;
+}
+
 #sone .post .trust button {
 	color: rgb(0, 128, 0);
 }
