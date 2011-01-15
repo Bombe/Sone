@@ -894,6 +894,48 @@ function editProfileField(fieldId, newName, successFunction) {
 	});
 }
 
+/**
+ * Moves the profile field with the given ID one slot in the given direction.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param direction
+ *            The direction to move in (“up” or “down”)
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileField(fieldId, direction, successFunction) {
+	$.getJSON("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID up one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldUp(fieldId, successFunction) {
+	moveProfileField(fieldId, "up", successFunction);
+}
+
+/**
+ * Moves the profile field with the given ID down one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldDown(fieldId, successFunction) {
+	moveProfileField(fieldId, "down", successFunction);
+}
+
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
