@@ -930,7 +930,7 @@ public class Core implements IdentityListener {
 	public void setTrust(Sone origin, Sone target, int trustValue) {
 		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
 		try {
-			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, "Set from Sone Web Interface");
+			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, options.getStringOption("TrustComment").get());
 		} catch (WebOfTrustException wote1) {
 			logger.log(Level.WARNING, "Could not set trust for Sone: " + target, wote1);
 		}
@@ -1555,6 +1555,7 @@ public class Core implements IdentityListener {
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
+			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1618,6 +1619,7 @@ public class Core implements IdentityListener {
 		}));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-100));
+		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1636,6 +1638,7 @@ public class Core implements IdentityListener {
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
 		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
+		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
