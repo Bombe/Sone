@@ -97,8 +97,8 @@ public class GetReplyAjaxPage extends JsonPage {
 		jsonReply.put("time", reply.getTime());
 		StringWriter stringWriter = new StringWriter();
 		DataProvider dataProvider = replyTemplate.createDataProvider();
-		dataProvider.setData("reply", reply);
-		dataProvider.setData("currentSone", currentSone);
+		dataProvider.set("reply", reply);
+		dataProvider.set("currentSone", currentSone);
 		try {
 			replyTemplate.render(dataProvider, stringWriter);
 		} catch (TemplateException te1) {

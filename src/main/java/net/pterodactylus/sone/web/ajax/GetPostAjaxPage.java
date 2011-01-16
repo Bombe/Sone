@@ -95,8 +95,8 @@ public class GetPostAjaxPage extends JsonPage {
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
 		DataProvider dataProvider = postTemplate.createDataProvider();
-		dataProvider.setData("post", post);
-		dataProvider.setData("currentSone", currentSone);
+		dataProvider.set("post", post);
+		dataProvider.set("currentSone", currentSone);
 		try {
 			postTemplate.render(dataProvider, stringWriter);
 		} catch (TemplateException te1) {

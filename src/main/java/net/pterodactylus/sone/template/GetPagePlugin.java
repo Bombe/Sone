@@ -50,7 +50,7 @@ public class GetPagePlugin implements Plugin {
 			pageKey = "page";
 		}
 
-		Request request = (Request) dataProvider.getData(requestKey);
+		Request request = (Request) dataProvider.get(requestKey);
 		String pageString = request.getHttpRequest().getParam(parameter);
 		int page = 0;
 		try {
@@ -58,7 +58,7 @@ public class GetPagePlugin implements Plugin {
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
 		}
-		dataProvider.setData(pageKey, page);
+		dataProvider.set(pageKey, page);
 	}
 
 }

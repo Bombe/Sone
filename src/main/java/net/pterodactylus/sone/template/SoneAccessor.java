@@ -69,10 +69,10 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("local")) {
 			return sone.getInsertUri() != null;
 		} else if (member.equals("friend")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			Sone currentSone = (Sone) dataProvider.get("currentSone");
 			return (currentSone != null) && currentSone.hasFriend(sone.getId());
 		} else if (member.equals("current")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			Sone currentSone = (Sone) dataProvider.get("currentSone");
 			return (currentSone != null) && currentSone.equals(sone);
 		} else if (member.equals("modified")) {
 			return core.isModifiedSone(sone);
@@ -91,7 +91,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
 		} else if (member.equals("trust")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			Sone currentSone = (Sone) dataProvider.get("currentSone");
 			Trust trust = core.getTrust(currentSone, sone);
 			if (trust == null) {
 				return new Trust(null, null, null);

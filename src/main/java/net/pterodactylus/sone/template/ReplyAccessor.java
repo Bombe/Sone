@@ -66,7 +66,7 @@ public class ReplyAccessor extends ReflectionAccessor {
 		if ("likes".equals(member)) {
 			return core.getLikes(reply);
 		} else if (member.equals("liked")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			Sone currentSone = (Sone) dataProvider.get("currentSone");
 			return (currentSone != null) && (currentSone.isLikedReplyId(reply.getId()));
 		} else if (member.equals("new")) {
 			return core.isNewReply(reply.getId(), false);

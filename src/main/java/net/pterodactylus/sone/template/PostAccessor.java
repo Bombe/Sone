@@ -70,7 +70,7 @@ public class PostAccessor extends ReflectionAccessor {
 		} else if (member.equals("likes")) {
 			return core.getLikes(post);
 		} else if (member.equals("liked")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			Sone currentSone = (Sone) dataProvider.get("currentSone");
 			return (currentSone != null) && (currentSone.isLikedPostId(post.getId()));
 		} else if (member.equals("new")) {
 			return core.isNewPost(post.getId(), false);

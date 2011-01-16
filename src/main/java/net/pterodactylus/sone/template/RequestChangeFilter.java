@@ -49,12 +49,12 @@ public class RequestChangeFilter implements Filter {
 		String name = parameters.get("name");
 		String nameKey = parameters.get("nameKey");
 		if (nameKey != null) {
-			name = String.valueOf(dataProvider.getData(nameKey));
+			name = String.valueOf(dataProvider.get(nameKey));
 		}
 		String key = parameters.get("key");
 		String value = null;
 		if (key != null) {
-			value = String.valueOf(dataProvider.getData(key));
+			value = String.valueOf(dataProvider.get(key));
 		}
 		if (value == null) {
 			value = parameters.get("value");
