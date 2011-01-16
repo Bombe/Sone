@@ -170,8 +170,8 @@ public class WebInterface implements CoreListener {
 		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
 		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
 		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
-		templateFactory.addAccessor(Post.class, new PostAccessor(getCore(), templateFactory));
-		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore(), templateFactory));
+		templateFactory.addAccessor(Post.class, new PostAccessor(getCore()));
+		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
 		templateFactory.addAccessor(Trust.class, new TrustAccessor());

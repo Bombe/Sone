@@ -17,17 +17,11 @@
 
 package net.pterodactylus.sone.template;
 
-import java.io.IOException;
-import java.io.StringReader;
-
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.text.FreenetLinkParser;
-import net.pterodactylus.sone.text.FreenetLinkParserContext;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
-import net.pterodactylus.util.template.TemplateFactory;
 
 /**
  * Accessor for {@link Post} objects that adds additional properties:
@@ -40,9 +34,6 @@ import net.pterodactylus.util.template.TemplateFactory;
  */
 public class PostAccessor extends ReflectionAccessor {
 
-	/** Parser for Freenet links. */
-	private final FreenetLinkParser linkParser;
-
 	/** The core to get the replies from. */
 	private final Core core;
 
@@ -51,12 +42,9 @@ public class PostAccessor extends ReflectionAccessor {
 	 *
 	 * @param core
 	 *            The core to get the replies from
-	 * @param templateFactory
-	 *            The template factory for the text parser
 	 */
-	public PostAccessor(Core core, TemplateFactory templateFactory) {
+	public PostAccessor(Core core) {
 		this.core = core;
-		linkParser = new FreenetLinkParser(templateFactory);
 	}
 
 	/**
@@ -74,16 +62,6 @@ public class PostAccessor extends ReflectionAccessor {
 			return (currentSone != null) && (currentSone.isLikedPostId(post.getId()));
 		} else if (member.equals("new")) {
 			return core.isNewPost(post.getId(), false);
-		} else if (member.equals("text")) {
-			String text = post.getText();
-			if (text == null) {
-				return null;
-			}
-			try {
-				return linkParser.parse(new FreenetLinkParserContext(post.getSone()), new StringReader(text));
-			} catch (IOException ioe1) {
-				/* ignore. */
-			}
 		}
 		return super.get(dataProvider, object, member);
 	}

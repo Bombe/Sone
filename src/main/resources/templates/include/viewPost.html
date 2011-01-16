@@ -16,7 +16,7 @@
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
 				<%/if>
 			<%/if>
-			<div class="text"><% post.text></div>
+			<div class="text"><% post.text|parse sone=post.sone></div>
 		</div>
 		<div class="post-status-line status-line">
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
