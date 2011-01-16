@@ -19,7 +19,7 @@
 		<fields>
 			<%foreach currentSone.profile.fields field>
 			<field>
-				<field-name><% field.key|xml></field-name>
+				<field-name><% field.name|xml></field-name>
 				<field-value><% field.value|xml></field-value>
 			</field>
 			<%/foreach>
