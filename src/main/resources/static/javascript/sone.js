@@ -153,7 +153,13 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 		toggleClass("modified", modified);
 	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
-	$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	if (lastUpdated != null) {
+		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	} else {
+		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
+			$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
+		});
+	}
 	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
 }
 
@@ -690,7 +696,7 @@ function getStatus() {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
-				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdated);
+				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
 			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
