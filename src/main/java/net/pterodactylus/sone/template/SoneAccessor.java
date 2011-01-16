@@ -17,11 +17,15 @@
 
 package net.pterodactylus.sone.template;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Trust;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -44,6 +48,9 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneAccessor extends ReflectionAccessor {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SoneAccessor.class);
 
 	/** The core. */
 	private final Core core;
@@ -96,6 +103,7 @@ public class SoneAccessor extends ReflectionAccessor {
 				return null;
 			}
 			Trust trust = core.getTrust(currentSone, sone);
+			logger.log(Level.FINEST, "Trust for %s by %s: %s", new Object[] { sone, currentSone, trust });
 			if (trust == null) {
 				return new Trust(null, null, null);
 			}
