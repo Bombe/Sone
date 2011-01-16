@@ -12,9 +12,12 @@
 		</div>
 		<div class="reply-status-line status-line">
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
-			<span class='separator'>·</span>
-			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>"><span title="<% reply.likes.soneNames|html>">↑<span class="like-count"><% reply.likes.size></span></span></div>
+			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>">
+				<span class='separator'>·</span>
+				<span title="<% reply.likes.soneNames|html>">↑<span class="like-count"><% reply.likes.size></span></span>
+			</div>
 			<%ifnull ! currentSone>
+				<span class='separator'>·</span>
 				<form class="like like-reply<%if reply.liked> hidden<%/if>" action="like.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
