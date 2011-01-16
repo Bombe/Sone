@@ -40,7 +40,7 @@
 						<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
 						<button type="submit" title="<%= View.Trust.Tooltip.Trust|l10n|html>">✓</button>
 					</form>
-					<form class="distrust reply-distrust" action="distrust.html" method="post">
+					<form class="distrust reply-distrust<%if reply.sone.trust.assigned> hidden<%/if>" action="distrust.html" method="post">
 						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 						<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
