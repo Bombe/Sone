@@ -182,7 +182,6 @@ public class SoneInserter extends AbstractService {
 					} else {
 						lastModificationTime = System.currentTimeMillis();
 						modified = true;
-						sone.setTime(lastModificationTime);
 						logger.log(Level.FINE, "Sone %s has been modified, waiting %d seconds before inserting.", new Object[] { sone.getName(), insertionDelay });
 					}
 					lastFingerprint = fingerprint;
@@ -199,12 +198,15 @@ public class SoneInserter extends AbstractService {
 				boolean success = false;
 				try {
 					core.setSoneStatus(sone, SoneStatus.inserting);
+					long insertTime = System.currentTimeMillis();
+					insertInformation.setTime(insertTime);
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
 					/* at this point we might already be stopped. */
 					if (shouldStop()) {
 						/* if so, bail out, don’t change anything. */
 						break;
 					}
+					sone.setTime(insertTime);
 					sone.setLatestEdition(finalUri.getEdition());
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
@@ -274,6 +276,16 @@ public class SoneInserter extends AbstractService {
 		 */
 		public FreenetURI getInsertUri() {
 			return (FreenetURI) soneProperties.get("insertUri");
+		}
+
+		/**
+		 * Sets the time of the Sone at the time of the insert.
+		 *
+		 * @param time
+		 *            The time of the Sone
+		 */
+		public void setTime(long time) {
+			soneProperties.put("time", time);
 		}
 
 		//
