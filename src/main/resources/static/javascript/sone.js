@@ -65,7 +65,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  *            The element to add a “comment” link to
  */
 function addCommentLink(postId, element, insertAfterThisElement) {
-	if ($(element).find(".show-reply-form").length > 0) {
+	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
 	commentElement = (function(postId) {
