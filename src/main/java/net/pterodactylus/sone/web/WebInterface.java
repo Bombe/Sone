@@ -57,6 +57,7 @@ import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
+import net.pterodactylus.sone.template.UnknownDateFilter;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
@@ -184,6 +185,7 @@ public class WebInterface implements CoreListener {
 		templateFactory.addFilter("css", new CssClassNameFilter());
 		templateFactory.addFilter("js", new JavascriptFilter());
 		templateFactory.addFilter("parse", new ParserFilter(templateFactory));
+		templateFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateFactory.addPlugin("getpage", new GetPagePlugin());
 		templateFactory.addPlugin("paginate", new PaginationPlugin());
 		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
