@@ -107,6 +107,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			if (trust == null) {
 				return new Trust(null, null, null);
 			}
+			return trust;
 		}
 		return super.get(dataProvider, object, member);
 	}
