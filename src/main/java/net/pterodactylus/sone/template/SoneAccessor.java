@@ -92,6 +92,9 @@ public class SoneAccessor extends ReflectionAccessor {
 			return core.isLocked(sone);
 		} else if (member.equals("trust")) {
 			Sone currentSone = (Sone) dataProvider.get("currentSone");
+			if (currentSone == null) {
+				return null;
+			}
 			Trust trust = core.getTrust(currentSone, sone);
 			if (trust == null) {
 				return new Trust(null, null, null);
