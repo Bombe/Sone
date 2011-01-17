@@ -475,7 +475,7 @@ textarea {
 	display: none;
 }
 
-#sone .profile-field button.confirm {
+#sone .profile-field button.confirm.edit {
 	font-weight: bold;
 	color: #080;
 }
