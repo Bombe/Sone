@@ -55,14 +55,14 @@ public class DistrustPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
 		super.processTemplate(request, dataProvider);
 		if (request.getMethod() == Method.POST) {
-			String returnPath = request.getHttpRequest().getPartAsStringFailsafe("returnPath", 256);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			String identity = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			Sone sone = webInterface.getCore().getSone(identity, false);
 			if (sone != null) {
 				webInterface.getCore().distrustSone(currentSone, sone);
 			}
-			throw new RedirectException(returnPath);
+			throw new RedirectException(returnPage);
 		}
 	}
 
