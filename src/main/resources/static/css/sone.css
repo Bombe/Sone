@@ -147,6 +147,10 @@ textarea {
 	padding-left: 1ex;
 }
 
+#sone #update-status {
+	margin-bottom: 1em;
+}
+
 #sone #update-status label {
 	display: none;
 }
