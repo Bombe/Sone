@@ -1125,6 +1125,23 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Marks the given Sone as known. If the Sone was {@link #isNewPost(String)
+	 * new} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
+	 *
+	 * @param sone
+	 *            The Sone to mark as known
+	 */
+	public void markSoneKnown(Sone sone) {
+		synchronized (newSones) {
+			if (newSones.remove(sone.getId())) {
+				knownPosts.add(sone.getId());
+				coreListenerManager.fireMarkSoneKnown(sone);
+				saveConfiguration();
+			}
+		}
+	}
+
+	/**
 	 * Loads and updates the given Sone from the configuration. If any error is
 	 * encountered, loading is aborted and the given Sone is not changed.
 	 *
