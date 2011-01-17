@@ -94,7 +94,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("downloading")) {
 			return core.getSoneStatus(sone) == SoneStatus.downloading;
 		} else if (member.equals("new")) {
-			return core.isNewSone(sone);
+			return core.isNewSone(sone.getId(), false);
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
 		} else if (member.equals("trust")) {
