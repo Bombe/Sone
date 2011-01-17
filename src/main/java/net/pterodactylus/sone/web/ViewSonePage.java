@@ -68,6 +68,7 @@ public class ViewSonePage extends SoneTemplatePage {
 		if (sone == null) {
 			return;
 		}
+		webInterface.getCore().markSoneKnown(sone);
 		List<Post> posts = sone.getPosts();
 		for (Post post : posts) {
 			webInterface.getCore().markPostKnown(post);
