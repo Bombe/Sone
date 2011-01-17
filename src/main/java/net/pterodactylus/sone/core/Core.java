@@ -415,6 +415,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				localSones.put(id, sone);
+				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -458,6 +459,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
+				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
