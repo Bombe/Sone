@@ -496,6 +496,7 @@ textarea {
 #sone .profile-field .edit-field-name, #sone .profile-field .move-up-field, #sone .profile-field .move-down-field, #sone .profile-field .delete-field-name {
 	float: right;
 	margin-top: -1ex;
+	position: relative;
 }
 
 #sone #tail {
