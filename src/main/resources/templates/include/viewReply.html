@@ -54,7 +54,7 @@
 					</form>
 				<%/if>
 			<%/if>
-			<%if reply.sone.current>
+			<%if reply.sone.local>
 				<span class='separator'>·</span>
 				<form class="delete delete-reply" action="deleteReply.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />

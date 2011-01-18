@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
@@ -50,14 +49,10 @@ public class DeletePostAjaxPage extends JsonPage {
 	protected JsonObject createJsonObject(Request request) {
 		String postId = request.getHttpRequest().getParam("post");
 		Post post = webInterface.getCore().getPost(postId, false);
-		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if ((post == null) || (post.getSone() == null)) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		if (currentSone == null) {
-			return createErrorJsonObject("auth-required");
-		}
-		if (!post.getSone().equals(currentSone)) {
+		if (!webInterface.getCore().isLocalSone(post.getSone())) {
 			return createErrorJsonObject("not-authorized");
 		}
 		webInterface.getCore().deletePost(post);
