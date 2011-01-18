@@ -178,7 +178,7 @@ textarea {
 
 #sone #update-status .select-sender button {
 	display: inline;
-	float: none;
+	float: left;
 }
 
 #sone .nice-name {
