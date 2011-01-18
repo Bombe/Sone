@@ -1078,7 +1078,7 @@ $(document).ready(function() {
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
-		$("#sone #update-status .select-sender").show();
+		$("#sone #update-status .select-sender").css("display", "inline");
 		$("#sone #update-status .sender").hide();
 		$("#sone #update-status .select-sender button").click(function() {
 			$("#sone #update-status .sender").show();
