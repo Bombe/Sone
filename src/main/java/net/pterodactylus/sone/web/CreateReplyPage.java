@@ -58,8 +58,12 @@ public class CreateReplyPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			Post post = webInterface.getCore().getPost(postId);
 			if (text.length() > 0) {
-				Sone currentSone = getCurrentSone(request.getToadletContext());
-				webInterface.getCore().createReply(currentSone, post, text);
+				String senderId = request.getHttpRequest().getPartAsStringFailsafe("sender", 43);
+				Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+				if (sender == null) {
+					sender = getCurrentSone(request.getToadletContext());
+				}
+				webInterface.getCore().createReply(sender, post, text);
 				throw new RedirectException(returnPage);
 			}
 			dataProvider.set("errorTextEmpty", true);

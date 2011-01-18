@@ -491,6 +491,8 @@ function updateReplyLikes(replyId) {
 /**
  * Posts a reply and calls the given callback when the request finishes.
  *
+ * @param sender
+ *            The ID of the sender
  * @param postId
  *            The ID of the post the reply refers to
  * @param text
@@ -499,14 +501,14 @@ function updateReplyLikes(replyId) {
  *            The callback function to call when the request finishes (takes 3
  *            parameters: success, error, replyId)
  */
-function postReply(postId, text, callbackFunction) {
-	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+function postReply(sender, postId, text, callbackFunction) {
+	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
 		}
 		if (data.success) {
-			callbackFunction(true, null, data.reply);
+			callbackFunction(true, null, data.reply, data.sone);
 		} else {
 			callbackFunction(false, data.error);
 		}
@@ -545,21 +547,25 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
-		inputField = $(this.form).find(":input:enabled").get(0);
+		sender = $(this.form).find(":input[name=sender]").val();
+		inputField = $(this.form).find(":input[name=text]:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		(function(postId, text, inputField) {
-			postReply(postId, text, function(success, error, replyId) {
+		(function(sender, postId, text, inputField) {
+			postReply(sender, postId, text, function(success, error, replyId, soneId) {
 				if (success) {
 					$(inputField).val("");
-					loadNewReply(replyId, getCurrentSoneId(), postId);
+					loadNewReply(replyId, soneId, postId);
 					markPostAsKnown(getPostElement(inputField));
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+					$("#sone .post#" + postId + " .create-reply .sender").hide();
+					$("#sone .post#" + postId + " .create-reply .select-sender").show();
+					$("#sone .post#" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
 				} else {
 					alert(error);
 				}
 			});
-		})(postId, text, inputField);
+		})(sender, postId, text, inputField);
 		return false;
 	});
 
@@ -610,6 +616,15 @@ function ajaxifyPost(postElement) {
 		$(postElement).find("input.reply-input").each(function() {
 			registerInputTextareaSwap(this, text, "text", false, false);
 		});
+	});
+
+	/* process sender selection. */
+	$(".select-sender", postElement).css("display", "inline");
+	$(".sender", postElement).hide();
+	$(".select-sender button", postElement).click(function() {
+		$(".sender", postElement).show();
+		$(".select-sender", postElement).hide();
+		return false;
 	});
 
 	/* mark everything as known on click. */
@@ -1078,17 +1093,28 @@ $(document).ready(function() {
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
+		$("#sone #update-status .select-sender").css("display", "inline");
+		$("#sone #update-status .sender").hide();
+		$("#sone #update-status .select-sender button").click(function() {
+			$("#sone #update-status .sender").show();
+			$("#sone #update-status .select-sender").hide();
+			return false;
+		});
 		$("#sone #update-status").submit(function() {
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId, getCurrentSoneId());
+					loadNewPost(data.postId, data.sone, data.recipient);
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});

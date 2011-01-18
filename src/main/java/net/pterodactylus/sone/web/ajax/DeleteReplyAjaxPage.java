@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.data.Reply;
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
@@ -50,14 +49,10 @@ public class DeleteReplyAjaxPage extends JsonPage {
 	protected JsonObject createJsonObject(Request request) {
 		String replyId = request.getHttpRequest().getParam("reply");
 		Reply reply = webInterface.getCore().getReply(replyId);
-		Sone currentSone = getCurrentSone(request.getToadletContext());
 		if (reply == null) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		if (currentSone == null) {
-			return createErrorJsonObject("auth-required");
-		}
-		if (!reply.getSone().equals(currentSone)) {
+		if (!webInterface.getCore().isLocalSone(reply.getSone())) {
 			return createErrorJsonObject("not-authorized");
 		}
 		webInterface.getCore().deleteReply(reply);

@@ -62,7 +62,7 @@
 					</form>
 				<%/if>
 			<%/if>
-			<%if post.sone.current>
+			<%if post.sone.local>
 				<span class='separator'>·</span>
 				<form class="delete delete-post" action="deletePost.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
@@ -82,6 +82,14 @@
 						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 						<input type="hidden" name="post" value="<% post.id|html>" />
+						<div class="sender">
+							<select name="sender" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">
+								<%foreach localSones localSone>
+									<option value="<% localSone.id|html>"<%if localSone.current> selected="selected"<%/if>><% localSone.niceName|html></option>
+								<%/foreach>
+							</select>
+						</div>
+						<div class="select-sender"><button type="button" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">+</button></div>
 						<input type="text" class="reply-input" name="text" value="" />
 						<button type="submit"><%= View.Post.SendReply|l10n|html></button>
 					</form>

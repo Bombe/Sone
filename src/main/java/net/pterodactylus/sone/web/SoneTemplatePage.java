@@ -189,6 +189,7 @@ public class SoneTemplatePage extends TemplatePage {
 	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
 		super.processTemplate(request, dataProvider);
 		dataProvider.set("currentSone", getCurrentSone(request.getToadletContext(), false));
+		dataProvider.set("localSones", webInterface.getCore().getLocalSones());
 		dataProvider.set("request", request);
 		dataProvider.set("currentVersion", SonePlugin.VERSION);
 		dataProvider.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());

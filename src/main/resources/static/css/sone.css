@@ -35,6 +35,11 @@ textarea {
 	margin: 0px;
 }
 
+#sone select {
+	color: #444;
+	padding: 0.5ex 1.5ex;
+}
+
 /* now for the real stuff. */
 
 #sone {
@@ -165,6 +170,15 @@ textarea {
 
 #sone #update-status button {
 	float: right;
+}
+
+#sone #update-status .select-sender, #sone .create-reply .select-sender {
+	display: none;
+}
+
+#sone #update-status .select-sender button {
+	display: inline;
+	float: none;
 }
 
 #sone .nice-name {
@@ -357,17 +371,22 @@ textarea {
 
 #sone .post .create-reply input[type=text] {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 }
 
 #sone .post .create-reply textarea {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 	height: 4em;
 }
 
 #sone .post .create-reply button {
 	float: right;
+}
+
+#sone .create-reply .select-sender button {
+	display: inline;
+	float: left;
 }
 
 #sone .sone {
