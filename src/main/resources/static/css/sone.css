@@ -172,7 +172,7 @@ textarea {
 	float: right;
 }
 
-#sone #update-status .select-sender {
+#sone #update-status .select-sender, #sone .create-reply .select-sender {
 	display: none;
 }
 
@@ -371,17 +371,22 @@ textarea {
 
 #sone .post .create-reply input[type=text] {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 }
 
 #sone .post .create-reply textarea {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 	height: 4em;
 }
 
 #sone .post .create-reply button {
 	float: right;
+}
+
+#sone .create-reply .select-sender button {
+	display: inline;
+	float: left;
 }
 
 #sone .sone {

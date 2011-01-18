@@ -491,6 +491,8 @@ function updateReplyLikes(replyId) {
 /**
  * Posts a reply and calls the given callback when the request finishes.
  *
+ * @param sender
+ *            The ID of the sender
  * @param postId
  *            The ID of the post the reply refers to
  * @param text
@@ -499,14 +501,14 @@ function updateReplyLikes(replyId) {
  *            The callback function to call when the request finishes (takes 3
  *            parameters: success, error, replyId)
  */
-function postReply(postId, text, callbackFunction) {
-	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+function postReply(sender, postId, text, callbackFunction) {
+	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
 		}
 		if (data.success) {
-			callbackFunction(true, null, data.reply);
+			callbackFunction(true, null, data.reply, data.sone);
 		} else {
 			callbackFunction(false, data.error);
 		}
@@ -545,21 +547,25 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
-		inputField = $(this.form).find(":input:enabled").get(0);
+		sender = $(this.form).find(":input[name=sender]").val();
+		inputField = $(this.form).find(":input[name=text]:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		(function(postId, text, inputField) {
-			postReply(postId, text, function(success, error, replyId) {
+		(function(sender, postId, text, inputField) {
+			postReply(sender, postId, text, function(success, error, replyId, soneId) {
 				if (success) {
 					$(inputField).val("");
-					loadNewReply(replyId, getCurrentSoneId(), postId);
+					loadNewReply(replyId, soneId, postId);
 					markPostAsKnown(getPostElement(inputField));
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+					$("#sone .post#" + postId + " .create-reply .sender").hide();
+					$("#sone .post#" + postId + " .create-reply .select-sender").show();
+					$("#sone .post#" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
 				} else {
 					alert(error);
 				}
 			});
-		})(postId, text, inputField);
+		})(sender, postId, text, inputField);
 		return false;
 	});
 
@@ -610,6 +616,15 @@ function ajaxifyPost(postElement) {
 		$(postElement).find("input.reply-input").each(function() {
 			registerInputTextareaSwap(this, text, "text", false, false);
 		});
+	});
+
+	/* process sender selection. */
+	$(".select-sender", postElement).css("display", "inline");
+	$(".sender", postElement).hide();
+	$(".select-sender button", postElement).click(function() {
+		$(".sender", postElement).show();
+		$(".select-sender", postElement).hide();
+		return false;
 	});
 
 	/* mark everything as known on click. */
