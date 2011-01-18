@@ -172,6 +172,15 @@ textarea {
 	float: right;
 }
 
+#sone #update-status .select-sender {
+	display: none;
+}
+
+#sone #update-status .select-sender button {
+	display: inline;
+	float: none;
+}
+
 #sone .nice-name {
 	font-weight: bold;
 }

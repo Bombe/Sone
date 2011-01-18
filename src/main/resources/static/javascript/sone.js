@@ -1078,17 +1078,28 @@ $(document).ready(function() {
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
+		$("#sone #update-status .select-sender").show();
+		$("#sone #update-status .sender").hide();
+		$("#sone #update-status .select-sender button").click(function() {
+			$("#sone #update-status .sender").show();
+			$("#sone #update-status .select-sender").hide();
+			return false;
+		});
 		$("#sone #update-status").submit(function() {
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId, getCurrentSoneId());
+					loadNewPost(data.postId, data.sone, data.recipient);
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});
