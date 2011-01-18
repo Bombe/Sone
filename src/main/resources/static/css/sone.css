@@ -35,6 +35,12 @@ textarea {
 	margin: 0px;
 }
 
+#sone select {
+	color: #444;
+	padding: 0.5ex 1.5ex;
+	width: 45em;
+}
+
 /* now for the real stuff. */
 
 #sone {
