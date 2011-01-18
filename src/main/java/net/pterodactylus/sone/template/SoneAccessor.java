@@ -74,7 +74,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		if (member.equals("niceName")) {
 			return getNiceName(sone);
 		} else if (member.equals("local")) {
-			return sone.getInsertUri() != null;
+			return core.isLocalSone(sone);
 		} else if (member.equals("friend")) {
 			Sone currentSone = (Sone) dataProvider.get("currentSone");
 			return (currentSone != null) && currentSone.hasFriend(sone.getId());
