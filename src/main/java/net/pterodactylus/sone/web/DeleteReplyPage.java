@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Reply;
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
@@ -56,8 +55,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 		Reply reply = webInterface.getCore().getReply(replyId);
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
-			Sone currentSone = getCurrentSone(request.getToadletContext());
-			if (!reply.getSone().equals(currentSone)) {
+			if (!webInterface.getCore().isLocalSone(reply.getSone())) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {
