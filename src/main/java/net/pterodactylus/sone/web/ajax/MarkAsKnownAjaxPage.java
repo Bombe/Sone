@@ -51,7 +51,7 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 		if (!type.equals("sone") && !type.equals("post") && !type.equals("reply")) {
 			return createErrorJsonObject("invalid-type");
 		}
-		String[] ids = request.getHttpRequest().getParam("ids").split(" ");
+		String[] ids = request.getHttpRequest().getParam("id").split(" ");
 		Core core = webInterface.getCore();
 		for (String id : ids) {
 			if (type.equals("post")) {
