@@ -105,6 +105,10 @@ textarea {
 	min-height: 3.5ex;
 }
 
+#sone #notification-area .notification button {
+	margin-left: 1ex;
+}
+
 #sone #notification-area .notification .dismiss {
 	float: right;
 }
