@@ -62,7 +62,6 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 		String ids = request.getHttpRequest().getPartAsStringFailsafe("id", 65536);
 		for (StringTokenizer idTokenizer = new StringTokenizer(ids); idTokenizer.hasMoreTokens();) {
 			String id = idTokenizer.nextToken();
-			System.out.println("id: " + id);
 			if (type.equals("post")) {
 				Post post = webInterface.getCore().getPost(id, false);
 				if (post == null) {
@@ -84,7 +83,6 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 			}
 		}
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
-		System.out.println("returnPage: " + returnPage);
 		throw new RedirectException(returnPage);
 	}
 
