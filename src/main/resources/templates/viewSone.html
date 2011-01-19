@@ -7,7 +7,7 @@
 
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
 
-		<p><%= Page.ViewSone.NoSone.Description|l10n|insert needle="{sone}" key=sone.id|html></p>
+		<p><%= Page.ViewSone.NoSone.Description|l10n|replace needle="{sone}" replacementKey=sone.id|html></p>
 
 	<%elseifnull sone.name>
 
@@ -47,7 +47,7 @@
 			</form>
 		<%/if>
 
-		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
+		<h1><%= Page.ViewSone.PostList.Title|l10n|replace needle="{sone}" replacementKey=sone.niceName|html></h1>
 
 		<div id="posts">
 			<%:getpage parameter=postPage>
