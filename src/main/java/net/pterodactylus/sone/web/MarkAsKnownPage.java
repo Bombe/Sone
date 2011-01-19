@@ -42,7 +42,7 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public MarkAsKnownPage(Template template, WebInterface webInterface) {
-		super("markAsKnown.html", template, "Page.MarkRead.Title", webInterface);
+		super("markAsKnown.html", template, "Page.MarkAsKnown.Title", webInterface);
 	}
 
 	//
