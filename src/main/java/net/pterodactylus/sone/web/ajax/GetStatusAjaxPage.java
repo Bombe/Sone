@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +36,7 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
+import net.pterodactylus.util.notify.TemplateNotification;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -162,10 +165,20 @@ public class GetStatusAjaxPage extends JsonPage {
 	 *            The notification to create a JSON object
 	 * @return The JSON object
 	 */
-	private static JsonObject createJsonNotification(Notification notification) {
+	private JsonObject createJsonNotification(Notification notification) {
 		JsonObject jsonNotification = new JsonObject();
 		jsonNotification.put("id", notification.getId());
-		jsonNotification.put("text", notification.toString());
+		StringWriter notificationWriter = new StringWriter();
+		try {
+			if (notification instanceof TemplateNotification) {
+				((TemplateNotification) notification).render(webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext()), notificationWriter);
+			} else {
+				notification.render(notificationWriter);
+			}
+		} catch (IOException ioe1) {
+			/* StringWriter never throws, ignore. */
+		}
+		jsonNotification.put("text", notificationWriter.toString());
 		jsonNotification.put("createdTime", notification.getCreatedTime());
 		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
 		jsonNotification.put("dismissable", notification.isDismissable());

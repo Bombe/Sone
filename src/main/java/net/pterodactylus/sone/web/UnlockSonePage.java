@@ -18,8 +18,8 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This page lets the user unlock a {@link Sone} to allow its insertion.
@@ -48,8 +48,8 @@ public class UnlockSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 		Sone sone = webInterface.getCore().getLocalSone(soneId, false);
 		if (sone != null) {

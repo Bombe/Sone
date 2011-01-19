@@ -21,8 +21,8 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Accessor;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Accessor} implementation that adds a couple of properties to
@@ -49,17 +49,17 @@ public class ReplyAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Reply reply = (Reply) object;
 		if ("likes".equals(member)) {
 			return core.getLikes(reply);
 		} else if (member.equals("liked")) {
-			Sone currentSone = (Sone) dataProvider.get("currentSone");
+			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && (currentSone.isLikedReplyId(reply.getId()));
 		} else if (member.equals("new")) {
 			return core.isNewReply(reply.getId(), false);
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 }

@@ -22,8 +22,8 @@ import java.util.StringTokenizer;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that lets the user mark a number of {@link Sone}s, {@link Post}s, or
@@ -53,8 +53,8 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		String type = request.getHttpRequest().getPartAsStringFailsafe("type", 5);
 		if (!type.equals("sone") && !type.equals("post") && !type.equals("reply")) {
 			throw new RedirectException("invalid.html");

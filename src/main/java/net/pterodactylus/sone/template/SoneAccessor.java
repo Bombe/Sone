@@ -27,8 +27,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Accessor;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Accessor} for {@link Sone}s that adds a couple of properties to Sones.
@@ -39,7 +39,7 @@ import net.pterodactylus.util.template.ReflectionAccessor;
  * <dt>friend</dt>
  * <dd>Will return {@code true} if the sone in question is a friend of the
  * currently logged in Sone (as determined by accessing the “currentSone”
- * variable of the given {@link DataProvider}).</dd>
+ * variable of the given {@link TemplateContext}).</dd>
  * <dt>current</dt>
  * <dd>Will return {@code true} if the sone in question is the currently logged
  * in Sone.</dd>
@@ -69,17 +69,17 @@ public class SoneAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Sone sone = (Sone) object;
 		if (member.equals("niceName")) {
 			return getNiceName(sone);
 		} else if (member.equals("local")) {
 			return sone.getInsertUri() != null;
 		} else if (member.equals("friend")) {
-			Sone currentSone = (Sone) dataProvider.get("currentSone");
+			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && currentSone.hasFriend(sone.getId());
 		} else if (member.equals("current")) {
-			Sone currentSone = (Sone) dataProvider.get("currentSone");
+			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && currentSone.equals(sone);
 		} else if (member.equals("modified")) {
 			return core.isModifiedSone(sone);
@@ -98,7 +98,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
 		} else if (member.equals("trust")) {
-			Sone currentSone = (Sone) dataProvider.get("currentSone");
+			Sone currentSone = (Sone) templateContext.get("currentSone");
 			if (currentSone == null) {
 				return null;
 			}
@@ -109,7 +109,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			}
 			return trust;
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 	//

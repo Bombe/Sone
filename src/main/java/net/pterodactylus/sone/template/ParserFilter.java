@@ -24,9 +24,9 @@ import java.util.Map;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.FreenetLinkParser;
 import net.pterodactylus.sone.text.FreenetLinkParserContext;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Filter;
-import net.pterodactylus.util.template.TemplateFactory;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
 
 /**
  * Filter that filters a given text through a {@link FreenetLinkParser}.
@@ -39,26 +39,27 @@ public class ParserFilter implements Filter {
 	private final FreenetLinkParser linkParser;
 
 	/**
-	 * Creates a new parser filter.
+	 * Creates a new filter that runs its input through a
+	 * {@link FreenetLinkParser}.
 	 *
-	 * @param templateFactory
-	 *            The template factory for the link parser
+	 * @param templateContextFactory
+	 *            The context factory for rendering the parts
 	 */
-	public ParserFilter(TemplateFactory templateFactory) {
-		this.linkParser = new FreenetLinkParser(templateFactory);
+	public ParserFilter(TemplateContextFactory templateContextFactory) {
+		linkParser = new FreenetLinkParser(templateContextFactory);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String text = String.valueOf(data);
 		String soneKey = parameters.get("sone");
 		if (soneKey == null) {
 			soneKey = "sone";
 		}
-		Sone sone = (Sone) dataProvider.get(soneKey);
+		Sone sone = (Sone) templateContext.get(soneKey);
 		FreenetLinkParserContext context = new FreenetLinkParserContext(sone);
 		try {
 			return linkParser.parse(context, new StringReader(text));

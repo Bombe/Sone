@@ -24,8 +24,8 @@ import java.util.List;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.number.Numbers;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This page shows all known Sones.
@@ -54,23 +54,23 @@ public class KnownSonesPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		List<Sone> knownSones = new ArrayList<Sone>(webInterface.getCore().getSones());
 		Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
 		Pagination<Sone> sonePagination = new Pagination<Sone>(knownSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
-		dataProvider.set("pagination", sonePagination);
-		dataProvider.set("knownSones", sonePagination.getItems());
+		templateContext.set("pagination", sonePagination);
+		templateContext.set("knownSones", sonePagination.getItems());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void postProcess(Request request, DataProvider dataProvider) {
-		super.postProcess(request, dataProvider);
+	protected void postProcess(Request request, TemplateContext templateContext) {
+		super.postProcess(request, templateContext);
 		@SuppressWarnings("unchecked")
-		List<Sone> sones = (List<Sone>) dataProvider.get("knownSones");
+		List<Sone> sones = (List<Sone>) templateContext.get("knownSones");
 		for (Sone sone : sones) {
 			webInterface.getCore().markSoneKnown(sone);
 		}

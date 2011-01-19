@@ -90,14 +90,18 @@ import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
-import net.pterodactylus.util.template.DefaultTemplateFactory;
+import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
 import net.pterodactylus.util.template.PaginationPlugin;
+import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.ReplaceFilter;
+import net.pterodactylus.util.template.StoreFilter;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateException;
-import net.pterodactylus.util.template.TemplateFactory;
-import net.pterodactylus.util.template.TemplateProvider;
+import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.version.Version;
@@ -130,8 +134,8 @@ public class WebInterface implements CoreListener {
 	/** The form password. */
 	private final String formPassword;
 
-	/** The template factory. */
-	private DefaultTemplateFactory templateFactory;
+	/** The template context factory. */
+	private final TemplateContextFactory templateContextFactory;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -163,54 +167,59 @@ public class WebInterface implements CoreListener {
 	 * @param sonePlugin
 	 *            The Sone plugin
 	 */
+	@SuppressWarnings("synthetic-access")
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
-		templateFactory = new DefaultTemplateFactory();
-		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
-		templateFactory.addAccessor(Post.class, new PostAccessor(getCore()));
-		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
-		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
-		templateFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
-		templateFactory.addAccessor(Trust.class, new TrustAccessor());
-		templateFactory.addFilter("date", new DateFilter());
-		templateFactory.addFilter("l10n", new L10nFilter(getL10n()));
-		templateFactory.addFilter("substring", new SubstringFilter());
-		templateFactory.addFilter("xml", new XmlFilter());
-		templateFactory.addFilter("change", new RequestChangeFilter());
-		templateFactory.addFilter("match", new MatchFilter());
-		templateFactory.addFilter("css", new CssClassNameFilter());
-		templateFactory.addFilter("js", new JavascriptFilter());
-		templateFactory.addFilter("parse", new ParserFilter(templateFactory));
-		templateFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
-		templateFactory.addPlugin("getpage", new GetPagePlugin());
-		templateFactory.addPlugin("paginate", new PaginationPlugin());
-		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
-		templateFactory.addTemplateObject("formPassword", formPassword);
+		templateContextFactory = new TemplateContextFactory();
+		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateContextFactory.addAccessor(Collection.class, new CollectionAccessor());
+		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
+		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
+		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
+		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
+		templateContextFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
+		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
+		templateContextFactory.addFilter("date", new DateFilter());
+		templateContextFactory.addFilter("html", new HtmlFilter());
+		templateContextFactory.addFilter("replace", new ReplaceFilter());
+		templateContextFactory.addFilter("store", new StoreFilter());
+		templateContextFactory.addFilter("l10n", new L10nFilter(getL10n()));
+		templateContextFactory.addFilter("substring", new SubstringFilter());
+		templateContextFactory.addFilter("xml", new XmlFilter());
+		templateContextFactory.addFilter("change", new RequestChangeFilter());
+		templateContextFactory.addFilter("match", new MatchFilter());
+		templateContextFactory.addFilter("css", new CssClassNameFilter());
+		templateContextFactory.addFilter("js", new JavascriptFilter());
+		templateContextFactory.addFilter("parse", new ParserFilter(templateContextFactory));
+		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
+		templateContextFactory.addPlugin("getpage", new GetPagePlugin());
+		templateContextFactory.addPlugin("paginate", new PaginationPlugin());
+		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		templateContextFactory.addProvider(new ClassPathTemplateProvider());
+		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template newSoneNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newSoneNotification.html"));
+		Template newSoneNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newSoneNotification.html"));
 		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate);
 
-		Template newPostNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newPostNotification.html"));
+		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate);
 
-		Template newReplyNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newReplyNotification.html"));
+		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
 		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate);
 
-		Template rescuingSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/rescuingSonesNotification.html"));
+		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
 		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
 
-		Template sonesRescuedTemplate = templateFactory.createTemplate(createReader("/templates/notify/sonesRescuedNotification.html"));
+		Template sonesRescuedTemplate = TemplateParser.parse(createReader("/templates/notify/sonesRescuedNotification.html"));
 		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
 
-		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
+		Template lockedSonesTemplate = TemplateParser.parse(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
 
-		Template newVersionTemplate = templateFactory.createTemplate(createReader("/templates/notify/newVersionNotification.html"));
+		Template newVersionTemplate = TemplateParser.parse(createReader("/templates/notify/newVersionNotification.html"));
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 	}
 
@@ -225,6 +234,15 @@ public class WebInterface implements CoreListener {
 	 */
 	public Core getCore() {
 		return sonePlugin.core();
+	}
+
+	/**
+	 * Returns the template context factory of the web interface.
+	 *
+	 * @return The template context factory
+	 */
+	public TemplateContextFactory getTemplateContextFactory() {
+		return templateContextFactory;
 	}
 
 	/**
@@ -389,7 +407,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void setFirstStart(boolean firstStart) {
 		if (firstStart) {
-			Template firstStartNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/firstStartNotification.html"));
+			Template firstStartNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/firstStartNotification.html"));
 			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
 			notificationManager.addNotification(firstStartNotification);
 		}
@@ -404,7 +422,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void setNewConfig(boolean newConfig) {
 		if (newConfig && !hasFirstStartNotification()) {
-			Template configNotReadNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/configNotReadNotification.html"));
+			Template configNotReadNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/configNotReadNotification.html"));
 			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
 			notificationManager.addNotification(configNotReadNotification);
 		}
@@ -435,7 +453,7 @@ public class WebInterface implements CoreListener {
 		registerToadlets();
 
 		/* notification templates. */
-		Template startupNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/startupNotification.html"));
+		Template startupNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/startupNotification.html"));
 
 		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
 		notificationManager.addNotification(startupNotification);
@@ -448,7 +466,7 @@ public class WebInterface implements CoreListener {
 			}
 		}, "Sone Startup Notification Remover");
 
-		Template wotMissingNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/wotMissingNotification.html"));
+		Template wotMissingNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/wotMissingNotification.html"));
 		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
 		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), new Runnable() {
 
@@ -482,27 +500,27 @@ public class WebInterface implements CoreListener {
 	 * Register all toadlets.
 	 */
 	private void registerToadlets() {
-		Template emptyTemplate = templateFactory.createTemplate(new StringReader(""));
-		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
-		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
-		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
-		Template createSoneTemplate = templateFactory.createTemplate(createReader("/templates/createSone.html"));
-		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
-		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
-		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
-		Template editProfileFieldTemplate = templateFactory.createTemplate(createReader("/templates/editProfileField.html"));
-		Template deleteProfileFieldTemplate = templateFactory.createTemplate(createReader("/templates/deleteProfileField.html"));
-		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
-		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
-		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
-		Template deleteReplyTemplate = templateFactory.createTemplate(createReader("/templates/deleteReply.html"));
-		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
-		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
-		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
-		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
-		Template invalidTemplate = templateFactory.createTemplate(createReader("/templates/invalid.html"));
-		Template postTemplate = templateFactory.createTemplate(createReader("/templates/include/viewPost.html"));
-		Template replyTemplate = templateFactory.createTemplate(createReader("/templates/include/viewReply.html"));
+		Template emptyTemplate = TemplateParser.parse(new StringReader(""));
+		Template loginTemplate = TemplateParser.parse(createReader("/templates/login.html"));
+		Template indexTemplate = TemplateParser.parse(createReader("/templates/index.html"));
+		Template knownSonesTemplate = TemplateParser.parse(createReader("/templates/knownSones.html"));
+		Template createSoneTemplate = TemplateParser.parse(createReader("/templates/createSone.html"));
+		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
+		Template createReplyTemplate = TemplateParser.parse(createReader("/templates/createReply.html"));
+		Template editProfileTemplate = TemplateParser.parse(createReader("/templates/editProfile.html"));
+		Template editProfileFieldTemplate = TemplateParser.parse(createReader("/templates/editProfileField.html"));
+		Template deleteProfileFieldTemplate = TemplateParser.parse(createReader("/templates/deleteProfileField.html"));
+		Template viewSoneTemplate = TemplateParser.parse(createReader("/templates/viewSone.html"));
+		Template viewPostTemplate = TemplateParser.parse(createReader("/templates/viewPost.html"));
+		Template deletePostTemplate = TemplateParser.parse(createReader("/templates/deletePost.html"));
+		Template deleteReplyTemplate = TemplateParser.parse(createReader("/templates/deleteReply.html"));
+		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
+		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
+		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
+		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
+		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
+		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
+		Template replyTemplate = TemplateParser.parse(createReader("/templates/include/viewReply.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
@@ -598,6 +616,7 @@ public class WebInterface implements CoreListener {
 		try {
 			return new InputStreamReader(getClass().getResourceAsStream(resourceName), "UTF-8");
 		} catch (UnsupportedEncodingException uee1) {
+			System.out.println("  fail.");
 			return null;
 		}
 	}
@@ -737,8 +756,8 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void updateFound(Version version, long releaseTime) {
-		newVersionNotification.set("version", version);
-		newVersionNotification.set("releaseTime", releaseTime);
+		newVersionNotification.getTemplateContext().set("version", version);
+		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
 		notificationManager.addNotification(newVersionNotification);
 	}
 
@@ -749,36 +768,21 @@ public class WebInterface implements CoreListener {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class ClassPathTemplateProvider implements TemplateProvider {
-
-		/** The template factory. */
-		@SuppressWarnings("hiding")
-		private final TemplateFactory templateFactory;
-
-		/**
-		 * Creates a new template provider that locates templates on the
-		 * classpath.
-		 *
-		 * @param templateFactory
-		 *            The template factory to create the templates
-		 */
-		public ClassPathTemplateProvider(TemplateFactory templateFactory) {
-			this.templateFactory = templateFactory;
-		}
+	private class ClassPathTemplateProvider implements Provider {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public Template getTemplate(String templateName) {
+		public Template getTemplate(TemplateContext templateContext, String templateName) {
 			Reader templateReader = createReader("/templates/" + templateName);
 			if (templateReader == null) {
 				return null;
 			}
-			Template template = templateFactory.createTemplate(templateReader);
+			Template template = null;
 			try {
-				template.parse();
+				template = TemplateParser.parse(templateReader);
 			} catch (TemplateException te1) {
 				logger.log(Level.WARNING, "Could not parse template “" + templateName + "” for inclusion!", te1);
 			}

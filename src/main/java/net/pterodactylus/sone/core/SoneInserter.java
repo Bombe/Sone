@@ -36,10 +36,12 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
-import net.pterodactylus.util.template.DefaultTemplateFactory;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateException;
+import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
@@ -58,11 +60,11 @@ public class SoneInserter extends AbstractService {
 	private static volatile int insertionDelay = 60;
 
 	/** The template factory used to create the templates. */
-	private static final DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
+	private static final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
 
 	static {
-		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateFactory.addFilter("xml", new XmlFilter());
+		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateContextFactory.addFilter("xml", new XmlFilter());
 	}
 
 	/** The UTF-8 charset. */
@@ -326,10 +328,11 @@ public class SoneInserter extends AbstractService {
 		 */
 		@SuppressWarnings("synthetic-access")
 		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
-			InputStreamReader templateInputStreamReader;
-			Template template = templateFactory.createTemplate(templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset));
+			InputStreamReader templateInputStreamReader = null;
+			Template template;
 			try {
-				template.parse();
+				templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset);
+				template = TemplateParser.parse(templateInputStreamReader);
 			} catch (TemplateException te1) {
 				logger.log(Level.SEVERE, "Could not parse template “" + templateName + "”!", te1);
 				return null;
@@ -337,12 +340,13 @@ public class SoneInserter extends AbstractService {
 				Closer.close(templateInputStreamReader);
 			}
 
-			template.set("currentSone", soneProperties);
-			template.set("version", SonePlugin.VERSION);
+			TemplateContext templateContext = templateContextFactory.createTemplateContext();
+			templateContext.set("currentSone", soneProperties);
+			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
 			try {
-				template.render(writer);
+				template.render(templateContext, writer);
 				bucket = new StringBucket(writer.toString(), utf8Charset);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
 			} catch (TemplateException te1) {

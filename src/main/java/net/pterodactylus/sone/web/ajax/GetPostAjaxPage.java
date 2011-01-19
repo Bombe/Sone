@@ -24,8 +24,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateException;
 
 /**
@@ -94,11 +94,11 @@ public class GetPostAjaxPage extends JsonPage {
 		jsonPost.put("recipient", (post.getRecipient() == null) ? null : post.getRecipient().getId());
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
-		DataProvider dataProvider = postTemplate.createDataProvider();
-		dataProvider.set("post", post);
-		dataProvider.set("currentSone", currentSone);
+		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("post", post);
+		templateContext.set("currentSone", currentSone);
 		try {
-			postTemplate.render(dataProvider, stringWriter);
+			postTemplate.render(templateContext, stringWriter);
 		} catch (TemplateException te1) {
 			/* TODO - shouldn’t happen. */
 		} finally {

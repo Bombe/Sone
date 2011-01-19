@@ -23,8 +23,8 @@ import java.util.List;
 
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Adds additional properties to a {@link NotificationManager}.
@@ -44,7 +44,7 @@ public class NotificationManagerAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		NotificationManager notificationManager = (NotificationManager) object;
 		if ("all".equals(member)) {
 			List<Notification> notifications = new ArrayList<Notification>(notificationManager.getNotifications());
@@ -55,7 +55,7 @@ public class NotificationManagerAccessor extends ReflectionAccessor {
 			Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
 			return notifications;
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 }

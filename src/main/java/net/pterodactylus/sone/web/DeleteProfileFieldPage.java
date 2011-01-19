@@ -21,8 +21,8 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that lets the user confirm the deletion of a profile field.
@@ -51,8 +51,8 @@ public class DeleteProfileFieldPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Profile profile = currentSone.getProfile();
 
@@ -78,7 +78,7 @@ public class DeleteProfileFieldPage extends SoneTemplatePage {
 		}
 
 		/* set current values in template. */
-		dataProvider.set("field", field);
+		templateContext.set("field", field);
 	}
 
 }
