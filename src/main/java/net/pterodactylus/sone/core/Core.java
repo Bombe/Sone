@@ -1152,7 +1152,7 @@ public class Core implements IdentityListener, UpdateListener {
 	public void markSoneKnown(Sone sone) {
 		synchronized (newSones) {
 			if (newSones.remove(sone.getId())) {
-				knownPosts.add(sone.getId());
+				knownSones.add(sone.getId());
 				coreListenerManager.fireMarkSoneKnown(sone);
 				saveConfiguration();
 			}
