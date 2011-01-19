@@ -4,6 +4,7 @@
 	<div id="currentSoneId" class="hidden"><% currentSone.id|html></div>
 
 	<script src="javascript/jquery-1.4.2.js" language="javascript"></script>
+	<script src="javascript/jquery.url.js" language="javascript"></script>
 	<script src="javascript/sone.js" language="javascript"></script>
 
 	<div id="main">
@@ -27,7 +28,7 @@
 							<button type="submit"><%= Notification.Button.Dismiss|l10n|html></button>
 						</form>
 					<%/if>
-					<% notification>
+					<%include notification request=request>
 				</div>
 			<%/foreach>
 		</div>

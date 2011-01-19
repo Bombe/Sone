@@ -20,8 +20,8 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This page lets the user edit the options of the Sone plugin.
@@ -50,8 +50,8 @@ public class OptionsPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		Options options = webInterface.getCore().getOptions();
 		if (request.getMethod() == Method.POST) {
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
@@ -74,13 +74,13 @@ public class OptionsPage extends SoneTemplatePage {
 			webInterface.getCore().saveConfiguration();
 			throw new RedirectException(getPath());
 		}
-		dataProvider.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
-		dataProvider.set("positive-trust", options.getIntegerOption("PositiveTrust").get());
-		dataProvider.set("negative-trust", options.getIntegerOption("NegativeTrust").get());
-		dataProvider.set("trust-comment", options.getStringOption("TrustComment").get());
-		dataProvider.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
-		dataProvider.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
-		dataProvider.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
+		templateContext.set("insertion-delay", options.getIntegerOption("InsertionDelay").get());
+		templateContext.set("positive-trust", options.getIntegerOption("PositiveTrust").get());
+		templateContext.set("negative-trust", options.getIntegerOption("NegativeTrust").get());
+		templateContext.set("trust-comment", options.getStringOption("TrustComment").get());
+		templateContext.set("sone-rescue-mode", options.getBooleanOption("SoneRescueMode").get());
+		templateContext.set("clear-on-next-restart", options.getBooleanOption("ClearOnNextRestart").get());
+		templateContext.set("really-clear-on-next-restart", options.getBooleanOption("ReallyClearOnNextRestart").get());
 	}
 
 }

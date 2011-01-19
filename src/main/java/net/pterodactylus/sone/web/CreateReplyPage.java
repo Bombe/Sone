@@ -20,8 +20,8 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This page lets the user post a reply to a post.
@@ -50,8 +50,8 @@ public class CreateReplyPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
@@ -66,11 +66,11 @@ public class CreateReplyPage extends SoneTemplatePage {
 				webInterface.getCore().createReply(sender, post, text);
 				throw new RedirectException(returnPage);
 			}
-			dataProvider.set("errorTextEmpty", true);
+			templateContext.set("errorTextEmpty", true);
 		}
-		dataProvider.set("postId", postId);
-		dataProvider.set("text", text);
-		dataProvider.set("returnPage", returnPage);
+		templateContext.set("postId", postId);
+		templateContext.set("text", text);
+		templateContext.set("returnPage", returnPage);
 	}
 
 }

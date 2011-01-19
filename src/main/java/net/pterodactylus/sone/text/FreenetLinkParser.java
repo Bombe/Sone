@@ -28,7 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.template.TemplateFactory;
+import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.template.TemplateParser;
 import freenet.keys.FreenetURI;
 
 /**
@@ -72,16 +73,16 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	}
 
 	/** The template factory. */
-	private final TemplateFactory templateFactory;
+	private final TemplateContextFactory templateContextFactory;
 
 	/**
 	 * Creates a new freenet link parser.
 	 *
-	 * @param templateFactory
-	 *            The template factory
+	 * @param templateContextFactory
+	 *            The template context factory
 	 */
-	public FreenetLinkParser(TemplateFactory templateFactory) {
-		this.templateFactory = templateFactory;
+	public FreenetLinkParser(TemplateContextFactory templateContextFactory) {
+		this.templateContextFactory = templateContextFactory;
 	}
 
 	//
@@ -218,7 +219,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the given text
 	 */
 	private Part createPlainTextPart(String text) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<% text|html>"))).set("text", text);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<% text|html>"))).set("text", text);
 	}
 
 	/**
@@ -232,7 +233,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the link
 	 */
 	private Part createInternetLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"internet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"internet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 	/**
@@ -246,7 +247,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the link
 	 */
 	private Part createFreenetLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"freenet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"freenet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 	/**
@@ -260,7 +261,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the link
 	 */
 	private Part createTrustedFreenetLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"freenet-trusted\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"freenet-trusted\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 }

@@ -21,13 +21,19 @@ import java.io.IOException;
 import java.io.Writer;
 
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.template.TemplateException;
 
 /**
  * {@link Part} implementation that is rendered using a {@link Template}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplatePart implements Part {
+public class TemplatePart implements Part, net.pterodactylus.util.template.Part {
+
+	/** The template context factory. */
+	private final TemplateContextFactory templateContextFactory;
 
 	/** The template to render for this part. */
 	private final Template template;
@@ -35,10 +41,13 @@ public class TemplatePart implements Part {
 	/**
 	 * Creates a new template part.
 	 *
+	 * @param templateContextFactory
+	 *            The template context factory
 	 * @param template
 	 *            The template to render
 	 */
-	public TemplatePart(Template template) {
+	public TemplatePart(TemplateContextFactory templateContextFactory, Template template) {
+		this.templateContextFactory = templateContextFactory;
 		this.template = template;
 	}
 
@@ -56,7 +65,7 @@ public class TemplatePart implements Part {
 	 * @return This template part (for method chaining)
 	 */
 	public TemplatePart set(String key, Object value) {
-		template.set(key, value);
+		template.getInitialContext().set(key, value);
 		return this;
 	}
 
@@ -69,7 +78,15 @@ public class TemplatePart implements Part {
 	 */
 	@Override
 	public void render(Writer writer) throws IOException {
-		template.render(writer);
+		template.render(templateContextFactory.createTemplateContext().mergeContext(template.getInitialContext()), writer);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
+		template.render(templateContext.mergeContext(template.getInitialContext()), writer);
 	}
 
 }

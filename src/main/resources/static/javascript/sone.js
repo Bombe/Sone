@@ -692,8 +692,16 @@ function ajaxifyReply(replyElement) {
  *            jQuery object representing the notification.
  */
 function ajaxifyNotification(notification) {
-	notification.find("form.dismiss").submit(function() {
+	notification.find("form").submit(function() {
 		return false;
+	});
+	notification.find("input[name=returnPage]").val($.url.attr("relative"));
+	if (notification.find(".short-text").length > 0) {
+		notification.find(".short-text").removeClass("hidden");
+		notification.find(".text").addClass("hidden");
+	}
+	notification.find("form.mark-as-read button").click(function() {
+		$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
 	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
@@ -936,7 +944,7 @@ function markPostAsKnown(postElements) {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
-				$.getJSON("markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)}, function(data, textStatus) {
 					$(postElement).removeClass("new");
 					$(".click-to-show", postElement).removeClass("new");
 				});
@@ -951,7 +959,7 @@ function markReplyAsKnown(replyElements) {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
-				$.getJSON("markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function(data, textStatus) {
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)}, function(data, textStatus) {
 					$(replyElement).removeClass("new");
 				});
 			})(replyElement);

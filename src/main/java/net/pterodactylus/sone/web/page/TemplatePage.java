@@ -25,8 +25,9 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
 import freenet.clients.http.PageNode;
@@ -46,6 +47,9 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/** The path of the page. */
 	private final String path;
 
+	/** The template context factory. */
+	private final TemplateContextFactory templateContextFactory;
+
 	/** The template to render. */
 	private final Template template;
 
@@ -63,6 +67,8 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *
 	 * @param path
 	 *            The path of the page
+	 * @param templateContextFactory
+	 *            The template context factory
 	 * @param template
 	 *            The template to render
 	 * @param l10n
@@ -73,8 +79,9 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *            The target to redirect to if a POST request does not contain
 	 *            the correct form password
 	 */
-	public TemplatePage(String path, Template template, BaseL10n l10n, String pageTitleKey, String invalidFormPasswordRedirectTarget) {
+	public TemplatePage(String path, TemplateContextFactory templateContextFactory, Template template, BaseL10n l10n, String pageTitleKey, String invalidFormPasswordRedirectTarget) {
 		this.path = path;
+		this.templateContextFactory = templateContextFactory;
 		this.template = template;
 		this.l10n = l10n;
 		this.pageTitleKey = pageTitleKey;
@@ -117,10 +124,11 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			pageNode.addForwardLink("icon", shortcutIcon);
 		}
 
-		DataProvider dataProvider = template.createDataProvider();
+		TemplateContext templateContext = templateContextFactory.createTemplateContext();
+		templateContext.mergeContext(template.getInitialContext());
 		try {
 			long start = System.nanoTime();
-			processTemplate(request, dataProvider);
+			processTemplate(request, templateContext);
 			long finish = System.nanoTime();
 			logger.log(Level.FINEST, "Template was rendered in " + ((finish - start) / 1000) / 1000.0 + "ms.");
 		} catch (RedirectException re1) {
@@ -128,10 +136,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 		}
 
 		StringWriter stringWriter = new StringWriter();
-		template.render(dataProvider, stringWriter);
+		template.render(templateContext, stringWriter);
 		pageNode.content.addChild("%", stringWriter.toString());
 
-		postProcess(request, dataProvider);
+		postProcess(request, templateContext);
 
 		return new Response(200, "OK", "text/html", pageNode.outer.generate());
 	}
@@ -161,12 +169,12 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *
 	 * @param request
 	 *            The request that is rendered
-	 * @param dataProvider
-	 *            The data provider to set variables in
+	 * @param templateContext
+	 *            The template context to set variables in
 	 * @throws RedirectException
 	 *             if the processing page wants to redirect after processing
 	 */
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		/* do nothing. */
 	}
 
@@ -180,10 +188,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *
 	 * @param request
 	 *            The request being processed
-	 * @param dataProvider
-	 *            The data provider that supplied the rendered data
+	 * @param templateContext
+	 *            The template context that supplied the rendered data
 	 */
-	protected void postProcess(Request request, DataProvider dataProvider) {
+	protected void postProcess(Request request, TemplateContext templateContext) {
 		/* do nothing. */
 	}
 
@@ -214,7 +222,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/**
 	 * Exception that can be thrown to signal that a subclassed {@link Page}
 	 * wants to redirect the user during the
-	 * {@link TemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, DataProvider)}
+	 * {@link TemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
 	 * method call.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>

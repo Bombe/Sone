@@ -19,8 +19,8 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Lets the user delete a post they made.
@@ -49,14 +49,14 @@ public class DeletePostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.GET) {
 			String postId = request.getHttpRequest().getParam("post");
 			String returnPage = request.getHttpRequest().getParam("returnPage");
 			Post post = webInterface.getCore().getPost(postId);
-			dataProvider.set("post", post);
-			dataProvider.set("returnPage", returnPage);
+			templateContext.set("post", post);
+			templateContext.set("returnPage", returnPage);
 			return;
 		} else if (request.getMethod() == Method.POST) {
 			String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
@@ -71,8 +71,8 @@ public class DeletePostPage extends SoneTemplatePage {
 			} else if (request.getHttpRequest().isPartSet("abortDelete")) {
 				throw new RedirectException(returnPage);
 			}
-			dataProvider.set("post", post);
-			dataProvider.set("returnPage", returnPage);
+			templateContext.set("post", post);
+			templateContext.set("returnPage", returnPage);
 		}
 	}
 

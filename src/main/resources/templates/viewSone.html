@@ -50,8 +50,8 @@
 		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
 
 		<div id="posts">
-			<%getpage parameter=postPage>
-			<%paginate list=sone.posts pagesize=25>
+			<%:getpage parameter=postPage>
+			<%:paginate list=sone.posts pagesize=25>
 			<%= postPage|store key=pageParameter>
 			<%include include/pagination.html>
 			<%foreach pagination.items post>

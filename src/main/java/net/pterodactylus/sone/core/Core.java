@@ -415,6 +415,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				localSones.put(id, sone);
+				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -458,6 +459,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
+				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -492,20 +494,38 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
-	 * Returns whether the given Sone is a new Sone. After this check, the Sone
-	 * is marked as known, i.e. a second call with the same parameters will
-	 * always yield {@code false}.
+	 * Returns whether the Sone with the given ID is a new Sone. After this
+	 * check, the Sone is marked as known, i.e. a second call with the same
+	 * parameters will always yield {@code false}.
 	 *
-	 * @param sone
-	 *            The sone to check for
+	 * @param soneId
+	 *            The ID of the sone to check for
 	 * @return {@code true} if the given Sone is new, false otherwise
 	 */
-	public boolean isNewSone(Sone sone) {
+	public boolean isNewSone(String soneId) {
+		return isNewSone(soneId, true);
+	}
+
+	/**
+	 * Returns whether the Sone with the given ID is a new Sone. The Sone will
+	 * be marked as known if {@code markAsKnown} is {@code true}, otherwise the
+	 * Sone will keep its current “new” state.
+	 *
+	 * @param soneId
+	 *            The ID of the sone to check for
+	 * @param markAsKnown
+	 *            {@code true} to mark the Sone as known in any case,
+	 *            {@code false} to not mark it as known
+	 * @return {@code true} if the given Sone is new, false otherwise
+	 */
+	public boolean isNewSone(String soneId, boolean markAsKnown) {
 		synchronized (newSones) {
-			boolean isNew = !knownSones.contains(sone.getId()) && newSones.remove(sone.getId());
-			knownSones.add(sone.getId());
-			if (isNew) {
-				coreListenerManager.fireMarkSoneKnown(sone);
+			boolean isNew = !knownSones.contains(soneId) && newSones.contains(soneId);
+			if (markAsKnown) {
+				Sone sone = getSone(soneId, false);
+				if (sone != null) {
+					markSoneKnown(sone);
+				}
 			}
 			return isNew;
 		}
@@ -1119,6 +1139,23 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not remove Sone from configuration!", ce1);
+		}
+	}
+
+	/**
+	 * Marks the given Sone as known. If the Sone was {@link #isNewPost(String)
+	 * new} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
+	 *
+	 * @param sone
+	 *            The Sone to mark as known
+	 */
+	public void markSoneKnown(Sone sone) {
+		synchronized (newSones) {
+			if (newSones.remove(sone.getId())) {
+				knownSones.add(sone.getId());
+				coreListenerManager.fireMarkSoneKnown(sone);
+				saveConfiguration();
+			}
 		}
 	}
 
