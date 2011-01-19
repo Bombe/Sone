@@ -84,6 +84,12 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
+import net.pterodactylus.util.cache.Cache;
+import net.pterodactylus.util.cache.CacheException;
+import net.pterodactylus.util.cache.CacheItem;
+import net.pterodactylus.util.cache.DefaultCacheItem;
+import net.pterodactylus.util.cache.MemoryCache;
+import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -768,12 +774,44 @@ public class WebInterface implements CoreListener {
 	 */
 	private class ClassPathTemplateProvider implements Provider {
 
+		/** Cache for templates. */
+		private final Cache<String, Template> templateCache = new MemoryCache<String, Template>(new ValueRetriever<String, Template>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public CacheItem<Template> retrieve(String key) throws CacheException {
+				Template template = findTemplate(key);
+				if (template != null) {
+					return new DefaultCacheItem<Template>(template);
+				}
+				return null;
+			}
+		});
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
 		public Template getTemplate(TemplateContext templateContext, String templateName) {
+			try {
+				return templateCache.get(templateName);
+			} catch (CacheException ce1) {
+				logger.log(Level.WARNING, "Could not get template for " + templateName + "!", ce1);
+				return null;
+			}
+		}
+
+		/**
+		 * Locates a template in the class path.
+		 *
+		 * @param templateName
+		 *            The name of the template to load
+		 * @return The loaded template, or {@code null} if no template could be
+		 *         found
+		 */
+		@SuppressWarnings("synthetic-access")
+		private Template findTemplate(String templateName) {
 			Reader templateReader = createReader("/templates/" + templateName);
 			if (templateReader == null) {
 				return null;
