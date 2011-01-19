@@ -180,10 +180,10 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 
 	/**
 	 * This method will be called after
-	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, DataProvider)}
+	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
 	 * has processed the template and the template was rendered. This method
 	 * will not be called if
-	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, DataProvider)}
+	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
 	 * throws a {@link RedirectException}!
 	 *
 	 * @param request
