@@ -680,6 +680,11 @@ function ajaxifyNotification(notification) {
 	notification.find("form.dismiss").submit(function() {
 		return false;
 	});
+	notification.find("input[name=returnPage]").val($.url.attr("relative"));
+	if (notification.find(".short-text").length > 0) {
+		notification.find(".short-text").removeClass("hidden");
+		notification.find(".text").addClass("hidden");
+	}
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
 			/* dismiss in case of error, too. */

@@ -108,6 +108,10 @@ textarea {
 	margin-left: 1ex;
 }
 
+#sone #notification-area .notification .mark-as-read {
+	float: right;
+}
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;

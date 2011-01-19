@@ -27,7 +27,7 @@
 							<button type="submit"><%= Notification.Button.Dismiss|l10n|html></button>
 						</form>
 					<%/if>
-					<% notification>
+					<%include notification request=request>
 				</div>
 			<%/foreach>
 		</div>
