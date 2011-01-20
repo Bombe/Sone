@@ -62,6 +62,9 @@ public class ViewPostPage extends SoneTemplatePage {
 	@Override
 	protected void postProcess(Request request, TemplateContext templateContext) {
 		Post post = (Post) templateContext.get("post");
+		if (post == null) {
+			return;
+		}
 		webInterface.getCore().markPostKnown(post);
 		for (Reply reply : webInterface.getCore().getReplies(post)) {
 			webInterface.getCore().markReplyKnown(reply);
