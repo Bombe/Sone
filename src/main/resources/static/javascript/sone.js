@@ -537,6 +537,51 @@ function getReply(replyId, callbackFunction) {
 }
 
 /**
+ * Ajaxifies the given Sone by enhancing all eligible elements with AJAX.
+ *
+ * @param soneElement
+ *            The Sone to ajaxify
+ */
+function ajaxifySone(soneElement) {
+	/*
+	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
+	 * nicer.
+	 */
+	$(".follow", soneElement).submit(function() {
+		var followElement = this;
+		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(followElement).addClass("hidden");
+			$(followElement).parent().find(".unfollow").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".unfollow", soneElement).submit(function() {
+		var unfollowElement = this;
+		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(unfollowElement).addClass("hidden");
+			$(unfollowElement).parent().find(".follow").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".lock", soneElement).submit(function() {
+		var lockElement = this;
+		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(lockElement).addClass("hidden");
+			$(lockElement).parent().find(".unlock").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".unlock", soneElement).submit(function() {
+		var unlockElement = this;
+		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(unlockElement).addClass("hidden");
+			$(unlockElement).parent().find(".lock").removeClass("hidden");
+		});
+		return false;
+	});
+}
+
+/**
  * Ajaxifies the given post by enhancing all eligible elements with AJAX.
  *
  * @param postElement
@@ -944,6 +989,20 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 	});
 }
 
+/**
+ * Marks the given Sone as known if it is still new.
+ *
+ * @param soneElement
+ *            The Sone to mark as known
+ */
+function markSoneAsKnown(soneElement) {
+	if ($(".new", soneElement).length > 0) {
+		$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
+			$(soneElement).removeClass("new");
+		});
+	}
+}
+
 function markPostAsKnown(postElements) {
 	$(postElements).each(function() {
 		postElement = this;
@@ -1187,41 +1246,8 @@ $(document).ready(function() {
 		});
 	}
 
-	/*
-	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
-	 * nicer.
-	 */
-	$("#sone .follow").submit(function() {
-		var followElement = this;
-		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-			$(followElement).addClass("hidden");
-			$(followElement).parent().find(".unfollow").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .unfollow").submit(function() {
-		var unfollowElement = this;
-		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-			$(unfollowElement).addClass("hidden");
-			$(unfollowElement).parent().find(".follow").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .lock").submit(function() {
-		var lockElement = this;
-		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-			$(lockElement).addClass("hidden");
-			$(lockElement).parent().find(".unlock").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .unlock").submit(function() {
-		var unlockElement = this;
-		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-			$(unlockElement).addClass("hidden");
-			$(unlockElement).parent().find(".lock").removeClass("hidden");
-		});
-		return false;
+	$("#sone .sone").each(function() {
+		ajaxifySone($(this));
 	});
 
 	/* process all existing notifications, ajaxify dismiss buttons. */
