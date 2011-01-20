@@ -36,6 +36,7 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
+import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -65,6 +66,7 @@ public class SoneInserter extends AbstractService {
 	static {
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
 		templateContextFactory.addFilter("xml", new XmlFilter());
+		templateContextFactory.addFilter("html", new HtmlFilter());
 	}
 
 	/** The UTF-8 charset. */
