@@ -582,7 +582,7 @@ function ajaxifySone(soneElement) {
 
 	/* mark Sone as known when clicking it. */
 	$(soneElement).click(function() {
-		markSoneAsKnown(getSoneId(this));
+		markSoneAsKnown(soneElement);
 	});
 }
 
