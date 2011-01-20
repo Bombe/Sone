@@ -37,6 +37,7 @@ import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.TemplateNotification;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -171,7 +172,9 @@ public class GetStatusAjaxPage extends JsonPage {
 		StringWriter notificationWriter = new StringWriter();
 		try {
 			if (notification instanceof TemplateNotification) {
-				((TemplateNotification) notification).render(webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext()), notificationWriter);
+				TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext());
+				templateContext.set("notification", notification);
+				((TemplateNotification) notification).render(templateContext, notificationWriter);
 			} else {
 				notification.render(notificationWriter);
 			}
