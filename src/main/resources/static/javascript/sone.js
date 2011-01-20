@@ -579,6 +579,11 @@ function ajaxifySone(soneElement) {
 		});
 		return false;
 	});
+
+	/* mark Sone as known when clicking it. */
+	$(soneElement).click(function() {
+		markSoneAsKnown(getSoneId(this));
+	});
 }
 
 /**
