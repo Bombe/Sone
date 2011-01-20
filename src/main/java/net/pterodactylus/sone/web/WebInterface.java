@@ -95,6 +95,7 @@ import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.DateFilter;
+import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
 import net.pterodactylus.util.template.PaginationPlugin;
@@ -199,6 +200,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("js", new JavascriptFilter());
 		templateContextFactory.addFilter("parse", new ParserFilter(templateContextFactory));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
+		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addPlugin("getpage", new GetPagePlugin());
 		templateContextFactory.addPlugin("paginate", new PaginationPlugin());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
