@@ -777,7 +777,7 @@ function getStatus() {
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
 					if (oldNotification.find(".short-text").length > 0) {
-						opened = !oldNotification.find(".short-text").hasClass("hidden");
+						opened = oldNotification.find(".short-text").hasClass("hidden");
 						notification.find(".short-text").toggleClass("hidden", opened);
 						notification.find(".text").toggleClass("hidden", !opened);
 					}
