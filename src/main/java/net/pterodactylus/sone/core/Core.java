@@ -1047,10 +1047,11 @@ public class Core implements IdentityListener, UpdateListener {
 						}
 					}
 				}
+				List<Post> storedPosts = storedSone.getPosts();
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
-						post.setSone(getSone(post.getSone().getId()));
-						if (!storedSone.getPosts().contains(post) && !knownPosts.contains(post.getId())) {
+						post.setSone(storedSone);
+						if (!storedPosts.contains(post) && !knownPosts.contains(post.getId())) {
 							newPosts.add(post.getId());
 							coreListenerManager.fireNewPostFound(post);
 						}
@@ -1067,10 +1068,11 @@ public class Core implements IdentityListener, UpdateListener {
 						}
 					}
 				}
+				Set<Reply> storedReplies = sone.getReplies();
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
-						reply.setSone(getSone(reply.getSone().getId()));
-						if (!storedSone.getReplies().contains(reply) && !knownReplies.contains(reply.getId())) {
+						reply.setSone(storedSone);
+						if (!storedReplies.contains(reply) && !knownReplies.contains(reply.getId())) {
 							newReplies.add(reply.getId());
 							coreListenerManager.fireNewReplyFound(reply);
 						}
