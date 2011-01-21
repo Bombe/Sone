@@ -309,6 +309,10 @@ public class WebInterface implements CoreListener {
 	 *         currently logged in
 	 */
 	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+		Set<Sone> localSones = getCore().getLocalSones();
+		if (localSones.size() == 1) {
+			return localSones.iterator().next();
+		}
 		return getCurrentSone(getCurrentSession(toadletContext, create));
 	}
 
