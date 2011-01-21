@@ -1081,8 +1081,8 @@ function createNotification(id, text, dismissable) {
  *            The ID of the notification
  */
 function showNotificationDetails(notificationId) {
-	$("#sone .notification#" + notificationId + " .text").show();
-	$("#sone .notification#" + notificationId + " .short-text").hide();
+	$("#sone .notification#" + notificationId + " .text").removeClass("hidden");
+	$("#sone .notification#" + notificationId + " .short-text").addClass("hidden");
 }
 
 /**
