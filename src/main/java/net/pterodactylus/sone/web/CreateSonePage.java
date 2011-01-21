@@ -129,7 +129,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext) == null;
+		return getCurrentSone(toadletContext, false) == null;
 	}
 
 }

@@ -84,7 +84,7 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(Request request) {
-		if (getCurrentSone(request.getToadletContext()) != null) {
+		if (getCurrentSone(request.getToadletContext(), false) != null) {
 			return "index.html";
 		}
 		return null;
@@ -99,7 +99,7 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext) == null;
+		return getCurrentSone(toadletContext, false) == null;
 	}
 
 }
