@@ -57,7 +57,7 @@ public class ReplyAccessor extends ReflectionAccessor {
 			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && (currentSone.isLikedReplyId(reply.getId()));
 		} else if (member.equals("new")) {
-			return core.isNewReply(reply.getId(), false);
+			return core.isNewReply(reply.getId());
 		}
 		return super.get(templateContext, object, member);
 	}

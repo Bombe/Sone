@@ -494,40 +494,15 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
-	 * Returns whether the Sone with the given ID is a new Sone. After this
-	 * check, the Sone is marked as known, i.e. a second call with the same
-	 * parameters will always yield {@code false}.
+	 * Returns whether the Sone with the given ID is a new Sone.
 	 *
 	 * @param soneId
 	 *            The ID of the sone to check for
 	 * @return {@code true} if the given Sone is new, false otherwise
 	 */
 	public boolean isNewSone(String soneId) {
-		return isNewSone(soneId, true);
-	}
-
-	/**
-	 * Returns whether the Sone with the given ID is a new Sone. The Sone will
-	 * be marked as known if {@code markAsKnown} is {@code true}, otherwise the
-	 * Sone will keep its current “new” state.
-	 *
-	 * @param soneId
-	 *            The ID of the sone to check for
-	 * @param markAsKnown
-	 *            {@code true} to mark the Sone as known in any case,
-	 *            {@code false} to not mark it as known
-	 * @return {@code true} if the given Sone is new, false otherwise
-	 */
-	public boolean isNewSone(String soneId, boolean markAsKnown) {
 		synchronized (newSones) {
-			boolean isNew = !knownSones.contains(soneId) && newSones.contains(soneId);
-			if (markAsKnown) {
-				Sone sone = getSone(soneId, false);
-				if (sone != null) {
-					markSoneKnown(sone);
-				}
-			}
-			return isNew;
+			return !knownSones.contains(soneId) && newSones.contains(soneId);
 		}
 	}
 
@@ -589,8 +564,7 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
-	 * Returns whether the given post ID is new. After this method returns it is
-	 * marked a known post ID.
+	 * Returns whether the given post ID is new.
 	 *
 	 * @param postId
 	 *            The post ID
@@ -598,32 +572,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 *         otherwise
 	 */
 	public boolean isNewPost(String postId) {
-		return isNewPost(postId, true);
-	}
-
-	/**
-	 * Returns whether the given post ID is new. If {@code markAsKnown} is
-	 * {@code true} then after this method returns the post ID is marked a known
-	 * post ID.
-	 *
-	 * @param postId
-	 *            The post ID
-	 * @param markAsKnown
-	 *            {@code true} to mark the post ID as known, {@code false} to
-	 *            not to mark it as known
-	 * @return {@code true} if the post is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewPost(String postId, boolean markAsKnown) {
 		synchronized (newPosts) {
-			boolean isNew = !knownPosts.contains(postId) && newPosts.contains(postId);
-			if (markAsKnown) {
-				Post post = getPost(postId, false);
-				if (post != null) {
-					markPostKnown(post);
-				}
-			}
-			return isNew;
+			return !knownPosts.contains(postId) && newPosts.contains(postId);
 		}
 	}
 
@@ -692,30 +642,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 *         otherwise
 	 */
 	public boolean isNewReply(String replyId) {
-		return isNewReply(replyId, true);
-	}
-
-	/**
-	 * Returns whether the reply with the given ID is new.
-	 *
-	 * @param replyId
-	 *            The ID of the reply to check
-	 * @param markAsKnown
-	 *            {@code true} to mark the reply as known, {@code false} to not
-	 *            to mark it as known
-	 * @return {@code true} if the reply is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewReply(String replyId, boolean markAsKnown) {
 		synchronized (newReplies) {
-			boolean isNew = !knownReplies.contains(replyId) && newReplies.contains(replyId);
-			if (markAsKnown) {
-				Reply reply = getReply(replyId, false);
-				if (reply != null) {
-					markReplyKnown(reply);
-				}
-			}
-			return isNew;
+			return !knownReplies.contains(replyId) && newReplies.contains(replyId);
 		}
 	}
 
