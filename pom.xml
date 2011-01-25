@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>sone</artifactId>
-	<version>0.4.1</version>
+	<version>0.4.2</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils</artifactId>
-			<version>0.7.9-SNAPSHOT</version>
+			<version>0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -18,7 +18,7 @@
 		<dependency>
 			<groupId>org.freenetproject</groupId>
 			<artifactId>fred</artifactId>
-			<version>0.7.5.1311</version>
+			<version>0.7.5.1336</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
