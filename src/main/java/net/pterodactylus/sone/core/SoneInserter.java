@@ -204,7 +204,7 @@ public class SoneInserter extends AbstractService {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					long insertTime = System.currentTimeMillis();
 					insertInformation.setTime(insertTime);
-					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
+					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
 					/* at this point we might already be stopped. */
 					if (shouldStop()) {
 						/* if so, bail out, don’t change anything. */
