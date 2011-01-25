@@ -8,7 +8,7 @@
 
 		<p><%= Page.ViewPost.Text.UnknownPost|l10n|html></p>
 	<%else>
-		<h1><%= Page.ViewPost.Page.Title|l10n|insert needle="{sone}" key=post.sone.niceName|html></h1>
+		<h1><%= Page.ViewPost.Page.Title|l10n|replace needle="{sone}" replacementKey=post.sone.niceName|html></h1>
 
 		<%include include/viewPost.html>
 	<%/if>

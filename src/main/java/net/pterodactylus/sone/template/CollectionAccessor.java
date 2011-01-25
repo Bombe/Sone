@@ -24,8 +24,8 @@ import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Accessor;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Accessor} for {@link Collection}s that adds a couple of specialized
@@ -44,7 +44,7 @@ public class CollectionAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		if (object == null) {
 			return null;
 		}
@@ -67,7 +67,7 @@ public class CollectionAccessor extends ReflectionAccessor {
 			}
 			return soneNames.toString();
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 }

@@ -35,6 +35,11 @@ textarea {
 	margin: 0px;
 }
 
+#sone select {
+	color: #444;
+	padding: 0.5ex 1.5ex;
+}
+
 /* now for the real stuff. */
 
 #sone {
@@ -100,12 +105,20 @@ textarea {
 	min-height: 3.5ex;
 }
 
+#sone #notification-area .notification button {
+	margin-left: 1ex;
+}
+
 #sone #notification-area .notification .dismiss {
 	float: right;
 }
 
 #sone #notification-area .notification .post-count {
 	margin-left: 1ex;
+}
+
+#sone #notification-area .notification .mark-as-read {
+	float: right;
 }
 
 #sone #plugin-warning {
@@ -147,6 +160,10 @@ textarea {
 	padding-left: 1ex;
 }
 
+#sone #update-status {
+	margin-bottom: 1em;
+}
+
 #sone #update-status label {
 	display: none;
 }
@@ -161,6 +178,15 @@ textarea {
 
 #sone #update-status button {
 	float: right;
+}
+
+#sone #update-status .select-sender, #sone .create-reply .select-sender {
+	display: none;
+}
+
+#sone #update-status .select-sender button {
+	display: inline;
+	float: left;
 }
 
 #sone .nice-name {
@@ -353,17 +379,22 @@ textarea {
 
 #sone .post .create-reply input[type=text] {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 }
 
 #sone .post .create-reply textarea {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 	height: 4em;
 }
 
 #sone .post .create-reply button {
 	float: right;
+}
+
+#sone .create-reply .select-sender button {
+	display: inline;
+	float: left;
 }
 
 #sone .sone {
@@ -471,7 +502,7 @@ textarea {
 	display: none;
 }
 
-#sone .profile-field button.confirm {
+#sone .profile-field button.confirm.edit {
 	font-weight: bold;
 	color: #080;
 }
@@ -492,6 +523,7 @@ textarea {
 #sone .profile-field .edit-field-name, #sone .profile-field .move-up-field, #sone .profile-field .move-down-field, #sone .profile-field .delete-field-name {
 	float: right;
 	margin-top: -1ex;
+	position: relative;
 }
 
 #sone #tail {

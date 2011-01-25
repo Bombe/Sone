@@ -20,8 +20,8 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that lets the user distrust another Sone. This will assign a
@@ -52,17 +52,17 @@ public class DistrustPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
-			String returnPath = request.getHttpRequest().getPartAsStringFailsafe("returnPath", 256);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			String identity = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			Sone sone = webInterface.getCore().getSone(identity, false);
 			if (sone != null) {
 				webInterface.getCore().distrustSone(currentSone, sone);
 			}
-			throw new RedirectException(returnPath);
+			throw new RedirectException(returnPage);
 		}
 	}
 

@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import net.pterodactylus.sone.web.page.Page.Request;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This filter expects a {@link Request} as input and outputs a {@link URI} that
@@ -44,17 +44,17 @@ public class RequestChangeFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		Request request = (Request) data;
 		String name = parameters.get("name");
 		String nameKey = parameters.get("nameKey");
 		if (nameKey != null) {
-			name = String.valueOf(dataProvider.getData(nameKey));
+			name = String.valueOf(templateContext.get(nameKey));
 		}
 		String key = parameters.get("key");
 		String value = null;
 		if (key != null) {
-			value = String.valueOf(dataProvider.getData(key));
+			value = String.valueOf(templateContext.get(key));
 		}
 		if (value == null) {
 			value = parameters.get("value");

@@ -19,8 +19,8 @@ package net.pterodactylus.sone.template;
 
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.template.Accessor;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Accessor} implementation for {@link Trust} values, adding the
@@ -39,7 +39,7 @@ public class TrustAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Trust trust = (Trust) object;
 		if ("assigned".equals(member)) {
 			return trust.getExplicit() != null;
@@ -48,7 +48,7 @@ public class TrustAccessor extends ReflectionAccessor {
 		} else if ("hasDistance".equals(member)) {
 			return (trust.getDistance() != null) && (trust.getDistance() != Integer.MAX_VALUE);
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 }

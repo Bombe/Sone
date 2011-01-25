@@ -20,8 +20,8 @@ package net.pterodactylus.sone.template;
 import java.util.Map;
 
 import net.pterodactylus.util.number.Hex;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Escapes double quotes, backslashes, carriage returns and line feeds, and
@@ -36,7 +36,7 @@ public class JavascriptFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		StringBuilder javascriptString = new StringBuilder();
 		javascriptString.append('"');
 		for (char c : String.valueOf(data).toCharArray()) {

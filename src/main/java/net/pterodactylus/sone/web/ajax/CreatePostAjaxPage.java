@@ -50,12 +50,17 @@ public class CreatePostAjaxPage extends JsonPage {
 		}
 		String recipientId = request.getHttpRequest().getParam("recipient");
 		Sone recipient = webInterface.getCore().getSone(recipientId, false);
+		String senderId = request.getHttpRequest().getParam("sender");
+		Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+		if (sender == null) {
+			sender = sone;
+		}
 		String text = request.getHttpRequest().getParam("text");
 		if ((text == null) || (text.trim().length() == 0)) {
 			return createErrorJsonObject("text-required");
 		}
-		Post newPost = webInterface.getCore().createPost(sone, recipient, text);
-		return createSuccessJsonObject().put("postId", newPost.getId());
+		Post newPost = webInterface.getCore().createPost(sender, recipient, text);
+		return createSuccessJsonObject().put("postId", newPost.getId()).put("sone", sender.getId()).put("recipient", (newPost.getRecipient() != null) ? newPost.getRecipient().getId() : null);
 	}
 
 }

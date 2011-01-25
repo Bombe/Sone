@@ -191,7 +191,7 @@
 		<%foreach fields field fieldLoop>
 			<div class="profile-field" id="<% field.id|html>">
 				<div class="name"><% field.name|html></div>
-				<input class="short hidden" type="text"><button class="confirm hidden" type="button">✔</button><button class="cancel hidden" type="button">✘</button>
+				<input class="short hidden" type="text"><button class="edit confirm hidden" type="button">✔</button><button class="cancel hidden" type="button">✘</button>
 				<div class="edit-field-name"><button type="submit" name="edit-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.Edit|l10n|html></button></div>
 				<div class="delete-field-name"><button type="submit" name="delete-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.Delete|l10n|html></button></div>
 				<div class="<%if fieldLoop.last>hidden <%/if>move-down-field"><button type="submit" name="move-down-field-<% field.id|html>" value="true"><%= Page.EditProfile.Fields.Button.MoveDown|l10n|html></button></div>

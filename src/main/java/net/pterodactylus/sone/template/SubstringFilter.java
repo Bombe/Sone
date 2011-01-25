@@ -19,8 +19,8 @@ package net.pterodactylus.sone.template;
 
 import java.util.Map;
 
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Filter} implementation that executes
@@ -37,7 +37,7 @@ public class SubstringFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String startString = parameters.get("start");
 		String lengthString = parameters.get("length");
 		int start = 0;

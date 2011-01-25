@@ -79,4 +79,12 @@ public class Trust {
 		return distance;
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getClass().getName() + "[explicit=" + explicit + ",implicit=" + implicit + ",distance=" + distance + "]";
+	}
+
 }

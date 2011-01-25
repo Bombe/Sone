@@ -65,7 +65,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  *            The element to add a “comment” link to
  */
 function addCommentLink(postId, element, insertAfterThisElement) {
-	if ($(element).find(".show-reply-form").length > 0) {
+	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
 	commentElement = (function(postId) {
@@ -153,7 +153,13 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 		toggleClass("modified", modified);
 	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
-	$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	if (lastUpdated != null) {
+		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	} else {
+		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
+			$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
+		});
+	}
 	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
 }
 
@@ -457,14 +463,14 @@ function updateTrustControls(soneId, trustValue) {
 	$("#sone .post").each(function() {
 		if (getPostAuthor(this) == soneId) {
 			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
-			getPostElement(this).find(".post-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getPostElement(this).find(".post-distrust").toggleClass("hidden", trustValue != null);
 			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
 		}
 	});
 	$("#sone .reply").each(function() {
 		if (getReplyAuthor(this) == soneId) {
 			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
-			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", (trustValue != null) && (trustValue < 0));
+			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", trustValue != null);
 			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
 		}
 	});
@@ -485,6 +491,8 @@ function updateReplyLikes(replyId) {
 /**
  * Posts a reply and calls the given callback when the request finishes.
  *
+ * @param sender
+ *            The ID of the sender
  * @param postId
  *            The ID of the post the reply refers to
  * @param text
@@ -493,14 +501,14 @@ function updateReplyLikes(replyId) {
  *            The callback function to call when the request finishes (takes 3
  *            parameters: success, error, replyId)
  */
-function postReply(postId, text, callbackFunction) {
-	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+function postReply(sender, postId, text, callbackFunction) {
+	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
 		}
 		if (data.success) {
-			callbackFunction(true, null, data.reply);
+			callbackFunction(true, null, data.reply, data.sone);
 		} else {
 			callbackFunction(false, data.error);
 		}
@@ -529,6 +537,56 @@ function getReply(replyId, callbackFunction) {
 }
 
 /**
+ * Ajaxifies the given Sone by enhancing all eligible elements with AJAX.
+ *
+ * @param soneElement
+ *            The Sone to ajaxify
+ */
+function ajaxifySone(soneElement) {
+	/*
+	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
+	 * nicer.
+	 */
+	$(".follow", soneElement).submit(function() {
+		var followElement = this;
+		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(followElement).addClass("hidden");
+			$(followElement).parent().find(".unfollow").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".unfollow", soneElement).submit(function() {
+		var unfollowElement = this;
+		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(unfollowElement).addClass("hidden");
+			$(unfollowElement).parent().find(".follow").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".lock", soneElement).submit(function() {
+		var lockElement = this;
+		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(lockElement).addClass("hidden");
+			$(lockElement).parent().find(".unlock").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".unlock", soneElement).submit(function() {
+		var unlockElement = this;
+		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(unlockElement).addClass("hidden");
+			$(unlockElement).parent().find(".lock").removeClass("hidden");
+		});
+		return false;
+	});
+
+	/* mark Sone as known when clicking it. */
+	$(soneElement).click(function() {
+		markSoneAsKnown(soneElement);
+	});
+}
+
+/**
  * Ajaxifies the given post by enhancing all eligible elements with AJAX.
  *
  * @param postElement
@@ -539,21 +597,25 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
-		inputField = $(this.form).find(":input:enabled").get(0);
+		sender = $(this.form).find(":input[name=sender]").val();
+		inputField = $(this.form).find(":input[name=text]:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		(function(postId, text, inputField) {
-			postReply(postId, text, function(success, error, replyId) {
+		(function(sender, postId, text, inputField) {
+			postReply(sender, postId, text, function(success, error, replyId, soneId) {
 				if (success) {
 					$(inputField).val("");
-					loadNewReply(replyId, getCurrentSoneId(), postId);
+					loadNewReply(replyId, soneId, postId);
 					markPostAsKnown(getPostElement(inputField));
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+					$("#sone .post#" + postId + " .create-reply .sender").hide();
+					$("#sone .post#" + postId + " .create-reply .select-sender").show();
+					$("#sone .post#" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
 				} else {
 					alert(error);
 				}
 			});
-		})(postId, text, inputField);
+		})(sender, postId, text, inputField);
 		return false;
 	});
 
@@ -604,6 +666,15 @@ function ajaxifyPost(postElement) {
 		$(postElement).find("input.reply-input").each(function() {
 			registerInputTextareaSwap(this, text, "text", false, false);
 		});
+	});
+
+	/* process sender selection. */
+	$(".select-sender", postElement).css("display", "inline");
+	$(".sender", postElement).hide();
+	$(".select-sender button", postElement).click(function() {
+		$(".sender", postElement).show();
+		$(".select-sender", postElement).hide();
+		return false;
 	});
 
 	/* mark everything as known on click. */
@@ -671,8 +742,16 @@ function ajaxifyReply(replyElement) {
  *            jQuery object representing the notification.
  */
 function ajaxifyNotification(notification) {
-	notification.find("form.dismiss").submit(function() {
+	notification.find("form").submit(function() {
 		return false;
+	});
+	notification.find("input[name=returnPage]").val($.url.attr("relative"));
+	if (notification.find(".short-text").length > 0) {
+		notification.find(".short-text").removeClass("hidden");
+		notification.find(".text").addClass("hidden");
+	}
+	notification.find("form.mark-as-read button").click(function() {
+		$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
 	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
@@ -690,13 +769,18 @@ function getStatus() {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
-				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdated);
+				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
 			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
 				oldNotification = $("#sone #notification-area .notification#" + value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
+					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
+						opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
+						notification.find(".short-text").toggleClass("hidden", opened);
+						notification.find(".text").toggleClass("hidden", !opened);
+					}
 					oldNotification.replaceWith(notification.show());
 				} else {
 					$("#sone #notification-area").append(notification);
@@ -910,12 +994,26 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 	});
 }
 
+/**
+ * Marks the given Sone as known if it is still new.
+ *
+ * @param soneElement
+ *            The Sone to mark as known
+ */
+function markSoneAsKnown(soneElement) {
+	if ($(".new", soneElement).length > 0) {
+		$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
+			$(soneElement).removeClass("new");
+		});
+	}
+}
+
 function markPostAsKnown(postElements) {
 	$(postElements).each(function() {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
-				$.getJSON("markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)}, function(data, textStatus) {
 					$(postElement).removeClass("new");
 					$(".click-to-show", postElement).removeClass("new");
 				});
@@ -930,7 +1028,7 @@ function markReplyAsKnown(replyElements) {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
-				$.getJSON("markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function(data, textStatus) {
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)}, function(data, textStatus) {
 					$(replyElement).removeClass("new");
 				});
 			})(replyElement);
@@ -983,8 +1081,8 @@ function createNotification(id, text, dismissable) {
  *            The ID of the notification
  */
 function showNotificationDetails(notificationId) {
-	$("#sone .notification#" + notificationId + " .text").show();
-	$("#sone .notification#" + notificationId + " .short-text").hide();
+	$("#sone .notification#" + notificationId + " .text").removeClass("hidden");
+	$("#sone .notification#" + notificationId + " .short-text").addClass("hidden");
 }
 
 /**
@@ -1072,17 +1170,28 @@ $(document).ready(function() {
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
+		$("#sone #update-status .select-sender").css("display", "inline");
+		$("#sone #update-status .sender").hide();
+		$("#sone #update-status .select-sender button").click(function() {
+			$("#sone #update-status .sender").show();
+			$("#sone #update-status .select-sender").hide();
+			return false;
+		});
 		$("#sone #update-status").submit(function() {
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId, getCurrentSoneId());
+					loadNewPost(data.postId, data.sone, data.recipient);
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});
@@ -1142,41 +1251,8 @@ $(document).ready(function() {
 		});
 	}
 
-	/*
-	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
-	 * nicer.
-	 */
-	$("#sone .follow").submit(function() {
-		var followElement = this;
-		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-			$(followElement).addClass("hidden");
-			$(followElement).parent().find(".unfollow").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .unfollow").submit(function() {
-		var unfollowElement = this;
-		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-			$(unfollowElement).addClass("hidden");
-			$(unfollowElement).parent().find(".follow").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .lock").submit(function() {
-		var lockElement = this;
-		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-			$(lockElement).addClass("hidden");
-			$(lockElement).parent().find(".unlock").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .unlock").submit(function() {
-		var unlockElement = this;
-		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-			$(unlockElement).addClass("hidden");
-			$(unlockElement).parent().find(".lock").removeClass("hidden");
-		});
-		return false;
+	$("#sone .sone").each(function() {
+		ajaxifySone($(this));
 	});
 
 	/* process all existing notifications, ajaxify dismiss buttons. */

@@ -17,17 +17,11 @@
 
 package net.pterodactylus.sone.template;
 
-import java.io.IOException;
-import java.io.StringReader;
-
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.text.FreenetLinkParser;
-import net.pterodactylus.sone.text.FreenetLinkParserContext;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
-import net.pterodactylus.util.template.TemplateFactory;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Accessor for {@link Post} objects that adds additional properties:
@@ -40,9 +34,6 @@ import net.pterodactylus.util.template.TemplateFactory;
  */
 public class PostAccessor extends ReflectionAccessor {
 
-	/** Parser for Freenet links. */
-	private final FreenetLinkParser linkParser;
-
 	/** The core to get the replies from. */
 	private final Core core;
 
@@ -51,41 +42,28 @@ public class PostAccessor extends ReflectionAccessor {
 	 *
 	 * @param core
 	 *            The core to get the replies from
-	 * @param templateFactory
-	 *            The template factory for the text parser
 	 */
-	public PostAccessor(Core core, TemplateFactory templateFactory) {
+	public PostAccessor(Core core) {
 		this.core = core;
-		linkParser = new FreenetLinkParser(templateFactory);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Post post = (Post) object;
 		if ("replies".equals(member)) {
 			return core.getReplies(post);
 		} else if (member.equals("likes")) {
 			return core.getLikes(post);
 		} else if (member.equals("liked")) {
-			Sone currentSone = (Sone) dataProvider.getData("currentSone");
+			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && (currentSone.isLikedPostId(post.getId()));
 		} else if (member.equals("new")) {
-			return core.isNewPost(post.getId(), false);
-		} else if (member.equals("text")) {
-			String text = post.getText();
-			if (text == null) {
-				return null;
-			}
-			try {
-				return linkParser.parse(new FreenetLinkParserContext(post.getSone()), new StringReader(text));
-			} catch (IOException ioe1) {
-				/* ignore. */
-			}
+			return core.isNewPost(post.getId());
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 }

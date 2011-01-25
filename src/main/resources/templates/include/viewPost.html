@@ -16,13 +16,16 @@
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
 				<%/if>
 			<%/if>
-			<div class="text"><% post.text></div>
+			<div class="text"><% post.text|parse sone=post.sone></div>
 		</div>
 		<div class="post-status-line status-line">
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
-			<span class='separator'>·</span>
-			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>"><span title="<% post.likes.soneNames|html>">↑<span class="like-count"><% post.likes.size></span></span></div>
+			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>">
+				<span class='separator'>·</span>
+				<span title="<% post.likes.soneNames|html>">↑<span class="like-count"><% post.likes.size></span></span>
+			</div>
 			<%ifnull ! currentSone>
+				<span class='separator'>·</span>
 				<form class="like like-post<%if post.liked> hidden<%/if>" action="like.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
@@ -37,29 +40,29 @@
 					<input type="hidden" name="post" value="<% post.id|html>" />
 					<button type="submit" value="1"><%= View.Post.UnlikeLink|l10n|html></button>
 				</form>
+				<%if !post.sone.current>
+					<span class='separator'>·</span>
+					<form class="trust post-trust<%if post.sone.trust.assigned> hidden<%/if>" action="trust.html" method="post">
+						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+						<input type="hidden" name="sone" value="<% post.sone.id|html>" />
+						<button type="submit" title="<%= View.Trust.Tooltip.Trust|l10n|html>">✓</button>
+					</form>
+					<form class="distrust post-distrust<%if post.sone.trust.assigned> hidden<%/if>" action="distrust.html" method="post">
+						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+						<input type="hidden" name="sone" value="<% post.sone.id|html>" />
+						<button type="submit" title="<%= View.Trust.Tooltip.Distrust|l10n|html>">✗</button>
+					</form>
+					<form class="untrust post-untrust<%if !post.sone.trust.assigned> hidden<%/if>" action="untrust.html" method="post">
+						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+						<input type="hidden" name="sone" value="<% post.sone.id|html>" />
+						<button type="submit" title="<%= View.Trust.Tooltip.Untrust|l10n|html>">↶</button>
+					</form>
+				<%/if>
 			<%/if>
-			<%if !post.sone.current>
-				<span class='separator'>·</span>
-				<form class="trust post-trust<%if post.sone.trust.assigned> hidden<%/if>" action="trust.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<input type="hidden" name="sone" value="<% post.sone.id|html>" />
-					<button type="submit" title="<%= View.Trust.Tooltip.Trust|l10n|html>">✓</button>
-				</form>
-				<form class="distrust post-distrust" action="distrust.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<input type="hidden" name="sone" value="<% post.sone.id|html>" />
-					<button type="submit" title="<%= View.Trust.Tooltip.Distrust|l10n|html>">✗</button>
-				</form>
-				<form class="untrust post-untrust<%if !post.sone.trust.assigned> hidden<%/if>" action="untrust.html" method="post">
-					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-					<input type="hidden" name="sone" value="<% post.sone.id|html>" />
-					<button type="submit" title="<%= View.Trust.Tooltip.Untrust|l10n|html>">↶</button>
-				</form>
-			<%/if>
-			<%if post.sone.current>
+			<%if post.sone.local>
 				<span class='separator'>·</span>
 				<form class="delete delete-post" action="deletePost.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
@@ -79,6 +82,14 @@
 						<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 						<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 						<input type="hidden" name="post" value="<% post.id|html>" />
+						<div class="sender">
+							<select name="sender" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">
+								<%foreach localSones localSone>
+									<option value="<% localSone.id|html>"<%if localSone.current> selected="selected"<%/if>><% localSone.niceName|html></option>
+								<%/foreach>
+							</select>
+						</div>
+						<div class="select-sender"><button type="button" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">+</button></div>
 						<input type="text" class="reply-input" name="text" value="" />
 						<button type="submit"><%= View.Post.SendReply|l10n|html></button>
 					</form>

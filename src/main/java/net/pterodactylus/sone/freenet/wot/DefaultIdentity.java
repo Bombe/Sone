@@ -76,7 +76,7 @@ public class DefaultIdentity implements Identity {
 			}
 		}
 
-	}, new TimedMap<OwnIdentity, CacheItem<Trust>>(60000));
+	}, new TimedMap<OwnIdentity, CacheItem<Trust>>(60 * 60 * 1000));
 
 	/**
 	 * Creates a new identity.

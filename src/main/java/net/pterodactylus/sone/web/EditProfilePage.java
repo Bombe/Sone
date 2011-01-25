@@ -24,8 +24,8 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -55,8 +55,8 @@ public class EditProfilePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		ToadletContext toadletContenxt = request.getToadletContext();
 		Sone currentSone = getCurrentSone(toadletContenxt);
 		Profile profile = currentSone.getProfile();
@@ -95,8 +95,8 @@ public class EditProfilePage extends SoneTemplatePage {
 					webInterface.getCore().saveSone(currentSone);
 					throw new RedirectException("editProfile.html#profile-fields");
 				} catch (IllegalArgumentException iae1) {
-					dataProvider.set("fieldName", fieldName);
-					dataProvider.set("duplicateFieldName", true);
+					templateContext.set("fieldName", fieldName);
+					templateContext.set("duplicateFieldName", true);
 				}
 			} else {
 				String id = getFieldId(request, "delete-field-");
@@ -129,13 +129,13 @@ public class EditProfilePage extends SoneTemplatePage {
 				}
 			}
 		}
-		dataProvider.set("firstName", firstName);
-		dataProvider.set("middleName", middleName);
-		dataProvider.set("lastName", lastName);
-		dataProvider.set("birthDay", birthDay);
-		dataProvider.set("birthMonth", birthMonth);
-		dataProvider.set("birthYear", birthYear);
-		dataProvider.set("fields", fields);
+		templateContext.set("firstName", firstName);
+		templateContext.set("middleName", middleName);
+		templateContext.set("lastName", lastName);
+		templateContext.set("birthDay", birthDay);
+		templateContext.set("birthMonth", birthMonth);
+		templateContext.set("birthYear", birthYear);
+		templateContext.set("fields", fields);
 	}
 
 	//

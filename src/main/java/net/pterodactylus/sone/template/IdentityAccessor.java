@@ -23,8 +23,8 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.util.template.Accessor;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Accessor} implementation that adds a “uniqueNickname” member to an
@@ -51,7 +51,7 @@ public class IdentityAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Identity identity = (Identity) object;
 		if ("uniqueNickname".equals(member)) {
 			int minLength = -1;
@@ -75,7 +75,7 @@ public class IdentityAccessor extends ReflectionAccessor {
 			} while (!found && (minLength < 43));
 			return getAbbreviatedNickname(identity, minLength);
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 	//
