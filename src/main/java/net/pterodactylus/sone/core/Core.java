@@ -996,7 +996,7 @@ public class Core implements IdentityListener, UpdateListener {
 						}
 					}
 				}
-				Set<Reply> storedReplies = sone.getReplies();
+				Set<Reply> storedReplies = storedSone.getReplies();
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
 						reply.setSone(storedSone);
