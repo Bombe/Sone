@@ -766,7 +766,8 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void updateFound(Version version, long releaseTime, long latestEdition) {
-		newVersionNotification.getTemplateContext().set("version", version);
+		newVersionNotification.getTemplateContext().set("latestVersion", version);
+		newVersionNotification.getTemplateContext().set("latestEdition", latestEdition);
 		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
 		notificationManager.addNotification(newVersionNotification);
 	}
