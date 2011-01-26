@@ -1028,6 +1028,7 @@ function resetActivity() {
 	if (title.indexOf('(') == 0) {
 		document.title = title.substr(title.indexOf(' ') + 1);
 	}
+	changeIcon("images/icon.png");
 }
 
 function setActivity() {
@@ -1036,7 +1037,20 @@ function setActivity() {
 		if (title.indexOf('(') != 0) {
 			document.title = "(!) " + title;
 		}
+		changeIcon("images/icon-activity.png");
 	}
+}
+
+/**
+ * Changes the icon of the page.
+ *
+ * @param iconUrl
+ *            The new URL of the icon
+ */
+function changeIcon(iconUrl) {
+	$("link[rel=icon]").remove();
+	$("head").append($("<link>").attr("rel", "icon").attr("type", "image/png").attr("href", iconUrl));
+	$("iframe[id=icon-update]")[0].src += "";
 }
 
 /**
