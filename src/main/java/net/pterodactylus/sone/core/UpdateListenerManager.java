@@ -45,10 +45,12 @@ public class UpdateListenerManager extends AbstractListenerManager<Void, UpdateL
 	 *            The new version
 	 * @param releaseTime
 	 *            The release time of the new version
+	 * @param latestEdition
+	 *            The latest edition of the Sone homepage
 	 */
-	void fireUpdateFound(Version version, long releaseTime) {
+	void fireUpdateFound(Version version, long releaseTime, long latestEdition) {
 		for (UpdateListener updateListener : getListeners()) {
-			updateListener.updateFound(version, releaseTime);
+			updateListener.updateFound(version, releaseTime, latestEdition);
 		}
 	}
 

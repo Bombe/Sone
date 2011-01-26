@@ -1771,8 +1771,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updateFound(Version version, long releaseTime) {
-		coreListenerManager.fireUpdateFound(version, releaseTime);
+	public void updateFound(Version version, long releaseTime, long latestEdition) {
+		coreListenerManager.fireUpdateFound(version, releaseTime, latestEdition);
 	}
 
 }

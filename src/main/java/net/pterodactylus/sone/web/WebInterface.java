@@ -765,7 +765,7 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updateFound(Version version, long releaseTime) {
+	public void updateFound(Version version, long releaseTime, long latestEdition) {
 		newVersionNotification.getTemplateContext().set("version", version);
 		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
 		notificationManager.addNotification(newVersionNotification);
