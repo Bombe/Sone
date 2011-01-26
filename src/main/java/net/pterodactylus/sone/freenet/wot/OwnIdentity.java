@@ -72,8 +72,6 @@ public interface OwnIdentity extends Identity {
 
 	/**
 	 * Sets the property with the given name to the given value.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
 	 *
 	 * @param name
 	 *            The name of the property

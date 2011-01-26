@@ -201,15 +201,17 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	/**
 	 * Notifies all listeners that a new version was found.
 	 *
-	 * @see CoreListener#updateFound(Version, long)
+	 * @see CoreListener#updateFound(Version, long, long)
 	 * @param version
 	 *            The new version
 	 * @param releaseTime
 	 *            The release time of the new version
+	 * @param latestEdition
+	 *            The latest edition of the Sone homepage
 	 */
-	void fireUpdateFound(Version version, long releaseTime) {
+	void fireUpdateFound(Version version, long releaseTime, long latestEdition) {
 		for (CoreListener coreListener : getListeners()) {
-			coreListener.updateFound(version, releaseTime);
+			coreListener.updateFound(version, releaseTime, latestEdition);
 		}
 	}
 

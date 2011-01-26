@@ -135,7 +135,9 @@ public interface CoreListener extends EventListener {
 	 *            The version that was found
 	 * @param releaseTime
 	 *            The release time of the new version
+	 * @param latestEdition
+	 *            The latest edition of the Sone homepage
 	 */
-	public void updateFound(Version version, long releaseTime);
+	public void updateFound(Version version, long releaseTime, long latestEdition);
 
 }

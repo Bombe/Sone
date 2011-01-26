@@ -176,7 +176,7 @@ public class Sone implements Fingerprintable {
 	 */
 	public Sone setRequestUri(FreenetURI requestUri) {
 		if (this.requestUri == null) {
-			this.requestUri = requestUri.setDocName("Sone").setMetaString(new String[0]);
+			this.requestUri = requestUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
 			return this;
 		}
 		if (!this.requestUri.equalsKeypair(requestUri)) {
@@ -204,7 +204,7 @@ public class Sone implements Fingerprintable {
 	 */
 	public Sone setInsertUri(FreenetURI insertUri) {
 		if (this.insertUri == null) {
-			this.insertUri = insertUri.setDocName("Sone").setMetaString(new String[0]);
+			this.insertUri = insertUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
 			return this;
 		}
 		if (!this.insertUri.equalsKeypair(insertUri)) {

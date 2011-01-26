@@ -193,6 +193,7 @@ public class SoneTemplatePage extends TemplatePage {
 		templateContext.set("request", request);
 		templateContext.set("currentVersion", SonePlugin.VERSION);
 		templateContext.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
+		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
 		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
 	}

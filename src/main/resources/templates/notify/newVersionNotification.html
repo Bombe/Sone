@@ -1,1 +1,1 @@
-<div class="text"><%= Notification.NewVersion.Text|l10n|html|replace needle="{version}" replacementKey=version></div>
+<div class="text"><%= Notification.NewVersion.Text|l10n|replace needle="{version}" replacementKey=latestVersion|replace needle="{edition}" replacementKey=latestEdition|parse sone=currentSone></div>
