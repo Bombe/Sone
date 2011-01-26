@@ -198,7 +198,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", new ParserFilter(templateContextFactory));
+		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addPlugin("getpage", new GetPagePlugin());
