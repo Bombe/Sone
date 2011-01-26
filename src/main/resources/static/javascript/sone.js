@@ -1002,10 +1002,9 @@ function markPostAsKnown(postElements) {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)}, function(data, textStatus) {
-					$(postElement).removeClass("new");
-					$(".click-to-show", postElement).removeClass("new");
-				});
+				$(postElement).removeClass("new");
+				$(".click-to-show", postElement).removeClass("new");
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
 			})(postElement);
 		}
 	});
@@ -1017,9 +1016,8 @@ function markReplyAsKnown(replyElements) {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)}, function(data, textStatus) {
-					$(replyElement).removeClass("new");
-				});
+				$(replyElement).removeClass("new");
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
 			})(replyElement);
 		}
 	});
