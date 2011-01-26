@@ -71,7 +71,6 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 	commentElement = (function(postId) {
 		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
-			markPostAsKnown(getPostElement(this));
 			replyElement = $("#sone .post#" + postId + " .create-reply");
 			replyElement.removeClass("hidden");
 			replyElement.removeClass("light");
@@ -606,7 +605,6 @@ function ajaxifyPost(postElement) {
 				if (success) {
 					$(inputField).val("");
 					loadNewReply(replyId, soneId, postId);
-					markPostAsKnown(getPostElement(inputField));
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
 					$("#sone .post#" + postId + " .create-reply .sender").hide();
 					$("#sone .post#" + postId + " .create-reply .select-sender").show();
@@ -630,12 +628,10 @@ function ajaxifyPost(postElement) {
 	/* convert all “like” buttons to javascript functions. */
 	$(postElement).find(".like-post").submit(function() {
 		likePost(getPostId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	$(postElement).find(".unlike-post").submit(function() {
 		unlikePost(getPostId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 
@@ -698,12 +694,10 @@ function ajaxifyPost(postElement) {
 function ajaxifyReply(replyElement) {
 	$(replyElement).find(".like-reply").submit(function() {
 		likeReply(getReplyId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	$(replyElement).find(".unlike-reply").submit(function() {
 		unlikeReply(getReplyId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	(function(replyElement) {
@@ -727,11 +721,6 @@ function ajaxifyReply(replyElement) {
 	$(replyElement).find(".reply-untrust").submit(function() {
 		untrustSone(getReplyAuthor(this));
 		return false;
-	});
-
-	/* mark post and all replies as known on click. */
-	$(replyElement).click(function() {
-		markPostAsKnown(getPostElement(this));
 	});
 }
 
