@@ -1036,12 +1036,18 @@ function setActivity() {
 		if (title.indexOf('(') != 0) {
 			document.title = "(!) " + title;
 		}
-		setTimeout(toggleIcon, 1500);
+		if (!iconBlinking) {
+			setTimeout(toggleIcon, 1500);
+			iconBlinking = true;
+		}
 	}
 }
 
 /** Whether the icon is currently showing activity. */
 var iconActive = false;
+
+/** Whether the icon is currently supposed to blink. */
+var iconBlinking = false;
 
 /**
  * Toggles the icon. If the window has gained focus and the icon is still
@@ -1053,6 +1059,7 @@ function toggleIcon() {
 			changeIcon("images/icon.png");
 			iconActive = false;
 		}
+		iconBlinking = false;
 	} else {
 		iconActive = !iconActive;
 		console.log("showing icon: " + iconActive);
