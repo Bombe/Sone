@@ -1037,7 +1037,28 @@ function setActivity() {
 		if (title.indexOf('(') != 0) {
 			document.title = "(!) " + title;
 		}
-		changeIcon("images/icon-activity.png");
+		setTimeout(toggleIcon, 1500);
+	}
+}
+
+/** Whether the icon is currently showing activity. */
+var iconActive = false;
+
+/**
+ * Toggles the icon. If the window has gained focus and the icon is still
+ * showing the activity state, it is returned to normal.
+ */
+function toggleIcon() {
+	if (focus) {
+		if (iconActive) {
+			changeIcon("images/icon.png");
+			iconActive = false;
+		}
+	} else {
+		iconActive = !iconActive;
+		console.log("showing icon: " + iconActive);
+		changeIcon(iconActive ? "images/icon-activity.png" : "images/icon.png");
+		setTimeout(toggleIcon, 1500);
 	}
 }
 
