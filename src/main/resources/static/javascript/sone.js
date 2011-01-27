@@ -1028,7 +1028,6 @@ function resetActivity() {
 	if (title.indexOf('(') == 0) {
 		document.title = title.substr(title.indexOf(' ') + 1);
 	}
-	changeIcon("images/icon.png");
 }
 
 function setActivity() {
