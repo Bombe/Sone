@@ -58,7 +58,7 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setInsertionDelay(insertionDelay);
 			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
 			preferences.setPositiveTrust(positiveTrust);
-			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 3));
+			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
 			preferences.setNegativeTrust(negativeTrust);
 			String trustComment = request.getHttpRequest().getPartAsStringFailsafe("trust-comment", 256);
 			if (trustComment.trim().length() == 0) {
