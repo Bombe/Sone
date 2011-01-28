@@ -742,6 +742,15 @@ function ajaxifyNotification(notification) {
 	notification.find("form.mark-as-read button").click(function() {
 		$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
 	});
+	notification.find("a[class^='link-']").each(function() {
+		linkElement = $(this);
+		if (linkElement.is("[href^='viewPost']")) {
+			id = linkElement.attr("class").substr(5);
+			if (hasPost(id)) {
+				linkElement.attr("href", "#post-" + id);
+			}
+		}
+	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
 			/* dismiss in case of error, too. */
