@@ -1248,14 +1248,25 @@ $(document).ready(function() {
 	/* ajaxify input field on “view Sone” page. */
 	getTranslation("WebInterface.DefaultText.Message", function(defaultText) {
 		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
+		$("#sone #post-message .select-sender").css("display", "inline");
+		$("#sone #post-message .sender").hide();
+		$("#sone #post-message .select-sender button").click(function() {
+			$("#sone #post-message .sender").show();
+			$("#sone #post-message .select-sender").hide();
+			return false;
+		});
 		$("#sone #post-message").submit(function() {
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
 					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});

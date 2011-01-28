@@ -164,7 +164,7 @@ textarea {
 	margin-bottom: 1em;
 }
 
-#sone #update-status label {
+#sone #update-status label, #sone #post-message label {
 	display: none;
 }
 
@@ -180,11 +180,11 @@ textarea {
 	float: right;
 }
 
-#sone #update-status .select-sender, #sone .create-reply .select-sender {
+#sone #update-status .select-sender, #sone .create-reply .select-sender, #sone #post-message .select-sender {
 	display: none;
 }
 
-#sone #update-status .select-sender button {
+#sone #update-status .select-sender button, #sone #post-message .select-sender button {
 	display: inline;
 	float: left;
 }
@@ -392,7 +392,7 @@ textarea {
 	float: right;
 }
 
-#sone .create-reply .select-sender button {
+#sone .create-reply .select-sender button, #sone #post-message .select-sender button {
 	display: inline;
 	float: left;
 }
