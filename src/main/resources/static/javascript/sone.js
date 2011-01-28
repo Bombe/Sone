@@ -1035,7 +1035,7 @@ function markReplyAsKnown(replyElements) {
 function resetActivity() {
 	title = document.title;
 	if (title.indexOf('(') == 0) {
-		document.title = title.substr(title.indexOf(' ') + 1);
+		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
 }
 
@@ -1043,13 +1043,25 @@ function setActivity() {
 	if (!focus) {
 		title = document.title;
 		if (title.indexOf('(') != 0) {
-			document.title = "(!) " + title;
+			setTitle("(!) " + title);
 		}
 		if (!iconBlinking) {
 			setTimeout(toggleIcon, 1500);
 			iconBlinking = true;
 		}
 	}
+}
+
+/**
+ * Sets the window title after a small delay to prevent race-condition issues.
+ *
+ * @param title
+ *            The title to set
+ */
+function setTitle(title) {
+	setTimeout(function() {
+		document.title = title;
+	}, 50);
 }
 
 /** Whether the icon is currently showing activity. */
