@@ -12,6 +12,6 @@
 	</form>
 	<%= Notification.NewReply.Text|l10n|html>
 	<%foreach replies reply>
-		<a href="viewPost.html?post=<% reply.post.id|html>"><% reply.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
+		<a class="link-<% reply.post.id|html>" href="viewPost.html?post=<% reply.post.id|html>"><% reply.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
 	<%/foreach>
 </div>
