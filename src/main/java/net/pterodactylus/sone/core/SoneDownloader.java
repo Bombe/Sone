@@ -148,6 +148,7 @@ public class SoneDownloader extends AbstractService {
 			logger.log(Level.FINEST, "Got %d bytes back.", fetchResults.getRight().size());
 			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
 			if (parsedSone != null) {
+				addSone(parsedSone);
 				core.updateSone(parsedSone);
 			}
 		} finally {
