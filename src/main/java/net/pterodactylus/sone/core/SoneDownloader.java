@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
@@ -122,8 +123,8 @@ public class SoneDownloader extends AbstractService {
 
 	/**
 	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
-	 * specific URI (which happens when {@link Core#isSoneRescueMode() „Sone
-	 * rescue mode“} is active).
+	 * specific URI (which happens when {@link Preferences#isSoneRescueMode()
+	 * „Sone rescue mode“} is active).
 	 *
 	 * @param sone
 	 *            The Sone to fetch
