@@ -1743,6 +1743,7 @@ public class Core implements IdentityListener, UpdateListener {
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
 				sone.setIdentity(identity);
+				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
 		}).start();

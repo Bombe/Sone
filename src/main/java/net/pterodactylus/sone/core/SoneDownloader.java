@@ -94,6 +94,7 @@ public class SoneDownloader extends AbstractService {
 	 */
 	public void addSone(Sone sone) {
 		if (sones.add(sone)) {
+			freenetInterface.unregisterUsk(sone);
 			freenetInterface.registerUsk(sone, this);
 		}
 	}

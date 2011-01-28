@@ -176,7 +176,7 @@ public class FreenetInterface {
 				}
 			};
 			soneUskCallbacks.put(sone.getId(), uskCallback);
-			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, true, (HighLevelSimpleClientImpl) client);
+			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, (System.currentTimeMillis() - sone.getTime()) < 7 * 24 * 60 * 60 * 1000, (HighLevelSimpleClientImpl) client);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, "Could not subscribe USK “" + sone.getRequestUri() + "”!", mue1);
 		}
