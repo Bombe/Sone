@@ -254,6 +254,11 @@ textarea {
 	color: rgb(28, 131, 191);
 }
 
+#sone .post .bookmarks, #sone .post .bookmarked, #sone .post .not-bookmarked {
+	display: inline;
+	color: rgb(28, 131, 191);
+}
+
 #sone .post .time {
 	display: inline;
 	color: #666;
