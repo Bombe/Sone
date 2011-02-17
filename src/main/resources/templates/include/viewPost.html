@@ -19,6 +19,21 @@
 			<div class="text"><% post.text|parse sone=post.sone></div>
 		</div>
 		<div class="post-status-line status-line">
+			<div class="bookmarks">
+				<form class="unbookmark<%if !post.bookmarked> hidden<%/if>" action="unbookmark.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="post" value="<% post.id|html>" />
+					<button type="submit" title="<%= View.Post.Bookmarks.PostIsBookmarked|l10n|html>">★</button>
+				</form>
+				<form class="bookmark<%if post.bookmarked> hidden<%/if>" action="bookmark.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="post" value="<% post.id|html>" />
+					<button type="submit" title="<%= View.Post.Bookmarks.PostIsNotBookmarked|l10n|html>">☆</button>
+				</form>
+			</div>
+			<span class='separator'>·</span>
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
 			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>">
 				<span class='separator'>·</span>

@@ -1,0 +1,17 @@
+<%include include/head.html>
+
+	<div class="page-id hidden">bookmarks</div>
+
+	<h1><%= Page.Bookmarks.Page.Title|l10n|html></h1>
+
+	<div id="posts">
+		<%include include/pagination.html>
+		<%foreach posts post>
+			<%include include/viewPost.html>
+		<%foreachelse>
+			<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
+		<%/foreach>
+		<%include include/pagination.html>
+	</div>
+
+<%include include/tail.html>

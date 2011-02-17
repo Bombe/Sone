@@ -254,6 +254,17 @@ textarea {
 	color: rgb(28, 131, 191);
 }
 
+#sone .post .bookmarks {
+	display: inline;
+	color: rgb(28, 131, 191);
+}
+
+#sone .post .bookmark, #sone .post .unbookmark {
+	display: inline;
+	font: inherit;
+	margin: 0px;
+}
+
 #sone .post .time {
 	display: inline;
 	color: #666;
@@ -269,11 +280,11 @@ textarea {
 	display: none;
 }
 
-#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden {
+#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden, #sone .post .bookmark.hidden, #sone .post .unbookmark.hidden {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button, #sone .post .bookmark button, #sone .post .unbookmark button {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -299,7 +310,7 @@ textarea {
 	color: rgb(64, 64, 64);
 }
 
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover {
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover, #sone .post .bookmark button:hover, #sone .post .unbookmark button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
