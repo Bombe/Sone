@@ -158,6 +158,10 @@ public class Core implements IdentityListener, UpdateListener {
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
 
+	/** All bookmarked posts. */
+	/* synchronize access on itself. */
+	private Set<String> bookmarkedPosts = new HashSet<String>();
+
 	/** Trusted identities, sorted by own identities. */
 	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
 
@@ -672,6 +676,50 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 		return sones;
+	}
+
+	/**
+	 * Returns whether the given post is bookmarked.
+	 *
+	 * @param post
+	 *            The post to check
+	 * @return {@code true} if the given post is bookmarked, {@code false}
+	 *         otherwise
+	 */
+	public boolean isBookmarked(Post post) {
+		return isPostBookmarked(post.getId());
+	}
+
+	/**
+	 * Returns whether the post with the given ID is bookmarked.
+	 *
+	 * @param id
+	 *            The ID of the post to check
+	 * @return {@code true} if the post with the given ID is bookmarked,
+	 *         {@code false} otherwise
+	 */
+	public boolean isPostBookmarked(String id) {
+		synchronized (bookmarkedPosts) {
+			return bookmarkedPosts.contains(id);
+		}
+	}
+
+	/**
+	 * Returns all currently known bookmarked posts.
+	 *
+	 * @return All bookmarked posts
+	 */
+	public Set<Post> getBookmarkedPosts() {
+		Set<Post> posts = new HashSet<Post>();
+		synchronized (bookmarkedPosts) {
+			for (String bookmarkedPostId : bookmarkedPosts) {
+				Post post = getPost(bookmarkedPostId, false);
+				if (post != null) {
+					posts.add(post);
+				}
+			}
+		}
+		return posts;
 	}
 
 	//
@@ -1432,6 +1480,50 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Bookmarks the given post.
+	 *
+	 * @param post
+	 *            The post to bookmark
+	 */
+	public void bookmark(Post post) {
+		bookmarkPost(post.getId());
+	}
+
+	/**
+	 * Bookmarks the post with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the post to bookmark
+	 */
+	public void bookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.add(id);
+		}
+	}
+
+	/**
+	 * Removes the given post from the bookmarks.
+	 *
+	 * @param post
+	 *            The post to unbookmark
+	 */
+	public void unbookmark(Post post) {
+		unbookmarkPost(post.getId());
+	}
+
+	/**
+	 * Removes the post with the given ID from the bookmarks.
+	 *
+	 * @param id
+	 *            The ID of the post to unbookmark
+	 */
+	public void unbookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.remove(id);
+		}
+	}
+
+	/**
 	 * Creates a new reply.
 	 *
 	 * @param sone
@@ -1587,6 +1679,15 @@ public class Core implements IdentityListener, UpdateListener {
 				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
 			}
 
+			/* save bookmarked posts. */
+			int bookmarkedPostCounter = 0;
+			synchronized (bookmarkedPosts) {
+				for (String bookmarkedPostId : bookmarkedPosts) {
+					configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(bookmarkedPostId);
+				}
+			}
+			configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(null);
+
 			/* now save it. */
 			configuration.save();
 
@@ -1674,6 +1775,18 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 			synchronized (newReplies) {
 				knownReplies.add(knownReplyId);
+			}
+		}
+
+		/* load bookmarked posts. */
+		int bookmarkedPostCounter = 0;
+		while (true) {
+			String bookmarkedPostId = configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").getValue(null);
+			if (bookmarkedPostId == null) {
+				break;
+			}
+			synchronized (bookmarkedPosts) {
+				bookmarkedPosts.add(bookmarkedPostId);
 			}
 		}
 
