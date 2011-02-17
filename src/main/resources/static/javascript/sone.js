@@ -692,6 +692,16 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* convert bookmark/unbookmark buttons to javascript functions. */
+	$(postElement).find(".bookmark").submit(function() {
+		bookmarkPost(getPostId(this));
+		return false;
+	});
+	$(postElement).find(".unbookmark").submit(function() {
+		unbookmarkPost(getPostId(this));
+		return false;
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
