@@ -486,6 +486,38 @@ function updateTrustControls(soneId, trustValue) {
 	});
 }
 
+/**
+ * Bookmarks the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to bookmark
+ */
+function bookmarkPost(postId) {
+	(function(postId) {
+		$.getJSON("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+			if ((data != null) && data.success) {
+				getPost(postId).find(".bookmark").toggleClass("hidden", true);
+				getPost(postId).find(".unbookmark").toggleClass("hidden", false);
+			}
+		});
+	})(postId);
+}
+
+/**
+ * Unbookmarks the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to unbookmark
+ */
+function unbookmarkPost(postId) {
+	$.getJSON("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			getPost(postId).find(".bookmark").toggleClass("hidden", false);
+			getPost(postId).find(".unbookmark").toggleClass("hidden", true);
+		}
+	});
+}
+
 function updateReplyLikes(replyId) {
 	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
