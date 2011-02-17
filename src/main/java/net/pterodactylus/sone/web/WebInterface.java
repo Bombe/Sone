@@ -558,6 +558,8 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
