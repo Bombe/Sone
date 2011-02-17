@@ -20,13 +20,13 @@
 		</div>
 		<div class="post-status-line status-line">
 			<div class="bookmarks">
-				<form class="bookmarked<%if !post.bookmarked> hidden<%/if>" action="bookmark.html" method="post">
+				<form class="unbookmark<%if !post.bookmarked> hidden<%/if>" action="unbookmark.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="post" value="<% post.id|html>" />
 					<button type="submit" title="<%= View.Post.Bookmarks.PostIsBookmarked|l10n|html>">★</button>
 				</form>
-				<form class="not-bookmarked<%if post.bookmarked> hidden<%/if>" action="unbookmark.html" method="post">
+				<form class="bookmark<%if post.bookmarked> hidden<%/if>" action="bookmark.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
 					<input type="hidden" name="post" value="<% post.id|html>" />
