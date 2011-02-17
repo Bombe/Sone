@@ -297,6 +297,17 @@ function getSoneId(element) {
 	return getSoneElement(element).find(".id").text();
 }
 
+/**
+ * Returns the element of the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post
+ * @returns The element of the post
+ */
+function getPost(postId) {
+	return $("#sone .post#" + postId);
+}
+
 function getPostElement(element) {
 	return $(element).closest(".post");
 }
