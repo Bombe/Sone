@@ -133,9 +133,6 @@ public class SoneDownloader extends AbstractService {
 	 *            The URI to fetch the Sone from
 	 */
 	public void fetchSone(Sone sone, FreenetURI soneUri) {
-		if (core.getSoneStatus(sone) == SoneStatus.downloading) {
-			return;
-		}
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		core.setSoneStatus(sone, SoneStatus.downloading);
