@@ -42,7 +42,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	private static final Logger logger = Logging.getLogger(WebOfTrustConnector.class);
 
 	/** The name of the WoT plugin. */
-	private static final String WOT_PLUGIN_NAME = "plugins.WoT.WoT";
+	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";
 
 	/** A random connection identifier. */
 	private static final String PLUGIN_CONNECTION_IDENTIFIER = "Sone-WoT-Connector-" + Math.abs(Math.random());
