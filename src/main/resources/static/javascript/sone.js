@@ -702,6 +702,15 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* convert “show source” link into javascript function. */
+	$(postElement).find(".show-source").each(function() {
+		$("a", this).click(function() {
+			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.raw-text", getPostElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
@@ -761,6 +770,15 @@ function ajaxifyReply(replyElement) {
 		});
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+
+	/* convert “show source” link into javascript function. */
+	$(replyElement).find(".show-reply-source").each(function() {
+		$("a", this).click(function() {
+			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.raw-text", getReplyElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
 
 	/* convert trust control buttons to javascript functions. */
 	$(replyElement).find(".reply-trust").submit(function() {

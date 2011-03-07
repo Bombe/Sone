@@ -239,9 +239,13 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .text {
+#sone .post .text, #sone .post .raw-text {
 	display: inline;
 	white-space: pre-wrap;
+}
+
+#sone .post .text.hidden, #sone .post .raw-text.hidden {
+	display: none;
 }
 
 #sone .post .status-line {
@@ -252,6 +256,10 @@ textarea {
 #sone .separator {
 	font: inherit;
 	color: rgb(28, 131, 191);
+}
+
+#sone .show-source, #sone .show-reply-source {
+	display: inline;
 }
 
 #sone .post .bookmarks {

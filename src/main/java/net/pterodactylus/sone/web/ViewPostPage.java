@@ -52,8 +52,10 @@ public class ViewPostPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String postId = request.getHttpRequest().getParam("post");
+		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
 		Post post = webInterface.getCore().getPost(postId);
 		templateContext.set("post", post);
+		templateContext.set("raw", raw);
 	}
 
 	/**
