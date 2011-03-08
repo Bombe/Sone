@@ -93,10 +93,10 @@ public class SoneDownloader extends AbstractService {
 	 *            The Sone to add
 	 */
 	public void addSone(Sone sone) {
-		if (sones.add(sone)) {
+		if (!sones.add(sone)) {
 			freenetInterface.unregisterUsk(sone);
-			freenetInterface.registerUsk(sone, this);
 		}
+		freenetInterface.registerUsk(sone, this);
 	}
 
 	/**
