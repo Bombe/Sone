@@ -1,5 +1,5 @@
 /*
- * Sone - ViewPostPage.java - Copyright © 2010 David Roden
+ * Sone - BookmarkPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,29 @@
 
 package net.pterodactylus.sone.web;
 
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
 /**
- * This page lets the user view a post and all its replies.
+ * Page that lets the user bookmark a post.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ViewPostPage extends SoneTemplatePage {
+public class BookmarkPage extends SoneTemplatePage {
 
 	/**
-	 * Creates a new “view post” page.
-	 *
 	 * @param template
 	 *            The template to render
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public ViewPostPage(Template template, WebInterface webInterface) {
-		super("viewPost.html", template, "Page.ViewPost.Title", webInterface, false);
+	public BookmarkPage(Template template, WebInterface webInterface) {
+		super("bookmark.html", template, "Page.Bookmark.Title", webInterface);
 	}
 
 	//
-	// TEMPLATEPAGE METHODS
+	// SONETEMPLATEPAGE METHODS
 	//
 
 	/**
@@ -51,25 +48,11 @@ public class ViewPostPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		String postId = request.getHttpRequest().getParam("post");
-		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
-		Post post = webInterface.getCore().getPost(postId);
-		templateContext.set("post", post);
-		templateContext.set("raw", raw);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		Post post = (Post) templateContext.get("post");
-		if (post == null) {
-			return;
-		}
-		webInterface.getCore().markPostKnown(post);
-		for (Reply reply : webInterface.getCore().getReplies(post)) {
-			webInterface.getCore().markReplyKnown(reply);
+		if (request.getMethod() == Method.POST) {
+			String id = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
+			webInterface.getCore().bookmarkPost(id);
+			throw new RedirectException(returnPage);
 		}
 	}
 

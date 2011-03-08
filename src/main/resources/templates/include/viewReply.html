@@ -1,5 +1,5 @@
-<a name="reply-<% reply.id|html>"></a>
 <div id="<% reply.id|html>" class="reply<%if reply.new> new<%/if>">
+	<a name="reply-<% reply.id|html>"></a>
 	<div class="reply-time hidden"><% reply.time|html></div>
 	<div class="reply-author hidden"><% reply.sone.id|html></div>
 	<div class="avatar">
@@ -8,10 +8,13 @@
 	<div class="inner-part">
 		<div>
 			<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id|html>"><% reply.sone.niceName|html></a></div>
-			<div class="text"><% reply.text|parse sone=reply.sone></div>
+			<div class="reply-text raw-text<%if !raw> hidden<%/if>"><% reply.text|html></div>
+			<div class="reply-text text<%if raw> hidden<%/if>"><% reply.text|parse sone=reply.sone></div>
 		</div>
 		<div class="reply-status-line status-line">
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+			<span class='separator'>·</span>
+			<div class="show-reply-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
 			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>">
 				<span class='separator'>·</span>
 				<span title="<% reply.likes.soneNames|html>">↑<span class="like-count"><% reply.likes.size></span></span>

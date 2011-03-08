@@ -1,5 +1,5 @@
-<a name="post-<% post.id|html>"></a>
 <div id="<% post.id|html>" class="post<%if loop.last> last<%/if><%if post.new> new<%/if>">
+	<a name="post-<% post.id|html>"></a>
 	<div class="post-time hidden"><% post.time|html></div>
 	<div class="post-author hidden"><% post.sone.id|html></div>
 	<div class="avatar">
@@ -16,10 +16,28 @@
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
 				<%/if>
 			<%/if>
-			<div class="text"><% post.text|parse sone=post.sone></div>
+			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% post.text|html></div>
+			<div class="post-text text<%if raw> hidden<%/if>"><% post.text|parse sone=post.sone></div>
 		</div>
 		<div class="post-status-line status-line">
+			<div class="bookmarks">
+				<form class="unbookmark<%if !post.bookmarked> hidden<%/if>" action="unbookmark.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="post" value="<% post.id|html>" />
+					<button type="submit" title="<%= View.Post.Bookmarks.PostIsBookmarked|l10n|html>">★</button>
+				</form>
+				<form class="bookmark<%if post.bookmarked> hidden<%/if>" action="bookmark.html" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="post" value="<% post.id|html>" />
+					<button type="submit" title="<%= View.Post.Bookmarks.PostIsNotBookmarked|l10n|html>">☆</button>
+				</form>
+			</div>
+			<span class='separator'>·</span>
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
+			<span class='separator'>·</span>
+			<div class="show-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
 			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>">
 				<span class='separator'>·</span>
 				<span title="<% post.likes.soneNames|html>">↑<span class="like-count"><% post.likes.size></span></span>
@@ -84,7 +102,7 @@
 						<input type="hidden" name="post" value="<% post.id|html>" />
 						<div class="sender">
 							<select name="sender" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">
-								<%foreach localSones localSone>
+								<%foreach localSones localSone|sort>
 									<option value="<% localSone.id|html>"<%if localSone.current> selected="selected"<%/if>><% localSone.niceName|html></option>
 								<%/foreach>
 							</select>

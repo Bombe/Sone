@@ -97,6 +97,7 @@ public class GetPostAjaxPage extends JsonPage {
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
 		templateContext.set("post", post);
 		templateContext.set("currentSone", currentSone);
+		templateContext.set("localSones", webInterface.getCore().getLocalSones());
 		try {
 			postTemplate.render(templateContext, stringWriter);
 		} catch (TemplateException te1) {

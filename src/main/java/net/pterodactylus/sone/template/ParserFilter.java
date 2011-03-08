@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Map;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.FreenetLinkParser;
 import net.pterodactylus.sone.text.FreenetLinkParserContext;
@@ -35,6 +36,9 @@ import net.pterodactylus.util.template.TemplateContextFactory;
  */
 public class ParserFilter implements Filter {
 
+	/** The core. */
+	private final Core core;
+
 	/** The link parser. */
 	private final FreenetLinkParser linkParser;
 
@@ -42,10 +46,13 @@ public class ParserFilter implements Filter {
 	 * Creates a new filter that runs its input through a
 	 * {@link FreenetLinkParser}.
 	 *
+	 * @param core
+	 *            The core
 	 * @param templateContextFactory
 	 *            The context factory for rendering the parts
 	 */
-	public ParserFilter(TemplateContextFactory templateContextFactory) {
+	public ParserFilter(Core core, TemplateContextFactory templateContextFactory) {
+		this.core = core;
 		linkParser = new FreenetLinkParser(templateContextFactory);
 	}
 
@@ -60,6 +67,9 @@ public class ParserFilter implements Filter {
 			soneKey = "sone";
 		}
 		Sone sone = (Sone) templateContext.get(soneKey);
+		if (sone == null) {
+			sone = core.getSone(soneKey, false);
+		}
 		FreenetLinkParserContext context = new FreenetLinkParserContext(sone);
 		try {
 			return linkParser.parse(context, new StringReader(text));

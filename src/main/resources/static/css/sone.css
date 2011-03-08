@@ -164,7 +164,7 @@ textarea {
 	margin-bottom: 1em;
 }
 
-#sone #update-status label {
+#sone #update-status label, #sone #post-message label {
 	display: none;
 }
 
@@ -180,11 +180,11 @@ textarea {
 	float: right;
 }
 
-#sone #update-status .select-sender, #sone .create-reply .select-sender {
+#sone #update-status .select-sender, #sone .create-reply .select-sender, #sone #post-message .select-sender {
 	display: none;
 }
 
-#sone #update-status .select-sender button {
+#sone #update-status .select-sender button, #sone #post-message .select-sender button {
 	display: inline;
 	float: left;
 }
@@ -239,9 +239,13 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .text {
+#sone .post .text, #sone .post .raw-text {
 	display: inline;
 	white-space: pre-wrap;
+}
+
+#sone .post .text.hidden, #sone .post .raw-text.hidden {
+	display: none;
 }
 
 #sone .post .status-line {
@@ -252,6 +256,21 @@ textarea {
 #sone .separator {
 	font: inherit;
 	color: rgb(28, 131, 191);
+}
+
+#sone .show-source, #sone .show-reply-source {
+	display: inline;
+}
+
+#sone .post .bookmarks {
+	display: inline;
+	color: rgb(28, 131, 191);
+}
+
+#sone .post .bookmark, #sone .post .unbookmark {
+	display: inline;
+	font: inherit;
+	margin: 0px;
 }
 
 #sone .post .time {
@@ -269,11 +288,11 @@ textarea {
 	display: none;
 }
 
-#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden {
+#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden, #sone .post .bookmark.hidden, #sone .post .unbookmark.hidden {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button, #sone .post .bookmark button, #sone .post .unbookmark button {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -299,7 +318,7 @@ textarea {
 	color: rgb(64, 64, 64);
 }
 
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover {
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover, #sone .post .bookmark button:hover, #sone .post .unbookmark button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -392,7 +411,7 @@ textarea {
 	float: right;
 }
 
-#sone .create-reply .select-sender button {
+#sone .create-reply .select-sender button, #sone #post-message .select-sender button {
 	display: inline;
 	float: left;
 }

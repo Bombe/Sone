@@ -40,7 +40,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Sone implements Fingerprintable {
+public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/** comparator that sorts Sones by their nice name. */
 	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
@@ -623,6 +623,18 @@ public class Sone implements Fingerprintable {
 		fingerprint.append(')');
 
 		return fingerprint.toString();
+	}
+
+	//
+	// INTERFACE Comparable<Sone>
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int compareTo(Sone sone) {
+		return NICE_NAME_COMPARATOR.compare(this, sone);
 	}
 
 	//

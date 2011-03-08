@@ -1,5 +1,5 @@
 /*
- * Sone - ViewPostPage.java - Copyright © 2010 David Roden
+ * Sone - BookmarksPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,32 +17,38 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
 /**
- * This page lets the user view a post and all its replies.
+ * Page that lets the user browse all his bookmarked posts.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ViewPostPage extends SoneTemplatePage {
+public class BookmarksPage extends SoneTemplatePage {
 
 	/**
-	 * Creates a new “view post” page.
+	 * Creates a new bookmarks page.
 	 *
 	 * @param template
 	 *            The template to render
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public ViewPostPage(Template template, WebInterface webInterface) {
-		super("viewPost.html", template, "Page.ViewPost.Title", webInterface, false);
+	public BookmarksPage(Template template, WebInterface webInterface) {
+		super("bookmarks.html", template, "Page.Bookmarks.Title", webInterface);
 	}
 
 	//
-	// TEMPLATEPAGE METHODS
+	// SONETEMPLATEPAGE METHODS
 	//
 
 	/**
@@ -51,26 +57,12 @@ public class ViewPostPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		String postId = request.getHttpRequest().getParam("post");
-		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
-		Post post = webInterface.getCore().getPost(postId);
-		templateContext.set("post", post);
-		templateContext.set("raw", raw);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		Post post = (Post) templateContext.get("post");
-		if (post == null) {
-			return;
-		}
-		webInterface.getCore().markPostKnown(post);
-		for (Reply reply : webInterface.getCore().getReplies(post)) {
-			webInterface.getCore().markReplyKnown(reply);
-		}
+		Set<Post> posts = webInterface.getCore().getBookmarkedPosts();
+		List<Post> sortedPosts = new ArrayList<Post>(posts);
+		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		templateContext.set("pagination", pagination);
+		templateContext.set("posts", pagination.getItems());
 	}
 
 }

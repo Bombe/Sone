@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
@@ -93,6 +94,7 @@ public class SoneDownloader extends AbstractService {
 	 */
 	public void addSone(Sone sone) {
 		if (sones.add(sone)) {
+			freenetInterface.unregisterUsk(sone);
 			freenetInterface.registerUsk(sone, this);
 		}
 	}
@@ -122,8 +124,8 @@ public class SoneDownloader extends AbstractService {
 
 	/**
 	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
-	 * specific URI (which happens when {@link Core#isSoneRescueMode() „Sone
-	 * rescue mode“} is active).
+	 * specific URI (which happens when {@link Preferences#isSoneRescueMode()
+	 * „Sone rescue mode“} is active).
 	 *
 	 * @param sone
 	 *            The Sone to fetch
@@ -131,9 +133,6 @@ public class SoneDownloader extends AbstractService {
 	 *            The URI to fetch the Sone from
 	 */
 	public void fetchSone(Sone sone, FreenetURI soneUri) {
-		if (core.getSoneStatus(sone) == SoneStatus.downloading) {
-			return;
-		}
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		core.setSoneStatus(sone, SoneStatus.downloading);
@@ -146,6 +145,7 @@ public class SoneDownloader extends AbstractService {
 			logger.log(Level.FINEST, "Got %d bytes back.", fetchResults.getRight().size());
 			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
 			if (parsedSone != null) {
+				addSone(parsedSone);
 				core.updateSone(parsedSone);
 			}
 		} finally {
