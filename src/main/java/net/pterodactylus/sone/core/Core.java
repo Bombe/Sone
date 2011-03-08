@@ -85,6 +85,9 @@ public class Core implements IdentityListener, UpdateListener {
 	/** The options. */
 	private final Options options = new Options();
 
+	/** The preferences. */
+	private final Preferences preferences = new Preferences(options);
+
 	/** The core listener manager. */
 	private final CoreListenerManager coreListenerManager = new CoreListenerManager(this);
 
@@ -155,6 +158,10 @@ public class Core implements IdentityListener, UpdateListener {
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
 
+	/** All bookmarked posts. */
+	/* synchronize access on itself. */
+	private Set<String> bookmarkedPosts = new HashSet<String>();
+
 	/** Trusted identities, sorted by own identities. */
 	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
 
@@ -221,18 +228,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 *
 	 * @return The options of the core
 	 */
-	public Options getOptions() {
-		return options;
-	}
-
-	/**
-	 * Returns whether the “Sone rescue mode” is currently activated.
-	 *
-	 * @return {@code true} if the “Sone rescue mode” is currently activated,
-	 *         {@code false} if it is not
-	 */
-	public boolean isSoneRescueMode() {
-		return options.getBooleanOption("SoneRescueMode").get();
+	public Preferences getPreferences() {
+		return preferences;
 	}
 
 	/**
@@ -681,6 +678,50 @@ public class Core implements IdentityListener, UpdateListener {
 		return sones;
 	}
 
+	/**
+	 * Returns whether the given post is bookmarked.
+	 *
+	 * @param post
+	 *            The post to check
+	 * @return {@code true} if the given post is bookmarked, {@code false}
+	 *         otherwise
+	 */
+	public boolean isBookmarked(Post post) {
+		return isPostBookmarked(post.getId());
+	}
+
+	/**
+	 * Returns whether the post with the given ID is bookmarked.
+	 *
+	 * @param id
+	 *            The ID of the post to check
+	 * @return {@code true} if the post with the given ID is bookmarked,
+	 *         {@code false} otherwise
+	 */
+	public boolean isPostBookmarked(String id) {
+		synchronized (bookmarkedPosts) {
+			return bookmarkedPosts.contains(id);
+		}
+	}
+
+	/**
+	 * Returns all currently known bookmarked posts.
+	 *
+	 * @return All bookmarked posts
+	 */
+	public Set<Post> getBookmarkedPosts() {
+		Set<Post> posts = new HashSet<Post>();
+		synchronized (bookmarkedPosts) {
+			for (String bookmarkedPostId : bookmarkedPosts) {
+				Post post = getPost(bookmarkedPostId, false);
+				if (post != null) {
+					posts.add(post);
+				}
+			}
+		}
+		return posts;
+	}
+
 	//
 	// ACTIONS
 	//
@@ -767,7 +808,7 @@ public class Core implements IdentityListener, UpdateListener {
 			soneInserters.put(sone, soneInserter);
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
-			if (!isSoneRescueMode()) {
+			if (!preferences.isSoneRescueMode()) {
 				soneInserter.start();
 			}
 			new Thread(new Runnable() {
@@ -775,7 +816,7 @@ public class Core implements IdentityListener, UpdateListener {
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void run() {
-					if (!isSoneRescueMode()) {
+					if (!preferences.isSoneRescueMode()) {
 						soneDownloader.fetchSone(sone);
 						return;
 					}
@@ -783,7 +824,7 @@ public class Core implements IdentityListener, UpdateListener {
 					coreListenerManager.fireRescuingSone(sone);
 					lockSone(sone);
 					long edition = sone.getLatestEdition();
-					while (!stopped && (edition >= 0) && isSoneRescueMode()) {
+					while (!stopped && (edition >= 0) && preferences.isSoneRescueMode()) {
 						logger.log(Level.FINE, "Downloading edition " + edition + "…");
 						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
 						--edition;
@@ -893,7 +934,7 @@ public class Core implements IdentityListener, UpdateListener {
 	public void setTrust(Sone origin, Sone target, int trustValue) {
 		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
 		try {
-			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, options.getStringOption("TrustComment").get());
+			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, preferences.getTrustComment());
 		} catch (WebOfTrustException wote1) {
 			logger.log(Level.WARNING, "Could not set trust for Sone: " + target, wote1);
 		}
@@ -925,7 +966,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 *            The trust target
 	 */
 	public void trustSone(Sone origin, Sone target) {
-		setTrust(origin, target, options.getIntegerOption("PositiveTrust").get());
+		setTrust(origin, target, preferences.getPositiveTrust());
 	}
 
 	/**
@@ -937,7 +978,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 *            The trust target
 	 */
 	public void distrustSone(Sone origin, Sone target) {
-		setTrust(origin, target, options.getIntegerOption("NegativeTrust").get());
+		setTrust(origin, target, preferences.getNegativeTrust());
 	}
 
 	/**
@@ -960,7 +1001,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 */
 	public void updateSone(Sone sone) {
 		if (hasSone(sone.getId())) {
-			boolean soneRescueMode = isLocalSone(sone) && isSoneRescueMode();
+			boolean soneRescueMode = isLocalSone(sone) && preferences.isSoneRescueMode();
 			Sone storedSone = getSone(sone.getId());
 			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
@@ -1439,6 +1480,50 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Bookmarks the given post.
+	 *
+	 * @param post
+	 *            The post to bookmark
+	 */
+	public void bookmark(Post post) {
+		bookmarkPost(post.getId());
+	}
+
+	/**
+	 * Bookmarks the post with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the post to bookmark
+	 */
+	public void bookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.add(id);
+		}
+	}
+
+	/**
+	 * Removes the given post from the bookmarks.
+	 *
+	 * @param post
+	 *            The post to unbookmark
+	 */
+	public void unbookmark(Post post) {
+		unbookmarkPost(post.getId());
+	}
+
+	/**
+	 * Removes the post with the given ID from the bookmarks.
+	 *
+	 * @param id
+	 *            The ID of the post to unbookmark
+	 */
+	public void unbookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.remove(id);
+		}
+	}
+
+	/**
 	 * Creates a new reply.
 	 *
 	 * @param sone
@@ -1594,6 +1679,15 @@ public class Core implements IdentityListener, UpdateListener {
 				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
 			}
 
+			/* save bookmarked posts. */
+			int bookmarkedPostCounter = 0;
+			synchronized (bookmarkedPosts) {
+				for (String bookmarkedPostId : bookmarkedPosts) {
+					configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(bookmarkedPostId);
+				}
+			}
+			configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(null);
+
 			/* now save it. */
 			configuration.save();
 
@@ -1684,6 +1778,18 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 
+		/* load bookmarked posts. */
+		int bookmarkedPostCounter = 0;
+		while (true) {
+			String bookmarkedPostId = configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").getValue(null);
+			if (bookmarkedPostId == null) {
+				break;
+			}
+			synchronized (bookmarkedPosts) {
+				bookmarkedPosts.add(bookmarkedPostId);
+			}
+		}
+
 	}
 
 	/**
@@ -1750,6 +1856,7 @@ public class Core implements IdentityListener, UpdateListener {
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
 				sone.setIdentity(identity);
+				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
 		}).start();
@@ -1773,6 +1880,193 @@ public class Core implements IdentityListener, UpdateListener {
 	@Override
 	public void updateFound(Version version, long releaseTime, long latestEdition) {
 		coreListenerManager.fireUpdateFound(version, releaseTime, latestEdition);
+	}
+
+	/**
+	 * Convenience interface for external classes that want to access the core’s
+	 * configuration.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class Preferences {
+
+		/** The wrapped options. */
+		private final Options options;
+
+		/**
+		 * Creates a new preferences object wrapped around the given options.
+		 *
+		 * @param options
+		 *            The options to wrap
+		 */
+		public Preferences(Options options) {
+			this.options = options;
+		}
+
+		/**
+		 * Returns the insertion delay.
+		 *
+		 * @return The insertion delay
+		 */
+		public int getInsertionDelay() {
+			return options.getIntegerOption("InsertionDelay").get();
+		}
+
+		/**
+		 * Sets the insertion delay
+		 *
+		 * @param insertionDelay
+		 *            The new insertion delay, or {@code null} to restore it to
+		 *            the default value
+		 * @return This preferences
+		 */
+		public Preferences setInsertionDelay(Integer insertionDelay) {
+			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			return this;
+		}
+
+		/**
+		 * Returns the positive trust.
+		 *
+		 * @return The positive trust
+		 */
+		public int getPositiveTrust() {
+			return options.getIntegerOption("PositiveTrust").get();
+		}
+
+		/**
+		 * Sets the positive trust.
+		 *
+		 * @param positiveTrust
+		 *            The new positive trust, or {@code null} to restore it to
+		 *            the default vlaue
+		 * @return This preferences
+		 */
+		public Preferences setPositiveTrust(Integer positiveTrust) {
+			options.getIntegerOption("PositiveTrust").set(positiveTrust);
+			return this;
+		}
+
+		/**
+		 * Returns the negative trust.
+		 *
+		 * @return The negative trust
+		 */
+		public int getNegativeTrust() {
+			return options.getIntegerOption("NegativeTrust").get();
+		}
+
+		/**
+		 * Sets the negative trust.
+		 *
+		 * @param negativeTrust
+		 *            The negative trust, or {@code null} to restore it to the
+		 *            default value
+		 * @return The preferences
+		 */
+		public Preferences setNegativeTrust(Integer negativeTrust) {
+			options.getIntegerOption("NegativeTrust").set(negativeTrust);
+			return this;
+		}
+
+		/**
+		 * Returns the trust comment. This is the comment that is set in the web
+		 * of trust when a trust value is assigned to an identity.
+		 *
+		 * @return The trust comment
+		 */
+		public String getTrustComment() {
+			return options.getStringOption("TrustComment").get();
+		}
+
+		/**
+		 * Sets the trust comment.
+		 *
+		 * @param trustComment
+		 *            The trust comment, or {@code null} to restore it to the
+		 *            default value
+		 * @return This preferences
+		 */
+		public Preferences setTrustComment(String trustComment) {
+			options.getStringOption("TrustComment").set(trustComment);
+			return this;
+		}
+
+		/**
+		 * Returns whether the rescue mode is active.
+		 *
+		 * @return {@code true} if the rescue mode is active, {@code false}
+		 *         otherwise
+		 */
+		public boolean isSoneRescueMode() {
+			return options.getBooleanOption("SoneRescueMode").get();
+		}
+
+		/**
+		 * Sets whether the rescue mode is active.
+		 *
+		 * @param soneRescueMode
+		 *            {@code true} if the rescue mode is active, {@code false}
+		 *            otherwise
+		 * @return This preferences
+		 */
+		public Preferences setSoneRescueMode(Boolean soneRescueMode) {
+			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
+			return this;
+		}
+
+		/**
+		 * Returns whether Sone should clear its settings on the next restart.
+		 * In order to be effective, {@link #isReallyClearOnNextRestart()} needs
+		 * to return {@code true} as well!
+		 *
+		 * @return {@code true} if Sone should clear its settings on the next
+		 *         restart, {@code false} otherwise
+		 */
+		public boolean isClearOnNextRestart() {
+			return options.getBooleanOption("ClearOnNextRestart").get();
+		}
+
+		/**
+		 * Sets whether Sone will clear its settings on the next restart.
+		 *
+		 * @param clearOnNextRestart
+		 *            {@code true} if Sone should clear its settings on the next
+		 *            restart, {@code false} otherwise
+		 * @return This preferences
+		 */
+		public Preferences setClearOnNextRestart(Boolean clearOnNextRestart) {
+			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
+			return this;
+		}
+
+		/**
+		 * Returns whether Sone should really clear its settings on next
+		 * restart. This is a confirmation option that needs to be set in
+		 * addition to {@link #isClearOnNextRestart()} in order to clear Sone’s
+		 * settings on the next restart.
+		 *
+		 * @return {@code true} if Sone should really clear its settings on the
+		 *         next restart, {@code false} otherwise
+		 */
+		public boolean isReallyClearOnNextRestart() {
+			return options.getBooleanOption("ReallyClearOnNextRestart").get();
+		}
+
+		/**
+		 * Sets whether Sone should really clear its settings on the next
+		 * restart.
+		 *
+		 * @param reallyClearOnNextRestart
+		 *            {@code true} if Sone should really clear its settings on
+		 *            the next restart, {@code false} otherwise
+		 * @return This preferences
+		 */
+		public Preferences setReallyClearOnNextRestart(Boolean reallyClearOnNextRestart) {
+			options.getBooleanOption("ReallyClearOnNextRestart").set(reallyClearOnNextRestart);
+			return this;
+		}
+
 	}
 
 }

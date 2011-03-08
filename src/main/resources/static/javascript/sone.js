@@ -297,6 +297,17 @@ function getSoneId(element) {
 	return getSoneElement(element).find(".id").text();
 }
 
+/**
+ * Returns the element of the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post
+ * @returns The element of the post
+ */
+function getPost(postId) {
+	return $("#sone .post#" + postId);
+}
+
 function getPostElement(element) {
 	return $(element).closest(".post");
 }
@@ -475,6 +486,38 @@ function updateTrustControls(soneId, trustValue) {
 	});
 }
 
+/**
+ * Bookmarks the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to bookmark
+ */
+function bookmarkPost(postId) {
+	(function(postId) {
+		$.getJSON("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+			if ((data != null) && data.success) {
+				getPost(postId).find(".bookmark").toggleClass("hidden", true);
+				getPost(postId).find(".unbookmark").toggleClass("hidden", false);
+			}
+		});
+	})(postId);
+}
+
+/**
+ * Unbookmarks the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to unbookmark
+ */
+function unbookmarkPost(postId) {
+	$.getJSON("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			getPost(postId).find(".bookmark").toggleClass("hidden", false);
+			getPost(postId).find(".unbookmark").toggleClass("hidden", true);
+		}
+	});
+}
+
 function updateReplyLikes(replyId) {
 	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
@@ -649,6 +692,25 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
+	/* convert bookmark/unbookmark buttons to javascript functions. */
+	$(postElement).find(".bookmark").submit(function() {
+		bookmarkPost(getPostId(this));
+		return false;
+	});
+	$(postElement).find(".unbookmark").submit(function() {
+		unbookmarkPost(getPostId(this));
+		return false;
+	});
+
+	/* convert “show source” link into javascript function. */
+	$(postElement).find(".show-source").each(function() {
+		$("a", this).click(function() {
+			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.raw-text", getPostElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
@@ -709,6 +771,15 @@ function ajaxifyReply(replyElement) {
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
 
+	/* convert “show source” link into javascript function. */
+	$(replyElement).find(".show-reply-source").each(function() {
+		$("a", this).click(function() {
+			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.raw-text", getReplyElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+
 	/* convert trust control buttons to javascript functions. */
 	$(replyElement).find(".reply-trust").submit(function() {
 		trustSone(getReplyAuthor(this));
@@ -741,6 +812,15 @@ function ajaxifyNotification(notification) {
 	}
 	notification.find("form.mark-as-read button").click(function() {
 		$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
+	});
+	notification.find("a[class^='link-']").each(function() {
+		linkElement = $(this);
+		if (linkElement.is("[href^='viewPost']")) {
+			id = linkElement.attr("class").substr(5);
+			if (hasPost(id)) {
+				linkElement.attr("href", "#post-" + id);
+			}
+		}
 	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
@@ -1026,7 +1106,7 @@ function markReplyAsKnown(replyElements) {
 function resetActivity() {
 	title = document.title;
 	if (title.indexOf('(') == 0) {
-		document.title = title.substr(title.indexOf(' ') + 1);
+		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
 }
 
@@ -1034,9 +1114,62 @@ function setActivity() {
 	if (!focus) {
 		title = document.title;
 		if (title.indexOf('(') != 0) {
-			document.title = "(!) " + title;
+			setTitle("(!) " + title);
+		}
+		if (!iconBlinking) {
+			setTimeout(toggleIcon, 1500);
+			iconBlinking = true;
 		}
 	}
+}
+
+/**
+ * Sets the window title after a small delay to prevent race-condition issues.
+ *
+ * @param title
+ *            The title to set
+ */
+function setTitle(title) {
+	setTimeout(function() {
+		document.title = title;
+	}, 50);
+}
+
+/** Whether the icon is currently showing activity. */
+var iconActive = false;
+
+/** Whether the icon is currently supposed to blink. */
+var iconBlinking = false;
+
+/**
+ * Toggles the icon. If the window has gained focus and the icon is still
+ * showing the activity state, it is returned to normal.
+ */
+function toggleIcon() {
+	if (focus) {
+		if (iconActive) {
+			changeIcon("images/icon.png");
+			iconActive = false;
+		}
+		iconBlinking = false;
+	} else {
+		iconActive = !iconActive;
+		console.log("showing icon: " + iconActive);
+		changeIcon(iconActive ? "images/icon-activity.png" : "images/icon.png");
+		setTimeout(toggleIcon, 1500);
+	}
+}
+
+/**
+ * Changes the icon of the page.
+ *
+ * @param iconUrl
+ *            The new URL of the icon
+ */
+function changeIcon(iconUrl) {
+	$("link[rel=icon]").remove();
+	$("head").append($("<link>").attr("rel", "icon").attr("type", "image/png").attr("href", iconUrl));
+	$("iframe[id=icon-update]")[0].src += "";
 }
 
 /**
@@ -1186,14 +1319,25 @@ $(document).ready(function() {
 	/* ajaxify input field on “view Sone” page. */
 	getTranslation("WebInterface.DefaultText.Message", function(defaultText) {
 		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
+		$("#sone #post-message .select-sender").css("display", "inline");
+		$("#sone #post-message .sender").hide();
+		$("#sone #post-message .select-sender button").click(function() {
+			$("#sone #post-message .sender").show();
+			$("#sone #post-message .select-sender").hide();
+			return false;
+		});
 		$("#sone #post-message").submit(function() {
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
 					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});

@@ -1,0 +1,27 @@
+<%include include/head.html>
+
+	<div class="page-id hidden">bookmarks</div>
+
+	<h1><%= Page.Bookmarks.Page.Title|l10n|html></h1>
+
+	<div id="posts">
+		<%include include/pagination.html>
+		<%foreach posts post>
+			<%if post.loaded>
+				<%= true|store key=postShown>
+				<%include include/viewPost.html>
+			<%else>
+				<%= true|store key=postNotLoaded>
+			<%/if>
+		<%/foreach>
+		<%if postNotLoaded>
+			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html></p>
+		<%else>
+			<%if !postShown>
+				<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
+			<%/if>
+		<%/if>
+		<%include include/pagination.html>
+	</div>
+
+<%include include/tail.html>
