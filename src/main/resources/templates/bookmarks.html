@@ -8,10 +8,10 @@
 		<%include include/pagination.html>
 		<%foreach posts post>
 			<%if post.loaded>
-				<%= true|store key=postShown>
+				<%= true|store key=postShown parent=true>
 				<%include include/viewPost.html>
 			<%else>
-				<%= true|store key=postNotLoaded>
+				<%= true|store key=postNotLoaded parent=true>
 			<%/if>
 		<%/foreach>
 		<%if postNotLoaded>
