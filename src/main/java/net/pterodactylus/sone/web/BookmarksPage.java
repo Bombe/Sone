@@ -24,6 +24,8 @@ import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -57,12 +59,20 @@ public class BookmarksPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		Set<Post> posts = webInterface.getCore().getBookmarkedPosts();
-		List<Post> sortedPosts = new ArrayList<Post>(posts);
+		Set<Post> allPosts = webInterface.getCore().getBookmarkedPosts();
+		Set<Post> loadedPosts = Filters.filteredSet(allPosts, new Filter<Post>() {
+
+			@Override
+			public boolean filterObject(Post post) {
+				return post.getSone() != null;
+			}
+		});
+		List<Post> sortedPosts = new ArrayList<Post>(loadedPosts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
+		templateContext.set("postsNotLoaded", allPosts.size() != loadedPosts.size());
 	}
 
 }
