@@ -14,6 +14,7 @@
 				<%= true|store key=postNotLoaded parent=true>
 			<%/if>
 		<%/foreach>
+		<%include include/pagination.html>
 		<%if postNotLoaded>
 			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html></p>
 		<%else>
@@ -21,7 +22,6 @@
 				<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
 			<%/if>
 		<%/if>
-		<%include include/pagination.html>
 	</div>
 
 <%include include/tail.html>
