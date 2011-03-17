@@ -7,21 +7,14 @@
 	<div id="posts">
 		<%include include/pagination.html>
 		<%foreach posts post>
-			<%if post.loaded>
-				<%= true|store key=postShown>
-				<%include include/viewPost.html>
-			<%else>
-				<%= true|store key=postNotLoaded>
-			<%/if>
+			<%include include/viewPost.html>
 		<%/foreach>
-		<%if postNotLoaded>
-			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html></p>
-		<%else>
-			<%if !postShown>
-				<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
-			<%/if>
-		<%/if>
 		<%include include/pagination.html>
+		<%if postsNotLoaded>
+			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html|replace needle='{link}' replacement='<a href="unbookmark.html?post=allNotLoaded">'|replace needle='{/link}' replacement='</a>'></p>
+		<%elseif posts.empty>
+			<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
+		<%/if>
 	</div>
 
 <%include include/tail.html>

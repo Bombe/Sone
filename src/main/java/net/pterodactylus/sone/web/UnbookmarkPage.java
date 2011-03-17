@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.Set;
+
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -53,6 +56,16 @@ public class UnbookmarkPage extends SoneTemplatePage {
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			webInterface.getCore().unbookmarkPost(id);
 			throw new RedirectException(returnPage);
+		}
+		String id = request.getHttpRequest().getParam("post");
+		if (id.equals("allNotLoaded")) {
+			Set<Post> posts = webInterface.getCore().getBookmarkedPosts();
+			for (Post post : posts) {
+				if (post.getSone() == null) {
+					webInterface.getCore().unbookmark(post);
+				}
+			}
+			throw new RedirectException("bookmarks.html");
 		}
 	}
 
