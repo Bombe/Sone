@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -28,6 +30,7 @@ import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
+import freenet.support.api.HTTPRequest;
 
 /**
  * Base page for the Freetalk web interface.
@@ -204,7 +207,26 @@ public class SoneTemplatePage extends TemplatePage {
 	@Override
 	protected String getRedirectTarget(Page.Request request) {
 		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
-			return "login.html?target=" + request.getHttpRequest().getPath();
+			HTTPRequest httpRequest = request.getHttpRequest();
+			String originalUrl = httpRequest.getPath();
+			if (httpRequest.hasParameters()) {
+				StringBuilder requestParameters = new StringBuilder();
+				for (String parameterName : httpRequest.getParameterNames()) {
+					if (requestParameters.length() > 0) {
+						requestParameters.append('&');
+					}
+					String[] parameterValues = httpRequest.getMultipleParam(parameterName);
+					for (String parameterValue : parameterValues) {
+						try {
+							requestParameters.append(URLEncoder.encode(parameterName, "UTF-8")).append('=').append(URLEncoder.encode(parameterValue, "UTF-8"));
+						} catch (UnsupportedEncodingException uee1) {
+							/* A JVM without UTF-8? I don’t think so. */
+						}
+					}
+				}
+				originalUrl += "?" + requestParameters.toString();
+			}
+			return "login.html?target=" + originalUrl;
 		}
 		return null;
 	}
