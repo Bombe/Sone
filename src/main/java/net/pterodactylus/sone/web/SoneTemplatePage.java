@@ -204,7 +204,7 @@ public class SoneTemplatePage extends TemplatePage {
 	@Override
 	protected String getRedirectTarget(Page.Request request) {
 		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
-			return "login.html";
+			return "login.html?target=" + request.getHttpRequest().getPath();
 		}
 		return null;
 	}
