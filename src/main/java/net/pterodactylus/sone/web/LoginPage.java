@@ -72,7 +72,11 @@ public class LoginPage extends SoneTemplatePage {
 			Sone selectedSone = webInterface.getCore().getLocalSone(soneId, false);
 			if (selectedSone != null) {
 				setCurrentSone(request.getToadletContext(), selectedSone);
-				throw new RedirectException("index.html");
+				String target = request.getHttpRequest().getParam("target");
+				if ((target == null) || (target.length() == 0)) {
+					target = "index.html";
+				}
+				throw new RedirectException(target);
 			}
 		}
 		List<OwnIdentity> ownIdentitiesWithoutSone = CreateSonePage.getOwnIdentitiesWithoutSone(webInterface.getCore());
