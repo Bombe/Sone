@@ -1,5 +1,5 @@
 /*
- * Sone - MarkPostAsKnownPage.java - Copyright © 2010 David Roden
+ * Sone - BookmarkAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,39 +17,49 @@
 
 package net.pterodactylus.sone.web.ajax;
 
-import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
- * AJAX handler that marks a {@link Post} as known.
+ * AJAX page that lets the user bookmark a post.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class MarkPostAsKnownPage extends JsonPage {
+public class BookmarkAjaxPage extends JsonPage {
 
 	/**
-	 * Creates a new “mark post as known” AJAX handler.
+	 * Creates a new bookmark AJAX page.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public MarkPostAsKnownPage(WebInterface webInterface) {
-		super("markPostAsKnown.ajax", webInterface);
+	public BookmarkAjaxPage(WebInterface webInterface) {
+		super("bookmark.ajax", webInterface);
 	}
+
+	//
+	// JSONPAGE METHODS
+	//
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
-		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId, false);
-		if (post == null) {
+		String id = request.getHttpRequest().getParam("post", null);
+		if ((id == null) || (id.length() == 0)) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		webInterface.getCore().markPostKnown(post);
+		webInterface.getCore().bookmarkPost(id);
 		return createSuccessJsonObject();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean requiresLogin() {
+		return false;
 	}
 
 }

@@ -153,8 +153,8 @@ public class FreenetInterface {
 				@SuppressWarnings("synthetic-access")
 				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
 					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", new Object[] { sone, key, newKnownGood, newSlotToo });
-					if (newKnownGood) {
-						sone.setLatestEdition(key.suggestedEdition);
+					if (edition > sone.getLatestEdition()) {
+						sone.setLatestEdition(edition);
 						new Thread(new Runnable() {
 
 							@Override
@@ -176,7 +176,7 @@ public class FreenetInterface {
 				}
 			};
 			soneUskCallbacks.put(sone.getId(), uskCallback);
-			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, true, (HighLevelSimpleClientImpl) client);
+			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, (System.currentTimeMillis() - sone.getTime()) < 7 * 24 * 60 * 60 * 1000, (HighLevelSimpleClientImpl) client);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, "Could not subscribe USK “" + sone.getRequestUri() + "”!", mue1);
 		}

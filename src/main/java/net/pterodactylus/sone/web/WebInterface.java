@@ -42,6 +42,7 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.template.AlbumAccessor;
@@ -49,17 +50,25 @@ import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.NotificationManagerAccessor;
+import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
+import net.pterodactylus.sone.template.TrustAccessor;
+import net.pterodactylus.sone.template.UnknownDateFilter;
+import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeletePostAjaxPage;
+import net.pterodactylus.sone.web.ajax.DeleteProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DismissNotificationAjaxPage;
+import net.pterodactylus.sone.web.ajax.DistrustAjaxPage;
+import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
@@ -68,27 +77,42 @@ import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
-import net.pterodactylus.sone.web.ajax.MarkPostAsKnownPage;
-import net.pterodactylus.sone.web.ajax.MarkReplyAsKnownPage;
+import net.pterodactylus.sone.web.ajax.MarkAsKnownAjaxPage;
+import net.pterodactylus.sone.web.ajax.MoveProfileFieldAjaxPage;
+import net.pterodactylus.sone.web.ajax.TrustAjaxPage;
+import net.pterodactylus.sone.web.ajax.UnbookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
+import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
+import net.pterodactylus.util.cache.Cache;
+import net.pterodactylus.util.cache.CacheException;
+import net.pterodactylus.util.cache.CacheItem;
+import net.pterodactylus.util.cache.DefaultCacheItem;
+import net.pterodactylus.util.cache.MemoryCache;
+import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
+import net.pterodactylus.util.template.CollectionSortFilter;
 import net.pterodactylus.util.template.DateFilter;
-import net.pterodactylus.util.template.DefaultTemplateFactory;
+import net.pterodactylus.util.template.FormatFilter;
+import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
 import net.pterodactylus.util.template.PaginationPlugin;
+import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.ReplaceFilter;
+import net.pterodactylus.util.template.StoreFilter;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateException;
-import net.pterodactylus.util.template.TemplateFactory;
-import net.pterodactylus.util.template.TemplateProvider;
+import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.version.Version;
@@ -121,8 +145,8 @@ public class WebInterface implements CoreListener {
 	/** The form password. */
 	private final String formPassword;
 
-	/** The template factory. */
-	private DefaultTemplateFactory templateFactory;
+	/** The template context factory. */
+	private final TemplateContextFactory templateContextFactory;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -154,51 +178,62 @@ public class WebInterface implements CoreListener {
 	 * @param sonePlugin
 	 *            The Sone plugin
 	 */
+	@SuppressWarnings("synthetic-access")
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
-		templateFactory = new DefaultTemplateFactory();
-		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
-		templateFactory.addAccessor(Post.class, new PostAccessor(getCore(), templateFactory));
-		templateFactory.addAccessor(Reply.class, new ReplyAccessor(getCore(), templateFactory));
-		templateFactory.addAccessor(Album.class, new AlbumAccessor());
-		templateFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
-		templateFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
-		templateFactory.addFilter("date", new DateFilter());
-		templateFactory.addFilter("l10n", new L10nFilter(getL10n()));
-		templateFactory.addFilter("substring", new SubstringFilter());
-		templateFactory.addFilter("xml", new XmlFilter());
-		templateFactory.addFilter("change", new RequestChangeFilter());
-		templateFactory.addFilter("match", new MatchFilter());
-		templateFactory.addFilter("css", new CssClassNameFilter());
-		templateFactory.addPlugin("getpage", new GetPagePlugin());
-		templateFactory.addPlugin("paginate", new PaginationPlugin());
-		templateFactory.setTemplateProvider(new ClassPathTemplateProvider(templateFactory));
-		templateFactory.addTemplateObject("formPassword", formPassword);
+		templateContextFactory = new TemplateContextFactory();
+		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateContextFactory.addAccessor(Collection.class, new CollectionAccessor());
+		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
+		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
+		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
+		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
+		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
+		templateContextFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
+		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
+		templateContextFactory.addFilter("date", new DateFilter());
+		templateContextFactory.addFilter("html", new HtmlFilter());
+		templateContextFactory.addFilter("replace", new ReplaceFilter());
+		templateContextFactory.addFilter("store", new StoreFilter());
+		templateContextFactory.addFilter("l10n", new L10nFilter(getL10n()));
+		templateContextFactory.addFilter("substring", new SubstringFilter());
+		templateContextFactory.addFilter("xml", new XmlFilter());
+		templateContextFactory.addFilter("change", new RequestChangeFilter());
+		templateContextFactory.addFilter("match", new MatchFilter());
+		templateContextFactory.addFilter("css", new CssClassNameFilter());
+		templateContextFactory.addFilter("js", new JavascriptFilter());
+		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory));
+		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
+		templateContextFactory.addFilter("format", new FormatFilter());
+		templateContextFactory.addFilter("sort", new CollectionSortFilter());
+		templateContextFactory.addPlugin("getpage", new GetPagePlugin());
+		templateContextFactory.addPlugin("paginate", new PaginationPlugin());
+		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
+		templateContextFactory.addProvider(new ClassPathTemplateProvider());
+		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template newSoneNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newSoneNotification.html"));
+		Template newSoneNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newSoneNotification.html"));
 		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate);
 
-		Template newPostNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newPostNotification.html"));
+		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate);
 
-		Template newReplyNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/newReplyNotification.html"));
+		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
 		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate);
 
-		Template rescuingSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/rescuingSonesNotification.html"));
+		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
 		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
 
-		Template sonesRescuedTemplate = templateFactory.createTemplate(createReader("/templates/notify/sonesRescuedNotification.html"));
+		Template sonesRescuedTemplate = TemplateParser.parse(createReader("/templates/notify/sonesRescuedNotification.html"));
 		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
 
-		Template lockedSonesTemplate = templateFactory.createTemplate(createReader("/templates/notify/lockedSonesNotification.html"));
+		Template lockedSonesTemplate = TemplateParser.parse(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
 
-		Template newVersionTemplate = templateFactory.createTemplate(createReader("/templates/notify/newVersionNotification.html"));
+		Template newVersionTemplate = TemplateParser.parse(createReader("/templates/notify/newVersionNotification.html"));
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 	}
 
@@ -213,6 +248,15 @@ public class WebInterface implements CoreListener {
 	 */
 	public Core getCore() {
 		return sonePlugin.core();
+	}
+
+	/**
+	 * Returns the template context factory of the web interface.
+	 *
+	 * @return The template context factory
+	 */
+	public TemplateContextFactory getTemplateContextFactory() {
+		return templateContextFactory;
 	}
 
 	/**
@@ -272,6 +316,10 @@ public class WebInterface implements CoreListener {
 	 *         currently logged in
 	 */
 	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+		Set<Sone> localSones = getCore().getLocalSones();
+		if (localSones.size() == 1) {
+			return localSones.iterator().next();
+		}
 		return getCurrentSone(getCurrentSession(toadletContext, create));
 	}
 
@@ -377,7 +425,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void setFirstStart(boolean firstStart) {
 		if (firstStart) {
-			Template firstStartNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/firstStartNotification.html"));
+			Template firstStartNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/firstStartNotification.html"));
 			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
 			notificationManager.addNotification(firstStartNotification);
 		}
@@ -392,7 +440,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void setNewConfig(boolean newConfig) {
 		if (newConfig && !hasFirstStartNotification()) {
-			Template configNotReadNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/configNotReadNotification.html"));
+			Template configNotReadNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/configNotReadNotification.html"));
 			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
 			notificationManager.addNotification(configNotReadNotification);
 		}
@@ -423,7 +471,7 @@ public class WebInterface implements CoreListener {
 		registerToadlets();
 
 		/* notification templates. */
-		Template startupNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/startupNotification.html"));
+		Template startupNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/startupNotification.html"));
 
 		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
 		notificationManager.addNotification(startupNotification);
@@ -436,7 +484,7 @@ public class WebInterface implements CoreListener {
 			}
 		}, "Sone Startup Notification Remover");
 
-		Template wotMissingNotificationTemplate = templateFactory.createTemplate(createReader("/templates/notify/wotMissingNotification.html"));
+		Template wotMissingNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/wotMissingNotification.html"));
 		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
 		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), new Runnable() {
 
@@ -470,32 +518,38 @@ public class WebInterface implements CoreListener {
 	 * Register all toadlets.
 	 */
 	private void registerToadlets() {
-		Template emptyTemplate = templateFactory.createTemplate(new StringReader(""));
-		Template loginTemplate = templateFactory.createTemplate(createReader("/templates/login.html"));
-		Template indexTemplate = templateFactory.createTemplate(createReader("/templates/index.html"));
-		Template knownSonesTemplate = templateFactory.createTemplate(createReader("/templates/knownSones.html"));
-		Template createSoneTemplate = templateFactory.createTemplate(createReader("/templates/createSone.html"));
-		Template createPostTemplate = templateFactory.createTemplate(createReader("/templates/createPost.html"));
-		Template createReplyTemplate = templateFactory.createTemplate(createReader("/templates/createReply.html"));
-		Template editProfileTemplate = templateFactory.createTemplate(createReader("/templates/editProfile.html"));
-		Template viewSoneTemplate = templateFactory.createTemplate(createReader("/templates/viewSone.html"));
-		Template viewPostTemplate = templateFactory.createTemplate(createReader("/templates/viewPost.html"));
-		Template deletePostTemplate = templateFactory.createTemplate(createReader("/templates/deletePost.html"));
-		Template deleteReplyTemplate = templateFactory.createTemplate(createReader("/templates/deleteReply.html"));
-		Template deleteSoneTemplate = templateFactory.createTemplate(createReader("/templates/deleteSone.html"));
-		Template imageBrowserTemplate = templateFactory.createTemplate(createReader("/templates/imageBrowser.html"));
-		Template createAlbumTemplate = templateFactory.createTemplate(createReader("/templates/createAlbum.html"));
-		Template noPermissionTemplate = templateFactory.createTemplate(createReader("/templates/noPermission.html"));
-		Template optionsTemplate = templateFactory.createTemplate(createReader("/templates/options.html"));
-		Template aboutTemplate = templateFactory.createTemplate(createReader("/templates/about.html"));
-		Template postTemplate = templateFactory.createTemplate(createReader("/templates/include/viewPost.html"));
-		Template replyTemplate = templateFactory.createTemplate(createReader("/templates/include/viewReply.html"));
+		Template emptyTemplate = TemplateParser.parse(new StringReader(""));
+		Template loginTemplate = TemplateParser.parse(createReader("/templates/login.html"));
+		Template indexTemplate = TemplateParser.parse(createReader("/templates/index.html"));
+		Template knownSonesTemplate = TemplateParser.parse(createReader("/templates/knownSones.html"));
+		Template createSoneTemplate = TemplateParser.parse(createReader("/templates/createSone.html"));
+		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
+		Template createReplyTemplate = TemplateParser.parse(createReader("/templates/createReply.html"));
+		Template bookmarksTemplate = TemplateParser.parse(createReader("/templates/bookmarks.html"));
+		Template editProfileTemplate = TemplateParser.parse(createReader("/templates/editProfile.html"));
+		Template editProfileFieldTemplate = TemplateParser.parse(createReader("/templates/editProfileField.html"));
+		Template deleteProfileFieldTemplate = TemplateParser.parse(createReader("/templates/deleteProfileField.html"));
+		Template viewSoneTemplate = TemplateParser.parse(createReader("/templates/viewSone.html"));
+		Template viewPostTemplate = TemplateParser.parse(createReader("/templates/viewPost.html"));
+		Template deletePostTemplate = TemplateParser.parse(createReader("/templates/deletePost.html"));
+		Template deleteReplyTemplate = TemplateParser.parse(createReader("/templates/deleteReply.html"));
+		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
+		Template imageBrowserTemplate = TemplateParser.parse(createReader("/templates/imageBrowser.html"));
+		Template createAlbumTemplate = TemplateParser.parse(createReader("/templates/createAlbum.html"));
+		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
+		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
+		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
+		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
+		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
+		Template replyTemplate = TemplateParser.parse(createReader("/templates/include/viewReply.html"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldPage(editProfileFieldTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldPage(deleteProfileFieldTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
@@ -510,6 +564,13 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImageBrowserPage(imageBrowserTemplate, this), "ImageBrowser"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateAlbumPage(createAlbumTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarksPage(bookmarksTemplate, this), "Bookmarks"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
@@ -517,6 +578,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
@@ -527,17 +589,24 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkPostAsKnownPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkReplyAsKnownPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikeAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLikesAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new MoveProfileFieldAjaxPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
@@ -574,6 +643,7 @@ public class WebInterface implements CoreListener {
 		try {
 			return new InputStreamReader(getClass().getResourceAsStream(resourceName), "UTF-8");
 		} catch (UnsupportedEncodingException uee1) {
+			System.out.println("  fail.");
 			return null;
 		}
 	}
@@ -712,9 +782,10 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updateFound(Version version, long releaseTime) {
-		newVersionNotification.set("version", version);
-		newVersionNotification.set("releaseTime", releaseTime);
+	public void updateFound(Version version, long releaseTime, long latestEdition) {
+		newVersionNotification.getTemplateContext().set("latestVersion", version);
+		newVersionNotification.getTemplateContext().set("latestEdition", latestEdition);
+		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
 		notificationManager.addNotification(newVersionNotification);
 	}
 
@@ -725,36 +796,53 @@ public class WebInterface implements CoreListener {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class ClassPathTemplateProvider implements TemplateProvider {
+	private class ClassPathTemplateProvider implements Provider {
 
-		/** The template factory. */
-		@SuppressWarnings("hiding")
-		private final TemplateFactory templateFactory;
+		/** Cache for templates. */
+		private final Cache<String, Template> templateCache = new MemoryCache<String, Template>(new ValueRetriever<String, Template>() {
 
-		/**
-		 * Creates a new template provider that locates templates on the
-		 * classpath.
-		 *
-		 * @param templateFactory
-		 *            The template factory to create the templates
-		 */
-		public ClassPathTemplateProvider(TemplateFactory templateFactory) {
-			this.templateFactory = templateFactory;
-		}
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public CacheItem<Template> retrieve(String key) throws CacheException {
+				Template template = findTemplate(key);
+				if (template != null) {
+					return new DefaultCacheItem<Template>(template);
+				}
+				return null;
+			}
+		});
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public Template getTemplate(String templateName) {
+		public Template getTemplate(TemplateContext templateContext, String templateName) {
+			try {
+				return templateCache.get(templateName);
+			} catch (CacheException ce1) {
+				logger.log(Level.WARNING, "Could not get template for " + templateName + "!", ce1);
+				return null;
+			}
+		}
+
+		/**
+		 * Locates a template in the class path.
+		 *
+		 * @param templateName
+		 *            The name of the template to load
+		 * @return The loaded template, or {@code null} if no template could be
+		 *         found
+		 */
+		@SuppressWarnings("synthetic-access")
+		private Template findTemplate(String templateName) {
 			Reader templateReader = createReader("/templates/" + templateName);
 			if (templateReader == null) {
 				return null;
 			}
-			Template template = templateFactory.createTemplate(templateReader);
+			Template template = null;
 			try {
-				template.parse();
+				template = TemplateParser.parse(templateReader);
 			} catch (TemplateException te1) {
 				logger.log(Level.WARNING, "Could not parse template “" + templateName + "” for inclusion!", te1);
 			}

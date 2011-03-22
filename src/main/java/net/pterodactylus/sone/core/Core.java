@@ -36,17 +36,21 @@ import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.Trust;
+import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
 import freenet.keys.FreenetURI;
 
@@ -82,6 +86,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** The options. */
 	private final Options options = new Options();
+
+	/** The preferences. */
+	private final Preferences preferences = new Preferences(options);
 
 	/** The core listener manager. */
 	private final CoreListenerManager coreListenerManager = new CoreListenerManager(this);
@@ -153,6 +160,13 @@ public class Core implements IdentityListener, UpdateListener {
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
 
+	/** All bookmarked posts. */
+	/* synchronize access on itself. */
+	private Set<String> bookmarkedPosts = new HashSet<String>();
+
+	/** Trusted identities, sorted by own identities. */
+	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+
 	/** All known albums. */
 	private Map<String, Album> albums = new HashMap<String, Album>();
 
@@ -222,18 +236,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 *
 	 * @return The options of the core
 	 */
-	public Options getOptions() {
-		return options;
-	}
-
-	/**
-	 * Returns whether the “Sone rescue mode” is currently activated.
-	 *
-	 * @return {@code true} if the “Sone rescue mode” is currently activated,
-	 *         {@code false} if it is not
-	 */
-	public boolean isSoneRescueMode() {
-		return options.getBooleanOption("SoneRescueMode").get();
+	public Preferences getPreferences() {
+		return preferences;
 	}
 
 	/**
@@ -416,6 +420,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				localSones.put(id, sone);
+				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -459,6 +464,7 @@ public class Core implements IdentityListener, UpdateListener {
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
+				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -493,22 +499,15 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
-	 * Returns whether the given Sone is a new Sone. After this check, the Sone
-	 * is marked as known, i.e. a second call with the same parameters will
-	 * always yield {@code false}.
+	 * Returns whether the Sone with the given ID is a new Sone.
 	 *
-	 * @param sone
-	 *            The sone to check for
+	 * @param soneId
+	 *            The ID of the sone to check for
 	 * @return {@code true} if the given Sone is new, false otherwise
 	 */
-	public boolean isNewSone(Sone sone) {
+	public boolean isNewSone(String soneId) {
 		synchronized (newSones) {
-			boolean isNew = !knownSones.contains(sone.getId()) && newSones.remove(sone.getId());
-			knownSones.add(sone.getId());
-			if (isNew) {
-				coreListenerManager.fireMarkSoneKnown(sone);
-			}
-			return isNew;
+			return !knownSones.contains(soneId) && newSones.contains(soneId);
 		}
 	}
 
@@ -522,6 +521,19 @@ public class Core implements IdentityListener, UpdateListener {
 	 */
 	public boolean isModifiedSone(Sone sone) {
 		return (soneInserters.containsKey(sone)) ? soneInserters.get(sone).isModified() : false;
+	}
+
+	/**
+	 * Returns whether the target Sone is trusted by the origin Sone.
+	 *
+	 * @param origin
+	 *            The origin Sone
+	 * @param target
+	 *            The target Sone
+	 * @return {@code true} if the target Sone is trusted by the origin Sone
+	 */
+	public boolean isSoneTrusted(Sone origin, Sone target) {
+		return trustedIdentities.containsKey(origin) && trustedIdentities.get(origin.getIdentity()).contains(target);
 	}
 
 	/**
@@ -557,8 +569,7 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
-	 * Returns whether the given post ID is new. After this method returns it is
-	 * marked a known post ID.
+	 * Returns whether the given post ID is new.
 	 *
 	 * @param postId
 	 *            The post ID
@@ -566,32 +577,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 *         otherwise
 	 */
 	public boolean isNewPost(String postId) {
-		return isNewPost(postId, true);
-	}
-
-	/**
-	 * Returns whether the given post ID is new. If {@code markAsKnown} is
-	 * {@code true} then after this method returns the post ID is marked a known
-	 * post ID.
-	 *
-	 * @param postId
-	 *            The post ID
-	 * @param markAsKnown
-	 *            {@code true} to mark the post ID as known, {@code false} to
-	 *            not to mark it as known
-	 * @return {@code true} if the post is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewPost(String postId, boolean markAsKnown) {
 		synchronized (newPosts) {
-			boolean isNew = !knownPosts.contains(postId) && newPosts.contains(postId);
-			if (markAsKnown) {
-				Post post = getPost(postId, false);
-				if (post != null) {
-					markPostKnown(post);
-				}
-			}
-			return isNew;
+			return !knownPosts.contains(postId) && newPosts.contains(postId);
 		}
 	}
 
@@ -660,30 +647,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 *         otherwise
 	 */
 	public boolean isNewReply(String replyId) {
-		return isNewReply(replyId, true);
-	}
-
-	/**
-	 * Returns whether the reply with the given ID is new.
-	 *
-	 * @param replyId
-	 *            The ID of the reply to check
-	 * @param markAsKnown
-	 *            {@code true} to mark the reply as known, {@code false} to not
-	 *            to mark it as known
-	 * @return {@code true} if the reply is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewReply(String replyId, boolean markAsKnown) {
 		synchronized (newReplies) {
-			boolean isNew = !knownReplies.contains(replyId) && newReplies.contains(replyId);
-			if (markAsKnown) {
-				Reply reply = getReply(replyId, false);
-				if (reply != null) {
-					markReplyKnown(reply);
-				}
-			}
-			return isNew;
+			return !knownReplies.contains(replyId) && newReplies.contains(replyId);
 		}
 	}
 
@@ -722,6 +687,51 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Returns whether the given post is bookmarked.
+	 *
+	 * @param post
+	 *            The post to check
+	 * @return {@code true} if the given post is bookmarked, {@code false}
+	 *         otherwise
+	 */
+	public boolean isBookmarked(Post post) {
+		return isPostBookmarked(post.getId());
+	}
+
+	/**
+	 * Returns whether the post with the given ID is bookmarked.
+	 *
+	 * @param id
+	 *            The ID of the post to check
+	 * @return {@code true} if the post with the given ID is bookmarked,
+	 *         {@code false} otherwise
+	 */
+	public boolean isPostBookmarked(String id) {
+		synchronized (bookmarkedPosts) {
+			return bookmarkedPosts.contains(id);
+		}
+	}
+
+	/**
+	 * Returns all currently known bookmarked posts.
+	 *
+	 * @return All bookmarked posts
+	 */
+	public Set<Post> getBookmarkedPosts() {
+		Set<Post> posts = new HashSet<Post>();
+		synchronized (bookmarkedPosts) {
+			for (String bookmarkedPostId : bookmarkedPosts) {
+				Post post = getPost(bookmarkedPostId, false);
+				if (post != null) {
+					posts.add(post);
+				}
+			}
+		}
+		return posts;
+	}
+
+	/**
+	 * 	
 	 * Returns the album with the given ID, creating a new album if no album
 	 * with the given ID can be found.
 	 *
@@ -876,7 +886,7 @@ public class Core implements IdentityListener, UpdateListener {
 			soneInserters.put(sone, soneInserter);
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
-			if (!isSoneRescueMode()) {
+			if (!preferences.isSoneRescueMode()) {
 				soneInserter.start();
 			}
 			new Thread(new Runnable() {
@@ -884,7 +894,7 @@ public class Core implements IdentityListener, UpdateListener {
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void run() {
-					if (!isSoneRescueMode()) {
+					if (!preferences.isSoneRescueMode()) {
 						soneDownloader.fetchSone(sone);
 						return;
 					}
@@ -892,7 +902,7 @@ public class Core implements IdentityListener, UpdateListener {
 					coreListenerManager.fireRescuingSone(sone);
 					lockSone(sone);
 					long edition = sone.getLatestEdition();
-					while (!stopped && (edition >= 0) && isSoneRescueMode()) {
+					while (!stopped && (edition >= 0) && preferences.isSoneRescueMode()) {
 						logger.log(Level.FINE, "Downloading edition " + edition + "…");
 						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
 						--edition;
@@ -916,7 +926,12 @@ public class Core implements IdentityListener, UpdateListener {
 	 * @return The created Sone
 	 */
 	public Sone createSone(OwnIdentity ownIdentity) {
-		identityManager.addContext(ownIdentity, "Sone");
+		try {
+			ownIdentity.addContext("Sone");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.SEVERE, "Could not add “Sone” context to own identity: " + ownIdentity, wote1);
+			return null;
+		}
 		Sone sone = addLocalSone(ownIdentity);
 		return sone;
 	}
@@ -966,6 +981,97 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Retrieves the trust relationship from the origin to the target. If the
+	 * trust relationship can not be retrieved, {@code null} is returned.
+	 *
+	 * @see Identity#getTrust(OwnIdentity)
+	 * @param origin
+	 *            The origin of the trust tree
+	 * @param target
+	 *            The target of the trust
+	 * @return The trust relationship
+	 */
+	public Trust getTrust(Sone origin, Sone target) {
+		if (!isLocalSone(origin)) {
+			logger.log(Level.WARNING, "Tried to get trust from remote Sone: %s", origin);
+			return null;
+		}
+		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
+	}
+
+	/**
+	 * Sets the trust value of the given origin Sone for the target Sone.
+	 *
+	 * @param origin
+	 *            The origin Sone
+	 * @param target
+	 *            The target Sone
+	 * @param trustValue
+	 *            The trust value (from {@code -100} to {@code 100})
+	 */
+	public void setTrust(Sone origin, Sone target, int trustValue) {
+		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
+		try {
+			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, preferences.getTrustComment());
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set trust for Sone: " + target, wote1);
+		}
+	}
+
+	/**
+	 * Removes any trust assignment for the given target Sone.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void removeTrust(Sone origin, Sone target) {
+		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
+		try {
+			((OwnIdentity) origin.getIdentity()).removeTrust(target.getIdentity());
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not remove trust for Sone: " + target, wote1);
+		}
+	}
+
+	/**
+	 * Assigns the configured positive trust value for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void trustSone(Sone origin, Sone target) {
+		setTrust(origin, target, preferences.getPositiveTrust());
+	}
+
+	/**
+	 * Assigns the configured negative trust value for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void distrustSone(Sone origin, Sone target) {
+		setTrust(origin, target, preferences.getNegativeTrust());
+	}
+
+	/**
+	 * Removes the trust assignment for the given target.
+	 *
+	 * @param origin
+	 *            The trust origin
+	 * @param target
+	 *            The trust target
+	 */
+	public void untrustSone(Sone origin, Sone target) {
+		removeTrust(origin, target);
+	}
+
+	/**
 	 * Updates the stores Sone with the given Sone.
 	 *
 	 * @param sone
@@ -973,7 +1079,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 */
 	public void updateSone(Sone sone) {
 		if (hasSone(sone.getId())) {
-			boolean soneRescueMode = isLocalSone(sone) && isSoneRescueMode();
+			boolean soneRescueMode = isLocalSone(sone) && preferences.isSoneRescueMode();
 			Sone storedSone = getSone(sone.getId());
 			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
@@ -988,10 +1094,11 @@ public class Core implements IdentityListener, UpdateListener {
 						}
 					}
 				}
+				List<Post> storedPosts = storedSone.getPosts();
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
-						post.setSone(getSone(post.getSone().getId()));
-						if (!storedSone.getPosts().contains(post) && !knownPosts.contains(post.getId())) {
+						post.setSone(storedSone);
+						if (!storedPosts.contains(post) && !knownPosts.contains(post.getId())) {
 							newPosts.add(post.getId());
 							coreListenerManager.fireNewPostFound(post);
 						}
@@ -1008,10 +1115,11 @@ public class Core implements IdentityListener, UpdateListener {
 						}
 					}
 				}
+				Set<Reply> storedReplies = storedSone.getReplies();
 				synchronized (newReplies) {
 					for (Reply reply : sone.getReplies()) {
-						reply.setSone(getSone(reply.getSone().getId()));
-						if (!storedSone.getReplies().contains(reply) && !knownReplies.contains(reply.getId())) {
+						reply.setSone(storedSone);
+						if (!storedReplies.contains(reply) && !knownReplies.contains(reply.getId())) {
 							newReplies.add(reply.getId());
 							coreListenerManager.fireNewReplyFound(reply);
 						}
@@ -1070,12 +1178,33 @@ public class Core implements IdentityListener, UpdateListener {
 			localSones.remove(sone.getId());
 			soneInserters.remove(sone).stop();
 		}
-		identityManager.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
-		identityManager.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
+		try {
+			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
+			((OwnIdentity) sone.getIdentity()).removeProperty("Sone.LatestEdition");
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not remove context and properties from Sone: " + sone, wote1);
+		}
 		try {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not remove Sone from configuration!", ce1);
+		}
+	}
+
+	/**
+	 * Marks the given Sone as known. If the Sone was {@link #isNewPost(String)
+	 * new} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
+	 *
+	 * @param sone
+	 *            The Sone to mark as known
+	 */
+	public void markSoneKnown(Sone sone) {
+		synchronized (newSones) {
+			if (newSones.remove(sone.getId())) {
+				knownSones.add(sone.getId());
+				coreListenerManager.fireMarkSoneKnown(sone);
+				saveConfiguration();
+			}
 		}
 	}
 
@@ -1109,6 +1238,17 @@ public class Core implements IdentityListener, UpdateListener {
 		profile.setBirthDay(configuration.getIntValue(sonePrefix + "/Profile/BirthDay").getValue(null));
 		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
 		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
+
+		/* load profile fields. */
+		while (true) {
+			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFields().size();
+			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
+			if (fieldName == null) {
+				break;
+			}
+			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
+			profile.addField(fieldName).setValue(fieldValue);
+		}
 
 		/* load posts. */
 		Set<Post> posts = new HashSet<Post>();
@@ -1226,8 +1366,9 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		logger.log(Level.INFO, "Saving Sone: %s", sone);
-		identityManager.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 		try {
+			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
 			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
@@ -1241,6 +1382,15 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
+
+			/* save profile fields. */
+			int fieldCounter = 0;
+			for (Field profileField : profile.getFields()) {
+				String fieldPrefix = sonePrefix + "/Profile/Fields/" + fieldCounter++;
+				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getName());
+				configuration.getStringValue(fieldPrefix + "/Value").setValue(profileField.getValue());
+			}
+			configuration.getStringValue(sonePrefix + "/Profile/Fields/" + fieldCounter + "/Name").setValue(null);
 
 			/* save posts. */
 			int postCounter = 0;
@@ -1289,6 +1439,8 @@ public class Core implements IdentityListener, UpdateListener {
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set WoT property for Sone: " + sone, wote1);
 		}
 	}
 
@@ -1402,6 +1554,50 @@ public class Core implements IdentityListener, UpdateListener {
 				coreListenerManager.fireMarkPostKnown(post);
 				saveConfiguration();
 			}
+		}
+	}
+
+	/**
+	 * Bookmarks the given post.
+	 *
+	 * @param post
+	 *            The post to bookmark
+	 */
+	public void bookmark(Post post) {
+		bookmarkPost(post.getId());
+	}
+
+	/**
+	 * Bookmarks the post with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the post to bookmark
+	 */
+	public void bookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.add(id);
+		}
+	}
+
+	/**
+	 * Removes the given post from the bookmarks.
+	 *
+	 * @param post
+	 *            The post to unbookmark
+	 */
+	public void unbookmark(Post post) {
+		unbookmarkPost(post.getId());
+	}
+
+	/**
+	 * Removes the post with the given ID from the bookmarks.
+	 *
+	 * @param id
+	 *            The ID of the post to unbookmark
+	 */
+	public void unbookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.remove(id);
 		}
 	}
 
@@ -1561,6 +1757,9 @@ public class Core implements IdentityListener, UpdateListener {
 		try {
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
+			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
+			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1592,6 +1791,15 @@ public class Core implements IdentityListener, UpdateListener {
 				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
 			}
 
+			/* save bookmarked posts. */
+			int bookmarkedPostCounter = 0;
+			synchronized (bookmarkedPosts) {
+				for (String bookmarkedPostId : bookmarkedPosts) {
+					configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(bookmarkedPostId);
+				}
+			}
+			configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(null);
+
 			/* now save it. */
 			configuration.save();
 
@@ -1622,6 +1830,9 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 
 		}));
+		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-100));
+		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1638,6 +1849,9 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
+		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
+		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -1676,6 +1890,18 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 
+		/* load bookmarked posts. */
+		int bookmarkedPostCounter = 0;
+		while (true) {
+			String bookmarkedPostId = configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").getValue(null);
+			if (bookmarkedPostId == null) {
+				break;
+			}
+			synchronized (bookmarkedPosts) {
+				bookmarkedPosts.add(bookmarkedPostId);
+			}
+		}
+
 	}
 
 	/**
@@ -1706,6 +1932,7 @@ public class Core implements IdentityListener, UpdateListener {
 	public void ownIdentityAdded(OwnIdentity ownIdentity) {
 		logger.log(Level.FINEST, "Adding OwnIdentity: " + ownIdentity);
 		if (ownIdentity.hasContext("Sone")) {
+			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			addLocalSone(ownIdentity);
 		}
 	}
@@ -1716,14 +1943,16 @@ public class Core implements IdentityListener, UpdateListener {
 	@Override
 	public void ownIdentityRemoved(OwnIdentity ownIdentity) {
 		logger.log(Level.FINEST, "Removing OwnIdentity: " + ownIdentity);
+		trustedIdentities.remove(ownIdentity);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityAdded(Identity identity) {
+	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
 		logger.log(Level.FINEST, "Adding Identity: " + identity);
+		trustedIdentities.get(ownIdentity).add(identity);
 		addRemoteSone(identity);
 	}
 
@@ -1731,13 +1960,15 @@ public class Core implements IdentityListener, UpdateListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityUpdated(final Identity identity) {
+	public void identityUpdated(OwnIdentity ownIdentity, final Identity identity) {
 		new Thread(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
+				sone.setIdentity(identity);
+				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
 		}).start();
@@ -1747,8 +1978,8 @@ public class Core implements IdentityListener, UpdateListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void identityRemoved(Identity identity) {
-		/* TODO */
+	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
+		trustedIdentities.get(ownIdentity).remove(identity);
 	}
 
 	//
@@ -1759,8 +1990,195 @@ public class Core implements IdentityListener, UpdateListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void updateFound(Version version, long releaseTime) {
-		coreListenerManager.fireUpdateFound(version, releaseTime);
+	public void updateFound(Version version, long releaseTime, long latestEdition) {
+		coreListenerManager.fireUpdateFound(version, releaseTime, latestEdition);
+	}
+
+	/**
+	 * Convenience interface for external classes that want to access the core’s
+	 * configuration.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class Preferences {
+
+		/** The wrapped options. */
+		private final Options options;
+
+		/**
+		 * Creates a new preferences object wrapped around the given options.
+		 *
+		 * @param options
+		 *            The options to wrap
+		 */
+		public Preferences(Options options) {
+			this.options = options;
+		}
+
+		/**
+		 * Returns the insertion delay.
+		 *
+		 * @return The insertion delay
+		 */
+		public int getInsertionDelay() {
+			return options.getIntegerOption("InsertionDelay").get();
+		}
+
+		/**
+		 * Sets the insertion delay
+		 *
+		 * @param insertionDelay
+		 *            The new insertion delay, or {@code null} to restore it to
+		 *            the default value
+		 * @return This preferences
+		 */
+		public Preferences setInsertionDelay(Integer insertionDelay) {
+			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			return this;
+		}
+
+		/**
+		 * Returns the positive trust.
+		 *
+		 * @return The positive trust
+		 */
+		public int getPositiveTrust() {
+			return options.getIntegerOption("PositiveTrust").get();
+		}
+
+		/**
+		 * Sets the positive trust.
+		 *
+		 * @param positiveTrust
+		 *            The new positive trust, or {@code null} to restore it to
+		 *            the default vlaue
+		 * @return This preferences
+		 */
+		public Preferences setPositiveTrust(Integer positiveTrust) {
+			options.getIntegerOption("PositiveTrust").set(positiveTrust);
+			return this;
+		}
+
+		/**
+		 * Returns the negative trust.
+		 *
+		 * @return The negative trust
+		 */
+		public int getNegativeTrust() {
+			return options.getIntegerOption("NegativeTrust").get();
+		}
+
+		/**
+		 * Sets the negative trust.
+		 *
+		 * @param negativeTrust
+		 *            The negative trust, or {@code null} to restore it to the
+		 *            default value
+		 * @return The preferences
+		 */
+		public Preferences setNegativeTrust(Integer negativeTrust) {
+			options.getIntegerOption("NegativeTrust").set(negativeTrust);
+			return this;
+		}
+
+		/**
+		 * Returns the trust comment. This is the comment that is set in the web
+		 * of trust when a trust value is assigned to an identity.
+		 *
+		 * @return The trust comment
+		 */
+		public String getTrustComment() {
+			return options.getStringOption("TrustComment").get();
+		}
+
+		/**
+		 * Sets the trust comment.
+		 *
+		 * @param trustComment
+		 *            The trust comment, or {@code null} to restore it to the
+		 *            default value
+		 * @return This preferences
+		 */
+		public Preferences setTrustComment(String trustComment) {
+			options.getStringOption("TrustComment").set(trustComment);
+			return this;
+		}
+
+		/**
+		 * Returns whether the rescue mode is active.
+		 *
+		 * @return {@code true} if the rescue mode is active, {@code false}
+		 *         otherwise
+		 */
+		public boolean isSoneRescueMode() {
+			return options.getBooleanOption("SoneRescueMode").get();
+		}
+
+		/**
+		 * Sets whether the rescue mode is active.
+		 *
+		 * @param soneRescueMode
+		 *            {@code true} if the rescue mode is active, {@code false}
+		 *            otherwise
+		 * @return This preferences
+		 */
+		public Preferences setSoneRescueMode(Boolean soneRescueMode) {
+			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
+			return this;
+		}
+
+		/**
+		 * Returns whether Sone should clear its settings on the next restart.
+		 * In order to be effective, {@link #isReallyClearOnNextRestart()} needs
+		 * to return {@code true} as well!
+		 *
+		 * @return {@code true} if Sone should clear its settings on the next
+		 *         restart, {@code false} otherwise
+		 */
+		public boolean isClearOnNextRestart() {
+			return options.getBooleanOption("ClearOnNextRestart").get();
+		}
+
+		/**
+		 * Sets whether Sone will clear its settings on the next restart.
+		 *
+		 * @param clearOnNextRestart
+		 *            {@code true} if Sone should clear its settings on the next
+		 *            restart, {@code false} otherwise
+		 * @return This preferences
+		 */
+		public Preferences setClearOnNextRestart(Boolean clearOnNextRestart) {
+			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
+			return this;
+		}
+
+		/**
+		 * Returns whether Sone should really clear its settings on next
+		 * restart. This is a confirmation option that needs to be set in
+		 * addition to {@link #isClearOnNextRestart()} in order to clear Sone’s
+		 * settings on the next restart.
+		 *
+		 * @return {@code true} if Sone should really clear its settings on the
+		 *         next restart, {@code false} otherwise
+		 */
+		public boolean isReallyClearOnNextRestart() {
+			return options.getBooleanOption("ReallyClearOnNextRestart").get();
+		}
+
+		/**
+		 * Sets whether Sone should really clear its settings on the next
+		 * restart.
+		 *
+		 * @param reallyClearOnNextRestart
+		 *            {@code true} if Sone should really clear its settings on
+		 *            the next restart, {@code false} otherwise
+		 * @return This preferences
+		 */
+		public Preferences setReallyClearOnNextRestart(Boolean reallyClearOnNextRestart) {
+			options.getBooleanOption("ReallyClearOnNextRestart").set(reallyClearOnNextRestart);
+			return this;
+		}
+
 	}
 
 }

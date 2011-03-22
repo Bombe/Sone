@@ -30,8 +30,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -94,10 +94,10 @@ public class CreateSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.getCore());
-		dataProvider.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
+		templateContext.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 		if (request.getMethod() == Method.POST) {
 			String id = request.getHttpRequest().getPartAsStringFailsafe("identity", 44);
 			OwnIdentity selectedIdentity = null;
@@ -108,11 +108,10 @@ public class CreateSonePage extends SoneTemplatePage {
 				}
 			}
 			if (selectedIdentity == null) {
-				dataProvider.set("errorNoIdentity", true);
+				templateContext.set("errorNoIdentity", true);
 				return;
 			}
 			/* create Sone. */
-			webInterface.getCore().getIdentityManager().addContext(selectedIdentity, "Sone");
 			Sone sone = webInterface.getCore().createSone(selectedIdentity);
 			if (sone == null) {
 				logger.log(Level.SEVERE, "Could not create Sone for OwnIdentity: %s", selectedIdentity);
@@ -130,7 +129,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext) == null;
+		return (getCurrentSone(toadletContext, false) == null) || (webInterface.getCore().getLocalSones().size() == 1);
 	}
 
 }

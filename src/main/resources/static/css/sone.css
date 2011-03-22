@@ -1,7 +1,7 @@
 /* Sone Main CSS File */
 
 /* first, override some fproxy rules. */
-#sone .post .reply div,#sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
+#sone div, #sone span, #sone .post .time,#sone .post .delete,#sone .post .show-reply-form, input[type=text], textarea {
 	font: inherit;
 }
 
@@ -16,12 +16,28 @@ input[type=text], textarea {
 	outline: none;
 }
 
+input[type=text].short {
+	width: 25em;
+}
+
 textarea {
 	height: 4em;
 }
 
+#sone button {
+	background-color: #ddd;
+	border-width: 1px;
+	color: #444;
+	padding: 0.5ex 1.5ex;
+}
+
 #sone form {
 	margin: 0px;
+}
+
+#sone select {
+	color: #444;
+	padding: 0.5ex 1.5ex;
 }
 
 /* now for the real stuff. */
@@ -89,12 +105,20 @@ textarea {
 	min-height: 3.5ex;
 }
 
+#sone #notification-area .notification button {
+	margin-left: 1ex;
+}
+
 #sone #notification-area .notification .dismiss {
 	float: right;
 }
 
 #sone #notification-area .notification .post-count {
 	margin-left: 1ex;
+}
+
+#sone #notification-area .notification .mark-as-read {
+	float: right;
 }
 
 #sone #plugin-warning {
@@ -136,7 +160,11 @@ textarea {
 	padding-left: 1ex;
 }
 
-#sone #update-status label {
+#sone #update-status {
+	margin-bottom: 1em;
+}
+
+#sone #update-status label, #sone #post-message label {
 	display: none;
 }
 
@@ -150,6 +178,15 @@ textarea {
 
 #sone #update-status button {
 	float: right;
+}
+
+#sone #update-status .select-sender, #sone .create-reply .select-sender, #sone #post-message .select-sender {
+	display: none;
+}
+
+#sone #update-status .select-sender button, #sone #post-message .select-sender button {
+	display: inline;
+	float: left;
 }
 
 #sone .nice-name {
@@ -202,9 +239,13 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .text {
+#sone .post .text, #sone .post .raw-text {
 	display: inline;
 	white-space: pre-wrap;
+}
+
+#sone .post .text.hidden, #sone .post .raw-text.hidden {
+	display: none;
 }
 
 #sone .post .status-line {
@@ -212,42 +253,77 @@ textarea {
 	font-size: 85%;
 }
 
+#sone .separator {
+	font: inherit;
+	color: rgb(28, 131, 191);
+}
+
+#sone .show-source, #sone .show-reply-source {
+	display: inline;
+}
+
+#sone .post .bookmarks {
+	display: inline;
+	color: rgb(28, 131, 191);
+}
+
+#sone .post .bookmark, #sone .post .unbookmark {
+	display: inline;
+	font: inherit;
+	margin: 0px;
+}
+
 #sone .post .time {
 	display: inline;
 	color: #666;
 }
 
-#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike {
+#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .trust, #sone .post .distrust, #sone .post .untrust {
 	display: inline;
 	font: inherit;
+	margin: 0px;
 }
 
 #sone .post .likes.hidden {
 	display: none;
 }
 
-#sone .post .like.hidden, #sone .post .unlike.hidden {
+#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden, #sone .post .bookmark.hidden, #sone .post .unbookmark.hidden {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button, #sone .post .bookmark button, #sone .post .unbookmark button {
 	border: 0px;
 	background: none;
 	padding: 0px;
 	color: rgb(28, 131, 191);
 	font: inherit;
+	margin: 0px;
 }
 
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover {
+#sone .post .delete button.confirm {
+	color: red;
+	font-weight: bold;
+}
+
+#sone .post .trust button {
+	color: rgb(0, 128, 0);
+}
+
+#sone .post .distrust button {
+	color: rgb(255, 0, 0);
+}
+
+#sone .post .untrust button {
+	color: rgb(64, 64, 64);
+}
+
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover, #sone .post .bookmark button:hover, #sone .post .unbookmark button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;
 	color: rgb(255, 172, 0);
 	cursor: pointer;
-}
-
-#sone .post .delete:before, #sone .post .likes:before, #sone .post .like:before, #sone .post .unlike:before {
-	content: ' ‧ ';
 }
 
 #sone .post .likes span {
@@ -314,10 +390,6 @@ textarea {
 	color: rgb(255, 172, 0);
 }
 
-#sone .post .show-reply-form:before {
-	content: ' ‧ ';
-}
-
 #sone .post .create-reply {
 	clear: both;
 	background-color: #f0f0ff;
@@ -326,17 +398,22 @@ textarea {
 
 #sone .post .create-reply input[type=text] {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 }
 
 #sone .post .create-reply textarea {
 	margin-left: 0.5ex;
-	width: 44em;
+	width: 42em;
 	height: 4em;
 }
 
 #sone .post .create-reply button {
 	float: right;
+}
+
+#sone .create-reply .select-sender button, #sone #post-message .select-sender button {
+	display: inline;
+	float: left;
 }
 
 #sone .sone {
@@ -431,8 +508,41 @@ textarea {
 	display: inline;
 }
 
-#sone #create-sone {
+#sone .profile-field, #sone #edit-profile button[type=submit], #sone #delete-profile-field {
+	margin-top: 1em;
+}
 
+#sone .profile-field .name {
+	display: inline;
+	font-weight: bold;
+}
+
+#sone .profile-field .name.hidden {
+	display: none;
+}
+
+#sone .profile-field button.confirm.edit {
+	font-weight: bold;
+	color: #080;
+}
+
+#sone .profile-field button.cancel {
+	font-weight: bold;
+	color: red;
+}
+
+#sone .profile-field .value {
+	margin-left: 2em;
+}
+
+#sone #edit-profile .profile-field .value {
+	margin-left: inherit;
+}
+
+#sone .profile-field .edit-field-name, #sone .profile-field .move-up-field, #sone .profile-field .move-down-field, #sone .profile-field .delete-field-name {
+	float: right;
+	margin-top: -1ex;
+	position: relative;
 }
 
 #sone #tail {
@@ -518,6 +628,6 @@ textarea {
 }
 
 #sone .confirm {
-	font-weight: bold !important;
-	color: red !important;
+	font-weight: bold;
+	color: red;
 }

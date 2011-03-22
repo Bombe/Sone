@@ -19,8 +19,8 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * The image browser page is the entry page for the image management.
@@ -49,20 +49,20 @@ public class ImageBrowserPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		String albumId = request.getHttpRequest().getParam("album", null);
 		if (albumId != null) {
 			Album album = webInterface.getCore().getAlbum(albumId, false);
-			dataProvider.set("albumRequested", true);
-			dataProvider.set("album", album);
+			templateContext.set("albumRequested", true);
+			templateContext.set("album", album);
 			return;
 		}
 		String imageId = request.getHttpRequest().getParam("image", null);
 		if (imageId != null) {
 			Image image = webInterface.getCore().getImage(imageId, false);
-			dataProvider.set("imageRequested", true);
-			dataProvider.set("image", image);
+			templateContext.set("imageRequested", true);
+			templateContext.set("image", image);
 		}
 	}
 }

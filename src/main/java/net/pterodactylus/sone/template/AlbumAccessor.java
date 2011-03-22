@@ -24,8 +24,8 @@ import java.util.Map;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.util.template.Accessor;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.ReflectionAccessor;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * {@link Accessor} implementation for {@link Album}s. A property named
@@ -40,7 +40,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object get(DataProvider dataProvider, Object object, String member) {
+	public Object get(TemplateContext templateContext, Object object, String member) {
 		Album album = (Album) object;
 		if ("backlinks".equals(member)) {
 			List<Map<String, String>> backlinks = new ArrayList<Map<String, String>>();
@@ -52,7 +52,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 			backlinks.add(0, createLink("viewSone.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
 			return backlinks;
 		}
-		return super.get(dataProvider, object, member);
+		return super.get(templateContext, object, member);
 	}
 
 	//

@@ -1,0 +1,7 @@
+<%include include/head.html>
+
+	<h1><%= Page.Invalid.Page.Title|l10n|html></h1>
+
+	<p><%= Page.Invalid.Text|l10n|html|replace needle="{link}" replacement='<a href="index.html">'|replace needle="{/link}" replacement='</a>'></p>
+
+<%include include/tail.html>

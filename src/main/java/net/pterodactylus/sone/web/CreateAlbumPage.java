@@ -20,8 +20,8 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that lets the user create a new album.
@@ -50,12 +50,12 @@ public class CreateAlbumPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String name = request.getHttpRequest().getPartAsStringFailsafe("name", 64).trim();
 			if (name.length() == 0) {
-				dataProvider.set("nameMissing", true);
+				templateContext.set("nameMissing", true);
 				return;
 			}
 			Sone currentSone = getCurrentSone(request.getToadletContext());

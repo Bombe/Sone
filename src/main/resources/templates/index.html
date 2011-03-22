@@ -4,9 +4,9 @@
 
 	<h1><%= Page.Index.PostList.Title|l10n|html></h1>
 
+	<%include include/updateStatus.html>
+
 	<div id="posts">
-		<%getpage>
-		<%paginate list=posts pagesize=25>
 		<%= page|store key=pageParameter>
 		<%include include/pagination.html>
 		<%foreach pagination.items post>

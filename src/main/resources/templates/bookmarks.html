@@ -1,0 +1,20 @@
+<%include include/head.html>
+
+	<div class="page-id hidden">bookmarks</div>
+
+	<h1><%= Page.Bookmarks.Page.Title|l10n|html></h1>
+
+	<div id="posts">
+		<%include include/pagination.html>
+		<%foreach posts post>
+			<%include include/viewPost.html>
+		<%/foreach>
+		<%include include/pagination.html>
+		<%if postsNotLoaded>
+			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html|replace needle='{link}' replacement='<a href="unbookmark.html?post=allNotLoaded">'|replace needle='{/link}' replacement='</a>'></p>
+		<%elseif posts.empty>
+			<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
+		<%/if>
+	</div>
+
+<%include include/tail.html>

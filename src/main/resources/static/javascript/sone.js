@@ -47,6 +47,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 				textarea.show();
 			}
 			$(inputField.get(0).form).submit(function() {
+				inputField.attr("disabled", "disabled");
 				if (!optional && (textarea.val() == "")) {
 					return false;
 				}
@@ -64,12 +65,12 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  *            The element to add a “comment” link to
  */
 function addCommentLink(postId, element, insertAfterThisElement) {
-	if ($(element).find(".show-reply-form").length > 0) {
+	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
 	commentElement = (function(postId) {
+		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
-			markPostAsKnown(getPostElement(this));
 			replyElement = $("#sone .post#" + postId + " .create-reply");
 			replyElement.removeClass("hidden");
 			replyElement.removeClass("light");
@@ -87,6 +88,7 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 		return commentElement;
 	})(postId);
 	$(insertAfterThisElement).after(commentElement.clone(true));
+	$(insertAfterThisElement).after(separator);
 }
 
 var translations = {};
@@ -150,7 +152,13 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 		toggleClass("modified", modified);
 	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
-	$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	if (lastUpdated != null) {
+		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+	} else {
+		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
+			$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
+		});
+	}
 	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
 }
 
@@ -289,6 +297,17 @@ function getSoneId(element) {
 	return getSoneElement(element).find(".id").text();
 }
 
+/**
+ * Returns the element of the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post
+ * @returns The element of the post
+ */
+function getPost(postId) {
+	return $("#sone .post#" + postId);
+}
+
 function getPostElement(element) {
 	return $(element).closest(".post");
 }
@@ -301,6 +320,17 @@ function getPostTime(element) {
 	return getPostElement(element).find(".post-time").text();
 }
 
+/**
+ * Returns the author of the post the given element belongs to.
+ *
+ * @param element
+ *            The element whose post to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getPostAuthor(element) {
+	return getPostElement(element).find(".post-author").text();
+}
+
 function getReplyElement(element) {
 	return $(element).closest(".reply");
 }
@@ -311,6 +341,17 @@ function getReplyId(element) {
 
 function getReplyTime(element) {
 	return getReplyElement(element).find(".reply-time").text();
+}
+
+/**
+ * Returns the author of the reply the given element belongs to.
+ *
+ * @param element
+ *            The element whose reply to get the author for
+ * @returns The ID of the authoring Sone
+ */
+function getReplyAuthor(element) {
+	return getReplyElement(element).find(".reply-author").text();
 }
 
 function likePost(postId) {
@@ -377,6 +418,106 @@ function unlikeReply(replyId) {
 	});
 }
 
+/**
+ * Trusts the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone to trust
+ */
+function trustSone(soneId) {
+	$.getJSON("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Distrusts the Sone with the given ID, i.e. assigns a negative trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to distrust
+ */
+function distrustSone(soneId) {
+	$.getJSON("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Untrusts the Sone with the given ID, i.e. removes any trust assignment.
+ *
+ * @param soneId
+ *            The ID of the Sone to untrust
+ */
+function untrustSone(soneId) {
+	$.getJSON("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			updateTrustControls(soneId, data.trustValue);
+		}
+	});
+}
+
+/**
+ * Updates the trust controls for all posts and replies of the given Sone,
+ * according to the given trust value.
+ *
+ * @param soneId
+ *            The ID of the Sone to update all trust controls for
+ * @param trustValue
+ *            The trust value for the Sone
+ */
+function updateTrustControls(soneId, trustValue) {
+	$("#sone .post").each(function() {
+		if (getPostAuthor(this) == soneId) {
+			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
+			getPostElement(this).find(".post-distrust").toggleClass("hidden", trustValue != null);
+			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
+		}
+	});
+	$("#sone .reply").each(function() {
+		if (getReplyAuthor(this) == soneId) {
+			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
+			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", trustValue != null);
+			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
+		}
+	});
+}
+
+/**
+ * Bookmarks the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to bookmark
+ */
+function bookmarkPost(postId) {
+	(function(postId) {
+		$.getJSON("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+			if ((data != null) && data.success) {
+				getPost(postId).find(".bookmark").toggleClass("hidden", true);
+				getPost(postId).find(".unbookmark").toggleClass("hidden", false);
+			}
+		});
+	})(postId);
+}
+
+/**
+ * Unbookmarks the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to unbookmark
+ */
+function unbookmarkPost(postId) {
+	$.getJSON("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			getPost(postId).find(".bookmark").toggleClass("hidden", false);
+			getPost(postId).find(".unbookmark").toggleClass("hidden", true);
+		}
+	});
+}
+
 function updateReplyLikes(replyId) {
 	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
@@ -392,6 +533,8 @@ function updateReplyLikes(replyId) {
 /**
  * Posts a reply and calls the given callback when the request finishes.
  *
+ * @param sender
+ *            The ID of the sender
  * @param postId
  *            The ID of the post the reply refers to
  * @param text
@@ -400,14 +543,14 @@ function updateReplyLikes(replyId) {
  *            The callback function to call when the request finishes (takes 3
  *            parameters: success, error, replyId)
  */
-function postReply(postId, text, callbackFunction) {
-	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "post" : postId, "text": text }, function(data, textStatus) {
+function postReply(sender, postId, text, callbackFunction) {
+	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
 		}
 		if (data.success) {
-			callbackFunction(true, null, data.reply);
+			callbackFunction(true, null, data.reply, data.sone);
 		} else {
 			callbackFunction(false, data.error);
 		}
@@ -436,6 +579,56 @@ function getReply(replyId, callbackFunction) {
 }
 
 /**
+ * Ajaxifies the given Sone by enhancing all eligible elements with AJAX.
+ *
+ * @param soneElement
+ *            The Sone to ajaxify
+ */
+function ajaxifySone(soneElement) {
+	/*
+	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
+	 * nicer.
+	 */
+	$(".follow", soneElement).submit(function() {
+		var followElement = this;
+		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(followElement).addClass("hidden");
+			$(followElement).parent().find(".unfollow").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".unfollow", soneElement).submit(function() {
+		var unfollowElement = this;
+		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+			$(unfollowElement).addClass("hidden");
+			$(unfollowElement).parent().find(".follow").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".lock", soneElement).submit(function() {
+		var lockElement = this;
+		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(lockElement).addClass("hidden");
+			$(lockElement).parent().find(".unlock").removeClass("hidden");
+		});
+		return false;
+	});
+	$(".unlock", soneElement).submit(function() {
+		var unlockElement = this;
+		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+			$(unlockElement).addClass("hidden");
+			$(unlockElement).parent().find(".lock").removeClass("hidden");
+		});
+		return false;
+	});
+
+	/* mark Sone as known when clicking it. */
+	$(soneElement).click(function() {
+		markSoneAsKnown(soneElement);
+	});
+}
+
+/**
  * Ajaxifies the given post by enhancing all eligible elements with AJAX.
  *
  * @param postElement
@@ -446,21 +639,24 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
-		inputField = $(this.form).find(":input:enabled").get(0);
+		sender = $(this.form).find(":input[name=sender]").val();
+		inputField = $(this.form).find(":input[name=text]:enabled").get(0);
 		postId = getPostId(this);
 		text = $(inputField).val();
-		(function(postId, text, inputField) {
-			postReply(postId, text, function(success, error, replyId) {
+		(function(sender, postId, text, inputField) {
+			postReply(sender, postId, text, function(success, error, replyId, soneId) {
 				if (success) {
 					$(inputField).val("");
-					loadNewReply(replyId);
-					markPostAsKnown(getPostElement(inputField));
+					loadNewReply(replyId, soneId, postId);
 					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
+					$("#sone .post#" + postId + " .create-reply .sender").hide();
+					$("#sone .post#" + postId + " .create-reply .select-sender").show();
+					$("#sone .post#" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
 				} else {
 					alert(error);
 				}
 			});
-		})(postId, text, inputField);
+		})(sender, postId, text, inputField);
 		return false;
 	});
 
@@ -475,13 +671,44 @@ function ajaxifyPost(postElement) {
 	/* convert all “like” buttons to javascript functions. */
 	$(postElement).find(".like-post").submit(function() {
 		likePost(getPostId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	$(postElement).find(".unlike-post").submit(function() {
 		unlikePost(getPostId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
+	});
+
+	/* convert trust control buttons to javascript functions. */
+	$(postElement).find(".post-trust").submit(function() {
+		trustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-distrust").submit(function() {
+		distrustSone(getPostAuthor(this));
+		return false;
+	});
+	$(postElement).find(".post-untrust").submit(function() {
+		untrustSone(getPostAuthor(this));
+		return false;
+	});
+
+	/* convert bookmark/unbookmark buttons to javascript functions. */
+	$(postElement).find(".bookmark").submit(function() {
+		bookmarkPost(getPostId(this));
+		return false;
+	});
+	$(postElement).find(".unbookmark").submit(function() {
+		unbookmarkPost(getPostId(this));
+		return false;
+	});
+
+	/* convert “show source” link into javascript function. */
+	$(postElement).find(".show-source").each(function() {
+		$("a", this).click(function() {
+			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.raw-text", getPostElement(this)).toggleClass("hidden");
+			return false;
+		});
 	});
 
 	/* add “comment” link. */
@@ -499,8 +726,20 @@ function ajaxifyPost(postElement) {
 		});
 	});
 
+	/* process sender selection. */
+	$(".select-sender", postElement).css("display", "inline");
+	$(".sender", postElement).hide();
+	$(".select-sender button", postElement).click(function() {
+		$(".sender", postElement).show();
+		$(".select-sender", postElement).hide();
+		return false;
+	});
+
 	/* mark everything as known on click. */
-	$(postElement).click(function() {
+	$(postElement).click(function(event) {
+		if ($(event.target).hasClass("click-to-show")) {
+			return false;
+		}
 		markPostAsKnown(this);
 	});
 
@@ -517,12 +756,10 @@ function ajaxifyPost(postElement) {
 function ajaxifyReply(replyElement) {
 	$(replyElement).find(".like-reply").submit(function() {
 		likeReply(getReplyId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	$(replyElement).find(".unlike-reply").submit(function() {
 		unlikeReply(getReplyId(this));
-		markPostAsKnown(getPostElement(this));
 		return false;
 	});
 	(function(replyElement) {
@@ -534,9 +771,27 @@ function ajaxifyReply(replyElement) {
 	})(replyElement);
 	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
 
-	/* mark post and all replies as known on click. */
-	$(replyElement).click(function() {
-		markPostAsKnown(getPostElement(this));
+	/* convert “show source” link into javascript function. */
+	$(replyElement).find(".show-reply-source").each(function() {
+		$("a", this).click(function() {
+			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.raw-text", getReplyElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+
+	/* convert trust control buttons to javascript functions. */
+	$(replyElement).find(".reply-trust").submit(function() {
+		trustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-distrust").submit(function() {
+		distrustSone(getReplyAuthor(this));
+		return false;
+	});
+	$(replyElement).find(".reply-untrust").submit(function() {
+		untrustSone(getReplyAuthor(this));
+		return false;
 	});
 }
 
@@ -547,8 +802,25 @@ function ajaxifyReply(replyElement) {
  *            jQuery object representing the notification.
  */
 function ajaxifyNotification(notification) {
-	notification.find("form.dismiss").submit(function() {
+	notification.find("form").submit(function() {
 		return false;
+	});
+	notification.find("input[name=returnPage]").val($.url.attr("relative"));
+	if (notification.find(".short-text").length > 0) {
+		notification.find(".short-text").removeClass("hidden");
+		notification.find(".text").addClass("hidden");
+	}
+	notification.find("form.mark-as-read button").click(function() {
+		$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
+	});
+	notification.find("a[class^='link-']").each(function() {
+		linkElement = $(this);
+		if (linkElement.is("[href^='viewPost']")) {
+			id = linkElement.attr("class").substr(5);
+			if (hasPost(id)) {
+				linkElement.attr("href", "#post-" + id);
+			}
+		}
 	});
 	notification.find("form.dismiss button").click(function() {
 		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
@@ -566,13 +838,18 @@ function getStatus() {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
-				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdated);
+				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
 			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
 				oldNotification = $("#sone #notification-area .notification#" + value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
+					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
+						opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
+						notification.find(".short-text").toggleClass("hidden", opened);
+						notification.find(".text").toggleClass("hidden", !opened);
+					}
 					oldNotification.replaceWith(notification.show());
 				} else {
 					$("#sone #notification-area").append(notification);
@@ -585,11 +862,11 @@ function getStatus() {
 			});
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value);
+				loadNewPost(value.id, value.sone, value.recipient, value.time);
 			});
 			/* process new replies. */
 			$.each(data.newReplies, function(index, value) {
-				loadNewReply(value);
+				loadNewReply(value.id, value.sone, value.post, value.postSone);
 			});
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
@@ -601,6 +878,16 @@ function getStatus() {
 		/* something really bad happend, wait a minute. */
 		setTimeout(getStatus, 60000);
 	})
+}
+
+/**
+ * Returns the ID of the currently logged in Sone.
+ *
+ * @return The ID of the current Sone, or an empty string if no Sone is logged
+ *         in
+ */
+function getCurrentSoneId() {
+	return $("#currentSoneId").text();
 }
 
 /**
@@ -696,8 +983,18 @@ function hasReply(replyId) {
 	return $("#sone .reply#" + replyId).length > 0;
 }
 
-function loadNewPost(postId) {
+function loadNewPost(postId, soneId, recipientId, time) {
 	if (hasPost(postId)) {
+		return;
+	}
+	if (!isIndexPage()) {
+		if (!isViewPostPage() || (getShownPostId() != postId)) {
+			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
+				return;
+			}
+		}
+	}
+	if (getPostTime($("#sone .post").last()) > time) {
 		return;
 	}
 	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
@@ -718,8 +1015,6 @@ function loadNewPost(postId) {
 			newPost = $(data.post.html).addClass("hidden");
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
-			} else {
-				$("#sone #posts").append(newPost);
 			}
 			ajaxifyPost(newPost);
 			newPost.slideDown();
@@ -728,8 +1023,11 @@ function loadNewPost(postId) {
 	});
 }
 
-function loadNewReply(replyId) {
+function loadNewReply(replyId, soneId, postId, postSoneId) {
 	if (hasReply(replyId)) {
+		return;
+	}
+	if (!hasPost(postId)) {
 		return;
 	}
 	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
@@ -765,14 +1063,28 @@ function loadNewReply(replyId) {
 	});
 }
 
+/**
+ * Marks the given Sone as known if it is still new.
+ *
+ * @param soneElement
+ *            The Sone to mark as known
+ */
+function markSoneAsKnown(soneElement) {
+	if ($(".new", soneElement).length > 0) {
+		$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
+			$(soneElement).removeClass("new");
+		});
+	}
+}
+
 function markPostAsKnown(postElements) {
 	$(postElements).each(function() {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
-				$.getJSON("markPostAsKnown.ajax", {"formPassword": getFormPassword(), "post": getPostId(postElement)}, function(data, textStatus) {
-					$(postElement).removeClass("new");
-				});
+				$(postElement).removeClass("new");
+				$(".click-to-show", postElement).removeClass("new");
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
 			})(postElement);
 		}
 	});
@@ -784,9 +1096,8 @@ function markReplyAsKnown(replyElements) {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
-				$.getJSON("markReplyAsKnown.ajax", {"formPassword": getFormPassword(), "reply": getReplyId(replyElement)}, function(data, textStatus) {
-					$(replyElement).removeClass("new");
-				});
+				$(replyElement).removeClass("new");
+				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
 			})(replyElement);
 		}
 	});
@@ -795,7 +1106,7 @@ function markReplyAsKnown(replyElements) {
 function resetActivity() {
 	title = document.title;
 	if (title.indexOf('(') == 0) {
-		document.title = title.substr(title.indexOf(' ') + 1);
+		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
 }
 
@@ -803,9 +1114,62 @@ function setActivity() {
 	if (!focus) {
 		title = document.title;
 		if (title.indexOf('(') != 0) {
-			document.title = "(!) " + title;
+			setTitle("(!) " + title);
+		}
+		if (!iconBlinking) {
+			setTimeout(toggleIcon, 1500);
+			iconBlinking = true;
 		}
 	}
+}
+
+/**
+ * Sets the window title after a small delay to prevent race-condition issues.
+ *
+ * @param title
+ *            The title to set
+ */
+function setTitle(title) {
+	setTimeout(function() {
+		document.title = title;
+	}, 50);
+}
+
+/** Whether the icon is currently showing activity. */
+var iconActive = false;
+
+/** Whether the icon is currently supposed to blink. */
+var iconBlinking = false;
+
+/**
+ * Toggles the icon. If the window has gained focus and the icon is still
+ * showing the activity state, it is returned to normal.
+ */
+function toggleIcon() {
+	if (focus) {
+		if (iconActive) {
+			changeIcon("images/icon.png");
+			iconActive = false;
+		}
+		iconBlinking = false;
+	} else {
+		iconActive = !iconActive;
+		console.log("showing icon: " + iconActive);
+		changeIcon(iconActive ? "images/icon-activity.png" : "images/icon.png");
+		setTimeout(toggleIcon, 1500);
+	}
+}
+
+/**
+ * Changes the icon of the page.
+ *
+ * @param iconUrl
+ *            The new URL of the icon
+ */
+function changeIcon(iconUrl) {
+	$("link[rel=icon]").remove();
+	$("head").append($("<link>").attr("rel", "icon").attr("type", "image/png").attr("href", iconUrl));
+	$("iframe[id=icon-update]")[0].src += "";
 }
 
 /**
@@ -837,8 +1201,82 @@ function createNotification(id, text, dismissable) {
  *            The ID of the notification
  */
 function showNotificationDetails(notificationId) {
-	$("#sone .notification#" + notificationId + " .text").show();
-	$("#sone .notification#" + notificationId + " .short-text").hide();
+	$("#sone .notification#" + notificationId + " .text").removeClass("hidden");
+	$("#sone .notification#" + notificationId + " .short-text").addClass("hidden");
+}
+
+/**
+ * Deletes the field with the given ID from the profile.
+ *
+ * @param fieldId
+ *            The ID of the field to delete
+ */
+function deleteProfileField(fieldId) {
+	$.getJSON("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
+		if (data && data.success) {
+			$("#sone .profile-field#" + data.field.id).slideUp();
+		}
+	});
+}
+
+/**
+ * Renames a profile field.
+ *
+ * @param fieldId
+ *            The ID of the field to rename
+ * @param newName
+ *            The new name of the field
+ * @param successFunction
+ *            Called when the renaming was successful
+ */
+function editProfileField(fieldId, newName, successFunction) {
+	$.getJSON("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID one slot in the given direction.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param direction
+ *            The direction to move in (“up” or “down”)
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileField(fieldId, direction, successFunction) {
+	$.getJSON("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
+		if (data && data.success) {
+			successFunction();
+		}
+	});
+}
+
+/**
+ * Moves the profile field with the given ID up one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldUp(fieldId, successFunction) {
+	moveProfileField(fieldId, "up", successFunction);
+}
+
+/**
+ * Moves the profile field with the given ID down one slot.
+ *
+ * @param fieldId
+ *            The ID of the field to move
+ * @param successFunction
+ *            Function to call on success
+ */
+function moveProfileFieldDown(fieldId, successFunction) {
+	moveProfileField(fieldId, "down", successFunction);
 }
 
 //
@@ -852,17 +1290,28 @@ $(document).ready(function() {
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
+		$("#sone #update-status .select-sender").css("display", "inline");
+		$("#sone #update-status .sender").hide();
+		$("#sone #update-status .select-sender button").click(function() {
+			$("#sone #update-status .sender").show();
+			$("#sone #update-status .select-sender").hide();
+			return false;
+		});
 		$("#sone #update-status").submit(function() {
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId);
+					loadNewPost(data.postId, data.sone, data.recipient);
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});
@@ -870,14 +1319,25 @@ $(document).ready(function() {
 	/* ajaxify input field on “view Sone” page. */
 	getTranslation("WebInterface.DefaultText.Message", function(defaultText) {
 		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
+		$("#sone #post-message .select-sender").css("display", "inline");
+		$("#sone #post-message .sender").hide();
+		$("#sone #post-message .select-sender button").click(function() {
+			$("#sone #post-message .sender").show();
+			$("#sone #post-message .select-sender").hide();
+			return false;
+		});
 		$("#sone #post-message").submit(function() {
-			text = $(this).find(":input:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "text": text }, function(data, textStatus) {
+			sender = $(this).find(":input[name=sender]").val();
+			text = $(this).find(":input[name=text]:enabled").val();
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text }, function(data, textStatus) {
 				if ((data != null) && data.success) {
-					loadNewPost(data.postId);
+					loadNewPost(data.postId, getCurrentSoneId());
 				}
 			});
-			$(this).find(":input:enabled").val("").blur();
+			$(this).find(":input[name=sender]").val(getCurrentSoneId());
+			$(this).find(":input[name=text]:enabled").val("").blur();
+			$(this).find(".sender").hide();
+			$(this).find(".select-sender").show();
 			return false;
 		});
 	});
@@ -929,41 +1389,8 @@ $(document).ready(function() {
 		});
 	}
 
-	/*
-	 * convert all “follow”, “unfollow”, “lock”, and “unlock” links to something
-	 * nicer.
-	 */
-	$("#sone .follow").submit(function() {
-		var followElement = this;
-		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-			$(followElement).addClass("hidden");
-			$(followElement).parent().find(".unfollow").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .unfollow").submit(function() {
-		var unfollowElement = this;
-		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
-			$(unfollowElement).addClass("hidden");
-			$(unfollowElement).parent().find(".follow").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .lock").submit(function() {
-		var lockElement = this;
-		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-			$(lockElement).addClass("hidden");
-			$(lockElement).parent().find(".unlock").removeClass("hidden");
-		});
-		return false;
-	});
-	$("#sone .unlock").submit(function() {
-		var unlockElement = this;
-		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
-			$(unlockElement).addClass("hidden");
-			$(unlockElement).parent().find(".lock").removeClass("hidden");
-		});
-		return false;
+	$("#sone .sone").each(function() {
+		ajaxifySone($(this));
 	});
 
 	/* process all existing notifications, ajaxify dismiss buttons. */

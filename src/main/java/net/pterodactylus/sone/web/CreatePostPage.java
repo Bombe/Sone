@@ -20,8 +20,8 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This page lets the user create a new {@link Post}.
@@ -50,21 +50,26 @@ public class CreatePostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
 			String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 			if (text.length() != 0) {
+				String senderId = request.getHttpRequest().getPartAsStringFailsafe("sender", 43);
 				String recipientId = request.getHttpRequest().getPartAsStringFailsafe("recipient", 43);
-				Sone recipient = webInterface.getCore().getSone(recipientId, false);
 				Sone currentSone = getCurrentSone(request.getToadletContext());
-				webInterface.getCore().createPost(currentSone, recipient, System.currentTimeMillis(), text);
+				Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+				if (sender == null) {
+					sender = currentSone;
+				}
+				Sone recipient = webInterface.getCore().getSone(recipientId, false);
+				webInterface.getCore().createPost(sender, recipient, System.currentTimeMillis(), text);
 				throw new RedirectException(returnPage);
 			}
-			dataProvider.set("errorTextEmpty", true);
+			templateContext.set("errorTextEmpty", true);
 		}
-		dataProvider.set("returnPage", returnPage);
+		templateContext.set("returnPage", returnPage);
 	}
 
 }

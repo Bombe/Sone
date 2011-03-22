@@ -19,8 +19,8 @@ package net.pterodactylus.sone.freenet;
 
 import java.util.Map;
 
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.TemplateContext;
 import freenet.l10n.BaseL10n;
 
 /**
@@ -48,7 +48,7 @@ public class L10nFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		return l10n.getString(String.valueOf(data));
 	}
 

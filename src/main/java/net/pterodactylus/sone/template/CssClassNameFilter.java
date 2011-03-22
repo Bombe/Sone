@@ -19,8 +19,8 @@ package net.pterodactylus.sone.template;
 
 import java.util.Map;
 
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Converts the {@link String} {@link String#valueOf(Object) representation} of
@@ -35,7 +35,7 @@ public class CssClassNameFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(DataProvider dataProvider, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		return String.valueOf(data).replaceAll("[^a-zA-Z0-9-]", "_");
 	}
 

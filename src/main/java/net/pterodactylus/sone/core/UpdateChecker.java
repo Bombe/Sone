@@ -49,7 +49,7 @@ public class UpdateChecker {
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
 
 	/** The current latest known edition. */
-	private static final int LATEST_EDITION = 23;
+	private static final int LATEST_EDITION = 25;
 
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
@@ -59,6 +59,9 @@ public class UpdateChecker {
 
 	/** The current URI of the homepage. */
 	private FreenetURI currentUri;
+
+	/** The latest known edition. */
+	private long latestEdition;
 
 	/** The current latest known version. */
 	private Version currentLatestVersion = SonePlugin.VERSION;
@@ -135,6 +138,15 @@ public class UpdateChecker {
 		return latestVersionDate;
 	}
 
+	/**
+	 * Returns the latest known edition of the Sone homepage.
+	 *
+	 * @return The latest edition of the Sone homepage
+	 */
+	public long getLatestEdition() {
+		return latestEdition;
+	}
+
 	//
 	// ACTIONS
 	//
@@ -163,7 +175,8 @@ public class UpdateChecker {
 					}
 					Bucket resultBucket = uriResult.getRight().asBucket();
 					try {
-						parseProperties(resultBucket.getInputStream());
+						parseProperties(resultBucket.getInputStream(), edition);
+						latestEdition = edition;
 					} catch (IOException ioe1) {
 						logger.log(Level.WARNING, "Could not parse sone.properties of " + uri, ioe1);
 					} finally {
@@ -189,14 +202,16 @@ public class UpdateChecker {
 	 * Parses the properties of the latest version and fires events, if
 	 * necessary.
 	 *
-	 * @see UpdateListener#updateFound(Version, long)
-	 * @see UpdateListenerManager#fireUpdateFound(Version, long)
+	 * @see UpdateListener#updateFound(Version, long, long)
+	 * @see UpdateListenerManager#fireUpdateFound(Version, long, long)
 	 * @param propertiesInputStream
 	 *            The input stream to parse
+	 * @param edition
+	 *            The latest edition of the Sone homepage
 	 * @throws IOException
 	 *             if an I/O error occured
 	 */
-	private void parseProperties(InputStream propertiesInputStream) throws IOException {
+	private void parseProperties(InputStream propertiesInputStream, long edition) throws IOException {
 		Properties properties = new Properties();
 		InputStreamReader inputStreamReader = null;
 		try {
@@ -226,7 +241,7 @@ public class UpdateChecker {
 			currentLatestVersion = version;
 			latestVersionDate = releaseTime;
 			logger.log(Level.INFO, "Found new version: %s (%tc)", new Object[] { version, new Date(releaseTime) });
-			updateListenerManager.fireUpdateFound(version, releaseTime);
+			updateListenerManager.fireUpdateFound(version, releaseTime, edition);
 		}
 	}
 

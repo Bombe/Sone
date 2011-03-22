@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
@@ -92,9 +93,10 @@ public class SoneDownloader extends AbstractService {
 	 *            The Sone to add
 	 */
 	public void addSone(Sone sone) {
-		if (sones.add(sone)) {
-			freenetInterface.registerUsk(sone, this);
+		if (!sones.add(sone)) {
+			freenetInterface.unregisterUsk(sone);
 		}
+		freenetInterface.registerUsk(sone, this);
 	}
 
 	/**
@@ -122,8 +124,8 @@ public class SoneDownloader extends AbstractService {
 
 	/**
 	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
-	 * specific URI (which happens when {@link Core#isSoneRescueMode() „Sone
-	 * rescue mode“} is active).
+	 * specific URI (which happens when {@link Preferences#isSoneRescueMode()
+	 * „Sone rescue mode“} is active).
 	 *
 	 * @param sone
 	 *            The Sone to fetch
@@ -131,9 +133,6 @@ public class SoneDownloader extends AbstractService {
 	 *            The URI to fetch the Sone from
 	 */
 	public void fetchSone(Sone sone, FreenetURI soneUri) {
-		if (core.getSoneStatus(sone) == SoneStatus.downloading) {
-			return;
-		}
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		core.setSoneStatus(sone, SoneStatus.downloading);
@@ -146,6 +145,7 @@ public class SoneDownloader extends AbstractService {
 			logger.log(Level.FINEST, "Got %d bytes back.", fetchResults.getRight().size());
 			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
 			if (parsedSone != null) {
+				addSone(parsedSone);
 				core.updateSone(parsedSone);
 			}
 		} finally {
@@ -285,7 +285,7 @@ public class SoneDownloader extends AbstractService {
 		if ((soneInsertUri != null) && (sone.getInsertUri() == null)) {
 			try {
 				sone.setInsertUri(new FreenetURI(soneInsertUri));
-				sone.setLatestEdition(Math.max(sone.getRequestUri().getSuggestedEdition(), sone.getInsertUri().getSuggestedEdition()));
+				sone.setLatestEdition(Math.max(sone.getRequestUri().getEdition(), sone.getInsertUri().getEdition()));
 			} catch (MalformedURLException mue1) {
 				/* TODO - mark Sone as bad. */
 				logger.log(Level.WARNING, "Downloaded Sone " + sone + " has invalid insert URI: " + soneInsertUri, mue1);
@@ -309,6 +309,25 @@ public class SoneDownloader extends AbstractService {
 		Integer profileBirthYear = Numbers.safeParseInteger(profileXml.getValue("birth-year", null));
 		Profile profile = new Profile().setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
 		profile.setBirthDay(profileBirthDay).setBirthMonth(profileBirthMonth).setBirthYear(profileBirthYear);
+
+		/* parse profile fields. */
+		SimpleXML profileFieldsXml = profileXml.getNode("fields");
+		if (profileFieldsXml != null) {
+			for (SimpleXML fieldXml : profileFieldsXml.getNodes("field")) {
+				String fieldName = fieldXml.getValue("field-name", null);
+				String fieldValue = fieldXml.getValue("field-value", null);
+				if ((fieldName == null) || (fieldValue == null)) {
+					logger.log(Level.WARNING, "Downloaded profile field for Sone %s with missing data! Name: %s, Value: %s", new Object[] { sone, fieldName, fieldValue });
+					return null;
+				}
+				try {
+					profile.addField(fieldName).setValue(fieldValue);
+				} catch (IllegalArgumentException iae1) {
+					logger.log(Level.WARNING, "Duplicate field: " + fieldName, iae1);
+					return null;
+				}
+			}
+		}
 
 		/* parse posts. */
 		SimpleXML postsXml = soneXml.getNode("posts");

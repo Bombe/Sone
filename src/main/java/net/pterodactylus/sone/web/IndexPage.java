@@ -24,8 +24,10 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.template.DataProvider;
+import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * The index page shows the main page of Sone. This page will contain the posts
@@ -53,8 +55,8 @@ public class IndexPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(currentSone.getPosts());
@@ -72,16 +74,18 @@ public class IndexPage extends SoneTemplatePage {
 			}
 		}
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
-		dataProvider.set("posts", allPosts);
+		Pagination<Post> pagination = new Pagination<Post>(allPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		templateContext.set("pagination", pagination);
+		templateContext.set("posts", pagination.getItems());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void postProcess(Request request, DataProvider dataProvider) {
+	protected void postProcess(Request request, TemplateContext templateContext) {
 		@SuppressWarnings("unchecked")
-		List<Post> posts = (List<Post>) dataProvider.get("posts");
+		List<Post> posts = (List<Post>) templateContext.get("posts");
 		for (Post post : posts) {
 			webInterface.getCore().markPostKnown(post);
 			for (Reply reply : webInterface.getCore().getReplies(post)) {

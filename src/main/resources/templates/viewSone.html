@@ -7,7 +7,7 @@
 
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
 
-		<p><%= Page.ViewSone.NoSone.Description|l10n|insert needle="{sone}" key=sone.id|html></p>
+		<p><%= Page.ViewSone.NoSone.Description|l10n|replace needle="{sone}" replacementKey=sone.id|html></p>
 
 	<%elseifnull sone.name>
 
@@ -19,24 +19,50 @@
 
 		<%if ! sone.current>
 			<%include include/viewSone.html>
-
-			<p><%= Page.ViewSone.WriteAMessage|l10n|html></p>
-
-			<form action="createPost.html" id="post-message" method="post">
-				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-				<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-				<input type="hidden" name="recipient" value="<% sone.id|html>" />
-				<input type="text" name="text" value="" />
-				<button type="submit"><%= Page.CreatePost.Button.Post|l10n|html></button>
-			</form>
 		<%/if>
 
+		<h1><%= Page.ViewSone.Profile.Title|l10n|html></h1>
 
-		<h1><%= Page.ViewSone.PostList.Title|l10n|insert needle="{sone}" key=sone.niceName|html></h1>
+			<div class="profile-field">
+				<div class="name"><%= Page.ViewSone.Profile.Label.Name|l10n|html></div>
+				<div class="value"><a href="/WoT/ShowIdentity?id=<% sone.id|html>"><% sone.niceName|html></a></div>
+			</div>
+
+			<%foreach sone.profile.fields field>
+				<div class="profile-field">
+					<div class="name"><% field.name|html></div>
+					<div class="value"><% field.value|parse></div>
+				</div>
+			<%/foreach>
+
+		<%ifnull ! currentSone>
+			<%if ! sone.current>
+				<p><%= Page.ViewSone.WriteAMessage|l10n|html></p>
+
+				<form action="createPost.html" id="post-message" method="post">
+					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+					<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+					<input type="hidden" name="recipient" value="<% sone.id|html>" />
+					<label for="sender"><%= Page.Index.Label.Sender|l10n|html></label>
+					<div class="sender">
+						<select name="sender" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">
+							<%foreach localSones localSone>
+								<option value="<% localSone.id|html>"<%if localSone.current> selected="selected"<%/if>><% localSone.niceName|html></option>
+							<%/foreach>
+						</select>
+					</div>
+					<div class="select-sender"><button type="button" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">+</button></div><label for="text"><%= Page.Index.Label.Text|l10n|html></label>
+					<input type="text" name="text" value="" />
+					<button type="submit"><%= Page.CreatePost.Button.Post|l10n|html></button>
+				</form>
+			<%/if>
+		<%/if>
+
+		<h1><%= Page.ViewSone.PostList.Title|l10n|replace needle="{sone}" replacementKey=sone.niceName|html></h1>
 
 		<div id="posts">
-			<%getpage parameter=postPage>
-			<%paginate list=sone.posts pagesize=25>
+			<%:getpage parameter=postPage>
+			<%:paginate list=sone.posts pagesize=25>
 			<%= postPage|store key=pageParameter>
 			<%include include/pagination.html>
 			<%foreach pagination.items post>

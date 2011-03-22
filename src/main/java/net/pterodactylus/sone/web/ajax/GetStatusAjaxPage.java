@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,6 +36,8 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
+import net.pterodactylus.util.notify.TemplateNotification;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -91,13 +95,23 @@ public class GetStatusAjaxPage extends JsonPage {
 		Set<Post> newPosts = webInterface.getNewPosts();
 		JsonArray jsonPosts = new JsonArray();
 		for (Post post : newPosts) {
-			jsonPosts.add(post.getId());
+			JsonObject jsonPost = new JsonObject();
+			jsonPost.put("id", post.getId());
+			jsonPost.put("sone", post.getSone().getId());
+			jsonPost.put("recipient", (post.getRecipient() != null) ? post.getRecipient().getId() : null);
+			jsonPost.put("time", post.getTime());
+			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
 		Set<Reply> newReplies = webInterface.getNewReplies();
 		JsonArray jsonReplies = new JsonArray();
 		for (Reply reply : newReplies) {
-			jsonReplies.add(reply.getId());
+			JsonObject jsonReply = new JsonObject();
+			jsonReply.put("id", reply.getId());
+			jsonReply.put("sone", reply.getSone().getId());
+			jsonReply.put("post", reply.getPost().getId());
+			jsonReply.put("postSone", reply.getPost().getSone().getId());
+			jsonReplies.add(jsonReply);
 		}
 		return createSuccessJsonObject().put("sones", jsonSones).put("notifications", jsonNotifications).put("removedNotifications", jsonRemovedNotifications).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
@@ -107,6 +121,14 @@ public class GetStatusAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected boolean needsFormPassword() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean requiresLogin() {
 		return false;
 	}
 
@@ -129,6 +151,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		jsonSone.put("status", webInterface.getCore().getSoneStatus(sone).name());
 		jsonSone.put("modified", webInterface.getCore().isModifiedSone(sone));
 		jsonSone.put("locked", webInterface.getCore().isLocked(sone));
+		jsonSone.put("lastUpdatedUnknown", sone.getTime() == 0);
 		synchronized (dateFormat) {
 			jsonSone.put("lastUpdated", dateFormat.format(new Date(sone.getTime())));
 		}
@@ -143,10 +166,22 @@ public class GetStatusAjaxPage extends JsonPage {
 	 *            The notification to create a JSON object
 	 * @return The JSON object
 	 */
-	private static JsonObject createJsonNotification(Notification notification) {
+	private JsonObject createJsonNotification(Notification notification) {
 		JsonObject jsonNotification = new JsonObject();
 		jsonNotification.put("id", notification.getId());
-		jsonNotification.put("text", notification.toString());
+		StringWriter notificationWriter = new StringWriter();
+		try {
+			if (notification instanceof TemplateNotification) {
+				TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext());
+				templateContext.set("notification", notification);
+				((TemplateNotification) notification).render(templateContext, notificationWriter);
+			} else {
+				notification.render(notificationWriter);
+			}
+		} catch (IOException ioe1) {
+			/* StringWriter never throws, ignore. */
+		}
+		jsonNotification.put("text", notificationWriter.toString());
 		jsonNotification.put("createdTime", notification.getCreatedTime());
 		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
 		jsonNotification.put("dismissable", notification.isDismissable());

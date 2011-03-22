@@ -36,10 +36,13 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
-import net.pterodactylus.util.template.DefaultTemplateFactory;
+import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateException;
+import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
@@ -58,11 +61,12 @@ public class SoneInserter extends AbstractService {
 	private static volatile int insertionDelay = 60;
 
 	/** The template factory used to create the templates. */
-	private static final DefaultTemplateFactory templateFactory = new DefaultTemplateFactory();
+	private static final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
 
 	static {
-		templateFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateFactory.addFilter("xml", new XmlFilter());
+		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
+		templateContextFactory.addFilter("xml", new XmlFilter());
+		templateContextFactory.addFilter("html", new HtmlFilter());
 	}
 
 	/** The UTF-8 charset. */
@@ -182,7 +186,6 @@ public class SoneInserter extends AbstractService {
 					} else {
 						lastModificationTime = System.currentTimeMillis();
 						modified = true;
-						sone.setTime(lastModificationTime);
 						logger.log(Level.FINE, "Sone %s has been modified, waiting %d seconds before inserting.", new Object[] { sone.getName(), insertionDelay });
 					}
 					lastFingerprint = fingerprint;
@@ -199,13 +202,17 @@ public class SoneInserter extends AbstractService {
 				boolean success = false;
 				try {
 					core.setSoneStatus(sone, SoneStatus.inserting);
-					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri().setKeyType("USK").setSuggestedEdition(0), insertInformation.generateManifestEntries(), "index.html");
+					long insertTime = System.currentTimeMillis();
+					insertInformation.setTime(insertTime);
+					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
 					/* at this point we might already be stopped. */
 					if (shouldStop()) {
 						/* if so, bail out, don’t change anything. */
 						break;
 					}
+					sone.setTime(insertTime);
 					sone.setLatestEdition(finalUri.getEdition());
+					core.saveSone(sone);
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {
@@ -276,6 +283,16 @@ public class SoneInserter extends AbstractService {
 			return (FreenetURI) soneProperties.get("insertUri");
 		}
 
+		/**
+		 * Sets the time of the Sone at the time of the insert.
+		 *
+		 * @param time
+		 *            The time of the Sone
+		 */
+		public void setTime(long time) {
+			soneProperties.put("time", time);
+		}
+
 		//
 		// ACTIONS
 		//
@@ -314,10 +331,11 @@ public class SoneInserter extends AbstractService {
 		 */
 		@SuppressWarnings("synthetic-access")
 		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
-			InputStreamReader templateInputStreamReader;
-			Template template = templateFactory.createTemplate(templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset));
+			InputStreamReader templateInputStreamReader = null;
+			Template template;
 			try {
-				template.parse();
+				templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset);
+				template = TemplateParser.parse(templateInputStreamReader);
 			} catch (TemplateException te1) {
 				logger.log(Level.SEVERE, "Could not parse template “" + templateName + "”!", te1);
 				return null;
@@ -325,12 +343,13 @@ public class SoneInserter extends AbstractService {
 				Closer.close(templateInputStreamReader);
 			}
 
-			template.set("currentSone", soneProperties);
-			template.set("version", SonePlugin.VERSION);
+			TemplateContext templateContext = templateContextFactory.createTemplateContext();
+			templateContext.set("currentSone", soneProperties);
+			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
 			try {
-				template.render(writer);
+				template.render(templateContext, writer);
 				bucket = new StringBucket(writer.toString(), utf8Charset);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
 			} catch (TemplateException te1) {

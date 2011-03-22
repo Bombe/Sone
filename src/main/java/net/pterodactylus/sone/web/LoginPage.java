@@ -26,8 +26,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -61,22 +61,26 @@ public class LoginPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		/* get all own identities. */
 		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
 		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);
-		dataProvider.set("sones", localSones);
+		templateContext.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
 			Sone selectedSone = webInterface.getCore().getLocalSone(soneId, false);
 			if (selectedSone != null) {
 				setCurrentSone(request.getToadletContext(), selectedSone);
-				throw new RedirectException("index.html");
+				String target = request.getHttpRequest().getParam("target");
+				if ((target == null) || (target.length() == 0)) {
+					target = "index.html";
+				}
+				throw new RedirectException(target);
 			}
 		}
 		List<OwnIdentity> ownIdentitiesWithoutSone = CreateSonePage.getOwnIdentitiesWithoutSone(webInterface.getCore());
-		dataProvider.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
+		templateContext.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 	}
 
 	/**
@@ -84,7 +88,7 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(Request request) {
-		if (getCurrentSone(request.getToadletContext()) != null) {
+		if (getCurrentSone(request.getToadletContext(), false) != null) {
 			return "index.html";
 		}
 		return null;
@@ -99,7 +103,7 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext) == null;
+		return getCurrentSone(toadletContext, false) == null;
 	}
 
 }

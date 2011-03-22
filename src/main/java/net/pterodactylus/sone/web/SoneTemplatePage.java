@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -24,10 +26,11 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.sone.web.page.TemplatePage;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
+import freenet.support.api.HTTPRequest;
 
 /**
  * Base page for the Freetalk web interface.
@@ -74,10 +77,10 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            Whether this page requires a login
 	 */
 	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface, boolean requireLogin) {
-		super(path, template, webInterface.getL10n(), pageTitleKey, "noPermission.html");
+		super(path, webInterface.getTemplateContextFactory(), template, webInterface.getL10n(), pageTitleKey, "noPermission.html");
 		this.webInterface = webInterface;
 		this.requireLogin = requireLogin;
-		template.set("webInterface", webInterface);
+		template.getInitialContext().set("webInterface", webInterface);
 	}
 
 	//
@@ -186,14 +189,16 @@ public class SoneTemplatePage extends TemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
-		dataProvider.set("currentSone", getCurrentSone(request.getToadletContext(), false));
-		dataProvider.set("request", request);
-		dataProvider.set("currentVersion", SonePlugin.VERSION);
-		dataProvider.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
-		dataProvider.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
-		dataProvider.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
+		templateContext.set("currentSone", getCurrentSone(request.getToadletContext(), false));
+		templateContext.set("localSones", webInterface.getCore().getLocalSones());
+		templateContext.set("request", request);
+		templateContext.set("currentVersion", SonePlugin.VERSION);
+		templateContext.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
+		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
+		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
+		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
 	}
 
 	/**
@@ -202,7 +207,26 @@ public class SoneTemplatePage extends TemplatePage {
 	@Override
 	protected String getRedirectTarget(Page.Request request) {
 		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
-			return "login.html";
+			HTTPRequest httpRequest = request.getHttpRequest();
+			String originalUrl = httpRequest.getPath();
+			if (httpRequest.hasParameters()) {
+				StringBuilder requestParameters = new StringBuilder();
+				for (String parameterName : httpRequest.getParameterNames()) {
+					if (requestParameters.length() > 0) {
+						requestParameters.append("%26");
+					}
+					String[] parameterValues = httpRequest.getMultipleParam(parameterName);
+					for (String parameterValue : parameterValues) {
+						try {
+							requestParameters.append(URLEncoder.encode(parameterName, "UTF-8")).append("%3d").append(URLEncoder.encode(parameterValue, "UTF-8"));
+						} catch (UnsupportedEncodingException uee1) {
+							/* A JVM without UTF-8? I don’t think so. */
+						}
+					}
+				}
+				originalUrl += "?" + requestParameters.toString();
+			}
+			return "login.html?target=" + originalUrl;
 		}
 		return null;
 	}

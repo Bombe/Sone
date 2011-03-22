@@ -1,5 +1,5 @@
 /*
- * Sone - MarkPostAsKnownPage.java - Copyright © 2010 David Roden
+ * Sone - DeleteProfileFieldAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +17,27 @@
 
 package net.pterodactylus.sone.web.ajax;
 
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
- * AJAX handler that marks a {@link Reply} as known.
+ * AJAX page that lets the user delete a profile field.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class MarkReplyAsKnownPage extends JsonPage {
+public class DeleteProfileFieldAjaxPage extends JsonPage {
 
 	/**
-	 * Creates a new “mark reply as known” AJAX handler.
+	 * Creates a new “delete profile field” AJAX page.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public MarkReplyAsKnownPage(WebInterface webInterface) {
-		super("markReplyAsKnown.ajax", webInterface);
+	public DeleteProfileFieldAjaxPage(WebInterface webInterface) {
+		super("deleteProfileField.ajax", webInterface);
 	}
 
 	/**
@@ -43,13 +45,17 @@ public class MarkReplyAsKnownPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
-		String replyId = request.getHttpRequest().getParam("reply");
-		Reply reply = webInterface.getCore().getReply(replyId, false);
-		if (reply == null) {
-			return createErrorJsonObject("invalid-reply-id");
+		String fieldId = request.getHttpRequest().getParam("field");
+		Sone currentSone = getCurrentSone(request.getToadletContext());
+		Profile profile = currentSone.getProfile();
+		Field field = profile.getFieldById(fieldId);
+		if (field == null) {
+			return createErrorJsonObject("invalid-field-id");
 		}
-		webInterface.getCore().markReplyKnown(reply);
-		return createSuccessJsonObject();
+		profile.removeField(field);
+		currentSone.setProfile(profile);
+		webInterface.getCore().saveSone(currentSone);
+		return createSuccessJsonObject().put("field", new JsonObject().put("id", field.getId()));
 	}
 
 }

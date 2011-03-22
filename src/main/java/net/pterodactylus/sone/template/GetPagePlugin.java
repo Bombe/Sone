@@ -20,12 +20,12 @@ package net.pterodactylus.sone.template;
 import java.util.Map;
 
 import net.pterodactylus.sone.web.page.Page.Request;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Plugin;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
- * Extracts a page number from a {@link Request}’s parameters and stores it in a
- * {@link DataProvider}.
+ * Extracts a page number from a {@link Request}’s parameters and stores it in
+ * the {@link TemplateContext}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -35,7 +35,7 @@ public class GetPagePlugin implements Plugin {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void execute(DataProvider dataProvider, Map<String, String> parameters) {
+	public void execute(TemplateContext templateContext, Map<String, String> parameters) {
 		String requestKey = parameters.get("request");
 		String parameter = parameters.get("parameter");
 		String pageKey = parameters.get("key");
@@ -50,7 +50,7 @@ public class GetPagePlugin implements Plugin {
 			pageKey = "page";
 		}
 
-		Request request = (Request) dataProvider.getData(requestKey);
+		Request request = (Request) templateContext.get(requestKey);
 		String pageString = request.getHttpRequest().getParam(parameter);
 		int page = 0;
 		try {
@@ -58,7 +58,7 @@ public class GetPagePlugin implements Plugin {
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
 		}
-		dataProvider.setData(pageKey, page);
+		templateContext.set(pageKey, page);
 	}
 
 }

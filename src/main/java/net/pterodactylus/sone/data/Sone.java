@@ -41,7 +41,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Sone implements Fingerprintable {
+public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/** comparator that sorts Sones by their nice name. */
 	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
@@ -180,7 +180,7 @@ public class Sone implements Fingerprintable {
 	 */
 	public Sone setRequestUri(FreenetURI requestUri) {
 		if (this.requestUri == null) {
-			this.requestUri = requestUri.setDocName("Sone").setMetaString(new String[0]);
+			this.requestUri = requestUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
 			return this;
 		}
 		if (!this.requestUri.equalsKeypair(requestUri)) {
@@ -208,7 +208,7 @@ public class Sone implements Fingerprintable {
 	 */
 	public Sone setInsertUri(FreenetURI insertUri) {
 		if (this.insertUri == null) {
-			this.insertUri = insertUri.setDocName("Sone").setMetaString(new String[0]);
+			this.insertUri = insertUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
 			return this;
 		}
 		if (!this.insertUri.equalsKeypair(insertUri)) {
@@ -625,26 +625,7 @@ public class Sone implements Fingerprintable {
 	@Override
 	public synchronized String getFingerprint() {
 		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Profile(");
-		if (profile.getFirstName() != null) {
-			fingerprint.append("FirstName(").append(profile.getFirstName()).append(')');
-		}
-		if (profile.getMiddleName() != null) {
-			fingerprint.append("MiddleName(").append(profile.getMiddleName()).append(')');
-		}
-		if (profile.getLastName() != null) {
-			fingerprint.append("LastName(").append(profile.getLastName()).append(')');
-		}
-		if (profile.getBirthDay() != null) {
-			fingerprint.append("BirthDay(").append(profile.getBirthDay()).append(')');
-		}
-		if (profile.getBirthMonth() != null) {
-			fingerprint.append("BirthMonth(").append(profile.getBirthMonth()).append(')');
-		}
-		if (profile.getBirthYear() != null) {
-			fingerprint.append("BirthYear(").append(profile.getBirthYear()).append(')');
-		}
-		fingerprint.append(")");
+		fingerprint.append(profile.getFingerprint());
 
 		fingerprint.append("Posts(");
 		for (Post post : getPosts()) {
@@ -683,6 +664,18 @@ public class Sone implements Fingerprintable {
 		fingerprint.append(')');
 
 		return fingerprint.toString();
+	}
+
+	//
+	// INTERFACE Comparable<Sone>
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int compareTo(Sone sone) {
+		return NICE_NAME_COMPARATOR.compare(this, sone);
 	}
 
 	//

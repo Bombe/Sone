@@ -1,10 +1,17 @@
-<div class="short-text">
+<div class="short-text hidden">
 	<%= Notification.NewPost.ShortText|l10n|html>
 	<a class="link" onclick="showNotificationDetails('<%notification.id|html>'); return false;"><%= Notification.ClickHereToRead|l10n|html></a>
 </div>
-<div class="text hidden">
+<div class="text">
+	<form class="mark-as-read" action="markAsKnown.html" method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+		<input type="hidden" name="type" value="post" />
+		<input type="hidden" name="id" value="<%foreach posts post><% post.id|html><%notlast> <%/notlast><%/foreach>" />
+		<button type="submit" name="mark-read" value="true"><%= Notification.NewPost.Button.MarkRead|l10n|html></button>
+	</form>
 	<%= Notification.NewPost.Text|l10n|html>
 	<%foreach posts post>
-		<a href="viewPost.html?post=<% post.id|html>"><% post.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
+		<a class="link-<% post.id|html>" href="viewPost.html?post=<% post.id|html>"><% post.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
 	<%/foreach>
 </div>

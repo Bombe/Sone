@@ -55,4 +55,12 @@ public class DismissNotificationAjaxPage extends JsonPage {
 		return createSuccessJsonObject();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected boolean requiresLogin() {
+		return false;
+	}
+
 }

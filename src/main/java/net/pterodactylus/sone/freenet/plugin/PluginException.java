@@ -15,14 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.wot;
+package net.pterodactylus.sone.freenet.plugin;
+
+import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 
 /**
  * Exception that signals an error when communicating with a plugin.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PluginException extends Exception {
+public class PluginException extends WebOfTrustException {
 
 	/**
 	 * Creates a new plugin exception.

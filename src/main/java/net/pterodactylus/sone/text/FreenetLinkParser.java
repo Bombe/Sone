@@ -28,7 +28,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.template.TemplateFactory;
+import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.template.TemplateParser;
 import freenet.keys.FreenetURI;
 
 /**
@@ -72,16 +73,16 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	}
 
 	/** The template factory. */
-	private final TemplateFactory templateFactory;
+	private final TemplateContextFactory templateContextFactory;
 
 	/**
 	 * Creates a new freenet link parser.
 	 *
-	 * @param templateFactory
-	 *            The template factory
+	 * @param templateContextFactory
+	 *            The template context factory
 	 */
-	public FreenetLinkParser(TemplateFactory templateFactory) {
-		this.templateFactory = templateFactory;
+	public FreenetLinkParser(TemplateContextFactory templateContextFactory) {
+		this.templateContextFactory = templateContextFactory;
 	}
 
 	//
@@ -147,36 +148,35 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 					String name = link;
 					logger.log(Level.FINER, "Found link: %s", link);
 					logger.log(Level.FINEST, "Next: %d, CHK: %d, SSK: %d, USK: %d", new Object[] { next, nextChk, nextSsk, nextUsk });
-					if (linkType == LinkType.KSK) {
-						name = link.substring(4);
-					} else if ((linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
-						if (name.indexOf('/') > -1) {
-							if (!name.endsWith("/")) {
-								name = name.substring(name.lastIndexOf('/') + 1);
-							} else {
-								if (name.indexOf('/') != name.lastIndexOf('/')) {
-									name = name.substring(name.lastIndexOf('/', name.lastIndexOf('/') - 1));
-								} else {
-									/* shorten to 5 chars. */
-									name = name.substring(4, Math.min(9, name.length()));
-								}
-							}
-						}
+
+					if ((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
+						FreenetURI uri;
 						if (name.indexOf('?') > -1) {
 							name = name.substring(0, name.indexOf('?'));
 						}
-						boolean fromPostingSone = false;
-						if ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
-							try {
-								new FreenetURI(link);
-								fromPostingSone = link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
-								parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
-							} catch (MalformedURLException mue1) {
-								/* it’s not a valid link. */
-								parts.add(createPlainTextPart(link));
+						if (name.endsWith("/")) {
+							name = name.substring(0, name.length() - 1);
+						}
+						try {
+							uri = new FreenetURI(name);
+							name = uri.lastMetaString();
+							if (name == null) {
+								name = uri.getDocName();
 							}
-						} else {
+							if (name == null) {
+								name = link.substring(0, Math.min(9, link.length()));
+							}
+							boolean fromPostingSone = ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
 							parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
+						} catch (MalformedURLException mue1) {
+							/* not a valid link, insert as plain text. */
+							parts.add(createPlainTextPart(link));
+						} catch (NullPointerException npe1) {
+							/* FreenetURI sometimes throws these, too. */
+							parts.add(createPlainTextPart(link));
+						} catch (ArrayIndexOutOfBoundsException aioobe1) {
+							/* oh, and these, too. */
+							parts.add(createPlainTextPart(link));
 						}
 					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
 						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
@@ -219,7 +219,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the given text
 	 */
 	private Part createPlainTextPart(String text) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<% text|html>"))).set("text", text);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<% text|html>"))).set("text", text);
 	}
 
 	/**
@@ -233,7 +233,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the link
 	 */
 	private Part createInternetLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"internet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"internet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the link
 	 */
 	private Part createFreenetLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"freenet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"freenet\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 	/**
@@ -261,7 +261,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 * @return The part that displays the link
 	 */
 	private Part createTrustedFreenetLinkPart(String link, String name) {
-		return new TemplatePart(templateFactory.createTemplate(new StringReader("<a class=\"freenet-trusted\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"freenet-trusted\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
 	}
 
 }

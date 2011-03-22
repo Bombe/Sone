@@ -68,39 +68,45 @@ public class IdentityListenerManager extends AbstractListenerManager<IdentityMan
 	/**
 	 * Notifies all listeners that a new identity was discovered.
 	 *
-	 * @see IdentityListener#identityAdded(Identity)
+	 * @see IdentityListener#identityAdded(OwnIdentity, Identity)
+	 * @param ownIdentity
+	 *            The own identity at the root of the trust tree
 	 * @param identity
 	 *            The new identity
 	 */
-	public void fireIdentityAdded(Identity identity) {
+	public void fireIdentityAdded(OwnIdentity ownIdentity, Identity identity) {
 		for (IdentityListener identityListener : getListeners()) {
-			identityListener.identityAdded(identity);
+			identityListener.identityAdded(ownIdentity, identity);
 		}
 	}
 
 	/**
 	 * Notifies all listeners that some properties of the identity have changed.
 	 *
-	 * @see IdentityListener#identityUpdated(Identity)
+	 * @see IdentityListener#identityUpdated(OwnIdentity, Identity)
+	 * @param ownIdentity
+	 *            The own identity at the root of the trust tree
 	 * @param identity
 	 *            The updated identity
 	 */
-	public void fireIdentityUpdated(Identity identity) {
+	public void fireIdentityUpdated(OwnIdentity ownIdentity, Identity identity) {
 		for (IdentityListener identityListener : getListeners()) {
-			identityListener.identityUpdated(identity);
+			identityListener.identityUpdated(ownIdentity, identity);
 		}
 	}
 
 	/**
 	 * Notifies all listeners that an identity has gone away.
 	 *
-	 * @see IdentityListener#identityRemoved(Identity)
+	 * @see IdentityListener#identityRemoved(OwnIdentity, Identity)
+	 * @param ownIdentity
+	 *            The own identity at the root of the trust tree
 	 * @param identity
 	 *            The disappeared identity
 	 */
-	public void fireIdentityRemoved(Identity identity) {
+	public void fireIdentityRemoved(OwnIdentity ownIdentity, Identity identity) {
 		for (IdentityListener identityListener : getListeners()) {
-			identityListener.identityRemoved(identity);
+			identityListener.identityRemoved(ownIdentity, identity);
 		}
 	}
 

@@ -51,16 +51,17 @@ public class CreateReplyAjaxPage extends JsonPage {
 	protected JsonObject createJsonObject(Request request) {
 		String postId = request.getHttpRequest().getParam("post");
 		String text = request.getHttpRequest().getParam("text").trim();
-		Sone currentSone = getCurrentSone(request.getToadletContext());
-		if (currentSone == null) {
-			return createErrorJsonObject("auth-required");
+		String senderId = request.getHttpRequest().getParam("sender");
+		Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+		if (sender == null) {
+			sender = getCurrentSone(request.getToadletContext());
 		}
 		Post post = webInterface.getCore().getPost(postId);
 		if ((post == null) || (post.getSone() == null)) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		Reply reply = webInterface.getCore().createReply(currentSone, post, text);
-		return createSuccessJsonObject().put("reply", reply.getId());
+		Reply reply = webInterface.getCore().createReply(sender, post, text);
+		return createSuccessJsonObject().put("reply", reply.getId()).put("sone", sender.getId());
 	}
 
 }

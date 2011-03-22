@@ -19,8 +19,8 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * This page lets the user view a post and all its replies.
@@ -49,19 +49,24 @@ public class ViewPostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		String postId = request.getHttpRequest().getParam("post");
+		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
 		Post post = webInterface.getCore().getPost(postId);
-		dataProvider.set("post", post);
+		templateContext.set("post", post);
+		templateContext.set("raw", raw);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void postProcess(Request request, DataProvider dataProvider) {
-		Post post = (Post) dataProvider.get("post");
+	protected void postProcess(Request request, TemplateContext templateContext) {
+		Post post = (Post) templateContext.get("post");
+		if (post == null) {
+			return;
+		}
 		webInterface.getCore().markPostKnown(post);
 		for (Reply reply : webInterface.getCore().getReplies(post)) {
 			webInterface.getCore().markReplyKnown(reply);

@@ -47,25 +47,31 @@ public interface IdentityListener extends EventListener {
 	/**
 	 * Notifies a listener that a new identity was discovered.
 	 *
+	 * @param ownIdentity
+	 *            The own identity at the root of the trust tree
 	 * @param identity
 	 *            The new identity
 	 */
-	public void identityAdded(Identity identity);
+	public void identityAdded(OwnIdentity ownIdentity, Identity identity);
 
 	/**
 	 * Notifies a listener that some properties of the identity have changed.
 	 *
+	 * @param ownIdentity
+	 *            The own identity at the root of the trust tree
 	 * @param identity
 	 *            The updated identity
 	 */
-	public void identityUpdated(Identity identity);
+	public void identityUpdated(OwnIdentity ownIdentity, Identity identity);
 
 	/**
 	 * Notifies a listener that an identity has gone away.
 	 *
+	 * @param ownIdentity
+	 *            The own identity at the root of the trust tree
 	 * @param identity
 	 *            The disappeared identity
 	 */
-	public void identityRemoved(Identity identity);
+	public void identityRemoved(OwnIdentity ownIdentity, Identity identity);
 
 }

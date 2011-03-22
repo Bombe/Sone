@@ -19,8 +19,8 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
-import net.pterodactylus.util.template.DataProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Lets the user delete a Sone. Of course the Sone is not really deleted from
@@ -51,8 +51,8 @@ public class DeleteSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, DataProvider dataProvider) throws RedirectException {
-		super.processTemplate(request, dataProvider);
+	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().isPartSet("deleteSone")) {
 				Sone currentSone = getCurrentSone(request.getToadletContext());

@@ -48,8 +48,7 @@ public class ListNotification<T> extends TemplateNotification {
 	 */
 	public ListNotification(String id, String key, Template template) {
 		super(id, template);
-		template.set(key, elements);
-		template.set("notification", this);
+		template.getInitialContext().set(key, elements);
 	}
 
 	//
