@@ -47,15 +47,25 @@
 
 	<%elseif imageRequested>
 
-	<%else>
+	<%elseif soneRequested>
 
-		<%foreach currentSone.albums album>
-			<div class="album">
-				<div class="name"><% album.name|html></div>
-			</div>
-		<%/foreach>
+		<%ifnull sone>
 
-		<%include include/createAlbum.html>
+			<p><%= Page.ImageBrowser.Sone.Error.NotFound.Text|l10n|html></p>
+
+		<%else>
+
+			<%foreach sone.albums album>
+				<div class="album">
+					<div class="name"><a href="imageBrowser.html?album=<% album.id|html>"><% album.name|html></a></div>
+				</div>
+			<%/foreach>
+
+			<%if sone.current>
+				<%include include/createAlbum.html>
+			<%/if>
+
+		<%/if>
 
 	<%/if>
 

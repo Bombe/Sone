@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -63,6 +64,15 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			Image image = webInterface.getCore().getImage(imageId, false);
 			templateContext.set("imageRequested", true);
 			templateContext.set("image", image);
+			return;
 		}
+		Sone sone = getCurrentSone(request.getToadletContext(), false);
+		String soneId = request.getHttpRequest().getParam("sone", null);
+		if (soneId != null) {
+			sone = webInterface.getCore().getSone(soneId, false);
+		}
+		templateContext.set("soneRequested", true);
+		templateContext.set("sone", sone);
 	}
+
 }
