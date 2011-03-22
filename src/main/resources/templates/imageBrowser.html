@@ -35,11 +35,13 @@
 				</div>
 			<%/foreach>
 
-			<%include include/createAlbum.html>
-
 			<div id="description">
 				<% album.description|html>
 			</div>
+
+			<%if album.sone.current>
+				<%include include/createAlbum.html>
+			<%/if>
 
 		<%/if>
 
