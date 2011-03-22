@@ -49,7 +49,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 				backlinks.add(0, createLink("imageBrowser.html?album=" + album.getId(), album.getName()));
 				currentAlbum = currentAlbum.getParent();
 			}
-			backlinks.add(0, createLink("viewSone.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
+			backlinks.add(0, createLink("imageBrowser.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
 			return backlinks;
 		}
 		return super.get(templateContext, object, member);
