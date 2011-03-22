@@ -53,6 +53,8 @@
 
 		<%else>
 
+			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
+
 			<%foreach sone.albums album>
 				<div class="album">
 					<div class="name"><a href="imageBrowser.html?album=<% album.id|html>"><% album.name|html></a></div>
