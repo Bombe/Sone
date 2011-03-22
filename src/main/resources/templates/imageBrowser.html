@@ -31,7 +31,7 @@
 
 			<%foreach album.albums album>
 				<div class="album">
-					<div class="name"><% album.name|html></div>
+					<div class="name"><a href="imageBrowser.html?album=<% album.id|html>"><% album.name|html></a></div>
 				</div>
 			<%/foreach>
 
