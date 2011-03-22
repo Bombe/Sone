@@ -1710,8 +1710,9 @@ public class Core implements IdentityListener, UpdateListener {
 		album.setSone(sone);
 		if (parent != null) {
 			parent.addAlbum(album);
+		} else {
+			sone.addAlbum(album);
 		}
-		sone.addAlbum(album);
 		return album;
 	}
 
