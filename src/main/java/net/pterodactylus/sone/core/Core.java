@@ -731,7 +731,6 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
-	 *
 	 * Returns the album with the given ID, creating a new album if no album
 	 * with the given ID can be found.
 	 *
