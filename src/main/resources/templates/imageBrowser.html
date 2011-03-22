@@ -16,7 +16,7 @@
 
 		<%else>
 
-			<h2><% album.name|html></h2>
+			<h2><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.name|html></h2>
 
 			<div class="backlinks">
 				<%foreach album.backlinks backlink backlinks>
