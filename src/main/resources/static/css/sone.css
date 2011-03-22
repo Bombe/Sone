@@ -545,6 +545,14 @@ textarea {
 	position: relative;
 }
 
+#sone .backlinks .backlink {
+	display: inline;
+}
+
+#sone .backlinks .separator {
+	display: inline;
+}
+
 #sone #tail {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;
