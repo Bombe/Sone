@@ -1343,9 +1343,14 @@ $(document).ready(function() {
 	});
 
 	/* ajaxify album creation input field. */
-	getTranslation("WebInterface.DefaultText.Reply", function(text) {
-		$("#create-album input[type=text]").each(function() {
+	getTranslation("WebInterface.DefaultText.CreateAlbum.Name", function(text) {
+		$("#create-album input[name='name']").each(function() {
 			registerInputTextareaSwap(this, text, "name", false, true);
+		});
+	});
+	getTranslation("WebInterface.DefaultText.CreateAlbum.Description", function(text) {
+		$("#create-album input[name='description']").each(function() {
+			registerInputTextareaSwap(this, text, "description", true, true);
 		});
 	});
 
