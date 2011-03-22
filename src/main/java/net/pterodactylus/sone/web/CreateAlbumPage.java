@@ -58,11 +58,12 @@ public class CreateAlbumPage extends SoneTemplatePage {
 				templateContext.set("nameMissing", true);
 				return;
 			}
+			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 256).trim();
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
 			Album parent = webInterface.getCore().getAlbum(parentId, false);
 			Album album = webInterface.getCore().createAlbum(currentSone, parent);
-			album.setName(name);
+			album.setName(name).setDescription(description);
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}
 	}
