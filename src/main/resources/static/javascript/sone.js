@@ -1342,18 +1342,6 @@ $(document).ready(function() {
 		});
 	});
 
-	/* ajaxify album creation input field. */
-	getTranslation("WebInterface.DefaultText.CreateAlbum.Name", function(text) {
-		$("#create-album input[name='name']").each(function() {
-			registerInputTextareaSwap(this, text, "name", false, true);
-		});
-	});
-	getTranslation("WebInterface.DefaultText.CreateAlbum.Description", function(text) {
-		$("#create-album input[name='description']").each(function() {
-			registerInputTextareaSwap(this, text, "description", true, true);
-		});
-	});
-
 	/* Ajaxifies all posts. */
 	/* calling getTranslation here will cache the necessary values. */
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
