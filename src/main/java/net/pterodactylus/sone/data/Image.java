@@ -57,6 +57,7 @@ public class Image implements Fingerprintable {
 	 */
 	public Image() {
 		this(UUID.randomUUID().toString());
+		setCreationTime(System.currentTimeMillis());
 	}
 
 	/**
