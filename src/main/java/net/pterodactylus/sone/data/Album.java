@@ -51,6 +51,9 @@ public class Album implements Fingerprintable {
 	/** The description of this album. */
 	private String description;
 
+	/** The index of the album picture. */
+	private int albumImage = -1;
+
 	/**
 	 * Creates a new album with a random ID.
 	 */
@@ -167,6 +170,19 @@ public class Album implements Fingerprintable {
 	public void removeImage(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
 		images.remove(image);
+	}
+
+	/**
+	 * Returns the album image of this album, or {@code null} if no album image
+	 * has been set.
+	 *
+	 * @return The image to show when this album is listed
+	 */
+	public Image getAlbumImage() {
+		if (albumImage == -1) {
+			return null;
+		}
+		return images.get(albumImage);
 	}
 
 	/**
