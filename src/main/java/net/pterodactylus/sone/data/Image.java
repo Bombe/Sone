@@ -34,7 +34,7 @@ public class Image implements Fingerprintable {
 	/** The Sone the image belongs to. */
 	private Sone sone;
 
-	/** The key of the image. */
+	/** The request key of the image. */
 	private String key;
 
 	/** The creation time of the image. */
@@ -107,20 +107,20 @@ public class Image implements Fingerprintable {
 	}
 
 	/**
-	 * Returns the key of this image.
+	 * Returns the request key of this image.
 	 *
-	 * @return The key of this image
+	 * @return The request key of this image
 	 */
 	public String getKey() {
 		return key;
 	}
 
 	/**
-	 * Sets the key of this image. The key can only be set as long as no key has
-	 * yet been set.
+	 * Sets the request key of this image. The request key can only be set as
+	 * long as no request key has yet been set.
 	 *
 	 * @param key
-	 *            The new key of this image
+	 *            The new request key of this image
 	 * @return This image
 	 */
 	public Image setKey(String key) {
