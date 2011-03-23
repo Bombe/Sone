@@ -29,7 +29,15 @@
 
 			<%foreach album.albums album>
 				<div class="album">
-					<div class="image"><a href="imageBrowser.html?album=<% album.id|html>"><img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" /></a></div>
+					<div class="image">
+						<a href="imageBrowser.html?album=<% album.id|html>">
+							<%ifnull album.image>
+								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+							<%else><!-- TODO -->
+								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+							<%/if>
+						</a>
+					</div>
 				</div>
 			<%/foreach>
 
@@ -57,7 +65,15 @@
 
 			<%foreach sone.albums album>
 				<div class="album">
-					<div class="image"><a href="imageBrowser.html?album=<% album.id|html>"><img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" /></a></div>
+					<div class="image">
+						<a href="imageBrowser.html?album=<% album.id|html>">
+							<%ifnull album.image>
+								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+							<%else><!-- TODO -->
+								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+							<%/if>
+						</a>
+					</div>
 				</div>
 			<%/foreach>
 
