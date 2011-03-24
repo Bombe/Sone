@@ -166,7 +166,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 							if (name == null) {
 								name = link.substring(0, Math.min(9, link.length()));
 							}
-							boolean fromPostingSone = ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
+							boolean fromPostingSone = (context.getPostingSone() != null) && ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
 							parts.add(fromPostingSone ? createTrustedFreenetLinkPart(link, name) : createFreenetLinkPart(link, name));
 						} catch (MalformedURLException mue1) {
 							/* not a valid link, insert as plain text. */
