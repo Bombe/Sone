@@ -557,6 +557,10 @@ textarea {
 	float: left;
 }
 
+#sone .image {
+	float: left;
+}
+
 #sone .backlinks .separator {
 	display: inline;
 }
