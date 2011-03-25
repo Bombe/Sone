@@ -82,7 +82,8 @@ public class UploadImagePage extends SoneTemplatePage {
 				imageInputStream = fileBucket.getInputStream();
 				Image uploadedImage = ImageIO.read(imageInputStream);
 				if (uploadedImage == null) {
-					throw new RedirectException("invalid.html");
+					templateContext.set("messages", webInterface.getL10n().getString("Page.UploadImage.Error.InvalidImage"));
+					return;
 				}
 				image = new net.pterodactylus.sone.data.Image().setSone(currentSone);
 				image.setTitle(name).setDescription(description).setWidth(uploadedImage.getWidth(null)).setHeight(uploadedImage.getHeight(null));
