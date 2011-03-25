@@ -70,7 +70,7 @@ public class UploadImagePage extends SoneTemplatePage {
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
 			Album parent = webInterface.getCore().getAlbum(parentId, false);
 			if (parent == null) {
-				throw new RedirectException("invalid.html");
+				return;
 			}
 			String name = request.getHttpRequest().getPartAsStringFailsafe("title", 200);
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 4000);
@@ -91,7 +91,7 @@ public class UploadImagePage extends SoneTemplatePage {
 				uploadedImage.flush();
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
-				throw new RedirectException("invalid.html");
+				return;
 			} finally {
 				Closer.close(imageInputStream);
 				fileBucket.free();
