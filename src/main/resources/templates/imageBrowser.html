@@ -48,15 +48,25 @@
 
 			<%foreach album.albums album>
 				<div class="album">
-					<div class="image">
-						<a href="imageBrowser.html?album=<% album.id|html>">
-							<%ifnull album.image>
-								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
-							<%else><!-- TODO -->
-								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
-							<%/if>
-						</a>
-					</div>
+					<a href="imageBrowser.html?album=<% album.id|html>">
+						<%ifnull album.image>
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+						<%else><!-- TODO -->
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+						<%/if>
+					</a>
+				</div>
+			<%/foreach>
+
+			<%foreach album.images image>
+				<div class="image">
+					<a href="imageBrowser.html?image=<%image.id|html>">
+						<%ifnull image.key>
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% image.title|html>" title="<% image.title|html>" />
+						<%else>
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% image.title|html>" title="<% image.title|html>" />
+						<%/if>
+					</a>
 				</div>
 			<%/foreach>
 
