@@ -60,10 +60,4 @@
 		<%/foreach>
 	</reply-likes>
 
-	<albums>
-		<%foreach currentSone.albums album>
-		<%include insert/include/album.xml>
-		<%/foreach>
-	</albums>
-
 </sone>
