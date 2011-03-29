@@ -817,7 +817,6 @@ public class Core implements IdentityListener, UpdateListener {
 				@SuppressWarnings("synthetic-access")
 				public void run() {
 					if (!preferences.isSoneRescueMode()) {
-						soneDownloader.fetchSone(sone);
 						return;
 					}
 					logger.log(Level.INFO, "Trying to restore Sone from Freenet…");
