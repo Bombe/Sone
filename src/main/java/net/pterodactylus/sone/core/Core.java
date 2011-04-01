@@ -525,7 +525,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 * @return {@code true} if the target Sone is trusted by the origin Sone
 	 */
 	public boolean isSoneTrusted(Sone origin, Sone target) {
-		return trustedIdentities.containsKey(origin) && trustedIdentities.get(origin.getIdentity()).contains(target);
+		return trustedIdentities.containsKey(origin.getIdentity()) && trustedIdentities.get(origin.getIdentity()).contains(target.getIdentity());
 	}
 
 	/**
