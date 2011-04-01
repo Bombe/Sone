@@ -1157,7 +1157,6 @@ function toggleIcon() {
 		iconBlinking = false;
 	} else {
 		iconActive = !iconActive;
-		console.log("showing icon: " + iconActive);
 		changeIcon(iconActive ? "images/icon-activity.png" : "images/icon.png");
 		setTimeout(toggleIcon, 1500);
 	}
