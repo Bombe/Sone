@@ -62,7 +62,7 @@
 
 		<div id="posts">
 			<%:getpage parameter=postPage>
-			<%:paginate list=sone.posts pagesize=25>
+			<%:paginate list=sone.posts pagesize=10>
 			<%= postPage|store key=pageParameter>
 			<%include include/pagination.html>
 			<%foreach pagination.items post>
