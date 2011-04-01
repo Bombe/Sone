@@ -191,21 +191,31 @@ public class SearchPage extends SoneTemplatePage {
 		int forbiddenHits = 0;
 		int requiredPhrases = 0;
 		for (Phrase phrase : phrases) {
+			String phraseString = phrase.getPhrase().toLowerCase();
 			if (phrase.getOptionality() == Phrase.Optionality.REQUIRED) {
 				++requiredPhrases;
 			}
-			boolean matches = expression.toLowerCase().contains(phrase.getPhrase().toLowerCase());
-			if (!matches) {
+			int matches = 0;
+			int index = 0;
+			while (index < expression.length()) {
+				int position = expression.toLowerCase().indexOf(phraseString, index);
+				if (position == -1) {
+					break;
+				}
+				index = position + phraseString.length();
+				++matches;
+			}
+			if (matches == 0) {
 				continue;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.REQUIRED) {
-				++requiredHits;
+				requiredHits += matches;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.OPTIONAL) {
-				++optionalHits;
+				optionalHits += matches;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.FORBIDDEN) {
-				++forbiddenHits;
+				forbiddenHits += matches;
 			}
 		}
 		return requiredHits * 3 + optionalHits + (requiredHits - requiredPhrases) * 5 - (forbiddenHits * 2);
