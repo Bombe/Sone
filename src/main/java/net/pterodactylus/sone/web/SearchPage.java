@@ -79,7 +79,7 @@ public class SearchPage extends SoneTemplatePage {
 		List<Phrase> phrases = parseSearchPhrases(query);
 
 		Set<Sone> sones = webInterface.getCore().getSones();
-		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.GENERATOR);
+		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
 		Set<Post> posts = new HashSet<Post>();
 		for (Sone sone : sones) {
@@ -239,8 +239,28 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private static class SoneStringGenerator implements StringGenerator<Sone> {
 
-		/** A static instance of the Sone string generator. */
-		public static final SoneStringGenerator GENERATOR = new SoneStringGenerator();
+		/** A static instance of a complete Sone string generator. */
+		public static final SoneStringGenerator COMPLETE_GENERATOR = new SoneStringGenerator(true);
+
+		/**
+		 * A static instance of a Sone string generator that will only use the
+		 * name of the Sone.
+		 */
+		public static final SoneStringGenerator NAME_GENERATOR = new SoneStringGenerator(false);
+
+		/** Whether to generate a string from all data of a Sone. */
+		private final boolean complete;
+
+		/**
+		 * Creates a new Sone string generator.
+		 *
+		 * @param complete
+		 *            {@code true} to use the profile’s fields, {@code false} to
+		 *            not to use the profile‘s fields
+		 */
+		private SoneStringGenerator(boolean complete) {
+			this.complete = complete;
+		}
 
 		/**
 		 * {@inheritDoc}
@@ -259,8 +279,10 @@ public class SearchPage extends SoneTemplatePage {
 			if (soneProfile.getLastName() != null) {
 				soneString.append(' ').append(soneProfile.getLastName());
 			}
-			for (Field field : soneProfile.getFields()) {
-				soneString.append(' ').append(field.getValue());
+			if (complete) {
+				for (Field field : soneProfile.getFields()) {
+					soneString.append(' ').append(field.getValue());
+				}
 			}
 			return soneString.toString();
 		}
@@ -284,10 +306,10 @@ public class SearchPage extends SoneTemplatePage {
 			StringBuilder postString = new StringBuilder();
 			postString.append(post.getText());
 			if (post.getRecipient() != null) {
-				postString.append(' ').append(SoneStringGenerator.GENERATOR.generateString(post.getRecipient()));
+				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient()));
 			}
 			for (Reply reply : webInterface.getCore().getReplies(post)) {
-				postString.append(' ').append(SoneStringGenerator.GENERATOR.generateString(reply.getSone()));
+				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(reply.getSone()));
 				postString.append(' ').append(reply.getText());
 			}
 			return postString.toString();
