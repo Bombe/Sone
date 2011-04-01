@@ -49,6 +49,36 @@ public class PartContainer implements Part {
 		parts.add(part);
 	}
 
+	/**
+	 * Returns the part at the given index.
+	 *
+	 * @param index
+	 *            The index of the part
+	 * @return The part
+	 */
+	public Part getPart(int index) {
+		return parts.get(index);
+	}
+
+	/**
+	 * Removes the part at the given index.
+	 *
+	 * @param index
+	 *            The index of the part to remove
+	 */
+	public void removePart(int index) {
+		parts.remove(index);
+	}
+
+	/**
+	 * Returns the number of parts.
+	 *
+	 * @return The number of parts
+	 */
+	public int size() {
+		return parts.size();
+	}
+
 	//
 	// PART METHODS
 	//
