@@ -16,8 +16,10 @@
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
 				<%/if>
 			<%/if>
-			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% post.text|html></div>
-			<div class="post-text text<%if raw> hidden<%/if>"><% post.text|parse sone=post.sone></div>
+			<% post.text|html|store key=originalText text=true>
+			<% post.text|parse sone=post.sone|store key=parsedText text=true>
+			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
+			<div class="post-text text<%if raw> hidden<%/if>"><% parsedText></div>
 		</div>
 		<div class="post-status-line status-line">
 			<div class="bookmarks">
@@ -36,8 +38,10 @@
 			</div>
 			<span class='separator'>·</span>
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
-			<span class='separator'>·</span>
-			<div class="show-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
+			<%if ! originalText|match key=parsedText>
+				<span class='separator'>·</span>
+				<div class="show-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
+			<%/if>
 			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>">
 				<span class='separator'>·</span>
 				<span title="<% post.likes.soneNames|html>">↑<span class="like-count"><% post.likes.size></span></span>
