@@ -227,7 +227,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public class RedirectException extends Exception {
+	public static class RedirectException extends Exception {
 
 		/** The target to redirect to. */
 		private final String target;

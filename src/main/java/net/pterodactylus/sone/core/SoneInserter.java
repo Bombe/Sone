@@ -246,7 +246,7 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class InsertInformation {
+	private static class InsertInformation {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
