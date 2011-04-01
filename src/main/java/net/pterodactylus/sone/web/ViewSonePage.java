@@ -65,6 +65,10 @@ public class ViewSonePage extends SoneTemplatePage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);
 		templateContext.set("sone", sone);
+		List<Post> sonePosts = sone.getPosts();
+		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
+		templateContext.set("postPagination", postPagination);
+		templateContext.set("posts", postPagination.getItems());
 		Set<Reply> replies = sone.getReplies();
 		final Map<Post, List<Reply>> repliedPosts = new HashMap<Post, List<Reply>>();
 		for (Reply reply : replies) {
@@ -100,7 +104,7 @@ public class ViewSonePage extends SoneTemplatePage {
 			return;
 		}
 		webInterface.getCore().markSoneKnown(sone);
-		List<Post> posts = sone.getPosts();
+		List<Post> posts = (List<Post>) templateContext.get("posts");
 		posts.addAll((List<Post>) templateContext.get("repliedPosts"));
 		for (Post post : posts) {
 			if (post.getSone() != null) {
