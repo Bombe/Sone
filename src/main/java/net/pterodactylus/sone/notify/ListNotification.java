@@ -18,8 +18,8 @@
 package net.pterodactylus.sone.notify;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.Template;
@@ -34,7 +34,7 @@ import net.pterodactylus.util.template.Template;
 public class ListNotification<T> extends TemplateNotification {
 
 	/** The list of new elements. */
-	private final List<T> elements = Collections.synchronizedList(new ArrayList<T>());
+	private final List<T> elements = new CopyOnWriteArrayList<T>();
 
 	/**
 	 * Creates a new list notification.
