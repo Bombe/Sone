@@ -397,8 +397,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone setPosts(Collection<Post> posts) {
-		this.posts.clear();
-		this.posts.addAll(posts);
+		synchronized (this) {
+			this.posts.clear();
+			this.posts.addAll(posts);
+		}
 		return this;
 	}
 
