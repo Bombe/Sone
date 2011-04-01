@@ -523,6 +523,7 @@ public class WebInterface implements CoreListener {
 		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
 		Template createReplyTemplate = TemplateParser.parse(createReader("/templates/createReply.html"));
 		Template bookmarksTemplate = TemplateParser.parse(createReader("/templates/bookmarks.html"));
+		Template searchTemplate = TemplateParser.parse(createReader("/templates/search.html"));
 		Template editProfileTemplate = TemplateParser.parse(createReader("/templates/editProfile.html"));
 		Template editProfileFieldTemplate = TemplateParser.parse(createReader("/templates/editProfileField.html"));
 		Template deleteProfileFieldTemplate = TemplateParser.parse(createReader("/templates/deleteProfileField.html"));
@@ -564,6 +565,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarksPage(bookmarksTemplate, this), "Bookmarks"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SearchPage(searchTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));

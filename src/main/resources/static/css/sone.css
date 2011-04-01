@@ -545,6 +545,19 @@ textarea {
 	position: relative;
 }
 
+#sone #search {
+	text-align: right;
+}
+
+#sone #search input[type=text] {
+	width: 35em;
+}
+
+#sone #sone-results + #sone #post-results {
+	clear: both;
+	padding-top: 1em;
+}
+
 #sone #tail {
 	margin-top: 1em;
 	border-top: solid 1px #ccc;

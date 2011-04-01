@@ -1322,6 +1322,11 @@ $(document).ready(function() {
 		});
 	});
 
+	/* ajaxify the search input field. */
+	getTranslation("WebInterface.DefaultText.Search", function(defaultText) {
+		registerInputTextareaSwap("#sone #search input[name=query]", defaultText, "query", false, true);
+	});
+
 	/* ajaxify input field on “view Sone” page. */
 	getTranslation("WebInterface.DefaultText.Message", function(defaultText) {
 		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
