@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.text;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,6 +61,21 @@ public class PartContainer implements Part {
 		for (Part part : parts) {
 			part.render(writer);
 		}
+	}
+
+	//
+	// OBJECT METHODS
+	//
+
+	@Override
+	public String toString() {
+		StringWriter stringWriter = new StringWriter();
+		try {
+			render(stringWriter);
+		} catch (IOException ioe1) {
+			/* should never throw, ignore. */
+		}
+		return stringWriter.toString();
 	}
 
 }
