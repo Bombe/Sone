@@ -65,6 +65,9 @@ public class SearchPage extends SoneTemplatePage {
 	// SONETEMPLATEPAGE METHODS
 	//
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
@@ -144,8 +147,8 @@ public class SearchPage extends SoneTemplatePage {
 	 * Parses the given query into search phrases. The query is split on
 	 * whitespace while allowing to group words using single or double quotes.
 	 * Isolated phrases starting with a “+” are
-	 * {@link Phrase.Optionality#REQUIRED}, phrases with a
-	 * “-” are {@link Phrase.Optionality#FORBIDDEN}.
+	 * {@link Phrase.Optionality#REQUIRED}, phrases with a “-” are
+	 * {@link Phrase.Optionality#FORBIDDEN}.
 	 *
 	 * @param query
 	 *            The query to parse
@@ -267,8 +270,7 @@ public class SearchPage extends SoneTemplatePage {
 	/**
 	 * Generates a {@link String} from a {@link Post}, concatenating the text of
 	 * the post, the text of all {@link Reply}s, and the name of all
-	 * {@link Sone}s that have
-	 * replied.
+	 * {@link Sone}s that have replied.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
@@ -437,6 +439,9 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	public static class HitConverter<T> implements Converter<Hit<T>, T> {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
 		public T convert(Hit<T> input) {
 			return input.getObject();
