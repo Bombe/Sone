@@ -97,8 +97,21 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = (source instanceof BufferedReader) ? (BufferedReader) source : new BufferedReader(source);
 		String line;
+		boolean lastLineEmpty = true;
+		int emptyLines = 0;
 		while ((line = bufferedReader.readLine()) != null) {
-			line = line.trim() + "\n";
+			line = line.trim();
+			if (line.length() == 0) {
+				if (lastLineEmpty) {
+					continue;
+				}
+				parts.add(createPlainTextPart("\n"));
+				++emptyLines;
+				lastLineEmpty = emptyLines == 2;
+				continue;
+			}
+			emptyLines = 0;
+			boolean lineComplete = true;
 			while (line.length() > 0) {
 				int nextKsk = line.indexOf("KSK@");
 				int nextChk = line.indexOf("CHK@");
@@ -107,7 +120,11 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 				int nextHttp = line.indexOf("http://");
 				int nextHttps = line.indexOf("https://");
 				if ((nextKsk == -1) && (nextChk == -1) && (nextSsk == -1) && (nextUsk == -1) && (nextHttp == -1) && (nextHttps == -1)) {
-					parts.add(createPlainTextPart(line));
+					if (lineComplete && !lastLineEmpty) {
+						parts.add(createPlainTextPart("\n" + line));
+					} else {
+						parts.add(createPlainTextPart(line));
+					}
 					break;
 				}
 				int next = Integer.MAX_VALUE;
@@ -143,7 +160,11 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 				Matcher matcher = whitespacePattern.matcher(line);
 				int nextSpace = matcher.find(next) ? matcher.start() : line.length();
 				if (nextSpace > (next + 4)) {
-					parts.add(createPlainTextPart(line.substring(0, next)));
+					if (!lastLineEmpty && lineComplete) {
+						parts.add(createPlainTextPart("\n" + line.substring(0, next)));
+					} else {
+						parts.add(createPlainTextPart(line.substring(0, next)));
+					}
 					String link = line.substring(next, nextSpace);
 					String name = link;
 					logger.log(Level.FINER, "Found link: %s", link);
@@ -199,10 +220,22 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 					}
 					line = line.substring(nextSpace);
 				} else {
-					parts.add(createPlainTextPart(line.substring(0, next + 4)));
+					if (!lastLineEmpty && lineComplete) {
+						parts.add(createPlainTextPart("\n" + line.substring(0, next + 4)));
+					} else {
+						parts.add(createPlainTextPart(line.substring(0, next + 4)));
+					}
 					line = line.substring(next + 4);
 				}
+				lineComplete = false;
 			}
+			lastLineEmpty = false;
+		}
+		for (int partIndex = parts.size() - 1; partIndex >= 0; --partIndex) {
+			if (!parts.getPart(partIndex).toString().equals("\n")) {
+				break;
+			}
+			parts.removePart(partIndex);
 		}
 		return parts;
 	}
