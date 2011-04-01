@@ -17,11 +17,19 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -57,12 +65,35 @@ public class ViewSonePage extends SoneTemplatePage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);
 		templateContext.set("sone", sone);
+		Set<Reply> replies = sone.getReplies();
+		final Map<Post, List<Reply>> repliedPosts = new HashMap<Post, List<Reply>>();
+		for (Reply reply : replies) {
+			Post post = reply.getPost();
+			if (repliedPosts.containsKey(post) || sone.equals(post.getSone())) {
+				continue;
+			}
+			repliedPosts.put(post, webInterface.getCore().getReplies(post));
+		}
+		List<Post> posts = new ArrayList<Post>(repliedPosts.keySet());
+		Collections.sort(posts, new Comparator<Post>() {
+
+			@Override
+			public int compare(Post leftPost, Post rightPost) {
+				return (int) Math.min(Integer.MAX_VALUE, Math.max(Integer.MIN_VALUE, repliedPosts.get(rightPost).get(0).getTime() - repliedPosts.get(leftPost).get(0).getTime()));
+			}
+
+		});
+
+		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
+		templateContext.set("repliedPostPagination", repliedPostPagination);
+		templateContext.set("repliedPosts", repliedPostPagination.getItems());
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	protected void postProcess(Request request, TemplateContext templateContext) {
 		Sone sone = (Sone) templateContext.get("sone");
 		if (sone == null) {
@@ -70,8 +101,11 @@ public class ViewSonePage extends SoneTemplatePage {
 		}
 		webInterface.getCore().markSoneKnown(sone);
 		List<Post> posts = sone.getPosts();
+		posts.addAll((List<Post>) templateContext.get("repliedPosts"));
 		for (Post post : posts) {
-			webInterface.getCore().markPostKnown(post);
+			if (post.getSone() != null) {
+				webInterface.getCore().markPostKnown(post);
+			}
 			for (Reply reply : webInterface.getCore().getReplies(post)) {
 				webInterface.getCore().markReplyKnown(reply);
 			}

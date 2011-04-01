@@ -3,10 +3,14 @@
 	<div class="post-time hidden"><% post.time|html></div>
 	<div class="post-author hidden"><% post.sone.id|html></div>
 	<div class="avatar">
-		<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
+		<%if post.loaded>
+			<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
+		<%else>
+			<img src="images/sone-avatar.png" width="48" height="48" alt="Avatar Image" />
+		<%/if>
 	</div>
 	<div class="inner-part">
-		<div>
+		<div<%if !post.loaded> class="hidden"<%/if>>
 			<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a></div>
 			<%ifnull !post.recipient>
 				<span class="recipient-to">→</span>
@@ -21,7 +25,7 @@
 			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="post-text text<%if raw> hidden<%/if>"><% parsedText></div>
 		</div>
-		<div class="post-status-line status-line">
+		<div class="post-status-line status-line<%if !post.loaded> hidden<%/if>">
 			<div class="bookmarks">
 				<form class="unbookmark<%if !post.bookmarked> hidden<%/if>" action="unbookmark.html" method="post">
 					<input type="hidden" name="formPassword" value="<% formPassword|html>" />
@@ -93,6 +97,9 @@
 					<button type="submit"><%= View.Post.DeleteLink|l10n|html></button>
 				</form>
 			<%/if>
+		</div>
+		<div<%if post.loaded> class="hidden"<%/if>>
+			<%= View.Post.NotDownloaded|l10n|html>
 		</div>
 		<div class="replies">
 			<%foreach post.replies reply>
