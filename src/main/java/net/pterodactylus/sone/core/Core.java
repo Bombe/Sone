@@ -534,7 +534,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 *
 	 * @param postId
 	 *            The ID of the post to get
-	 * @return The post, or {@code null} if there is no such post
+	 * @return The post with the given ID, or a new post with the given ID
 	 */
 	public Post getPost(String postId) {
 		return getPost(postId, true);
