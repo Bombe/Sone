@@ -100,8 +100,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 		boolean lastLineEmpty = true;
 		int emptyLines = 0;
 		while ((line = bufferedReader.readLine()) != null) {
-			line = line.trim();
-			if (line.length() == 0) {
+			if (line.trim().length() == 0) {
 				if (lastLineEmpty) {
 					continue;
 				}
