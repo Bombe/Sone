@@ -32,7 +32,6 @@ import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
 import freenet.clients.http.PageNode;
 import freenet.clients.http.ToadletContext;
-import freenet.l10n.BaseL10n;
 
 /**
  * Base class for all {@link Page}s that are rendered with {@link Template}s.
@@ -53,12 +52,6 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/** The template to render. */
 	private final Template template;
 
-	/** The L10n handler. */
-	private final BaseL10n l10n;
-
-	/** The l10n key for the page title. */
-	private final String pageTitleKey;
-
 	/** Where to redirect for invalid form passwords. */
 	private final String invalidFormPasswordRedirectTarget;
 
@@ -71,20 +64,14 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *            The template context factory
 	 * @param template
 	 *            The template to render
-	 * @param l10n
-	 *            The L10n handler
-	 * @param pageTitleKey
-	 *            The l10n key of the title page
 	 * @param invalidFormPasswordRedirectTarget
 	 *            The target to redirect to if a POST request does not contain
 	 *            the correct form password
 	 */
-	public TemplatePage(String path, TemplateContextFactory templateContextFactory, Template template, BaseL10n l10n, String pageTitleKey, String invalidFormPasswordRedirectTarget) {
+	public TemplatePage(String path, TemplateContextFactory templateContextFactory, Template template, String invalidFormPasswordRedirectTarget) {
 		this.path = path;
 		this.templateContextFactory = templateContextFactory;
 		this.template = template;
-		this.l10n = l10n;
-		this.pageTitleKey = pageTitleKey;
 		this.invalidFormPasswordRedirectTarget = invalidFormPasswordRedirectTarget;
 	}
 
@@ -94,6 +81,17 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	@Override
 	public String getPath() {
 		return path;
+	}
+
+	/**
+	 * Returns the title of the page.
+	 *
+	 * @param request
+	 *            The request to serve
+	 * @return The title of the page
+	 */
+	protected String getPageTitle(Request request) {
+		return null;
 	}
 
 	/**
@@ -115,7 +113,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 			}
 		}
 		PageMaker pageMaker = toadletContext.getPageMaker();
-		PageNode pageNode = pageMaker.getPageNode(l10n.getString(pageTitleKey), toadletContext);
+		PageNode pageNode = pageMaker.getPageNode(getPageTitle(request), toadletContext);
 		for (String styleSheet : getStyleSheets()) {
 			pageNode.addCustomStyleSheet(styleSheet);
 		}

@@ -42,8 +42,26 @@ public class SoneTemplatePage extends TemplatePage {
 	/** The Sone core. */
 	protected final WebInterface webInterface;
 
+	/** The page title l10n key. */
+	private final String pageTitleKey;
+
 	/** Whether to require a login. */
 	private final boolean requireLogin;
+
+	/**
+	 * Creates a new template page for Freetalk that does not require the user
+	 * to be logged in.
+	 *
+	 * @param path
+	 *            The path of the page
+	 * @param template
+	 *            The template to render
+	 * @param webInterface
+	 *            The Sone web interface
+	 */
+	public SoneTemplatePage(String path, Template template, WebInterface webInterface) {
+		this(path, template, null, webInterface, false);
+	}
 
 	/**
 	 * Creates a new template page for Freetalk that does not require the user
@@ -69,6 +87,22 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            The path of the page
 	 * @param template
 	 *            The template to render
+	 * @param webInterface
+	 *            The Sone web interface
+	 * @param requireLogin
+	 *            Whether this page requires a login
+	 */
+	public SoneTemplatePage(String path, Template template, WebInterface webInterface, boolean requireLogin) {
+		this(path, template, null, webInterface, requireLogin);
+	}
+
+	/**
+	 * Creates a new template page for Freetalk.
+	 *
+	 * @param path
+	 *            The path of the page
+	 * @param template
+	 *            The template to render
 	 * @param pageTitleKey
 	 *            The l10n key of the page title
 	 * @param webInterface
@@ -77,7 +111,8 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            Whether this page requires a login
 	 */
 	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface, boolean requireLogin) {
-		super(path, webInterface.getTemplateContextFactory(), template, webInterface.getL10n(), pageTitleKey, "noPermission.html");
+		super(path, webInterface.getTemplateContextFactory(), template, "noPermission.html");
+		this.pageTitleKey = pageTitleKey;
 		this.webInterface = webInterface;
 		this.requireLogin = requireLogin;
 		template.getInitialContext().set("webInterface", webInterface);
@@ -158,6 +193,17 @@ public class SoneTemplatePage extends TemplatePage {
 	//
 	// TEMPLATEPAGE METHODS
 	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getPageTitle(Request request) {
+		if (pageTitleKey != null) {
+			return webInterface.getL10n().getString(pageTitleKey);
+		}
+		return "";
+	}
 
 	/**
 	 * {@inheritDoc}
