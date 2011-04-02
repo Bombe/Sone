@@ -21,11 +21,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
+import net.pterodactylus.util.collection.ListBuilder;
+import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.SessionManager.Session;
@@ -203,6 +207,14 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 			return webInterface.getL10n().getString(pageTitleKey);
 		}
 		return "";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected List<Map<String, String>> getAdditionalLinkNodes(Request request) {
+		return new ListBuilder<Map<String, String>>().add(new MapBuilder<String, String>().put("rel", "search").put("type", "application/opensearchdescription+xml").put("title", "Sone").put("href", "http://" + request.getHttpRequest().getHeader("host") + "/Sone/OpenSearch.xml").get()).get();
 	}
 
 	/**

@@ -86,6 +86,7 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.page.StaticPage;
+import net.pterodactylus.sone.web.page.TemplatePage;
 import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
 import net.pterodactylus.util.cache.CacheItem;
@@ -537,6 +538,7 @@ public class WebInterface implements CoreListener {
 		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
 		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
 		Template replyTemplate = TemplateParser.parse(createReader("/templates/include/viewReply.html"));
+		Template openSearchTemplate = TemplateParser.parse(createReader("/templates/xml/OpenSearch.xml"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
@@ -576,6 +578,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
