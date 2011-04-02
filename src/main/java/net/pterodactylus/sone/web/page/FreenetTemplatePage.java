@@ -20,6 +20,9 @@ package net.pterodactylus.sone.web.page;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +35,7 @@ import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
 import freenet.clients.http.PageNode;
 import freenet.clients.http.ToadletContext;
+import freenet.support.HTMLNode;
 
 /**
  * Base class for all {@link Page}s that are rendered with {@link Template}s and
@@ -117,6 +121,12 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 		PageNode pageNode = pageMaker.getPageNode(getPageTitle(request), toadletContext);
 		for (String styleSheet : getStyleSheets()) {
 			pageNode.addCustomStyleSheet(styleSheet);
+		}
+		for (Map<String, String> linkNodeParameters : getAdditionalLinkNodes(request)) {
+			HTMLNode linkNode = pageNode.headNode.addChild("link");
+			for (Entry<String, String> parameter : linkNodeParameters.entrySet()) {
+				linkNode.addAttribute(parameter.getKey(), parameter.getValue());
+			}
 		}
 		String shortcutIcon = getShortcutIcon();
 		if (shortcutIcon != null) {
@@ -204,6 +214,17 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 */
 	protected String getRedirectTarget(Page.Request request) {
 		return null;
+	}
+
+	/**
+	 * Returns additional &lt;link&gt; nodes for the HTML’s &lt;head&gt; node.
+	 *
+	 * @param request
+	 *            The request for which to return the link nodes
+	 * @return All link nodes that should be added to the HTML head
+	 */
+	protected List<Map<String, String>> getAdditionalLinkNodes(Request request) {
+		return Collections.emptyList();
 	}
 
 	//
