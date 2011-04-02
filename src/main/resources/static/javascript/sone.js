@@ -49,6 +49,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 			$(inputField.get(0).form).submit(function() {
 				inputField.attr("disabled", "disabled");
 				if (!optional && (textarea.val() == "")) {
+					inputField.removeAttr("disabled").focus();
 					return false;
 				}
 			});
