@@ -34,14 +34,15 @@ import freenet.clients.http.PageNode;
 import freenet.clients.http.ToadletContext;
 
 /**
- * Base class for all {@link Page}s that are rendered with {@link Template}s.
+ * Base class for all {@link Page}s that are rendered with {@link Template}s and
+ * fit into Freenet’s web interface.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TemplatePage implements Page, LinkEnabledCallback {
+public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(TemplatePage.class);
+	private static final Logger logger = Logging.getLogger(FreenetTemplatePage.class);
 
 	/** The path of the page. */
 	private final String path;
@@ -68,7 +69,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	 *            The target to redirect to if a POST request does not contain
 	 *            the correct form password
 	 */
-	public TemplatePage(String path, TemplateContextFactory templateContextFactory, Template template, String invalidFormPasswordRedirectTarget) {
+	public FreenetTemplatePage(String path, TemplateContextFactory templateContextFactory, Template template, String invalidFormPasswordRedirectTarget) {
 		this.path = path;
 		this.templateContextFactory = templateContextFactory;
 		this.template = template;
@@ -220,7 +221,7 @@ public class TemplatePage implements Page, LinkEnabledCallback {
 	/**
 	 * Exception that can be thrown to signal that a subclassed {@link Page}
 	 * wants to redirect the user during the
-	 * {@link TemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
+	 * {@link FreenetTemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
 	 * method call.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>

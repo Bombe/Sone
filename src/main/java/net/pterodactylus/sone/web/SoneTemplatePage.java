@@ -25,7 +25,7 @@ import java.util.Collection;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.Page;
-import net.pterodactylus.sone.web.page.TemplatePage;
+import net.pterodactylus.sone.web.page.FreenetTemplatePage;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.SessionManager.Session;
@@ -37,7 +37,7 @@ import freenet.support.api.HTTPRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SoneTemplatePage extends TemplatePage {
+public class SoneTemplatePage extends FreenetTemplatePage {
 
 	/** The Sone core. */
 	protected final WebInterface webInterface;
