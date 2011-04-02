@@ -46,6 +46,7 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
+import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.NotificationManagerAccessor;
@@ -117,6 +118,7 @@ import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
+import freenet.support.api.HTTPRequest;
 
 /**
  * Bundles functionality that a web interface of a Freenet plugin needs, e.g.
@@ -188,6 +190,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateContextFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
+		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
 		templateContextFactory.addFilter("date", new DateFilter());
 		templateContextFactory.addFilter("html", new HtmlFilter());
 		templateContextFactory.addFilter("replace", new ReplaceFilter());
