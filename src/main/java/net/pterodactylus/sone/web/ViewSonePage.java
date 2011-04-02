@@ -28,6 +28,7 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -49,12 +50,26 @@ public class ViewSonePage extends SoneTemplatePage {
 	 *            The Sone web interface
 	 */
 	public ViewSonePage(Template template, WebInterface webInterface) {
-		super("viewSone.html", template, "Page.ViewSone.Title", webInterface, false);
+		super("viewSone.html", template, webInterface, false);
 	}
 
 	//
 	// TEMPLATEPAGE METHODS
 	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getPageTitle(Request request) {
+		String soneId = request.getHttpRequest().getParam("sone");
+		Sone sone = webInterface.getCore().getSone(soneId, false);
+		if ((sone != null) && (sone.getTime() > 0)) {
+			String soneName = SoneAccessor.getNiceName(sone);
+			return soneName + " - " + webInterface.getL10n().getString("Page.ViewSone.Title");
+		}
+		return webInterface.getL10n().getString("Page.ViewSone.Page.TitleWithoutSone");
+	}
 
 	/**
 	 * {@inheritDoc}
