@@ -23,6 +23,7 @@ import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -56,7 +57,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		List<Sone> knownSones = new ArrayList<Sone>(webInterface.getCore().getSones());
+		List<Sone> knownSones = Filters.filteredList(new ArrayList<Sone>(webInterface.getCore().getSones()), Sone.EMPTY_SONE_FILTER);
 		Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
 		Pagination<Sone> sonePagination = new Pagination<Sone>(knownSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", sonePagination);

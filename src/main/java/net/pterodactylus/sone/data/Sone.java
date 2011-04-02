@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
 
@@ -54,6 +55,15 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 			return leftSone.getId().compareToIgnoreCase(rightSone.getId());
 		}
 
+	};
+
+	/** Filter to remove Sones that have not been downloaded. */
+	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
+
+		@Override
+		public boolean filterObject(Sone sone) {
+			return sone.getTime() != 0;
+		}
 	};
 
 	/** The logger. */
@@ -387,8 +397,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @return This Sone (for method chaining)
 	 */
 	public synchronized Sone setPosts(Collection<Post> posts) {
-		this.posts.clear();
-		this.posts.addAll(posts);
+		synchronized (this) {
+			this.posts.clear();
+			this.posts.addAll(posts);
+		}
 		return this;
 	}
 

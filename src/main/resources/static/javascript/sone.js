@@ -49,6 +49,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 			$(inputField.get(0).form).submit(function() {
 				inputField.attr("disabled", "disabled");
 				if (!optional && (textarea.val() == "")) {
+					inputField.removeAttr("disabled").focus();
 					return false;
 				}
 			});
@@ -639,6 +640,8 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
+		button = $(this);
+		button.attr("disabled", "disabled");
 		sender = $(this.form).find(":input[name=sender]").val();
 		inputField = $(this.form).find(":input[name=text]:enabled").get(0);
 		postId = getPostId(this);
@@ -655,6 +658,7 @@ function ajaxifyPost(postElement) {
 				} else {
 					alert(error);
 				}
+				button.removeAttr("disabled");
 			});
 		})(sender, postId, text, inputField);
 		return false;
@@ -1154,7 +1158,6 @@ function toggleIcon() {
 		iconBlinking = false;
 	} else {
 		iconActive = !iconActive;
-		console.log("showing icon: " + iconActive);
 		changeIcon(iconActive ? "images/icon-activity.png" : "images/icon.png");
 		setTimeout(toggleIcon, 1500);
 	}
@@ -1298,6 +1301,8 @@ $(document).ready(function() {
 			return false;
 		});
 		$("#sone #update-status").submit(function() {
+			button = $("button:submit", this);
+			button.attr("disabled", "disabled");
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
@@ -1307,6 +1312,7 @@ $(document).ready(function() {
 				if ((data != null) && data.success) {
 					loadNewPost(data.postId, data.sone, data.recipient);
 				}
+				button.removeAttr("disabled");
 			});
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
 			$(this).find(":input[name=text]:enabled").val("").blur();
@@ -1314,6 +1320,11 @@ $(document).ready(function() {
 			$(this).find(".select-sender").show();
 			return false;
 		});
+	});
+
+	/* ajaxify the search input field. */
+	getTranslation("WebInterface.DefaultText.Search", function(defaultText) {
+		registerInputTextareaSwap("#sone #search input[name=query]", defaultText, "query", false, true);
 	});
 
 	/* ajaxify input field on “view Sone” page. */

@@ -47,4 +47,8 @@
 					<%include include/viewSone.html>
 				</div>
 			<%/if>
+			<form id="search" action="search.html" method="get">
+				<input type="text" name="query" value="" />
+				<button type="submit"><%= View.Search.Button.Search|l10n|html></button>
+			</form>
 		</div>

@@ -230,7 +230,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Trust getTrust(OwnIdentity ownIdentity, Identity identity) throws PluginException {
-		Reply getTrustReply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", ownIdentity.getId()).put("Identity", identity.getId()).get());
+		Reply getTrustReply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("Truster", ownIdentity.getId()).put("Identity", identity.getId()).get());
 		String trust = getTrustReply.getFields().get("Trust");
 		String score = getTrustReply.getFields().get("Score");
 		String rank = getTrustReply.getFields().get("Rank");

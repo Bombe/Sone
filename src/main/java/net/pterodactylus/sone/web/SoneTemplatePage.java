@@ -21,11 +21,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.Page;
-import net.pterodactylus.sone.web.page.TemplatePage;
+import net.pterodactylus.sone.web.page.FreenetTemplatePage;
+import net.pterodactylus.util.collection.ListBuilder;
+import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.SessionManager.Session;
@@ -37,13 +41,31 @@ import freenet.support.api.HTTPRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SoneTemplatePage extends TemplatePage {
+public class SoneTemplatePage extends FreenetTemplatePage {
 
 	/** The Sone core. */
 	protected final WebInterface webInterface;
 
+	/** The page title l10n key. */
+	private final String pageTitleKey;
+
 	/** Whether to require a login. */
 	private final boolean requireLogin;
+
+	/**
+	 * Creates a new template page for Freetalk that does not require the user
+	 * to be logged in.
+	 *
+	 * @param path
+	 *            The path of the page
+	 * @param template
+	 *            The template to render
+	 * @param webInterface
+	 *            The Sone web interface
+	 */
+	public SoneTemplatePage(String path, Template template, WebInterface webInterface) {
+		this(path, template, null, webInterface, false);
+	}
 
 	/**
 	 * Creates a new template page for Freetalk that does not require the user
@@ -69,6 +91,22 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            The path of the page
 	 * @param template
 	 *            The template to render
+	 * @param webInterface
+	 *            The Sone web interface
+	 * @param requireLogin
+	 *            Whether this page requires a login
+	 */
+	public SoneTemplatePage(String path, Template template, WebInterface webInterface, boolean requireLogin) {
+		this(path, template, null, webInterface, requireLogin);
+	}
+
+	/**
+	 * Creates a new template page for Freetalk.
+	 *
+	 * @param path
+	 *            The path of the page
+	 * @param template
+	 *            The template to render
 	 * @param pageTitleKey
 	 *            The l10n key of the page title
 	 * @param webInterface
@@ -77,7 +115,8 @@ public class SoneTemplatePage extends TemplatePage {
 	 *            Whether this page requires a login
 	 */
 	public SoneTemplatePage(String path, Template template, String pageTitleKey, WebInterface webInterface, boolean requireLogin) {
-		super(path, webInterface.getTemplateContextFactory(), template, webInterface.getL10n(), pageTitleKey, "noPermission.html");
+		super(path, webInterface.getTemplateContextFactory(), template, "noPermission.html");
+		this.pageTitleKey = pageTitleKey;
 		this.webInterface = webInterface;
 		this.requireLogin = requireLogin;
 		template.getInitialContext().set("webInterface", webInterface);
@@ -158,6 +197,25 @@ public class SoneTemplatePage extends TemplatePage {
 	//
 	// TEMPLATEPAGE METHODS
 	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected String getPageTitle(Request request) {
+		if (pageTitleKey != null) {
+			return webInterface.getL10n().getString(pageTitleKey);
+		}
+		return "";
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	protected List<Map<String, String>> getAdditionalLinkNodes(Request request) {
+		return new ListBuilder<Map<String, String>>().add(new MapBuilder<String, String>().put("rel", "search").put("type", "application/opensearchdescription+xml").put("title", "Sone").put("href", "http://" + request.getHttpRequest().getHeader("host") + "/Sone/OpenSearch.xml").get()).get();
+	}
 
 	/**
 	 * {@inheritDoc}

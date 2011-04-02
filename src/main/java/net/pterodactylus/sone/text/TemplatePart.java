@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.text;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.io.Writer;
 
 import net.pterodactylus.util.template.Template;
@@ -87,6 +88,21 @@ public class TemplatePart implements Part, net.pterodactylus.util.template.Part 
 	@Override
 	public void render(TemplateContext templateContext, Writer writer) throws TemplateException {
 		template.render(templateContext.mergeContext(template.getInitialContext()), writer);
+	}
+
+	//
+	// OBJECT METHODS
+	//
+
+	@Override
+	public String toString() {
+		StringWriter stringWriter = new StringWriter();
+		try {
+			render(stringWriter);
+		} catch (IOException ioe1) {
+			/* should never throw, ignore. */
+		}
+		return stringWriter.toString();
 	}
 
 }

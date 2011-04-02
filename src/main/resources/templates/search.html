@@ -1,0 +1,35 @@
+<%include include/head.html>
+
+	<h1><%= Page.Search.Page.Title|l10n|html></h1>
+
+	<%foreach soneHits sone>
+		<%first>
+			<div id="sone-results">
+				<p><%= Page.Search.Text.SoneHits|l10n|html></p>
+				<%include include/pagination.html pagination=sonePagination pageParameter==sonePage>
+		<%/first>
+		<%include include/viewSone.html>
+		<%last>
+				<%include include/pagination.html pagination=sonePagination pageParameter==sonePage>
+			</div>
+		<%/last>
+	<%/foreach>
+
+	<%foreach postHits post>
+		<%first>
+			<div id="post-results">
+				<p><%= Page.Search.Text.PostHits|l10n|html></p>
+				<%include include/pagination.html pagination=postPagination pageParameter==postPage>
+		<%/first>
+		<%include include/viewPost.html>
+		<%last>
+				<%include include/pagination.html pagination=postPagination pageParameter==postPage>
+			</div>
+		<%/last>
+	<%/foreach>
+
+	<%if soneHits.empty><%if postHits.empty>
+		<p><%= Page.Search.Text.NoHits|l10n|html></p>
+	<%/if><%/if>
+
+<%include include/tail.html>
