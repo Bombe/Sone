@@ -37,7 +37,8 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 		(function(inputField, textarea) {
 			inputField.focus(function() {
 				$(this).hide().attr("disabled", "disabled");
-				textarea.show().focus();
+				/* no, show(), “display: block” is not what I need. */
+				textarea.attr("style", "display: inline").focus();
 			});
 			if (inputField.val() == "") {
 				inputField.addClass("default");
