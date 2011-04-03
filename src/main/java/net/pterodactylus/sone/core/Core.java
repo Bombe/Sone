@@ -1719,7 +1719,7 @@ public class Core implements IdentityListener, UpdateListener {
 
 		}));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-100));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
