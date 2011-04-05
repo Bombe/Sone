@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.filter.Filter;
@@ -108,6 +109,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/** The IDs of all liked replies. */
 	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
+
+	/** Sone-specific options. */
+	private final Options options = new Options();
 
 	/**
 	 * Creates a new Sone.
@@ -590,6 +594,15 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	public synchronized Sone removeLikedReplyId(String replyId) {
 		likedReplyIds.remove(replyId);
 		return this;
+	}
+
+	/**
+	 * Returns Sone-specific options.
+	 *
+	 * @return The options of this Sone
+	 */
+	public Options getOptions() {
+		return options;
 	}
 
 	//
