@@ -84,6 +84,18 @@ public class ListNotification<T> extends TemplateNotification {
 	}
 
 	/**
+	 * Sets the elements to show in this notification.
+	 *
+	 * @param elements
+	 *            The elements to show
+	 */
+	public void setElements(Collection<? extends T> elements) {
+		this.elements.clear();
+		this.elements.addAll(elements);
+		touch();
+	}
+
+	/**
 	 * Returns whether there are any new elements.
 	 *
 	 * @return {@code true} if there are no new elements, {@code false} if there
