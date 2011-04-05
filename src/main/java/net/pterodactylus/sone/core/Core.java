@@ -576,6 +576,27 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Returns all posts that have the given Sone as recipient.
+	 *
+	 * @see Post#getRecipient()
+	 * @param recipient
+	 *            The recipient of the posts
+	 * @return All posts that have the given Sone as recipient
+	 */
+	public Set<Post> getDirectedPosts(Sone recipient) {
+		Validation.begin().isNotNull("Recipient", recipient).check();
+		Set<Post> directedPosts = new HashSet<Post>();
+		synchronized (posts) {
+			for (Post post : posts.values()) {
+				if (recipient.equals(post.getRecipient())) {
+					directedPosts.add(post);
+				}
+			}
+		}
+		return directedPosts;
+	}
+
+	/**
 	 * Returns the reply with the given ID. If there is no reply with the given
 	 * ID yet, a new one is created.
 	 *
