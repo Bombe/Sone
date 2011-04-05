@@ -103,6 +103,9 @@ public class ListNotificationFilters {
 				newPosts.add(post);
 			}
 		}
+		if (newPosts.isEmpty()) {
+			return null;
+		}
 		if (newPosts.size() == newPostNotification.getElements().size()) {
 			return newPostNotification;
 		}
@@ -137,6 +140,9 @@ public class ListNotificationFilters {
 				System.out.println("  CS.e: " + currentSone.equals(reply.getPost().getSone()));
 				newReplies.add(reply);
 			}
+		}
+		if (newReplies.isEmpty()) {
+			return null;
 		}
 		if (newReplies.size() == newReplyNotification.getElements().size()) {
 			return newReplyNotification;
