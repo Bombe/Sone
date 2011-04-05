@@ -35,12 +35,11 @@ public class ListNotificationFilters {
 
 	/**
 	 * Filters new-post and new-reply notifications in the given list of
-	 * notifications. If {@code currentSone} is <code>null</code>, nothing is
-	 * filtered and the given list is returned.
-	 * If {@code currentSone} is not {@code null}, only posts that are posted by
-	 * a friend Sone or the Sone itself, and replies that are replies to posts
-	 * of friend Sones or the Sone itself will be retained
-	 * in the notifications.
+	 * notifications. If {@code currentSone} is <code>null</code>, new-post and
+	 * new-reply notifications are removed completely. If {@code currentSone} is
+	 * not {@code null}, only posts that are posted by a friend Sone or the Sone
+	 * itself, and replies that are replies to posts of friend Sones or the Sone
+	 * itself will be retained in the notifications.
 	 *
 	 * @param notifications
 	 *            The notifications to filter
@@ -49,56 +48,102 @@ public class ListNotificationFilters {
 	 * @return The filtered notifications
 	 */
 	public static List<Notification> filterNotifications(List<Notification> notifications, Sone currentSone) {
-		if (currentSone == null) {
-			return notifications;
-		}
 		ListNotification<Post> newPostNotification = getNotification(notifications, "new-post-notification", Post.class);
 		System.out.println("Found new-post-notification with " + ((newPostNotification != null) ? newPostNotification.getElements().size() : -1) + " posts.");
 		if (newPostNotification != null) {
-			List<Post> newPosts = new ArrayList<Post>();
-			for (Post post : newPostNotification.getElements()) {
-				System.out.println("Checking Post: " + post);
-				if (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone())) {
-					System.out.println("  CS.hF: " + currentSone.hasFriend(post.getSone().getId()));
-					System.out.println("  CS.e:" + currentSone.equals(post.getSone()));
-					newPosts.add(post);
-				}
-			}
+			ListNotification<Post> filteredNotification = filterNewPostNotification(newPostNotification, currentSone);
 			int notificationIndex = notifications.indexOf(newPostNotification);
-			if (newPosts.isEmpty()) {
+			if (filteredNotification == null) {
 				System.out.println("Removing notification.");
 				notifications.remove(notificationIndex);
 			} else {
 				System.out.println("Replacing Notification.");
-				newPostNotification = new ListNotification<Post>(newPostNotification);
-				newPostNotification.setElements(newPosts);
-				notifications.set(notificationIndex, newPostNotification);
+				notifications.set(notificationIndex, filteredNotification);
 			}
 		}
 		ListNotification<Reply> newReplyNotification = getNotification(notifications, "new-replies-notification", Reply.class);
 		System.out.println("Found new-reply-notification with " + ((newReplyNotification != null) ? newReplyNotification.getElements().size() : -1) + " replies.");
 		if (newReplyNotification != null) {
-			List<Reply> newReplies = new ArrayList<Reply>();
-			for (Reply reply : newReplyNotification.getElements()) {
-				System.out.println("Checking Reply: " + reply);
-				if (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone())) {
-					System.out.println("  CS.hF: " + currentSone.hasFriend(reply.getPost().getSone().getId()));
-					System.out.println("  CS.e: " + currentSone.equals(reply.getPost().getSone()));
-					newReplies.add(reply);
-				}
-			}
+			ListNotification<Reply> filteredNotification = filterNewReplyNotification(newReplyNotification, currentSone);
 			int notificationIndex = notifications.indexOf(newReplyNotification);
-			if (newReplies.isEmpty()) {
+			if (filteredNotification == null) {
 				System.out.println("Removing Notification.");
 				notifications.remove(notificationIndex);
 			} else {
 				System.out.println("Replacing Notification.");
-				newReplyNotification = new ListNotification<Reply>(newReplyNotification);
-				newReplyNotification.setElements(newReplies);
-				notifications.set(notificationIndex, newReplyNotification);
+				notifications.set(notificationIndex, filteredNotification);
 			}
 		}
 		return notifications;
+	}
+
+	/**
+	 * Filters the new posts of the given notification. If {@code currentSone}
+	 * is {@code null}, {@code null} is returned and the notification is
+	 * subsequently removed. Otherwise only posts that are posted by friend
+	 * Sones of the given Sone are retained; all other posts are removed.
+	 *
+	 * @param newPostNotification
+	 *            The new-post notification
+	 * @param currentSone
+	 *            The current Sone, or {@code null} if not logged in
+	 * @return The filtered new-post notification, or {@code null} if the
+	 *         notification should be removed
+	 */
+	private static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone) {
+		if (currentSone == null) {
+			return null;
+		}
+		List<Post> newPosts = new ArrayList<Post>();
+		for (Post post : newPostNotification.getElements()) {
+			System.out.println("Checking Post: " + post);
+			if (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone())) {
+				System.out.println("  CS.hF: " + currentSone.hasFriend(post.getSone().getId()));
+				System.out.println("  CS.e:" + currentSone.equals(post.getSone()));
+				newPosts.add(post);
+			}
+		}
+		if (newPosts.size() == newPostNotification.getElements().size()) {
+			return newPostNotification;
+		}
+		ListNotification<Post> filteredNotification = new ListNotification<Post>(newPostNotification);
+		filteredNotification.setElements(newPosts);
+		return filteredNotification;
+	}
+
+	/**
+	 * Filters the new replies of the given notification. If {@code currentSone}
+	 * is {@code null}, {@code null} is returned and the notification is
+	 * subsequently removed. Otherwise only replies that are replies to posts
+	 * that are posted by friend Sones of the given Sone are retained; all other
+	 * replies are removed.
+	 *
+	 * @param newReplyNotification
+	 *            The new-reply notification
+	 * @param currentSone
+	 *            The current Sone, or {@code null} if not logged in
+	 * @return The filtered new-reply notification, or {@code null} if the
+	 *         notification should be removed
+	 */
+	private static ListNotification<Reply> filterNewReplyNotification(ListNotification<Reply> newReplyNotification, Sone currentSone) {
+		if (currentSone == null) {
+			return null;
+		}
+		List<Reply> newReplies = new ArrayList<Reply>();
+		for (Reply reply : newReplyNotification.getElements()) {
+			System.out.println("Checking Reply: " + reply);
+			if (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone())) {
+				System.out.println("  CS.hF: " + currentSone.hasFriend(reply.getPost().getSone().getId()));
+				System.out.println("  CS.e: " + currentSone.equals(reply.getPost().getSone()));
+				newReplies.add(reply);
+			}
+		}
+		if (newReplies.size() == newReplyNotification.getElements().size()) {
+			return newReplyNotification;
+		}
+		ListNotification<Reply> filteredNotification = new ListNotification<Reply>(newReplyNotification);
+		filteredNotification.setElements(newReplies);
+		return filteredNotification;
 	}
 
 	/**
