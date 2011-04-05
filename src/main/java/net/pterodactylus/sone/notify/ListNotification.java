@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.notify;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -32,6 +33,9 @@ import net.pterodactylus.util.template.Template;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ListNotification<T> extends TemplateNotification {
+
+	/** The key under which to store the elements in the template. */
+	private final String key;
 
 	/** The list of new elements. */
 	private final List<T> elements = new CopyOnWriteArrayList<T>();
@@ -48,7 +52,22 @@ public class ListNotification<T> extends TemplateNotification {
 	 */
 	public ListNotification(String id, String key, Template template) {
 		super(id, template);
+		this.key = key;
 		template.getInitialContext().set(key, elements);
+	}
+
+	/**
+	 * Creates a new list notification that copies its ID and the template from
+	 * the given list notification.
+	 *
+	 * @param listNotification
+	 *            The list notification to copy
+	 */
+	public ListNotification(ListNotification<T> listNotification) {
+		super(listNotification.getId(), new Template());
+		this.key = listNotification.key;
+		getTemplate().add(listNotification.getTemplate());
+		getTemplate().getInitialContext().set(key, elements);
 	}
 
 	//
