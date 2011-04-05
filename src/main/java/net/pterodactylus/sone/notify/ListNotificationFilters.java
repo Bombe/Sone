@@ -49,28 +49,22 @@ public class ListNotificationFilters {
 	 */
 	public static List<Notification> filterNotifications(List<Notification> notifications, Sone currentSone) {
 		ListNotification<Post> newPostNotification = getNotification(notifications, "new-post-notification", Post.class);
-		System.out.println("Found new-post-notification with " + ((newPostNotification != null) ? newPostNotification.getElements().size() : -1) + " posts.");
 		if (newPostNotification != null) {
 			ListNotification<Post> filteredNotification = filterNewPostNotification(newPostNotification, currentSone);
 			int notificationIndex = notifications.indexOf(newPostNotification);
 			if (filteredNotification == null) {
-				System.out.println("Removing notification.");
 				notifications.remove(notificationIndex);
 			} else {
-				System.out.println("Replacing Notification.");
 				notifications.set(notificationIndex, filteredNotification);
 			}
 		}
 		ListNotification<Reply> newReplyNotification = getNotification(notifications, "new-replies-notification", Reply.class);
-		System.out.println("Found new-reply-notification with " + ((newReplyNotification != null) ? newReplyNotification.getElements().size() : -1) + " replies.");
 		if (newReplyNotification != null) {
 			ListNotification<Reply> filteredNotification = filterNewReplyNotification(newReplyNotification, currentSone);
 			int notificationIndex = notifications.indexOf(newReplyNotification);
 			if (filteredNotification == null) {
-				System.out.println("Removing Notification.");
 				notifications.remove(notificationIndex);
 			} else {
-				System.out.println("Replacing Notification.");
 				notifications.set(notificationIndex, filteredNotification);
 			}
 		}
@@ -96,10 +90,7 @@ public class ListNotificationFilters {
 		}
 		List<Post> newPosts = new ArrayList<Post>();
 		for (Post post : newPostNotification.getElements()) {
-			System.out.println("Checking Post: " + post);
 			if (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone())) {
-				System.out.println("  CS.hF: " + currentSone.hasFriend(post.getSone().getId()));
-				System.out.println("  CS.e:" + currentSone.equals(post.getSone()));
 				newPosts.add(post);
 			}
 		}
@@ -134,10 +125,7 @@ public class ListNotificationFilters {
 		}
 		List<Reply> newReplies = new ArrayList<Reply>();
 		for (Reply reply : newReplyNotification.getElements()) {
-			System.out.println("Checking Reply: " + reply);
 			if (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone())) {
-				System.out.println("  CS.hF: " + currentSone.hasFriend(reply.getPost().getSone().getId()));
-				System.out.println("  CS.e: " + currentSone.equals(reply.getPost().getSone()));
 				newReplies.add(reply);
 			}
 		}
