@@ -15,6 +15,17 @@
 	<form id="options" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 
+		<h2><%= Page.Options.Section.SoneSpecificOptions.Title|l10n|html></h2>
+
+		<%ifnull currentSone>
+			<p><%= Page.Options.Section.SoneSpecificOptions.NotLoggedIn|l10n|html|replace needle="{link}" replacement='<a href="login.html">'|replace needle="{/link}" replacement='</a>'></p>
+		<%/if>
+
+		<p>
+			<input type="checkbox" name="auto-follow"<%ifnull currentSone> disabled="disabled"<%/if><%if auto-follow> checked="checked"<%/if> />
+			<%= Page.Options.Option.AutoFollow.Description|l10n|html>
+		</p>
+
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>

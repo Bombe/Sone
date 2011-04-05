@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.core.Core.Preferences;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -53,7 +54,13 @@ public class OptionsPage extends SoneTemplatePage {
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Preferences preferences = webInterface.getCore().getPreferences();
+		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);
 		if (request.getMethod() == Method.POST) {
+			if (currentSone != null) {
+				boolean autoFollow = request.getHttpRequest().isPartSet("auto-follow");
+				currentSone.getOptions().getBooleanOption("AutoFollow").set(autoFollow);
+				webInterface.getCore().saveSone(currentSone);
+			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			preferences.setInsertionDelay(insertionDelay);
 			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
@@ -73,6 +80,9 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setReallyClearOnNextRestart(reallyClearOnNextRestart);
 			webInterface.getCore().saveConfiguration();
 			throw new RedirectException(getPath());
+		}
+		if (currentSone != null) {
+			templateContext.set("auto-follow", currentSone.getOptions().getBooleanOption("AutoFollow").get());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("positive-trust", preferences.getPositiveTrust());

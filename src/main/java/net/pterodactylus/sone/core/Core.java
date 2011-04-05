@@ -905,6 +905,11 @@ public class Core implements IdentityListener, UpdateListener {
 				}
 				if (newSone) {
 					coreListenerManager.fireNewSoneFound(sone);
+					for (Sone localSone : getLocalSones()) {
+						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
+							localSone.addFriend(sone.getId());
+						}
+					}
 				}
 			}
 			remoteSones.put(identity.getId(), sone);
@@ -1263,6 +1268,10 @@ public class Core implements IdentityListener, UpdateListener {
 			friends.add(friendId);
 		}
 
+		/* load options. */
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
+
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
 			sone.setTime(soneTime);
@@ -1377,6 +1386,9 @@ public class Core implements IdentityListener, UpdateListener {
 				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter++ + "/ID").setValue(friendId);
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
+
+			/* save options. */
+			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
 
 			configuration.save();
 			logger.log(Level.INFO, "Sone %s saved.", sone);
