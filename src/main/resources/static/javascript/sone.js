@@ -845,6 +845,22 @@ function getStatus() {
 			$.each(data.sones, function(index, value) {
 				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
 			});
+			/* search for removed notifications. */
+			$("#sone #notification-area .notification").each(function() {
+				notificationId = $(this).attr("id");
+				foundNotification = false;
+				$.each(data.notifications, function(index, value) {
+					if (value.id == notificationId) {
+						foundNotification = true;
+						return false;
+					}
+				});
+				if (!foundNotification) {
+					$(this).slideUp("normal", function() {
+						$(this).remove();
+					});
+				}
+			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
 				oldNotification = $("#sone #notification-area .notification#" + value.id);
@@ -859,11 +875,8 @@ function getStatus() {
 				} else {
 					$("#sone #notification-area").append(notification);
 					notification.slideDown();
+					setActivity();
 				}
-				setActivity();
-			});
-			$.each(data.removedNotifications, function(index, value) {
-				$("#sone #notification-area .notification#" + value.id).slideUp();
 			});
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
