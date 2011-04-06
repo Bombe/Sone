@@ -712,9 +712,12 @@ function ajaxifyPost(postElement) {
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
 	/* process all replies. */
+	replyIds = [];
 	$(postElement).find(".reply").each(function() {
+		replyIds.push(getReplyId(this));
 		ajaxifyReply(this);
 	});
+	updateReplyTimes(replyIds.join(","));
 
 	/* process reply input fields. */
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
@@ -1027,6 +1030,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				newPost.insertBefore(firstOlderPost);
 			}
 			ajaxifyPost(newPost);
+			updatePostTimes(data.post.id);
 			newPost.slideDown();
 			setActivity();
 		}
@@ -1065,6 +1069,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				}
 				ajaxifyReply(newReply);
+				updateReplyTimes(data.reply.id);
 				newReply.slideDown();
 				setActivity();
 				return false;
@@ -1109,6 +1114,86 @@ function markReplyAsKnown(replyElements) {
 				$(replyElement).removeClass("new");
 				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
 			})(replyElement);
+		}
+	});
+}
+
+/**
+ * Updates the time of the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to update
+ * @param timeText
+ *            The text of the time to show
+ * @param refreshTime
+ *            The refresh time after which to request a new time (in seconds)
+ * @param tooltip
+ *            The tooltip to show
+ */
+function updatePostTime(postId, timeText, refreshTime, tooltip) {
+	if (!getPost(postId).is(":visible")) {
+		return;
+	}
+	getPost(postId).find(".post-status-line > .time a").html(timeText).attr("title", tooltip);
+	(function(postId, refreshTime) {
+		setTimeout(function() {
+			updatePostTimes(postId);
+		}, refreshTime * 1000);
+	})(postId, refreshTime);
+}
+
+/**
+ * Requests new rendered times for the posts with the given IDs.
+ *
+ * @param postIds
+ *            Comma-separated post IDs
+ */
+function updatePostTimes(postIds) {
+	$.getJSON("getTimes.ajax", { "posts" : postIds }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			$.each(data.postTimes, function(index, value) {
+				updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
+			});
+		}
+	});
+}
+
+/**
+ * Updates the time of the reply with the given ID.
+ *
+ * @param postId
+ *            The ID of the reply to update
+ * @param timeText
+ *            The text of the time to show
+ * @param refreshTime
+ *            The refresh time after which to request a new time (in seconds)
+ * @param tooltip
+ *            The tooltip to show
+ */
+function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
+	if (!getReply(replyId).is(":visible")) {
+		return;
+	}
+	getReply(replyId).find(".reply-status-line > .time").html(timeText).attr("title", tooltip);
+	(function(replyId, refreshTime) {
+		setTimeout(function() {
+			updateReplyTimes(replyId);
+		}, refreshTime * 1000);
+	})(replyId, refreshTime);
+}
+
+/**
+ * Requests new rendered times for the posts with the given IDs.
+ *
+ * @param postIds
+ *            Comma-separated post IDs
+ */
+function updateReplyTimes(replyIds) {
+	$.getJSON("getTimes.ajax", { "replies" : replyIds }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			$.each(data.replyTimes, function(index, value) {
+				updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
+			});
 		}
 	});
 }
@@ -1370,6 +1455,13 @@ $(document).ready(function() {
 			});
 		});
 	});
+
+	/* update post times. */
+	postIds = [];
+	$("#sone .post").each(function() {
+		postIds.push(getPostId(this));
+	});
+	updatePostTimes(postIds.join(","));
 
 	/* hides all replies but the latest two. */
 	if (!isViewPostPage()) {
