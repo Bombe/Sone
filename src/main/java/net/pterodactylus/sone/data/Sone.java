@@ -657,11 +657,11 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(')');
 
-		fingerprint.append("Albums(");
-		for (Album album : albums) {
-			fingerprint.append(album.getFingerprint());
-		}
-		fingerprint.append(')');
+//		fingerprint.append("Albums(");
+//		for (Album album : albums) {
+//			fingerprint.append(album.getFingerprint());
+//		}
+//		fingerprint.append(')');
 
 		return fingerprint.toString();
 	}
