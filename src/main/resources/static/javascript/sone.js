@@ -333,6 +333,17 @@ function getPostAuthor(element) {
 	return getPostElement(element).find(".post-author").text();
 }
 
+/**
+ * Returns the element of the reply with the given ID.
+ *
+ * @param replyId
+ *            The ID of the reply
+ * @returns The element of the reply
+ */
+function getReply(replyId) {
+	return $("#sone .reply#" + replyId);
+}
+
 function getReplyElement(element) {
 	return $(element).closest(".reply");
 }
