@@ -562,25 +562,6 @@ function postReply(sender, postId, text, callbackFunction) {
 }
 
 /**
- * Requests information about the reply with the given ID.
- *
- * @param replyId
- *            The ID of the reply
- * @param callbackFunction
- *            A callback function (parameters soneId, soneName, replyTime,
- *            replyDisplayTime, text, html)
- */
-function getReply(replyId, callbackFunction) {
-	$.getJSON("getReply.ajax", { "reply" : replyId }, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			callbackFunction(data.soneId, data.soneName, data.time, data.displayTime, data.text, data.html);
-		}
-	}, function(xmlHttpRequest, textStatus, error) {
-		/* ignore error. */
-	});
-}
-
-/**
  * Ajaxifies the given Sone by enhancing all eligible elements with AJAX.
  *
  * @param soneElement
