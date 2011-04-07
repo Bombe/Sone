@@ -86,7 +86,7 @@ public class SearchPage extends SoneTemplatePage {
 			posts.addAll(sone.getPosts());
 		}
 		@SuppressWarnings("synthetic-access")
-		Set<Hit<Post>> postHits = getHits(posts, phrases, new PostStringGenerator());
+		Set<Hit<Post>> postHits = getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator());
 
 		/* now filter. */
 		soneHits = Filters.filteredSet(soneHits, Hit.POSITIVE_FILTER);
@@ -329,7 +329,7 @@ public class SearchPage extends SoneTemplatePage {
 			if (post.getRecipient() != null) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient()));
 			}
-			for (Reply reply : webInterface.getCore().getReplies(post)) {
+			for (Reply reply : Filters.filteredList(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLIES_FILTER)) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(reply.getSone()));
 				postString.append(' ').append(reply.getText());
 			}

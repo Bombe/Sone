@@ -20,6 +20,8 @@ package net.pterodactylus.sone.data;
 import java.util.Comparator;
 import java.util.UUID;
 
+import net.pterodactylus.util.filter.Filter;
+
 /**
  * A reply is like a {@link Post} but can never be posted on its own, it always
  * refers to another {@link Post}.
@@ -34,6 +36,16 @@ public class Reply {
 		@Override
 		public int compare(Reply leftReply, Reply rightReply) {
 			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, leftReply.getTime() - rightReply.getTime()));
+		}
+
+	};
+
+	/** Filter for replies with timestamps from the future. */
+	public static final Filter<Reply> FUTURE_REPLIES_FILTER = new Filter<Reply>() {
+
+		@Override
+		public boolean filterObject(Reply reply) {
+			return reply.getTime() <= System.currentTimeMillis();
 		}
 
 	};
