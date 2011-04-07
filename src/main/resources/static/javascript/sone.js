@@ -1030,6 +1030,10 @@ function getStatus() {
 			$.each(data.newReplies, function(index, value) {
 				loadNewReply(value.id, value.sone, value.post, value.postSone);
 			});
+			/* remove activity when no notifications are visible. */
+			if ($("#sone #notification-area .notification").length == 0) {
+				resetActivity();
+			}
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
 		} else {
