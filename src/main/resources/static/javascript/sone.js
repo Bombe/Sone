@@ -1129,36 +1129,45 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
  *
  * @param soneElement
  *            The Sone to mark as known
+ * @param skipRequest
+ *            true to skip the JSON request, false or omit to perform the JSON
+ *            request
  */
-function markSoneAsKnown(soneElement) {
+function markSoneAsKnown(soneElement, skipRequest) {
 	if ($(".new", soneElement).length > 0) {
-		$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
-			$(soneElement).removeClass("new");
-		});
+		if ((typeof skipRequest != "undefined") && !skipRequest) {
+			$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
+				$(soneElement).removeClass("new");
+			});
+		}
 	}
 }
 
-function markPostAsKnown(postElements) {
+function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
 				$(".click-to-show", postElement).removeClass("new");
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+				if ((typeof skipRequest == "undefined") || !skipRequest) {
+					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+				}
 			})(postElement);
 		}
 	});
 	markReplyAsKnown($(postElements).find(".reply"));
 }
 
-function markReplyAsKnown(replyElements) {
+function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+				if ((typeof skipRequest == "undefined") || !skipRequest) {
+					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+				}
 			})(replyElement);
 		}
 	});
