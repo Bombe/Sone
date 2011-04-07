@@ -1558,9 +1558,6 @@ $(document).ready(function() {
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
-				if ((data != null) && data.success) {
-					loadNewPost(data.postId, data.sone, data.recipient);
-				}
 				button.removeAttr("disabled");
 			});
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
@@ -1589,11 +1586,7 @@ $(document).ready(function() {
 		$("#sone #post-message").submit(function() {
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text }, function(data, textStatus) {
-				if ((data != null) && data.success) {
-					loadNewPost(data.postId, getCurrentSoneId());
-				}
-			});
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text });
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
 			$(this).find(":input[name=text]:enabled").val("").blur();
 			$(this).find(".sender").hide();

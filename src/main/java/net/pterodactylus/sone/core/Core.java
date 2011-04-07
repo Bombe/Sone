@@ -1470,7 +1470,8 @@ public class Core implements IdentityListener, UpdateListener {
 			posts.put(post.getId(), post);
 		}
 		synchronized (newPosts) {
-			knownPosts.add(post.getId());
+			newPosts.add(post.getId());
+			coreListenerManager.fireNewPostFound(post);
 		}
 		sone.addPost(post);
 		saveSone(sone);
@@ -1594,7 +1595,8 @@ public class Core implements IdentityListener, UpdateListener {
 			replies.put(reply.getId(), reply);
 		}
 		synchronized (newReplies) {
-			knownReplies.add(reply.getId());
+			newReplies.add(reply.getId());
+			coreListenerManager.fireNewReplyFound(reply);
 		}
 		sone.addReply(reply);
 		saveSone(sone);
