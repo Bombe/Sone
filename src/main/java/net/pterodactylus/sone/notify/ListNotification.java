@@ -51,7 +51,24 @@ public class ListNotification<T> extends TemplateNotification {
 	 *            The template to render
 	 */
 	public ListNotification(String id, String key, Template template) {
-		super(id, template);
+		this(id, key, template, true);
+	}
+
+	/**
+	 * Creates a new list notification.
+	 *
+	 * @param id
+	 *            The ID of the notification
+	 * @param key
+	 *            The key under which to store the elements in the template
+	 * @param template
+	 *            The template to render
+	 * @param dismissable
+	 *            {@code true} if this notification should be dismissable by the
+	 *            user, {@code false} otherwise
+	 */
+	public ListNotification(String id, String key, Template template, boolean dismissable) {
+		super(id, System.currentTimeMillis(), System.currentTimeMillis(), dismissable, template);
 		this.key = key;
 		template.getInitialContext().set(key, elements);
 	}
