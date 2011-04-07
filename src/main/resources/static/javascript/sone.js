@@ -265,6 +265,19 @@ function getFormPassword() {
 	return $("#sone #formPassword").text();
 }
 
+/**
+ * Returns the element of the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone
+ * @returns All Sone elements with the given ID
+ */
+function getSone(soneId) {
+	return $("#sone .sone").filter(function(index) {
+		return $(".id").text() == soneId;
+	});
+}
+
 function getSoneElement(element) {
 	return $(element).closest(".sone");
 }
@@ -365,6 +378,39 @@ function getReplyTime(element) {
  */
 function getReplyAuthor(element) {
 	return getReplyElement(element).find(".reply-author").text();
+}
+
+/**
+ * Returns the notification with the given ID.
+ *
+ * @param notificationId
+ *            The ID of the notification
+ * @returns The notification element
+ */
+function getNotification(notificationId) {
+	return $("#sone #notification-area .notification#" + notificationId);
+}
+
+/**
+ * Returns the notification element closest to the given element.
+ *
+ * @param element
+ *            The element to get the closest notification of
+ * @return The closest notification element
+ */
+function getNotificationElement(element) {
+	return $(element).closest(".notification");
+}
+
+/**
+ * Returns the ID of the notification element.
+ *
+ * @param notificationElement
+ *            The notification element
+ * @returns The ID of the notification
+ */
+function getNotificationId(notificationElement) {
+	return $(notificationElement).attr("id");
 }
 
 function likePost(postId) {
@@ -833,6 +879,90 @@ function ajaxifyNotification(notification) {
 	return notification;
 }
 
+/**
+ * Retrieves element IDs from notification elements.
+ *
+ * @param notification
+ *            The notification element
+ * @param selector
+ *            The selector of the element containing the ID as text
+ * @returns All extracted IDs
+ */
+function getElementIds(notification, selector) {
+	elementIds = [];
+	$(selector, notification).each(function() {
+		elementIds.push($(this).text());
+	});
+	return elementIds;
+}
+
+/**
+ * Compares the given notification elements and calls {@link #markSoneAsKnown()}
+ * for every ID that is contained in the old notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedSones(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-sone-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".sone-id");
+	newIds = getElementIds(newNotification, ".sone-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markSoneAsKnown(getSone(value), true);
+		}
+	});
+}
+
+/**
+ * Compares the given notification elements and calls {@link #markPostAsKnown()}
+ * for every ID that is contained in the old notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedPosts(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-post-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".post-id");
+	newIds = getElementIds(newNotification, ".post-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markPostAsKnown(getPost(value), true);
+		}
+	});
+}
+
+/**
+ * Compares the given notification elements and calls
+ * {@link #markReplyAsKnown()} for every ID that is contained in the old
+ * notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedReplies(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-replies-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".reply-id");
+	newIds = getElementIds(newNotification, ".reply-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markReplyAsKnown(getReply(value), true);
+		}
+	});
+}
+
 function getStatus() {
 	$.getJSON("getStatus.ajax", {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
 		if ((data != null) && data.success) {
@@ -851,6 +981,22 @@ function getStatus() {
 					}
 				});
 				if (!foundNotification) {
+					if (notificationId == "new-sone-notification") {
+						$(".sone-id", this).each(function(index, element) {
+							soneId = $(this).text();
+							markSoneAsKnown(getSone(soneId), true);
+						});
+					} else if (notificationId == "new-post-notification") {
+						$(".post-id", this).each(function(index, element) {
+							postId = $(this).text();
+							markPostAsKnown(getPost(postId), true);
+						});
+					} else if (notificationId == "new-replies-notification") {
+						$(".reply-id", this).each(function(index, element) {
+							replyId = $(this).text();
+							markReplyAsKnown(getReply(replyId), true);
+						});
+					}
 					$(this).slideUp("normal", function() {
 						$(this).remove();
 					});
@@ -858,7 +1004,7 @@ function getStatus() {
 			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
-				oldNotification = $("#sone #notification-area .notification#" + value.id);
+				oldNotification = getNotification(value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
 					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
@@ -866,6 +1012,9 @@ function getStatus() {
 						notification.find(".short-text").toggleClass("hidden", opened);
 						notification.find(".text").toggleClass("hidden", !opened);
 					}
+					checkForRemovedSones(oldNotification, notification);
+					checkForRemovedPosts(oldNotification, notification);
+					checkForRemovedReplies(oldNotification, notification);
 					oldNotification.replaceWith(notification.show());
 				} else {
 					$("#sone #notification-area").append(notification);
@@ -1083,36 +1232,45 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
  *
  * @param soneElement
  *            The Sone to mark as known
+ * @param skipRequest
+ *            true to skip the JSON request, false or omit to perform the JSON
+ *            request
  */
-function markSoneAsKnown(soneElement) {
+function markSoneAsKnown(soneElement, skipRequest) {
 	if ($(".new", soneElement).length > 0) {
-		$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
-			$(soneElement).removeClass("new");
-		});
+		if ((typeof skipRequest != "undefined") && !skipRequest) {
+			$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
+				$(soneElement).removeClass("new");
+			});
+		}
 	}
 }
 
-function markPostAsKnown(postElements) {
+function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
 				$(".click-to-show", postElement).removeClass("new");
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+				if ((typeof skipRequest == "undefined") || !skipRequest) {
+					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+				}
 			})(postElement);
 		}
 	});
 	markReplyAsKnown($(postElements).find(".reply"));
 }
 
-function markReplyAsKnown(replyElements) {
+function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+				if ((typeof skipRequest == "undefined") || !skipRequest) {
+					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+				}
 			})(replyElement);
 		}
 	});
