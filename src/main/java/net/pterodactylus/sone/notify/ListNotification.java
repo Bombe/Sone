@@ -81,7 +81,7 @@ public class ListNotification<T> extends TemplateNotification {
 	 *            The list notification to copy
 	 */
 	public ListNotification(ListNotification<T> listNotification) {
-		super(listNotification.getId(), new Template());
+		super(listNotification.getId(), listNotification.getCreatedTime(), listNotification.getLastUpdatedTime(), listNotification.isDismissable(), new Template());
 		this.key = listNotification.key;
 		getTemplate().add(listNotification.getTemplate());
 		getTemplate().getInitialContext().set(key, elements);
