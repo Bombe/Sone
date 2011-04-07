@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.filter.Filters;
@@ -79,15 +78,6 @@ public class IndexPage extends SoneTemplatePage {
 		Pagination<Post> pagination = new Pagination<Post>(allPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
-
-		/* mark it all as known. */
-		for (Post post : pagination.getItems()) {
-			webInterface.getCore().markPostKnown(post);
-			for (Reply reply : webInterface.getCore().getReplies(post)) {
-				webInterface.getCore().markReplyKnown(reply);
-			}
-		}
-
 	}
 
 }

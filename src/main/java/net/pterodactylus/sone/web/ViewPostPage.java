@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -73,10 +72,6 @@ public class ViewPostPage extends SoneTemplatePage {
 		Post post = webInterface.getCore().getPost(postId);
 		templateContext.set("post", post);
 		templateContext.set("raw", raw);
-		webInterface.getCore().markPostKnown(post);
-		for (Reply reply : webInterface.getCore().getReplies(post)) {
-			webInterface.getCore().markReplyKnown(reply);
-		}
 	}
 
 }

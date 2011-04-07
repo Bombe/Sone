@@ -62,11 +62,6 @@ public class KnownSonesPage extends SoneTemplatePage {
 		Pagination<Sone> sonePagination = new Pagination<Sone>(knownSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", sonePagination);
 		templateContext.set("knownSones", sonePagination.getItems());
-
-		/* mark Sones as known. */
-		for (Sone sone : sonePagination.getItems()) {
-			webInterface.getCore().markSoneKnown(sone);
-		}
 	}
 
 }
