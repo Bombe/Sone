@@ -121,6 +121,10 @@ textarea {
 	float: right;
 }
 
+#sone #notification-area .notification .hidden {
+	display: none;
+}
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;
