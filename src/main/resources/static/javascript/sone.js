@@ -1001,6 +1001,10 @@ function getStatus() {
 					}
 					$(this).slideUp("normal", function() {
 						$(this).remove();
+						/* remove activity when no notifications are visible. */
+						if ($("#sone #notification-area .notification").length == 0) {
+							resetActivity();
+						}
 					});
 				}
 			});
@@ -1032,10 +1036,6 @@ function getStatus() {
 			$.each(data.newReplies, function(index, value) {
 				loadNewReply(value.id, value.sone, value.post, value.postSone);
 			});
-			/* remove activity when no notifications are visible. */
-			if ($("#sone #notification-area .notification").length == 0) {
-				resetActivity();
-			}
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
 		} else {
@@ -1367,6 +1367,7 @@ function resetActivity() {
 	if (title.indexOf('(') == 0) {
 		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
+	iconBlinking = false;
 }
 
 function setActivity() {
@@ -1405,7 +1406,7 @@ var iconBlinking = false;
  * showing the activity state, it is returned to normal.
  */
 function toggleIcon() {
-	if (focus) {
+	if (focus || !iconBlinking) {
 		if (iconActive) {
 			changeIcon("images/icon.png");
 			iconActive = false;
