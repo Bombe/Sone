@@ -904,7 +904,7 @@ function getStatus() {
 			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
-				oldNotification = $("#sone #notification-area .notification#" + value.id);
+				oldNotification = getNotification(value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
 					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
