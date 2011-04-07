@@ -110,6 +110,17 @@ public class SearchPage extends SoneTemplatePage {
 		templateContext.set("soneHits", sonePagination.getItems());
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("postHits", postPagination.getItems());
+
+		/* mark found posts and Sones as knew. */
+		for (Sone sone : sonePagination.getItems()) {
+			webInterface.getCore().markSoneKnown(sone);
+		}
+		for (Post post : postPagination.getItems()) {
+			webInterface.getCore().markPostKnown(post);
+			for (Reply reply : webInterface.getCore().getReplies(post)) {
+				webInterface.getCore().markReplyKnown(reply);
+			}
+		}
 	}
 
 	//

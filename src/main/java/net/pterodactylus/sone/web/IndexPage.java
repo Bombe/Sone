@@ -77,21 +77,15 @@ public class IndexPage extends SoneTemplatePage {
 		Pagination<Post> pagination = new Pagination<Post>(allPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		@SuppressWarnings("unchecked")
-		List<Post> posts = (List<Post>) templateContext.get("posts");
-		for (Post post : posts) {
+		/* mark it all as known. */
+		for (Post post : pagination.getItems()) {
 			webInterface.getCore().markPostKnown(post);
 			for (Reply reply : webInterface.getCore().getReplies(post)) {
 				webInterface.getCore().markReplyKnown(reply);
 			}
 		}
+
 	}
 
 }

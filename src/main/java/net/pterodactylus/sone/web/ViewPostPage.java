@@ -73,17 +73,6 @@ public class ViewPostPage extends SoneTemplatePage {
 		Post post = webInterface.getCore().getPost(postId);
 		templateContext.set("post", post);
 		templateContext.set("raw", raw);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		Post post = (Post) templateContext.get("post");
-		if (post == null) {
-			return;
-		}
 		webInterface.getCore().markPostKnown(post);
 		for (Reply reply : webInterface.getCore().getReplies(post)) {
 			webInterface.getCore().markReplyKnown(reply);

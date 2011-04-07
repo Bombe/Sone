@@ -29,6 +29,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.util.collection.ListBuilder;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -108,22 +109,10 @@ public class ViewSonePage extends SoneTemplatePage {
 		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
 		templateContext.set("repliedPostPagination", repliedPostPagination);
 		templateContext.set("repliedPosts", repliedPostPagination.getItems());
-	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		Sone sone = (Sone) templateContext.get("sone");
-		if (sone == null) {
-			return;
-		}
+		/* mark Sone and posts and replies as known. */
 		webInterface.getCore().markSoneKnown(sone);
-		List<Post> posts = (List<Post>) templateContext.get("posts");
-		posts.addAll((List<Post>) templateContext.get("repliedPosts"));
-		for (Post post : posts) {
+		for (Post post : new ListBuilder<Post>().addAll(postPagination.getItems()).addAll(repliedPostPagination.getItems()).get()) {
 			if (post.getSone() != null) {
 				webInterface.getCore().markPostKnown(post);
 			}
