@@ -265,6 +265,19 @@ function getFormPassword() {
 	return $("#sone #formPassword").text();
 }
 
+/**
+ * Returns the element of the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone
+ * @returns All Sone elements with the given ID
+ */
+function getSone(soneId) {
+	return $("#sone .sone").filter(function(index) {
+		return $(".id").text() == soneId;
+	});
+}
+
 function getSoneElement(element) {
 	return $(element).closest(".sone");
 }
