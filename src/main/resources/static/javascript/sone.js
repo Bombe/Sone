@@ -879,6 +879,90 @@ function ajaxifyNotification(notification) {
 	return notification;
 }
 
+/**
+ * Retrieves element IDs from notification elements.
+ *
+ * @param notification
+ *            The notification element
+ * @param selector
+ *            The selector of the element containing the ID as text
+ * @returns All extracted IDs
+ */
+function getElementIds(notification, selector) {
+	elementIds = [];
+	$(selector, notification).each(function() {
+		elementIds.push($(this).text());
+	});
+	return elementIds;
+}
+
+/**
+ * Compares the given notification elements and calls {@link #markSoneAsKnown()}
+ * for every ID that is contained in the old notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedSones(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-sone-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".sone-id");
+	newIds = getElementIds(newNotification, ".sone-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markSoneAsKnown(getSone(value), true);
+		}
+	});
+}
+
+/**
+ * Compares the given notification elements and calls {@link #markPostAsKnown()}
+ * for every ID that is contained in the old notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedPosts(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-post-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".post-id");
+	newIds = getElementIds(newNotification, ".post-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markPostAsKnown(getPost(value), true);
+		}
+	});
+}
+
+/**
+ * Compares the given notification elements and calls
+ * {@link #markReplyAsKnown()} for every ID that is contained in the old
+ * notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedReplies(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-replies-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".reply-id");
+	newIds = getElementIds(newNotification, ".reply-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markReplyAsKnown(getReply(value), true);
+		}
+	});
+}
+
 function getStatus() {
 	$.getJSON("getStatus.ajax", {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
 		if ((data != null) && data.success) {
