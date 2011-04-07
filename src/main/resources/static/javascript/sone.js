@@ -1335,9 +1335,6 @@ function updatePostTimes(postIds) {
  *            The tooltip to show
  */
 function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
-	if (!getReply(replyId).is(":visible")) {
-		return;
-	}
 	getReply(replyId).find(".reply-status-line > .time").html(timeText).attr("title", tooltip);
 	(function(replyId, refreshTime) {
 		setTimeout(function() {
