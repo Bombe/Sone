@@ -218,7 +218,8 @@ function enhanceDeletePostButton(button, postId, text) {
 			if (data.success) {
 				$("#sone .post#" + postId).slideUp();
 			} else if (data.error == "invalid-post-id") {
-				alert("Invalid post ID given!");
+				/* pretend the post is already gone. */
+				getPost(postId).slideUp();
 			} else if (data.error == "auth-required") {
 				alert("You need to be logged in.");
 			} else if (data.error == "not-authorized") {
@@ -249,7 +250,8 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 			if (data.success) {
 				$("#sone .reply#" + replyId).slideUp();
 			} else if (data.error == "invalid-reply-id") {
-				alert("Invalid reply ID given!");
+				/* pretend the reply is already gone. */
+				getReply(replyId).slideUp();
 			} else if (data.error == "auth-required") {
 				alert("You need to be logged in.");
 			} else if (data.error == "not-authorized") {
