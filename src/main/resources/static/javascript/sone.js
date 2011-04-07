@@ -981,6 +981,22 @@ function getStatus() {
 					}
 				});
 				if (!foundNotification) {
+					if (notificationId == "new-sone-notification") {
+						$(".sone-id", this).each(function(index, element) {
+							soneId = $(this).text();
+							markSoneAsKnown(getSone(soneId), true);
+						});
+					} else if (notificationId == "new-post-notification") {
+						$(".post-id", this).each(function(index, element) {
+							postId = $(this).text();
+							markPostAsKnown(getPost(postId), true);
+						});
+					} else if (notificationId == "new-replies-notification") {
+						$(".reply-id", this).each(function(index, element) {
+							replyId = $(this).text();
+							markReplyAsKnown(getReply(replyId), true);
+						});
+					}
 					$(this).slideUp("normal", function() {
 						$(this).remove();
 					});
