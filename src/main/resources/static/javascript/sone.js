@@ -996,6 +996,9 @@ function getStatus() {
 						notification.find(".short-text").toggleClass("hidden", opened);
 						notification.find(".text").toggleClass("hidden", !opened);
 					}
+					checkForRemovedSones(oldNotification, notification);
+					checkForRemovedPosts(oldNotification, notification);
+					checkForRemovedReplies(oldNotification, notification);
 					oldNotification.replaceWith(notification.show());
 				} else {
 					$("#sone #notification-area").append(notification);
