@@ -380,6 +380,39 @@ function getReplyAuthor(element) {
 	return getReplyElement(element).find(".reply-author").text();
 }
 
+/**
+ * Returns the notification with the given ID.
+ *
+ * @param notificationId
+ *            The ID of the notification
+ * @returns The notification element
+ */
+function getNotification(notificationId) {
+	return $("#sone #notification-area .notification#" + notificationId);
+}
+
+/**
+ * Returns the notification element closest to the given element.
+ *
+ * @param element
+ *            The element to get the closest notification of
+ * @return The closest notification element
+ */
+function getNotificationElement(element) {
+	return $(element).closest(".notification");
+}
+
+/**
+ * Returns the ID of the notification element.
+ *
+ * @param notificationElement
+ *            The notification element
+ * @returns The ID of the notification
+ */
+function getNotificationId(notificationElement) {
+	return $(notificationElement).attr("id");
+}
+
 function likePost(postId) {
 	$.getJSON("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
