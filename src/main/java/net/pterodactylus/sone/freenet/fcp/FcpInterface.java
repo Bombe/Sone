@@ -24,6 +24,7 @@ import java.util.Map;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.Reply;
+import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
 import freenet.support.SimpleFieldSet;
@@ -37,15 +38,38 @@ import freenet.support.api.Bucket;
  */
 public class FcpInterface {
 
+	/** The core. */
 	private final Core core;
+
+	/** All available FCP commands. */
 	private final Map<String, Command> commands = Collections.synchronizedMap(new HashMap<String, Command>());
 
+	/**
+	 * Creates a new FCP interface.
+	 *
+	 * @param core
+	 *            The core
+	 */
 	public FcpInterface(Core core) {
 		this.core = core;
 		commands.put("Version", new VersionCommand());
 		commands.put("GetPostFeed", new GetPostFeedCommand(core));
 	}
 
+	/**
+	 * Handles a plugin FCP request.
+	 *
+	 * @param pluginReplySender
+	 *            The reply sender
+	 * @param parameters
+	 *            The message parameters
+	 * @param data
+	 *            The message data (may be {@code null})
+	 * @param accessType
+	 *            One of {@link FredPluginFCP#ACCESS_DIRECT},
+	 *            {@link FredPluginFCP#ACCESS_FCP_FULL},
+	 *            {@link FredPluginFCP#ACCESS_FCP_RESTRICTED}
+	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
 		Command command = commands.get(parameters.get("Message"));
 		if (command == null) {
