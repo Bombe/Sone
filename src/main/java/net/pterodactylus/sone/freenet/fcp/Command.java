@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.freenet.fcp;
 
+import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -174,6 +175,38 @@ public interface Command {
 		 */
 		public Bucket getBucket() {
 			return bucket;
+		}
+
+	}
+
+	/**
+	 * Response implementation that can return an error message and an optional
+	 * error code.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public class ErrorResponse extends Response {
+
+		/**
+		 * Creates a new error response with the given message.
+		 *
+		 * @param message
+		 *            The error message
+		 */
+		public ErrorResponse(String message) {
+			super(new SimpleFieldSetBuilder().put("ErrorMessage", message).get());
+		}
+
+		/**
+		 * Creates a new error response with the given code and message.
+		 *
+		 * @param code
+		 *            The error code
+		 * @param message
+		 *            The error message
+		 */
+		public ErrorResponse(int code, String message) {
+			super(new SimpleFieldSetBuilder().put("ErrorMessage", message).put("ErrorCode", code).get());
 		}
 
 	}
