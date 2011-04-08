@@ -52,4 +52,24 @@ public abstract class AbstractCommand implements Command {
 		}
 	}
 
+	/**
+	 * Returns an int value from the given simple field set.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set to get the value from
+	 * @param key
+	 *            The key of the value
+	 * @return The int value
+	 * @throws FcpException
+	 *             if there is no value for the given key in the simple field
+	 *             set, or the value can not be converted to an int
+	 */
+	protected int getInt(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
+		try {
+			return simpleFieldSet.getInt(key);
+		} catch (FSParseException fspe1) {
+			throw new FcpException("Could not get parameter “" + key + "” as int.", fspe1);
+		}
+	}
+
 }
