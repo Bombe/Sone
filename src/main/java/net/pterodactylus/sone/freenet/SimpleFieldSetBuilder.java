@@ -89,4 +89,19 @@ public class SimpleFieldSetBuilder {
 		return this;
 	}
 
+	/**
+	 * Stores the given value under the given key, overwriting any previous
+	 * value.
+	 *
+	 * @param key
+	 *            The key of the value
+	 * @param value
+	 *            The value to store
+	 * @return This simple field set builder
+	 */
+	public SimpleFieldSetBuilder put(String key, long value) {
+		simpleFieldSet.put(key, value);
+		return this;
+	}
+
 }
