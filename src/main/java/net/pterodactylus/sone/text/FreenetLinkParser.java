@@ -27,6 +27,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
@@ -68,9 +72,18 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 		HTTP,
 
 		/** Link is HTTPS. */
-		HTTPS;
+		HTTPS,
+
+		/** Link is a Sone. */
+		SONE,
+
+		/** Link is a post. */
+		POST,
 
 	}
+
+	/** The core. */
+	private final Core core;
 
 	/** The template factory. */
 	private final TemplateContextFactory templateContextFactory;
@@ -78,10 +91,13 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	/**
 	 * Creates a new freenet link parser.
 	 *
+	 * @param core
+	 *            The core
 	 * @param templateContextFactory
 	 *            The template context factory
 	 */
-	public FreenetLinkParser(TemplateContextFactory templateContextFactory) {
+	public FreenetLinkParser(Core core, TemplateContextFactory templateContextFactory) {
+		this.core = core;
 		this.templateContextFactory = templateContextFactory;
 	}
 
@@ -118,7 +134,9 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 				int nextUsk = line.indexOf("USK@");
 				int nextHttp = line.indexOf("http://");
 				int nextHttps = line.indexOf("https://");
-				if ((nextKsk == -1) && (nextChk == -1) && (nextSsk == -1) && (nextUsk == -1) && (nextHttp == -1) && (nextHttps == -1)) {
+				int nextSone = line.indexOf("sone://");
+				int nextPost = line.indexOf("post://");
+				if ((nextKsk == -1) && (nextChk == -1) && (nextSsk == -1) && (nextUsk == -1) && (nextHttp == -1) && (nextHttps == -1) && (nextSone == -1) && (nextPost == -1)) {
 					if (lineComplete && !lastLineEmpty) {
 						parts.add(createPlainTextPart("\n" + line));
 					} else {
@@ -151,6 +169,14 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 				if ((nextHttps > -1) && (nextHttps < next)) {
 					next = nextHttps;
 					linkType = LinkType.HTTPS;
+				}
+				if ((nextSone > -1) && (nextSone < next)) {
+					next = nextSone;
+					linkType = LinkType.SONE;
+				}
+				if ((nextPost > -1) && (nextPost < next)) {
+					next = nextPost;
+					linkType = LinkType.POST;
 				}
 				if ((next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
 					next -= 8;
@@ -216,6 +242,25 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 						}
 						link = "?_CHECKED_HTTP_=" + link;
 						parts.add(createInternetLinkPart(link, name));
+					} else if (linkType == LinkType.SONE) {
+						String soneId = link.substring(7);
+						Sone sone = core.getSone(soneId, false);
+						if (sone != null) {
+							parts.add(createInSoneLinkPart("viewSone.html?sone=" + soneId, SoneAccessor.getNiceName(sone)));
+						} else {
+							parts.add(createPlainTextPart(link));
+						}
+					} else if (linkType == LinkType.POST) {
+						String postId = link.substring(7);
+						Post post = core.getPost(postId, false);
+						if (post != null) {
+							String postText = post.getText();
+							postText = postText.substring(0, Math.min(postText.length(), 20)) + "…";
+							Sone postSone = post.getSone();
+							parts.add(createInSoneLinkPart("viewPost.html?post=" + postId, postText, (postSone == null) ? postText : SoneAccessor.getNiceName(post.getSone())));
+						} else {
+							parts.add(createPlainTextPart(link));
+						}
 					}
 					line = line.substring(nextSpace);
 				} else {
@@ -294,6 +339,34 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 	 */
 	private Part createTrustedFreenetLinkPart(String link, String name) {
 		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"freenet-trusted\" href=\"/<% link|html>\" title=\"<% link|html>\"><% name|html></a>"))).set("link", link).set("name", name);
+	}
+
+	/**
+	 * Creates a new part based on a template that links to a page in Sone.
+	 *
+	 * @param link
+	 *            The target of the link
+	 * @param name
+	 *            The name of the link
+	 * @return The part that displays the link
+	 */
+	private Part createInSoneLinkPart(String link, String name) {
+		return createInSoneLinkPart(link, name, name);
+	}
+
+	/**
+	 * Creates a new part based on a template that links to a page in Sone.
+	 *
+	 * @param link
+	 *            The target of the link
+	 * @param name
+	 *            The name of the link
+	 * @param title
+	 *            The title attribute of the link
+	 * @return The part that displays the link
+	 */
+	private Part createInSoneLinkPart(String link, String name, String title) {
+		return new TemplatePart(templateContextFactory, TemplateParser.parse(new StringReader("<a class=\"in-sone\" href=\"<%link|html>\" title=\"<%title|html>\"><%name|html></a>"))).set("link", link).set("name", name).set("title", title);
 	}
 
 }
