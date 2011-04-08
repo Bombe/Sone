@@ -38,9 +38,6 @@ import freenet.support.api.Bucket;
  */
 public class FcpInterface {
 
-	/** The core. */
-	private final Core core;
-
 	/** All available FCP commands. */
 	private final Map<String, Command> commands = Collections.synchronizedMap(new HashMap<String, Command>());
 
@@ -51,7 +48,6 @@ public class FcpInterface {
 	 *            The core
 	 */
 	public FcpInterface(Core core) {
-		this.core = core;
 		commands.put("Version", new VersionCommand());
 		commands.put("GetPostFeed", new GetPostFeedCommand(core));
 	}
