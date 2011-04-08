@@ -125,22 +125,22 @@ public class GetTimesAjaxPage extends JsonPage {
 		if (age < 0) {
 			text = webInterface.getL10n().getDefaultString("View.Time.InTheFuture");
 			refresh = 5 * Time.MINUTE;
-		} else if (age < 30 * Time.SECOND) {
+		} else if (age < 20 * Time.SECOND) {
 			text = webInterface.getL10n().getDefaultString("View.Time.AFewSecondsAgo");
-			refresh = 5 * Time.SECOND;
-		} else if (age < 1 * Time.MINUTE) {
-			text = webInterface.getL10n().getString("View.Time.XSecondsAgo", "sec", String.valueOf((int) Digits.round(age / Time.SECOND, 10)));
 			refresh = 10 * Time.SECOND;
-		} else if (age < 2 * Time.MINUTE) {
+		} else if (age < 45 * Time.SECOND) {
+			text = webInterface.getL10n().getString("View.Time.HalfAMinuteAgo");
+			refresh = 20 * Time.SECOND;
+		} else if (age < 90 * Time.SECOND) {
 			text = webInterface.getL10n().getString("View.Time.AMinuteAgo");
 			refresh = Time.MINUTE;
 		} else if (age < 30 * Time.MINUTE) {
 			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf((int) Digits.round(age / Time.MINUTE, 1)));
-			refresh = Time.MINUTE;
+			refresh = 1 * Time.MINUTE;
 		} else if (age < 45 * Time.MINUTE) {
 			text = webInterface.getL10n().getString("View.Time.HalfAnHourAgo");
 			refresh = 10 * Time.MINUTE;
-		} else if (age < 2 * Time.HOUR) {
+		} else if (age < 90 * Time.MINUTE) {
 			text = webInterface.getL10n().getString("View.Time.AnHourAgo");
 			refresh = Time.HOUR;
 		} else if (age < 21 * Time.HOUR) {
