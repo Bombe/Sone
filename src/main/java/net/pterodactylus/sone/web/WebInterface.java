@@ -545,6 +545,7 @@ public class WebInterface implements CoreListener {
 		Template openSearchTemplate = TemplateParser.parse(createReader("/templates/xml/OpenSearch.xml"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
@@ -609,7 +610,6 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MoveProfileFieldAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage("", "index.html")));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
 		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
