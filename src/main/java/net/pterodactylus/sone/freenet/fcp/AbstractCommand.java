@@ -88,4 +88,40 @@ public abstract class AbstractCommand implements Command {
 		return simpleFieldSet.getInt(key, defaultValue);
 	}
 
+	/**
+	 * Returns a boolean value from the given simple field set.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set to get the value from
+	 * @param key
+	 *            The key of the value
+	 * @return The boolean value
+	 * @throws FcpException
+	 *             if there is no value for the given key in the simple field
+	 *             set, or the value can not be converted to a boolean
+	 */
+	protected boolean getBoolean(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
+		try {
+			return simpleFieldSet.getBoolean(key);
+		} catch (FSParseException fspe1) {
+			throw new FcpException("Could not get parameter “" + key + "” as boolean.", fspe1);
+		}
+	}
+
+	/**
+	 * Returns a boolean value from the given simple field set, returning a
+	 * default value if the value can not be found or converted.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set to get the value from
+	 * @param key
+	 *            The key of the value
+	 * @param defaultValue
+	 *            The default value
+	 * @return The boolean value
+	 */
+	protected boolean getBoolean(SimpleFieldSet simpleFieldSet, String key, boolean defaultValue) {
+		return simpleFieldSet.getBoolean(key, defaultValue);
+	}
+
 }
