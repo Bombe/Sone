@@ -20,12 +20,16 @@ package net.pterodactylus.sone.fcp;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.fcp.Command;
-import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
+import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
+import net.pterodactylus.sone.freenet.fcp.FcpException;
+import net.pterodactylus.util.logging.Logging;
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
@@ -39,6 +43,9 @@ import freenet.support.api.Bucket;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FcpInterface {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(FcpInterface.class);
 
 	/** All available FCP commands. */
 	private final Map<String, Command> commands = Collections.synchronizedMap(new HashMap<String, Command>());
@@ -72,30 +79,54 @@ public class FcpInterface {
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
 		Command command = commands.get(parameters.get("Message"));
-		if (command == null) {
-			/* TODO - return error? */
-			return;
-		}
-		String identifier = parameters.get("Identifier");
-		if ((identifier == null) || (identifier.length() == 0)) {
-			/* TODO - return error? */
-			return;
-		}
 		try {
-			Response reply = command.execute(parameters, data, AccessType.values()[accessType]);
-			SimpleFieldSet replyParameters = reply.getReplyParameters();
-			replyParameters.putOverwrite("Identifier", identifier);
-			if (reply.hasData()) {
-				pluginReplySender.send(replyParameters, reply.getData());
-			} else if (reply.hasBucket()) {
-				pluginReplySender.send(replyParameters, reply.getBucket());
-			} else {
-				pluginReplySender.send(replyParameters);
+			if (command == null) {
+				sendReply(pluginReplySender, null, new ErrorResponse("Unrecognized Message: " + parameters.get("Message")));
+				return;
 			}
-		} catch (FcpException fe1) {
-			/* TODO - log, report */
+			String identifier = parameters.get("Identifier");
+			if ((identifier == null) || (identifier.length() == 0)) {
+				sendReply(pluginReplySender, null, new ErrorResponse("Missing Identifier."));
+				return;
+			}
+			try {
+				Response response = command.execute(parameters, data, AccessType.values()[accessType]);
+				sendReply(pluginReplySender, identifier, response);
+			} catch (FcpException fe1) {
+				sendReply(pluginReplySender, null, new ErrorResponse("Error executing command: " + fe1.getMessage()));
+			}
 		} catch (PluginNotFoundException pnfe1) {
-			/* TODO - log */
+			logger.log(Level.WARNING, "Could not find destination plugin: " + pluginReplySender);
+		}
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Sends the given response to the given plugin.
+	 *
+	 * @param pluginReplySender
+	 *            The reply sender
+	 * @param identifier
+	 *            The identifier (may be {@code null})
+	 * @param response
+	 *            The response to send
+	 * @throws PluginNotFoundException
+	 *             if the plugin can not be found
+	 */
+	private void sendReply(PluginReplySender pluginReplySender, String identifier, Response response) throws PluginNotFoundException {
+		SimpleFieldSet replyParameters = response.getReplyParameters();
+		if (identifier != null) {
+			replyParameters.putOverwrite("Identifier", identifier);
+		}
+		if (response.hasData()) {
+			pluginReplySender.send(replyParameters, response.getData());
+		} else if (response.hasBucket()) {
+			pluginReplySender.send(replyParameters, response.getBucket());
+		} else {
+			pluginReplySender.send(replyParameters);
 		}
 	}
 
