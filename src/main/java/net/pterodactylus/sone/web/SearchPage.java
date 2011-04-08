@@ -103,8 +103,8 @@ public class SearchPage extends SoneTemplatePage {
 		List<Post> resultPosts = Converters.convertList(sortedPostHits, new HitConverter<Post>());
 
 		/* pagination. */
-		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
-		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
+		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 
 		templateContext.set("sonePagination", sonePagination);
 		templateContext.set("soneHits", sonePagination.getItems());

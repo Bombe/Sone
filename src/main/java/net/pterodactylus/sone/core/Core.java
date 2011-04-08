@@ -1680,6 +1680,7 @@ public class Core implements IdentityListener, UpdateListener {
 		try {
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
@@ -1753,6 +1754,7 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 
 		}));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(25));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
@@ -1772,6 +1774,7 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		options.getIntegerOption("PostsPerPage").set(configuration.getIntValue("Option/PostsPerPage").getValue(null));
 		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
@@ -1957,6 +1960,27 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public Preferences setInsertionDelay(Integer insertionDelay) {
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			return this;
+		}
+
+		/**
+		 * Returns the number of posts to show per page.
+		 *
+		 * @return The number of posts to show per page
+		 */
+		public int getPostsPerPage() {
+			return options.getIntegerOption("PostsPerPage").get();
+		}
+
+		/**
+		 * Sets the number of posts to show per page.
+		 *
+		 * @param postsPerPage
+		 *            The number of posts to show per page
+		 * @return This preferences object
+		 */
+		public Preferences setPostsPerPage(Integer postsPerPage) {
+			options.getIntegerOption("PostsPerPage").set(postsPerPage);
 			return this;
 		}
 

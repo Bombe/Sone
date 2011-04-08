@@ -5,6 +5,9 @@
 			getTranslation("WebInterface.DefaultText.Option.InsertionDelay", function(insertionDelayDefaultText) {
 				registerInputTextareaSwap("#sone #options input[name=insertion-delay]", insertionDelayDefaultText, "insertion-delay", true, true);
 			});
+			getTranslation("WebInterface.DefaultText.Option.PostsPerPage", function(postsPerPageText) {
+				registerInputTextareaSwap("#sone #options input[name=posts-per-page]", postsPerPageText, "posts-per-page", true, true);
+			});
 		});
 	</script>
 
@@ -30,6 +33,9 @@
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
 		<p><input type="text" name="insertion-delay" value="<% insertion-delay|html>" /></p>
+
+		<p><%= Page.Options.Option.PostsPerPage.Description|l10n|html></p>
+		<p><input type="text" name="posts-per-page" value="<% posts-per-page|html>" /></p>
 
 		<h2><%= Page.Options.Section.TrustOptions.Title|l10n|html></h2>
 

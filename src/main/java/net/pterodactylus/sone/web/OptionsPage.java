@@ -63,6 +63,8 @@ public class OptionsPage extends SoneTemplatePage {
 			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			preferences.setInsertionDelay(insertionDelay);
+			Integer postsPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
+			preferences.setPostsPerPage(postsPerPage);
 			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
 			preferences.setPositiveTrust(positiveTrust);
 			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
@@ -85,6 +87,7 @@ public class OptionsPage extends SoneTemplatePage {
 			templateContext.set("auto-follow", currentSone.getOptions().getBooleanOption("AutoFollow").get());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
+		templateContext.set("posts-per-page", preferences.getPostsPerPage());
 		templateContext.set("positive-trust", preferences.getPositiveTrust());
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());

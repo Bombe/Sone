@@ -75,7 +75,7 @@ public class IndexPage extends SoneTemplatePage {
 		}
 		allPosts = Filters.filteredList(allPosts, Post.FUTURE_POSTS_FILTER);
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
-		Pagination<Post> pagination = new Pagination<Post>(allPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(allPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}

@@ -83,7 +83,7 @@ public class ViewSonePage extends SoneTemplatePage {
 		List<Post> sonePosts = sone.getPosts();
 		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone));
 		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
-		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
+		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());
 		Set<Reply> replies = sone.getReplies();
@@ -105,7 +105,7 @@ public class ViewSonePage extends SoneTemplatePage {
 
 		});
 
-		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
+		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
 		templateContext.set("repliedPostPagination", repliedPostPagination);
 		templateContext.set("repliedPosts", repliedPostPagination.getItems());
 	}
