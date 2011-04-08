@@ -236,4 +236,28 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		return replyBuilder.get();
 	}
 
+	/**
+	 * Creates a simple field set from the given collection of Sones that like
+	 * an element.
+	 *
+	 * @param likes
+	 *            The liking Sones
+	 * @param prefix
+	 *            The prefix for the field names (may be empty but not
+	 *            {@code null})
+	 * @return The simple field set containing the likes
+	 */
+	protected SimpleFieldSet encodeLikes(Collection<? extends Sone> likes, String prefix) {
+		SimpleFieldSetBuilder likesBuilder = new SimpleFieldSetBuilder();
+
+		int likeIndex = 0;
+		likesBuilder.put(prefix + "Count", likes.size());
+		for (Sone sone : likes) {
+			String sonePrefix = prefix + likeIndex++ + ".";
+			likesBuilder.put(sonePrefix + "ID", sone.getId());
+		}
+
+		return likesBuilder.get();
+	}
+
 }
