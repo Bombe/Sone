@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.fcp;
 
 import java.util.Collection;
+import java.util.List;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
@@ -127,15 +128,18 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *
 	 * @param sones
 	 *            The Sones to encode
+	 * @param prefix
+	 *            The prefix for the field names (may be empty but not
+	 *            {@code null})
 	 * @return The simple field set containing the given Sones
 	 */
-	protected SimpleFieldSet encodeSones(Collection<? extends Sone> sones) {
+	protected SimpleFieldSet encodeSones(Collection<? extends Sone> sones, String prefix) {
 		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
 
 		int soneIndex = 0;
-		soneBuilder.put("Sones.Count", sones.size());
+		soneBuilder.put(prefix + "Count", sones.size());
 		for (Sone sone : sones) {
-			String sonePrefix = "Sones." + soneIndex++;
+			String sonePrefix = prefix + soneIndex++;
 			soneBuilder.put(sonePrefix + ".ID", sone.getId());
 			soneBuilder.put(sonePrefix + ".Name", sone.getName());
 			soneBuilder.put(sonePrefix + ".NiceName", SoneAccessor.getNiceName(sone));
@@ -146,29 +150,58 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	}
 
 	/**
+	 * Creates a simple field set from the given post.
+	 *
+	 * @param post
+	 *            The post to encode
+	 * @param prefix
+	 *            The prefix for the field names (may be empty but not
+	 *            {@code null})
+	 * @param includeReplies
+	 *            {@code true} to include replies, {@code false} to not include
+	 *            replies
+	 * @return The simple field set containing the post
+	 */
+	protected SimpleFieldSet encodePost(Post post, String prefix, boolean includeReplies) {
+		SimpleFieldSetBuilder postBuilder = new SimpleFieldSetBuilder();
+
+		postBuilder.put(prefix + "ID", post.getId());
+		postBuilder.put(prefix + "Sone", post.getSone().getId());
+		if (post.getRecipient() != null) {
+			postBuilder.put(prefix + "Recipient", post.getRecipient().getId());
+		}
+		postBuilder.put(prefix + "Time", post.getTime());
+		postBuilder.put(prefix + "Text", post.getText());
+
+		if (includeReplies) {
+			List<Reply> replies = core.getReplies(post);
+			postBuilder.put(encodeReplies(replies, prefix));
+		}
+
+		return postBuilder.get();
+	}
+
+	/**
 	 * Creates a simple field set from the given collection of posts.
 	 *
 	 * @param posts
 	 *            The posts to encode
+	 * @param prefix
+	 *            The prefix for the field names (may be empty but not
+	 *            {@code null})
 	 * @param includeReplies
 	 *            {@code true} to include the replies, {@code false} to not
 	 *            include the replies
 	 * @return The simple field set containing the posts
 	 */
-	public SimpleFieldSet encodePosts(Collection<? extends Post> posts, boolean includeReplies) {
+	public SimpleFieldSet encodePosts(Collection<? extends Post> posts, String prefix, boolean includeReplies) {
 		SimpleFieldSetBuilder postBuilder = new SimpleFieldSetBuilder();
 
 		int postIndex = 0;
-		postBuilder.put("Posts.Count", posts.size());
+		postBuilder.put(prefix + "Count", posts.size());
 		for (Post post : posts) {
-			String postPrefix = "Posts." + postIndex++;
-			postBuilder.put(postPrefix + ".ID", post.getId());
-			postBuilder.put(postPrefix + ".Sone", post.getSone().getId());
-			if (post.getRecipient() != null) {
-				postBuilder.put(postPrefix + ".Recipient", post.getRecipient().getId());
-			}
-			postBuilder.put(postPrefix + ".Time", post.getTime());
-			postBuilder.put(postPrefix + ".Text", post.getText());
+			String postPrefix = prefix + postIndex++;
+			postBuilder.put(encodePost(post, postPrefix + ".", includeReplies));
 			if (includeReplies) {
 				postBuilder.put(encodeReplies(Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLIES_FILTER), postPrefix + "."));
 			}

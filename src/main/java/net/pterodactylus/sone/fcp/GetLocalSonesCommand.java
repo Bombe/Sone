@@ -45,7 +45,7 @@ public class GetLocalSonesCommand extends AbstractSoneCommand {
 	 */
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
-		return new Response(encodeSones(getCore().getLocalSones()));
+		return new Response(encodeSones(getCore().getLocalSones(), "LocalSones."));
 	}
 
 }
