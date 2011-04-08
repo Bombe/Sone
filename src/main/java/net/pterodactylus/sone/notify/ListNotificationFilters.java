@@ -90,7 +90,7 @@ public class ListNotificationFilters {
 		}
 		List<Post> newPosts = new ArrayList<Post>();
 		for (Post post : newPostNotification.getElements()) {
-			if (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone())) {
+			if (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone()) || currentSone.equals(post.getRecipient())) {
 				newPosts.add(post);
 			}
 		}
@@ -125,7 +125,7 @@ public class ListNotificationFilters {
 		}
 		List<Reply> newReplies = new ArrayList<Reply>();
 		for (Reply reply : newReplyNotification.getElements()) {
-			if (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone())) {
+			if (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient())) {
 				newReplies.add(reply);
 			}
 		}
