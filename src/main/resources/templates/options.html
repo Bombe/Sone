@@ -8,6 +8,15 @@
 			getTranslation("WebInterface.DefaultText.Option.PostsPerPage", function(postsPerPageText) {
 				registerInputTextareaSwap("#sone #options input[name=posts-per-page]", postsPerPageText, "posts-per-page", true, true);
 			});
+			getTranslation("WebInterface.DefaultText.Option.PositiveTrust", function(positiveTrustText) {
+				registerInputTextareaSwap("#sone #options input[name=positive-trust]", positiveTrustText, "positive-trust", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.Option.NegativeTrust", function(negativeTrustText) {
+				registerInputTextareaSwap("#sone #options input[name=negative-trust]", negativeTrustText, "negative-trust", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.Option.TrustComment", function(trustCommentText) {
+				registerInputTextareaSwap("#sone #options input[name=trust-comment]", trustCommentText, "trust-comment", true, true);
+			});
 		});
 	</script>
 
