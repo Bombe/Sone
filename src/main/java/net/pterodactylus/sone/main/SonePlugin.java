@@ -24,8 +24,8 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
+import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
-import net.pterodactylus.sone.freenet.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;

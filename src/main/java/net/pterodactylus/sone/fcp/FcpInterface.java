@@ -15,13 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.fcp;
+package net.pterodactylus.sone.fcp;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.freenet.fcp.Command;
+import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.Reply;
 import freenet.pluginmanager.FredPluginFCP;

@@ -15,9 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.fcp;
+package net.pterodactylus.sone.fcp;
 
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
+import net.pterodactylus.sone.freenet.fcp.Command;
+import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
+import net.pterodactylus.sone.freenet.fcp.Command.Reply;
 import net.pterodactylus.sone.main.SonePlugin;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
