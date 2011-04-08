@@ -34,8 +34,8 @@ public class VersionCommand implements Command {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Reply execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
-		return new Reply(new SimpleFieldSetBuilder().put("Version", SonePlugin.VERSION.toString()).put("ProtocolVersion", 1).get());
+	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
+		return new Response(new SimpleFieldSetBuilder().put("Version", SonePlugin.VERSION.toString()).put("ProtocolVersion", 1).get());
 	}
 
 }

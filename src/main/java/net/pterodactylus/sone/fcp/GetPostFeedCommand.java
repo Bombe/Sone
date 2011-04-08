@@ -53,7 +53,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Reply execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		Sone sone = getSone(parameters, "Sone");
 		int startPost = getInt(parameters, "StartPost", 0);
 		int maxPosts = getInt(parameters, "MaxPosts", -1);
@@ -73,10 +73,10 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 
 		if (sortedPosts.size() < startPost) {
-			return new Reply(encodePosts(Collections.<Post> emptyList()));
+			return new Response(encodePosts(Collections.<Post> emptyList()));
 		}
 
-		return new Reply(encodePosts(sortedPosts.subList(startPost, (maxPosts == -1) ? sortedPosts.size() : Math.min(startPost + maxPosts, sortedPosts.size()))));
+		return new Response(encodePosts(sortedPosts.subList(startPost, (maxPosts == -1) ? sortedPosts.size() : Math.min(startPost + maxPosts, sortedPosts.size()))));
 	}
 
 }

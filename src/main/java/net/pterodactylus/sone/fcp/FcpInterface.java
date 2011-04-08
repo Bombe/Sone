@@ -25,7 +25,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
-import net.pterodactylus.sone.freenet.fcp.Command.Reply;
+import net.pterodactylus.sone.freenet.fcp.Command.Response;
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
@@ -81,7 +81,7 @@ public class FcpInterface {
 			return;
 		}
 		try {
-			Reply reply = command.execute(parameters, data, AccessType.values()[accessType]);
+			Response reply = command.execute(parameters, data, AccessType.values()[accessType]);
 			SimpleFieldSet replyParameters = reply.getReplyParameters();
 			replyParameters.putOverwrite("Identifier", identifier);
 			if (reply.hasData()) {

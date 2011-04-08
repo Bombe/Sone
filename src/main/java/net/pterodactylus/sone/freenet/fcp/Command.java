@@ -42,7 +42,7 @@ public interface Command {
 	 * @throws FcpException
 	 *             if an error processing the parameters occurs
 	 */
-	public Reply execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException;
+	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException;
 
 	/**
 	 * The access type of the request.
@@ -67,7 +67,7 @@ public interface Command {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class Reply {
+	public static class Response {
 
 		/** The reply parameters. */
 		private final SimpleFieldSet replyParameters;
@@ -84,7 +84,7 @@ public interface Command {
 		 * @param replyParameters
 		 *            The reply parameters
 		 */
-		public Reply(SimpleFieldSet replyParameters) {
+		public Response(SimpleFieldSet replyParameters) {
 			this(replyParameters, null, null);
 		}
 
@@ -96,7 +96,7 @@ public interface Command {
 		 * @param data
 		 *            The data of the reply (may be {@code null})
 		 */
-		public Reply(SimpleFieldSet replyParameters, byte[] data) {
+		public Response(SimpleFieldSet replyParameters, byte[] data) {
 			this(replyParameters, data, null);
 		}
 
@@ -108,7 +108,7 @@ public interface Command {
 		 * @param bucket
 		 *            The bucket of the reply (may be {@code null})
 		 */
-		public Reply(SimpleFieldSet replyParameters, Bucket bucket) {
+		public Response(SimpleFieldSet replyParameters, Bucket bucket) {
 			this(replyParameters, null, bucket);
 		}
 
@@ -122,7 +122,7 @@ public interface Command {
 		 * @param bucket
 		 *            The bucket of the reply (may be {@code null})
 		 */
-		private Reply(SimpleFieldSet replyParameters, byte[] data, Bucket bucket) {
+		private Response(SimpleFieldSet replyParameters, byte[] data, Bucket bucket) {
 			this.replyParameters = replyParameters;
 			this.data = data;
 			this.bucket = bucket;
