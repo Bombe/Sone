@@ -28,6 +28,7 @@ import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
 import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.util.filter.Filters;
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
 
@@ -123,9 +124,12 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *
 	 * @param posts
 	 *            The posts to encode
+	 * @param includeReplies
+	 *            {@code true} to include the replies, {@code false} to not
+	 *            include the replies
 	 * @return The simple field set containing the posts
 	 */
-	public SimpleFieldSet encodePosts(Collection<? extends Post> posts) {
+	public SimpleFieldSet encodePosts(Collection<? extends Post> posts, boolean includeReplies) {
 		SimpleFieldSetBuilder postBuilder = new SimpleFieldSetBuilder();
 
 		int postIndex = 0;
@@ -139,6 +143,9 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			}
 			postBuilder.put(postPrefix + ".Time", post.getTime());
 			postBuilder.put(postPrefix + ".Text", post.getText());
+			if (includeReplies) {
+				postBuilder.put(encodeReplies(Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLIES_FILTER), postPrefix + "."));
+			}
 		}
 
 		return postBuilder.get();
