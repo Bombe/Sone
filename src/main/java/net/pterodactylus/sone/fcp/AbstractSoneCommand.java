@@ -21,6 +21,7 @@ import java.util.Collection;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
@@ -141,6 +142,32 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		}
 
 		return postBuilder.get();
+	}
+
+	/**
+	 * Creates a simple field set from the given collection of replies.
+	 *
+	 * @param replies
+	 *            The replies to encode
+	 * @param prefix
+	 *            The prefix for the field names (may be empty, but not
+	 *            {@code null})
+	 * @return The simple field set containing the replies
+	 */
+	public SimpleFieldSet encodeReplies(Collection<? extends Reply> replies, String prefix) {
+		SimpleFieldSetBuilder replyBuilder = new SimpleFieldSetBuilder();
+
+		int replyIndex = 0;
+		replyBuilder.put(prefix + "Replies.Count", replies.size());
+		for (Reply reply : replies) {
+			String replyPrefix = prefix + "Replies." + replyIndex++;
+			replyBuilder.put(replyPrefix + ".ID", reply.getId());
+			replyBuilder.put(replyPrefix + ".Sone", reply.getSone().getId());
+			replyBuilder.put(replyPrefix + ".Time", reply.getTime());
+			replyBuilder.put(replyPrefix + ".Text", reply.getText());
+		}
+
+		return replyBuilder.get();
 	}
 
 }
