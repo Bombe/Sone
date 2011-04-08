@@ -1493,6 +1493,10 @@ public class Core implements IdentityListener, UpdateListener {
 		synchronized (posts) {
 			posts.remove(post.getId());
 		}
+		synchronized (newPosts) {
+			markPostKnown(post);
+			knownPosts.remove(post.getId());
+		}
 		saveSone(post.getSone());
 	}
 
@@ -1617,6 +1621,10 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 		synchronized (replies) {
 			replies.remove(reply.getId());
+		}
+		synchronized (newReplies) {
+			markReplyKnown(reply);
+			knownReplies.remove(reply.getId());
 		}
 		sone.removeReply(reply);
 		saveSone(sone);
