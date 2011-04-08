@@ -60,6 +60,19 @@ public class SimpleFieldSetBuilder {
 	}
 
 	/**
+	 * Copies the given simple field set into the simple field set being built
+	 * in this builder, overwriting all previously existing values.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set to copy
+	 * @return This simple field set builder
+	 */
+	public SimpleFieldSetBuilder put(SimpleFieldSet simpleFieldSet) {
+		this.simpleFieldSet.putAllOverwrite(simpleFieldSet);
+		return this;
+	}
+
+	/**
 	 * Stores the given value under the given key, overwriting any previous
 	 * value.
 	 *
