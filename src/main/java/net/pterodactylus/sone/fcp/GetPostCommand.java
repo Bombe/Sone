@@ -46,7 +46,9 @@ public class GetPostCommand extends AbstractSoneCommand {
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		Post post = getPost(parameters, "Post");
-		return new Response(encodePost(post, "Post.", true));
+		boolean includeReplies = getBoolean(parameters, "IncludeReplies", true);
+
+		return new Response(encodePost(post, "Post.", includeReplies));
 	}
 
 }
