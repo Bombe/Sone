@@ -194,7 +194,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            include the replies
 	 * @return The simple field set containing the posts
 	 */
-	public SimpleFieldSet encodePosts(Collection<? extends Post> posts, String prefix, boolean includeReplies) {
+	protected SimpleFieldSet encodePosts(Collection<? extends Post> posts, String prefix, boolean includeReplies) {
 		SimpleFieldSetBuilder postBuilder = new SimpleFieldSetBuilder();
 
 		int postIndex = 0;
@@ -220,7 +220,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the replies
 	 */
-	public SimpleFieldSet encodeReplies(Collection<? extends Reply> replies, String prefix) {
+	protected SimpleFieldSet encodeReplies(Collection<? extends Reply> replies, String prefix) {
 		SimpleFieldSetBuilder replyBuilder = new SimpleFieldSetBuilder();
 
 		int replyIndex = 0;
