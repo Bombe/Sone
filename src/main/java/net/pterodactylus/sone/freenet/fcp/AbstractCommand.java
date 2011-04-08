@@ -72,4 +72,20 @@ public abstract class AbstractCommand implements Command {
 		}
 	}
 
+	/**
+	 * Returns an int value from the given simple field set, returning a default
+	 * value if the value can not be found or converted.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set to get the value from
+	 * @param key
+	 *            The key of the value
+	 * @param defaultValue
+	 *            The default value
+	 * @return The int value
+	 */
+	protected int getInt(SimpleFieldSet simpleFieldSet, String key, int defaultValue) {
+		return simpleFieldSet.getInt(key, defaultValue);
+	}
+
 }
