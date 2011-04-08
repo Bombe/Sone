@@ -139,11 +139,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		int soneIndex = 0;
 		soneBuilder.put(prefix + "Count", sones.size());
 		for (Sone sone : sones) {
-			String sonePrefix = prefix + soneIndex++;
-			soneBuilder.put(sonePrefix + ".ID", sone.getId());
-			soneBuilder.put(sonePrefix + ".Name", sone.getName());
-			soneBuilder.put(sonePrefix + ".NiceName", SoneAccessor.getNiceName(sone));
-			soneBuilder.put(sonePrefix + ".Time", sone.getTime());
+			String sonePrefix = prefix + soneIndex++ + ".";
+			soneBuilder.put(sonePrefix + "ID", sone.getId());
+			soneBuilder.put(sonePrefix + "Name", sone.getName());
+			soneBuilder.put(sonePrefix + "NiceName", SoneAccessor.getNiceName(sone));
+			soneBuilder.put(sonePrefix + "Time", sone.getTime());
 		}
 
 		return soneBuilder.get();
@@ -226,11 +226,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		int replyIndex = 0;
 		replyBuilder.put(prefix + "Replies.Count", replies.size());
 		for (Reply reply : replies) {
-			String replyPrefix = prefix + "Replies." + replyIndex++;
-			replyBuilder.put(replyPrefix + ".ID", reply.getId());
-			replyBuilder.put(replyPrefix + ".Sone", reply.getSone().getId());
-			replyBuilder.put(replyPrefix + ".Time", reply.getTime());
-			replyBuilder.put(replyPrefix + ".Text", reply.getText());
+			String replyPrefix = prefix + "Replies." + replyIndex++ + ".";
+			replyBuilder.put(replyPrefix + "ID", reply.getId());
+			replyBuilder.put(replyPrefix + "Sone", reply.getSone().getId());
+			replyBuilder.put(replyPrefix + "Time", reply.getTime());
+			replyBuilder.put(replyPrefix + "Text", reply.getText());
 		}
 
 		return replyBuilder.get();
