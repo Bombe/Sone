@@ -93,7 +93,7 @@ public class FcpInterface {
 				Response response = command.execute(parameters, data, AccessType.values()[accessType]);
 				sendReply(pluginReplySender, identifier, response);
 			} catch (FcpException fe1) {
-				sendReply(pluginReplySender, null, new ErrorResponse("Error executing command: " + fe1.getMessage()));
+				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + fe1.getMessage()));
 			}
 		} catch (PluginNotFoundException pnfe1) {
 			logger.log(Level.WARNING, "Could not find destination plugin: " + pluginReplySender);
