@@ -39,8 +39,10 @@ public interface Command {
 	 * @param accessType
 	 *            The access type
 	 * @return A reply to send back to the plugin
+	 * @throws FcpException
+	 *             if an error processing the parameters occurs
 	 */
-	public Reply execute(SimpleFieldSet parameters, Bucket data, AccessType accessType);
+	public Reply execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException;
 
 	/**
 	 * The access type of the request.

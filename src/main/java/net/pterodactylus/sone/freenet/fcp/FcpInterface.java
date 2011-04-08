@@ -81,8 +81,8 @@ public class FcpInterface {
 			/* TODO - return error? */
 			return;
 		}
-		Reply reply = command.execute(parameters, data, AccessType.values()[accessType]);
 		try {
+			Reply reply = command.execute(parameters, data, AccessType.values()[accessType]);
 			SimpleFieldSet replyParameters = reply.getReplyParameters();
 			replyParameters.putOverwrite("Identifier", identifier);
 			if (reply.hasData()) {
@@ -92,6 +92,8 @@ public class FcpInterface {
 			} else {
 				pluginReplySender.send(replyParameters);
 			}
+		} catch (FcpException fe1) {
+			/* TODO - log, report */
 		} catch (PluginNotFoundException pnfe1) {
 			/* TODO - log */
 		}
