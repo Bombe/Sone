@@ -97,6 +97,32 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	}
 
 	/**
+	 * Returns a post whose ID is a parameter in the given simple field set.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set containing the ID of the post
+	 * @param parameterName
+	 *            The name under which the post ID is stored in the simple field
+	 *            set
+	 * @return The post
+	 * @throws FcpException
+	 *             if there is no post ID stored under the given parameter name,
+	 *             or if the post ID is invalid
+	 */
+	protected Post getPost(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
+		try {
+			String postId = simpleFieldSet.getString(parameterName);
+			Post post = core.getPost(postId, false);
+			if (post == null) {
+				throw new FcpException("Could not load post from “" + postId + "”.");
+			}
+			return post;
+		} catch (FSParseException fspe1) {
+			throw new FcpException("Could not post ID from “" + parameterName + "”.", fspe1);
+		}
+	}
+
+	/**
 	 * Creates a simple field set from the given collection of Sones.
 	 *
 	 * @param sones
