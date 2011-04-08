@@ -172,6 +172,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		}
 		postBuilder.put(prefix + "Time", post.getTime());
 		postBuilder.put(prefix + "Text", post.getText());
+		postBuilder.put(encodeLikes(core.getLikes(post), prefix + "Likes."));
 
 		if (includeReplies) {
 			List<Reply> replies = core.getReplies(post);
