@@ -94,6 +94,9 @@ public class TemplatePart implements Part, net.pterodactylus.util.template.Part 
 	// OBJECT METHODS
 	//
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		StringWriter stringWriter = new StringWriter();

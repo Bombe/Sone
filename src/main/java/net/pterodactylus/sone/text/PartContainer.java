@@ -97,6 +97,9 @@ public class PartContainer implements Part {
 	// OBJECT METHODS
 	//
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public String toString() {
 		StringWriter stringWriter = new StringWriter();
