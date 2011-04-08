@@ -26,6 +26,7 @@ import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
 import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
+import net.pterodactylus.sone.template.SoneAccessor;
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
 
@@ -91,6 +92,29 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		} catch (FSParseException fspe1) {
 			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.", fspe1);
 		}
+	}
+
+	/**
+	 * Creates a simple field set from the given collection of Sones.
+	 *
+	 * @param sones
+	 *            The Sones to encode
+	 * @return The simple field set containing the given Sones
+	 */
+	protected SimpleFieldSet encodeSones(Collection<? extends Sone> sones) {
+		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
+
+		int soneIndex = 0;
+		soneBuilder.put("Sones.Count", sones.size());
+		for (Sone sone : sones) {
+			String sonePrefix = "Sones." + soneIndex++;
+			soneBuilder.put(sonePrefix + ".ID", sone.getId());
+			soneBuilder.put(sonePrefix + ".Name", sone.getName());
+			soneBuilder.put(sonePrefix + ".NiceName", SoneAccessor.getNiceName(sone));
+			soneBuilder.put(sonePrefix + ".Time", sone.getTime());
+		}
+
+		return soneBuilder.get();
 	}
 
 	/**
