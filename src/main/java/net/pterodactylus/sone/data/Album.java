@@ -304,6 +304,14 @@ public class Album implements Fingerprintable {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean equals(Object object) {
 		if (!(object instanceof Album)) {
 			return false;
