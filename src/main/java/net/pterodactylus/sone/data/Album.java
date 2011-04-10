@@ -45,8 +45,8 @@ public class Album implements Fingerprintable {
 	/** The parent album. */
 	private Album parent;
 
-	/** The name of this album. */
-	private String name;
+	/** The title of this album. */
+	private String title;
 
 	/** The description of this album. */
 	private String description;
@@ -220,24 +220,24 @@ public class Album implements Fingerprintable {
 	}
 
 	/**
-	 * Returns the name of this album.
+	 * Returns the title of this album.
 	 *
-	 * @return The name of this album
+	 * @return The title of this album
 	 */
-	public String getName() {
-		return name;
+	public String getTitle() {
+		return title;
 	}
 
 	/**
-	 * Sets the name of this album.
+	 * Sets the title of this album.
 	 *
-	 * @param name
-	 *            The name of this album
+	 * @param title
+	 *            The title of this album
 	 * @return This album
 	 */
-	public Album setName(String name) {
-		Validation.begin().isNotNull("Album Name", name).check();
-		this.name = name;
+	public Album setTitle(String title) {
+		Validation.begin().isNotNull("Album Title", title).check();
+		this.title = title;
 		return this;
 	}
 
@@ -275,7 +275,7 @@ public class Album implements Fingerprintable {
 		StringBuilder fingerprint = new StringBuilder();
 		fingerprint.append("Album(");
 		fingerprint.append("ID(").append(id).append(')');
-		fingerprint.append("Name(").append(name).append(')');
+		fingerprint.append("Title(").append(title).append(')');
 		fingerprint.append("Description(").append(description).append(')');
 
 		/* add nested albums. */
