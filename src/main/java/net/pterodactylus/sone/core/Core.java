@@ -39,6 +39,7 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -172,6 +173,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** All known images. */
 	private Map<String, Image> images = new HashMap<String, Image>();
+
+	/** All temporary images. */
+	private Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
 
 	/**
 	 * Creates a new core.
@@ -796,6 +800,20 @@ public class Core implements IdentityListener, UpdateListener {
 				images.put(imageId, image);
 			}
 			return image;
+		}
+	}
+
+	/**
+	 * Returns the temporary image with the given ID.
+	 *
+	 * @param imageId
+	 *            The ID of the temporary image
+	 * @return The temporary image, or {@code null} if there is no temporary
+	 *         image with the given ID
+	 */
+	public TemporaryImage getTemporaryImage(String imageId) {
+		synchronized (temporaryImages) {
+			return temporaryImages.get(imageId);
 		}
 	}
 
@@ -1772,6 +1790,24 @@ public class Core implements IdentityListener, UpdateListener {
 			sone.addAlbum(album);
 		}
 		return album;
+	}
+
+	/**
+	 * Creates a new temporary image.
+	 *
+	 * @param mimeType
+	 *            The MIME type of the temporary image
+	 * @param imageData
+	 *            The encoded data of the image
+	 * @return The temporary image
+	 */
+	public TemporaryImage createTemporaryImage(String mimeType, byte[] imageData) {
+		TemporaryImage temporaryImage = new TemporaryImage();
+		temporaryImage.setMimeType(mimeType).setImageData(imageData);
+		synchronized (temporaryImages) {
+			temporaryImages.put(temporaryImage.getId(), temporaryImage);
+		}
+		return temporaryImage;
 	}
 
 	/**
