@@ -612,7 +612,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public synchronized void setAlbums(Collection<? extends Album> albums) {
 		Validation.begin().isNotNull("Albums", albums).check();
-		albums.clear();
+		this.albums.clear();
 		for (Album album : albums) {
 			addAlbum(album);
 		}
