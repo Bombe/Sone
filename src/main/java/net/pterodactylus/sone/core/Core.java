@@ -1454,6 +1454,7 @@ public class Core implements IdentityListener, UpdateListener {
 				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
 				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
 			}
+			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
 
 			/* save options. */
 			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
