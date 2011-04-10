@@ -237,7 +237,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public void setLatestEdition(long latestEdition) {
 		if (!(latestEdition > this.latestEdition)) {
-			logger.log(Level.INFO, "New latest edition %d is not greater than current latest edition %d!", new Object[] { latestEdition, this.latestEdition });
+			logger.log(Level.FINE, "New latest edition %d is not greater than current latest edition %d!", new Object[] { latestEdition, this.latestEdition });
 			return;
 		}
 		this.latestEdition = latestEdition;
