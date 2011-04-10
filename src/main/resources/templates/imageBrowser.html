@@ -27,13 +27,13 @@
 
 			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
 
-		<%elseifnull album.name>
+		<%elseifnull album.title>
 
 			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
 
 		<%else>
 
-			<h1><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.name|html></h1>
+			<h1><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.title|html></h1>
 
 			<div class="backlinks">
 				<%foreach album.backlinks backlink backlinks>
@@ -50,9 +50,9 @@
 				<div class="album">
 					<a href="imageBrowser.html?album=<% album.id|html>">
 						<%ifnull album.image>
-							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 						<%else><!-- TODO -->
-							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 						<%/if>
 					</a>
 				</div>
@@ -98,9 +98,9 @@
 					<div class="image">
 						<a href="imageBrowser.html?album=<% album.id|html>">
 							<%ifnull album.image>
-								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 							<%else><!-- TODO -->
-								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.name|html>" title="<% album.name|html>" />
+								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 							<%/if>
 						</a>
 					</div>
