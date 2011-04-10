@@ -31,6 +31,8 @@
 
 		<%ifnull currentSone>
 			<p><%= Page.Options.Section.SoneSpecificOptions.NotLoggedIn|l10n|html|replace needle="{link}" replacement='<a href="login.html">'|replace needle="{/link}" replacement='</a>'></p>
+		<%else>
+			<p><%= Page.Options.Section.SoneSpecificOptions.LoggedIn|l10n|html></p>
 		<%/if>
 
 		<p>
