@@ -1811,6 +1811,30 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Deletes the given temporary image.
+	 *
+	 * @param temporaryImage
+	 *            The temporary image to delete
+	 */
+	public void deteleTemporaryImage(TemporaryImage temporaryImage) {
+		Validation.begin().isNotNull("Temporary Image", temporaryImage).check();
+		deleteTemporaryImage(temporaryImage.getId());
+	}
+
+	/**
+	 * Deletes the temporary image with the given ID.
+	 *
+	 * @param imageId
+	 *            The ID of the temporary image to delete
+	 */
+	public void deleteTemporaryImage(String imageId) {
+		Validation.begin().isNotNull("Temporary Image ID", imageId).check();
+		synchronized (temporaryImages) {
+			temporaryImages.remove(imageId);
+		}
+	}
+
+	/**
 	 * Starts the core.
 	 */
 	public void start() {
