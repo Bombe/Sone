@@ -1365,6 +1365,35 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 
+		/* load images. */
+		int imageCounter = 0;
+		while (true) {
+			String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
+			String imageId = configuration.getStringValue(imagePrefix + "/ID").getValue(null);
+			if (imageId == null) {
+				break;
+			}
+			String albumId = configuration.getStringValue(imagePrefix + "/Album").getValue(null);
+			String key = configuration.getStringValue(imagePrefix + "/Key").getValue(null);
+			String title = configuration.getStringValue(imagePrefix + "/Title").getValue(null);
+			String description = configuration.getStringValue(imagePrefix + "/Description").getValue(null);
+			Long creationTime = configuration.getLongValue(imagePrefix + "/CreationTime").getValue(null);
+			Integer width = configuration.getIntValue(imagePrefix + "/Width").getValue(null);
+			Integer height = configuration.getIntValue(imagePrefix + "/Height").getValue(null);
+			if ((albumId == null) || (key == null) || (title == null) || (description == null) || (creationTime == null) || (width == null) || (height == null)) {
+				logger.log(Level.WARNING, "Invalid image found, aborting load!");
+				return;
+			}
+			Album album = getAlbum(albumId, false);
+			if (album == null) {
+				logger.log(Level.WARNING, "Invalid album image encountered, aborting load!");
+				return;
+			}
+			Image image = getImage(imageId).setSone(sone).setCreationTime(creationTime).setKey(key);
+			image.setTitle(title).setDescription(description).setWidth(width).setHeight(height);
+			album.addImage(image);
+		}
+
 		/* load options. */
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
@@ -1506,6 +1535,26 @@ public class Core implements IdentityListener, UpdateListener {
 				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
 			}
 			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
+
+			/* save images. */
+			int imageCounter = 0;
+			for (Album album : albums) {
+				for (Image image : album.getImages()) {
+					if (!image.isInserted()) {
+						continue;
+					}
+					String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
+					configuration.getStringValue(imagePrefix + "/ID").setValue(image.getId());
+					configuration.getStringValue(imagePrefix + "/Album").setValue(album.getId());
+					configuration.getStringValue(imagePrefix + "/Key").setValue(image.getKey());
+					configuration.getStringValue(imagePrefix + "/Title").setValue(image.getTitle());
+					configuration.getStringValue(imagePrefix + "/Description").setValue(image.getDescription());
+					configuration.getLongValue(imagePrefix + "/CreationTime").setValue(image.getCreationTime());
+					configuration.getIntValue(imagePrefix + "/Width").setValue(image.getWidth());
+					configuration.getIntValue(imagePrefix + "/Height").setValue(image.getHeight());
+				}
+			}
+			configuration.getStringValue(sonePrefix + "/Images/" + imageCounter + "/ID").setValue(null);
 
 			/* save options. */
 			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
