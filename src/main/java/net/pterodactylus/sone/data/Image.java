@@ -131,6 +131,18 @@ public class Image implements Fingerprintable {
 	}
 
 	/**
+	 * Returns whether the image has already been inserted. An image is
+	 * considered as having been inserted it its {@link #getKey() key} is not
+	 * {@code null}.
+	 *
+	 * @return {@code true} if there is a key for this image, {@code false}
+	 *         otherwise
+	 */
+	public boolean isInserted() {
+		return key != null;
+	}
+
+	/**
 	 * Returns the creation time of this image.
 	 *
 	 * @return The creation time of this image (in milliseconds since 1970, Jan
