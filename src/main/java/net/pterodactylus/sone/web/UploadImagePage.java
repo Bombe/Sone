@@ -18,17 +18,24 @@
 package net.pterodactylus.sone.web;
 
 import java.awt.Image;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.io.StreamCopier;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -36,7 +43,7 @@ import freenet.support.api.Bucket;
 import freenet.support.api.HTTPUploadedFile;
 
 /**
- * TODO
+ * Page implementation that lets the user upload an image.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -46,10 +53,12 @@ public class UploadImagePage extends SoneTemplatePage {
 	private static final Logger logger = Logging.getLogger(UploadImagePage.class);
 
 	/**
-	 * TODO
+	 * Creates a new “upload image” page.
 	 *
 	 * @param template
+	 *            The template to render
 	 * @param webInterface
+	 *            The Sone web interface
 	 */
 	public UploadImagePage(Template template, WebInterface webInterface) {
 		super("uploadImage.html", template, "Page.UploadImage.Title", webInterface, true);
@@ -70,6 +79,11 @@ public class UploadImagePage extends SoneTemplatePage {
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
 			Album parent = webInterface.getCore().getAlbum(parentId, false);
 			if (parent == null) {
+				/* TODO - signal error */
+				return;
+			}
+			if (!currentSone.equals(parent.getSone())) {
+				/* TODO - signal error. */
 				return;
 			}
 			String name = request.getHttpRequest().getPartAsStringFailsafe("title", 200);
@@ -77,27 +91,70 @@ public class UploadImagePage extends SoneTemplatePage {
 			HTTPUploadedFile uploadedFile = request.getHttpRequest().getUploadedFile("image");
 			Bucket fileBucket = uploadedFile.getData();
 			InputStream imageInputStream = null;
+			ByteArrayOutputStream imageDataOutputStream = null;
 			net.pterodactylus.sone.data.Image image = null;
 			try {
 				imageInputStream = fileBucket.getInputStream();
-				Image uploadedImage = ImageIO.read(imageInputStream);
-				if (uploadedImage == null) {
-					templateContext.set("messages", webInterface.getL10n().getString("Page.UploadImage.Error.InvalidImage"));
-					return;
-				}
-				image = new net.pterodactylus.sone.data.Image().setSone(currentSone);
-				image.setTitle(name).setDescription(description).setWidth(uploadedImage.getWidth(null)).setHeight(uploadedImage.getHeight(null));
-				parent.addImage(image);
-				uploadedImage.flush();
+				/* TODO - check length */
+				imageDataOutputStream = new ByteArrayOutputStream((int) fileBucket.size());
+				StreamCopier.copy(imageInputStream, imageDataOutputStream);
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
 				return;
 			} finally {
-				Closer.close(imageInputStream);
 				fileBucket.free();
+				Closer.close(imageInputStream);
+				Closer.close(imageDataOutputStream);
 			}
-			throw new RedirectException("imageBrowser.html?image=" + image.getId());
+			byte[] imageData = imageDataOutputStream.toByteArray();
+			ByteArrayInputStream imageDataInputStream = null;
+			Image uploadedImage = null;
+			try {
+				imageDataInputStream = new ByteArrayInputStream(imageData);
+				uploadedImage = ImageIO.read(imageDataInputStream);
+				if (uploadedImage == null) {
+					templateContext.set("messages", webInterface.getL10n().getString("Page.UploadImage.Error.InvalidImage"));
+					return;
+				}
+				String mimeType = getMimeType(imageData);
+				TemporaryImage temporaryImage = webInterface.getCore().createTemporaryImage(mimeType, imageData);
+				image = webInterface.getCore().createImage(currentSone, parent, temporaryImage);
+				image.setTitle(name).setDescription(description).setWidth(uploadedImage.getWidth(null)).setHeight(uploadedImage.getHeight(null));
+			} catch (IOException ioe1) {
+				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
+				return;
+			} finally {
+				Closer.close(imageDataInputStream);
+				Closer.flush(uploadedImage);
+			}
+			throw new RedirectException("imageBrowser.html?album=" + parent.getId());
 		}
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Tries to detect the MIME type of the encoded image.
+	 *
+	 * @param imageData
+	 *            The encoded image
+	 * @return The MIME type of the image, or “application/octet-stream” if the
+	 *         image type could not be detected
+	 */
+	private String getMimeType(byte[] imageData) {
+		ByteArrayInputStream imageDataInputStream = new ByteArrayInputStream(imageData);
+		try {
+			ImageInputStream imageInputStream = ImageIO.createImageInputStream(imageDataInputStream);
+			Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(imageInputStream);
+			if (imageReaders.hasNext()) {
+				return imageReaders.next().getOriginatingProvider().getMIMETypes()[0];
+			}
+		} catch (IOException ioe1) {
+			logger.log(Level.FINE, "Could not detect MIME type for image.", ioe1);
+		}
+		return "application/octet-stream";
 	}
 
 }
