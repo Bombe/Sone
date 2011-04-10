@@ -61,11 +61,7 @@
 			<%foreach album.images image>
 				<div class="image">
 					<a href="imageBrowser.html?image=<%image.id|html>">
-						<%ifnull image.key>
-							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% image.title|html>" title="<% image.title|html>" />
-						<%else>
-							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% image.title|html>" title="<% image.title|html>" />
-						<%/if>
+						<% image|image-link max-width=200 max-height=150>
 					</a>
 				</div>
 			<%/foreach>
@@ -82,6 +78,18 @@
 		<%/if>
 
 	<%elseif imageRequested>
+
+		<%ifnull image>
+
+		<%else>
+
+			<div class="image">
+				<a href="imageBrowser.html?image=<%image.id|html>">
+					<% image|image-link max-width=200 max-height=150>
+				</a>
+			</div>
+
+		<%/if>
 
 	<%elseif soneRequested>
 
