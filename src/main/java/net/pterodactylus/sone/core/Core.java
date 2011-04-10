@@ -1319,6 +1319,40 @@ public class Core implements IdentityListener, UpdateListener {
 			friends.add(friendId);
 		}
 
+		/* load albums. */
+		Map<String, Album> albums = new HashMap<String, Album>();
+		List<Album> topLevelAlbums = new ArrayList<Album>();
+		while (true) {
+			String albumPrefix = sonePrefix + "/Albums/" + albums.size();
+			String albumId = configuration.getStringValue(albumPrefix + "/ID").getValue(null);
+			if (albumId == null) {
+				break;
+			}
+			String albumName = configuration.getStringValue(albumPrefix + "/Name").getValue(null);
+			String albumDescription = configuration.getStringValue(albumPrefix + "/Description").getValue(null);
+			String albumParentId = configuration.getStringValue(albumPrefix + "/Parent").getValue(null);
+			if ((albumName == null) || (albumDescription == null)) {
+				logger.log(Level.WARNING, "Invalid album found, aborting load!");
+				return;
+			}
+			Album album = new Album(albumId).setSone(sone).setName(albumName).setDescription(albumDescription);
+			albums.put(albumId, album);
+			if (albumParentId != null) {
+				Album parentAlbum = albums.get(albumParentId);
+				if (parentAlbum == null) {
+					logger.log(Level.WARNING, "Invalid parent album ID: " + albumParentId);
+					return;
+				}
+				parentAlbum.addAlbum(album);
+			} else {
+				topLevelAlbums.add(album);
+			}
+		}
+
+		/* load options. */
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
+
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
 			sone.setTime(soneTime);
@@ -1328,6 +1362,7 @@ public class Core implements IdentityListener, UpdateListener {
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
 			sone.setFriends(friends);
+			sone.setAlbums(topLevelAlbums);
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
 		synchronized (newSones) {
