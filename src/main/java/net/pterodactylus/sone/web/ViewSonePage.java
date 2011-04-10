@@ -81,14 +81,16 @@ public class ViewSonePage extends SoneTemplatePage {
 		Sone sone = webInterface.getCore().getSone(soneId, false);
 		templateContext.set("sone", sone);
 		List<Post> sonePosts = sone.getPosts();
-		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
+		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone));
+		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
+		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());
 		Set<Reply> replies = sone.getReplies();
 		final Map<Post, List<Reply>> repliedPosts = new HashMap<Post, List<Reply>>();
 		for (Reply reply : replies) {
 			Post post = reply.getPost();
-			if (repliedPosts.containsKey(post) || sone.equals(post.getSone())) {
+			if (repliedPosts.containsKey(post) || sone.equals(post.getSone()) || (sone.equals(post.getRecipient()))) {
 				continue;
 			}
 			repliedPosts.put(post, webInterface.getCore().getReplies(post));
@@ -103,32 +105,9 @@ public class ViewSonePage extends SoneTemplatePage {
 
 		});
 
-		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, 10).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
+		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
 		templateContext.set("repliedPostPagination", repliedPostPagination);
 		templateContext.set("repliedPosts", repliedPostPagination.getItems());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		Sone sone = (Sone) templateContext.get("sone");
-		if (sone == null) {
-			return;
-		}
-		webInterface.getCore().markSoneKnown(sone);
-		List<Post> posts = (List<Post>) templateContext.get("posts");
-		posts.addAll((List<Post>) templateContext.get("repliedPosts"));
-		for (Post post : posts) {
-			if (post.getSone() != null) {
-				webInterface.getCore().markPostKnown(post);
-			}
-			for (Reply reply : webInterface.getCore().getReplies(post)) {
-				webInterface.getCore().markReplyKnown(reply);
-			}
-		}
 	}
 
 }

@@ -171,12 +171,18 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	// OBJECT METHODS
 	//
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public int hashCode() {
 		/* The hash of DefaultIdentity is fine. */
 		return super.hashCode();
 	}
 
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public boolean equals(Object object) {
 		/* The ID of the superclass is still enough. */

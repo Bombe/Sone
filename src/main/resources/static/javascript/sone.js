@@ -37,7 +37,8 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 		(function(inputField, textarea) {
 			inputField.focus(function() {
 				$(this).hide().attr("disabled", "disabled");
-				textarea.show().focus();
+				/* no, show(), “display: block” is not what I need. */
+				textarea.attr("style", "display: inline").focus();
 			});
 			if (inputField.val() == "") {
 				inputField.addClass("default");
@@ -217,7 +218,8 @@ function enhanceDeletePostButton(button, postId, text) {
 			if (data.success) {
 				$("#sone .post#" + postId).slideUp();
 			} else if (data.error == "invalid-post-id") {
-				alert("Invalid post ID given!");
+				/* pretend the post is already gone. */
+				getPost(postId).slideUp();
 			} else if (data.error == "auth-required") {
 				alert("You need to be logged in.");
 			} else if (data.error == "not-authorized") {
@@ -248,7 +250,8 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 			if (data.success) {
 				$("#sone .reply#" + replyId).slideUp();
 			} else if (data.error == "invalid-reply-id") {
-				alert("Invalid reply ID given!");
+				/* pretend the reply is already gone. */
+				getReply(replyId).slideUp();
 			} else if (data.error == "auth-required") {
 				alert("You need to be logged in.");
 			} else if (data.error == "not-authorized") {
@@ -262,6 +265,19 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 
 function getFormPassword() {
 	return $("#sone #formPassword").text();
+}
+
+/**
+ * Returns the element of the Sone with the given ID.
+ *
+ * @param soneId
+ *            The ID of the Sone
+ * @returns All Sone elements with the given ID
+ */
+function getSone(soneId) {
+	return $("#sone .sone").filter(function(index) {
+		return $(".id").text() == soneId;
+	});
 }
 
 function getSoneElement(element) {
@@ -332,6 +348,17 @@ function getPostAuthor(element) {
 	return getPostElement(element).find(".post-author").text();
 }
 
+/**
+ * Returns the element of the reply with the given ID.
+ *
+ * @param replyId
+ *            The ID of the reply
+ * @returns The element of the reply
+ */
+function getReply(replyId) {
+	return $("#sone .reply#" + replyId);
+}
+
 function getReplyElement(element) {
 	return $(element).closest(".reply");
 }
@@ -353,6 +380,39 @@ function getReplyTime(element) {
  */
 function getReplyAuthor(element) {
 	return getReplyElement(element).find(".reply-author").text();
+}
+
+/**
+ * Returns the notification with the given ID.
+ *
+ * @param notificationId
+ *            The ID of the notification
+ * @returns The notification element
+ */
+function getNotification(notificationId) {
+	return $("#sone #notification-area .notification#" + notificationId);
+}
+
+/**
+ * Returns the notification element closest to the given element.
+ *
+ * @param element
+ *            The element to get the closest notification of
+ * @return The closest notification element
+ */
+function getNotificationElement(element) {
+	return $(element).closest(".notification");
+}
+
+/**
+ * Returns the ID of the notification element.
+ *
+ * @param notificationElement
+ *            The notification element
+ * @returns The ID of the notification
+ */
+function getNotificationId(notificationElement) {
+	return $(notificationElement).attr("id");
 }
 
 function likePost(postId) {
@@ -561,25 +621,6 @@ function postReply(sender, postId, text, callbackFunction) {
 }
 
 /**
- * Requests information about the reply with the given ID.
- *
- * @param replyId
- *            The ID of the reply
- * @param callbackFunction
- *            A callback function (parameters soneId, soneName, replyTime,
- *            replyDisplayTime, text, html)
- */
-function getReply(replyId, callbackFunction) {
-	$.getJSON("getReply.ajax", { "reply" : replyId }, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			callbackFunction(data.soneId, data.soneName, data.time, data.displayTime, data.text, data.html);
-		}
-	}, function(xmlHttpRequest, textStatus, error) {
-		/* ignore error. */
-	});
-}
-
-/**
  * Ajaxifies the given Sone by enhancing all eligible elements with AJAX.
  *
  * @param soneElement
@@ -719,9 +760,12 @@ function ajaxifyPost(postElement) {
 	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
 	/* process all replies. */
+	replyIds = [];
 	$(postElement).find(".reply").each(function() {
+		replyIds.push(getReplyId(this));
 		ajaxifyReply(this);
 	});
+	updateReplyTimes(replyIds.join(","));
 
 	/* process reply input fields. */
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
@@ -837,6 +881,90 @@ function ajaxifyNotification(notification) {
 	return notification;
 }
 
+/**
+ * Retrieves element IDs from notification elements.
+ *
+ * @param notification
+ *            The notification element
+ * @param selector
+ *            The selector of the element containing the ID as text
+ * @returns All extracted IDs
+ */
+function getElementIds(notification, selector) {
+	elementIds = [];
+	$(selector, notification).each(function() {
+		elementIds.push($(this).text());
+	});
+	return elementIds;
+}
+
+/**
+ * Compares the given notification elements and calls {@link #markSoneAsKnown()}
+ * for every ID that is contained in the old notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedSones(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-sone-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".sone-id");
+	newIds = getElementIds(newNotification, ".sone-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markSoneAsKnown(getSone(value), true);
+		}
+	});
+}
+
+/**
+ * Compares the given notification elements and calls {@link #markPostAsKnown()}
+ * for every ID that is contained in the old notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedPosts(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-post-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".post-id");
+	newIds = getElementIds(newNotification, ".post-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markPostAsKnown(getPost(value), true);
+		}
+	});
+}
+
+/**
+ * Compares the given notification elements and calls
+ * {@link #markReplyAsKnown()} for every ID that is contained in the old
+ * notification but not in the new.
+ *
+ * @param oldNotification
+ *            The old notification element
+ * @param newNotification
+ *            The new notification element
+ */
+function checkForRemovedReplies(oldNotification, newNotification) {
+	if (getNotificationId(oldNotification) != "new-replies-notification") {
+		return;
+	}
+	oldIds = getElementIds(oldNotification, ".reply-id");
+	newIds = getElementIds(newNotification, ".reply-id");
+	$.each(oldIds, function(index, value) {
+		if ($.inArray(value, newIds) == -1) {
+			markReplyAsKnown(getReply(value), true);
+		}
+	});
+}
+
 function getStatus() {
 	$.getJSON("getStatus.ajax", {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
 		if ((data != null) && data.success) {
@@ -844,9 +972,45 @@ function getStatus() {
 			$.each(data.sones, function(index, value) {
 				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
 			});
+			/* search for removed notifications. */
+			$("#sone #notification-area .notification").each(function() {
+				notificationId = $(this).attr("id");
+				foundNotification = false;
+				$.each(data.notifications, function(index, value) {
+					if (value.id == notificationId) {
+						foundNotification = true;
+						return false;
+					}
+				});
+				if (!foundNotification) {
+					if (notificationId == "new-sone-notification") {
+						$(".sone-id", this).each(function(index, element) {
+							soneId = $(this).text();
+							markSoneAsKnown(getSone(soneId), true);
+						});
+					} else if (notificationId == "new-post-notification") {
+						$(".post-id", this).each(function(index, element) {
+							postId = $(this).text();
+							markPostAsKnown(getPost(postId), true);
+						});
+					} else if (notificationId == "new-replies-notification") {
+						$(".reply-id", this).each(function(index, element) {
+							replyId = $(this).text();
+							markReplyAsKnown(getReply(replyId), true);
+						});
+					}
+					$(this).slideUp("normal", function() {
+						$(this).remove();
+						/* remove activity when no notifications are visible. */
+						if ($("#sone #notification-area .notification").length == 0) {
+							resetActivity();
+						}
+					});
+				}
+			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
-				oldNotification = $("#sone #notification-area .notification#" + value.id);
+				oldNotification = getNotification(value.id);
 				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
 				if (oldNotification.length != 0) {
 					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
@@ -854,15 +1018,15 @@ function getStatus() {
 						notification.find(".short-text").toggleClass("hidden", opened);
 						notification.find(".text").toggleClass("hidden", !opened);
 					}
+					checkForRemovedSones(oldNotification, notification);
+					checkForRemovedPosts(oldNotification, notification);
+					checkForRemovedReplies(oldNotification, notification);
 					oldNotification.replaceWith(notification.show());
 				} else {
 					$("#sone #notification-area").append(notification);
 					notification.slideDown();
+					setActivity();
 				}
-				setActivity();
-			});
-			$.each(data.removedNotifications, function(index, value) {
-				$("#sone #notification-area .notification#" + value.id).slideUp();
 			});
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
@@ -1021,6 +1185,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				newPost.insertBefore(firstOlderPost);
 			}
 			ajaxifyPost(newPost);
+			updatePostTimes(data.post.id);
 			newPost.slideDown();
 			setActivity();
 		}
@@ -1059,6 +1224,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				}
 				ajaxifyReply(newReply);
+				updateReplyTimes(data.reply.id);
 				newReply.slideDown();
 				setActivity();
 				return false;
@@ -1072,37 +1238,123 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
  *
  * @param soneElement
  *            The Sone to mark as known
+ * @param skipRequest
+ *            true to skip the JSON request, false or omit to perform the JSON
+ *            request
  */
-function markSoneAsKnown(soneElement) {
+function markSoneAsKnown(soneElement, skipRequest) {
 	if ($(".new", soneElement).length > 0) {
-		$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
-			$(soneElement).removeClass("new");
-		});
+		if ((typeof skipRequest != "undefined") && !skipRequest) {
+			$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
+				$(soneElement).removeClass("new");
+			});
+		}
 	}
 }
 
-function markPostAsKnown(postElements) {
+function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
 				$(".click-to-show", postElement).removeClass("new");
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+				if ((typeof skipRequest == "undefined") || !skipRequest) {
+					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+				}
 			})(postElement);
 		}
 	});
 	markReplyAsKnown($(postElements).find(".reply"));
 }
 
-function markReplyAsKnown(replyElements) {
+function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
 		if ($(replyElement).hasClass("new")) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
-				$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+				if ((typeof skipRequest == "undefined") || !skipRequest) {
+					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+				}
 			})(replyElement);
+		}
+	});
+}
+
+/**
+ * Updates the time of the post with the given ID.
+ *
+ * @param postId
+ *            The ID of the post to update
+ * @param timeText
+ *            The text of the time to show
+ * @param refreshTime
+ *            The refresh time after which to request a new time (in seconds)
+ * @param tooltip
+ *            The tooltip to show
+ */
+function updatePostTime(postId, timeText, refreshTime, tooltip) {
+	if (!getPost(postId).is(":visible")) {
+		return;
+	}
+	getPost(postId).find(".post-status-line > .time a").html(timeText).attr("title", tooltip);
+	(function(postId, refreshTime) {
+		setTimeout(function() {
+			updatePostTimes(postId);
+		}, refreshTime * 1000);
+	})(postId, refreshTime);
+}
+
+/**
+ * Requests new rendered times for the posts with the given IDs.
+ *
+ * @param postIds
+ *            Comma-separated post IDs
+ */
+function updatePostTimes(postIds) {
+	$.getJSON("getTimes.ajax", { "posts" : postIds }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			$.each(data.postTimes, function(index, value) {
+				updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
+			});
+		}
+	});
+}
+
+/**
+ * Updates the time of the reply with the given ID.
+ *
+ * @param postId
+ *            The ID of the reply to update
+ * @param timeText
+ *            The text of the time to show
+ * @param refreshTime
+ *            The refresh time after which to request a new time (in seconds)
+ * @param tooltip
+ *            The tooltip to show
+ */
+function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
+	getReply(replyId).find(".reply-status-line > .time").html(timeText).attr("title", tooltip);
+	(function(replyId, refreshTime) {
+		setTimeout(function() {
+			updateReplyTimes(replyId);
+		}, refreshTime * 1000);
+	})(replyId, refreshTime);
+}
+
+/**
+ * Requests new rendered times for the posts with the given IDs.
+ *
+ * @param postIds
+ *            Comma-separated post IDs
+ */
+function updateReplyTimes(replyIds) {
+	$.getJSON("getTimes.ajax", { "replies" : replyIds }, function(data, textStatus) {
+		if ((data != null) && data.success) {
+			$.each(data.replyTimes, function(index, value) {
+				updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
+			});
 		}
 	});
 }
@@ -1112,6 +1364,7 @@ function resetActivity() {
 	if (title.indexOf('(') == 0) {
 		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
+	iconBlinking = false;
 }
 
 function setActivity() {
@@ -1150,7 +1403,7 @@ var iconBlinking = false;
  * showing the activity state, it is returned to normal.
  */
 function toggleIcon() {
-	if (focus) {
+	if (focus || !iconBlinking) {
 		if (iconActive) {
 			changeIcon("images/icon.png");
 			iconActive = false;
@@ -1309,9 +1562,6 @@ $(document).ready(function() {
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
 			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
-				if ((data != null) && data.success) {
-					loadNewPost(data.postId, data.sone, data.recipient);
-				}
 				button.removeAttr("disabled");
 			});
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
@@ -1340,11 +1590,7 @@ $(document).ready(function() {
 		$("#sone #post-message").submit(function() {
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text }, function(data, textStatus) {
-				if ((data != null) && data.success) {
-					loadNewPost(data.postId, getCurrentSoneId());
-				}
-			});
+			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text });
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
 			$(this).find(":input[name=text]:enabled").val("").blur();
 			$(this).find(".sender").hide();
@@ -1364,6 +1610,13 @@ $(document).ready(function() {
 			});
 		});
 	});
+
+	/* update post times. */
+	postIds = [];
+	$("#sone .post").each(function() {
+		postIds.push(getPostId(this));
+	});
+	updatePostTimes(postIds.join(","));
 
 	/* hides all replies but the latest two. */
 	if (!isViewPostPage()) {

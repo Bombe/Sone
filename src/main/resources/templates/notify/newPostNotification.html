@@ -12,6 +12,7 @@
 	</form>
 	<%= Notification.NewPost.Text|l10n|html>
 	<%foreach posts post>
+		<div class="hidden post-id"><%post.id|html></div>
 		<a class="link-<% post.id|html>" href="viewPost.html?post=<% post.id|html>"><% post.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
 	<%/foreach>
 </div>

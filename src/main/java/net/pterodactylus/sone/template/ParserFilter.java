@@ -53,7 +53,7 @@ public class ParserFilter implements Filter {
 	 */
 	public ParserFilter(Core core, TemplateContextFactory templateContextFactory) {
 		this.core = core;
-		linkParser = new FreenetLinkParser(templateContextFactory);
+		linkParser = new FreenetLinkParser(core, templateContextFactory);
 	}
 
 	/**

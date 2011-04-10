@@ -40,7 +40,7 @@ public class FreenetLinkParserTest extends TestCase {
 	public void testParser() throws IOException {
 		TemplateContextFactory templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addFilter("html", new HtmlFilter());
-		FreenetLinkParser parser = new FreenetLinkParser(templateContextFactory);
+		FreenetLinkParser parser = new FreenetLinkParser(null, templateContextFactory);
 		FreenetLinkParserContext context = new FreenetLinkParserContext(null);
 		Part part;
 

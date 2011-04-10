@@ -576,6 +576,27 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Returns all posts that have the given Sone as recipient.
+	 *
+	 * @see Post#getRecipient()
+	 * @param recipient
+	 *            The recipient of the posts
+	 * @return All posts that have the given Sone as recipient
+	 */
+	public Set<Post> getDirectedPosts(Sone recipient) {
+		Validation.begin().isNotNull("Recipient", recipient).check();
+		Set<Post> directedPosts = new HashSet<Post>();
+		synchronized (posts) {
+			for (Post post : posts.values()) {
+				if (recipient.equals(post.getRecipient())) {
+					directedPosts.add(post);
+				}
+			}
+		}
+		return directedPosts;
+	}
+
+	/**
 	 * Returns the reply with the given ID. If there is no reply with the given
 	 * ID yet, a new one is created.
 	 *
@@ -884,6 +905,11 @@ public class Core implements IdentityListener, UpdateListener {
 				}
 				if (newSone) {
 					coreListenerManager.fireNewSoneFound(sone);
+					for (Sone localSone : getLocalSones()) {
+						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
+							localSone.addFriend(sone.getId());
+						}
+					}
 				}
 			}
 			remoteSones.put(identity.getId(), sone);
@@ -1242,6 +1268,10 @@ public class Core implements IdentityListener, UpdateListener {
 			friends.add(friendId);
 		}
 
+		/* load options. */
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
+
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
 			sone.setTime(soneTime);
@@ -1357,6 +1387,9 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
+			/* save options. */
+			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
+
 			configuration.save();
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
@@ -1437,7 +1470,8 @@ public class Core implements IdentityListener, UpdateListener {
 			posts.put(post.getId(), post);
 		}
 		synchronized (newPosts) {
-			knownPosts.add(post.getId());
+			newPosts.add(post.getId());
+			coreListenerManager.fireNewPostFound(post);
 		}
 		sone.addPost(post);
 		saveSone(sone);
@@ -1458,6 +1492,10 @@ public class Core implements IdentityListener, UpdateListener {
 		post.getSone().removePost(post);
 		synchronized (posts) {
 			posts.remove(post.getId());
+		}
+		synchronized (newPosts) {
+			markPostKnown(post);
+			knownPosts.remove(post.getId());
 		}
 		saveSone(post.getSone());
 	}
@@ -1561,7 +1599,8 @@ public class Core implements IdentityListener, UpdateListener {
 			replies.put(reply.getId(), reply);
 		}
 		synchronized (newReplies) {
-			knownReplies.add(reply.getId());
+			newReplies.add(reply.getId());
+			coreListenerManager.fireNewReplyFound(reply);
 		}
 		sone.addReply(reply);
 		saveSone(sone);
@@ -1582,6 +1621,10 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 		synchronized (replies) {
 			replies.remove(reply.getId());
+		}
+		synchronized (newReplies) {
+			markReplyKnown(reply);
+			knownReplies.remove(reply.getId());
 		}
 		sone.removeReply(reply);
 		saveSone(sone);
@@ -1645,6 +1688,7 @@ public class Core implements IdentityListener, UpdateListener {
 		try {
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
@@ -1718,8 +1762,9 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 
 		}));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-100));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1737,6 +1782,7 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		options.getIntegerOption("PostsPerPage").set(configuration.getIntValue("Option/PostsPerPage").getValue(null));
 		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
@@ -1922,6 +1968,27 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public Preferences setInsertionDelay(Integer insertionDelay) {
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			return this;
+		}
+
+		/**
+		 * Returns the number of posts to show per page.
+		 *
+		 * @return The number of posts to show per page
+		 */
+		public int getPostsPerPage() {
+			return options.getIntegerOption("PostsPerPage").get();
+		}
+
+		/**
+		 * Sets the number of posts to show per page.
+		 *
+		 * @param postsPerPage
+		 *            The number of posts to show per page
+		 * @return This preferences object
+		 */
+		public Preferences setPostsPerPage(Integer postsPerPage) {
+			options.getIntegerOption("PostsPerPage").set(postsPerPage);
 			return this;
 		}
 

@@ -160,7 +160,7 @@ public class SoneInserter extends AbstractService {
 	protected void serviceRun() {
 		long lastModificationTime = 0;
 		String lastFingerprint = "";
-		while (!shouldStop()) {
+		while (!shouldStop()) { try {
 			/* check every seconds. */
 			sleep(1000);
 
@@ -236,7 +236,9 @@ public class SoneInserter extends AbstractService {
 					}
 				}
 			}
-		}
+		} catch (Throwable t1) {
+			logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
+		}}
 	}
 
 	/**

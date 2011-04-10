@@ -10,8 +10,9 @@
 		<input type="hidden" name="id" value="<%foreach replies reply><% reply.id|html><%notlast> <%/notlast><%/foreach>" />
 		<button type="submit" name="mark-read" value="true"><%= Notification.NewPost.Button.MarkRead|l10n|html></button>
 	</form>
+	<%foreach replies reply><div class="hidden reply-id"><%reply.id|html></div><%/foreach>
 	<%= Notification.NewReply.Text|l10n|html>
-	<%foreach replies reply>
-		<a class="link-<% reply.post.id|html>" href="viewPost.html?post=<% reply.post.id|html>"><% reply.sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
+	<%foreach replies postGroup|replyGroup>
+		<a class="link-<% postGroup.key.id|html>" href="viewPost.html?post=<% postGroup.key.id|html>"><% postGroup.key.sone.niceName|html></a> (<%foreach postGroup.value.sones sone><%sone.niceName|html><%notlast>, <%/notlast><%/foreach>)<%notlast>, <%/notlast><%last>.<%/last>
 	<%/foreach>
 </div>

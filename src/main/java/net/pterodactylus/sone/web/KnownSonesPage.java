@@ -64,17 +64,4 @@ public class KnownSonesPage extends SoneTemplatePage {
 		templateContext.set("knownSones", sonePagination.getItems());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		super.postProcess(request, templateContext);
-		@SuppressWarnings("unchecked")
-		List<Sone> sones = (List<Sone>) templateContext.get("knownSones");
-		for (Sone sone : sones) {
-			webInterface.getCore().markSoneKnown(sone);
-		}
-	}
-
 }

@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.notify;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -33,6 +34,9 @@ import net.pterodactylus.util.template.Template;
  */
 public class ListNotification<T> extends TemplateNotification {
 
+	/** The key under which to store the elements in the template. */
+	private final String key;
+
 	/** The list of new elements. */
 	private final List<T> elements = new CopyOnWriteArrayList<T>();
 
@@ -47,8 +51,40 @@ public class ListNotification<T> extends TemplateNotification {
 	 *            The template to render
 	 */
 	public ListNotification(String id, String key, Template template) {
-		super(id, template);
+		this(id, key, template, true);
+	}
+
+	/**
+	 * Creates a new list notification.
+	 *
+	 * @param id
+	 *            The ID of the notification
+	 * @param key
+	 *            The key under which to store the elements in the template
+	 * @param template
+	 *            The template to render
+	 * @param dismissable
+	 *            {@code true} if this notification should be dismissable by the
+	 *            user, {@code false} otherwise
+	 */
+	public ListNotification(String id, String key, Template template, boolean dismissable) {
+		super(id, System.currentTimeMillis(), System.currentTimeMillis(), dismissable, template);
+		this.key = key;
 		template.getInitialContext().set(key, elements);
+	}
+
+	/**
+	 * Creates a new list notification that copies its ID and the template from
+	 * the given list notification.
+	 *
+	 * @param listNotification
+	 *            The list notification to copy
+	 */
+	public ListNotification(ListNotification<T> listNotification) {
+		super(listNotification.getId(), listNotification.getCreatedTime(), listNotification.getLastUpdatedTime(), listNotification.isDismissable(), new Template());
+		this.key = listNotification.key;
+		getTemplate().add(listNotification.getTemplate());
+		getTemplate().getInitialContext().set(key, elements);
 	}
 
 	//
@@ -62,6 +98,18 @@ public class ListNotification<T> extends TemplateNotification {
 	 */
 	public List<T> getElements() {
 		return new ArrayList<T>(elements);
+	}
+
+	/**
+	 * Sets the elements to show in this notification.
+	 *
+	 * @param elements
+	 *            The elements to show
+	 */
+	public void setElements(Collection<? extends T> elements) {
+		this.elements.clear();
+		this.elements.addAll(elements);
+		touch();
 	}
 
 	/**
