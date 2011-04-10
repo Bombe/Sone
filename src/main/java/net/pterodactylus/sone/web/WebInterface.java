@@ -50,6 +50,7 @@ import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.GetPagePlugin;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.NotificationManagerAccessor;
 import net.pterodactylus.sone.template.ParserFilter;
@@ -208,8 +209,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
-		templateContextFactory.addPlugin("getpage", new GetPagePlugin());
-		templateContextFactory.addPlugin("paginate", new PaginationPlugin());
+		templateContextFactory.addFilter("image-link", new ImageLinkFilter(templateContextFactory));
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
