@@ -1434,6 +1434,30 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
+			/* save albums. first, collect in a flat structure, top-level first. */
+			List<Album> albums = new ArrayList<Album>();
+			albums.addAll(sone.getAlbums());
+			int lastAlbumIndex = 0;
+			while (lastAlbumIndex < albums.size()) {
+				int previousAlbumCount = albums.size();
+				for (Album album : new ArrayList<Album>(albums.subList(lastAlbumIndex, albums.size()))) {
+					albums.addAll(album.getAlbums());
+				}
+				lastAlbumIndex = previousAlbumCount;
+			}
+
+			int albumCounter = 0;
+			for (Album album : albums) {
+				String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
+				configuration.getStringValue(albumPrefix + "/ID").setValue(album.getId());
+				configuration.getStringValue(albumPrefix + "/Name").setValue(album.getName());
+				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
+				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
+			}
+
+			/* save options. */
+			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
+
 			configuration.save();
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
