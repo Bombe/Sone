@@ -1793,6 +1793,27 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Creates a new image.
+	 *
+	 * @param sone
+	 *            The Sone creating the image
+	 * @param album
+	 *            The album the image will be inserted into
+	 * @param temporaryImage
+	 *            The temporary image to create the image from
+	 * @return The newly created image
+	 */
+	public Image createImage(Sone sone, Album album, TemporaryImage temporaryImage) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Album", album).isNotNull("Temporary Image", temporaryImage).check().is("Local Sone", isLocalSone(sone)).check().isEqual("Owner and Album Owner", sone, album.getSone()).check();
+		Image image = new Image(temporaryImage.getId()).setSone(sone).setCreationTime(System.currentTimeMillis());
+		album.addImage(image);
+		synchronized (images) {
+			images.put(image.getId(), image);
+		}
+		return image;
+	}
+
+	/**
 	 * Creates a new temporary image.
 	 *
 	 * @param mimeType
