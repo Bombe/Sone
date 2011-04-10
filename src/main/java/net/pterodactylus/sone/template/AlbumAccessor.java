@@ -46,7 +46,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 			List<Map<String, String>> backlinks = new ArrayList<Map<String, String>>();
 			Album currentAlbum = album;
 			while (currentAlbum != null) {
-				backlinks.add(0, createLink("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getName()));
+				backlinks.add(0, createLink("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getTitle()));
 				currentAlbum = currentAlbum.getParent();
 			}
 			backlinks.add(0, createLink("imageBrowser.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
