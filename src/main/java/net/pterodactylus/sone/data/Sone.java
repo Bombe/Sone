@@ -605,6 +605,20 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
+	 * Sets the albums of this Sone.
+	 *
+	 * @param albums
+	 *            The albums of this Sone
+	 */
+	public synchronized void setAlbums(Collection<? extends Album> albums) {
+		Validation.begin().isNotNull("Albums", albums).check();
+		albums.clear();
+		for (Album album : albums) {
+			addAlbum(album);
+		}
+	}
+
+	/**
 	 * Removes an album from this Sone.
 	 *
 	 * @param album
