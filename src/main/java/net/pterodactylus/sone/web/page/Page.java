@@ -316,9 +316,11 @@ public interface Page {
 		 *            The name of the header
 		 * @param value
 		 *            The value of the header
+		 * @return This response
 		 */
-		public void setHeader(String name, String value) {
+		public Response setHeader(String name, String value) {
 			headers.put(name, value);
+			return this;
 		}
 
 		/**
