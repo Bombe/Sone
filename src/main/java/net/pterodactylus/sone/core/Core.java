@@ -1320,7 +1320,6 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/* load albums. */
-		Map<String, Album> albums = new HashMap<String, Album>();
 		List<Album> topLevelAlbums = new ArrayList<Album>();
 		while (true) {
 			String albumPrefix = sonePrefix + "/Albums/" + albums.size();
@@ -1335,10 +1334,9 @@ public class Core implements IdentityListener, UpdateListener {
 				logger.log(Level.WARNING, "Invalid album found, aborting load!");
 				return;
 			}
-			Album album = new Album(albumId).setSone(sone).setName(albumName).setDescription(albumDescription);
-			albums.put(albumId, album);
+			Album album = getAlbum(albumId).setSone(sone).setName(albumName).setDescription(albumDescription);
 			if (albumParentId != null) {
-				Album parentAlbum = albums.get(albumParentId);
+				Album parentAlbum = getAlbum(albumParentId, false);
 				if (parentAlbum == null) {
 					logger.log(Level.WARNING, "Invalid parent album ID: " + albumParentId);
 					return;
