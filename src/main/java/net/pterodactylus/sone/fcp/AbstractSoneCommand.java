@@ -124,6 +124,32 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	}
 
 	/**
+	 * Returns a reply whose ID is a parameter in the given simple field set.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set containing the ID of the reply
+	 * @param parameterName
+	 *            The name under which the reply ID is stored in the simple
+	 *            field set
+	 * @return The reply
+	 * @throws FcpException
+	 *             if there is no reply ID stored under the given parameter
+	 *             name, or if the reply ID is invalid
+	 */
+	protected Reply getReply(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
+		try {
+			String replyId = simpleFieldSet.getString(parameterName);
+			Reply reply = core.getReply(replyId, false);
+			if (reply == null) {
+				throw new FcpException("Could not load reply from “" + replyId + "”.");
+			}
+			return reply;
+		} catch (FSParseException fspe1) {
+			throw new FcpException("Could not reply ID from “" + parameterName + "”.", fspe1);
+		}
+	}
+
+	/**
 	 * Creates a simple field set from the given collection of Sones.
 	 *
 	 * @param sones
