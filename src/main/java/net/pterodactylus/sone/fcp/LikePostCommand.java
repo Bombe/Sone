@@ -50,7 +50,7 @@ public class LikePostCommand extends AbstractSoneCommand {
 		Post post = getPost(parameters, "Post");
 		Sone sone = getSone(parameters, "Sone");
 		sone.addLikedPostId(post.getId());
-		return new Response(new SimpleFieldSetBuilder().put("Message", "PostLiked").put("LikeCount", getCore().getLikes(post).size()).get());
+		return new Response("PostLiked", new SimpleFieldSetBuilder().put("LikeCount", getCore().getLikes(post).size()).get());
 	}
 
 }

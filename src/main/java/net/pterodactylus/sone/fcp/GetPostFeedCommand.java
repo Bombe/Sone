@@ -73,10 +73,10 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 
 		if (sortedPosts.size() < startPost) {
-			return new Response(encodePosts(Collections.<Post> emptyList(), "Posts.", false));
+			return new Response("PostFeed", encodePosts(Collections.<Post> emptyList(), "Posts.", false));
 		}
 
-		return new Response(encodePosts(sortedPosts.subList(startPost, (maxPosts == -1) ? sortedPosts.size() : Math.min(startPost + maxPosts, sortedPosts.size())), "Posts.", true));
+		return new Response("PostFeed", encodePosts(sortedPosts.subList(startPost, (maxPosts == -1) ? sortedPosts.size() : Math.min(startPost + maxPosts, sortedPosts.size())), "Posts.", true));
 	}
 
 }

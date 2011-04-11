@@ -70,6 +70,9 @@ public interface Command {
 	 */
 	public static class Response {
 
+		/** The message name of the reponse. */
+		private final String messageName;
+
 		/** The reply parameters. */
 		private final SimpleFieldSet replyParameters;
 
@@ -82,40 +85,48 @@ public interface Command {
 		/**
 		 * Creates a new reply with the given parameters.
 		 *
+		 * @param messageName
+		 *            The message name
 		 * @param replyParameters
 		 *            The reply parameters
 		 */
-		public Response(SimpleFieldSet replyParameters) {
-			this(replyParameters, null, null);
+		public Response(String messageName, SimpleFieldSet replyParameters) {
+			this(messageName, replyParameters, null, null);
 		}
 
 		/**
 		 * Creates a new reply with the given parameters.
 		 *
+		 * @param messageName
+		 *            The message name
 		 * @param replyParameters
 		 *            The reply parameters
 		 * @param data
 		 *            The data of the reply (may be {@code null})
 		 */
-		public Response(SimpleFieldSet replyParameters, byte[] data) {
-			this(replyParameters, data, null);
+		public Response(String messageName, SimpleFieldSet replyParameters, byte[] data) {
+			this(messageName, replyParameters, data, null);
 		}
 
 		/**
 		 * Creates a new reply with the given parameters.
 		 *
+		 * @param messageName
+		 *            The message name
 		 * @param replyParameters
 		 *            The reply parameters
 		 * @param bucket
 		 *            The bucket of the reply (may be {@code null})
 		 */
-		public Response(SimpleFieldSet replyParameters, Bucket bucket) {
-			this(replyParameters, null, bucket);
+		public Response(String messageName, SimpleFieldSet replyParameters, Bucket bucket) {
+			this(messageName, replyParameters, null, bucket);
 		}
 
 		/**
 		 * Creates a new reply with the given parameters.
 		 *
+		 * @param messageName
+		 *            The message name
 		 * @param replyParameters
 		 *            The reply parameters
 		 * @param data
@@ -123,7 +134,8 @@ public interface Command {
 		 * @param bucket
 		 *            The bucket of the reply (may be {@code null})
 		 */
-		private Response(SimpleFieldSet replyParameters, byte[] data, Bucket bucket) {
+		private Response(String messageName, SimpleFieldSet replyParameters, byte[] data, Bucket bucket) {
+			this.messageName = messageName;
 			this.replyParameters = replyParameters;
 			this.data = data;
 			this.bucket = bucket;
@@ -135,7 +147,7 @@ public interface Command {
 		 * @return The reply parameters
 		 */
 		public SimpleFieldSet getReplyParameters() {
-			return replyParameters;
+			return new SimpleFieldSetBuilder(replyParameters).put("Message", messageName).get();
 		}
 
 		/**
@@ -194,7 +206,7 @@ public interface Command {
 		 *            The error message
 		 */
 		public ErrorResponse(String message) {
-			super(new SimpleFieldSetBuilder().put("ErrorMessage", message).get());
+			super("Error", new SimpleFieldSetBuilder().put("ErrorMessage", message).get());
 		}
 
 		/**
@@ -206,7 +218,7 @@ public interface Command {
 		 *            The error message
 		 */
 		public ErrorResponse(int code, String message) {
-			super(new SimpleFieldSetBuilder().put("ErrorMessage", message).put("ErrorCode", code).get());
+			super("Error", new SimpleFieldSetBuilder().put("ErrorMessage", message).put("ErrorCode", code).get());
 		}
 
 	}
