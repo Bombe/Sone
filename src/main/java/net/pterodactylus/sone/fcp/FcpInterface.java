@@ -68,6 +68,7 @@ public class FcpInterface {
 		commands.put("LikePost", new LikePostCommand(core));
 		commands.put("LikeReply", new LikeReplyCommand(core));
 		commands.put("CreatePost", new CreatePostCommand(core));
+		commands.put("CreateReply", new CreateReplyCommand(core));
 	}
 
 	//
