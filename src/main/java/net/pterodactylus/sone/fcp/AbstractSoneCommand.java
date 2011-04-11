@@ -44,6 +44,9 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	/** The Sone core. */
 	private final Core core;
 
+	/** Whether this command needs write access. */
+	private final boolean writeAccess;
+
 	/**
 	 * Creates a new abstract Sone FCP command.
 	 *
@@ -51,7 +54,21 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            The Sone core
 	 */
 	protected AbstractSoneCommand(Core core) {
+		this(core, false);
+	}
+
+	/**
+	 * Creates a new abstract Sone FCP command.
+	 *
+	 * @param core
+	 *            The Sone core
+	 * @param writeAccess
+	 *            {@code true} if this command requires write access,
+	 *            {@code false} otherwise
+	 */
+	protected AbstractSoneCommand(Core core, boolean writeAccess) {
 		this.core = core;
+		this.writeAccess = writeAccess;
 	}
 
 	//
@@ -65,6 +82,16 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 */
 	protected Core getCore() {
 		return core;
+	}
+
+	/**
+	 * Returns whether this command requires write access.
+	 *
+	 * @return {@code true} if this command require write access, {@code false}
+	 *         otherwise
+	 */
+	public boolean requiresWriteAccess() {
+		return writeAccess;
 	}
 
 	//

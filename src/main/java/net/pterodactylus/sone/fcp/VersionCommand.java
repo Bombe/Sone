@@ -17,8 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
-import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.main.SonePlugin;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
@@ -28,7 +28,17 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class VersionCommand implements Command {
+public class VersionCommand extends AbstractSoneCommand {
+
+	/**
+	 * Creates a new “Version” FCP command.
+	 *
+	 * @param core
+	 *            The Sone core
+	 */
+	protected VersionCommand(Core core) {
+		super(core);
+	}
 
 	/**
 	 * {@inheritDoc}
