@@ -47,6 +47,9 @@ public class FcpInterface {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FcpInterface.class);
 
+	/** Whether the FCP interface is currently active. */
+	private volatile boolean active;
+
 	/** All available FCP commands. */
 	private final Map<String, Command> commands = Collections.synchronizedMap(new HashMap<String, Command>());
 
@@ -63,6 +66,26 @@ public class FcpInterface {
 		commands.put("GetPostFeed", new GetPostFeedCommand(core));
 	}
 
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Sets whether the FCP interface should handle requests. If {@code active}
+	 * is {@code false}, all requests are answered with an error.
+	 *
+	 * @param active
+	 *            {@code true} to activate the FCP interface, {@code false} to
+	 *            deactivate the FCP interface
+	 */
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	//
+	// ACTIONS
+	//
+
 	/**
 	 * Handles a plugin FCP request.
 	 *
@@ -78,6 +101,14 @@ public class FcpInterface {
 	 *            {@link FredPluginFCP#ACCESS_FCP_RESTRICTED}
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
+		if (!active) {
+			try {
+				sendReply(pluginReplySender, null, new ErrorResponse(400, "FCP Interface deactivated"));
+			} catch (PluginNotFoundException pnfe1) {
+				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
+			}
+			return;
+		}
 		Command command = commands.get(parameters.get("Message"));
 		try {
 			if (command == null) {
