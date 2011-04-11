@@ -876,6 +876,8 @@ public class Core implements IdentityListener, UpdateListener {
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		saveSone(sone);
 		return sone;
 	}
 
