@@ -70,6 +70,7 @@ public class FcpInterface {
 		commands.put("CreatePost", new CreatePostCommand(core));
 		commands.put("CreateReply", new CreateReplyCommand(core));
 		commands.put("DeletePost", new DeletePostCommand(core));
+		commands.put("DeleteReply", new DeleteReplyCommand(core));
 	}
 
 	//
