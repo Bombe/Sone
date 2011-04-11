@@ -79,15 +79,18 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 * @param parameterName
 	 *            The name under which the Sone ID is stored in the simple field
 	 *            set
+	 * @param localOnly
+	 *            {@code true} to only return local Sones, {@code false} to
+	 *            return any Sones
 	 * @return The Sone
 	 * @throws FcpException
 	 *             if there is no Sone ID stored under the given parameter name,
 	 *             or if the Sone ID is invalid
 	 */
-	protected Sone getSone(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
+	protected Sone getSone(SimpleFieldSet simpleFieldSet, String parameterName, boolean localOnly) throws FcpException {
 		try {
 			String soneId = simpleFieldSet.getString(parameterName);
-			Sone sone = core.getSone(soneId, false);
+			Sone sone = localOnly ? core.getLocalSone(soneId, false) : core.getSone(soneId, false);
 			if (sone == null) {
 				throw new FcpException("Could not load Sone from “" + soneId + "”.");
 			}

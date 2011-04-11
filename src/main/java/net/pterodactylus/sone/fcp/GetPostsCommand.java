@@ -50,7 +50,7 @@ public class GetPostsCommand extends AbstractSoneCommand {
 	 */
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
-		Sone sone = getSone(parameters, "Sone");
+		Sone sone = getSone(parameters, "Sone", false);
 		int startPost = getInt(parameters, "StartPost", 0);
 		int maxPosts = getInt(parameters, "MaxPosts", -1);
 		List<Post> posts = sone.getPosts();
