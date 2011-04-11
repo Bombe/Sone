@@ -33,7 +33,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 				inputField.val(defaultText);
 			}
 		}).hide().data("inputField", $(this)).val($(this).val());
-		$(this).after(textarea);
+		$(this).data("textarea", textarea).after(textarea);
 		(function(inputField, textarea) {
 			inputField.focus(function() {
 				$(this).hide().attr("disabled", "disabled");
