@@ -39,7 +39,7 @@ public class DeleteReplyCommand extends AbstractSoneCommand {
 	 *            The Sone core
 	 */
 	public DeleteReplyCommand(Core core) {
-		super(core);
+		super(core, true);
 	}
 
 	/**

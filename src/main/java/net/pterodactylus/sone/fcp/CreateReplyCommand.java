@@ -41,7 +41,7 @@ public class CreateReplyCommand extends AbstractSoneCommand {
 	 *            The Sone core
 	 */
 	public CreateReplyCommand(Core core) {
-		super(core);
+		super(core, true);
 	}
 
 	/**

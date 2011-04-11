@@ -39,7 +39,7 @@ public class LikePostCommand extends AbstractSoneCommand {
 	 *            The Sone core
 	 */
 	protected LikePostCommand(Core core) {
-		super(core);
+		super(core, true);
 	}
 
 	/**

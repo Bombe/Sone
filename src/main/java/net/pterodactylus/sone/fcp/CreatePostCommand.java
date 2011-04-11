@@ -40,7 +40,7 @@ public class CreatePostCommand extends AbstractSoneCommand {
 	 *            The Sone core
 	 */
 	public CreatePostCommand(Core core) {
-		super(core);
+		super(core, true);
 	}
 
 	/**
