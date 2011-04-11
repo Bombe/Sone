@@ -24,7 +24,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
@@ -50,8 +49,11 @@ public class FcpInterface {
 	/** Whether the FCP interface is currently active. */
 	private volatile boolean active;
 
+	/** Whether to allow write access from full access hosts only. */
+	private volatile boolean allowWriteFromFullAccessOnly;
+
 	/** All available FCP commands. */
-	private final Map<String, Command> commands = Collections.synchronizedMap(new HashMap<String, Command>());
+	private final Map<String, AbstractSoneCommand> commands = Collections.synchronizedMap(new HashMap<String, AbstractSoneCommand>());
 
 	/**
 	 * Creates a new FCP interface.
@@ -60,7 +62,7 @@ public class FcpInterface {
 	 *            The core
 	 */
 	public FcpInterface(Core core) {
-		commands.put("Version", new VersionCommand());
+		commands.put("Version", new VersionCommand(core));
 		commands.put("GetLocalSones", new GetLocalSonesCommand(core));
 		commands.put("GetPost", new GetPostCommand(core));
 		commands.put("GetPosts", new GetPostsCommand(core));
@@ -87,6 +89,17 @@ public class FcpInterface {
 	 */
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	/**
+	 * Sets whether write access is only allowed from full access hosts.
+	 *
+	 * @param allowWriteFromFullAccessOnly
+	 *            {@code true} to allow write access only from full access
+	 *            hosts, {@code false} to always allow write access
+	 */
+	public void setAllowWriteFromFullAccessOnly(boolean allowWriteFromFullAccessOnly) {
+		this.allowWriteFromFullAccessOnly = allowWriteFromFullAccessOnly;
 	}
 
 	//
@@ -116,7 +129,15 @@ public class FcpInterface {
 			}
 			return;
 		}
-		Command command = commands.get(parameters.get("Message"));
+		AbstractSoneCommand command = commands.get(parameters.get("Message"));
+		if (allowWriteFromFullAccessOnly && command.requiresWriteAccess() && (accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED)) {
+			try {
+				sendReply(pluginReplySender, null, new ErrorResponse(401, "No Write Access"));
+			} catch (PluginNotFoundException pnfe1) {
+				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
+			}
+			return;
+		}
 		try {
 			if (command == null) {
 				sendReply(pluginReplySender, null, new ErrorResponse("Unrecognized Message: " + parameters.get("Message")));
