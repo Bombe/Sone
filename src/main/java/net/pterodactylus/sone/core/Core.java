@@ -1706,6 +1706,7 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
+			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1780,6 +1781,14 @@ public class Core implements IdentityListener, UpdateListener {
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
+		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, new OptionWatcher<Boolean>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
+				fcpInterface.setActive(newValue);
+			}
+		}));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1800,6 +1809,7 @@ public class Core implements IdentityListener, UpdateListener {
 		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
+		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -2070,6 +2080,33 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public Preferences setTrustComment(String trustComment) {
 			options.getStringOption("TrustComment").set(trustComment);
+			return this;
+		}
+
+		/**
+		 * Returns whether the {@link FcpInterface FCP interface} is currently
+		 * active.
+		 *
+		 * @see FcpInterface#setActive(boolean)
+		 * @return {@code true} if the FCP interface is currently active,
+		 *         {@code false} otherwise
+		 */
+		public boolean isFcpInterfaceActive() {
+			return options.getBooleanOption("ActivateFcpInterface").get();
+		}
+
+		/**
+		 * Sets whether the {@link FcpInterface FCP interface} is currently
+		 * active.
+		 *
+		 * @see FcpInterface#setActive(boolean)
+		 * @param fcpInterfaceActive
+		 *            {@code true} to activate the FCP interface, {@code false}
+		 *            to deactivate the FCP interface
+		 * @return This preferences object
+		 */
+		public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
+			options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
 			return this;
 		}
 

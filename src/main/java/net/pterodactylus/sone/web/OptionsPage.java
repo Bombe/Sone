@@ -74,6 +74,8 @@ public class OptionsPage extends SoneTemplatePage {
 				trustComment = null;
 			}
 			preferences.setTrustComment(trustComment);
+			boolean fcpInterfaceActive = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("fcp-interface-active", 5));
+			preferences.setFcpInterfaceActive(fcpInterfaceActive);
 			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
 			preferences.setSoneRescueMode(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
@@ -91,6 +93,7 @@ public class OptionsPage extends SoneTemplatePage {
 		templateContext.set("positive-trust", preferences.getPositiveTrust());
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());
+		templateContext.set("fcp-interface-active", preferences.isFcpInterfaceActive());
 		templateContext.set("sone-rescue-mode", preferences.isSoneRescueMode());
 		templateContext.set("clear-on-next-restart", preferences.isClearOnNextRestart());
 		templateContext.set("really-clear-on-next-restart", preferences.isReallyClearOnNextRestart());
