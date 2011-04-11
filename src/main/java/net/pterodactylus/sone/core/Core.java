@@ -1707,6 +1707,7 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
+			configuration.getBooleanValue("Option/FcpWriteFromFullAccessOnly").setValue(options.getBooleanOption("FcpWriteFromFullAccessOnly").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1789,6 +1790,15 @@ public class Core implements IdentityListener, UpdateListener {
 				fcpInterface.setActive(newValue);
 			}
 		}));
+		options.addBooleanOption("FcpWriteFromFullAccessOnly", new DefaultOption<Boolean>(true, new OptionWatcher<Boolean>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
+				fcpInterface.setAllowWriteFromFullAccessOnly(newValue);
+			}
+
+		}));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1810,6 +1820,7 @@ public class Core implements IdentityListener, UpdateListener {
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
+		options.getBooleanOption("FcpWriteFromFullAccessOnly").set(configuration.getBooleanValue("Option/FcpWriteFromFullAccessOnly").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -2107,6 +2118,33 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
 			options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
+			return this;
+		}
+
+		/**
+		 * Returns whether write access to the FCP interface is only allowed
+		 * from the allowed FCP hosts of the node configuration.
+		 *
+		 * @return {@code true} if only allowed hosts are allowed to change data
+		 *         using the FCP interface, {@code false} if everybody can
+		 *         change data using the FCP interface
+		 */
+		public boolean isFcpWriteFromFullAccessOnly() {
+			return options.getBooleanOption("FcpWriteFromFullAccessOnly").get();
+		}
+
+		/**
+		 * Sets whether write access to the FCP interface is only allowed from
+		 * the allowed FCP hosts of the node configuration.
+		 *
+		 * @param fcpWriteFromFullAccessOnly
+		 *            {@code true} if only allowed hosts should be allowed to
+		 *            change data using the FCP interface, {@code false} if
+		 *            everybody can change data using the FCP interface
+		 * @return This preferences object
+		 */
+		public Preferences setFcpWriteFromFullAccessOnly(boolean fcpWriteFromFullAccessOnly) {
+			options.getBooleanOption("FcpWriteFromFullAccessOnly").set(fcpWriteFromFullAccessOnly);
 			return this;
 		}
 
