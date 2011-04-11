@@ -194,6 +194,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			/* create FCP interface. */
 			fcpInterface = new FcpInterface(core);
+			core.setFcpInterface(fcpInterface);
 
 			/* create the identity manager. */
 			identityManager.addIdentityListener(core);

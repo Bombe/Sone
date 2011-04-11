@@ -37,6 +37,7 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -108,6 +109,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
+
+	/** The FCP interface. */
+	private volatile FcpInterface fcpInterface;
 
 	/** Whether the core has been stopped. */
 	private volatile boolean stopped;
@@ -248,6 +252,16 @@ public class Core implements IdentityListener, UpdateListener {
 	 */
 	public UpdateChecker getUpdateChecker() {
 		return updateChecker;
+	}
+
+	/**
+	 * Sets the FCP interface to use.
+	 *
+	 * @param fcpInterface
+	 *            The FCP interface to use
+	 */
+	public void setFcpInterface(FcpInterface fcpInterface) {
+		this.fcpInterface = fcpInterface;
 	}
 
 	/**
