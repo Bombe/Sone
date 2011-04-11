@@ -666,7 +666,7 @@ function ajaxifySone(soneElement) {
 
 	/* mark Sone as known when clicking it. */
 	$(soneElement).click(function() {
-		markSoneAsKnown(soneElement);
+		markSoneAsKnown(this);
 	});
 }
 
