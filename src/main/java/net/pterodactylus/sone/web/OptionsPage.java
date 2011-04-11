@@ -76,6 +76,8 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setTrustComment(trustComment);
 			boolean fcpInterfaceActive = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("fcp-interface-active", 5));
 			preferences.setFcpInterfaceActive(fcpInterfaceActive);
+			boolean requireFullAccessHosts = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("require-full-access-hosts", 5));
+			preferences.setFcpWriteFromFullAccessOnly(requireFullAccessHosts);
 			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
 			preferences.setSoneRescueMode(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
@@ -94,6 +96,7 @@ public class OptionsPage extends SoneTemplatePage {
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());
 		templateContext.set("fcp-interface-active", preferences.isFcpInterfaceActive());
+		templateContext.set("require-full-access-hosts", preferences.isFcpWriteFromFullAccessOnly());
 		templateContext.set("sone-rescue-mode", preferences.isSoneRescueMode());
 		templateContext.set("clear-on-next-restart", preferences.isClearOnNextRestart());
 		templateContext.set("really-clear-on-next-restart", preferences.isReallyClearOnNextRestart());
