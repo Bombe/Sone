@@ -66,11 +66,11 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  * @param element
  *            The element to add a “comment” link to
  */
-function addCommentLink(postId, element, insertAfterThisElement) {
+function addCommentLink(postId, author, element, insertAfterThisElement) {
 	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
-	commentElement = (function(postId) {
+	commentElement = (function(postId, author) {
 		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 			replyElement = $("#sone .post#" + postId + " .create-reply");
@@ -85,10 +85,11 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 					replyElement.removeClass("light");
 				});
 			})(replyElement);
-			replyElement.find("input.reply-input").focus();
+			textArea = replyElement.find("input.reply-input").focus().data("textarea");
+			textArea.val(textArea.val() + "@sone://" + author + " ");
 		});
 		return commentElement;
-	})(postId);
+	})(postId, author);
 	$(insertAfterThisElement).after(commentElement.clone(true));
 	$(insertAfterThisElement).after(separator);
 }
@@ -757,7 +758,7 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* add “comment” link. */
-	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
+	addCommentLink(getPostId(postElement), getPostAuthor(postElement), postElement, $(postElement).find(".post-status-line .time"));
 
 	/* process all replies. */
 	replyIds = [];
@@ -817,7 +818,7 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
-	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+	addCommentLink(getPostId(replyElement), getReplyAuthor(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
 
 	/* convert “show source” link into javascript function. */
 	$(replyElement).find(".show-reply-source").each(function() {
