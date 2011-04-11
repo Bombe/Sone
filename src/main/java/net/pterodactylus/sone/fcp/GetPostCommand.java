@@ -36,7 +36,7 @@ public class GetPostCommand extends AbstractSoneCommand {
 	 * @param core
 	 *            The Sone core
 	 */
-	protected GetPostCommand(Core core) {
+	public GetPostCommand(Core core) {
 		super(core);
 	}
 
