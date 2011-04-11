@@ -64,6 +64,7 @@ public class FcpInterface {
 	public FcpInterface(Core core) {
 		commands.put("Version", new VersionCommand(core));
 		commands.put("GetLocalSones", new GetLocalSonesCommand(core));
+		commands.put("GetSones", new GetSonesCommand(core));
 		commands.put("GetPost", new GetPostCommand(core));
 		commands.put("GetPosts", new GetPostsCommand(core));
 		commands.put("GetPostFeed", new GetPostFeedCommand(core));
