@@ -793,6 +793,34 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertStarted(Image image) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertAborted(Image image) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFinished(Image image) {
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFailed(Image image, Throwable cause) {
+	}
+
+	/**
 	 * Template provider implementation that uses
 	 * {@link WebInterface#createReader(String)} to load templates for
 	 * inclusion.

@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import java.util.EventListener;
 
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -139,5 +140,39 @@ public interface CoreListener extends EventListener {
 	 *            The latest edition of the Sone homepage
 	 */
 	public void updateFound(Version version, long releaseTime, long latestEdition);
+
+	/**
+	 * Notifies a listener that an image has started being inserted.
+	 *
+	 * @param image
+	 *            The image that is now inserted
+	 */
+	public void imageInsertStarted(Image image);
+
+	/**
+	 * Notifies a listener that an image insert was aborted by the user.
+	 *
+	 * @param image
+	 *            The image that is not inserted anymore
+	 */
+	public void imageInsertAborted(Image image);
+
+	/**
+	 * Notifies a listener that an image was successfully inserted.
+	 *
+	 * @param image
+	 *            The image that was inserted
+	 */
+	public void imageInsertFinished(Image image);
+
+	/**
+	 * Notifies a listener that an image failed to be inserted.
+	 *
+	 * @param image
+	 *            The image that could not be inserted
+	 * @param cause
+	 *            The reason for the failed insert
+	 */
+	public void imageInsertFailed(Image image, Throwable cause);
 
 }

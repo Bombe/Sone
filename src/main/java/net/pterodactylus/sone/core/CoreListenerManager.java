@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.core;
 
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -212,6 +213,60 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	void fireUpdateFound(Version version, long releaseTime, long latestEdition) {
 		for (CoreListener coreListener : getListeners()) {
 			coreListener.updateFound(version, releaseTime, latestEdition);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that an image has started being inserted.
+	 *
+	 * @see CoreListener#imageInsertStarted(Image)
+	 * @param image
+	 *            The image that is now inserted
+	 */
+	void fireImageInsertStarted(Image image) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.imageInsertStarted(image);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that an image insert was aborted by the user.
+	 *
+	 * @see CoreListener#imageInsertAborted(Image)
+	 * @param image
+	 *            The image that is not inserted anymore
+	 */
+	void fireImageInsertAborted(Image image) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.imageInsertAborted(image);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that an image was successfully inserted.
+	 *
+	 * @see CoreListener#imageInsertFinished(Image)
+	 * @param image
+	 *            The image that was inserted
+	 */
+	void fireImageInsertFinished(Image image) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.imageInsertFinished(image);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that an image failed to be inserted.
+	 *
+	 * @see CoreListener#imageInsertFailed(Image, Throwable)
+	 * @param image
+	 *            The image that could not be inserted
+	 * @param cause
+	 *            The cause of the failure
+	 */
+	void fireImageInsertFailed(Image image, Throwable cause) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.imageInsertFailed(image, cause);
 		}
 	}
 
