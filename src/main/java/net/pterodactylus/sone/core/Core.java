@@ -1891,7 +1891,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 * @param temporaryImage
 	 *            The temporary image to delete
 	 */
-	public void deteleTemporaryImage(TemporaryImage temporaryImage) {
+	public void deleteTemporaryImage(TemporaryImage temporaryImage) {
 		Validation.begin().isNotNull("Temporary Image", temporaryImage).check();
 		deleteTemporaryImage(temporaryImage.getId());
 	}
