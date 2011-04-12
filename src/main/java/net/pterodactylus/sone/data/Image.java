@@ -34,6 +34,9 @@ public class Image implements Fingerprintable {
 	/** The Sone the image belongs to. */
 	private Sone sone;
 
+	/** The album this image belongs to. */
+	private Album album;
+
 	/** The request key of the image. */
 	private String key;
 
@@ -104,6 +107,29 @@ public class Image implements Fingerprintable {
 	public Image setSone(Sone sone) {
 		Validation.begin().isNull("Current Image Owner", this.sone).isNotNull("New Image Owner", sone);
 		this.sone = sone;
+		return this;
+	}
+
+	/**
+	 * Returns the album this image belongs to.
+	 *
+	 * @return The album this image belongs to
+	 */
+	public Album getAlbum() {
+		return album;
+	}
+
+	/**
+	 * Sets the album this image belongs to. The album of an image can only be
+	 * set once, and it is usually called by {@link Album#addImage(Image)}.
+	 *
+	 * @param album
+	 *            The album this image belongs to
+	 * @return This image
+	 */
+	public Image setAlbum(Album album) {
+		Validation.begin().isNull("Current Album", this.album).isNotNull("New Album", album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
+		this.album = album;
 		return this;
 	}
 
