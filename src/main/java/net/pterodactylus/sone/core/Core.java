@@ -60,7 +60,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener, UpdateListener {
+public class Core implements IdentityListener, UpdateListener, ImageInsertListener {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -2180,6 +2180,49 @@ public class Core implements IdentityListener, UpdateListener {
 	@Override
 	public void updateFound(Version version, long releaseTime, long latestEdition) {
 		coreListenerManager.fireUpdateFound(version, releaseTime, latestEdition);
+	}
+
+	//
+	// INTERFACE ImageInsertListener
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertStarted(Image image) {
+		logger.log(Level.WARNING, "Image insert started for " + image);
+		coreListenerManager.fireImageInsertStarted(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertAborted(Image image) {
+		logger.log(Level.WARNING, "Image insert aborted for " + image);
+		coreListenerManager.fireImageInsertAborted(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFinished(Image image, FreenetURI key) {
+		logger.log(Level.WARNING, "Image insert finished for " + image + ": " + key);
+		image.setKey(key.toString());
+		deleteTemporaryImage(image.getId());
+		saveSone(image.getSone());
+		coreListenerManager.fireImageInsertFinished(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFailed(Image image, Throwable cause) {
+		logger.log(Level.WARNING, "Image insert failed for " + image, cause);
+		coreListenerManager.fireImageInsertFailed(image, cause);
 	}
 
 	/**
