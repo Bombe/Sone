@@ -558,7 +558,18 @@ textarea {
 }
 
 #sone .image {
-	float: left;
+	width: 200px;
+	height: 150px;
+	display: table-cell;
+	vertical-align: middle;
+	text-align: center;
+	padding: 0.5ex;
+}
+
+#sone .image img {
+	padding: 1ex;
+	border: solid 1px #000;
+	background-color: #fff;
 }
 
 #sone .backlinks .separator {
