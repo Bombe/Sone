@@ -125,7 +125,7 @@ public class ListNotificationFilters {
 		}
 		List<Reply> newReplies = new ArrayList<Reply>();
 		for (Reply reply : newReplyNotification.getElements()) {
-			if (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient())) {
+			if (((reply.getPost().getSone() != null) && currentSone.hasFriend(reply.getPost().getSone().getId())) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient())) {
 				newReplies.add(reply);
 			}
 		}
