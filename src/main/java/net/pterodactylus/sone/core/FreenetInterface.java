@@ -18,29 +18,43 @@
 package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.SoneException.Type;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
 
+import freenet.client.ClientMetadata;
 import freenet.client.FetchException;
 import freenet.client.FetchResult;
 import freenet.client.HighLevelSimpleClient;
 import freenet.client.HighLevelSimpleClientImpl;
+import freenet.client.InsertBlock;
+import freenet.client.InsertContext;
 import freenet.client.InsertException;
+import freenet.client.async.BaseClientPutter;
 import freenet.client.async.ClientContext;
+import freenet.client.async.ClientPutCallback;
+import freenet.client.async.ClientPutter;
 import freenet.client.async.USKCallback;
 import freenet.keys.FreenetURI;
+import freenet.keys.InsertableClientSSK;
 import freenet.keys.USK;
 import freenet.node.Node;
 import freenet.node.RequestStarter;
+import freenet.support.api.Bucket;
+import freenet.support.io.ArrayBucket;
 
 /**
  * Contains all necessary functionality for interacting with the Freenet node.
@@ -112,6 +126,36 @@ public class FreenetInterface {
 	public String[] generateKeyPair() {
 		FreenetURI[] keyPair = client.generateKeyPair("");
 		return new String[] { keyPair[1].toString(), keyPair[0].toString() };
+	}
+
+	/**
+	 * Inserts the image data of the given {@link TemporaryImage} and returns
+	 * the given insert token that can be used to add listeners or cancel the
+	 * insert.
+	 *
+	 * @param temporaryImage
+	 *            The temporary image data
+	 * @param image
+	 *            The image
+	 * @param insertToken
+	 *            The insert token
+	 * @throws SoneException
+	 *             if the insert could not be started
+	 */
+	public void insertImage(TemporaryImage temporaryImage, Image image, InsertToken insertToken) throws SoneException {
+		String filenameHint = image.getId() + "." + temporaryImage.getMimeType().substring(temporaryImage.getMimeType().lastIndexOf("/") + 1);
+		InsertableClientSSK key = InsertableClientSSK.createRandom(node.random, "");
+		FreenetURI targetUri = key.getInsertURI().setDocName(filenameHint);
+		InsertContext insertContext = client.getInsertContext(true);
+		Bucket bucket = new ArrayBucket(temporaryImage.getImageData());
+		ClientMetadata metadata = new ClientMetadata(temporaryImage.getMimeType());
+		InsertBlock insertBlock = new InsertBlock(bucket, metadata, targetUri);
+		try {
+			ClientPutter clientPutter = client.insert(insertBlock, false, null, false, insertContext, insertToken, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
+			insertToken.setClientPutter(clientPutter);
+		} catch (InsertException ie1) {
+			throw new SoneException(Type.INSERT_FAILED, "Could not start image insert.", ie1);
+		}
 	}
 
 	/**
@@ -277,6 +321,145 @@ public class FreenetInterface {
 		 *            found editions
 		 */
 		public void editionFound(FreenetURI uri, long edition, boolean newKnownGood, boolean newSlot);
+
+	}
+
+	/**
+	 * Insert token that can be used to add {@link ImageInsertListener}s and
+	 * cancel a running insert.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class InsertToken implements ClientPutCallback {
+
+		/** The image being inserted. */
+		private final Image image;
+
+		/** The list of registered image insert listeners. */
+		private final List<ImageInsertListener> imageInsertListeners = Collections.synchronizedList(new ArrayList<ImageInsertListener>());
+
+		/** The client putter. */
+		private ClientPutter clientPutter;
+
+		/** The final URI. */
+		private FreenetURI resultingUri;
+
+		/**
+		 * Creates a new insert token for the given image.
+		 *
+		 * @param image
+		 *            The image being inserted
+		 */
+		public InsertToken(Image image) {
+			this.image = image;
+		}
+
+		//
+		// LISTENER MANAGEMENT
+		//
+
+		/**
+		 * Adds the given listener to the list of registered listener.
+		 *
+		 * @param imageInsertListener
+		 *            The listener to add
+		 */
+		public void addImageInsertListener(ImageInsertListener imageInsertListener) {
+			imageInsertListeners.add(imageInsertListener);
+		}
+
+		/**
+		 * Removes the given listener from the list of registered listener.
+		 *
+		 * @param imageInsertListener
+		 *            The listener to remove
+		 */
+		public void removeImageInsertListener(ImageInsertListener imageInsertListener) {
+			imageInsertListeners.remove(imageInsertListener);
+		}
+
+		//
+		// ACCESSORS
+		//
+
+		/**
+		 * Sets the client putter that is inserting the image. This will also
+		 * signal all registered listeners that the image has started.
+		 *
+		 * @see ImageInsertListener#imageInsertStarted(Image)
+		 * @param clientPutter
+		 *            The client putter
+		 */
+		public void setClientPutter(ClientPutter clientPutter) {
+			this.clientPutter = clientPutter;
+			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
+				imageInsertListener.imageInsertStarted(image);
+			}
+		}
+
+		//
+		// ACTIONS
+		//
+
+		/**
+		 * Cancels the running insert.
+		 *
+		 * @see ImageInsertListener#imageInsertAborted(Image)
+		 */
+		public void cancel() {
+			clientPutter.cancel(null, null);
+			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
+				imageInsertListener.imageInsertAborted(image);
+			}
+		}
+
+		//
+		// INTERFACE ClientPutCallback
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onMajorProgress(ObjectContainer objectContainer) {
+			/* ignore, we don’t care. */
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onFailure(InsertException insertException, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
+				imageInsertListener.imageInsertFailed(image, insertException);
+			}
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onFetchable(BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+			/* ignore, we don’t care. */
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onGeneratedURI(FreenetURI generatedUri, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+			resultingUri = generatedUri;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public void onSuccess(BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
+				imageInsertListener.imageInsertFinished(image, resultingUri);
+			}
+		}
 
 	}
 
