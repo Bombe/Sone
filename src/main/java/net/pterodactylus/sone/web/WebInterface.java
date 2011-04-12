@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -173,6 +174,15 @@ public class WebInterface implements CoreListener {
 	/** The “new version” notification. */
 	private final TemplateNotification newVersionNotification;
 
+	/** The “inserting images” notification. */
+	private final ListNotification<Image> insertingImagesNotification;
+
+	/** The “inserted images” notification. */
+	private final ListNotification<Image> insertedImagesNotification;
+
+	/** The “image insert failed” notification. */
+	private final ListNotification<Image> imageInsertFailedNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -235,6 +245,15 @@ public class WebInterface implements CoreListener {
 
 		Template newVersionTemplate = TemplateParser.parse(createReader("/templates/notify/newVersionNotification.html"));
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
+
+		Template insertingImagesTemplate = TemplateParser.parse(createReader("/templates/notify/inserting-images-notification.html"));
+		insertingImagesNotification = new ListNotification<Image>("inserting-images-notification", "images", insertingImagesTemplate);
+
+		Template insertedImagesTemplate = TemplateParser.parse(createReader("/templates/notify/inserted-images-notification.html"));
+		insertedImagesNotification = new ListNotification<Image>("inserted-images-notification", "images", insertedImagesTemplate);
+
+		Template imageInsertFailedTemplate = TemplateParser.parse(createReader("/templates/notify/image-insert-failed-notification.html"));
+		imageInsertFailedNotification = new ListNotification<Image>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
 	}
 
 	//
@@ -797,6 +816,8 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void imageInsertStarted(Image image) {
+		insertingImagesNotification.add(image);
+		notificationManager.addNotification(insertingImagesNotification);
 	}
 
 	/**
@@ -804,6 +825,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void imageInsertAborted(Image image) {
+		insertingImagesNotification.remove(image);
 	}
 
 	/**
@@ -811,6 +833,9 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void imageInsertFinished(Image image) {
+		insertingImagesNotification.remove(image);
+		insertedImagesNotification.add(image);
+		notificationManager.addNotification(insertedImagesNotification);
 	}
 
 	/**
@@ -818,6 +843,9 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void imageInsertFailed(Image image, Throwable cause) {
+		insertingImagesNotification.remove(image);
+		imageInsertFailedNotification.add(image);
+		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 
 	/**
