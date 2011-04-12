@@ -1343,8 +1343,9 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 
 		/* load albums. */
 		List<Album> topLevelAlbums = new ArrayList<Album>();
+		int albumCounter = 0;
 		while (true) {
-			String albumPrefix = sonePrefix + "/Albums/" + albums.size();
+			String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
 			String albumId = configuration.getStringValue(albumPrefix + "/ID").getValue(null);
 			if (albumId == null) {
 				break;
