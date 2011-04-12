@@ -187,6 +187,15 @@ public class Album implements Fingerprintable {
 	}
 
 	/**
+	 * Returns whether this album contains any other albums or images.
+	 *
+	 * @return {@code true} if this album is empty, {@code false} otherwise
+	 */
+	public boolean isEmpty() {
+		return albums.isEmpty() && images.isEmpty();
+	}
+
+	/**
 	 * Returns the parent album of this album.
 	 *
 	 * @return The parent album of this album, or {@code null} if this album
