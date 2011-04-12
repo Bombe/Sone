@@ -1864,6 +1864,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		synchronized (images) {
 			images.put(image.getId(), image);
 		}
+		imageInserter.insertImage(temporaryImage, image);
 		return image;
 	}
 
