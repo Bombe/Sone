@@ -60,9 +60,7 @@
 
 			<%foreach album.images image>
 				<div class="image">
-					<a href="imageBrowser.html?image=<%image.id|html>">
-						<% image|image-link max-width=200 max-height=150>
-					</a>
+					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=200 max-height=150></a>
 				</div>
 			<%/foreach>
 
