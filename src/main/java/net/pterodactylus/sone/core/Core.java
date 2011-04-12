@@ -109,6 +109,9 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	/** The Sone downloader. */
 	private final SoneDownloader soneDownloader;
 
+	/** The image inserter. */
+	private final ImageInserter imageInserter;
+
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
 
@@ -192,6 +195,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
+		this.imageInserter = new ImageInserter(this, freenetInterface);
 		this.updateChecker = new UpdateChecker(freenetInterface);
 	}
 
