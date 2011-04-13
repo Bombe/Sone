@@ -93,6 +93,10 @@ textarea {
 	border: none;
 }
 
+#sone .parsed {
+	white-space: pre-wrap;
+}
+
 #sone #notification-area {
 	margin-top: 1em;
 }
