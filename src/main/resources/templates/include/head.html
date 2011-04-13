@@ -36,7 +36,7 @@
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
 			<a class="picture" href="index.html">
 				<%ifnull !currentSone>
-					<img src="/WoT/GetIdenticon?identity=<% currentSone.id|html>&amp;width=80&amp;height=80" width="80" height="80" alt="Profile Avatar" />
+					<img src="/WebOfTrust/GetIdenticon?identity=<% currentSone.id|html>&amp;width=80&amp;height=80" width="80" height="80" alt="Profile Avatar" />
 				<%else>
 					<img src="images/sone.png" width="80" height="80" alt="Sone is offline" />
 				<%/if>
@@ -47,4 +47,8 @@
 					<%include include/viewSone.html>
 				</div>
 			<%/if>
+			<form id="search" action="search.html" method="get">
+				<input type="text" name="query" value="" />
+				<button type="submit"><%= View.Search.Button.Search|l10n|html></button>
+			</form>
 		</div>

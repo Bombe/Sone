@@ -20,6 +20,8 @@ package net.pterodactylus.sone.data;
 import java.util.Comparator;
 import java.util.UUID;
 
+import net.pterodactylus.util.filter.Filter;
+
 /**
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
@@ -34,6 +36,16 @@ public class Post {
 		@Override
 		public int compare(Post leftPost, Post rightPost) {
 			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
+		}
+
+	};
+
+	/** Filter for posts with timestamps from the future. */
+	public static final Filter<Post> FUTURE_POSTS_FILTER = new Filter<Post>() {
+
+		@Override
+		public boolean filterObject(Post post) {
+			return post.getTime() <= System.currentTimeMillis();
 		}
 
 	};

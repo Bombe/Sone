@@ -19,7 +19,9 @@ package net.pterodactylus.sone.template;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -54,7 +56,7 @@ public class PostAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Post post = (Post) object;
 		if ("replies".equals(member)) {
-			return core.getReplies(post);
+			return Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLIES_FILTER);
 		} else if (member.equals("likes")) {
 			return core.getLikes(post);
 		} else if (member.equals("liked")) {

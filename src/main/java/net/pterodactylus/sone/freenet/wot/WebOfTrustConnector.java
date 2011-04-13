@@ -42,7 +42,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	private static final Logger logger = Logging.getLogger(WebOfTrustConnector.class);
 
 	/** The name of the WoT plugin. */
-	private static final String WOT_PLUGIN_NAME = "plugins.WoT.WoT";
+	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";
 
 	/** A random connection identifier. */
 	private static final String PLUGIN_CONNECTION_IDENTIFIER = "Sone-WoT-Connector-" + Math.abs(Math.random());
@@ -230,7 +230,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Trust getTrust(OwnIdentity ownIdentity, Identity identity) throws PluginException {
-		Reply getTrustReply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("TreeOwner", ownIdentity.getId()).put("Identity", identity.getId()).get());
+		Reply getTrustReply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentity").put("Truster", ownIdentity.getId()).put("Identity", identity.getId()).get());
 		String trust = getTrustReply.getFields().get("Trust");
 		String score = getTrustReply.getFields().get("Score");
 		String rank = getTrustReply.getFields().get("Rank");

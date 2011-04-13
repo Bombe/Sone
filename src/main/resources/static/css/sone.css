@@ -125,6 +125,10 @@ textarea {
 	float: right;
 }
 
+#sone #notification-area .notification .hidden {
+	display: none;
+}
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;
@@ -577,6 +581,19 @@ textarea {
 
 #sone .backlinks .separator {
 	display: inline;
+}
+
+#sone #search {
+	text-align: right;
+}
+
+#sone #search input[type=text] {
+	width: 35em;
+}
+
+#sone #sone-results + #sone #post-results {
+	clear: both;
+	padding-top: 1em;
 }
 
 #sone #tail {

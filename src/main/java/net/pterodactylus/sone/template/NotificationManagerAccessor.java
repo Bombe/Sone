@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -47,12 +49,8 @@ public class NotificationManagerAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		NotificationManager notificationManager = (NotificationManager) object;
 		if ("all".equals(member)) {
-			List<Notification> notifications = new ArrayList<Notification>(notificationManager.getNotifications());
+			List<Notification> notifications = ListNotificationFilters.filterNotifications(new ArrayList<Notification>(notificationManager.getNotifications()), (Sone) templateContext.get("currentSone"));
 			Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
-			return notifications;
-		} else if ("new".equals(member)) {
-			List<Notification> notifications = new ArrayList<Notification>(notificationManager.getChangedNotifications());
-			Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
 			return notifications;
 		}
 		return super.get(templateContext, object, member);

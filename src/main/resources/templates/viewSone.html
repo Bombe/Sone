@@ -25,7 +25,7 @@
 
 			<div class="profile-field">
 				<div class="name"><%= Page.ViewSone.Profile.Label.Name|l10n|html></div>
-				<div class="value"><a href="/WoT/ShowIdentity?id=<% sone.id|html>"><% sone.niceName|html></a></div>
+				<div class="value"><a href="/WebOfTrust/ShowIdentity?id=<% sone.id|html>"><% sone.niceName|html></a></div>
 			</div>
 
 			<%foreach sone.profile.fields field>
@@ -60,18 +60,32 @@
 
 		<h1><%= Page.ViewSone.PostList.Title|l10n|replace needle="{sone}" replacementKey=sone.niceName|html></h1>
 
-		<div id="posts">
-			<%:getpage parameter=postPage>
-			<%:paginate list=sone.posts pagesize=25>
-			<%= postPage|store key=pageParameter>
-			<%include include/pagination.html>
-			<%foreach pagination.items post>
-				<%include include/viewPost.html>
-			<%foreachelse>
-				<div><%= Page.ViewSone.PostList.Text.NoPostYet|l10n|html></div>
-			<%/foreach>
-			<%include include/pagination.html>
-		</div>
+		<%foreach posts post>
+			<%first>
+				<div id="posts">
+					<%include include/pagination.html pagination=postPagination pageParameter==postPage>
+			<%/first>
+			<%include include/viewPost.html>
+			<%last>
+					<%include include/pagination.html pagination=postPagination pageParameter==postPage>
+				</div>
+			<%/last>
+		<%foreachelse>
+			<div><%= Page.ViewSone.PostList.Text.NoPostYet|l10n|html></div>
+		<%/foreach>
+
+		<%foreach repliedPosts post>
+			<%first>
+				<h2><%= Page.ViewSone.Replies.Title|l10n|html></h2>
+				<div id="replied-posts">
+					<%include include/pagination.html pagination=repliedPostPagination pageParameter==repliedPostPage>
+			<%/first>
+			<%include include/viewPost.html>
+			<%last>
+					<%include include/pagination.html pagination=repliedPostPagination pageParameter==repliedPostPage>
+				</div>
+			<%/last>
+		<%/foreach>
 
 	<%/if>
 

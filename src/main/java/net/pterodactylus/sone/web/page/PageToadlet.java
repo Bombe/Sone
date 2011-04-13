@@ -53,6 +53,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 * Creates a new toadlet that hands off processing to a {@link Page}.
 	 *
 	 * @param highLevelSimpleClient
+	 *            The high-level simple client
 	 * @param menuName
 	 *            The name of the menu item
 	 * @param page

@@ -49,7 +49,7 @@ import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.template.AlbumAccessor;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
-import net.pterodactylus.sone.template.GetPagePlugin;
+import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
@@ -57,6 +57,7 @@ import net.pterodactylus.sone.template.NotificationManagerAccessor;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
+import net.pterodactylus.sone.template.ReplyGroupFilter;
 import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
@@ -76,6 +77,7 @@ import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetTranslationPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
@@ -89,7 +91,9 @@ import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
+import net.pterodactylus.sone.web.page.RedirectPage;
 import net.pterodactylus.sone.web.page.StaticPage;
+import net.pterodactylus.sone.web.page.TemplatePage;
 import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
 import net.pterodactylus.util.cache.CacheItem;
@@ -105,7 +109,6 @@ import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
-import net.pterodactylus.util.template.PaginationPlugin;
 import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.ReplaceFilter;
@@ -123,6 +126,7 @@ import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
+import freenet.support.api.HTTPRequest;
 
 /**
  * Bundles functionality that a web interface of a Freenet plugin needs, e.g.
@@ -204,6 +208,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateContextFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
+		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
 		templateContextFactory.addFilter("date", new DateFilter());
 		templateContextFactory.addFilter("html", new HtmlFilter());
 		templateContextFactory.addFilter("replace", new ReplaceFilter());
@@ -220,19 +225,20 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
 		templateContextFactory.addFilter("image-link", new ImageLinkFilter(templateContextFactory));
+		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
 		Template newSoneNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newSoneNotification.html"));
-		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate);
+		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate, false);
 
 		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
-		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate);
+		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
-		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate);
+		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate, false);
 
 		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
 		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
@@ -545,6 +551,7 @@ public class WebInterface implements CoreListener {
 		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
 		Template createReplyTemplate = TemplateParser.parse(createReader("/templates/createReply.html"));
 		Template bookmarksTemplate = TemplateParser.parse(createReader("/templates/bookmarks.html"));
+		Template searchTemplate = TemplateParser.parse(createReader("/templates/search.html"));
 		Template editProfileTemplate = TemplateParser.parse(createReader("/templates/editProfile.html"));
 		Template editProfileFieldTemplate = TemplateParser.parse(createReader("/templates/editProfileField.html"));
 		Template deleteProfileFieldTemplate = TemplateParser.parse(createReader("/templates/deleteProfileField.html"));
@@ -563,8 +570,10 @@ public class WebInterface implements CoreListener {
 		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
 		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
 		Template replyTemplate = TemplateParser.parse(createReader("/templates/include/viewReply.html"));
+		Template openSearchTemplate = TemplateParser.parse(createReader("/templates/xml/OpenSearch.xml"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
@@ -597,6 +606,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarksPage(bookmarksTemplate, this), "Bookmarks"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SearchPage(searchTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
@@ -617,6 +627,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));

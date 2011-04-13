@@ -18,7 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -49,6 +49,22 @@ public class ViewPostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
+	protected String getPageTitle(Request request) {
+		String postId = request.getHttpRequest().getParam("post");
+		Post post = webInterface.getCore().getPost(postId, false);
+		String title = "";
+		if ((post != null) && (post.getSone() != null)) {
+			title = post.getText().substring(0, Math.min(20, post.getText().length())) + "…";
+			title += " - " + SoneAccessor.getNiceName(post.getSone()) + " - ";
+		}
+		title += webInterface.getL10n().getString("Page.ViewPost.Title");
+		return title;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String postId = request.getHttpRequest().getParam("post");
@@ -56,21 +72,6 @@ public class ViewPostPage extends SoneTemplatePage {
 		Post post = webInterface.getCore().getPost(postId);
 		templateContext.set("post", post);
 		templateContext.set("raw", raw);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	protected void postProcess(Request request, TemplateContext templateContext) {
-		Post post = (Post) templateContext.get("post");
-		if (post == null) {
-			return;
-		}
-		webInterface.getCore().markPostKnown(post);
-		for (Reply reply : webInterface.getCore().getReplies(post)) {
-			webInterface.getCore().markReplyKnown(reply);
-		}
 	}
 
 }

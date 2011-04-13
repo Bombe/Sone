@@ -31,8 +31,11 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
@@ -65,6 +68,7 @@ public class GetStatusAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
+		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		/* load Sones. */
 		boolean loadAllSones = Boolean.parseBoolean(request.getHttpRequest().getParam("loadAllSones", "true"));
 		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSone(request.getToadletContext(), false)));
@@ -80,19 +84,24 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonSones.add(jsonSone);
 		}
 		/* load notifications. */
-		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications().getChangedNotifications());
-		Set<Notification> removedNotifications = webInterface.getNotifications().getRemovedNotifications();
+		List<Notification> notifications = ListNotificationFilters.filterNotifications(new ArrayList<Notification>(webInterface.getNotifications().getNotifications()), currentSone);
 		Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
 		JsonArray jsonNotifications = new JsonArray();
 		for (Notification notification : notifications) {
 			jsonNotifications.add(createJsonNotification(notification));
 		}
-		JsonArray jsonRemovedNotifications = new JsonArray();
-		for (Notification notification : removedNotifications) {
-			jsonRemovedNotifications.add(createJsonNotification(notification));
-		}
 		/* load new posts. */
 		Set<Post> newPosts = webInterface.getNewPosts();
+		if (currentSone != null) {
+			newPosts = Filters.filteredSet(newPosts, new Filter<Post>() {
+
+				@Override
+				public boolean filterObject(Post post) {
+					return currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone()) || currentSone.equals(post.getRecipient());
+				}
+
+			});
+		}
 		JsonArray jsonPosts = new JsonArray();
 		for (Post post : newPosts) {
 			JsonObject jsonPost = new JsonObject();
@@ -104,6 +113,16 @@ public class GetStatusAjaxPage extends JsonPage {
 		}
 		/* load new replies. */
 		Set<Reply> newReplies = webInterface.getNewReplies();
+		if (currentSone != null) {
+			newReplies = Filters.filteredSet(newReplies, new Filter<Reply>() {
+
+				@Override
+				public boolean filterObject(Reply reply) {
+					return currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient());
+				}
+
+			});
+		}
 		JsonArray jsonReplies = new JsonArray();
 		for (Reply reply : newReplies) {
 			JsonObject jsonReply = new JsonObject();
@@ -113,7 +132,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("sones", jsonSones).put("notifications", jsonNotifications).put("removedNotifications", jsonRemovedNotifications).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("sones", jsonSones).put("notifications", jsonNotifications).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**

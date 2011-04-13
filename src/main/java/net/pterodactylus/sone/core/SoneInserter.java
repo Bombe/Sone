@@ -160,7 +160,7 @@ public class SoneInserter extends AbstractService {
 	protected void serviceRun() {
 		long lastModificationTime = 0;
 		String lastFingerprint = "";
-		while (!shouldStop()) {
+		while (!shouldStop()) { try {
 			/* check every seconds. */
 			sleep(1000);
 
@@ -236,7 +236,9 @@ public class SoneInserter extends AbstractService {
 					}
 				}
 			}
-		}
+		} catch (Throwable t1) {
+			logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
+		}}
 	}
 
 	/**
@@ -246,7 +248,7 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class InsertInformation {
+	private static class InsertInformation {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();

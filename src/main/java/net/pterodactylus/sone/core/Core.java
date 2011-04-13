@@ -541,7 +541,8 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 * @return {@code true} if the target Sone is trusted by the origin Sone
 	 */
 	public boolean isSoneTrusted(Sone origin, Sone target) {
-		return trustedIdentities.containsKey(origin) && trustedIdentities.get(origin.getIdentity()).contains(target);
+		Validation.begin().isNotNull("Origin", origin).isNotNull("Target", target).check().isInstanceOf("Origin’s OwnIdentity", origin.getIdentity(), OwnIdentity.class).check();
+		return trustedIdentities.containsKey(origin.getIdentity()) && trustedIdentities.get(origin.getIdentity()).contains(target.getIdentity());
 	}
 
 	/**
@@ -549,7 +550,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 *
 	 * @param postId
 	 *            The ID of the post to get
-	 * @return The post, or {@code null} if there is no such post
+	 * @return The post with the given ID, or a new post with the given ID
 	 */
 	public Post getPost(String postId) {
 		return getPost(postId, true);
@@ -588,6 +589,27 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		synchronized (newPosts) {
 			return !knownPosts.contains(postId) && newPosts.contains(postId);
 		}
+	}
+
+	/**
+	 * Returns all posts that have the given Sone as recipient.
+	 *
+	 * @see Post#getRecipient()
+	 * @param recipient
+	 *            The recipient of the posts
+	 * @return All posts that have the given Sone as recipient
+	 */
+	public Set<Post> getDirectedPosts(Sone recipient) {
+		Validation.begin().isNotNull("Recipient", recipient).check();
+		Set<Post> directedPosts = new HashSet<Post>();
+		synchronized (posts) {
+			for (Post post : posts.values()) {
+				if (recipient.equals(post.getRecipient())) {
+					directedPosts.add(post);
+				}
+			}
+		}
+		return directedPosts;
 	}
 
 	/**
@@ -916,7 +938,6 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 				@SuppressWarnings("synthetic-access")
 				public void run() {
 					if (!preferences.isSoneRescueMode()) {
-						soneDownloader.fetchSone(sone);
 						return;
 					}
 					logger.log(Level.INFO, "Trying to restore Sone from Freenet…");
@@ -954,6 +975,8 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		saveSone(sone);
 		return sone;
 	}
 
@@ -983,6 +1006,11 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 				}
 				if (newSone) {
 					coreListenerManager.fireNewSoneFound(sone);
+					for (Sone localSone : getLocalSones()) {
+						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
+							localSone.addFriend(sone.getId());
+						}
+					}
 				}
 			}
 			remoteSones.put(identity.getId(), sone);
@@ -1644,7 +1672,8 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			posts.put(post.getId(), post);
 		}
 		synchronized (newPosts) {
-			knownPosts.add(post.getId());
+			newPosts.add(post.getId());
+			coreListenerManager.fireNewPostFound(post);
 		}
 		sone.addPost(post);
 		saveSone(sone);
@@ -1665,6 +1694,10 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		post.getSone().removePost(post);
 		synchronized (posts) {
 			posts.remove(post.getId());
+		}
+		synchronized (newPosts) {
+			markPostKnown(post);
+			knownPosts.remove(post.getId());
 		}
 		saveSone(post.getSone());
 	}
@@ -1768,7 +1801,8 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			replies.put(reply.getId(), reply);
 		}
 		synchronized (newReplies) {
-			knownReplies.add(reply.getId());
+			newReplies.add(reply.getId());
+			coreListenerManager.fireNewReplyFound(reply);
 		}
 		sone.addReply(reply);
 		saveSone(sone);
@@ -1789,6 +1823,10 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 		synchronized (replies) {
 			replies.remove(reply.getId());
+		}
+		synchronized (newReplies) {
+			markReplyKnown(reply);
+			knownReplies.remove(reply.getId());
 		}
 		sone.removeReply(reply);
 		saveSone(sone);
@@ -1996,6 +2034,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		try {
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
+			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
@@ -2069,8 +2108,9 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			}
 
 		}));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-100));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -2088,6 +2128,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
+		options.getIntegerOption("PostsPerPage").set(configuration.getIntValue("Option/PostsPerPage").getValue(null));
 		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
@@ -2316,6 +2357,27 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		 */
 		public Preferences setInsertionDelay(Integer insertionDelay) {
 			options.getIntegerOption("InsertionDelay").set(insertionDelay);
+			return this;
+		}
+
+		/**
+		 * Returns the number of posts to show per page.
+		 *
+		 * @return The number of posts to show per page
+		 */
+		public int getPostsPerPage() {
+			return options.getIntegerOption("PostsPerPage").get();
+		}
+
+		/**
+		 * Sets the number of posts to show per page.
+		 *
+		 * @param postsPerPage
+		 *            The number of posts to show per page
+		 * @return This preferences object
+		 */
+		public Preferences setPostsPerPage(Integer postsPerPage) {
+			options.getIntegerOption("PostsPerPage").set(postsPerPage);
 			return this;
 		}
 
