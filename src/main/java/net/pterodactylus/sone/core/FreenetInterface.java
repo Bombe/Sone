@@ -432,7 +432,11 @@ public class FreenetInterface {
 		@Override
 		public void onFailure(InsertException insertException, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
 			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
-				imageInsertListener.imageInsertFailed(image, insertException);
+				if ((insertException != null) && ("Cancelled by user".equals(insertException.getMessage()))) {
+					imageInsertListener.imageInsertAborted(image);
+				} else {
+					imageInsertListener.imageInsertFailed(image, insertException);
+				}
 			}
 		}
 
