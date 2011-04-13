@@ -1200,6 +1200,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 					storedSone.setReplies(sone.getReplies());
 					storedSone.setLikePostIds(sone.getLikedPostIds());
 					storedSone.setLikeReplyIds(sone.getLikedReplyIds());
+					storedSone.setAlbums(sone.getAlbums());
 				}
 				storedSone.setLatestEdition(sone.getLatestEdition());
 			}
