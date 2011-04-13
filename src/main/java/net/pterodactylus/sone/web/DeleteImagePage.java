@@ -51,18 +51,22 @@ public class DeleteImagePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
+		String imageId = (request.getMethod() == Method.POST) ? request.getHttpRequest().getPartAsStringFailsafe("image", 36) : request.getHttpRequest().getParam("image");
+		Image image = webInterface.getCore().getImage(imageId, false);
+		if (image == null) {
+			throw new RedirectException("invalid.html");
+		}
+		if (!webInterface.getCore().isLocalSone(image.getSone())) {
+			throw new RedirectException("noPermission.html");
+		}
 		if (request.getMethod() == Method.POST) {
-			String imageId = request.getHttpRequest().getPartAsStringFailsafe("image", 36);
-			Image image = webInterface.getCore().getImage(imageId, false);
-			if (image == null) {
-				throw new RedirectException("invalid.html");
-			}
-			if (!webInterface.getCore().isLocalSone(image.getSone())) {
-				throw new RedirectException("noPermission.html");
+			if (request.getHttpRequest().isPartSet("abortDelete")) {
+				throw new RedirectException("imageBrowser.html?image=" + image.getId());
 			}
 			webInterface.getCore().deleteImage(image);
 			throw new RedirectException("imageBrowser.html?album=" + image.getAlbum().getId());
 		}
+		templateContext.set("image", image);
 	}
 
 }

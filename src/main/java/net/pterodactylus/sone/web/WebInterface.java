@@ -556,6 +556,7 @@ public class WebInterface implements CoreListener {
 		Template imageBrowserTemplate = TemplateParser.parse(createReader("/templates/imageBrowser.html"));
 		Template createAlbumTemplate = TemplateParser.parse(createReader("/templates/createAlbum.html"));
 		Template deleteAlbumTemplate = TemplateParser.parse(createReader("/templates/deleteAlbum.html"));
+		Template deleteImageTemplate = TemplateParser.parse(createReader("/templates/deleteImage.html"));
 		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
 		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
@@ -588,7 +589,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteAlbumPage(deleteAlbumTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UploadImagePage(invalidTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImagePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteImagePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteImagePage(deleteImageTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustPage(emptyTemplate, this)));

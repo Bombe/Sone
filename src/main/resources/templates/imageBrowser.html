@@ -191,8 +191,7 @@
 
 				<h2><%= Page.ImageBrowser.Image.Delete.Title|l10n|html></h2>
 
-				<form id="delete-image" action="deleteImage.html" method="post">
-					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+				<form id="delete-image" action="deleteImage.html" method="get">
 					<input type="hidden" name="image" value="<%image.id|html>" />
 					<button type="submit"><%= Page.ImageBrowser.Image.Button.Delete|l10n|html></button>
 				</form>

@@ -1,0 +1,14 @@
+<%include include/head.html>
+
+	<h1><%= Page.DeleteImage.Page.Title|l10n|html></h1>
+
+	<p><%= Page.DeleteImage.Text.ImageWillBeGone|l10n|replace needle="{image}" replacementKey=image.title|replace needle="{album}" replacementKey=image.album.title|html></p>
+
+	<form method="post">
+		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+		<input type="hidden" name="image" value="<%image.id|html>" />
+		<button type="submit" name="confirmDelete" value="1"><%= Page.DeleteImage.Button.Yes|l10n|html></button>
+		<button type="submit" name="abortDelete" value="1"><%= Page.DeleteImage.Button.No|l10n|html></button>
+	</form>
+
+<%include include/tail.html>
