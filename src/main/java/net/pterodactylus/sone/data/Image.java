@@ -105,7 +105,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setSone(Sone sone) {
-		Validation.begin().isNull("Current Image Owner", this.sone).isNotNull("New Image Owner", sone);
+		Validation.begin().isNotNull("New Image Owner", sone);
 		this.sone = sone;
 		return this;
 	}
@@ -128,7 +128,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setAlbum(Album album) {
-		Validation.begin().isNull("Current Album", this.album).isNotNull("New Album", album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
+		Validation.begin().isNotNull("New Album", album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
 		this.album = album;
 		return this;
 	}
@@ -151,7 +151,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setKey(String key) {
-		Validation.begin().isNull("Current Image Key", this.key).isNotNull("New Image Key", key).check();
+		Validation.begin().isNotNull("New Image Key", key).check();
 		this.key = key;
 		return this;
 	}
@@ -187,7 +187,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setCreationTime(long creationTime) {
-		Validation.begin().isEqual("Current Image Creation Time", this.creationTime, 0).isGreater("New Image Creation Time", creationTime, 0).check();
+		Validation.begin().isGreater("New Image Creation Time", creationTime, 0).check();
 		this.creationTime = creationTime;
 		return this;
 	}
@@ -210,7 +210,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setWidth(int width) {
-		Validation.begin().isEqual("Current Image Width", this.width, 0).isGreater("New Image Width", width, 0).check();
+		Validation.begin().isGreater("New Image Width", width, 0).check();
 		this.width = width;
 		return this;
 	}
@@ -233,7 +233,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setHeight(int height) {
-		Validation.begin().isEqual("Current Image Height", this.height, 0).isGreater("New Image Height", height, 0);
+		Validation.begin().isGreater("New Image Height", height, 0);
 		this.height = height;
 		return this;
 	}
