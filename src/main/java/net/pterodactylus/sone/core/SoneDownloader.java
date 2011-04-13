@@ -451,10 +451,10 @@ public class SoneDownloader extends AbstractService {
 						String imageCreationTimeString = imageXml.getValue("creation-time", null);
 						String imageKey = imageXml.getValue("key", null);
 						String imageTitle = imageXml.getValue("title", null);
-						String imageDescription = imageXml.getValue("description", null);
+						String imageDescription = imageXml.getValue("description", "");
 						String imageWidthString = imageXml.getValue("width", null);
 						String imageHeightString = imageXml.getValue("height", null);
-						if ((imageId == null) || (imageCreationTimeString == null) || (imageKey == null) || (imageTitle == null) || (imageDescription == null) || (imageWidthString == null) || (imageHeightString == null)) {
+						if ((imageId == null) || (imageCreationTimeString == null) || (imageKey == null) || (imageTitle == null) || (imageWidthString == null) || (imageHeightString == null)) {
 							logger.log(Level.WARNING, "Downloaded Sone %s contains invalid images!", new Object[] { sone });
 							return null;
 						}
