@@ -1,24 +1,5 @@
 <%include include/head.html>
 
-	<script language="javascript">
-
-		/* ajaxify album creation input field. */
-		$(document).ready(function() {
-			getTranslation("WebInterface.DefaultText.CreateAlbum.Name", function(text) {
-				$("#create-album input[name='name']").each(function() {
-					registerInputTextareaSwap(this, text, "name", false, true);
-				});
-			});
-			getTranslation("WebInterface.DefaultText.CreateAlbum.Description", function(text) {
-				$("#create-album input[name='description']").each(function() {
-					registerInputTextareaSwap(this, text, "description", true, true);
-				});
-			});
-			$("#create-album label").hide();
-		});
-
-	</script>
-
 	<div class="page-id hidden">image-browser</div>
 
 	<%if albumRequested>
@@ -32,6 +13,46 @@
 			<p><%= Page.ImageBrowser.Album.Error.NotFound.Text|l10n|html></p>
 
 		<%else>
+
+			<%if album.sone.local>
+				<script language="javascript">
+					$(function() {
+						getTranslation("WebInterface.DefaultText.UploadImage.Title", function(text) {
+							$("#upload-image :input[name='title']").each(function() {
+								registerInputTextareaSwap(this, text, "title", false, true);
+							});
+						});
+						getTranslation("WebInterface.DefaultText.UploadImage.Description", function(text) {
+							$("#upload-image :input[name='description']").each(function() {
+								registerInputTextareaSwap(this, text, "description", true, false);
+							});
+						});
+						$("#upload-image label").hide();
+						getTranslation("WebInterface.DefaultText.CreateAlbum.Name", function(text) {
+							$("#create-album input[name='name']").each(function() {
+								registerInputTextareaSwap(this, text, "name", false, true);
+							});
+						});
+						getTranslation("WebInterface.DefaultText.CreateAlbum.Description", function(text) {
+							$("#create-album input[name='description']").each(function() {
+								registerInputTextareaSwap(this, text, "description", true, true);
+							});
+						});
+						$("#create-album label").hide();
+						getTranslation("WebInterface.DefaultText.EditAlbum.Title", function(text) {
+							$("#edit-album input[name='title']").each(function() {
+								registerInputTextareaSwap(this, text, "title", false, true);
+							});
+						});
+						getTranslation("WebInterface.DefaultText.EditAlbum.Description", function(text) {
+							$("#edit-album :input[name='description']").each(function() {
+								registerInputTextareaSwap(this, text, "description", true, false);
+							});
+						});
+						$("#edit-album label").hide();
+					});
+				</script>
+			<%/if>
 
 			<h1><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.title|html></h1>
 
@@ -47,7 +68,7 @@
 			</div>
 
 			<%foreach album.albums album>
-				<div class="album">
+				<div class="album image">
 					<a href="imageBrowser.html?album=<% album.id|html>">
 						<%ifnull album.image>
 							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
@@ -71,25 +92,135 @@
 			<%if album.sone.current>
 				<%include include/uploadImage.html>
 				<%include include/createAlbum.html>
+
+				<h2><%= Page.ImageBrowser.Album.Edit.Title|l10n|html></h2>
+
+				<form id="edit-album" action="editAlbum.html" method="post">
+					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+					<input type="hidden" name="album" value="<%album.id|html>" />
+
+					<div>
+						<label for="title"><%= Page.ImageBrowser.Album.Label.Title|l10n|html></label>
+						<input type="text" name="title" value="<%album.title|html>" />
+					</div>
+					<div>
+						<label for="description"><%= Page.ImageBrowser.Album.Label.Description|l10n|html></label>
+						<textarea name="description"><%album.description|html></textarea>
+					</div>
+					<button type="submit"><%= Page.ImageBrowser.Album.Button.Save|l10n|html></button>
+				</form>
+
+				<%if album.empty>
+					<form id="delete-album" action="deleteAlbum.html" method="post">
+						<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+						<input type="hidden" name="album" value="<%album.id|html>" />
+						<button type="submit"><%= Page.ImageBrowser.Album.Button.Delete|l10n|html></button>
+					</form>
+				<%/if>
+
 			<%/if>
 
 		<%/if>
 
 	<%elseif imageRequested>
 
+		<h1><%image.title|html></h1>
+
+		<div class="backlinks">
+			<%foreach image.album.backlinks backlink backlinks>
+				<div class="backlink">
+					<a href="<% backlink.target|html>"><% backlink.name|html></a>
+				</div>
+				<%if ! backlinks.last>
+					<div class="separator">&gt;</div>
+				<%/if>
+			<%/foreach>
+		</div>
+
 		<%ifnull image>
 
 		<%else>
 
-			<div class="image">
-				<a href="imageBrowser.html?image=<%image.id|html>">
-					<% image|image-link max-width=200 max-height=150>
-				</a>
+			<%if image.sone.local>
+				<script language="javascript">
+					$(function() {
+						getTranslation("WebInterface.DefaultText.EditImage.Title", function(text) {
+							$("#edit-image input[name='title']").each(function() {
+								registerInputTextareaSwap(this, text, "title", false, true);
+							});
+						});
+						getTranslation("WebInterface.DefaultText.EditImage.Description", function(text) {
+							$("#edit-image :input[name='description']").each(function() {
+								registerInputTextareaSwap(this, text, "description", true, false);
+							});
+						});
+						$("#edit-image label").hide();
+					});
+				</script>
+			<%/if>
+
+			<div class="single-image">
+				<%ifnull !image.key>
+					<a href="/<%image.key|html>"><% image|image-link max-width=640 max-height=480></a>
+				<%else>
+					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=640 max-height=480></a>
+				<%/if>
 			</div>
+
+			<p class="parsed"><%image.description|parse sone=image.sone></p>
+
+			<%if image.sone.local>
+
+				<h2><%= Page.ImageBrowser.Image.Edit.Title|l10n|html></h2>
+
+				<form id="edit-image" action="editImage.html" method="post">
+					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+					<input type="hidden" name="image" value="<%image.id|html>" />
+
+					<div>
+						<label for="title"><%= Page.ImageBrowser.Image.Title.Label|l10n|html></label>
+						<input type="text" name="title" value="<%image.title|html>" />
+					</div>
+					<div>
+						<label for="description"><%= Page.ImageBrowser.Image.Description.Label|l10n|html></label>
+						<textarea name="description"><%image.description|html></textarea>
+					</div>
+					<div>
+						<button type="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
+					</div>
+				</form>
+
+				<h2><%= Page.ImageBrowser.Image.Delete.Title|l10n|html></h2>
+
+				<form id="delete-image" action="deleteImage.html" method="post">
+					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+					<input type="hidden" name="image" value="<%image.id|html>" />
+					<button type="submit"><%= Page.ImageBrowser.Image.Button.Delete|l10n|html></button>
+				</form>
+
+			<%/if>
 
 		<%/if>
 
 	<%elseif soneRequested>
+
+		<%if sone.local>
+			<script language="javascript">
+				$(function() {
+					getTranslation("WebInterface.DefaultText.CreateAlbum.Name", function(text) {
+						$("#create-album input[name='name']").each(function() {
+							registerInputTextareaSwap(this, text, "name", false, true);
+						});
+					});
+					getTranslation("WebInterface.DefaultText.CreateAlbum.Description", function(text) {
+						$("#create-album input[name='description']").each(function() {
+							registerInputTextareaSwap(this, text, "description", true, true);
+						});
+					});
+					$("#create-album label").hide();
+				});
+			</script>
+		<%/if>
 
 		<%ifnull sone>
 
@@ -100,16 +231,14 @@
 			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
 
 			<%foreach sone.albums album>
-				<div class="album">
-					<div class="image">
-						<a href="imageBrowser.html?album=<% album.id|html>">
-							<%ifnull album.image>
-								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
-							<%else><!-- TODO -->
-								<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
-							<%/if>
-						</a>
-					</div>
+				<div class="album image">
+					<a href="imageBrowser.html?album=<% album.id|html>">
+						<%ifnull album.image>
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
+						<%else><!-- TODO -->
+							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
+						<%/if>
+					</a>
 				</div>
 			<%/foreach>
 
