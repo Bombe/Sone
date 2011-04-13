@@ -330,7 +330,7 @@ public class FreenetInterface {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class InsertToken implements ClientPutCallback {
+	public class InsertToken implements ClientPutCallback {
 
 		/** The image being inserted. */
 		private final Image image;
@@ -406,8 +406,9 @@ public class FreenetInterface {
 		 *
 		 * @see ImageInsertListener#imageInsertAborted(Image)
 		 */
+		@SuppressWarnings("synthetic-access")
 		public void cancel() {
-			clientPutter.cancel(null, null);
+			clientPutter.cancel(null, node.clientCore.clientContext);
 			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
 				imageInsertListener.imageInsertAborted(image);
 			}

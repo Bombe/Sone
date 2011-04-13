@@ -76,7 +76,7 @@ public class ImageInserter {
 	public void insertImage(TemporaryImage temporaryImage, Image image) {
 		Validation.begin().isNotNull("Temporary Image", temporaryImage).isNotNull("Image", image).check().isEqual("Image IDs", image.getId(), temporaryImage.getId()).check();
 		try {
-			InsertToken insertToken = new InsertToken(image);
+			InsertToken insertToken = freenetInterface.new InsertToken(image);
 			insertTokens.put(image.getId(), insertToken);
 			insertToken.addImageInsertListener(core);
 			freenetInterface.insertImage(temporaryImage, image, insertToken);
