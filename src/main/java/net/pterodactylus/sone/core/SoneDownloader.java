@@ -458,7 +458,7 @@ public class SoneDownloader extends AbstractService {
 							logger.log(Level.WARNING, "Downloaded Sone %s contains invalid images!", new Object[] { sone });
 							return null;
 						}
-						long creationTime = Numbers.safeParseInteger(imageCreationTimeString, 0);
+						long creationTime = Numbers.safeParseLong(imageCreationTimeString, 0L);
 						int imageWidth = Numbers.safeParseInteger(imageWidthString, 0);
 						int imageHeight = Numbers.safeParseInteger(imageHeightString, 0);
 						if ((imageWidth < 1) || (imageHeight < 1)) {
