@@ -706,6 +706,33 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	//
+	// STATIC METHODS
+	//
+
+	/**
+	 * Flattens the given top-level albums so that the resulting list contains
+	 * parent albums before child albums and the resulting list can be parsed in
+	 * a single pass.
+	 *
+	 * @param albums
+	 *            The albums to flatten
+	 * @return The flattened albums
+	 */
+	public static List<Album> flattenAlbums(Collection<? extends Album> albums) {
+		List<Album> flatAlbums = new ArrayList<Album>();
+		flatAlbums.addAll(albums);
+		int lastAlbumIndex = 0;
+		while (lastAlbumIndex < flatAlbums.size()) {
+			int previousAlbumCount = flatAlbums.size();
+			for (Album album : new ArrayList<Album>(flatAlbums.subList(lastAlbumIndex, flatAlbums.size()))) {
+				flatAlbums.addAll(album.getAlbums());
+			}
+			lastAlbumIndex = previousAlbumCount;
+		}
+		return flatAlbums;
+	}
+
+	//
 	// INTERFACE Comparable<Sone>
 	//
 

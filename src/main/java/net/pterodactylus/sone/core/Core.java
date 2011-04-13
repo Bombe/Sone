@@ -1548,16 +1548,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = new ArrayList<Album>();
-			albums.addAll(sone.getAlbums());
-			int lastAlbumIndex = 0;
-			while (lastAlbumIndex < albums.size()) {
-				int previousAlbumCount = albums.size();
-				for (Album album : new ArrayList<Album>(albums.subList(lastAlbumIndex, albums.size()))) {
-					albums.addAll(album.getAlbums());
-				}
-				lastAlbumIndex = previousAlbumCount;
-			}
+			List<Album> albums = Sone.flattenAlbums(sone.getAlbums());
 
 			int albumCounter = 0;
 			for (Album album : albums) {
