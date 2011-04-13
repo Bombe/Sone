@@ -585,6 +585,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateAlbumPage(createAlbumTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteAlbumPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UploadImagePage(invalidTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteImagePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustPage(emptyTemplate, this)));
