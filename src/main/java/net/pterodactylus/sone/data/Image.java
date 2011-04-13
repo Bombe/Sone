@@ -105,7 +105,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setSone(Sone sone) {
-		Validation.begin().isNotNull("New Image Owner", sone);
+		Validation.begin().isNotNull("New Image Owner", sone).isEither("Old Image Owner", this.sone, null, sone).check();
 		this.sone = sone;
 		return this;
 	}
@@ -128,7 +128,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setAlbum(Album album) {
-		Validation.begin().isNotNull("New Album", album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
+		Validation.begin().isNotNull("New Album", album).isEither("Old Album", this.album, null, album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
 		this.album = album;
 		return this;
 	}
@@ -151,7 +151,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setKey(String key) {
-		Validation.begin().isNotNull("New Image Key", key).check();
+		Validation.begin().isNotNull("New Image Key", key).isEither("Old Image Key", this.key, null, key).check();
 		this.key = key;
 		return this;
 	}
@@ -187,7 +187,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setCreationTime(long creationTime) {
-		Validation.begin().isGreater("New Image Creation Time", creationTime, 0).check();
+		Validation.begin().isGreater("New Image Creation Time", creationTime, 0).isEither("Old Image Creation Time", this.creationTime, 0, creationTime).check();
 		this.creationTime = creationTime;
 		return this;
 	}
@@ -210,7 +210,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setWidth(int width) {
-		Validation.begin().isGreater("New Image Width", width, 0).check();
+		Validation.begin().isGreater("New Image Width", width, 0).isEither("Old Image Width", this.width, 0, width).check();
 		this.width = width;
 		return this;
 	}
@@ -233,7 +233,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setHeight(int height) {
-		Validation.begin().isGreater("New Image Height", height, 0);
+		Validation.begin().isGreater("New Image Height", height, 0).isEither("Old Image Height", this.height, 0, height).check();
 		this.height = height;
 		return this;
 	}
