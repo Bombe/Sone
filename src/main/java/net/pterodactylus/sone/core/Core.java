@@ -1847,6 +1847,29 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	}
 
 	/**
+	 * Deletes the given album. The owner of the album has to be a local Sone,
+	 * and the album has to be {@link Album#isEmpty() empty} to be deleted.
+	 *
+	 * @param album
+	 *            The album to remove
+	 */
+	public void deleteAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().is("Local Sone", isLocalSone(album.getSone())).check();
+		if (!album.isEmpty()) {
+			return;
+		}
+		if (album.getParent() == null) {
+			album.getSone().removeAlbum(album);
+		} else {
+			album.getParent().removeAlbum(album);
+		}
+		synchronized (albums) {
+			albums.remove(album.getId());
+		}
+		saveSone(album.getSone());
+	}
+
+	/**
 	 * Creates a new image.
 	 *
 	 * @param sone
