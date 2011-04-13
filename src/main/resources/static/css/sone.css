@@ -652,7 +652,7 @@ textarea {
 	font-weight: bold;
 }
 
-#sone input.default {
+#sone input.default, #sone textarea.default {
 	color: #888;
 }
 
