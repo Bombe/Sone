@@ -1901,11 +1901,11 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 */
 	public void deleteImage(Image image) {
 		Validation.begin().isNotNull("Image", image).check().is("Local Sone", isLocalSone(image.getSone())).check();
+		deleteTemporaryImage(image.getId());
 		image.getAlbum().removeImage(image);
 		synchronized (images) {
 			images.remove(image.getId());
 		}
-		deleteTemporaryImage(image.getId());
 		saveSone(image.getSone());
 	}
 
