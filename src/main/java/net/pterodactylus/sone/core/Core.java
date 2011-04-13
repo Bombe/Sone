@@ -1892,6 +1892,24 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	}
 
 	/**
+	 * Deletes the given image. This method will also delete a matching
+	 * temporary image.
+	 *
+	 * @see #deleteTemporaryImage(TemporaryImage)
+	 * @param image
+	 *            The image to delete
+	 */
+	public void deleteImage(Image image) {
+		Validation.begin().isNotNull("Image", image).check().is("Local Sone", isLocalSone(image.getSone())).check();
+		image.getAlbum().removeImage(image);
+		synchronized (images) {
+			images.remove(image.getId());
+		}
+		deleteTemporaryImage(image.getId());
+		saveSone(image.getSone());
+	}
+
+	/**
 	 * Creates a new temporary image.
 	 *
 	 * @param mimeType
