@@ -342,7 +342,7 @@ public class FreenetInterface {
 		private ClientPutter clientPutter;
 
 		/** The final URI. */
-		private FreenetURI resultingUri;
+		private volatile FreenetURI resultingUri;
 
 		/**
 		 * Creates a new insert token for the given image.
