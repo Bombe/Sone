@@ -93,7 +93,7 @@ public class ImageInserter {
 	 *            The image being inserted
 	 */
 	public void cancelImageInsert(Image image) {
-		InsertToken insertToken = insertTokens.remove(image);
+		InsertToken insertToken = insertTokens.remove(image.getId());
 		if (insertToken == null) {
 			return;
 		}
