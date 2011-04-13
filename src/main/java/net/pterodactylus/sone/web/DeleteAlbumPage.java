@@ -56,6 +56,9 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 			if (!webInterface.getCore().isLocalSone(album.getSone())) {
 				throw new RedirectException("noPermission.html");
 			}
+			if (request.getHttpRequest().isPartSet("abortDelete")) {
+				throw new RedirectException("imageBrowser.html?album=" + album.getId());
+			}
 			Album parentAlbum = album.getParent();
 			webInterface.getCore().deleteAlbum(album);
 			if (parentAlbum == null) {
@@ -63,6 +66,12 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 			}
 			throw new RedirectException("imageBrowser.html?album=" + parentAlbum.getId());
 		}
+		String albumId = request.getHttpRequest().getParam("album");
+		Album album = webInterface.getCore().getAlbum(albumId, false);
+		if (album == null) {
+			throw new RedirectException("invalid.html");
+		}
+		templateContext.set("album", album);
 	}
 
 }

@@ -555,6 +555,7 @@ public class WebInterface implements CoreListener {
 		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
 		Template imageBrowserTemplate = TemplateParser.parse(createReader("/templates/imageBrowser.html"));
 		Template createAlbumTemplate = TemplateParser.parse(createReader("/templates/createAlbum.html"));
+		Template deleteAlbumTemplate = TemplateParser.parse(createReader("/templates/deleteAlbum.html"));
 		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
 		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
@@ -584,7 +585,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImageBrowserPage(imageBrowserTemplate, this), "ImageBrowser"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateAlbumPage(createAlbumTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteAlbumPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteAlbumPage(deleteAlbumTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UploadImagePage(invalidTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImagePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteImagePage(emptyTemplate, this)));

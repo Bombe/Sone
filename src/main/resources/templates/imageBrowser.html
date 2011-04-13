@@ -111,8 +111,7 @@
 				</form>
 
 				<%if album.empty>
-					<form id="delete-album" action="deleteAlbum.html" method="post">
-						<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+					<form id="delete-album" action="deleteAlbum.html" method="get">
 						<input type="hidden" name="album" value="<%album.id|html>" />
 						<button type="submit"><%= Page.ImageBrowser.Album.Button.Delete|l10n|html></button>
 					</form>
