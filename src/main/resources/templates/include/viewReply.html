@@ -14,6 +14,8 @@
 			<div class="reply-text text<%if raw> hidden<%/if>"><% parsedText></div>
 		</div>
 		<div class="reply-status-line status-line">
+			<div class="permalink"><a href="sone://<%reply.sone.id|html>">[<%= View.Post.PermalinkAuthor|l10n|html>]</a></div>
+			<span class='separator'>·</span>
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
 			<%if ! originalText|match key=parsedText>
 				<span class='separator'>·</span>

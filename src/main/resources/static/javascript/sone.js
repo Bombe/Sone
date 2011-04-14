@@ -1692,6 +1692,11 @@ $(document).ready(function() {
 		ajaxifyNotification($(this));
 	});
 
+	/* disable all permalinks. */
+	$(".permalink").click(function() {
+		return false;
+	});
+
 	/* activate status polling. */
 	setTimeout(getStatus, 5000);
 
