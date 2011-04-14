@@ -128,7 +128,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setAlbum(Album album) {
-		Validation.begin().isNotNull("New Album", album).isEither("Old Album", this.album, null, album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
+		Validation.begin().isNotNull("New Album", album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
 		this.album = album;
 		return this;
 	}

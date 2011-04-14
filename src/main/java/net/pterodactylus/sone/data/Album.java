@@ -103,7 +103,7 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	public Album setSone(Sone sone) {
-		Validation.begin().isNotNull("New Album Owner", sone).check();
+		Validation.begin().isNotNull("New Album Owner", sone).isEither("Old Album Owner", this.sone, null, sone).check();
 		this.sone = sone;
 		return this;
 	}
@@ -124,7 +124,7 @@ public class Album implements Fingerprintable {
 	 *            The album to add
 	 */
 	public void addAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isNull("Album Parent", album.parent).check();
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEither("Old Album Parent", this.parent, null, album.parent).check();
 		albums.add(album);
 		album.setParent(this);
 	}
@@ -226,7 +226,6 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	protected Album removeParent() {
-		Validation.begin().isNotNull("Album Parent", parent).check();
 		this.parent = null;
 		return this;
 	}
