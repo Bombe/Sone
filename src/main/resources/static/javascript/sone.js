@@ -277,7 +277,7 @@ function getFormPassword() {
  */
 function getSone(soneId) {
 	return $("#sone .sone").filter(function(index) {
-		return $(".id").text() == soneId;
+		return $(".id", this).text() == soneId;
 	});
 }
 
