@@ -146,7 +146,7 @@ function filterSoneId(soneId) {
  * @param lastUpdated
  *            The date and time of the last update (formatted for display)
  */
-function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
+function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, lastUpdatedText) {
 	$("#sone .sone." + filterSoneId(soneId)).
 		toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
@@ -156,7 +156,7 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
 	if (lastUpdated != null) {
-		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").attr("title", lastUpdated).text(lastUpdatedText);
 	} else {
 		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
 			$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
@@ -982,7 +982,7 @@ function getStatus() {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
-				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
+				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated, value.lastUpdatedText);
 			});
 			/* search for removed notifications. */
 			$("#sone #notification-area .notification").each(function() {
