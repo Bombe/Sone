@@ -416,6 +416,17 @@ function getNotificationId(notificationElement) {
 	return $(notificationElement).attr("id");
 }
 
+/**
+ * Returns the time the notification was last updated.
+ *
+ * @param notificationElement
+ *            The notification element
+ * @returns The last update time of the notification
+ */
+function getNotificationLastUpdatedTime(notificationElement) {
+	return $(notificationElement).attr("lastUpdatedTime");
+}
+
 function likePost(postId) {
 	$.getJSON("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
