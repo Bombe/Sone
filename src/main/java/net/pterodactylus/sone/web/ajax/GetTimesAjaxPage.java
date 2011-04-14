@@ -256,6 +256,14 @@ public class GetTimesAjaxPage extends JsonPage {
 			return refresh;
 		}
 
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return text;
+		}
+
 	}
 
 }
