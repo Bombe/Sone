@@ -1495,6 +1495,7 @@ public class Core implements IdentityListener, UpdateListener {
 		synchronized (posts) {
 			posts.remove(post.getId());
 		}
+		coreListenerManager.firePostRemoved(post);
 		synchronized (newPosts) {
 			markPostKnown(post);
 			knownPosts.remove(post.getId());

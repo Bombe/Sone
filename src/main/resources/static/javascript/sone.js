@@ -416,6 +416,17 @@ function getNotificationId(notificationElement) {
 	return $(notificationElement).attr("id");
 }
 
+/**
+ * Returns the time the notification was last updated.
+ *
+ * @param notificationElement
+ *            The notification element
+ * @returns The last update time of the notification
+ */
+function getNotificationLastUpdatedTime(notificationElement) {
+	return $(notificationElement).attr("lastUpdatedTime");
+}
+
 function likePost(postId) {
 	$.getJSON("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
@@ -1010,25 +1021,16 @@ function getStatus() {
 				}
 			});
 			/* process notifications. */
+			notificationIds = [];
 			$.each(data.notifications, function(index, value) {
 				oldNotification = getNotification(value.id);
-				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
-				if (oldNotification.length != 0) {
-					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
-						opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
-						notification.find(".short-text").toggleClass("hidden", opened);
-						notification.find(".text").toggleClass("hidden", !opened);
-					}
-					checkForRemovedSones(oldNotification, notification);
-					checkForRemovedPosts(oldNotification, notification);
-					checkForRemovedReplies(oldNotification, notification);
-					oldNotification.replaceWith(notification.show());
-				} else {
-					$("#sone #notification-area").append(notification);
-					notification.slideDown();
-					setActivity();
+				if ((oldNotification.length == 0) || (value.lastUpdatedTime > getNotificationLastUpdatedTime(oldNotification))) {
+					notificationIds.push(value.id);
 				}
 			});
+			if (notificationIds.length > 0) {
+				loadNotifications(notificationIds);
+			}
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
 				loadNewPost(value.id, value.sone, value.recipient, value.time);
@@ -1047,6 +1049,40 @@ function getStatus() {
 		/* something really bad happend, wait a minute. */
 		setTimeout(getStatus, 60000);
 	})
+}
+
+/**
+ * Requests multiple notifications from Sone and displays them.
+ *
+ * @param notificationIds
+ *            Array of IDs of the notifications to load
+ */
+function loadNotifications(notificationIds) {
+	$.getJSON("getNotification.ajax", {"notifications": notificationIds.join(",")}, function(data, textStatus) {
+		if (!data || !data.success) {
+			// TODO - show error
+			return;
+		}
+		$.each(data.notifications, function(index, value) {
+			oldNotification = getNotification(value.id);
+			notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
+			if (oldNotification.length != 0) {
+				if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
+					opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
+					notification.find(".short-text").toggleClass("hidden", opened);
+					notification.find(".text").toggleClass("hidden", !opened);
+				}
+				checkForRemovedSones(oldNotification, notification);
+				checkForRemovedPosts(oldNotification, notification);
+				checkForRemovedReplies(oldNotification, notification);
+				oldNotification.replaceWith(notification.show());
+			} else {
+				$("#sone #notification-area").append(notification);
+				notification.slideDown();
+				setActivity();
+			}
+		})
+	});
 }
 
 /**
@@ -1440,8 +1476,8 @@ function changeIcon(iconUrl) {
  *            <code>true</code> if the notification can be dismissed by the
  *            user
  */
-function createNotification(id, text, dismissable) {
-	notification = $("<div></div>").addClass("notification").attr("id", id);
+function createNotification(id, lastUpdatedTime, text, dismissable) {
+	notification = $("<div></div>").addClass("notification").attr("id", id).attr("lastUpdatedTime", lastUpdatedTime);
 	if (dismissable) {
 		dismissForm = $("#sone #notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id")
 		dismissForm.find("input[name=notification]").val(id);
