@@ -125,8 +125,10 @@ public class Album implements Fingerprintable {
 	 */
 	public void addAlbum(Album album) {
 		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEither("Old Album Parent", this.parent, null, album.parent).check();
-		albums.add(album);
 		album.setParent(this);
+		if (!albums.contains(album)) {
+			albums.add(album);
+		}
 	}
 
 	/**
