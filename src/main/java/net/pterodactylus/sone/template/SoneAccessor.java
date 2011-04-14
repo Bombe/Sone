@@ -25,6 +25,8 @@ import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Trust;
+import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -97,6 +99,8 @@ public class SoneAccessor extends ReflectionAccessor {
 			return core.isNewSone(sone.getId());
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
+		} else if (member.equals("lastUpdatedText")) {
+			return GetTimesAjaxPage.getTime((WebInterface) templateContext.get("webInterface"), System.currentTimeMillis() - sone.getTime());
 		} else if (member.equals("trust")) {
 			Sone currentSone = (Sone) templateContext.get("currentSone");
 			if (currentSone == null) {
