@@ -160,6 +160,9 @@ public class Album implements Fingerprintable {
 	 */
 	public void addImage(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isNotNull("Image Owner", image.getSone()).check().isEqual("Image Owner", image.getSone(), sone).check();
+		if (image.getAlbum() != null) {
+			image.getAlbum().removeImage(image);
+		}
 		image.setAlbum(this);
 		if (!images.contains(image)) {
 			images.add(image);
