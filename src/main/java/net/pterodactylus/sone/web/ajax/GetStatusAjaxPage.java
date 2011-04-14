@@ -170,7 +170,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		synchronized (dateFormat) {
 			jsonSone.put("lastUpdated", dateFormat.format(new Date(sone.getTime())));
 		}
-		jsonSone.put("age", (System.currentTimeMillis() - sone.getTime()) / 1000);
+		jsonSone.put("lastUpdatedText", GetTimesAjaxPage.getTime(webInterface, System.currentTimeMillis() - sone.getTime()).getText());
 		return jsonSone;
 	}
 
