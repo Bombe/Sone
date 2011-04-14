@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.core;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -184,8 +183,8 @@ public class SoneDownloader extends AbstractService {
 				}
 			}
 			return parsedSone;
-		} catch (IOException ioe1) {
-			logger.log(Level.WARNING, "Could not parse Sone from " + requestUri + "!", ioe1);
+		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Could not parse Sone from " + requestUri + "!", e1);
 		} finally {
 			Closer.close(soneInputStream);
 			soneBucket.free();
