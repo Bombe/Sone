@@ -1280,11 +1280,10 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
  *            request
  */
 function markSoneAsKnown(soneElement, skipRequest) {
-	if ($(".new", soneElement).length > 0) {
-		if ((typeof skipRequest != "undefined") && !skipRequest) {
-			$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
-				$(soneElement).removeClass("new");
-			});
+	if ($(soneElement).is(".new")) {
+		$(soneElement).removeClass("new");
+		if ((typeof skipRequest == "undefined") || !skipRequest) {
+			$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)});
 		}
 	}
 }
