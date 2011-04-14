@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.web.ajax;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,8 +37,6 @@ import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.notify.TemplateNotification;
-import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -86,9 +82,9 @@ public class GetStatusAjaxPage extends JsonPage {
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(new ArrayList<Notification>(webInterface.getNotifications().getNotifications()), currentSone);
 		Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
-		JsonArray jsonNotifications = new JsonArray();
+		JsonArray jsonNotificationInformations = new JsonArray();
 		for (Notification notification : notifications) {
-			jsonNotifications.add(createJsonNotification(notification));
+			jsonNotificationInformations.add(createJsonNotificationInformation(notification));
 		}
 		/* load new posts. */
 		Set<Post> newPosts = webInterface.getNewPosts();
@@ -132,7 +128,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("sones", jsonSones).put("notifications", jsonNotifications).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("sones", jsonSones).put("notifications", jsonNotificationInformations).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**
@@ -179,31 +175,20 @@ public class GetStatusAjaxPage extends JsonPage {
 	}
 
 	/**
-	 * Creates a JSON object from the given notification.
+	 * Creates a JSON object that only contains the ID and the last-updated time
+	 * of the given notification.
 	 *
+	 * @see Notification#getId()
+	 * @see Notification#getLastUpdatedTime()
 	 * @param notification
-	 *            The notification to create a JSON object
-	 * @return The JSON object
+	 *            The notification
+	 * @return A JSON object containing the notification ID and last-updated
+	 *         time
 	 */
-	private JsonObject createJsonNotification(Notification notification) {
+	private JsonObject createJsonNotificationInformation(Notification notification) {
 		JsonObject jsonNotification = new JsonObject();
 		jsonNotification.put("id", notification.getId());
-		StringWriter notificationWriter = new StringWriter();
-		try {
-			if (notification instanceof TemplateNotification) {
-				TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext());
-				templateContext.set("notification", notification);
-				((TemplateNotification) notification).render(templateContext, notificationWriter);
-			} else {
-				notification.render(notificationWriter);
-			}
-		} catch (IOException ioe1) {
-			/* StringWriter never throws, ignore. */
-		}
-		jsonNotification.put("text", notificationWriter.toString());
-		jsonNotification.put("createdTime", notification.getCreatedTime());
 		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
-		jsonNotification.put("dismissable", notification.isDismissable());
 		return jsonNotification;
 	}
 
