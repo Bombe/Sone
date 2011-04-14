@@ -120,6 +120,23 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * @return The formatted age
 	 */
 	private Time getTime(long age) {
+		return getTime(webInterface, age);
+	}
+
+	//
+	// STATIC METHODS
+	//
+
+	/**
+	 * Returns the formatted relative time for a given age.
+	 *
+	 * @param webInterface
+	 *            The Sone web interface (for l10n access)
+	 * @param age
+	 *            The age to format (in milliseconds)
+	 * @return The formatted age
+	 */
+	public static Time getTime(WebInterface webInterface, long age) {
 		String text;
 		long refresh;
 		if (age < 0) {
@@ -179,7 +196,7 @@ public class GetTimesAjaxPage extends JsonPage {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class Time {
+	public static class Time {
 
 		/** Number of milliseconds in a second. */
 		private static final long SECOND = 1000;
