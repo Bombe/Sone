@@ -769,7 +769,7 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* add “comment” link. */
-	addCommentLink(getPostId(postElement), getPostAuthor(postElement), postElement, $(postElement).find(".post-status-line .time"));
+	addCommentLink(getPostId(postElement), getPostAuthor(postElement), postElement, $(postElement).find(".post-status-line .permalink-author"));
 
 	/* process all replies. */
 	replyIds = [];
@@ -829,7 +829,7 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
-	addCommentLink(getPostId(replyElement), getReplyAuthor(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+	addCommentLink(getPostId(replyElement), getReplyAuthor(replyElement), replyElement, $(replyElement).find(".reply-status-line .permalink-author"));
 
 	/* convert “show source” link into javascript function. */
 	$(replyElement).find(".show-reply-source").each(function() {

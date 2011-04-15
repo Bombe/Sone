@@ -41,11 +41,11 @@
 				</form>
 			</div>
 			<span class='separator'>·</span>
-			<div class="permalink"><a href="post://<%post.id|html>">[<%= View.Post.Permalink|l10n|html>]</a></div>
-			<span class='separator'>·</span>
-			<div class="permalink"><a href="sone://<%post.sone.id|html>">[<%= View.Post.PermalinkAuthor|l10n|html>]</a></div>
-			<span class='separator'>·</span>
 			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
+			<span class='separator'>·</span>
+			<div class="permalink permalink-post"><a href="post://<%post.id|html>">[<%= View.Post.Permalink|l10n|html>]</a></div>
+			<span class='separator'>·</span>
+			<div class="permalink permalink-author"><a href="sone://<%post.sone.id|html>">[<%= View.Post.PermalinkAuthor|l10n|html>]</a></div>
 			<%if ! originalText|match key=parsedText>
 				<span class='separator'>·</span>
 				<div class="show-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
