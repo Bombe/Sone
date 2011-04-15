@@ -24,6 +24,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
@@ -49,6 +51,9 @@ import net.pterodactylus.util.text.TextException;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SearchPage extends SoneTemplatePage {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SearchPage.class);
 
 	/**
 	 * Creates a new search page.
@@ -187,6 +192,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * @return The score of the expression
 	 */
 	private double calculateScore(List<Phrase> phrases, String expression) {
+		logger.log(Level.FINEST, "Calculating Score for “" + expression + "”…");
 		double optionalHits = 0;
 		double requiredHits = 0;
 		int forbiddenHits = 0;
@@ -206,8 +212,10 @@ public class SearchPage extends SoneTemplatePage {
 				}
 				score += Math.pow(1 - position / (double) expression.length(), 2);
 				index = position + phraseString.length();
+				logger.log(Level.FINEST, "Got hit at position %d.", position);
 				++matches;
 			}
+			logger.log(Level.FINEST, "Score: %f", score);
 			if (matches == 0) {
 				continue;
 			}
