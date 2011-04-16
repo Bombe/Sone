@@ -1203,7 +1203,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	if (hasPost(postId)) {
 		return;
 	}
-	if (!isIndexPage()) {
+	if (!isIndexPage() || (getPage(".pagination-index") > 1)) {
 		if (!isViewPostPage() || (getShownPostId() != postId)) {
 			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
 				return;
@@ -1218,7 +1218,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if (hasPost(data.post.id)) {
 				return;
 			}
-			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
+			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
 			var firstOlderPost = null;
