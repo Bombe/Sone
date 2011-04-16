@@ -37,7 +37,7 @@ import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
 /**
- * Base page for the Freetalk web interface.
+ * Base page for the Sone web interface.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -53,7 +53,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	private final boolean requireLogin;
 
 	/**
-	 * Creates a new template page for Freetalk that does not require the user
+	 * Creates a new template page for Sone that does not require the user
 	 * to be logged in.
 	 *
 	 * @param path
@@ -68,7 +68,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Freetalk that does not require the user
+	 * Creates a new template page for Sone that does not require the user
 	 * to be logged in.
 	 *
 	 * @param path
@@ -85,7 +85,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Freetalk.
+	 * Creates a new template page for Sone.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -101,7 +101,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Freetalk.
+	 * Creates a new template page for Sone.
 	 *
 	 * @param path
 	 *            The path of the page
