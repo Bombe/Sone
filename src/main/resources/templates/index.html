@@ -8,7 +8,7 @@
 
 	<div id="posts">
 		<%= page|store key=pageParameter>
-		<%include include/pagination.html>
+		<%include include/pagination.html paginationName==pagination-index>
 		<%foreach pagination.items post>
 			<%include include/viewPost.html>
 		<%foreachelse>

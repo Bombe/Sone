@@ -1115,6 +1115,22 @@ function isIndexPage() {
 }
 
 /**
+ * Returns the current page of the selected pagination. If no pagination can be
+ * found with the given selector, {@code 1} is returned.
+ *
+ * @param paginationSelector
+ *            The pagination selector
+ * @returns The current page of the pagination
+ */
+function getPage(paginationSelector) {
+	pagination = $(paginationSelector);
+	if (pagination.length > 0) {
+		return $(".current-page", paginationSelector).text();
+	}
+	return 1;
+}
+
+/**
  * Returns whether the current page is a “view Sone” page.
  *
  * @returns {Boolean} <code>true</code> if the current page is a “view Sone”
@@ -1192,7 +1208,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	if (hasPost(postId)) {
 		return;
 	}
-	if (!isIndexPage()) {
+	if (!isIndexPage() || (getPage(".pagination-index") > 1)) {
 		if (!isViewPostPage() || (getShownPostId() != postId)) {
 			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
 				return;
@@ -1207,7 +1223,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if (hasPost(data.post.id)) {
 				return;
 			}
-			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
+			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
 			var firstOlderPost = null;
