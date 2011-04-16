@@ -1905,6 +1905,7 @@ public class Core implements IdentityListener, UpdateListener {
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
 				sone.setIdentity(identity);
+				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
