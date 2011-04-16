@@ -1115,14 +1115,19 @@ function isIndexPage() {
 }
 
 /**
- * Returns the current page of the selected pagination.
+ * Returns the current page of the selected pagination. If no pagination can be
+ * found with the given selector, {@code 1} is returned.
  *
  * @param paginationSelector
  *            The pagination selector
  * @returns The current page of the pagination
  */
 function getPage(paginationSelector) {
-	return $(".current-page", paginationSelector).text();
+	pagination = $(paginationSelector);
+	if (pagination.length > 0) {
+		return $(".current-page", paginationSelector).text();
+	}
+	return 1;
 }
 
 /**
