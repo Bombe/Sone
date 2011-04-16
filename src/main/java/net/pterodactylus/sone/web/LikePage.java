@@ -53,7 +53,7 @@ public class LikePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
-			String type=request.getHttpRequest().getPartAsStringFailsafe("type", 16);
+			String type = request.getHttpRequest().getPartAsStringFailsafe("type", 16);
 			String id = request.getHttpRequest().getPartAsStringFailsafe(type, 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Sone currentSone = getCurrentSone(request.getToadletContext());

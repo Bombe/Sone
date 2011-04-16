@@ -26,8 +26,8 @@ import java.util.Map;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
+import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.util.collection.ListBuilder;
 import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.template.Template;
@@ -53,8 +53,8 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	private final boolean requireLogin;
 
 	/**
-	 * Creates a new template page for Sone that does not require the user
-	 * to be logged in.
+	 * Creates a new template page for Sone that does not require the user to be
+	 * logged in.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -68,8 +68,8 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Sone that does not require the user
-	 * to be logged in.
+	 * Creates a new template page for Sone that does not require the user to be
+	 * logged in.
 	 *
 	 * @param path
 	 *            The path of the page
