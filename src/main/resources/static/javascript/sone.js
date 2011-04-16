@@ -1115,6 +1115,17 @@ function isIndexPage() {
 }
 
 /**
+ * Returns the current page of the selected pagination.
+ *
+ * @param paginationSelector
+ *            The pagination selector
+ * @returns The current page of the pagination
+ */
+function getPage(paginationSelector) {
+	return $(".current-page", paginationSelector).text();
+}
+
+/**
  * Returns whether the current page is a “view Sone” page.
  *
  * @returns {Boolean} <code>true</code> if the current page is a “view Sone”
