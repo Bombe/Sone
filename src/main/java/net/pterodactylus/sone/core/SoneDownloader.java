@@ -119,7 +119,7 @@ public class SoneDownloader extends AbstractService {
 	 *            The Sone to fetch
 	 */
 	public void fetchSone(Sone sone) {
-		fetchSone(sone, sone.getRequestUri());
+		fetchSone(sone, sone.getRequestUri().sskForUSK());
 	}
 
 	/**
