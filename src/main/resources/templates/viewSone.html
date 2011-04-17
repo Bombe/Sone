@@ -76,7 +76,7 @@
 
 		<%foreach repliedPosts post>
 			<%first>
-				<h2><%= Page.ViewSone.Replies.Title|l10n|html></h2>
+				<h2><%= Page.ViewSone.Replies.Title|l10n|html|replace needle="{sone}" replacementKey=sone.niceName></h2>
 				<div id="replied-posts">
 					<%include include/pagination.html pagination=repliedPostPagination pageParameter==repliedPostPage>
 			<%/first>

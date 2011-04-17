@@ -1,5 +1,5 @@
 /*
- * FreenetSone - SonePlugin.java - Copyright © 2010 David Roden
+ * Sone - SonePlugin.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -78,7 +78,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 6, 1);
+	public static final Version VERSION = new Version(0, 6, 2);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);

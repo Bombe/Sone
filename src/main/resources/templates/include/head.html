@@ -19,7 +19,7 @@
 			</form>
 
 			<%foreach webInterface.notifications.all notification>
-				<div class="notification" id="<% notification.id|html>">
+				<div class="notification" id="<% notification.id|html>" lastUpdatedTime="<%notification.lastUpdatedTime|html>">
 					<%if notification.dismissable>
 						<form class="dismiss" action="dismissNotification.html" method="post">
 							<input type="hidden" name="formPassword" value="<% formPassword|html>" />

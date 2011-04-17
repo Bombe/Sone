@@ -1,5 +1,5 @@
 /*
- * Sone - OptionsPage.java - Copyright © 2010 David Roden
+ * Sone - SearchPage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
@@ -35,6 +37,7 @@ import net.pterodactylus.util.collection.Converters;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -48,6 +51,9 @@ import net.pterodactylus.util.text.TextException;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SearchPage extends SoneTemplatePage {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SearchPage.class);
 
 	/**
 	 * Creates a new search page.
@@ -137,7 +143,7 @@ public class SearchPage extends SoneTemplatePage {
 		Set<Hit<T>> hits = new HashSet<Hit<T>>();
 		for (T object : objects) {
 			String objectString = stringGenerator.generateString(object);
-			int score = calculateScore(phrases, objectString);
+			double score = calculateScore(phrases, objectString);
 			hits.add(new Hit<T>(object, score));
 		}
 		return hits;
@@ -185,9 +191,10 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The expression to search
 	 * @return The score of the expression
 	 */
-	private int calculateScore(List<Phrase> phrases, String expression) {
-		int optionalHits = 0;
-		int requiredHits = 0;
+	private double calculateScore(List<Phrase> phrases, String expression) {
+		logger.log(Level.FINEST, "Calculating Score for “%s”…", expression);
+		double optionalHits = 0;
+		double requiredHits = 0;
 		int forbiddenHits = 0;
 		int requiredPhrases = 0;
 		for (Phrase phrase : phrases) {
@@ -197,22 +204,26 @@ public class SearchPage extends SoneTemplatePage {
 			}
 			int matches = 0;
 			int index = 0;
+			double score = 0;
 			while (index < expression.length()) {
 				int position = expression.toLowerCase().indexOf(phraseString, index);
 				if (position == -1) {
 					break;
 				}
+				score += Math.pow(1 - position / (double) expression.length(), 2);
 				index = position + phraseString.length();
+				logger.log(Level.FINEST, "Got hit at position %d.", position);
 				++matches;
 			}
+			logger.log(Level.FINEST, "Score: %f", score);
 			if (matches == 0) {
 				continue;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.REQUIRED) {
-				requiredHits += matches;
+				requiredHits += score;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.OPTIONAL) {
-				optionalHits += matches;
+				optionalHits += score;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.FORBIDDEN) {
 				forbiddenHits += matches;
@@ -418,7 +429,7 @@ public class SearchPage extends SoneTemplatePage {
 
 			@Override
 			public int compare(Hit<?> leftHit, Hit<?> rightHit) {
-				return rightHit.getScore() - leftHit.getScore();
+				return (rightHit.getScore() < leftHit.getScore()) ? -1 : ((rightHit.getScore() > leftHit.getScore()) ? 1 : 0);
 			}
 
 		};
@@ -427,7 +438,7 @@ public class SearchPage extends SoneTemplatePage {
 		private final T object;
 
 		/** The score of the object. */
-		private final int score;
+		private final double score;
 
 		/**
 		 * Creates a new hit.
@@ -437,7 +448,7 @@ public class SearchPage extends SoneTemplatePage {
 		 * @param score
 		 *            The score of the object
 		 */
-		public Hit(T object, int score) {
+		public Hit(T object, double score) {
 			this.object = object;
 			this.score = score;
 		}
@@ -456,7 +467,7 @@ public class SearchPage extends SoneTemplatePage {
 		 *
 		 * @return The score of the object
 		 */
-		public int getScore() {
+		public double getScore() {
 			return score;
 		}
 

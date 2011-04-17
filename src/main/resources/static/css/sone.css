@@ -266,6 +266,10 @@ textarea {
 	display: inline;
 }
 
+#sone .permalink {
+	display: inline;
+}
+
 #sone .post .bookmarks {
 	display: inline;
 	color: rgb(28, 131, 191);

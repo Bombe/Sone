@@ -33,7 +33,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 				inputField.val(defaultText);
 			}
 		}).hide().data("inputField", $(this)).val($(this).val());
-		$(this).after(textarea);
+		$(this).data("textarea", textarea).after(textarea);
 		(function(inputField, textarea) {
 			inputField.focus(function() {
 				$(this).hide().attr("disabled", "disabled");
@@ -66,11 +66,11 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  * @param element
  *            The element to add a “comment” link to
  */
-function addCommentLink(postId, element, insertAfterThisElement) {
+function addCommentLink(postId, author, element, insertAfterThisElement) {
 	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
-	commentElement = (function(postId) {
+	commentElement = (function(postId, author) {
 		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
 			replyElement = $("#sone .post#" + postId + " .create-reply");
@@ -85,10 +85,11 @@ function addCommentLink(postId, element, insertAfterThisElement) {
 					replyElement.removeClass("light");
 				});
 			})(replyElement);
-			replyElement.find("input.reply-input").focus();
+			textArea = replyElement.find("input.reply-input").focus().data("textarea");
+			textArea.val(textArea.val() + "@sone://" + author + " ");
 		});
 		return commentElement;
-	})(postId);
+	})(postId, author);
 	$(insertAfterThisElement).after(commentElement.clone(true));
 	$(insertAfterThisElement).after(separator);
 }
@@ -145,7 +146,7 @@ function filterSoneId(soneId) {
  * @param lastUpdated
  *            The date and time of the last update (formatted for display)
  */
-function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
+function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, lastUpdatedText) {
 	$("#sone .sone." + filterSoneId(soneId)).
 		toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
@@ -155,7 +156,7 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated) {
 	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
 	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
 	if (lastUpdated != null) {
-		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(lastUpdated);
+		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").attr("title", lastUpdated).text(lastUpdatedText);
 	} else {
 		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
 			$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
@@ -276,7 +277,7 @@ function getFormPassword() {
  */
 function getSone(soneId) {
 	return $("#sone .sone").filter(function(index) {
-		return $(".id").text() == soneId;
+		return $(".id", this).text() == soneId;
 	});
 }
 
@@ -413,6 +414,17 @@ function getNotificationElement(element) {
  */
 function getNotificationId(notificationElement) {
 	return $(notificationElement).attr("id");
+}
+
+/**
+ * Returns the time the notification was last updated.
+ *
+ * @param notificationElement
+ *            The notification element
+ * @returns The last update time of the notification
+ */
+function getNotificationLastUpdatedTime(notificationElement) {
+	return $(notificationElement).attr("lastUpdatedTime");
 }
 
 function likePost(postId) {
@@ -666,7 +678,7 @@ function ajaxifySone(soneElement) {
 
 	/* mark Sone as known when clicking it. */
 	$(soneElement).click(function() {
-		markSoneAsKnown(soneElement);
+		markSoneAsKnown(this);
 	});
 }
 
@@ -757,7 +769,7 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* add “comment” link. */
-	addCommentLink(getPostId(postElement), postElement, $(postElement).find(".post-status-line .time"));
+	addCommentLink(getPostId(postElement), getPostAuthor(postElement), postElement, $(postElement).find(".post-status-line .permalink-author"));
 
 	/* process all replies. */
 	replyIds = [];
@@ -817,7 +829,7 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
-	addCommentLink(getPostId(replyElement), replyElement, $(replyElement).find(".reply-status-line .time"));
+	addCommentLink(getPostId(replyElement), getReplyAuthor(replyElement), replyElement, $(replyElement).find(".reply-status-line .permalink-author"));
 
 	/* convert “show source” link into javascript function. */
 	$(replyElement).find(".show-reply-source").each(function() {
@@ -970,7 +982,7 @@ function getStatus() {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
-				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated);
+				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated, value.lastUpdatedText);
 			});
 			/* search for removed notifications. */
 			$("#sone #notification-area .notification").each(function() {
@@ -1009,25 +1021,16 @@ function getStatus() {
 				}
 			});
 			/* process notifications. */
+			notificationIds = [];
 			$.each(data.notifications, function(index, value) {
 				oldNotification = getNotification(value.id);
-				notification = ajaxifyNotification(createNotification(value.id, value.text, value.dismissable)).hide();
-				if (oldNotification.length != 0) {
-					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
-						opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
-						notification.find(".short-text").toggleClass("hidden", opened);
-						notification.find(".text").toggleClass("hidden", !opened);
-					}
-					checkForRemovedSones(oldNotification, notification);
-					checkForRemovedPosts(oldNotification, notification);
-					checkForRemovedReplies(oldNotification, notification);
-					oldNotification.replaceWith(notification.show());
-				} else {
-					$("#sone #notification-area").append(notification);
-					notification.slideDown();
-					setActivity();
+				if ((oldNotification.length == 0) || (value.lastUpdatedTime > getNotificationLastUpdatedTime(oldNotification))) {
+					notificationIds.push(value.id);
 				}
 			});
+			if (notificationIds.length > 0) {
+				loadNotifications(notificationIds);
+			}
 			/* process new posts. */
 			$.each(data.newPosts, function(index, value) {
 				loadNewPost(value.id, value.sone, value.recipient, value.time);
@@ -1046,6 +1049,40 @@ function getStatus() {
 		/* something really bad happend, wait a minute. */
 		setTimeout(getStatus, 60000);
 	})
+}
+
+/**
+ * Requests multiple notifications from Sone and displays them.
+ *
+ * @param notificationIds
+ *            Array of IDs of the notifications to load
+ */
+function loadNotifications(notificationIds) {
+	$.getJSON("getNotification.ajax", {"notifications": notificationIds.join(",")}, function(data, textStatus) {
+		if (!data || !data.success) {
+			// TODO - show error
+			return;
+		}
+		$.each(data.notifications, function(index, value) {
+			oldNotification = getNotification(value.id);
+			notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
+			if (oldNotification.length != 0) {
+				if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
+					opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
+					notification.find(".short-text").toggleClass("hidden", opened);
+					notification.find(".text").toggleClass("hidden", !opened);
+				}
+				checkForRemovedSones(oldNotification, notification);
+				checkForRemovedPosts(oldNotification, notification);
+				checkForRemovedReplies(oldNotification, notification);
+				oldNotification.replaceWith(notification.show());
+			} else {
+				$("#sone #notification-area").append(notification);
+				notification.slideDown();
+				setActivity();
+			}
+		})
+	});
 }
 
 /**
@@ -1075,6 +1112,22 @@ function getPageId() {
  */
 function isIndexPage() {
 	return getPageId() == "index";
+}
+
+/**
+ * Returns the current page of the selected pagination. If no pagination can be
+ * found with the given selector, {@code 1} is returned.
+ *
+ * @param paginationSelector
+ *            The pagination selector
+ * @returns The current page of the pagination
+ */
+function getPage(paginationSelector) {
+	pagination = $(paginationSelector);
+	if (pagination.length > 0) {
+		return $(".current-page", paginationSelector).text();
+	}
+	return 1;
 }
 
 /**
@@ -1155,7 +1208,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	if (hasPost(postId)) {
 		return;
 	}
-	if (!isIndexPage()) {
+	if (!isIndexPage() || (getPage(".pagination-index") > 1)) {
 		if (!isViewPostPage() || (getShownPostId() != postId)) {
 			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
 				return;
@@ -1170,7 +1223,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if (hasPost(data.post.id)) {
 				return;
 			}
-			if (!isIndexPage() && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
+			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
 				return;
 			}
 			var firstOlderPost = null;
@@ -1243,11 +1296,10 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
  *            request
  */
 function markSoneAsKnown(soneElement, skipRequest) {
-	if ($(".new", soneElement).length > 0) {
-		if ((typeof skipRequest != "undefined") && !skipRequest) {
-			$.getJSON("maskAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)}, function(data, textStatus) {
-				$(soneElement).removeClass("new");
-			});
+	if ($(soneElement).is(".new")) {
+		$(soneElement).removeClass("new");
+		if ((typeof skipRequest == "undefined") || !skipRequest) {
+			$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)});
 		}
 	}
 }
@@ -1439,8 +1491,8 @@ function changeIcon(iconUrl) {
  *            <code>true</code> if the notification can be dismissed by the
  *            user
  */
-function createNotification(id, text, dismissable) {
-	notification = $("<div></div>").addClass("notification").attr("id", id);
+function createNotification(id, lastUpdatedTime, text, dismissable) {
+	notification = $("<div></div>").addClass("notification").attr("id", id).attr("lastUpdatedTime", lastUpdatedTime);
 	if (dismissable) {
 		dismissForm = $("#sone #notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id")
 		dismissForm.find("input[name=notification]").val(id);
@@ -1653,6 +1705,11 @@ $(document).ready(function() {
 	/* process all existing notifications, ajaxify dismiss buttons. */
 	$("#sone #notification-area .notification").each(function() {
 		ajaxifyNotification($(this));
+	});
+
+	/* disable all permalinks. */
+	$(".permalink").click(function() {
+		return false;
 	});
 
 	/* activate status polling. */

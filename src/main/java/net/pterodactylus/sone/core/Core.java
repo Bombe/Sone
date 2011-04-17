@@ -876,6 +876,8 @@ public class Core implements IdentityListener, UpdateListener {
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		saveSone(sone);
 		return sone;
 	}
 
@@ -1493,6 +1495,7 @@ public class Core implements IdentityListener, UpdateListener {
 		synchronized (posts) {
 			posts.remove(post.getId());
 		}
+		coreListenerManager.firePostRemoved(post);
 		synchronized (newPosts) {
 			markPostKnown(post);
 			knownPosts.remove(post.getId());
@@ -1902,6 +1905,7 @@ public class Core implements IdentityListener, UpdateListener {
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
 				sone.setIdentity(identity);
+				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}

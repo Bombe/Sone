@@ -15,6 +15,8 @@
 		</div>
 		<div class="reply-status-line status-line">
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+			<span class='separator'>·</span>
+			<div class="permalink permalink-author"><a href="sone://<%reply.sone.id|html>">[<%= View.Post.PermalinkAuthor|l10n|html>]</a></div>
 			<%if ! originalText|match key=parsedText>
 				<span class='separator'>·</span>
 				<div class="show-reply-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>

@@ -19,7 +19,6 @@ package net.pterodactylus.sone.freenet.plugin;
 
 import java.util.EventListener;
 
-
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
