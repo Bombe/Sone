@@ -922,7 +922,7 @@ public class Core implements IdentityListener, UpdateListener {
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void run() {
-					soneDownloader.fetchSone(sone);
+					soneDownloader.fetchSone(sone, sone.getRequestUri());
 				}
 
 			}, "Sone Downloader").start();
