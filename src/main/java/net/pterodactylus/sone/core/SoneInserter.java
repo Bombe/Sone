@@ -229,7 +229,6 @@ public class SoneInserter extends AbstractService {
 					synchronized (sone) {
 						if (lastInsertFingerprint.equals(sone.getFingerprint())) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
-							core.saveSone(sone);
 							lastModificationTime = 0;
 							modified = false;
 						}
