@@ -32,8 +32,8 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.collection.Converter;
-import net.pterodactylus.util.collection.Converters;
+import net.pterodactylus.util.collection.Mapper;
+import net.pterodactylus.util.collection.Mappers;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
@@ -105,8 +105,8 @@ public class SearchPage extends SoneTemplatePage {
 		Collections.sort(sortedPostHits, Hit.DESCENDING_COMPARATOR);
 
 		/* extract Sones and posts. */
-		List<Sone> resultSones = Converters.convertList(sortedSoneHits, new HitConverter<Sone>());
-		List<Post> resultPosts = Converters.convertList(sortedPostHits, new HitConverter<Post>());
+		List<Sone> resultSones = Mappers.mappedList(sortedSoneHits, new HitMapper<Sone>());
+		List<Post> resultPosts = Mappers.mappedList(sortedPostHits, new HitMapper<Post>());
 
 		/* pagination. */
 		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
@@ -480,13 +480,13 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The type of the object to extract
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class HitConverter<T> implements Converter<Hit<T>, T> {
+	public static class HitMapper<T> implements Mapper<Hit<T>, T> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public T convert(Hit<T> input) {
+		public T map(Hit<T> input) {
 			return input.getObject();
 		}
 
