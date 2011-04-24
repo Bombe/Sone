@@ -247,7 +247,7 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class InsertInformation {
+	private class InsertInformation {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
@@ -346,6 +346,7 @@ public class SoneInserter extends AbstractService {
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
 			templateContext.set("currentSone", soneProperties);
+			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;
