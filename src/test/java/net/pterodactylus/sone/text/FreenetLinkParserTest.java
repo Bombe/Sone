@@ -41,7 +41,7 @@ public class FreenetLinkParserTest extends TestCase {
 		TemplateContextFactory templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addFilter("html", new HtmlFilter());
 		FreenetLinkParser parser = new FreenetLinkParser(null, templateContextFactory);
-		FreenetLinkParserContext context = new FreenetLinkParserContext(null);
+		FreenetLinkParserContext context = new FreenetLinkParserContext(null, null);
 		Part part;
 
 		part = parser.parse(context, new StringReader("Text."));
