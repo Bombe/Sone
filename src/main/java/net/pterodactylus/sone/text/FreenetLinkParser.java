@@ -127,6 +127,18 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 			}
 			emptyLines = 0;
 			boolean lineComplete = true;
+
+			/* filter http(s) links to own node. */
+			String hostHeader = (context.getRequest() != null) ? context.getRequest().getHttpRequest().getHeader("host") : null;
+			logger.log(Level.FINEST, "hostHeader: %s", hostHeader);
+			if (hostHeader != null) {
+				for (String toRemove : new String[] { "http://" + hostHeader + "/", "https://" + hostHeader + "/", "http://" + hostHeader, "https://" + hostHeader }) {
+					while (line.indexOf(toRemove) != -1) {
+						line = line.replace(toRemove, "");
+					}
+				}
+			}
+
 			while (line.length() > 0) {
 				int nextKsk = line.indexOf("KSK@");
 				int nextChk = line.indexOf("CHK@");
