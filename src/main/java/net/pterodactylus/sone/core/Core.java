@@ -25,6 +25,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -1919,6 +1920,48 @@ public class Core implements IdentityListener, UpdateListener {
 	@Override
 	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
 		trustedIdentities.get(ownIdentity).remove(identity);
+		boolean foundIdentity = false;
+		for (Entry<OwnIdentity, Set<Identity>> trustedIdentity : trustedIdentities.entrySet()) {
+			if (trustedIdentity.getKey().equals(ownIdentity)) {
+				continue;
+			}
+			if (trustedIdentity.getValue().contains(identity)) {
+				foundIdentity = true;
+			}
+		}
+		if (foundIdentity) {
+			/* some local identity still trusts this identity, don’t remove. */
+			return;
+		}
+		Sone sone = getSone(identity.getId(), false);
+		if (sone == null) {
+			/* TODO - we don’t have the Sone anymore. should this happen? */
+			return;
+		}
+		synchronized (posts) {
+			synchronized (newPosts) {
+				for (Post post : sone.getPosts()) {
+					posts.remove(post.getId());
+					newPosts.remove(post.getId());
+					coreListenerManager.firePostRemoved(post);
+				}
+			}
+		}
+		synchronized (replies) {
+			synchronized (newReplies) {
+				for (Reply reply : sone.getReplies()) {
+					replies.remove(reply.getId());
+					newReplies.remove(reply.getId());
+					coreListenerManager.fireReplyRemoved(reply);
+				}
+			}
+		}
+		synchronized (remoteSones) {
+			remoteSones.remove(identity.getId());
+		}
+		synchronized (newSones) {
+			newSones.remove(identity.getId());
+		}
 	}
 
 	//
