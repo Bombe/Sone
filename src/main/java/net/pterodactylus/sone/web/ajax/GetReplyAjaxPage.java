@@ -65,7 +65,7 @@ public class GetReplyAjaxPage extends JsonPage {
 		if ((reply == null) || (reply.getSone() == null)) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		return createSuccessJsonObject().put("reply", createJsonReply(reply, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("reply", createJsonReply(request, reply, getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the reply
 	 */
-	private JsonObject createJsonReply(Reply reply, Sone currentSone) {
+	private JsonObject createJsonReply(Request request, Reply reply, Sone currentSone) {
 		JsonObject jsonReply = new JsonObject();
 		jsonReply.put("id", reply.getId());
 		jsonReply.put("postId", reply.getPost().getId());
@@ -97,6 +97,7 @@ public class GetReplyAjaxPage extends JsonPage {
 		jsonReply.put("time", reply.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("request", request);
 		templateContext.set("reply", reply);
 		templateContext.set("currentSone", currentSone);
 		try {
