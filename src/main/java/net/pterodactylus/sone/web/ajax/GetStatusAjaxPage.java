@@ -114,7 +114,7 @@ public class GetStatusAjaxPage extends JsonPage {
 
 				@Override
 				public boolean filterObject(Reply reply) {
-					return currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient());
+					return (reply.getPost() != null) && (reply.getPost().getSone() != null) && (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient()));
 				}
 
 			});
