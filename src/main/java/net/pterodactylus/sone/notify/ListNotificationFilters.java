@@ -24,7 +24,10 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.notify.Notification;
+import net.pterodactylus.util.validation.Validation;
 
 /**
  * Filter for {@link ListNotification}s.
@@ -164,6 +167,52 @@ public class ListNotificationFilters {
 			return (ListNotification<T>) notification;
 		}
 		return null;
+	}
+
+	/**
+	 * Checks whether a post is visible to the given Sone. A post is not
+	 * considered visible if one of the following statements is true:
+	 * <ul>
+	 * <li>The post does not have a Sone.</li>
+	 * <li>The Sone of the post is not the given Sone, the given Sone does not
+	 * follow the post’s Sone, and the given Sone is not the recipient of the
+	 * post.</li>
+	 * <li>The trust relationship between the two Sones can not be retrieved.</li>
+	 * <li>The given Sone has explicitely assigned negative trust to the post’s
+	 * Sone.</li>
+	 * <li>The given Sone has not explicitely assigned negative trust to the
+	 * post’s Sone but the implicit trust is negative.</li>
+	 * </ul>
+	 * If none of these statements is true the post is considered visible.
+	 *
+	 * @param sone
+	 *            The Sone that checks for a post’s visibility
+	 * @param post
+	 *            The post to check for visibility
+	 * @return {@code true} if the post is considered visible, {@code false}
+	 *         otherwise
+	 */
+	public static boolean isPostVisible(Sone sone, Post post) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Post", post).check().isNotNull("Sone’s Identity", sone.getIdentity()).check().isInstanceOf("Sone’s Identity", sone.getIdentity(), OwnIdentity.class).check();
+		Sone postSone = post.getSone();
+		if (postSone == null) {
+			return false;
+		}
+		Trust trust = postSone.getIdentity().getTrust((OwnIdentity) sone.getIdentity());
+		if (trust != null) {
+			if ((trust.getExplicit() != null) && (trust.getExplicit() < 0)) {
+				return false;
+			}
+			if ((trust.getExplicit() == null) && (trust.getImplicit() != null) && (trust.getImplicit() < 0)) {
+				return false;
+			}
+		} else {
+			return false;
+		}
+		if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
+			return false;
+		}
+		return true;
 	}
 
 }
