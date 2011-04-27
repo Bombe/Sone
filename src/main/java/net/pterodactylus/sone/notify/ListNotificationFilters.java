@@ -90,7 +90,7 @@ public class ListNotificationFilters {
 		}
 		List<Post> newPosts = new ArrayList<Post>();
 		for (Post post : newPostNotification.getElements()) {
-			if (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone()) || currentSone.equals(post.getRecipient())) {
+			if ((post.getSone() != null) && (currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone()) || currentSone.equals(post.getRecipient()))) {
 				newPosts.add(post);
 			}
 		}
