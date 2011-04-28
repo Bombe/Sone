@@ -265,7 +265,7 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 					} else if (linkType == LinkType.POST) {
 						String postId = link.substring(7);
 						Post post = core.getPost(postId, false);
-						if (post != null) {
+						if ((post != null) && (post.getSone() != null)) {
 							String postText = post.getText();
 							postText = postText.substring(0, Math.min(postText.length(), 20)) + "…";
 							Sone postSone = post.getSone();
