@@ -62,7 +62,7 @@ public class GetPostAjaxPage extends JsonPage {
 		if (post == null) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		return createSuccessJsonObject().put("post", createJsonPost(post, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("post", createJsonPost(request, post, getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class GetPostAjaxPage extends JsonPage {
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the post
 	 */
-	private JsonObject createJsonPost(Post post, Sone currentSone) {
+	private JsonObject createJsonPost(Request request, Post post, Sone currentSone) {
 		JsonObject jsonPost = new JsonObject();
 		jsonPost.put("id", post.getId());
 		jsonPost.put("sone", post.getSone().getId());
@@ -95,6 +95,7 @@ public class GetPostAjaxPage extends JsonPage {
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("request", request);
 		templateContext.set("post", post);
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());

@@ -229,7 +229,6 @@ public class SoneInserter extends AbstractService {
 					synchronized (sone) {
 						if (lastInsertFingerprint.equals(sone.getFingerprint())) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
-							core.saveSone(sone);
 							lastModificationTime = 0;
 							modified = false;
 						}
@@ -248,7 +247,7 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class InsertInformation {
+	private class InsertInformation {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
@@ -347,6 +346,7 @@ public class SoneInserter extends AbstractService {
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
 			templateContext.set("currentSone", soneProperties);
+			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;

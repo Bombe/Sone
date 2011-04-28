@@ -25,6 +25,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.FreenetLinkParser;
 import net.pterodactylus.sone.text.FreenetLinkParserContext;
+import net.pterodactylus.sone.web.page.Page.Request;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
@@ -70,7 +71,7 @@ public class ParserFilter implements Filter {
 		if (sone == null) {
 			sone = core.getSone(soneKey, false);
 		}
-		FreenetLinkParserContext context = new FreenetLinkParserContext(sone);
+		FreenetLinkParserContext context = new FreenetLinkParserContext((Request) templateContext.get("request"), sone);
 		try {
 			return linkParser.parse(context, new StringReader(text));
 		} catch (IOException ioe1) {
