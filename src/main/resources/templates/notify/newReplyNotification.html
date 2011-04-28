@@ -1,15 +1,15 @@
+<form class="mark-as-read" action="markAsKnown.html" method="post">
+	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+	<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+	<input type="hidden" name="type" value="reply" />
+	<input type="hidden" name="id" value="<%foreach replies reply><% reply.id|html><%notlast> <%/notlast><%/foreach>" />
+	<button type="submit" name="mark-read" value="true"><%= Notification.NewPost.Button.MarkRead|l10n|html></button>
+</form>
 <div class="short-text hidden">
 	<%= Notification.NewReply.ShortText|l10n|html>
 	<a class="link" onclick="showNotificationDetails('<%notification.id|html>'); return false;"><%= Notification.ClickHereToRead|l10n|html></a>
 </div>
 <div class="text">
-	<form class="mark-as-read" action="markAsKnown.html" method="post">
-		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-		<input type="hidden" name="type" value="reply" />
-		<input type="hidden" name="id" value="<%foreach replies reply><% reply.id|html><%notlast> <%/notlast><%/foreach>" />
-		<button type="submit" name="mark-read" value="true"><%= Notification.NewPost.Button.MarkRead|l10n|html></button>
-	</form>
 	<%foreach replies reply><div class="hidden reply-id"><%reply.id|html></div><%/foreach>
 	<%= Notification.NewReply.Text|l10n|html>
 	<%foreach replies postGroup|replyGroup>
