@@ -923,8 +923,8 @@ function checkForRemovedSones(oldNotification, newNotification) {
 	if (getNotificationId(oldNotification) != "new-sone-notification") {
 		return;
 	}
-	oldIds = getElementIds(oldNotification, ".sone-id");
-	newIds = getElementIds(newNotification, ".sone-id");
+	oldIds = getElementIds(oldNotification, ".new-sone-id");
+	newIds = getElementIds(newNotification, ".new-sone-id");
 	$.each(oldIds, function(index, value) {
 		if ($.inArray(value, newIds) == -1) {
 			markSoneAsKnown(getSone(value), true);
@@ -996,7 +996,7 @@ function getStatus() {
 				});
 				if (!foundNotification) {
 					if (notificationId == "new-sone-notification") {
-						$(".sone-id", this).each(function(index, element) {
+						$(".new-sone-id", this).each(function(index, element) {
 							soneId = $(this).text();
 							markSoneAsKnown(getSone(soneId), true);
 						});
