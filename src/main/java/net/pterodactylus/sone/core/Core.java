@@ -1173,6 +1173,9 @@ public class Core implements IdentityListener, UpdateListener {
 			return;
 		}
 
+		/* initialize options. */
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+
 		/* load Sone. */
 		String sonePrefix = "Sone/" + sone.getId();
 		Long soneTime = configuration.getLongValue(sonePrefix + "/Time").getValue(null);
@@ -1273,7 +1276,6 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/* load options. */
-		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
 
 		/* if we’re still here, Sone was loaded successfully. */
