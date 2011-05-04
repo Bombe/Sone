@@ -7,7 +7,7 @@
 
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
 
-		<p><%= Page.ViewSone.NoSone.Description|l10n|replace needle="{sone}" replacementKey=sone.id|html></p>
+		<p><%= Page.ViewSone.NoSone.Description|l10n|replace needle="{sone}" replacementKey=soneId|html></p>
 
 	<%elseifnull sone.name>
 

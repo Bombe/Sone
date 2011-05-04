@@ -80,6 +80,7 @@ public class ViewSonePage extends SoneTemplatePage {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);
 		templateContext.set("sone", sone);
+		templateContext.set("soneId", soneId);
 		List<Post> sonePosts = sone.getPosts();
 		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone));
 		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
