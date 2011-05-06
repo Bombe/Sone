@@ -50,28 +50,25 @@ public class ListNotificationFilters {
 	 *            The current Sone, or {@code null} if not logged in
 	 * @return The filtered notifications
 	 */
-	public static List<Notification> filterNotifications(List<Notification> notifications, Sone currentSone) {
-		ListNotification<Post> newPostNotification = getNotification(notifications, "new-post-notification", Post.class);
-		if (newPostNotification != null) {
-			ListNotification<Post> filteredNotification = filterNewPostNotification(newPostNotification, currentSone);
-			int notificationIndex = notifications.indexOf(newPostNotification);
-			if (filteredNotification == null) {
-				notifications.remove(notificationIndex);
+	@SuppressWarnings("unchecked")
+	public static List<Notification> filterNotifications(Collection<? extends Notification> notifications, Sone currentSone) {
+		List<Notification> filteredNotifications = new ArrayList<Notification>();
+		for (Notification notification : notifications) {
+			if (notification.getId().equals("new-post-notification")) {
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone);
+				if (filteredNotification != null) {
+					filteredNotifications.add(filteredNotification);
+				}
+			} else if (notification.getId().equals("new-replies-notification")) {
+				ListNotification<Reply> filteredNotification = filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+				if (filteredNotification != null) {
+					filteredNotifications.add(filteredNotification);
+				}
 			} else {
-				notifications.set(notificationIndex, filteredNotification);
+				filteredNotifications.add(notification);
 			}
 		}
-		ListNotification<Reply> newReplyNotification = getNotification(notifications, "new-replies-notification", Reply.class);
-		if (newReplyNotification != null) {
-			ListNotification<Reply> filteredNotification = filterNewReplyNotification(newReplyNotification, currentSone);
-			int notificationIndex = notifications.indexOf(newReplyNotification);
-			if (filteredNotification == null) {
-				notifications.remove(notificationIndex);
-			} else {
-				notifications.set(notificationIndex, filteredNotification);
-			}
-		}
-		return notifications;
+		return filteredNotifications;
 	}
 
 	/**
@@ -141,32 +138,6 @@ public class ListNotificationFilters {
 		ListNotification<Reply> filteredNotification = new ListNotification<Reply>(newReplyNotification);
 		filteredNotification.setElements(newReplies);
 		return filteredNotification;
-	}
-
-	/**
-	 * Finds the notification with the given ID in the list of notifications and
-	 * returns it.
-	 *
-	 * @param <T>
-	 *            The type of the item in the notification
-	 * @param notifications
-	 *            The notification to search
-	 * @param notificationId
-	 *            The ID of the requested notification
-	 * @param notificationElementClass
-	 *            The class of the notification item
-	 * @return The requested notification, or {@code null} if no notification
-	 *         with the given ID could be found
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> ListNotification<T> getNotification(Collection<? extends Notification> notifications, String notificationId, Class<T> notificationElementClass) {
-		for (Notification notification : notifications) {
-			if (!notificationId.equals(notification.getId())) {
-				continue;
-			}
-			return (ListNotification<T>) notification;
-		}
-		return null;
 	}
 
 	/**
