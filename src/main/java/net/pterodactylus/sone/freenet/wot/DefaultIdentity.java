@@ -64,6 +64,7 @@ public class DefaultIdentity implements Identity {
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
 	/** Cached trust. */
+	/* synchronize on itself. */
 	private final WritableCache<OwnIdentity, Trust> trustCache = new MemoryCache<OwnIdentity, Trust>(new ValueRetriever<OwnIdentity, Trust>() {
 
 		@Override
@@ -249,7 +250,9 @@ public class DefaultIdentity implements Identity {
 	@Override
 	public Trust getTrust(OwnIdentity ownIdentity) {
 		try {
-			return trustCache.get(ownIdentity);
+			synchronized (trustCache) {
+				return trustCache.get(ownIdentity);
+			}
 		} catch (CacheException ce1) {
 			logger.log(Level.WARNING, "Could not get trust for OwnIdentity: " + ownIdentity, ce1);
 			return null;
@@ -265,7 +268,9 @@ public class DefaultIdentity implements Identity {
 	 *            The trust received for this identity
 	 */
 	void setTrustPrivate(OwnIdentity ownIdentity, Trust trust) {
-		trustCache.put(ownIdentity, trust);
+		synchronized (trustCache) {
+			trustCache.put(ownIdentity, trust);
+		}
 	}
 
 	//
