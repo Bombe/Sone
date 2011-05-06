@@ -181,6 +181,7 @@ public class IdentityManager extends AbstractService {
 			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
 			Set<OwnIdentity> ownIdentities = null;
+			boolean identitiesLoaded = false;
 			try {
 				/* get all identities with the wanted context from WoT. */
 				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
@@ -199,12 +200,12 @@ public class IdentityManager extends AbstractService {
 						identities.put(identity.getId(), identity);
 					}
 				}
+				identitiesLoaded = true;
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
-				ownIdentities = null;
 			}
 
-			if (ownIdentities != null) {
+			if (identitiesLoaded) {
 
 				/* check for changes. */
 				checkOwnIdentities(currentOwnIdentities);
