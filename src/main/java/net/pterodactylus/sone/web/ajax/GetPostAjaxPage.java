@@ -81,6 +81,8 @@ public class GetPostAjaxPage extends JsonPage {
 	 * Creates a JSON object from the given post. The JSON object will only
 	 * contain the ID of the post, its time, and its rendered HTML code.
 	 *
+	 * @param request
+	 *            The request being processed
 	 * @param post
 	 *            The post to create a JSON object from
 	 * @param currentSone

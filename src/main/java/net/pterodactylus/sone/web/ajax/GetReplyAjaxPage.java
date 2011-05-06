@@ -83,6 +83,8 @@ public class GetReplyAjaxPage extends JsonPage {
 	/**
 	 * Creates a JSON representation of the given reply.
 	 *
+	 * @param request
+	 *            The request being processed
 	 * @param reply
 	 *            The reply to convert
 	 * @param currentSone
