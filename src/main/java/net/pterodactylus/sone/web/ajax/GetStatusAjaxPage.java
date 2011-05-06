@@ -93,7 +93,7 @@ public class GetStatusAjaxPage extends JsonPage {
 
 				@Override
 				public boolean filterObject(Post post) {
-					return currentSone.hasFriend(post.getSone().getId()) || currentSone.equals(post.getSone()) || currentSone.equals(post.getRecipient());
+					return ListNotificationFilters.isPostVisible(currentSone, post);
 				}
 
 			});
@@ -114,7 +114,7 @@ public class GetStatusAjaxPage extends JsonPage {
 
 				@Override
 				public boolean filterObject(Reply reply) {
-					return (reply.getPost() != null) && (reply.getPost().getSone() != null) && (currentSone.hasFriend(reply.getPost().getSone().getId()) || currentSone.equals(reply.getPost().getSone()) || currentSone.equals(reply.getPost().getRecipient()));
+					return ListNotificationFilters.isReplyVisible(currentSone, reply);
 				}
 
 			});
