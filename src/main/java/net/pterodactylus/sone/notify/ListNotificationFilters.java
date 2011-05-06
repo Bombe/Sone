@@ -128,7 +128,7 @@ public class ListNotificationFilters {
 		}
 		List<Reply> newReplies = new ArrayList<Reply>();
 		for (Reply reply : newReplyNotification.getElements()) {
-			if (isPostVisible(currentSone, reply.getPost())) {
+			if (isReplyVisible(currentSone, reply)) {
 				newReplies.add(reply);
 			}
 		}
