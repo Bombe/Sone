@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -106,6 +108,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** The Sone downloader. */
 	private final SoneDownloader soneDownloader;
+
+	/** Sone downloader thread-pool. */
+	private final ExecutorService soneDownloaders = Executors.newFixedThreadPool(10);
 
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
@@ -919,7 +924,7 @@ public class Core implements IdentityListener, UpdateListener {
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
 			setSoneStatus(sone, SoneStatus.unknown);
-			new Thread(new Runnable() {
+			soneDownloaders.execute(new Runnable() {
 
 				@Override
 				@SuppressWarnings("synthetic-access")
@@ -927,7 +932,7 @@ public class Core implements IdentityListener, UpdateListener {
 					soneDownloader.fetchSone(sone, sone.getRequestUri());
 				}
 
-			}, "Sone Downloader").start();
+			});
 			return sone;
 		}
 	}
