@@ -182,6 +182,7 @@ public class ListNotificationFilters {
 	 * Sone.</li>
 	 * <li>The given Sone has not explicitely assigned negative trust to the
 	 * post’s Sone but the implicit trust is negative.</li>
+	 * <li>The post’s {@link Post#getTime() time} is in the future.</li>
 	 * </ul>
 	 * If none of these statements is true the post is considered visible.
 	 *
