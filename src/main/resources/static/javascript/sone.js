@@ -978,7 +978,7 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 }
 
 function getStatus() {
-	$.getJSON("getStatus.ajax", {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
+	$.getJSON("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
