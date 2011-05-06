@@ -17,7 +17,7 @@ jQuery.prototype.getJSON = function(url, data, successCallback, errorCallback) {
 		success: successCallback,
 		url: url
 	});
-}
+};
 
 function isOnline() {
 	return $("#sone").hasClass("online");
@@ -456,7 +456,7 @@ function unlikePost(postId) {
 function updatePostLikes(postId) {
 	$.getJSON("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0)
+			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
@@ -594,7 +594,7 @@ function unbookmarkPost(postId) {
 function updateReplyLikes(replyId) {
 	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0)
+			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
 			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
 			$("#sone .reply#" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
@@ -1048,7 +1048,7 @@ function getStatus() {
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* something really bad happend, wait a minute. */
 		setTimeout(getStatus, 60000);
-	})
+	});
 }
 
 /**
@@ -1081,7 +1081,7 @@ function loadNotifications(notificationIds) {
 				notification.slideDown();
 				setActivity();
 			}
-		})
+		});
 	});
 }
 
@@ -1494,7 +1494,7 @@ function changeIcon(iconUrl) {
 function createNotification(id, lastUpdatedTime, text, dismissable) {
 	notification = $("<div></div>").addClass("notification").attr("id", id).attr("lastUpdatedTime", lastUpdatedTime);
 	if (dismissable) {
-		dismissForm = $("#sone #notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id")
+		dismissForm = $("#sone #notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id");
 		dismissForm.find("input[name=notification]").val(id);
 		notification.append(dismissForm);
 	}
@@ -1721,6 +1721,6 @@ $(document).ready(function() {
 		resetActivity();
 	}).blur(function() {
 		focus = false;
-	})
+	});
 
 });
