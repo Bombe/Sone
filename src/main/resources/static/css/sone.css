@@ -89,6 +89,10 @@ textarea {
 	content: '★ ';
 }
 
+#sone a.in-page-link:before {
+	content: '↓ ';
+}
+
 #sone a img {
 	border: none;
 }

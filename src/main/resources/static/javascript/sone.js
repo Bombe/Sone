@@ -878,7 +878,7 @@ function ajaxifyNotification(notification) {
 		if (linkElement.is("[href^='viewPost']")) {
 			id = linkElement.attr("class").substr(5);
 			if (hasPost(id)) {
-				linkElement.attr("href", "#post-" + id);
+				linkElement.attr("href", "#post-" + id).addClass("in-page-link");
 			}
 		}
 	});
