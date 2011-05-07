@@ -129,6 +129,9 @@ public class CreateSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
+			return false;
+		}
 		return (getCurrentSone(toadletContext, false) == null) || (webInterface.getCore().getLocalSones().size() == 1);
 	}
 

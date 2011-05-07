@@ -188,6 +188,9 @@ public abstract class JsonPage implements Page {
 	 */
 	@Override
 	public Response handleRequest(Request request) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !request.getToadletContext().isAllowedFullAccess()) {
+			return new Response(401, "Not authorized", "application/json", JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+		}
 		if (needsFormPassword()) {
 			String formPassword = request.getHttpRequest().getParam("formPassword");
 			if (!webInterface.getFormPassword().equals(formPassword)) {

@@ -296,7 +296,18 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
+	protected boolean isFullAccessOnly() {
+		return webInterface.getCore().getPreferences().isRequireFullAccess();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
+			return false;
+		}
 		if (requiresLogin()) {
 			return getCurrentSone(toadletContext, false) != null;
 		}
