@@ -17,23 +17,6 @@ function ajaxGet(url, data, successCallback, errorCallback) {
 	})(url, data, successCallback, errorCallback);
 }
 
-function ajaxPost(url, data, successCallback, errorCallback) {
-	(function(url, data, successCallback, errorCallback) {
-		$.ajax({"type": "POST", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus, xmlHttpRequest) {
-			ajaxSuccess();
-			if (typeof successCallback != "undefined") {
-				successCallback(data, textStatus);
-			}
-		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
-			if (typeof errorCallback != "undefined") {
-				errorCallback();
-			} else {
-				ajaxError();
-			}
-		}});
-	})(url, data, successCallback, errorCallback);
-}
-
 function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, optional, dontUseTextarea) {
 	$(inputElement).each(function() {
 		textarea = $(dontUseTextarea ? "<input type=\"text\" name=\"" + inputFieldName + "\">" : "<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
@@ -880,7 +863,7 @@ function ajaxifyNotification(notification) {
 		notification.find(".text").addClass("hidden");
 	}
 	notification.find("form.mark-as-read button").click(function() {
-		ajaxPost("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
+		ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
 	});
 	notification.find("a[class^='link-']").each(function() {
 		linkElement = $(this);
