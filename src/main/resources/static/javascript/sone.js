@@ -1,26 +1,37 @@
 /* Sone JavaScript functions. */
 
-/* jQuery overrides. */
-oldGetJson = jQuery.prototype.getJSON;
-jQuery.prototype.getJSON = function(url, data, successCallback, errorCallback) {
-	if (typeof errorCallback == "undefined") {
-		return oldGetJson(url, data, successCallback);
-	}
-	if (jQuery.isFunction(data)) {
-		errorCallback = successCallback;
-		successCallback = data;
-		data = null;
-	}
-	return jQuery.ajax({
-		data: data,
-		error: errorCallback,
-		success: successCallback,
-		url: url
-	});
-};
+function ajaxGet(url, data, successCallback, errorCallback) {
+	(function(url, data, successCallback, errorCallback) {
+		$.ajax({"type": "GET", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus, xmlHttpRequest) {
+			ajaxSuccess();
+			if (typeof successCallback != "undefined") {
+				successCallback(data, textStatus);
+			}
+		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
+			if (typeof errorCallback != "undefined") {
+				errorCallback();
+			} else {
+				ajaxError();
+			}
+		}});
+	})(url, data, successCallback, errorCallback);
+}
 
-function isOnline() {
-	return $("#sone").hasClass("online");
+function ajaxPost(url, data, successCallback, errorCallback) {
+	(function(url, data, successCallback, errorCallback) {
+		$.ajax({"type": "POST", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus, xmlHttpRequest) {
+			ajaxSuccess();
+			if (typeof successCallback != "undefined") {
+				successCallback(data, textStatus);
+			}
+		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
+			if (typeof errorCallback != "undefined") {
+				errorCallback();
+			} else {
+				ajaxError();
+			}
+		}});
+	})(url, data, successCallback, errorCallback);
 }
 
 function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, optional, dontUseTextarea) {
@@ -110,13 +121,11 @@ function getTranslation(key, callback) {
 		callback(translations[key]);
 		return;
 	}
-	$.getJSON("getTranslation.ajax", {"key": key}, function(data, textStatus) {
+	ajaxGet("getTranslation.ajax", {"key": key}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			translations[key] = data.value;
 			callback(data.value);
 		}
-	}, function(xmlHttpRequest, textStatus, error) {
-		/* ignore error. */
 	});
 }
 
@@ -212,7 +221,7 @@ function enhanceDeleteButton(button, text, deleteCallback) {
  */
 function enhanceDeletePostButton(button, postId, text) {
 	enhanceDeleteButton(button, text, function() {
-		$.getJSON("deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		ajaxGet("deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 			if (data == null) {
 				return;
 			}
@@ -244,7 +253,7 @@ function enhanceDeletePostButton(button, postId, text) {
  */
 function enhanceDeleteReplyButton(button, replyId, text) {
 	enhanceDeleteButton(button, text, function() {
-		$.getJSON("deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+		ajaxGet("deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
 			if (data == null) {
 				return;
 			}
@@ -428,7 +437,7 @@ function getNotificationLastUpdatedTime(notificationElement) {
 }
 
 function likePost(postId) {
-	$.getJSON("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -441,7 +450,7 @@ function likePost(postId) {
 }
 
 function unlikePost(postId) {
-	$.getJSON("unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -454,7 +463,7 @@ function unlikePost(postId) {
 }
 
 function updatePostLikes(postId) {
-	$.getJSON("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
+	ajaxGet("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
 			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
@@ -466,7 +475,7 @@ function updatePostLikes(postId) {
 }
 
 function likeReply(replyId) {
-	$.getJSON("like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -479,7 +488,7 @@ function likeReply(replyId) {
 }
 
 function unlikeReply(replyId) {
-	$.getJSON("unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
 		if ((data == null) || !data.success) {
 			return;
 		}
@@ -498,7 +507,7 @@ function unlikeReply(replyId) {
  *            The ID of the Sone to trust
  */
 function trustSone(soneId) {
-	$.getJSON("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+	ajaxGet("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			updateTrustControls(soneId, data.trustValue);
 		}
@@ -512,7 +521,7 @@ function trustSone(soneId) {
  *            The ID of the Sone to distrust
  */
 function distrustSone(soneId) {
-	$.getJSON("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+	ajaxGet("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			updateTrustControls(soneId, data.trustValue);
 		}
@@ -526,7 +535,7 @@ function distrustSone(soneId) {
  *            The ID of the Sone to untrust
  */
 function untrustSone(soneId) {
-	$.getJSON("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+	ajaxGet("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			updateTrustControls(soneId, data.trustValue);
 		}
@@ -567,7 +576,7 @@ function updateTrustControls(soneId, trustValue) {
  */
 function bookmarkPost(postId) {
 	(function(postId) {
-		$.getJSON("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+		ajaxGet("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
 			if ((data != null) && data.success) {
 				getPost(postId).find(".bookmark").toggleClass("hidden", true);
 				getPost(postId).find(".unbookmark").toggleClass("hidden", false);
@@ -583,7 +592,7 @@ function bookmarkPost(postId) {
  *            The ID of the post to unbookmark
  */
 function unbookmarkPost(postId) {
-	$.getJSON("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+	ajaxGet("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			getPost(postId).find(".bookmark").toggleClass("hidden", false);
 			getPost(postId).find(".unbookmark").toggleClass("hidden", true);
@@ -592,7 +601,7 @@ function unbookmarkPost(postId) {
 }
 
 function updateReplyLikes(replyId) {
-	$.getJSON("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
+	ajaxGet("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
 			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
@@ -617,7 +626,7 @@ function updateReplyLikes(replyId) {
  *            parameters: success, error, replyId)
  */
 function postReply(sender, postId, text, callbackFunction) {
-	$.getJSON("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
+	ajaxGet("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
@@ -645,7 +654,7 @@ function ajaxifySone(soneElement) {
 	 */
 	$(".follow", soneElement).submit(function() {
 		var followElement = this;
-		$.getJSON("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+		ajaxGet("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 			$(followElement).addClass("hidden");
 			$(followElement).parent().find(".unfollow").removeClass("hidden");
 		});
@@ -653,7 +662,7 @@ function ajaxifySone(soneElement) {
 	});
 	$(".unfollow", soneElement).submit(function() {
 		var unfollowElement = this;
-		$.getJSON("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
+		ajaxGet("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 			$(unfollowElement).addClass("hidden");
 			$(unfollowElement).parent().find(".follow").removeClass("hidden");
 		});
@@ -661,7 +670,7 @@ function ajaxifySone(soneElement) {
 	});
 	$(".lock", soneElement).submit(function() {
 		var lockElement = this;
-		$.getJSON("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+		ajaxGet("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
 			$(lockElement).addClass("hidden");
 			$(lockElement).parent().find(".unlock").removeClass("hidden");
 		});
@@ -669,7 +678,7 @@ function ajaxifySone(soneElement) {
 	});
 	$(".unlock", soneElement).submit(function() {
 		var unlockElement = this;
-		$.getJSON("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
+		ajaxGet("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
 			$(unlockElement).addClass("hidden");
 			$(unlockElement).parent().find(".lock").removeClass("hidden");
 		});
@@ -871,7 +880,7 @@ function ajaxifyNotification(notification) {
 		notification.find(".text").addClass("hidden");
 	}
 	notification.find("form.mark-as-read button").click(function() {
-		$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
+		ajaxPost("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
 	});
 	notification.find("a[class^='link-']").each(function() {
 		linkElement = $(this);
@@ -883,7 +892,7 @@ function ajaxifyNotification(notification) {
 		}
 	});
 	notification.find("form.dismiss button").click(function() {
-		$.getJSON("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
+		ajaxGet("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
 			/* dismiss in case of error, too. */
 			notification.slideUp();
 		}, function(xmlHttpRequest, textStatus, error) {
@@ -978,7 +987,7 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 }
 
 function getStatus() {
-	$.getJSON("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
+	ajaxGet("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
@@ -1045,9 +1054,9 @@ function getStatus() {
 			/* data.success was false, wait 30 seconds. */
 			setTimeout(getStatus, 30000);
 		}
-	}, function(xmlHttpRequest, textStatus, error) {
-		/* something really bad happend, wait a minute. */
-		setTimeout(getStatus, 60000);
+	}, function() {
+		statusRequestQueued = false;
+		ajaxError();
 	});
 }
 
@@ -1058,7 +1067,7 @@ function getStatus() {
  *            Array of IDs of the notifications to load
  */
 function loadNotifications(notificationIds) {
-	$.getJSON("getNotification.ajax", {"notifications": notificationIds.join(",")}, function(data, textStatus) {
+	ajaxGet("getNotification.ajax", {"notifications": notificationIds.join(",")}, function(data, textStatus) {
 		if (!data || !data.success) {
 			// TODO - show error
 			return;
@@ -1218,7 +1227,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	if (getPostTime($("#sone .post").last()) > time) {
 		return;
 	}
-	$.getJSON("getPost.ajax", { "post" : postId }, function(data, textStatus) {
+	ajaxGet("getPost.ajax", { "post" : postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			if (hasPost(data.post.id)) {
 				return;
@@ -1252,7 +1261,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 	if (!hasPost(postId)) {
 		return;
 	}
-	$.getJSON("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
+	ajaxGet("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
 		/* find post. */
 		if ((data != null) && data.success) {
 			if (hasReply(data.reply.id)) {
@@ -1299,7 +1308,7 @@ function markSoneAsKnown(soneElement, skipRequest) {
 	if ($(soneElement).is(".new")) {
 		$(soneElement).removeClass("new");
 		if ((typeof skipRequest == "undefined") || !skipRequest) {
-			$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)});
+			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)});
 		}
 	}
 }
@@ -1312,7 +1321,7 @@ function markPostAsKnown(postElements, skipRequest) {
 				$(postElement).removeClass("new");
 				$(".click-to-show", postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
-					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+					ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
 				}
 			})(postElement);
 		}
@@ -1327,7 +1336,7 @@ function markReplyAsKnown(replyElements, skipRequest) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
-					$.getJSON("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+					ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
 				}
 			})(replyElement);
 		}
@@ -1365,7 +1374,7 @@ function updatePostTime(postId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updatePostTimes(postIds) {
-	$.getJSON("getTimes.ajax", { "posts" : postIds }, function(data, textStatus) {
+	ajaxGet("getTimes.ajax", { "posts" : postIds }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			$.each(data.postTimes, function(index, value) {
 				updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
@@ -1402,7 +1411,7 @@ function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updateReplyTimes(replyIds) {
-	$.getJSON("getTimes.ajax", { "replies" : replyIds }, function(data, textStatus) {
+	ajaxGet("getTimes.ajax", { "replies" : replyIds }, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			$.each(data.replyTimes, function(index, value) {
 				updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
@@ -1520,7 +1529,7 @@ function showNotificationDetails(notificationId) {
  *            The ID of the field to delete
  */
 function deleteProfileField(fieldId) {
-	$.getJSON("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
+	ajaxGet("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
 		if (data && data.success) {
 			$("#sone .profile-field#" + data.field.id).slideUp();
 		}
@@ -1538,7 +1547,7 @@ function deleteProfileField(fieldId) {
  *            Called when the renaming was successful
  */
 function editProfileField(fieldId, newName, successFunction) {
-	$.getJSON("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
+	ajaxGet("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
 		if (data && data.success) {
 			successFunction();
 		}
@@ -1556,7 +1565,7 @@ function editProfileField(fieldId, newName, successFunction) {
  *            Function to call on success
  */
 function moveProfileField(fieldId, direction, successFunction) {
-	$.getJSON("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
+	ajaxGet("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
 		if (data && data.success) {
 			successFunction();
 		}
@@ -1587,11 +1596,51 @@ function moveProfileFieldDown(fieldId, successFunction) {
 	moveProfileField(fieldId, "down", successFunction);
 }
 
+var statusRequestQueued = true;
+
+/**
+ * Sets the status of the web interface as offline.
+ */
+function ajaxError() {
+	online = false;
+	toggleOfflineMarker(true);
+	if (!statusRequestQueued) {
+		setTimeout(getStatus, 5000);
+		statusRequestQueued = true;
+	}
+}
+
+/**
+ * Sets the status of the web interface as online.
+ */
+function ajaxSuccess() {
+	online = true;
+	toggleOfflineMarker(false);
+}
+
+/**
+ * Shows or hides the offline marker.
+ *
+ * @param visible
+ *            {@code true} to display the offline marker, {@code false} to hide
+ *            it
+ */
+function toggleOfflineMarker(visible) {
+	/* jQuery documentation says toggle() works the other way around?! */
+	$("#sone #offline-marker").toggle(visible);
+	if (visible) {
+		$("#sone #main").addClass("offline");
+	} else {
+		$("#sone #main").removeClass("offline");
+	}
+}
+
 //
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
 
 var focus = true;
+var online = true;
 
 $(document).ready(function() {
 
@@ -1613,7 +1662,7 @@ $(document).ready(function() {
 			}
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
+			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
 				button.removeAttr("disabled");
 			});
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
@@ -1642,7 +1691,7 @@ $(document).ready(function() {
 		$("#sone #post-message").submit(function() {
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
-			$.getJSON("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text });
+			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text });
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
 			$(this).find(":input[name=text]:enabled").val("").blur();
 			$(this).find(".sender").hide();

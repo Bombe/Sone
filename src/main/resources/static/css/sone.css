@@ -97,6 +97,10 @@ textarea {
 	border: none;
 }
 
+#sone #main.offline {
+	opacity: 0.5;
+}
+
 #sone #offline-marker {
 	display: none;
 	position: fixed;
