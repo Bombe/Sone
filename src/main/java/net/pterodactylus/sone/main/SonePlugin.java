@@ -78,7 +78,7 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 6, 3);
+	public static final Version VERSION = new Version(0, 6, 4);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);

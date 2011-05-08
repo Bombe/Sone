@@ -152,7 +152,7 @@ public class GetTimesAjaxPage extends JsonPage {
 			text = webInterface.getL10n().getString("View.Time.AMinuteAgo");
 			refresh = Time.MINUTE;
 		} else if (age < 30 * Time.MINUTE) {
-			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf((int) Digits.round(age / Time.MINUTE, 1)));
+			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf((int) (Digits.round(age, Time.MINUTE) / Time.MINUTE)));
 			refresh = 1 * Time.MINUTE;
 		} else if (age < 45 * Time.MINUTE) {
 			text = webInterface.getL10n().getString("View.Time.HalfAnHourAgo");
@@ -161,31 +161,31 @@ public class GetTimesAjaxPage extends JsonPage {
 			text = webInterface.getL10n().getString("View.Time.AnHourAgo");
 			refresh = Time.HOUR;
 		} else if (age < 21 * Time.HOUR) {
-			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf((int) Digits.round(age / Time.HOUR, 1)));
+			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf((int) (Digits.round(age, Time.HOUR) / Time.HOUR)));
 			refresh = Time.HOUR;
 		} else if (age < 42 * Time.HOUR) {
 			text = webInterface.getL10n().getString("View.Time.ADayAgo");
 			refresh = Time.DAY;
 		} else if (age < 6 * Time.DAY) {
-			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf((int) Digits.round(age / Time.DAY, 1)));
+			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf((int) (Digits.round(age, Time.DAY) / Time.DAY)));
 			refresh = Time.DAY;
 		} else if (age < 11 * Time.DAY) {
 			text = webInterface.getL10n().getString("View.Time.AWeekAgo");
 			refresh = Time.DAY;
 		} else if (age < 4 * Time.WEEK) {
-			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((int) Digits.round(age / Time.WEEK, 1)));
+			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((int) (Digits.round(age, Time.WEEK) / Time.WEEK)));
 			refresh = Time.DAY;
 		} else if (age < 6 * Time.WEEK) {
 			text = webInterface.getL10n().getString("View.Time.AMonthAgo");
 			refresh = Time.DAY;
 		} else if (age < 11 * Time.MONTH) {
-			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((int) Digits.round(age / Time.MONTH, 1)));
+			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((int) (Digits.round(age, Time.MONTH) / Time.MONTH)));
 			refresh = Time.DAY;
 		} else if (age < 18 * Time.MONTH) {
 			text = webInterface.getL10n().getString("View.Time.AYearAgo");
 			refresh = Time.WEEK;
 		} else {
-			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((int) Digits.round(age / Time.YEAR, 1)));
+			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((int) (Digits.round(age, Time.YEAR) / Time.YEAR)));
 			refresh = Time.WEEK;
 		}
 		return new Time(text, refresh);

@@ -49,7 +49,6 @@ import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.JavascriptFilter;
-import net.pterodactylus.sone.template.NotificationManagerAccessor;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
@@ -193,7 +192,6 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
-		templateContextFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
 		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
 		templateContextFactory.addFilter("date", new DateFilter());

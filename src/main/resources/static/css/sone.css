@@ -89,8 +89,26 @@ textarea {
 	content: '★ ';
 }
 
+#sone a.in-page-link:before {
+	content: '↓ ';
+}
+
 #sone a img {
 	border: none;
+}
+
+#sone #main.offline {
+	opacity: 0.5;
+}
+
+#sone #offline-marker {
+	display: none;
+	position: fixed;
+	top: 2em;
+	right: 2em;
+	width: 128px;
+	height: 128px;
+	background-image: url("../images/sone-offline.png");
 }
 
 #sone #notification-area {

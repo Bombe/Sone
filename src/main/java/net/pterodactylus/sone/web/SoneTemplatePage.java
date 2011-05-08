@@ -26,6 +26,7 @@ import java.util.Map;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
 import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.util.collection.ListBuilder;
@@ -249,7 +250,8 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		templateContext.set("currentSone", getCurrentSone(request.getToadletContext(), false));
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
 		templateContext.set("request", request);
 		templateContext.set("currentVersion", SonePlugin.VERSION);
@@ -257,6 +259,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
 		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
+		templateContext.set("notifications", ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone));
 	}
 
 	/**
@@ -293,7 +296,18 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
+	protected boolean isFullAccessOnly() {
+		return webInterface.getCore().getPreferences().isRequireFullAccess();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
+			return false;
+		}
 		if (requiresLogin()) {
 			return getCurrentSone(toadletContext, false) != null;
 		}

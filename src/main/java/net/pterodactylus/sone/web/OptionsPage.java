@@ -65,6 +65,8 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setInsertionDelay(insertionDelay);
 			Integer postsPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
 			preferences.setPostsPerPage(postsPerPage);
+			boolean requireFullAccess = request.getHttpRequest().isPartSet("require-full-access");
+			preferences.setRequireFullAccess(requireFullAccess);
 			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
 			preferences.setPositiveTrust(positiveTrust);
 			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
@@ -88,6 +90,7 @@ public class OptionsPage extends SoneTemplatePage {
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());
+		templateContext.set("require-full-access", preferences.isRequireFullAccess());
 		templateContext.set("positive-trust", preferences.getPositiveTrust());
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());

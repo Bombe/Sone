@@ -12,7 +12,7 @@
 <div class="text">
 	<%= Notification.NewSone.Text|l10n|html>
 	<%foreach sones sone>
-		<div class="hidden sone-id"><% sone.id|html></div>
+		<div class="hidden new-sone-id"><% sone.id|html></div>
 		<a href="viewSone.html?sone=<% sone.id|html>" title="<% sone.requestUri|html>"><% sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
 	<%/foreach>
 </div>

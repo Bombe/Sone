@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -64,6 +65,7 @@ public class CreatePostPage extends SoneTemplatePage {
 					sender = currentSone;
 				}
 				Sone recipient = webInterface.getCore().getSone(recipientId, false);
+				text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
 				webInterface.getCore().createPost(sender, recipient, System.currentTimeMillis(), text);
 				throw new RedirectException(returnPage);
 			}

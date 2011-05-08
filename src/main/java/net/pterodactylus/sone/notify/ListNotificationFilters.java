@@ -50,28 +50,25 @@ public class ListNotificationFilters {
 	 *            The current Sone, or {@code null} if not logged in
 	 * @return The filtered notifications
 	 */
-	public static List<Notification> filterNotifications(List<Notification> notifications, Sone currentSone) {
-		ListNotification<Post> newPostNotification = getNotification(notifications, "new-post-notification", Post.class);
-		if (newPostNotification != null) {
-			ListNotification<Post> filteredNotification = filterNewPostNotification(newPostNotification, currentSone);
-			int notificationIndex = notifications.indexOf(newPostNotification);
-			if (filteredNotification == null) {
-				notifications.remove(notificationIndex);
+	@SuppressWarnings("unchecked")
+	public static List<Notification> filterNotifications(Collection<? extends Notification> notifications, Sone currentSone) {
+		List<Notification> filteredNotifications = new ArrayList<Notification>();
+		for (Notification notification : notifications) {
+			if (notification.getId().equals("new-post-notification")) {
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone);
+				if (filteredNotification != null) {
+					filteredNotifications.add(filteredNotification);
+				}
+			} else if (notification.getId().equals("new-replies-notification")) {
+				ListNotification<Reply> filteredNotification = filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+				if (filteredNotification != null) {
+					filteredNotifications.add(filteredNotification);
+				}
 			} else {
-				notifications.set(notificationIndex, filteredNotification);
+				filteredNotifications.add(notification);
 			}
 		}
-		ListNotification<Reply> newReplyNotification = getNotification(notifications, "new-replies-notification", Reply.class);
-		if (newReplyNotification != null) {
-			ListNotification<Reply> filteredNotification = filterNewReplyNotification(newReplyNotification, currentSone);
-			int notificationIndex = notifications.indexOf(newReplyNotification);
-			if (filteredNotification == null) {
-				notifications.remove(notificationIndex);
-			} else {
-				notifications.set(notificationIndex, filteredNotification);
-			}
-		}
-		return notifications;
+		return filteredNotifications;
 	}
 
 	/**
@@ -128,7 +125,7 @@ public class ListNotificationFilters {
 		}
 		List<Reply> newReplies = new ArrayList<Reply>();
 		for (Reply reply : newReplyNotification.getElements()) {
-			if (isPostVisible(currentSone, reply.getPost())) {
+			if (isReplyVisible(currentSone, reply)) {
 				newReplies.add(reply);
 			}
 		}
@@ -144,32 +141,6 @@ public class ListNotificationFilters {
 	}
 
 	/**
-	 * Finds the notification with the given ID in the list of notifications and
-	 * returns it.
-	 *
-	 * @param <T>
-	 *            The type of the item in the notification
-	 * @param notifications
-	 *            The notification to search
-	 * @param notificationId
-	 *            The ID of the requested notification
-	 * @param notificationElementClass
-	 *            The class of the notification item
-	 * @return The requested notification, or {@code null} if no notification
-	 *         with the given ID could be found
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> ListNotification<T> getNotification(Collection<? extends Notification> notifications, String notificationId, Class<T> notificationElementClass) {
-		for (Notification notification : notifications) {
-			if (!notificationId.equals(notification.getId())) {
-				continue;
-			}
-			return (ListNotification<T>) notification;
-		}
-		return null;
-	}
-
-	/**
 	 * Checks whether a post is visible to the given Sone. A post is not
 	 * considered visible if one of the following statements is true:
 	 * <ul>
@@ -182,6 +153,7 @@ public class ListNotificationFilters {
 	 * Sone.</li>
 	 * <li>The given Sone has not explicitely assigned negative trust to the
 	 * post’s Sone but the implicit trust is negative.</li>
+	 * <li>The post’s {@link Post#getTime() time} is in the future.</li>
 	 * </ul>
 	 * If none of these statements is true the post is considered visible.
 	 *
@@ -210,6 +182,50 @@ public class ListNotificationFilters {
 			return false;
 		}
 		if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
+			return false;
+		}
+		if (post.getTime() > System.currentTimeMillis()) {
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Checks whether a reply is visible to the given Sone. A reply is not
+	 * considered visible if one of the following statements is true:
+	 * <ul>
+	 * <li>The reply does not have a post.</li>
+	 * <li>The reply’s post does not have a Sone.</li>
+	 * <li>The Sone of the reply’s post is not the given Sone, the given Sone
+	 * does not follow the reply’s post’s Sone, and the given Sone is not the
+	 * recipient of the reply’s post.</li>
+	 * <li>The trust relationship between the two Sones can not be retrieved.</li>
+	 * <li>The given Sone has explicitely assigned negative trust to the post’s
+	 * Sone.</li>
+	 * <li>The given Sone has not explicitely assigned negative trust to the
+	 * reply’s post’s Sone but the implicit trust is negative.</li>
+	 * <li>The reply’s post’s {@link Post#getTime() time} is in the future.</li>
+	 * <li>The reply’s {@link Reply#getTime() time} is in the future.</li>
+	 * </ul>
+	 * If none of these statements is true the reply is considered visible.
+	 *
+	 * @param sone
+	 *            The Sone that checks for a post’s visibility
+	 * @param reply
+	 *            The reply to check for visibility
+	 * @return {@code true} if the reply is considered visible, {@code false}
+	 *         otherwise
+	 */
+	public static boolean isReplyVisible(Sone sone, Reply reply) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Reply", reply).check().isNotNull("Sone’s Identity", sone.getIdentity()).check().isInstanceOf("Sone’s Identity", sone.getIdentity(), OwnIdentity.class).check();
+		Post post = reply.getPost();
+		if (post == null) {
+			return false;
+		}
+		if (!isPostVisible(sone, post)) {
+			return false;
+		}
+		if (reply.getTime() > System.currentTimeMillis()) {
 			return false;
 		}
 		return true;

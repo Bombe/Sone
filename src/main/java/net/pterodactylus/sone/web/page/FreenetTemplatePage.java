@@ -109,6 +109,9 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 			return new RedirectResponse(redirectTarget);
 		}
 
+		if (isFullAccessOnly() && !request.getToadletContext().isAllowedFullAccess()) {
+			return new Response(401, "Not authorized", "text/html", "Not authorized");
+		}
 		ToadletContext toadletContext = request.getToadletContext();
 		if (request.getMethod() == Method.POST) {
 			/* require form password. */
@@ -227,6 +230,17 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 		return Collections.emptyList();
 	}
 
+	/**
+	 * Returns whether this page should only be allowed for requests from hosts
+	 * with full access.
+	 *
+	 * @return {@code true} if this page should only be allowed for hosts with
+	 *         full access, {@code false} to allow this page for any host
+	 */
+	protected boolean isFullAccessOnly() {
+		return false;
+	}
+
 	//
 	// INTERFACE LinkEnabledCallback
 	//
@@ -236,7 +250,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
-		return true;
+		return !isFullAccessOnly();
 	}
 
 	/**
