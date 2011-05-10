@@ -101,6 +101,7 @@ import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.CollectionSortFilter;
+import net.pterodactylus.util.template.ContainsFilter;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
@@ -210,6 +211,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
+		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
