@@ -2017,6 +2017,18 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/**
+		 * Validates the given insertion delay.
+		 *
+		 * @param insertionDelay
+		 *            The insertion delay to validate
+		 * @return {@code true} if the given insertion delay was valid, {@code
+		 *         false} otherwise
+		 */
+		public boolean validateInsertionDelay(Integer insertionDelay) {
+			return options.getIntegerOption("InsertionDelay").validate(insertionDelay);
+		}
+
+		/**
 		 * Sets the insertion delay
 		 *
 		 * @param insertionDelay
@@ -2036,6 +2048,18 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public int getPostsPerPage() {
 			return options.getIntegerOption("PostsPerPage").get();
+		}
+
+		/**
+		 * Validates the number of posts per page.
+		 *
+		 * @param postsPerPage
+		 *            The number of posts per page
+		 * @return {@code true} if the number of posts per page was valid,
+		 *         {@code false} otherwise
+		 */
+		public boolean validatePostsPerPage(Integer postsPerPage) {
+			return options.getIntegerOption("PostsPerPage").validate(postsPerPage);
 		}
 
 		/**
@@ -2081,6 +2105,18 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/**
+		 * Validates the positive trust.
+		 *
+		 * @param positiveTrust
+		 *            The positive trust to validate
+		 * @return {@code true} if the positive trust was valid, {@code false}
+		 *         otherwise
+		 */
+		public boolean validatePositiveTrust(Integer positiveTrust) {
+			return options.getIntegerOption("PositiveTrust").validate(positiveTrust);
+		}
+
+		/**
 		 * Sets the positive trust.
 		 *
 		 * @param positiveTrust
@@ -2100,6 +2136,18 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public int getNegativeTrust() {
 			return options.getIntegerOption("NegativeTrust").get();
+		}
+
+		/**
+		 * Validates the negative trust.
+		 *
+		 * @param negativeTrust
+		 *            The negative trust to validate
+		 * @return {@code true} if the negative trust was valid, {@code false}
+		 *         otherwise
+		 */
+		public boolean validateNegativeTrust(Integer negativeTrust) {
+			return options.getIntegerOption("NegativeTrust").validate(negativeTrust);
 		}
 
 		/**
