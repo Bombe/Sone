@@ -670,3 +670,8 @@ textarea {
 	font-weight: bold;
 	color: red;
 }
+
+#sone .warning {
+	color: red;
+	font-style: italic;
+}
