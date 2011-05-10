@@ -51,6 +51,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
 import freenet.keys.FreenetURI;
@@ -1767,7 +1768,7 @@ public class Core implements IdentityListener, UpdateListener {
 	@SuppressWarnings("unchecked")
 	private void loadConfiguration() {
 		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new OptionWatcher<Integer>() {
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangeValidator(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
 
 			@Override
 			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
@@ -1775,10 +1776,10 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 
 		}));
-		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
-		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
+		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1795,11 +1796,11 @@ public class Core implements IdentityListener, UpdateListener {
 			return;
 		}
 
-		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
-		options.getIntegerOption("PostsPerPage").set(configuration.getIntValue("Option/PostsPerPage").getValue(null));
+		loadConfigurationValue("InsertionDelay");
+		loadConfigurationValue("PostsPerPage");
 		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
-		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
-		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
+		loadConfigurationValue("PositiveTrust");
+		loadConfigurationValue("NegativeTrust");
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
@@ -1851,6 +1852,21 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 
+	}
+
+	/**
+	 * Loads an {@link Integer} configuration value for the option with the
+	 * given name, logging validation failures.
+	 *
+	 * @param optionName
+	 *            The name of the option to load
+	 */
+	private void loadConfigurationValue(String optionName) {
+		try {
+			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Invalid value for " + optionName + " in configuration, using default.");
+		}
 	}
 
 	/**
