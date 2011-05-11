@@ -22,8 +22,10 @@ import java.util.List;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
 import net.pterodactylus.sone.freenet.fcp.Command;
@@ -214,6 +216,41 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		} catch (FSParseException fspe1) {
 			throw new FcpException("Could not reply ID from “" + parameterName + "”.", fspe1);
 		}
+	}
+
+	/**
+	 * Creates a simple field set from the given Sone, including {@link Profile}
+	 * information.
+	 *
+	 * @param sone
+	 *            The Sone to encode
+	 * @param prefix
+	 *            The prefix for the field names (may be empty but not {@code
+	 *            null})
+	 * @param localSone
+	 *            An optional local Sone that is used for Sone-specific data,
+	 *            such as if the Sone is followed by the local Sone
+	 * @return The simple field set containing the given Sone
+	 */
+	protected SimpleFieldSet encodeSone(Sone sone, String prefix, Sone localSone) {
+		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
+
+		soneBuilder.put(prefix + "Name", sone.getName());
+		soneBuilder.put(prefix + "NiceName", SoneAccessor.getNiceName(sone));
+		soneBuilder.put(prefix + "LastUpdated", sone.getTime());
+		if (localSone != null) {
+			soneBuilder.put(prefix + "Followed", String.valueOf(localSone.hasFriend(sone.getId())));
+		}
+		Profile profile = sone.getProfile();
+		soneBuilder.put(prefix + "Field.Count", profile.getFields().size());
+		int fieldIndex = 0;
+		for (Field field : profile.getFields()) {
+			soneBuilder.put(prefix + "Field." + fieldIndex + ".Name", field.getName());
+			soneBuilder.put(prefix + "Field." + fieldIndex + ".Value", field.getValue());
+			++fieldIndex;
+		}
+
+		return soneBuilder.get();
 	}
 
 	/**
