@@ -38,6 +38,7 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.fcp.FcpInterface;
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -1707,7 +1708,7 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
-			configuration.getBooleanValue("Option/FcpWriteFromFullAccessOnly").setValue(options.getBooleanOption("FcpWriteFromFullAccessOnly").getReal());
+			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1790,12 +1791,12 @@ public class Core implements IdentityListener, UpdateListener {
 				fcpInterface.setActive(newValue);
 			}
 		}));
-		options.addBooleanOption("FcpWriteFromFullAccessOnly", new DefaultOption<Boolean>(true, new OptionWatcher<Boolean>() {
+		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, new OptionWatcher<Integer>() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
-			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
-				fcpInterface.setAllowWriteFromFullAccessOnly(newValue);
+			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+				fcpInterface.setFullAccessRequired(FullAccessRequired.values()[newValue]);
 			}
 
 		}));
@@ -1820,7 +1821,7 @@ public class Core implements IdentityListener, UpdateListener {
 		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
-		options.getBooleanOption("FcpWriteFromFullAccessOnly").set(configuration.getBooleanValue("Option/FcpWriteFromFullAccessOnly").getValue(null));
+		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -2122,29 +2123,26 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/**
-		 * Returns whether write access to the FCP interface is only allowed
-		 * from the allowed FCP hosts of the node configuration.
+		 * Returns the action level for which full access to the FCP interface
+		 * is required.
 		 *
-		 * @return {@code true} if only allowed hosts are allowed to change data
-		 *         using the FCP interface, {@code false} if everybody can
-		 *         change data using the FCP interface
+		 * @return The action level for which full access to the FCP interface
+		 *         is required
 		 */
-		public boolean isFcpWriteFromFullAccessOnly() {
-			return options.getBooleanOption("FcpWriteFromFullAccessOnly").get();
+		public FullAccessRequired getFcpFullAccessRequired() {
+			return FullAccessRequired.values()[options.getIntegerOption("FcpFullAccessRequired").get()];
 		}
 
 		/**
-		 * Sets whether write access to the FCP interface is only allowed from
-		 * the allowed FCP hosts of the node configuration.
+		 * Sets the action level for which full access to the FCP interface is
+		 * required
 		 *
-		 * @param fcpWriteFromFullAccessOnly
-		 *            {@code true} if only allowed hosts should be allowed to
-		 *            change data using the FCP interface, {@code false} if
-		 *            everybody can change data using the FCP interface
-		 * @return This preferences object
+		 * @param fcpFullAccessRequired
+		 *            The action level
+		 * @return This preferences
 		 */
-		public Preferences setFcpWriteFromFullAccessOnly(boolean fcpWriteFromFullAccessOnly) {
-			options.getBooleanOption("FcpWriteFromFullAccessOnly").set(fcpWriteFromFullAccessOnly);
+		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
+			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
 			return this;
 		}
 

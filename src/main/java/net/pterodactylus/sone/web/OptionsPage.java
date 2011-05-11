@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -74,10 +75,11 @@ public class OptionsPage extends SoneTemplatePage {
 				trustComment = null;
 			}
 			preferences.setTrustComment(trustComment);
-			boolean fcpInterfaceActive = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("fcp-interface-active", 5));
+			boolean fcpInterfaceActive = request.getHttpRequest().isPartSet("fcp-interface-active");
 			preferences.setFcpInterfaceActive(fcpInterfaceActive);
-			boolean requireFullAccessHosts = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("require-full-access-hosts", 5));
-			preferences.setFcpWriteFromFullAccessOnly(requireFullAccessHosts);
+			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
+			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
+			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
 			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
 			preferences.setSoneRescueMode(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
@@ -96,7 +98,7 @@ public class OptionsPage extends SoneTemplatePage {
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());
 		templateContext.set("fcp-interface-active", preferences.isFcpInterfaceActive());
-		templateContext.set("require-full-access-hosts", preferences.isFcpWriteFromFullAccessOnly());
+		templateContext.set("fcp-full-access-required", preferences.getFcpFullAccessRequired().ordinal());
 		templateContext.set("sone-rescue-mode", preferences.isSoneRescueMode());
 		templateContext.set("clear-on-next-restart", preferences.isClearOnNextRestart());
 		templateContext.set("really-clear-on-next-restart", preferences.isReallyClearOnNextRestart());

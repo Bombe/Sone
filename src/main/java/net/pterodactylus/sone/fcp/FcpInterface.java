@@ -29,6 +29,7 @@ import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.validation.Validation;
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
@@ -43,14 +44,32 @@ import freenet.support.api.Bucket;
  */
 public class FcpInterface {
 
+	/**
+	 * The action level that full access for the FCP connection is required.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public enum FullAccessRequired {
+
+		/** No action requires full access. */
+		NO,
+
+		/** All writing actions require full access. */
+		WRITING,
+
+		/** All actions require full access. */
+		ALWAYS,
+
+	}
+
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FcpInterface.class);
 
 	/** Whether the FCP interface is currently active. */
 	private volatile boolean active;
 
-	/** Whether to allow write access from full access hosts only. */
-	private volatile boolean allowWriteFromFullAccessOnly;
+	/** What function full access is required for. */
+	private volatile FullAccessRequired fullAccessRequired = FullAccessRequired.ALWAYS;
 
 	/** All available FCP commands. */
 	private final Map<String, AbstractSoneCommand> commands = Collections.synchronizedMap(new HashMap<String, AbstractSoneCommand>());
@@ -93,14 +112,14 @@ public class FcpInterface {
 	}
 
 	/**
-	 * Sets whether write access is only allowed from full access hosts.
+	 * Sets the action level for which full FCP access is required.
 	 *
-	 * @param allowWriteFromFullAccessOnly
-	 *            {@code true} to allow write access only from full access
-	 *            hosts, {@code false} to always allow write access
+	 * @param fullAccessRequired
+	 *            The action level for which full FCP access is required
 	 */
-	public void setAllowWriteFromFullAccessOnly(boolean allowWriteFromFullAccessOnly) {
-		this.allowWriteFromFullAccessOnly = allowWriteFromFullAccessOnly;
+	public void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
+		Validation.begin().isNotNull("FullAccessRequired", fullAccessRequired).check();
+		this.fullAccessRequired = fullAccessRequired;
 	}
 
 	//
@@ -131,9 +150,9 @@ public class FcpInterface {
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
-		if (allowWriteFromFullAccessOnly && command.requiresWriteAccess() && (accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED)) {
+		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired == FullAccessRequired.ALWAYS))) {
 			try {
-				sendReply(pluginReplySender, null, new ErrorResponse(401, "No Write Access"));
+				sendReply(pluginReplySender, null, new ErrorResponse(401, "Not authorized"));
 			} catch (PluginNotFoundException pnfe1) {
 				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
 			}
