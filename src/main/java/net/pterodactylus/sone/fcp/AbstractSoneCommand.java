@@ -128,16 +128,40 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *             or if the Sone ID is invalid
 	 */
 	protected Sone getSone(SimpleFieldSet simpleFieldSet, String parameterName, boolean localOnly) throws FcpException {
-		try {
-			String soneId = simpleFieldSet.getString(parameterName);
-			Sone sone = localOnly ? core.getLocalSone(soneId, false) : core.getSone(soneId, false);
-			if (sone == null) {
-				throw new FcpException("Could not load Sone from “" + soneId + "”.");
-			}
-			return sone;
-		} catch (FSParseException fspe1) {
-			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.", fspe1);
+		return getSone(simpleFieldSet, parameterName, localOnly, true);
+	}
+
+	/**
+	 * Returns a Sone whose ID is a parameter in the given simple field set.
+	 *
+	 * @param simpleFieldSet
+	 *            The simple field set containing the ID of the Sone
+	 * @param parameterName
+	 *            The name under which the Sone ID is stored in the simple field
+	 *            set
+	 * @param localOnly
+	 *            {@code true} to only return local Sones, {@code false} to
+	 *            return any Sones
+	 * @param mandatory
+	 *            {@code true} if a valid Sone ID is required, {@code false}
+	 *            otherwise
+	 * @return The Sone, or {@code null} if {@code mandatory} is {@code false}
+	 *         and the Sone ID is invalid
+	 * @throws FcpException
+	 *             if there is no Sone ID stored under the given parameter name,
+	 *             or if {@code mandatory} is {@code true} and the Sone ID is
+	 *             invalid
+	 */
+	protected Sone getSone(SimpleFieldSet simpleFieldSet, String parameterName, boolean localOnly, boolean mandatory) throws FcpException {
+		String soneId = simpleFieldSet.get(parameterName);
+		if (mandatory && (soneId == null)) {
+			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.");
 		}
+		Sone sone = localOnly ? core.getLocalSone(soneId, false) : core.getSone(soneId, false);
+		if (mandatory && (sone == null)) {
+			throw new FcpException("Could not load Sone from “" + soneId + "”.");
+		}
+		return sone;
 	}
 
 	/**
