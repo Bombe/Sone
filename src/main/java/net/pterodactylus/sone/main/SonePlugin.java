@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
+import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -40,10 +41,14 @@ import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.FredPluginBaseL10n;
+import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.FredPluginL10n;
 import freenet.pluginmanager.FredPluginThreadless;
 import freenet.pluginmanager.FredPluginVersioned;
+import freenet.pluginmanager.PluginReplySender;
 import freenet.pluginmanager.PluginRespirator;
+import freenet.support.SimpleFieldSet;
+import freenet.support.api.Bucket;
 
 /**
  * This class interfaces with Freenet. It is the class that is loaded by the
@@ -51,7 +56,7 @@ import freenet.pluginmanager.PluginRespirator;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
+public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
 
 	static {
 		/* initialize logging. */
@@ -91,6 +96,9 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 
 	/** The web interface. */
 	private WebInterface webInterface;
+
+	/** The FCP interface. */
+	private FcpInterface fcpInterface;
 
 	/** The l10n helper. */
 	private PluginL10n l10n;
@@ -184,6 +192,10 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 			webInterface = new WebInterface(this);
 			core.addCoreListener(webInterface);
 
+			/* create FCP interface. */
+			fcpInterface = new FcpInterface(core);
+			core.setFcpInterface(fcpInterface);
+
 			/* create the identity manager. */
 			identityManager.addIdentityListener(core);
 
@@ -230,6 +242,18 @@ public class SonePlugin implements FredPlugin, FredPluginL10n, FredPluginBaseL10
 			/* shutdown logger. */
 			Logging.shutdown();
 		}
+	}
+
+	//
+	// INTERFACE FredPluginFCP
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
+		fcpInterface.handle(pluginReplySender, parameters, data, accessType);
 	}
 
 	//

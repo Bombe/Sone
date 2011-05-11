@@ -40,6 +40,8 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.fcp.FcpInterface;
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -115,6 +117,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
+
+	/** The FCP interface. */
+	private volatile FcpInterface fcpInterface;
 
 	/** Whether the core has been stopped. */
 	private volatile boolean stopped;
@@ -255,6 +260,16 @@ public class Core implements IdentityListener, UpdateListener {
 	 */
 	public UpdateChecker getUpdateChecker() {
 		return updateChecker;
+	}
+
+	/**
+	 * Sets the FCP interface to use.
+	 *
+	 * @param fcpInterface
+	 *            The FCP interface to use
+	 */
+	public void setFcpInterface(FcpInterface fcpInterface) {
+		this.fcpInterface = fcpInterface;
 	}
 
 	/**
@@ -1706,6 +1721,8 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
+			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
+			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1781,6 +1798,23 @@ public class Core implements IdentityListener, UpdateListener {
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
+		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, new OptionWatcher<Boolean>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
+				fcpInterface.setActive(newValue);
+			}
+		}));
+		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, new OptionWatcher<Integer>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+				fcpInterface.setFullAccessRequired(FullAccessRequired.values()[newValue]);
+			}
+
+		}));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1802,6 +1836,8 @@ public class Core implements IdentityListener, UpdateListener {
 		loadConfigurationValue("PositiveTrust");
 		loadConfigurationValue("NegativeTrust");
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
+		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
+		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -2199,6 +2235,57 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public Preferences setTrustComment(String trustComment) {
 			options.getStringOption("TrustComment").set(trustComment);
+			return this;
+		}
+
+		/**
+		 * Returns whether the {@link FcpInterface FCP interface} is currently
+		 * active.
+		 *
+		 * @see FcpInterface#setActive(boolean)
+		 * @return {@code true} if the FCP interface is currently active,
+		 *         {@code false} otherwise
+		 */
+		public boolean isFcpInterfaceActive() {
+			return options.getBooleanOption("ActivateFcpInterface").get();
+		}
+
+		/**
+		 * Sets whether the {@link FcpInterface FCP interface} is currently
+		 * active.
+		 *
+		 * @see FcpInterface#setActive(boolean)
+		 * @param fcpInterfaceActive
+		 *            {@code true} to activate the FCP interface, {@code false}
+		 *            to deactivate the FCP interface
+		 * @return This preferences object
+		 */
+		public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
+			options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
+			return this;
+		}
+
+		/**
+		 * Returns the action level for which full access to the FCP interface
+		 * is required.
+		 *
+		 * @return The action level for which full access to the FCP interface
+		 *         is required
+		 */
+		public FullAccessRequired getFcpFullAccessRequired() {
+			return FullAccessRequired.values()[options.getIntegerOption("FcpFullAccessRequired").get()];
+		}
+
+		/**
+		 * Sets the action level for which full access to the FCP interface is
+		 * required
+		 *
+		 * @param fcpFullAccessRequired
+		 *            The action level
+		 * @return This preferences
+		 */
+		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
+			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
 			return this;
 		}
 
