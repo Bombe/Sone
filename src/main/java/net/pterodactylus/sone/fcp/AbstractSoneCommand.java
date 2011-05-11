@@ -330,4 +330,16 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		return likesBuilder.get();
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getClass().getName() + "[writeAccess=" + writeAccess + "]";
+	}
+
 }
