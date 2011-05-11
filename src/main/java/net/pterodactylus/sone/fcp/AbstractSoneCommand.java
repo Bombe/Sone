@@ -99,6 +99,19 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	//
 
 	/**
+	 * Encodes text in a way that makes it possible for the text to be stored in
+	 * a {@link SimpleFieldSet}. Backslashes, CR, and LF are prepended with a
+	 * backslash.
+	 *
+	 * @param text
+	 *            The text to encode
+	 * @return The encoded text
+	 */
+	protected String encodeString(String text) {
+		return text.replaceAll("\\\\", "\\\\").replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r");
+	}
+
+	/**
 	 * Returns a Sone whose ID is a parameter in the given simple field set.
 	 *
 	 * @param simpleFieldSet
@@ -227,7 +240,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			postBuilder.put(prefix + "Recipient", post.getRecipient().getId());
 		}
 		postBuilder.put(prefix + "Time", post.getTime());
-		postBuilder.put(prefix + "Text", post.getText());
+		postBuilder.put(prefix + "Text", encodeString(post.getText()));
 		postBuilder.put(encodeLikes(core.getLikes(post), prefix + "Likes."));
 
 		if (includeReplies) {
@@ -287,7 +300,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			replyBuilder.put(replyPrefix + "ID", reply.getId());
 			replyBuilder.put(replyPrefix + "Sone", reply.getSone().getId());
 			replyBuilder.put(replyPrefix + "Time", reply.getTime());
-			replyBuilder.put(replyPrefix + "Text", reply.getText());
+			replyBuilder.put(replyPrefix + "Text", encodeString(reply.getText()));
 		}
 
 		return replyBuilder.get();
