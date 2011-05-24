@@ -933,6 +933,7 @@ public class Core implements IdentityListener, UpdateListener {
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
 							localSone.addFriend(sone.getId());
+							saveSone(localSone);
 						}
 					}
 				}
