@@ -19,7 +19,6 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -89,7 +88,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonSones.add(jsonSone);
 		}
 		/* load notifications. */
-		List<Notification> notifications = ListNotificationFilters.filterNotifications(new ArrayList<Notification>(webInterface.getNotifications().getNotifications()), currentSone);
+		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
 		Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
 		JsonArray jsonNotificationInformations = new JsonArray();
 		for (Notification notification : notifications) {
