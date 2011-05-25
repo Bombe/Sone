@@ -19,7 +19,6 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
@@ -82,7 +81,6 @@ public class GetNotificationAjaxPage extends JsonPage {
 		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);
 		for (String notificationId : notificationIds) {
 			Notification notification = webInterface.getNotifications().getNotification(notificationId);
-			ListNotificationFilters.filterNotifications(new ArrayList<Notification>(), currentSone);
 			if ("new-post-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone);
 			} else if ("new-reply-notification".equals(notificationId)) {
