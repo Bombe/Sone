@@ -83,7 +83,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 			Notification notification = webInterface.getNotifications().getNotification(notificationId);
 			if ("new-post-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone);
-			} else if ("new-reply-notification".equals(notificationId)) {
+			} else if ("new-replies-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
 			}
 			if (notification == null) {
