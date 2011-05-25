@@ -78,7 +78,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 	protected JsonObject createJsonObject(Request request) {
 		String[] notificationIds = request.getHttpRequest().getParam("notifications").split(",");
 		JsonObject jsonNotifications = new JsonObject();
-		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		for (String notificationId : notificationIds) {
 			Notification notification = webInterface.getNotifications().getNotification(notificationId);
 			if ("new-post-notification".equals(notificationId)) {
