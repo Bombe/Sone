@@ -110,6 +110,7 @@ public class ListNotification<T> extends TemplateNotification {
 	public void setElements(Collection<? extends T> elements) {
 		this.elements.clear();
 		this.elements.addAll(elements);
+		touch();
 	}
 
 	/**
