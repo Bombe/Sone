@@ -867,6 +867,14 @@ public class Core implements IdentityListener, UpdateListener {
 					coreListenerManager.fireRescuingSone(sone);
 					lockSone(sone);
 					long edition = sone.getLatestEdition();
+					/* find the latest edition the node knows about. */
+					Pair<FreenetURI, FetchResult> currentUri = freenetInterface.fetchUri(sone.getRequestUri());
+					if (currentUri != null) {
+						long currentEdition = currentUri.getLeft().getEdition();
+						if (currentEdition > edition) {
+							edition = currentEdition;
+						}
+					}
 					while (!stopped && (edition >= 0) && preferences.isSoneRescueMode()) {
 						logger.log(Level.FINE, "Downloading edition " + edition + "…");
 						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
