@@ -224,7 +224,7 @@ public class WebInterface implements CoreListener {
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
-		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate, false);
+		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
 
 		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
 		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);

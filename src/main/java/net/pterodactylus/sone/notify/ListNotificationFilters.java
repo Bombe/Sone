@@ -59,7 +59,7 @@ public class ListNotificationFilters {
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
-			} else if (notification.getId().equals("new-replies-notification")) {
+			} else if (notification.getId().equals("new-reply-notification")) {
 				ListNotification<Reply> filteredNotification = filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
