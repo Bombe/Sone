@@ -214,6 +214,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
+		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */

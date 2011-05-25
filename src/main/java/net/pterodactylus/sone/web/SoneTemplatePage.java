@@ -120,7 +120,6 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		this.pageTitleKey = pageTitleKey;
 		this.webInterface = webInterface;
 		this.requireLogin = requireLogin;
-		template.getInitialContext().set("webInterface", webInterface);
 	}
 
 	//
