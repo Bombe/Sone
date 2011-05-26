@@ -1302,12 +1302,12 @@ function markPostAsKnown(postElements, skipRequest) {
 		if ($(postElement).hasClass("new")) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
-				$(".click-to-show", postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
 					ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
 				}
 			})(postElement);
 		}
+		$(".click-to-show", postElement).removeClass("new");
 	});
 	markReplyAsKnown($(postElements).find(".reply"));
 }
