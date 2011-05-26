@@ -49,6 +49,7 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -56,6 +57,7 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
+import freenet.client.FetchResult;
 import freenet.keys.FreenetURI;
 
 /**
