@@ -1703,6 +1703,9 @@ public class Core implements IdentityListener, UpdateListener {
 			for (SoneInserter soneInserter : soneInserters.values()) {
 				soneInserter.stop();
 			}
+			for (Sone localSone : localSones.values()) {
+				saveSone(localSone);
+			}
 		}
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
