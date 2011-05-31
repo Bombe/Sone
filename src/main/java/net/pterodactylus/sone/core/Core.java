@@ -2037,6 +2037,7 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 		synchronized (newSones) {
 			newSones.remove(identity.getId());
+			coreListenerManager.fireSoneRemoved(sone);
 		}
 	}
 
