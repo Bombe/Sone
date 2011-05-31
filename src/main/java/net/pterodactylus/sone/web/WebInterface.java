@@ -745,6 +745,14 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
+	public void soneRemoved(Sone sone) {
+		newSoneNotification.remove(sone);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public void postRemoved(Post post) {
 		newPostNotification.remove(post);
 	}
