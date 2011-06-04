@@ -178,6 +178,47 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 					next = nextPost;
 					linkType = LinkType.POST;
 				}
+				if (linkType == LinkType.SONE) {
+					if (next > 0) {
+						parts.add(createPlainTextPart(line.substring(0, next)));
+					}
+					if (line.length() >= (next + 7 + 43)) {
+						String soneId = line.substring(next + 7, next + 50);
+						Sone sone = core.getSone(soneId, false);
+						if (sone != null) {
+							parts.add(createInSoneLinkPart("viewSone.html?sone=" + soneId, SoneAccessor.getNiceName(sone)));
+						} else {
+							parts.add(createPlainTextPart(line.substring(next, next + 50)));
+						}
+						line = line.substring(next + 50);
+					} else {
+						parts.add(createPlainTextPart(line.substring(next)));
+						line = "";
+					}
+					continue;
+				}
+				if (linkType == LinkType.POST) {
+					if (next > 0) {
+						parts.add(createPlainTextPart(line.substring(0, next)));
+					}
+					if (line.length() >= (next + 7 + 36)) {
+						String postId = line.substring(next + 7, next + 43);
+						Post post = core.getPost(postId, false);
+						if ((post != null) && (post.getSone() != null)) {
+							String postText = post.getText();
+							postText = postText.substring(0, Math.min(postText.length(), 20)) + "…";
+							Sone postSone = post.getSone();
+							parts.add(createInSoneLinkPart("viewPost.html?post=" + postId, postText, (postSone == null) ? postText : SoneAccessor.getNiceName(post.getSone())));
+						} else {
+							parts.add(createPlainTextPart(line.substring(next, next + 43)));
+						}
+						line = line.substring(next + 43);
+					} else {
+						parts.add(createPlainTextPart(line.substring(next)));
+						line = "";
+					}
+					continue;
+				}
 				if ((next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
 					next -= 8;
 					line = line.substring(0, next) + line.substring(next + 8);
@@ -242,25 +283,6 @@ public class FreenetLinkParser implements Parser<FreenetLinkParserContext> {
 						}
 						link = "?_CHECKED_HTTP_=" + link;
 						parts.add(createInternetLinkPart(link, name));
-					} else if (linkType == LinkType.SONE) {
-						String soneId = link.substring(7);
-						Sone sone = core.getSone(soneId, false);
-						if (sone != null) {
-							parts.add(createInSoneLinkPart("viewSone.html?sone=" + soneId, SoneAccessor.getNiceName(sone)));
-						} else {
-							parts.add(createPlainTextPart(link));
-						}
-					} else if (linkType == LinkType.POST) {
-						String postId = link.substring(7);
-						Post post = core.getPost(postId, false);
-						if ((post != null) && (post.getSone() != null)) {
-							String postText = post.getText();
-							postText = postText.substring(0, Math.min(postText.length(), 20)) + "…";
-							Sone postSone = post.getSone();
-							parts.add(createInSoneLinkPart("viewPost.html?post=" + postId, postText, (postSone == null) ? postText : SoneAccessor.getNiceName(post.getSone())));
-						} else {
-							parts.add(createPlainTextPart(link));
-						}
 					}
 					line = line.substring(nextSpace);
 				} else {
