@@ -8,6 +8,9 @@ function ajaxGet(url, data, successCallback, errorCallback) {
 				successCallback(data, textStatus);
 			}
 		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
+			if (xmlHttpRequest.status == 403) {
+				notLoggedIn = true;
+			}
 			if (typeof errorCallback != "undefined") {
 				errorCallback();
 			} else {
@@ -976,6 +979,10 @@ function getStatus() {
 			$.each(data.sones, function(index, value) {
 				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated, value.lastUpdatedText);
 			});
+			notLoggedIn = !data.loggedIn;
+			if (!notLoggedIn) {
+				showOfflineMarker(!online);
+			}
 			/* search for removed notifications. */
 			$("#sone #notification-area .notification").each(function() {
 				notificationId = $(this).attr("id");
@@ -1586,7 +1593,7 @@ var statusRequestQueued = true;
  */
 function ajaxError() {
 	online = false;
-	toggleOfflineMarker(true);
+	showOfflineMarker(true);
 	if (!statusRequestQueued) {
 		setTimeout(getStatus, 5000);
 		statusRequestQueued = true;
@@ -1598,7 +1605,7 @@ function ajaxError() {
  */
 function ajaxSuccess() {
 	online = true;
-	toggleOfflineMarker(false);
+	showOfflineMarker(!online || (initiallyLoggedIn && notLoggedIn));
 }
 
 /**
@@ -1608,7 +1615,7 @@ function ajaxSuccess() {
  *            {@code true} to display the offline marker, {@code false} to hide
  *            it
  */
-function toggleOfflineMarker(visible) {
+function showOfflineMarker(visible) {
 	/* jQuery documentation says toggle() works the other way around?! */
 	$("#sone #offline-marker").toggle(visible);
 	if (visible) {
@@ -1624,6 +1631,8 @@ function toggleOfflineMarker(visible) {
 
 var focus = true;
 var online = true;
+var initiallyLoggedIn = $("#sone #loggedIn").text() == "true";
+var notLoggedIn = !initiallyLoggedIn;
 
 $(document).ready(function() {
 
