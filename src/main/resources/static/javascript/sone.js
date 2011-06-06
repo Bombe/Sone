@@ -1211,7 +1211,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	}
 	if (!isIndexPage() || (getPage(".pagination-index") > 1)) {
 		if (!isViewPostPage() || (getShownPostId() != postId)) {
-			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
+			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId)) || (getPage(".post-navigation") > 1)) {
 				return;
 			}
 		}
@@ -1224,7 +1224,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if (hasPost(data.post.id)) {
 				return;
 			}
-			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
+			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient) || (getPage(".post-navigation") > 1)))) {
 				return;
 			}
 			var firstOlderPost = null;
