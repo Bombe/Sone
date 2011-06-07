@@ -83,7 +83,9 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 				});
 			})(replyElement);
 			textArea = replyElement.find("input.reply-input").focus().data("textarea");
-			textArea.val(textArea.val() + "@sone://" + author + " ");
+			if (author != getCurrentSoneId()) {
+				textArea.val(textArea.val() + "@sone://" + author + " ");
+			}
 		});
 		return commentElement;
 	})(postId, author);
