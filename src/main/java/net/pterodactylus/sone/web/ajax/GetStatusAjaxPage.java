@@ -127,6 +127,14 @@ public class GetStatusAjaxPage extends JsonPage {
 
 			});
 		}
+		/* remove replies to unknown posts. */
+		newReplies = Filters.filteredSet(newReplies, new Filter<Reply>() {
+
+			@Override
+			public boolean filterObject(Reply reply) {
+				return reply.getPost() != null;
+			}
+		});
 		JsonArray jsonReplies = new JsonArray();
 		for (Reply reply : newReplies) {
 			JsonObject jsonReply = new JsonObject();
