@@ -31,7 +31,7 @@ import java.util.NoSuchElementException;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PartContainer implements Iterable<Part> {
+public class PartContainer implements Part, Iterable<Part> {
 
 	/** The parts to render. */
 	private final List<Part> parts = new ArrayList<Part>();
