@@ -654,7 +654,6 @@ public class WebInterface implements CoreListener {
 		try {
 			return new InputStreamReader(getClass().getResourceAsStream(resourceName), "UTF-8");
 		} catch (UnsupportedEncodingException uee1) {
-			System.out.println("  fail.");
 			return null;
 		}
 	}
