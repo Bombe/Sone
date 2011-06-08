@@ -34,7 +34,7 @@ public interface Parser<C extends ParserContext> {
 	 * Create one or more {@link Part}s from the given text source.
 	 *
 	 * @param context
-	 *            The parser context
+	 *            The parser context (may be {@code null})
 	 * @param source
 	 *            The text source
 	 * @return The parsed parts
