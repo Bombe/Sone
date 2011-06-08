@@ -106,13 +106,13 @@ public class ParserFilter implements Filter {
 	// PRIVATE METHODS
 	//
 
-	private void render(Writer writer, Iterable<Part> parts) throws IOException {
+	private void render(Writer writer, Iterable<Part> parts) {
 		for (Part part : parts) {
 			render(writer, part);
 		}
 	}
 
-	private void render(Writer writer, Part part) throws IOException {
+	private void render(Writer writer, Part part) {
 		if (part instanceof PlainTextPart) {
 			render(writer, (PlainTextPart) part);
 		} else if (part instanceof FreenetLinkPart) {
@@ -128,25 +128,25 @@ public class ParserFilter implements Filter {
 		}
 	}
 
-	private void render(Writer writer, PlainTextPart plainTextPart) throws IOException {
+	private void render(Writer writer, PlainTextPart plainTextPart) {
 		TemplateContext templateContext = templateContextFactory.createTemplateContext();
 		templateContext.set("text", plainTextPart.getText());
 		plainTextTemplate.render(templateContext, writer);
 	}
 
-	private void render(Writer writer, FreenetLinkPart freenetLinkPart) throws IOException {
+	private void render(Writer writer, FreenetLinkPart freenetLinkPart) {
 		renderLink(writer, "/" + freenetLinkPart.getLink(), freenetLinkPart.getText(), freenetLinkPart.getTitle(), freenetLinkPart.isTrusted() ? "freenet-trusted" : "freenet");
 	}
 
-	private void render(Writer writer, LinkPart linkPart) throws IOException {
+	private void render(Writer writer, LinkPart linkPart) {
 		renderLink(writer, "/?_CHECKED_HTTP_=" + linkPart.getLink(), linkPart.getText(), linkPart.getTitle(), "internet");
 	}
 
-	private void render(Writer writer, SonePart sonePart) throws IOException {
+	private void render(Writer writer, SonePart sonePart) {
 		renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
 	}
 
-	private void render(Writer writer, PostPart postPart) throws IOException {
+	private void render(Writer writer, PostPart postPart) {
 		renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), getExcerpt(postPart.getPost().getText(), 20), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
 	}
 
