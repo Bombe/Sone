@@ -19,19 +19,29 @@ package net.pterodactylus.sone.template;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Map;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.text.FreenetLinkParser;
-import net.pterodactylus.sone.text.FreenetLinkParserContext;
+import net.pterodactylus.sone.text.FreenetLinkPart;
+import net.pterodactylus.sone.text.LinkPart;
+import net.pterodactylus.sone.text.Part;
+import net.pterodactylus.sone.text.PlainTextPart;
+import net.pterodactylus.sone.text.PostPart;
+import net.pterodactylus.sone.text.SonePart;
+import net.pterodactylus.sone.text.SoneTextParser;
+import net.pterodactylus.sone.text.SoneTextParserContext;
 import net.pterodactylus.sone.web.page.Page.Request;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.template.TemplateParser;
 
 /**
- * Filter that filters a given text through a {@link FreenetLinkParser}.
+ * Filter that filters a given text through a {@link SoneTextParser}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -41,11 +51,20 @@ public class ParserFilter implements Filter {
 	private final Core core;
 
 	/** The link parser. */
-	private final FreenetLinkParser linkParser;
+	private final SoneTextParser textParser;
+
+	/** The template context factory. */
+	private final TemplateContextFactory templateContextFactory;
+
+	/** The template for {@link PlainTextPart}s. */
+	private final Template plainTextTemplate = TemplateParser.parse(new StringReader("<%text|html>"));
+
+	/** The template for {@link FreenetLinkPart}s. */
+	private final Template linkTemplate = TemplateParser.parse(new StringReader("<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>"));
 
 	/**
-	 * Creates a new filter that runs its input through a
-	 * {@link FreenetLinkParser}.
+	 * Creates a new filter that runs its input through a {@link SoneTextParser}
+	 * .
 	 *
 	 * @param core
 	 *            The core
@@ -54,7 +73,8 @@ public class ParserFilter implements Filter {
 	 */
 	public ParserFilter(Core core, TemplateContextFactory templateContextFactory) {
 		this.core = core;
-		linkParser = new FreenetLinkParser(core, templateContextFactory);
+		this.templateContextFactory = templateContextFactory;
+		textParser = new SoneTextParser(core);
 	}
 
 	/**
@@ -71,13 +91,75 @@ public class ParserFilter implements Filter {
 		if (sone == null) {
 			sone = core.getSone(soneKey, false);
 		}
-		FreenetLinkParserContext context = new FreenetLinkParserContext((Request) templateContext.get("request"), sone);
+		Request request = (Request) templateContext.get("request");
+		SoneTextParserContext context = new SoneTextParserContext(request, sone);
+		StringWriter parsedTextWriter = new StringWriter();
 		try {
-			return linkParser.parse(context, new StringReader(text));
+			render(parsedTextWriter, textParser.parse(context, new StringReader(text)));
 		} catch (IOException ioe1) {
-			/* no exceptions in a StringReader, ignore. */
+			/* no exceptions in a StringReader or StringWriter, ignore. */
 		}
-		return null;
+		return parsedTextWriter.toString();
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	private void render(Writer writer, Iterable<Part> parts) throws IOException {
+		for (Part part : parts) {
+			render(writer, part);
+		}
+	}
+
+	private void render(Writer writer, Part part) throws IOException {
+		if (part instanceof PlainTextPart) {
+			render(writer, (PlainTextPart) part);
+		} else if (part instanceof FreenetLinkPart) {
+			render(writer, (FreenetLinkPart) part);
+		}
+	}
+
+	private void render(Writer writer, PlainTextPart plainTextPart) throws IOException {
+		TemplateContext templateContext = templateContextFactory.createTemplateContext();
+		templateContext.set("text", plainTextPart.getText());
+		plainTextTemplate.render(templateContext, writer);
+	}
+
+	private void render(Writer writer, FreenetLinkPart freenetLinkPart) throws IOException {
+		renderLink(writer, "/" + freenetLinkPart.getLink(), freenetLinkPart.getText(), freenetLinkPart.getTitle(), freenetLinkPart.isTrusted() ? "freenet-trusted" : "freenet");
+	}
+
+	private void render(Writer writer, LinkPart linkPart) throws IOException {
+		renderLink(writer, "/?_CHECKED_HTTP_=" + linkPart.getLink(), linkPart.getText(), linkPart.getTitle(), "internet");
+	}
+
+	private void render(Writer writer, SonePart sonePart) throws IOException {
+		renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
+	}
+
+	private void render(Writer writer, PostPart postPart) throws IOException {
+		renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), getExcerpt(postPart.getPost().getText(), 20), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
+	}
+
+	private void renderLink(Writer writer, String link, String text, String title, String cssClass) {
+		TemplateContext templateContext = templateContextFactory.createTemplateContext();
+		templateContext.set("cssClass", cssClass);
+		templateContext.set("link", link);
+		templateContext.set("text", text);
+		templateContext.set("title", title);
+		linkTemplate.render(templateContext, writer);
+	}
+
+	//
+	// STATIC METHODS
+	//
+
+	private static String getExcerpt(String text, int length) {
+		if (text.length() > length) {
+			return text.substring(0, length) + "…";
+		}
+		return text;
 	}
 
 }

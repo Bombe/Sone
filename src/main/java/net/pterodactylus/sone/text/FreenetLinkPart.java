@@ -1,5 +1,5 @@
 /*
- * Sone - Parser.java - Copyright © 2010 David Roden
+ * Sone - FreenetLinkPart.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,26 @@
 
 package net.pterodactylus.sone.text;
 
-import java.io.IOException;
-import java.io.Reader;
-
 /**
- * Interface for parsers that can create {@link Part}s from a text source
- * (usually a {@link Reader}).
+ * TODO
  *
- * @param <C>
- *            The type of the parser context
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Parser<C extends ParserContext> {
+public class FreenetLinkPart extends LinkPart {
 
-	/**
-	 * Create a {@link Part} from the given text source.
-	 *
-	 * @param context
-	 *            The parser context
-	 * @param source
-	 *            The text source
-	 * @return The parsed part
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
-	public Iterable<Part> parse(C context, Reader source) throws IOException;
+	private final boolean trusted;
+
+	public FreenetLinkPart(String link, String text, boolean trusted) {
+		this(link, text, text, trusted);
+	}
+
+	public FreenetLinkPart(String link, String text, String title, boolean trusted) {
+		super(link, text, title);
+		this.trusted = trusted;
+	}
+
+	public boolean isTrusted() {
+		return trusted;
+	}
 
 }

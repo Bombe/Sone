@@ -20,8 +20,12 @@ package net.pterodactylus.sone.text;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 /**
  * Part implementation that can contain an arbitrary amount of other parts.
@@ -30,7 +34,7 @@ import java.util.List;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PartContainer implements Part {
+public class PartContainer implements Iterable<Part> {
 
 	/** The parts to render. */
 	private final List<Part> parts = new ArrayList<Part>();
@@ -80,35 +84,69 @@ public class PartContainer implements Part {
 	}
 
 	//
-	// PART METHODS
+	// ITERABLE METHODS
 	//
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void render(Writer writer) throws IOException {
-		for (Part part : parts) {
-			part.render(writer);
-		}
-	}
+	@SuppressWarnings("synthetic-access")
+	public Iterator<Part> iterator() {
+		return new Iterator<Part>() {
 
-	//
-	// OBJECT METHODS
-	//
+			private Deque<Iterator<Part>> partStack = new ArrayDeque<Iterator<Part>>();
+			private Part nextPart;
+			private boolean foundNextPart;
+			private boolean noNextPart;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		StringWriter stringWriter = new StringWriter();
-		try {
-			render(stringWriter);
-		} catch (IOException ioe1) {
-			/* should never throw, ignore. */
-		}
-		return stringWriter.toString();
+			{
+				partStack.push(parts.iterator());
+			}
+
+			private void findNext() {
+				if (foundNextPart) {
+					return;
+				}
+				noNextPart = true;
+				while (!partStack.isEmpty()) {
+					Iterator<Part> parts = partStack.pop();
+					if (parts.hasNext()) {
+						nextPart = parts.next();
+						partStack.push(parts);
+						if (nextPart instanceof PartContainer) {
+							partStack.push(((PartContainer) nextPart).iterator());
+						} else {
+							noNextPart = false;
+							break;
+						}
+					}
+				}
+				foundNextPart = true;
+			}
+
+			@Override
+			public boolean hasNext() {
+				findNext();
+				return !noNextPart;
+			}
+
+			@Override
+			public Part next() {
+				findNext();
+				if (noNextPart) {
+					throw new NoSuchElementException();
+				}
+				foundNextPart = false;
+				return nextPart;
+			}
+
+			@Override
+			public void remove() {
+				/* ignore. */
+			}
+
+		};
 	}
 
 }
