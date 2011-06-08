@@ -1276,8 +1276,8 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				});
 				newReply = $(data.reply.html).addClass("hidden");
-				if ($(".reply-author-local", newPost).text() == "true") {
-					newPost.removeClass("new");
+				if ($(".reply-author-local", newReply).text() == "true") {
+					newReply.removeClass("new");
 					(function(newReply) {
 						setTimeout(function() {
 							markReplyAsKnown(newReply, false);
