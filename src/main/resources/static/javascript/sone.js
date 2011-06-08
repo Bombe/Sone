@@ -1235,6 +1235,14 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				}
 			});
 			newPost = $(data.post.html).addClass("hidden");
+			if ($(".post-author-local", newPost).text() == "true") {
+				newPost.removeClass("new");
+				(function(newPost) {
+					setTimeout(function() {
+						markPostAsKnown(newPost, false);
+					}, 5000);
+				})(newPost);
+			}
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			}
@@ -1268,6 +1276,14 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				});
 				newReply = $(data.reply.html).addClass("hidden");
+				if ($(".reply-author-local", newReply).text() == "true") {
+					newReply.removeClass("new");
+					(function(newReply) {
+						setTimeout(function() {
+							markReplyAsKnown(newReply, false);
+						}, 5000);
+					})(newReply);
+				}
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
@@ -1308,7 +1324,7 @@ function markSoneAsKnown(soneElement, skipRequest) {
 function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
-		if ($(postElement).hasClass("new")) {
+		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
@@ -1324,7 +1340,7 @@ function markPostAsKnown(postElements, skipRequest) {
 function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
-		if ($(replyElement).hasClass("new")) {
+		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
