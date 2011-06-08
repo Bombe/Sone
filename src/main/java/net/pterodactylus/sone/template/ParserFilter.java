@@ -106,12 +106,29 @@ public class ParserFilter implements Filter {
 	// PRIVATE METHODS
 	//
 
+	/**
+	 * Renders the given parts.
+	 *
+	 * @param writer
+	 *            The writer to render the parts to
+	 * @param parts
+	 *            The parts to render
+	 */
 	private void render(Writer writer, Iterable<Part> parts) {
 		for (Part part : parts) {
 			render(writer, part);
 		}
 	}
 
+	/**
+	 * Renders the given part.
+	 *
+	 * @param writer
+	 *            The writer to render the part to
+	 * @param part
+	 *            The part to render
+	 */
+	@SuppressWarnings("unchecked")
 	private void render(Writer writer, Part part) {
 		if (part instanceof PlainTextPart) {
 			render(writer, (PlainTextPart) part);
@@ -128,28 +145,82 @@ public class ParserFilter implements Filter {
 		}
 	}
 
+	/**
+	 * Renders the given plain-text part.
+	 *
+	 * @param writer
+	 *            The writer to render the part to
+	 * @param plainTextPart
+	 *            The part to render
+	 */
 	private void render(Writer writer, PlainTextPart plainTextPart) {
 		TemplateContext templateContext = templateContextFactory.createTemplateContext();
 		templateContext.set("text", plainTextPart.getText());
 		plainTextTemplate.render(templateContext, writer);
 	}
 
+	/**
+	 * Renders the given freenet link part.
+	 *
+	 * @param writer
+	 *            The writer to render the part to
+	 * @param freenetLinkPart
+	 *            The part to render
+	 */
 	private void render(Writer writer, FreenetLinkPart freenetLinkPart) {
 		renderLink(writer, "/" + freenetLinkPart.getLink(), freenetLinkPart.getText(), freenetLinkPart.getTitle(), freenetLinkPart.isTrusted() ? "freenet-trusted" : "freenet");
 	}
 
+	/**
+	 * Renders the given link part.
+	 *
+	 * @param writer
+	 *            The writer to render the part to
+	 * @param linkPart
+	 *            The part to render
+	 */
 	private void render(Writer writer, LinkPart linkPart) {
 		renderLink(writer, "/?_CHECKED_HTTP_=" + linkPart.getLink(), linkPart.getText(), linkPart.getTitle(), "internet");
 	}
 
+	/**
+	 * Renders the given Sone part.
+	 *
+	 * @param writer
+	 *            The writer to render the part to
+	 * @param sonePart
+	 *            The part to render
+	 */
 	private void render(Writer writer, SonePart sonePart) {
 		renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
 	}
 
+	/**
+	 * Renders the given post part.
+	 *
+	 * @param writer
+	 *            The writer to render the part to
+	 * @param postPart
+	 *            The part to render
+	 */
 	private void render(Writer writer, PostPart postPart) {
 		renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), getExcerpt(postPart.getPost().getText(), 20), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
 	}
 
+	/**
+	 * Renders the given link.
+	 *
+	 * @param writer
+	 *            The writer to render the link to
+	 * @param link
+	 *            The link to render
+	 * @param text
+	 *            The text of the link
+	 * @param title
+	 *            The title of the link
+	 * @param cssClass
+	 *            The CSS class of the link
+	 */
 	private void renderLink(Writer writer, String link, String text, String title, String cssClass) {
 		TemplateContext templateContext = templateContextFactory.createTemplateContext();
 		templateContext.set("cssClass", cssClass);
@@ -163,6 +234,16 @@ public class ParserFilter implements Filter {
 	// STATIC METHODS
 	//
 
+	/**
+	 * Returns up to {@code length} characters from the given text, appending
+	 * “…” if the text is longer.
+	 *
+	 * @param text
+	 *            The text to get an excerpt from
+	 * @param length
+	 *            The maximum length of the excerpt (without the ellipsis)
+	 * @return The excerpt of the text
+	 */
 	private static String getExcerpt(String text, int length) {
 		if (text.length() > length) {
 			return text.substring(0, length) + "…";
