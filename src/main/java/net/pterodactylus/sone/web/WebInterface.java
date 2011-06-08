@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -58,6 +59,8 @@ import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
 import net.pterodactylus.sone.template.UnknownDateFilter;
+import net.pterodactylus.sone.text.Part;
+import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
@@ -97,6 +100,7 @@ import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -163,6 +167,9 @@ public class WebInterface implements CoreListener {
 
 	/** The “new reply” notification. */
 	private final ListNotification<Reply> newReplyNotification;
+
+	/** The “you have been mentioned” notification. */
+	private final ListNotification<Post> mentionNotification;
 
 	/** The “rescuing Sone” notification. */
 	private final ListNotification<Sone> rescuingSonesNotification;
@@ -231,6 +238,9 @@ public class WebInterface implements CoreListener {
 
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
 		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
+
+		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
+		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
 
 		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
 		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
@@ -658,6 +668,21 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
+	private Set<Sone> getMentionedSones(String text) {
+		/* we need no context to find mentioned Sones. */
+		Set<Sone> mentionedSones = new HashSet<Sone>();
+		try {
+			for (Part part : soneTextParser.parse(null, new StringReader(text))) {
+				if (part instanceof SonePart) {
+					mentionedSones.add(((SonePart) part).getSone());
+				}
+			}
+		} catch (IOException ioe1) {
+			logger.log(Level.WARNING, "Could not parse post text: " + text, ioe1);
+		}
+		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
@@ -700,6 +725,9 @@ public class WebInterface implements CoreListener {
 		newPostNotification.add(post);
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newPostNotification);
+			if (!getMentionedSones(post.getText()).isEmpty()) {
+				mentionNotification.add(post);
+			}
 		} else {
 			getCore().markPostKnown(post);
 		}
@@ -716,6 +744,9 @@ public class WebInterface implements CoreListener {
 		newReplyNotification.add(reply);
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newReplyNotification);
+			if (!getMentionedSones(reply.getText()).isEmpty()) {
+				mentionNotification.add(reply.getPost());
+			}
 		} else {
 			getCore().markReplyKnown(reply);
 		}
@@ -735,6 +766,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markPostKnown(Post post) {
 		newPostNotification.remove(post);
+		mentionNotification.remove(post);
 	}
 
 	/**
@@ -743,6 +775,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markReplyKnown(Reply reply) {
 		newReplyNotification.remove(reply);
+		mentionNotification.remove(reply.getPost());
 	}
 
 	/**
