@@ -31,13 +31,13 @@ import java.io.Reader;
 public interface Parser<C extends ParserContext> {
 
 	/**
-	 * Create a {@link Part} from the given text source.
+	 * Create one or more {@link Part}s from the given text source.
 	 *
 	 * @param context
 	 *            The parser context
 	 * @param source
 	 *            The text source
-	 * @return The parsed part
+	 * @return The parsed parts
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
