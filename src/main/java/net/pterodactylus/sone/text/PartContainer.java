@@ -17,9 +17,6 @@
 
 package net.pterodactylus.sone.text;
 
-import java.io.IOException;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
