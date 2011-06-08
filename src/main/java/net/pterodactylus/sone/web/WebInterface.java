@@ -58,6 +58,7 @@ import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
 import net.pterodactylus.sone.template.UnknownDateFilter;
+import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
@@ -151,6 +152,9 @@ public class WebInterface implements CoreListener {
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
 
+	/** The Sone text parser. */
+	private final SoneTextParser soneTextParser;
+
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
 
@@ -185,6 +189,7 @@ public class WebInterface implements CoreListener {
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
+		soneTextParser = new SoneTextParser(getCore());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
@@ -206,7 +211,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory));
+		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory, soneTextParser));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());

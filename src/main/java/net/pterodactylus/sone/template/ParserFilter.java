@@ -51,7 +51,7 @@ public class ParserFilter implements Filter {
 	private final Core core;
 
 	/** The link parser. */
-	private final SoneTextParser textParser;
+	private final SoneTextParser soneTextParser;
 
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
@@ -70,11 +70,13 @@ public class ParserFilter implements Filter {
 	 *            The core
 	 * @param templateContextFactory
 	 *            The context factory for rendering the parts
+	 * @param soneTextParser
+	 *            The Sone text parser
 	 */
-	public ParserFilter(Core core, TemplateContextFactory templateContextFactory) {
+	public ParserFilter(Core core, TemplateContextFactory templateContextFactory, SoneTextParser soneTextParser) {
 		this.core = core;
 		this.templateContextFactory = templateContextFactory;
-		textParser = new SoneTextParser(core);
+		this.soneTextParser = soneTextParser;
 	}
 
 	/**
@@ -95,7 +97,7 @@ public class ParserFilter implements Filter {
 		SoneTextParserContext context = new SoneTextParserContext(request, sone);
 		StringWriter parsedTextWriter = new StringWriter();
 		try {
-			render(parsedTextWriter, textParser.parse(context, new StringReader(text)));
+			render(parsedTextWriter, soneTextParser.parse(context, new StringReader(text)));
 		} catch (IOException ioe1) {
 			/* no exceptions in a StringReader or StringWriter, ignore. */
 		}
