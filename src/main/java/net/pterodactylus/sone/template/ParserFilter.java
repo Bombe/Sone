@@ -117,6 +117,14 @@ public class ParserFilter implements Filter {
 			render(writer, (PlainTextPart) part);
 		} else if (part instanceof FreenetLinkPart) {
 			render(writer, (FreenetLinkPart) part);
+		} else if (part instanceof LinkPart) {
+			render(writer, (LinkPart) part);
+		} else if (part instanceof SonePart) {
+			render(writer, (SonePart) part);
+		} else if (part instanceof PostPart) {
+			render(writer, (PostPart) part);
+		} else if (part instanceof Iterable<?>) {
+			render(writer, (Iterable<Part>) part);
 		}
 	}
 
