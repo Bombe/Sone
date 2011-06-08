@@ -727,6 +727,7 @@ public class WebInterface implements CoreListener {
 			notificationManager.addNotification(newPostNotification);
 			if (!getMentionedSones(post.getText()).isEmpty()) {
 				mentionNotification.add(post);
+				notificationManager.addNotification(mentionNotification);
 			}
 		} else {
 			getCore().markPostKnown(post);
@@ -746,6 +747,7 @@ public class WebInterface implements CoreListener {
 			notificationManager.addNotification(newReplyNotification);
 			if (!getMentionedSones(reply.getText()).isEmpty()) {
 				mentionNotification.add(reply.getPost());
+				notificationManager.addNotification(mentionNotification);
 			}
 		} else {
 			getCore().markReplyKnown(reply);
