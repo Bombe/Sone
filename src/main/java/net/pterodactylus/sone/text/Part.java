@@ -17,16 +17,15 @@
 
 package net.pterodactylus.sone.text;
 
-import net.pterodactylus.util.io.Renderable;
-
 /**
  * A part is a single piece of information that can be displayed as a single
- * element.
+ * element. How the part is displayed is not part of the {@code Part}
+ * specification.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Part extends Renderable {
+public interface Part {
 
-	/* all required methods are inherited from {@link Renderable}. */
+	/* no methods. */
 
 }
