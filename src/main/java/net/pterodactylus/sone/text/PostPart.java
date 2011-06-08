@@ -20,18 +20,34 @@ package net.pterodactylus.sone.text;
 import net.pterodactylus.sone.data.Post;
 
 /**
- * TODO
+ * {@link Part} implementation that stores a reference to a {@link Post}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostPart implements Part {
 
+	/** The post this part refers to. */
 	private final Post post;
 
+	/**
+	 * Creates a new post part.
+	 *
+	 * @param post
+	 *            The referenced post
+	 */
 	public PostPart(Post post) {
 		this.post = post;
 	}
 
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the post referenced by this part.
+	 *
+	 * @return The post referenced by this part
+	 */
 	public Post getPost() {
 		return post;
 	}

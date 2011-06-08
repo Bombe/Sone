@@ -18,21 +18,36 @@
 package net.pterodactylus.sone.text;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.template.SoneAccessor;
 
 /**
- * TODO
+ * {@link Part} implementation that stores a reference to a {@link Sone}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SonePart implements Part {
 
+	/** The referenced {@link Sone}. */
 	private final Sone sone;
 
+	/**
+	 * Creates a new Sone part.
+	 *
+	 * @param sone
+	 *            The referenced Sone
+	 */
 	public SonePart(Sone sone) {
 		this.sone = sone;
 	}
 
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the referenced Sone.
+	 *
+	 * @return The referenced Sone
+	 */
 	public Sone getSone() {
 		return sone;
 	}

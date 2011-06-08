@@ -17,21 +17,22 @@
 
 package net.pterodactylus.sone.text;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.util.Iterator;
-
-import net.pterodactylus.util.collection.ObjectIterator;
-
 /**
- * TODO
+ * {@link Part} implementation that holds a single piece of text.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PlainTextPart implements Part {
 
+	/** The text of the part. */
 	private final String text;
 
+	/**
+	 * Creates a new plain-text part.
+	 *
+	 * @param text
+	 *            The text of the part
+	 */
 	public PlainTextPart(String text) {
 		this.text = text;
 	}
@@ -40,6 +41,11 @@ public class PlainTextPart implements Part {
 	// ACCESSORS
 	//
 
+	/**
+	 * Returns the text of this part.
+	 *
+	 * @return The text of this part
+	 */
 	public String getText() {
 		return text;
 	}

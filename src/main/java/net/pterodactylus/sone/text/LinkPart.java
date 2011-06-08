@@ -18,20 +18,45 @@
 package net.pterodactylus.sone.text;
 
 /**
- * TODO
+ * {@link Part} implementation that can hold a link. A link contains of three
+ * attributes: the link itself, the text that is shown instead of the link, and
+ * an explanatory text that can be displayed e.g. as a tooltip.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class LinkPart implements Part {
 
+	/** The link of this part. */
 	private final String link;
+
+	/** The text of this part. */
 	private final String text;
+
+	/** The title of this part. */
 	private final String title;
 
+	/**
+	 * Creates a new link part.
+	 *
+	 * @param link
+	 *            The link of the link part
+	 * @param text
+	 *            The text of the link part
+	 */
 	public LinkPart(String link, String text) {
 		this(link, text, text);
 	}
 
+	/**
+	 * Creates a new link part.
+	 *
+	 * @param link
+	 *            The link of the link part
+	 * @param text
+	 *            The text of the link part
+	 * @param title
+	 *            The title of the link part
+	 */
 	public LinkPart(String link, String text, String title) {
 		this.link = link;
 		this.text = text;
@@ -42,14 +67,29 @@ public class LinkPart implements Part {
 	// ACCESSORS
 	//
 
+	/**
+	 * Returns the link of this part.
+	 *
+	 * @return The link of this part
+	 */
 	public String getLink() {
 		return link;
 	}
 
+	/**
+	 * Returns the text of this part.
+	 *
+	 * @return The text of this part
+	 */
 	public String getText() {
 		return text;
 	}
 
+	/**
+	 * Returns the title of this part.
+	 *
+	 * @return The title of this part
+	 */
 	public String getTitle() {
 		return title;
 	}

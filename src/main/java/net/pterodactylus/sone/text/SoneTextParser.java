@@ -20,10 +20,7 @@ package net.pterodactylus.sone.text;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringReader;
-import java.io.Writer;
 import java.net.MalformedURLException;
-import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -32,11 +29,7 @@ import java.util.regex.Pattern;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.template.Template;
-import net.pterodactylus.util.template.TemplateContextFactory;
-import net.pterodactylus.util.template.TemplateParser;
 import freenet.keys.FreenetURI;
 
 /**
