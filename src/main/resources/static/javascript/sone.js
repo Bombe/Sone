@@ -1235,6 +1235,9 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				}
 			});
 			newPost = $(data.post.html).addClass("hidden");
+			if ($(".post-author-local", newPost).text() == "true") {
+				newPost.removeClass("new");
+			}
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			}
@@ -1268,6 +1271,9 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				});
 				newReply = $(data.reply.html).addClass("hidden");
+				if ($(".reply-author-local", newPost).text() == "true") {
+					newPost.removeClass("new");
+				}
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
