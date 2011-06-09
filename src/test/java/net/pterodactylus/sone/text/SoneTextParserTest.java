@@ -38,37 +38,63 @@ public class SoneTextParserTest extends TestCase {
 	public void testPlainText() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts;
-		StringBuilder text = new StringBuilder();
 
 		/* check basic operation. */
-		text.setLength(0);
 		parts = soneTextParser.parse(null, new StringReader("Test."));
 		assertNotNull("Parts", parts);
-		for (Part part : parts) {
-			assertTrue("Part is PlainTextPart", part instanceof PlainTextPart);
-			text.append(((PlainTextPart) part).getText());
-		}
-		assertEquals("Part Text", "Test.", text.toString());
+		assertEquals("Part Text", "Test.", convertText(parts, PlainTextPart.class));
 
 		/* check empty lines at start and end. */
-		text.setLength(0);
 		parts = soneTextParser.parse(null, new StringReader("\nTest.\n\n"));
 		assertNotNull("Parts", parts);
-		for (Part part : parts) {
-			assertTrue("Part is PlainTextPart", part instanceof PlainTextPart);
-			text.append(((PlainTextPart) part).getText());
-		}
-		assertEquals("Part Text", "Test.", text.toString());
+		assertEquals("Part Text", "Test.", convertText(parts, PlainTextPart.class));
 
 		/* check duplicate empty lines in the text. */
-		text.setLength(0);
 		parts = soneTextParser.parse(null, new StringReader("\nTest.\n\n\nTest."));
 		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "Test.\n\nTest.", convertText(parts, PlainTextPart.class));
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Converts all given {@link Part}s into a string, validating that the
+	 * part’s classes match only the expected classes.
+	 *
+	 * @param parts
+	 *            The parts to convert to text
+	 * @param validClasses
+	 *            The valid classes; if no classes are given, all classes are
+	 *            valid
+	 * @return The converted text
+	 */
+	private String convertText(Iterable<Part> parts, Class<?>... validClasses) {
+		StringBuilder text = new StringBuilder();
 		for (Part part : parts) {
-			assertTrue("Part is PlainTextPart", part instanceof PlainTextPart);
-			text.append(((PlainTextPart) part).getText());
+			assertNotNull("Part", part);
+			boolean classValid = validClasses.length == 0;
+			for (Class<?> validClass : validClasses) {
+				if (validClass.isAssignableFrom(part.getClass())) {
+					classValid = true;
+					break;
+				}
+			}
+			if (!classValid) {
+				assertEquals("Part’s Class", null, part.getClass());
+			}
+			if (part instanceof PlainTextPart) {
+				text.append(((PlainTextPart) part).getText());
+			} else if (part instanceof FreenetLinkPart) {
+				FreenetLinkPart freenetLinkPart = (FreenetLinkPart) part;
+				text.append('[').append(freenetLinkPart.getLink()).append('|').append(freenetLinkPart.isTrusted() ? "trusted|" : "").append(freenetLinkPart.getText()).append(']');
+			} else if (part instanceof LinkPart) {
+				LinkPart linkPart = (LinkPart) part;
+				text.append('[').append(linkPart.getLink()).append('|').append(linkPart.getText()).append(']');
+			}
 		}
-		assertEquals("Part Text", "Test.\n\nTest.", text.toString());
+		return text.toString();
 	}
 
 }
