@@ -17,10 +17,6 @@
 
 package net.pterodactylus.sone.text;
 
-import java.util.logging.Logger;
-
-import net.pterodactylus.util.logging.Logging;
-
 /**
  * Filter for newly inserted text. This filter strips HTTP links to the local
  * node of identifying marks, e.g. a link to “http://localhost:8888/KSK@gpl.txt”
@@ -31,9 +27,6 @@ import net.pterodactylus.util.logging.Logging;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TextFilter {
-
-	/** The logger. */
-	private static final Logger logger = Logging.getLogger(TextFilter.class);
 
 	/**
 	 * Filters the given text, stripping the host header part for links to the
