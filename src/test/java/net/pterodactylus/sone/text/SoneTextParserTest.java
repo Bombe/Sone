@@ -55,6 +55,32 @@ public class SoneTextParserTest extends TestCase {
 		assertEquals("Part Text", "Test.\n\nTest.", convertText(parts, PlainTextPart.class));
 	}
 
+	/**
+	 * Tests parsing of KSK links.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	public void testKSKLinks() throws IOException {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts;
+
+		/* check basic links. */
+		parts = soneTextParser.parse(null, new StringReader("KSK@gpl.txt"));
+		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "[KSK@gpl.txt|gpl.txt|gpl.txt]", convertText(parts, FreenetLinkPart.class));
+
+		/* check embedded links. */
+		parts = soneTextParser.parse(null, new StringReader("Link is KSK@gpl.txt\u200b."));
+		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\u200b.", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
+
+		/* check embedded links and line breaks. */
+		parts = soneTextParser.parse(null, new StringReader("Link is KSK@gpl.txt\nKSK@test.dat\n"));
+		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
+	}
+
 	//
 	// PRIVATE METHODS
 	//
