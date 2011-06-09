@@ -88,10 +88,10 @@ public class SoneTextParserTest extends TestCase {
 				text.append(((PlainTextPart) part).getText());
 			} else if (part instanceof FreenetLinkPart) {
 				FreenetLinkPart freenetLinkPart = (FreenetLinkPart) part;
-				text.append('[').append(freenetLinkPart.getLink()).append('|').append(freenetLinkPart.isTrusted() ? "trusted|" : "").append(freenetLinkPart.getText()).append(']');
+				text.append('[').append(freenetLinkPart.getLink()).append('|').append(freenetLinkPart.isTrusted() ? "trusted|" : "").append(freenetLinkPart.getTitle()).append('|').append(freenetLinkPart.getText()).append(']');
 			} else if (part instanceof LinkPart) {
 				LinkPart linkPart = (LinkPart) part;
-				text.append('[').append(linkPart.getLink()).append('|').append(linkPart.getText()).append(']');
+				text.append('[').append(linkPart.getLink()).append('|').append(linkPart.getTitle()).append('|').append(linkPart.getText()).append(']');
 			}
 		}
 		return text.toString();
