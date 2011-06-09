@@ -65,7 +65,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener, UpdateListener {
+public class Core implements IdentityListener, UpdateListener, SoneProvider, PostProvider {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -352,6 +352,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 * @return The Sone with the given ID, or {@code null} if there is no such
 	 *         Sone
 	 */
+	@Override
 	public Sone getSone(String id, boolean create) {
 		if (isLocalSone(id)) {
 			return getLocalSone(id);
@@ -574,6 +575,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 *            exists, {@code false} to return {@code null}
 	 * @return The post, or {@code null} if there is no such post
 	 */
+	@Override
 	public Post getPost(String postId, boolean create) {
 		synchronized (posts) {
 			Post post = posts.get(postId);
