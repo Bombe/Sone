@@ -26,7 +26,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.PostProvider;
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.logging.Logging;
@@ -78,17 +79,23 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 	}
 
-	/** The core. */
-	private final Core core;
+	/** The Sone provider. */
+	private final SoneProvider soneProvider;
+
+	/** The post provider. */
+	private final PostProvider postProvider;
 
 	/**
 	 * Creates a new freenet link parser.
 	 *
-	 * @param core
-	 *            The core
+	 * @param soneProvider
+	 *            The Sone provider
+	 * @param postProvider
+	 *            The post provider
 	 */
-	public SoneTextParser(Core core) {
-		this.core = core;
+	public SoneTextParser(SoneProvider soneProvider, PostProvider postProvider) {
+		this.soneProvider = soneProvider;
+		this.postProvider = postProvider;
 	}
 
 	//
@@ -174,7 +181,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 					if (line.length() >= (next + 7 + 43)) {
 						String soneId = line.substring(next + 7, next + 50);
-						Sone sone = core.getSone(soneId, false);
+						Sone sone = soneProvider.getSone(soneId, false);
 						if (sone != null) {
 							parts.add(new SonePart(sone));
 						} else {
@@ -193,7 +200,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 					if (line.length() >= (next + 7 + 36)) {
 						String postId = line.substring(next + 7, next + 43);
-						Post post = core.getPost(postId, false);
+						Post post = postProvider.getPost(postId, false);
 						if ((post != null) && (post.getSone() != null)) {
 							String postText = post.getText();
 							postText = postText.substring(0, Math.min(postText.length(), 20)) + "…";
@@ -218,7 +225,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (!lastLineEmpty && lineComplete) {
 						parts.add(new PlainTextPart("\n" + line.substring(0, next)));
 					} else {
-						parts.add(new PlainTextPart(line.substring(0, next)));
+						if (next > 0) {
+							parts.add(new PlainTextPart(line.substring(0, next)));
+						}
 					}
 					String link = line.substring(next, nextSpace);
 					String name = link;

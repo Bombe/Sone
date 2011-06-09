@@ -196,7 +196,7 @@ public class WebInterface implements CoreListener {
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
-		soneTextParser = new SoneTextParser(getCore());
+		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
@@ -668,6 +668,15 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
+	/**
+	 * Returns all {@link Core#isLocalSone(Sone) local Sone}s that are
+	 * referenced by {@link SonePart}s in the given text (after parsing it using
+	 * {@link SoneTextParser}).
+	 *
+	 * @param text
+	 *            The text to parse
+	 * @return All mentioned local Sones
+	 */
 	private Set<Sone> getMentionedSones(String text) {
 		/* we need no context to find mentioned Sones. */
 		Set<Sone> mentionedSones = new HashSet<Sone>();
