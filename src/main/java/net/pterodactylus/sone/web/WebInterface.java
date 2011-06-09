@@ -196,7 +196,7 @@ public class WebInterface implements CoreListener {
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
-		soneTextParser = new SoneTextParser(getCore());
+		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
