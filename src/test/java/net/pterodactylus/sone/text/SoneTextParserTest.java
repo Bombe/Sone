@@ -29,6 +29,10 @@ import junit.framework.TestCase;
  */
 public class SoneTextParserTest extends TestCase {
 
+	//
+	// ACTIONS
+	//
+
 	/**
 	 * Tests basic plain-text operation of the parser.
 	 *
