@@ -225,7 +225,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (!lastLineEmpty && lineComplete) {
 						parts.add(new PlainTextPart("\n" + line.substring(0, next)));
 					} else {
-						parts.add(new PlainTextPart(line.substring(0, next)));
+						if (next > 0) {
+							parts.add(new PlainTextPart(line.substring(0, next)));
+						}
 					}
 					String link = line.substring(next, nextSpace);
 					String name = link;
