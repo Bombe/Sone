@@ -868,7 +868,11 @@ function ajaxifyNotification(notification) {
 		notification.find(".text").addClass("hidden");
 	}
 	notification.find("form.mark-as-read button").click(function() {
-		ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
+		allIds = $(":input[name=id]", this.form).val().split(" ");
+		for (index = 0; index < allIds.length; index += 16) {
+			ids = allIds.slice(index, index + 16).join(" ");
+			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": ids});
+		}
 	});
 	notification.find("a[class^='link-']").each(function() {
 		linkElement = $(this);
