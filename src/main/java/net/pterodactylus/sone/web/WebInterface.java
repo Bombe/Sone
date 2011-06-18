@@ -100,6 +100,7 @@ import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
+import net.pterodactylus.util.collection.SetBuilder;
 import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
@@ -428,7 +429,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new posts
 	 */
 	public Set<Post> getNewPosts() {
-		return new HashSet<Post>(newPostNotification.getElements());
+		return new SetBuilder<Post>().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).get();
 	}
 
 	/**
@@ -438,7 +439,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new replies
 	 */
 	public Set<Reply> getNewReplies() {
-		return new HashSet<Reply>(newReplyNotification.getElements());
+		return new SetBuilder<Reply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
 	}
 
 	/**
