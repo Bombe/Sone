@@ -143,6 +143,10 @@ textarea {
 	display: none;
 }
 
+#sone #notification-area #local-post-notification, #sone #notification-area #local-reply-notification {
+	display: none;
+} 
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;

@@ -1079,8 +1079,10 @@ function loadNotifications(notificationIds) {
 				oldNotification.replaceWith(notification.show());
 			} else {
 				$("#sone #notification-area").append(notification);
-				notification.slideDown();
-				setActivity();
+				if (value.id.substring(0, 5) != "local") {
+					notification.slideDown();
+					setActivity();
+				}
 			}
 		});
 	});

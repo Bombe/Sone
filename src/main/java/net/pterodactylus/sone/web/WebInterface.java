@@ -168,6 +168,12 @@ public class WebInterface implements CoreListener {
 	/** The “new reply” notification. */
 	private final ListNotification<Reply> newReplyNotification;
 
+	/** The invisible “local post” notification. */
+	private final ListNotification<Post> localPostNotification;
+
+	/** The invisible “local reply” notification. */
+	private final ListNotification<Reply> localReplyNotification;
+
 	/** The “you have been mentioned” notification. */
 	private final ListNotification<Post> mentionNotification;
 
@@ -235,9 +241,11 @@ public class WebInterface implements CoreListener {
 
 		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
+		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", newPostNotificationTemplate, false);
 
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
 		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
+		localReplyNotification = new ListNotification<Reply>("local-reply-notification", "replies", newReplyNotificationTemplate, false);
 
 		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
 		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
@@ -731,10 +739,15 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newPostFound(Post post) {
-		newPostNotification.add(post);
+		boolean isLocal = getCore().isLocalSone(post.getSone());
+		if (isLocal) {
+			localPostNotification.add(post);
+		} else {
+			newPostNotification.add(post);
+		}
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newPostNotification);
-			if (!getMentionedSones(post.getText()).isEmpty()) {
+			notificationManager.addNotification(isLocal ? localPostNotification : newPostNotification);
+			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
 				mentionNotification.add(post);
 				notificationManager.addNotification(mentionNotification);
 			}
@@ -751,10 +764,15 @@ public class WebInterface implements CoreListener {
 		if (reply.getPost().getSone() == null) {
 			return;
 		}
-		newReplyNotification.add(reply);
+		boolean isLocal = getCore().isLocalSone(reply.getSone());
+		if (isLocal) {
+			localReplyNotification.add(reply);
+		} else {
+			newReplyNotification.add(reply);
+		}
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newReplyNotification);
-			if (!getMentionedSones(reply.getText()).isEmpty()) {
+			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal) {
 				mentionNotification.add(reply.getPost());
 				notificationManager.addNotification(mentionNotification);
 			}
@@ -777,6 +795,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markPostKnown(Post post) {
 		newPostNotification.remove(post);
+		localPostNotification.remove(post);
 		mentionNotification.remove(post);
 	}
 
@@ -786,6 +805,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markReplyKnown(Reply reply) {
 		newReplyNotification.remove(reply);
+		localReplyNotification.remove(reply);
 		mentionNotification.remove(reply.getPost());
 	}
 
@@ -803,6 +823,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void postRemoved(Post post) {
 		newPostNotification.remove(post);
+		localPostNotification.remove(post);
 	}
 
 	/**
@@ -811,6 +832,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void replyRemoved(Reply reply) {
 		newReplyNotification.remove(reply);
+		localReplyNotification.remove(reply);
 	}
 
 	/**
