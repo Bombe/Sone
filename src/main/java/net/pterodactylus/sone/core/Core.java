@@ -54,6 +54,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
@@ -178,6 +179,9 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 
 	/** Trusted identities, sorted by own identities. */
 	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+
+	/** Ticker for threads that mark own elements as known. */
+	private Ticker localElementTicker = new Ticker();
 
 	/**
 	 * Creates a new core.
@@ -1502,7 +1506,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
 			return null;
 		}
-		Post post = new Post(sone, time, text);
+		final Post post = new Post(sone, time, text);
 		if (recipient != null) {
 			post.setRecipient(recipient);
 		}
@@ -1515,6 +1519,16 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 		}
 		sone.addPost(post);
 		saveSone(sone);
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markPostKnown(post);
+			}
+		}, "Mark " + post + " read.");
 		return post;
 	}
 
@@ -1635,7 +1649,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
 			return null;
 		}
-		Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
+		final Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
@@ -1645,6 +1659,16 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 		}
 		sone.addReply(reply);
 		saveSone(sone);
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markReplyKnown(reply);
+			}
+		}, "Mark " + reply + " read.");
 		return reply;
 	}
 

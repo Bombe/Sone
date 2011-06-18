@@ -1239,11 +1239,6 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			newPost = $(data.post.html).addClass("hidden");
 			if ($(".post-author-local", newPost).text() == "true") {
 				newPost.removeClass("new");
-				(function(newPost) {
-					setTimeout(function() {
-						markPostAsKnown(newPost, false);
-					}, 5000);
-				})(newPost);
 			}
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
