@@ -8,6 +8,9 @@ function ajaxGet(url, data, successCallback, errorCallback) {
 				successCallback(data, textStatus);
 			}
 		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
+			if (xmlHttpRequest.status == 403) {
+				notLoggedIn = true;
+			}
 			if (typeof errorCallback != "undefined") {
 				errorCallback();
 			} else {
@@ -80,7 +83,9 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 				});
 			})(replyElement);
 			textArea = replyElement.find("input.reply-input").focus().data("textarea");
-			textArea.val(textArea.val() + "@sone://" + author + " ");
+			if (author != getCurrentSoneId()) {
+				textArea.val(textArea.val() + "@sone://" + author + " ");
+			}
 		});
 		return commentElement;
 	})(postId, author);
@@ -863,7 +868,11 @@ function ajaxifyNotification(notification) {
 		notification.find(".text").addClass("hidden");
 	}
 	notification.find("form.mark-as-read button").click(function() {
-		ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": $(":input[name=id]", this.form).val()});
+		allIds = $(":input[name=id]", this.form).val().split(" ");
+		for (index = 0; index < allIds.length; index += 16) {
+			ids = allIds.slice(index, index + 16).join(" ");
+			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": ids});
+		}
 	});
 	notification.find("a[class^='link-']").each(function() {
 		linkElement = $(this);
@@ -976,6 +985,10 @@ function getStatus() {
 			$.each(data.sones, function(index, value) {
 				updateSoneStatus(value.id, value.name, value.status, value.modified, value.locked, value.lastUpdatedUnknown ? null : value.lastUpdated, value.lastUpdatedText);
 			});
+			notLoggedIn = !data.loggedIn;
+			if (!notLoggedIn) {
+				showOfflineMarker(!online);
+			}
 			/* search for removed notifications. */
 			$("#sone #notification-area .notification").each(function() {
 				notificationId = $(this).attr("id");
@@ -1070,8 +1083,10 @@ function loadNotifications(notificationIds) {
 				oldNotification.replaceWith(notification.show());
 			} else {
 				$("#sone #notification-area").append(notification);
-				notification.slideDown();
-				setActivity();
+				if (value.id.substring(0, 5) != "local") {
+					notification.slideDown();
+					setActivity();
+				}
 			}
 		});
 	});
@@ -1202,7 +1217,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	}
 	if (!isIndexPage() || (getPage(".pagination-index") > 1)) {
 		if (!isViewPostPage() || (getShownPostId() != postId)) {
-			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId))) {
+			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId)) || (getPage(".post-navigation") > 1)) {
 				return;
 			}
 		}
@@ -1215,7 +1230,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if (hasPost(data.post.id)) {
 				return;
 			}
-			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient)))) {
+			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient) || (getPage(".post-navigation") > 1)))) {
 				return;
 			}
 			var firstOlderPost = null;
@@ -1226,6 +1241,9 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				}
 			});
 			newPost = $(data.post.html).addClass("hidden");
+			if ($(".post-author-local", newPost).text() == "true") {
+				newPost.removeClass("new");
+			}
 			if (firstOlderPost != null) {
 				newPost.insertBefore(firstOlderPost);
 			}
@@ -1259,6 +1277,14 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				});
 				newReply = $(data.reply.html).addClass("hidden");
+				if ($(".reply-author-local", newReply).text() == "true") {
+					newReply.removeClass("new");
+					(function(newReply) {
+						setTimeout(function() {
+							markReplyAsKnown(newReply, false);
+						}, 5000);
+					})(newReply);
+				}
 				if (firstNewerReply != null) {
 					newReply.insertBefore(firstNewerReply);
 				} else {
@@ -1299,15 +1325,15 @@ function markSoneAsKnown(soneElement, skipRequest) {
 function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
-		if ($(postElement).hasClass("new")) {
+		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
-				$(".click-to-show", postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
 					ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
 				}
 			})(postElement);
 		}
+		$(".click-to-show", postElement).removeClass("new");
 	});
 	markReplyAsKnown($(postElements).find(".reply"));
 }
@@ -1315,7 +1341,7 @@ function markPostAsKnown(postElements, skipRequest) {
 function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
-		if ($(replyElement).hasClass("new")) {
+		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
@@ -1586,7 +1612,7 @@ var statusRequestQueued = true;
  */
 function ajaxError() {
 	online = false;
-	toggleOfflineMarker(true);
+	showOfflineMarker(true);
 	if (!statusRequestQueued) {
 		setTimeout(getStatus, 5000);
 		statusRequestQueued = true;
@@ -1598,7 +1624,7 @@ function ajaxError() {
  */
 function ajaxSuccess() {
 	online = true;
-	toggleOfflineMarker(false);
+	showOfflineMarker(!online || (initiallyLoggedIn && notLoggedIn));
 }
 
 /**
@@ -1608,7 +1634,7 @@ function ajaxSuccess() {
  *            {@code true} to display the offline marker, {@code false} to hide
  *            it
  */
-function toggleOfflineMarker(visible) {
+function showOfflineMarker(visible) {
 	/* jQuery documentation says toggle() works the other way around?! */
 	$("#sone #offline-marker").toggle(visible);
 	if (visible) {
@@ -1624,6 +1650,8 @@ function toggleOfflineMarker(visible) {
 
 var focus = true;
 var online = true;
+var initiallyLoggedIn = $("#sone #loggedIn").text() == "true";
+var notLoggedIn = !initiallyLoggedIn;
 
 $(document).ready(function() {
 
@@ -1709,7 +1737,7 @@ $(document).ready(function() {
 				allReplies = $(this).find(".reply");
 				if (allReplies.length > 2) {
 					newHidden = false;
-					for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
+					for (replyIndex = 0; !newHidden && (replyIndex < (allReplies.length - 2)); ++replyIndex) {
 						$(allReplies[replyIndex]).addClass("hidden");
 						newHidden |= $(allReplies[replyIndex]).hasClass("new");
 					}

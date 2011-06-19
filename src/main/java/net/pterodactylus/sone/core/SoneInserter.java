@@ -33,6 +33,8 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.util.collection.ListBuilder;
+import net.pterodactylus.util.collection.ReverseComparator;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -265,8 +267,8 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
-			soneProperties.put("posts", new ArrayList<Post>(sone.getPosts()));
-			soneProperties.put("replies", new HashSet<Reply>(sone.getReplies()));
+			soneProperties.put("posts", new ListBuilder<Post>(new ArrayList<Post>(sone.getPosts())).sort(Post.TIME_COMPARATOR).get());
+			soneProperties.put("replies", new ListBuilder<Reply>(new ArrayList<Reply>(sone.getReplies())).sort(new ReverseComparator<Reply>(Reply.TIME_COMPARATOR)).get());
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 		}

@@ -1,5 +1,5 @@
 /*
- * Sone - Parser.java - Copyright © 2010 David Roden
+ * Sone - SoneLinkPart.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,39 @@
 
 package net.pterodactylus.sone.text;
 
-import java.io.IOException;
-import java.io.Reader;
+import net.pterodactylus.sone.data.Sone;
 
 /**
- * Interface for parsers that can create {@link Part}s from a text source
- * (usually a {@link Reader}).
+ * {@link Part} implementation that stores a reference to a {@link Sone}.
  *
- * @param <C>
- *            The type of the parser context
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Parser<C extends ParserContext> {
+public class SonePart implements Part {
+
+	/** The referenced {@link Sone}. */
+	private final Sone sone;
 
 	/**
-	 * Create one or more {@link Part}s from the given text source.
+	 * Creates a new Sone part.
 	 *
-	 * @param context
-	 *            The parser context (may be {@code null})
-	 * @param source
-	 *            The text source
-	 * @return The parsed parts
-	 * @throws IOException
-	 *             if an I/O error occurs
+	 * @param sone
+	 *            The referenced Sone
 	 */
-	public Iterable<Part> parse(C context, Reader source) throws IOException;
+	public SonePart(Sone sone) {
+		this.sone = sone;
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the referenced Sone.
+	 *
+	 * @return The referenced Sone
+	 */
+	public Sone getSone() {
+		return sone;
+	}
 
 }

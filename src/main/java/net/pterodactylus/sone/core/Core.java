@@ -40,6 +40,8 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.fcp.FcpInterface;
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -47,12 +49,16 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.thread.Ticker;
+import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
+import freenet.client.FetchResult;
 import freenet.keys.FreenetURI;
 
 /**
@@ -60,7 +66,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener, UpdateListener {
+public class Core implements IdentityListener, UpdateListener, SoneProvider, PostProvider {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -114,6 +120,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
+
+	/** The FCP interface. */
+	private volatile FcpInterface fcpInterface;
 
 	/** Whether the core has been stopped. */
 	private volatile boolean stopped;
@@ -170,6 +179,9 @@ public class Core implements IdentityListener, UpdateListener {
 
 	/** Trusted identities, sorted by own identities. */
 	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+
+	/** Ticker for threads that mark own elements as known. */
+	private Ticker localElementTicker = new Ticker();
 
 	/**
 	 * Creates a new core.
@@ -257,6 +269,16 @@ public class Core implements IdentityListener, UpdateListener {
 	}
 
 	/**
+	 * Sets the FCP interface to use.
+	 *
+	 * @param fcpInterface
+	 *            The FCP interface to use
+	 */
+	public void setFcpInterface(FcpInterface fcpInterface) {
+		this.fcpInterface = fcpInterface;
+	}
+
+	/**
 	 * Returns the status of the given Sone.
 	 *
 	 * @param sone
@@ -334,6 +356,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 * @return The Sone with the given ID, or {@code null} if there is no such
 	 *         Sone
 	 */
+	@Override
 	public Sone getSone(String id, boolean create) {
 		if (isLocalSone(id)) {
 			return getLocalSone(id);
@@ -556,6 +579,7 @@ public class Core implements IdentityListener, UpdateListener {
 	 *            exists, {@code false} to return {@code null}
 	 * @return The post, or {@code null} if there is no such post
 	 */
+	@Override
 	public Post getPost(String postId, boolean create) {
 		synchronized (posts) {
 			Post post = posts.get(postId);
@@ -851,6 +875,14 @@ public class Core implements IdentityListener, UpdateListener {
 					coreListenerManager.fireRescuingSone(sone);
 					lockSone(sone);
 					long edition = sone.getLatestEdition();
+					/* find the latest edition the node knows about. */
+					Pair<FreenetURI, FetchResult> currentUri = freenetInterface.fetchUri(sone.getRequestUri());
+					if (currentUri != null) {
+						long currentEdition = currentUri.getLeft().getEdition();
+						if (currentEdition > edition) {
+							edition = currentEdition;
+						}
+					}
 					while (!stopped && (edition >= 0) && preferences.isSoneRescueMode()) {
 						logger.log(Level.FINE, "Downloading edition " + edition + "…");
 						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
@@ -917,6 +949,7 @@ public class Core implements IdentityListener, UpdateListener {
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
 							localSone.addFriend(sone.getId());
+							saveSone(localSone);
 						}
 					}
 				}
@@ -1473,7 +1506,7 @@ public class Core implements IdentityListener, UpdateListener {
 			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
 			return null;
 		}
-		Post post = new Post(sone, time, text);
+		final Post post = new Post(sone, time, text);
 		if (recipient != null) {
 			post.setRecipient(recipient);
 		}
@@ -1486,6 +1519,16 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 		sone.addPost(post);
 		saveSone(sone);
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markPostKnown(post);
+			}
+		}, "Mark " + post + " read.");
 		return post;
 	}
 
@@ -1606,7 +1649,7 @@ public class Core implements IdentityListener, UpdateListener {
 			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
 			return null;
 		}
-		Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
+		final Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
@@ -1616,6 +1659,16 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 		sone.addReply(reply);
 		saveSone(sone);
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markReplyKnown(reply);
+			}
+		}, "Mark " + reply + " read.");
 		return reply;
 	}
 
@@ -1676,6 +1729,9 @@ public class Core implements IdentityListener, UpdateListener {
 			for (SoneInserter soneInserter : soneInserters.values()) {
 				soneInserter.stop();
 			}
+			for (Sone localSone : localSones.values()) {
+				saveSone(localSone);
+			}
 		}
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
@@ -1705,6 +1761,8 @@ public class Core implements IdentityListener, UpdateListener {
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
+			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
+			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -1767,7 +1825,7 @@ public class Core implements IdentityListener, UpdateListener {
 	@SuppressWarnings("unchecked")
 	private void loadConfiguration() {
 		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new OptionWatcher<Integer>() {
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangeValidator(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
 
 			@Override
 			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
@@ -1775,11 +1833,28 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 
 		}));
-		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
-		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
+		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
+		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, new OptionWatcher<Boolean>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
+				fcpInterface.setActive(newValue);
+			}
+		}));
+		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, new OptionWatcher<Integer>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+				fcpInterface.setFullAccessRequired(FullAccessRequired.values()[newValue]);
+			}
+
+		}));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -1795,12 +1870,14 @@ public class Core implements IdentityListener, UpdateListener {
 			return;
 		}
 
-		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
-		options.getIntegerOption("PostsPerPage").set(configuration.getIntValue("Option/PostsPerPage").getValue(null));
+		loadConfigurationValue("InsertionDelay");
+		loadConfigurationValue("PostsPerPage");
 		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
-		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
-		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
+		loadConfigurationValue("PositiveTrust");
+		loadConfigurationValue("NegativeTrust");
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
+		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
+		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -1851,6 +1928,21 @@ public class Core implements IdentityListener, UpdateListener {
 			}
 		}
 
+	}
+
+	/**
+	 * Loads an {@link Integer} configuration value for the option with the
+	 * given name, logging validation failures.
+	 *
+	 * @param optionName
+	 *            The name of the option to load
+	 */
+	private void loadConfigurationValue(String optionName) {
+		try {
+			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Invalid value for " + optionName + " in configuration, using default.");
+		}
 	}
 
 	/**
@@ -1971,6 +2063,7 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 		synchronized (newSones) {
 			newSones.remove(identity.getId());
+			coreListenerManager.fireSoneRemoved(sone);
 		}
 	}
 
@@ -2017,6 +2110,18 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/**
+		 * Validates the given insertion delay.
+		 *
+		 * @param insertionDelay
+		 *            The insertion delay to validate
+		 * @return {@code true} if the given insertion delay was valid, {@code
+		 *         false} otherwise
+		 */
+		public boolean validateInsertionDelay(Integer insertionDelay) {
+			return options.getIntegerOption("InsertionDelay").validate(insertionDelay);
+		}
+
+		/**
 		 * Sets the insertion delay
 		 *
 		 * @param insertionDelay
@@ -2036,6 +2141,18 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public int getPostsPerPage() {
 			return options.getIntegerOption("PostsPerPage").get();
+		}
+
+		/**
+		 * Validates the number of posts per page.
+		 *
+		 * @param postsPerPage
+		 *            The number of posts per page
+		 * @return {@code true} if the number of posts per page was valid,
+		 *         {@code false} otherwise
+		 */
+		public boolean validatePostsPerPage(Integer postsPerPage) {
+			return options.getIntegerOption("PostsPerPage").validate(postsPerPage);
 		}
 
 		/**
@@ -2081,6 +2198,18 @@ public class Core implements IdentityListener, UpdateListener {
 		}
 
 		/**
+		 * Validates the positive trust.
+		 *
+		 * @param positiveTrust
+		 *            The positive trust to validate
+		 * @return {@code true} if the positive trust was valid, {@code false}
+		 *         otherwise
+		 */
+		public boolean validatePositiveTrust(Integer positiveTrust) {
+			return options.getIntegerOption("PositiveTrust").validate(positiveTrust);
+		}
+
+		/**
 		 * Sets the positive trust.
 		 *
 		 * @param positiveTrust
@@ -2100,6 +2229,18 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public int getNegativeTrust() {
 			return options.getIntegerOption("NegativeTrust").get();
+		}
+
+		/**
+		 * Validates the negative trust.
+		 *
+		 * @param negativeTrust
+		 *            The negative trust to validate
+		 * @return {@code true} if the negative trust was valid, {@code false}
+		 *         otherwise
+		 */
+		public boolean validateNegativeTrust(Integer negativeTrust) {
+			return options.getIntegerOption("NegativeTrust").validate(negativeTrust);
 		}
 
 		/**
@@ -2135,6 +2276,57 @@ public class Core implements IdentityListener, UpdateListener {
 		 */
 		public Preferences setTrustComment(String trustComment) {
 			options.getStringOption("TrustComment").set(trustComment);
+			return this;
+		}
+
+		/**
+		 * Returns whether the {@link FcpInterface FCP interface} is currently
+		 * active.
+		 *
+		 * @see FcpInterface#setActive(boolean)
+		 * @return {@code true} if the FCP interface is currently active,
+		 *         {@code false} otherwise
+		 */
+		public boolean isFcpInterfaceActive() {
+			return options.getBooleanOption("ActivateFcpInterface").get();
+		}
+
+		/**
+		 * Sets whether the {@link FcpInterface FCP interface} is currently
+		 * active.
+		 *
+		 * @see FcpInterface#setActive(boolean)
+		 * @param fcpInterfaceActive
+		 *            {@code true} to activate the FCP interface, {@code false}
+		 *            to deactivate the FCP interface
+		 * @return This preferences object
+		 */
+		public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
+			options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
+			return this;
+		}
+
+		/**
+		 * Returns the action level for which full access to the FCP interface
+		 * is required.
+		 *
+		 * @return The action level for which full access to the FCP interface
+		 *         is required
+		 */
+		public FullAccessRequired getFcpFullAccessRequired() {
+			return FullAccessRequired.values()[options.getIntegerOption("FcpFullAccessRequired").get()];
+		}
+
+		/**
+		 * Sets the action level for which full access to the FCP interface is
+		 * required
+		 *
+		 * @param fcpFullAccessRequired
+		 *            The action level
+		 * @return This preferences
+		 */
+		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
+			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
 			return this;
 		}
 

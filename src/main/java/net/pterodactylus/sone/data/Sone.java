@@ -27,8 +27,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
@@ -65,6 +67,16 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		public boolean filterObject(Sone sone) {
 			return sone.getTime() != 0;
 		}
+	};
+
+	/** Filter that matches all {@link Core#isLocalSone(Sone) local Sones}. */
+	public static final Filter<Sone> LOCAL_SONE_FILTER = new Filter<Sone>() {
+
+		@Override
+		public boolean filterObject(Sone sone) {
+			return sone.getIdentity() instanceof OwnIdentity;
+		}
+
 	};
 
 	/** The logger. */

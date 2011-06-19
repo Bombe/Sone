@@ -43,9 +43,15 @@
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
+		<%if =insertion-delay|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
 		<p><input type="text" name="insertion-delay" value="<% insertion-delay|html>" /></p>
 
 		<p><%= Page.Options.Option.PostsPerPage.Description|l10n|html></p>
+		<%if =posts-per-page|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
 		<p><input type="text" name="posts-per-page" value="<% posts-per-page|html>" /></p>
 
 		<p>
@@ -56,13 +62,32 @@
 		<h2><%= Page.Options.Section.TrustOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.PositiveTrust.Description|l10n|html></p>
+		<%if =positive-trust|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
 		<p><input type="text" name="positive-trust" value="<% positive-trust|html>" /></p>
 
 		<p><%= Page.Options.Option.NegativeTrust.Description|l10n|html></p>
+		<%if =negative-trust|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
 		<p><input type="text" name="negative-trust" value="<% negative-trust|html>" /></p>
 
 		<p><%= Page.Options.Option.TrustComment.Description|l10n|html></p>
 		<p><input type="text" name="trust-comment" value="<% trust-comment|html>" /></p>
+
+		<h2><%= Page.Options.Section.FcpOptions.Title|l10n|html></h2>
+
+		<p><input type="checkbox" name="fcp-interface-active"<%if fcp-interface-active> checked="checked"<%/if> /> <%= Page.Options.Option.FcpInterfaceActive.Description|l10n|html></p>
+
+		<p>
+			<%= Page.Options.Option.FcpFullAccessRequired.Description|l10n|html|replace needle="{link}" replacement='<a href="/config/fcp">'|replace needle="{/link}" replacement='</a>'>
+			<select name="fcp-full-access-required">
+				<option value="0"<%if fcp-full-access-required|match value="0"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.No|l10n|html></option>
+				<option value="1"<%if fcp-full-access-required|match value="1"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Writing|l10n|html></option>
+				<option value="2"<%if fcp-full-access-required|match value="2"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Always|l10n|html></option>
+			</select>
+		</p>
 
 		<h2><%= Page.Options.Section.RescueOptions.Title|l10n|html></h2>
 

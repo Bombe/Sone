@@ -2,6 +2,7 @@
 	<a name="post-<% post.id|html>"></a>
 	<div class="post-time hidden"><% post.time|html></div>
 	<div class="post-author hidden"><% post.sone.id|html></div>
+	<div class="post-author-local hidden"><% post.sone.local></div>
 	<div class="avatar">
 		<%if post.loaded>
 			<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />

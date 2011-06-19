@@ -143,6 +143,10 @@ textarea {
 	display: none;
 }
 
+#sone #notification-area #local-post-notification, #sone #notification-area #local-reply-notification {
+	display: none;
+} 
+
 #sone #plugin-warning {
 	border: solid 0.5em red;
 	padding: 0.5em;
@@ -264,6 +268,7 @@ textarea {
 #sone .post .text, #sone .post .raw-text {
 	display: inline;
 	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 
 #sone .post .text.hidden, #sone .post .raw-text.hidden {
@@ -669,4 +674,9 @@ textarea {
 #sone .confirm {
 	font-weight: bold;
 	color: red;
+}
+
+#sone .warning {
+	color: red;
+	font-style: italic;
 }

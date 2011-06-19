@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -58,6 +59,9 @@ import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
 import net.pterodactylus.sone.template.UnknownDateFilter;
+import net.pterodactylus.sone.text.Part;
+import net.pterodactylus.sone.text.SonePart;
+import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
@@ -96,11 +100,14 @@ import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
+import net.pterodactylus.util.collection.SetBuilder;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.CollectionSortFilter;
+import net.pterodactylus.util.template.ContainsFilter;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
@@ -150,6 +157,9 @@ public class WebInterface implements CoreListener {
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
 
+	/** The Sone text parser. */
+	private final SoneTextParser soneTextParser;
+
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
 
@@ -158,6 +168,15 @@ public class WebInterface implements CoreListener {
 
 	/** The “new reply” notification. */
 	private final ListNotification<Reply> newReplyNotification;
+
+	/** The invisible “local post” notification. */
+	private final ListNotification<Post> localPostNotification;
+
+	/** The invisible “local reply” notification. */
+	private final ListNotification<Reply> localReplyNotification;
+
+	/** The “you have been mentioned” notification. */
+	private final ListNotification<Post> mentionNotification;
 
 	/** The “rescuing Sone” notification. */
 	private final ListNotification<Sone> rescuingSonesNotification;
@@ -184,6 +203,7 @@ public class WebInterface implements CoreListener {
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
+		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
@@ -205,13 +225,15 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory));
+		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory, soneTextParser));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
+		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
+		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
@@ -221,8 +243,17 @@ public class WebInterface implements CoreListener {
 		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
+		Template localPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
+		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", localPostNotificationTemplate, false);
+
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
-		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate, false);
+		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
+
+		Template localReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
+		localReplyNotification = new ListNotification<Reply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
+
+		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
+		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
 
 		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
 		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
@@ -402,7 +433,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new posts
 	 */
 	public Set<Post> getNewPosts() {
-		return new HashSet<Post>(newPostNotification.getElements());
+		return new SetBuilder<Post>().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).get();
 	}
 
 	/**
@@ -412,7 +443,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new replies
 	 */
 	public Set<Reply> getNewReplies() {
-		return new HashSet<Reply>(newReplyNotification.getElements());
+		return new SetBuilder<Reply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
 	}
 
 	/**
@@ -646,9 +677,32 @@ public class WebInterface implements CoreListener {
 		try {
 			return new InputStreamReader(getClass().getResourceAsStream(resourceName), "UTF-8");
 		} catch (UnsupportedEncodingException uee1) {
-			System.out.println("  fail.");
 			return null;
 		}
+	}
+
+	/**
+	 * Returns all {@link Core#isLocalSone(Sone) local Sone}s that are
+	 * referenced by {@link SonePart}s in the given text (after parsing it using
+	 * {@link SoneTextParser}).
+	 *
+	 * @param text
+	 *            The text to parse
+	 * @return All mentioned local Sones
+	 */
+	private Set<Sone> getMentionedSones(String text) {
+		/* we need no context to find mentioned Sones. */
+		Set<Sone> mentionedSones = new HashSet<Sone>();
+		try {
+			for (Part part : soneTextParser.parse(null, new StringReader(text))) {
+				if (part instanceof SonePart) {
+					mentionedSones.add(((SonePart) part).getSone());
+				}
+			}
+		} catch (IOException ioe1) {
+			logger.log(Level.WARNING, "Could not parse post text: " + text, ioe1);
+		}
+		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}
 
 	//
@@ -690,9 +744,18 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newPostFound(Post post) {
-		newPostNotification.add(post);
+		boolean isLocal = getCore().isLocalSone(post.getSone());
+		if (isLocal) {
+			localPostNotification.add(post);
+		} else {
+			newPostNotification.add(post);
+		}
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newPostNotification);
+			notificationManager.addNotification(isLocal ? localPostNotification : newPostNotification);
+			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
+				mentionNotification.add(post);
+				notificationManager.addNotification(mentionNotification);
+			}
 		} else {
 			getCore().markPostKnown(post);
 		}
@@ -706,9 +769,18 @@ public class WebInterface implements CoreListener {
 		if (reply.getPost().getSone() == null) {
 			return;
 		}
-		newReplyNotification.add(reply);
+		boolean isLocal = getCore().isLocalSone(reply.getSone());
+		if (isLocal) {
+			localReplyNotification.add(reply);
+		} else {
+			newReplyNotification.add(reply);
+		}
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newReplyNotification);
+			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal) {
+				mentionNotification.add(reply.getPost());
+				notificationManager.addNotification(mentionNotification);
+			}
 		} else {
 			getCore().markReplyKnown(reply);
 		}
@@ -728,6 +800,8 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markPostKnown(Post post) {
 		newPostNotification.remove(post);
+		localPostNotification.remove(post);
+		mentionNotification.remove(post);
 	}
 
 	/**
@@ -736,6 +810,16 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markReplyKnown(Reply reply) {
 		newReplyNotification.remove(reply);
+		localReplyNotification.remove(reply);
+		mentionNotification.remove(reply.getPost());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneRemoved(Sone sone) {
+		newSoneNotification.remove(sone);
 	}
 
 	/**
@@ -744,6 +828,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void postRemoved(Post post) {
 		newPostNotification.remove(post);
+		localPostNotification.remove(post);
 	}
 
 	/**
@@ -752,6 +837,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void replyRemoved(Reply reply) {
 		newReplyNotification.remove(reply);
+		localReplyNotification.remove(reply);
 	}
 
 	/**

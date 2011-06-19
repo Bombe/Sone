@@ -17,8 +17,12 @@
 
 package net.pterodactylus.sone.web;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -56,26 +60,48 @@ public class OptionsPage extends SoneTemplatePage {
 		Preferences preferences = webInterface.getCore().getPreferences();
 		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);
 		if (request.getMethod() == Method.POST) {
+			List<String> fieldErrors = new ArrayList<String>();
 			if (currentSone != null) {
 				boolean autoFollow = request.getHttpRequest().isPartSet("auto-follow");
 				currentSone.getOptions().getBooleanOption("AutoFollow").set(autoFollow);
 				webInterface.getCore().saveSone(currentSone);
 			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
-			preferences.setInsertionDelay(insertionDelay);
+			if (!preferences.validateInsertionDelay(insertionDelay)) {
+				fieldErrors.add("insertion-delay");
+			} else {
+				preferences.setInsertionDelay(insertionDelay);
+			}
 			Integer postsPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
-			preferences.setPostsPerPage(postsPerPage);
+			if (!preferences.validatePostsPerPage(postsPerPage)) {
+				fieldErrors.add("posts-per-page");
+			} else {
+				preferences.setPostsPerPage(postsPerPage);
+			}
 			boolean requireFullAccess = request.getHttpRequest().isPartSet("require-full-access");
 			preferences.setRequireFullAccess(requireFullAccess);
 			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
-			preferences.setPositiveTrust(positiveTrust);
+			if (!preferences.validatePositiveTrust(positiveTrust)) {
+				fieldErrors.add("positive-trust");
+			} else {
+				preferences.setPositiveTrust(positiveTrust);
+			}
 			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
-			preferences.setNegativeTrust(negativeTrust);
+			if (!preferences.validateNegativeTrust(negativeTrust)) {
+				fieldErrors.add("negative-trust");
+			} else {
+				preferences.setNegativeTrust(negativeTrust);
+			}
 			String trustComment = request.getHttpRequest().getPartAsStringFailsafe("trust-comment", 256);
 			if (trustComment.trim().length() == 0) {
 				trustComment = null;
 			}
 			preferences.setTrustComment(trustComment);
+			boolean fcpInterfaceActive = request.getHttpRequest().isPartSet("fcp-interface-active");
+			preferences.setFcpInterfaceActive(fcpInterfaceActive);
+			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
+			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
+			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
 			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
 			preferences.setSoneRescueMode(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
@@ -83,7 +109,10 @@ public class OptionsPage extends SoneTemplatePage {
 			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
 			preferences.setReallyClearOnNextRestart(reallyClearOnNextRestart);
 			webInterface.getCore().saveConfiguration();
-			throw new RedirectException(getPath());
+			if (fieldErrors.isEmpty()) {
+				throw new RedirectException(getPath());
+			}
+			templateContext.set("fieldErrors", fieldErrors);
 		}
 		if (currentSone != null) {
 			templateContext.set("auto-follow", currentSone.getOptions().getBooleanOption("AutoFollow").get());
@@ -94,6 +123,8 @@ public class OptionsPage extends SoneTemplatePage {
 		templateContext.set("positive-trust", preferences.getPositiveTrust());
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());
+		templateContext.set("fcp-interface-active", preferences.isFcpInterfaceActive());
+		templateContext.set("fcp-full-access-required", preferences.getFcpFullAccessRequired().ordinal());
 		templateContext.set("sone-rescue-mode", preferences.isSoneRescueMode());
 		templateContext.set("clear-on-next-restart", preferences.isClearOnNextRestart());
 		templateContext.set("really-clear-on-next-restart", preferences.isReallyClearOnNextRestart());

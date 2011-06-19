@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>sone</artifactId>
-	<version>0.6.4</version>
+	<version>0.6.5</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils</artifactId>
-			<version>0.9.5</version>
+			<version>0.9.6</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
