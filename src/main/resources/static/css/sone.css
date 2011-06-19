@@ -251,6 +251,29 @@ textarea {
 	border-bottom: none;
 }
 
+#sone .post .sone-post-menu {
+	position: absolute;
+	top: 0;
+	left: -1ex;
+	padding: 1ex 1ex;
+	margin: -1px -1px;
+	display: none;
+	background-color: rgb(255, 255, 224);
+	border: solid 1px rgb(0, 0, 0);
+	z-index: 1;
+}
+
+#sone .post .sone-post-menu .avatar {
+	position: absolute;
+	margin-right: 1ex;
+}
+
+#sone .post .sone-post-menu .inner-menu {
+	margin-left: 64px;
+	padding-left: 1ex;
+	min-height: 64px;
+}
+
 #sone .post > .avatar {
 	position: absolute;
 }
@@ -264,6 +287,10 @@ textarea {
 #sone .post .author, #sone .post .recipient {
 	display: inline;
 	font-weight: bold;
+}
+
+#sone .post .author-wot-link {
+	font-size: 90%;
 }
 
 #sone .post .text, #sone .post .raw-text {

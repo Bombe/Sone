@@ -802,6 +802,14 @@ function ajaxifyPost(postElement) {
 
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
+
+	/* show Sone menu when hovering over the avatar. */
+	$(postElement).find(".avatar").mouseover(function() {
+		$(".sone-post-menu", postElement).mouseleave(function() {
+			$(this).fadeOut();
+		}).fadeIn();
+		return false;
+	});
 }
 
 /**
