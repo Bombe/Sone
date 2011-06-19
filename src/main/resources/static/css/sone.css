@@ -238,6 +238,7 @@ textarea {
 	padding: 1ex 0px;
 	border-bottom: solid 1px #ccc;
 	clear: both;
+	position: relative;
 }
 
 #sone .post.new {
