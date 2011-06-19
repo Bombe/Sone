@@ -242,11 +242,15 @@ public class WebInterface implements CoreListener {
 
 		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
-		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", newPostNotificationTemplate, false);
+
+		Template localPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
+		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", localPostNotificationTemplate, false);
 
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
 		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
-		localReplyNotification = new ListNotification<Reply>("local-reply-notification", "replies", newReplyNotificationTemplate, false);
+
+		Template localReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
+		localReplyNotification = new ListNotification<Reply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 
 		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
 		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
