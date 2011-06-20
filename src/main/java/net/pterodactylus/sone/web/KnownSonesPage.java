@@ -62,6 +62,9 @@ public class KnownSonesPage extends SoneTemplatePage {
 		String sortField = request.getHttpRequest().getParam("sort");
 		String sortOrder = request.getHttpRequest().getParam("order");
 		String followedSones = request.getHttpRequest().getParam("followedSones");
+		templateContext.set("sort", (sortField != null) ? sortField : "name");
+		templateContext.set("order", (sortOrder != null) ? sortOrder : "asc");
+		templateContext.set("followedSones", followedSones);
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		List<Sone> knownSones = Filters.filteredList(new ArrayList<Sone>(webInterface.getCore().getSones()), Sone.EMPTY_SONE_FILTER);
 		if ((currentSone != null) && "show-only".equals(followedSones)) {
@@ -72,7 +75,6 @@ public class KnownSonesPage extends SoneTemplatePage {
 					return currentSone.hasFriend(sone.getId());
 				}
 			});
-			templateContext.set("followedSones", "show-only");
 		} else if ((currentSone != null) && "hide".equals(followedSones)) {
 			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
 
@@ -81,24 +83,19 @@ public class KnownSonesPage extends SoneTemplatePage {
 					return !currentSone.hasFriend(sone.getId());
 				}
 			});
-			templateContext.set("followedSones", "hide");
 		}
-		if ("name".equals(sortField)) {
-			if ("desc".equals(sortOrder)) {
-				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.NICE_NAME_COMPARATOR));
-			} else {
-				Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
-			}
-			templateContext.set("sort", "name");
-			templateContext.set("order", "desc".equals(sortOrder) ? "desc" : "asc");
-		} else if ("activity".equals(sortField)) {
+		if ("activity".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
 				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.LAST_ACTIVITY_COMPARATOR));
 			} else {
 				Collections.sort(knownSones, Sone.LAST_ACTIVITY_COMPARATOR);
 			}
-			templateContext.set("sort", "activity");
-			templateContext.set("order", "asc".equals(sortOrder) ? "asc" : "desc");
+		} else {
+			if ("desc".equals(sortOrder)) {
+				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.NICE_NAME_COMPARATOR));
+			} else {
+				Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
+			}
 		}
 		Pagination<Sone> sonePagination = new Pagination<Sone>(knownSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", sonePagination);
