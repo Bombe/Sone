@@ -13,6 +13,9 @@
 					$("select[name=order]").val("asc");
 				} 
 			});
+			$("#sort-options select").change(function() {
+				this.form.submit();
+			});
 		});
 	
 	</script>
