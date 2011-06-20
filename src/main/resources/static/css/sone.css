@@ -680,3 +680,7 @@ textarea {
 	color: red;
 	font-style: italic;
 }
+
+#sone #sort-options {
+	margin-bottom: 1em;
+}
