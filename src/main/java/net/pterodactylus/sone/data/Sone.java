@@ -60,6 +60,17 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	};
 
+	/**
+	 * Comparator that sorts Sones by last activity (least recent active first).
+	 */
+	public static final Comparator<Sone> LAST_ACTIVITY_COMPARATOR = new Comparator<Sone>() {
+
+		@Override
+		public int compare(Sone firstSone, Sone secondSone) {
+			return (int) Math.min(Integer.MAX_VALUE, Math.max(Integer.MIN_VALUE, secondSone.getTime() - firstSone.getTime()));
+		}
+	};
+
 	/** Filter to remove Sones that have not been downloaded. */
 	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
 
