@@ -93,7 +93,7 @@ public class ParserFilter implements Filter {
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
 		}
-		if (length == -1) {
+		if ((length == -1) && (parameters.get("length") != null)) {
 			try {
 				length = Integer.parseInt(String.valueOf(templateContext.get(parameters.get("length"))));
 			} catch (NumberFormatException nfe1) {
