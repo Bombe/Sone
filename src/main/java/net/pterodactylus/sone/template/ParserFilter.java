@@ -114,7 +114,7 @@ public class ParserFilter implements Filter {
 						if (length >= longText.length()) {
 							shortenedParts.add(part);
 						} else {
-							shortenedParts.add(new PlainTextPart(longText.substring(0, length)));
+							shortenedParts.add(new PlainTextPart(longText.substring(0, length) + "…"));
 						}
 						length -= longText.length();
 					} else if (part instanceof LinkPart) {
