@@ -15,7 +15,7 @@
 			<div class="reply-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="reply-text text<%if raw> hidden<%/if><%if !shortText|match key=parsedText> hidden<%/if>"><% parsedText></div>
 			<div class="reply-text short-text<%if raw> hidden<%/if><%if shortText|match key=parsedText> hidden<%/if>"><% shortText></div>
-			<%if !shortText|match key=parsedText><%if !raw><a class="expand-reply-text" href="viewPost.html?post=<% reply.post.id|html>">…</a><%/if><%/if>
+			<%if !shortText|match key=parsedText><%if !raw><a class="expand-reply-text" href="viewPost.html?post=<% reply.post.id|html>&amp;raw=true">…</a><%/if><%/if>
 		</div>
 		<div class="reply-status-line status-line">
 			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
