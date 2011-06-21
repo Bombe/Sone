@@ -97,6 +97,7 @@ public class GetPostAjaxPage extends JsonPage {
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("core", webInterface.getCore());
 		templateContext.set("request", request);
 		templateContext.set("post", post);
 		templateContext.set("currentSone", currentSone);

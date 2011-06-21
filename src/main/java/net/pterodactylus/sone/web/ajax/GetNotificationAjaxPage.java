@@ -115,6 +115,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 		try {
 			if (notification instanceof TemplateNotification) {
 				TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext());
+				templateContext.set("core", webInterface.getCore());
 				templateContext.set("currentSone", webInterface.getCurrentSone(request.getToadletContext(), false));
 				templateContext.set("localSones", webInterface.getCore().getLocalSones());
 				templateContext.set("request", request);

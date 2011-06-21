@@ -347,6 +347,7 @@ public class SoneInserter extends AbstractService {
 			}
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
+			templateContext.set("core", core);
 			templateContext.set("currentSone", soneProperties);
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.VERSION);
