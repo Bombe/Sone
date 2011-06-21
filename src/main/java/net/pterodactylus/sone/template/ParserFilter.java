@@ -93,6 +93,13 @@ public class ParserFilter implements Filter {
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
 		}
+		if (length == -1) {
+			try {
+				length = Integer.parseInt(String.valueOf(templateContext.get(parameters.get("length"))));
+			} catch (NumberFormatException nfe1) {
+				/* ignore. */
+			}
+		}
 		String soneKey = parameters.get("sone");
 		if (soneKey == null) {
 			soneKey = "sone";
