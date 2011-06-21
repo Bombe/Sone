@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import net.pterodactylus.sone.core.Core;
@@ -85,6 +87,12 @@ public class ParserFilter implements Filter {
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String text = String.valueOf(data);
+		int length = -1;
+		try {
+			length = Integer.parseInt(parameters.get("length"));
+		} catch (NumberFormatException nfe1) {
+			/* ignore. */
+		}
 		String soneKey = parameters.get("sone");
 		if (soneKey == null) {
 			soneKey = "sone";
@@ -97,7 +105,31 @@ public class ParserFilter implements Filter {
 		SoneTextParserContext context = new SoneTextParserContext(request, sone);
 		StringWriter parsedTextWriter = new StringWriter();
 		try {
-			render(parsedTextWriter, soneTextParser.parse(context, new StringReader(text)));
+			Iterable<Part> parts = soneTextParser.parse(context, new StringReader(text));
+			if (length > -1) {
+				List<Part> shortenedParts = new ArrayList<Part>();
+				for (Part part : parts) {
+					if (part instanceof PlainTextPart) {
+						String longText = ((PlainTextPart) part).getText();
+						if (length >= longText.length()) {
+							shortenedParts.add(part);
+						} else {
+							shortenedParts.add(new PlainTextPart(longText.substring(0, length)));
+						}
+						length -= longText.length();
+					} else if (part instanceof LinkPart) {
+						shortenedParts.add(part);
+						length -= ((LinkPart) part).getText().length();
+					} else {
+						shortenedParts.add(part);
+					}
+					if (length <= 0) {
+						break;
+					}
+				}
+				parts = shortenedParts;
+			}
+			render(parsedTextWriter, parts);
 		} catch (IOException ioe1) {
 			/* no exceptions in a StringReader or StringWriter, ignore. */
 		}
