@@ -55,7 +55,9 @@ import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.thread.Ticker;
+import net.pterodactylus.util.validation.EqualityValidator;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
+import net.pterodactylus.util.validation.OrValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
 import freenet.client.FetchResult;
@@ -1757,6 +1759,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
+			configuration.getIntValue("Option/CharactersPerPost").setValue(options.getIntegerOption("CharactersPerPost").getReal());
 			configuration.getBooleanValue("Option/RequireFullAccess").setValue(options.getBooleanOption("RequireFullAccess").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
@@ -1834,6 +1837,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 
 		}));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
+		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
@@ -1872,6 +1876,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
+		loadConfigurationValue("CharactersPerPost");
 		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
 		loadConfigurationValue("PositiveTrust");
 		loadConfigurationValue("NegativeTrust");
@@ -2164,6 +2169,41 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 		 */
 		public Preferences setPostsPerPage(Integer postsPerPage) {
 			options.getIntegerOption("PostsPerPage").set(postsPerPage);
+			return this;
+		}
+
+		/**
+		 * Returns the number of characters per post, or <code>-1</code> if the
+		 * posts should not be cut off.
+		 *
+		 * @return The numbers of characters per post
+		 */
+		public int getCharactersPerPost() {
+			return options.getIntegerOption("CharactersPerPost").get();
+		}
+
+		/**
+		 * Validates the number of characters per post.
+		 *
+		 * @param charactersPerPost
+		 *            The number of characters per post
+		 * @return {@code true} if the number of characters per post was valid,
+		 *         {@code false} otherwise
+		 */
+		public boolean validateCharactersPerPost(Integer charactersPerPost) {
+			return options.getIntegerOption("CharactersPerPost").validate(charactersPerPost);
+		}
+
+		/**
+		 * Sets the number of characters per post.
+		 *
+		 * @param charactersPerPost
+		 *            The number of characters per post, or <code>-1</code> to
+		 *            not cut off the posts
+		 * @return This preferences objects
+		 */
+		public Preferences setCharactersPerPost(Integer charactersPerPost) {
+			options.getIntegerOption("CharactersPerPost").set(charactersPerPost);
 			return this;
 		}
 
