@@ -265,13 +265,13 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .text, #sone .post .raw-text {
+#sone .post .text, #sone .post .raw-text, #sone .post .short-text {
 	display: inline;
 	white-space: pre-wrap;
 	word-wrap: break-word;
 }
 
-#sone .post .text.hidden, #sone .post .raw-text.hidden {
+#sone .post .text.hidden, #sone .post .raw-text.hidden, #sone .post .short-text.hidden {
 	display: none;
 }
 

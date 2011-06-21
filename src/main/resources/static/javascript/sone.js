@@ -759,8 +759,27 @@ function ajaxifyPost(postElement) {
 	/* convert “show source” link into javascript function. */
 	$(postElement).find(".show-source").each(function() {
 		$("a", this).click(function() {
+			post = getPostElement(this);
+			rawPostText = $(".post-text.raw-text", post);
+			rawPostText.toggleClass("hidden");
+			if (rawPostText.hasClass("hidden")) {
+				$(".post-text.short-text", post).removeClass("hidden");
+				$(".post-text.text", post).addClass("hidden");
+				$(".expand-post-text", post).removeClass("hidden");
+			} else {
+				$(".post-text.short-text", post).addClass("hidden");
+				$(".post-text.text", post).addClass("hidden");
+				$(".expand-post-text", post).addClass("hidden");
+			}
+			return false;
+		});
+	});
+
+	/* convert “show more” link into javascript function. */
+	$(postElement).find(".expand-post-text").each(function() {
+		$(this).click(function() {
 			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
-			$(".post-text.raw-text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
 			return false;
 		});
 	});
@@ -831,8 +850,27 @@ function ajaxifyReply(replyElement) {
 	/* convert “show source” link into javascript function. */
 	$(replyElement).find(".show-reply-source").each(function() {
 		$("a", this).click(function() {
+			reply = getReplyElement(this);
+			rawReplyText = $(".reply-text.raw-text", reply);
+			rawReplyText.toggleClass("hidden");
+			if (rawReplyText.hasClass("hidden")) {
+				$(".reply-text.short-text", reply).removeClass("hidden");
+				$(".reply-text.text", reply).addClass("hidden");
+				$(".expand-reply-text", reply).removeClass("hidden");
+			} else {
+				$(".reply-text.short-text", reply).addClass("hidden");
+				$(".reply-text.text", reply).addClass("hidden");
+				$(".expand-reply-text", reply).addClass("hidden");
+			}
+			return false;
+		});
+	});
+
+	/* convert “show more” link into javascript function. */
+	$(replyElement).find(".expand-reply-text").each(function() {
+		$(this).click(function() {
 			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
-			$(".reply-text.raw-text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
 			return false;
 		});
 	});
