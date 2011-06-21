@@ -766,10 +766,12 @@ function ajaxifyPost(postElement) {
 				$(".post-text.short-text", post).removeClass("hidden");
 				$(".post-text.text", post).addClass("hidden");
 				$(".expand-post-text", post).removeClass("hidden");
+				$(".shrink-post-text", post).addClass("hidden");
 			} else {
 				$(".post-text.short-text", post).addClass("hidden");
 				$(".post-text.text", post).addClass("hidden");
 				$(".expand-post-text", post).addClass("hidden");
+				$(".shrink-post-text", post).addClass("hidden");
 			}
 			return false;
 		});
@@ -780,8 +782,19 @@ function ajaxifyPost(postElement) {
 		$(this).click(function() {
 			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
 			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
+			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
+			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
 			return false;
 		});
+	});
+	$(postElement).find(".shrink-post-text").each(function() {
+		$(this).click(function() {
+			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
+			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
+			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
+			return false;
+		})
 	});
 
 	/* add “comment” link. */
@@ -857,10 +870,12 @@ function ajaxifyReply(replyElement) {
 				$(".reply-text.short-text", reply).removeClass("hidden");
 				$(".reply-text.text", reply).addClass("hidden");
 				$(".expand-reply-text", reply).removeClass("hidden");
+				$(".shrink-reply-text", reply).addClass("hidden");
 			} else {
 				$(".reply-text.short-text", reply).addClass("hidden");
 				$(".reply-text.text", reply).addClass("hidden");
 				$(".expand-reply-text", reply).addClass("hidden");
+				$(".shrink-reply-text", reply).addClass("hidden");
 			}
 			return false;
 		});
@@ -871,6 +886,17 @@ function ajaxifyReply(replyElement) {
 		$(this).click(function() {
 			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
 			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
+			$(".expand-reply-text", getReplyElement(this)).toggleClass("hidden");
+			$(".shrink-reply-text", getReplyElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+	$(replyElement).find(".shrink-reply-text").each(function() {
+		$(this).click(function() {
+			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
+			$(".expand-reply-text", getReplyElement(this)).toggleClass("hidden");
+			$(".shrink-reply-text", getReplyElement(this)).toggleClass("hidden");
 			return false;
 		});
 	});

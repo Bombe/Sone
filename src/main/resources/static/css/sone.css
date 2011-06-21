@@ -275,6 +275,18 @@ textarea {
 	display: none;
 }
 
+#sone .post .expand-post-text:before, #sone .post .expand-reply-text:before {
+	content: "» ";
+}
+
+#sone .post .shrink-post-text:before, #sone .post .shrink-reply-text:before {
+	content: "« ";
+}
+
+#sone .post .shrink-post-text {
+	cursor: pointer;
+}
+
 #sone .post .status-line {
 	margin-top: 0.5ex;
 	font-size: 85%;
