@@ -829,6 +829,12 @@ function ajaxifyPost(postElement) {
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", true);
+						$(".unfollow", this).toggleClass("hidden", false);
+					}
+				});
 			});
 			return false;
 		});
@@ -837,6 +843,12 @@ function ajaxifyPost(postElement) {
 			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", false);
+						$(".unfollow", this).toggleClass("hidden", true);
+					}
+				});
 			});
 			return false;
 		});
