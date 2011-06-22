@@ -283,6 +283,18 @@ function getSoneElement(element) {
 }
 
 /**
+ * Returns the ID of the sone of the context menu that contains the given
+ * element.
+ *
+ * @param element
+ *            The element within a context menu to get the Sone ID for
+ * @return The Sone ID
+ */
+function getMenuSone(element) {
+	return $(element).closest(".sone-menu").find(".sone-id").text();
+}
+
+/**
  * Generates a list of Sones by concatening the names of the given sones with a
  * new line character (“\n”).
  *
