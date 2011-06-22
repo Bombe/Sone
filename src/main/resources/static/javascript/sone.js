@@ -901,6 +901,45 @@ function ajaxifyReply(replyElement) {
 		untrustSone(getReplyAuthor(this));
 		return false;
 	});
+
+	/* show Sone menu when hovering over the avatar. */
+	$(replyElement).find(".reply-avatar").mouseover(function() {
+		$(".sone-reply-menu", replyElement).mouseleave(function() {
+			$(this).fadeOut();
+		}).fadeIn();
+		return false;
+	});
+	(function(replyElement) {
+		var soneId = $(".sone-id", replyElement).text();
+		$(".sone-menu .follow", replyElement).click(function() {
+			var followElement = this;
+			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+				$(followElement).addClass("hidden");
+				$(followElement).parent().find(".unfollow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", true);
+						$(".unfollow", this).toggleClass("hidden", false);
+					}
+				});
+			});
+			return false;
+		});
+		$(".sone-menu .unfollow", replyElement).click(function() {
+			var unfollowElement = this;
+			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+				$(unfollowElement).addClass("hidden");
+				$(unfollowElement).parent().find(".follow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", false);
+						$(".unfollow", this).toggleClass("hidden", true);
+					}
+				});
+			});
+			return false;
+		});
+	})(replyElement);
 }
 
 /**

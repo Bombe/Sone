@@ -420,11 +420,15 @@ textarea {
 }
 
 #sone .post .reply {
+	position: relative;
 	clear: both;
 	background-color: #f0f0ff;
-	font-size: 85%;
 	margin: 1ex 0px;
 	padding: 1ex;
+}
+
+#sone .post .reply .inner-part {
+	font-size: 85%;
 }
 
 #sone .post .reply.new {
