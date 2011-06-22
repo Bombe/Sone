@@ -1,0 +1,14 @@
+<div class="sone-menu <% class|css|html>">
+	<div class="sone-id hidden"><%sone.id|html></div>
+	<img class="avatar" src="/WebOfTrust/GetIdenticon?identity=<%sone.id|html>&amp;width=64&height=64" width="64" height="64" alt="Avatar Image" />
+	<div class="inner-menu">
+		<div>
+			<a class="author" href="viewSone.html?sone=<%sone.id|html>"><%sone.niceName|html></a>
+			<span class="author-wot-link">(<a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>"><% =View.Post.WebOfTrustLink|l10n|html></a>)</span>
+		</div>
+		<div>
+			<a class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></a>
+			<a class="unfollow<%if !sone.friend> hidden<%/if>"><%= View.Sone.Button.UnfollowSone|l10n|html></a>
+		</div>
+	</div>
+</div>

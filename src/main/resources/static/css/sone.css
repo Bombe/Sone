@@ -274,6 +274,10 @@ textarea {
 	min-height: 64px;
 }
 
+#sone .sone-menu .follow, #sone .sone-menu .unfollow {
+	cursor: pointer;
+}
+
 #sone .post > .avatar {
 	position: absolute;
 }

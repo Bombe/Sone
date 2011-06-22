@@ -804,12 +804,30 @@ function ajaxifyPost(postElement) {
 	$(postElement).find(".create-reply").addClass("hidden");
 
 	/* show Sone menu when hovering over the avatar. */
-	$(postElement).find(".avatar").mouseover(function() {
+	$(postElement).find(".post-avatar").mouseover(function() {
 		$(".sone-post-menu", postElement).mouseleave(function() {
 			$(this).fadeOut();
 		}).fadeIn();
 		return false;
 	});
+	(function(postElement) {
+		$(".sone-post-menu .follow", postElement).click(function() {
+			var followElement = this;
+			ajaxGet("followSone.ajax", { "sone": $(".sone-id", postElement).text(), "formPassword": getFormPassword() }, function() {
+				$(followElement).addClass("hidden");
+				$(followElement).parent().find(".unfollow").removeClass("hidden");
+			});
+			return false;
+		});
+		$(".sone-post-menu .unfollow", postElement).click(function() {
+			var unfollowElement = this;
+			ajaxGet("unfollowSone.ajax", { "sone": $(".sone-id", postElement).text(), "formPassword": getFormPassword() }, function() {
+				$(unfollowElement).addClass("hidden");
+				$(unfollowElement).parent().find(".follow").removeClass("hidden");
+			});
+			return false;
+		});
+	})(postElement);
 }
 
 /**

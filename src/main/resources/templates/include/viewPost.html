@@ -3,17 +3,8 @@
 	<div class="post-time hidden"><% post.time|html></div>
 	<div class="post-author hidden"><% post.sone.id|html></div>
 	<div class="post-author-local hidden"><% post.sone.local></div>
-	<div class="sone-post-menu">
-		<div class="sone-id hidden"><%post.sone.id|html></div>
-		<img class="avatar" src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=64&height=64" width="64" height="64" alt="Avatar Image" />
-		<div class="inner-menu">
-			<div>
-				<a class="author" href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a>
-				<span class="author-wot-link">(<a href="/WebOfTrust/ShowIdentity?id=<% post.sone.id|html>"><% =View.Post.WebOfTrustLink|l10n|html></a>)</span>
-			</div>
-		</div>
-	</div>
-	<div class="avatar">
+	<%include include/soneMenu.html class=="sone-post-menu" sone=post.sone>
+	<div class="avatar post-avatar" >
 		<%if post.loaded>
 			<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
 		<%else>
