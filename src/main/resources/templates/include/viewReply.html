@@ -3,7 +3,8 @@
 	<div class="reply-time hidden"><% reply.time|html></div>
 	<div class="reply-author hidden"><% reply.sone.id|html></div>
 	<div class="reply-author-local hidden"><% reply.sone.local></div>
-	<div class="avatar">
+	<%include include/soneMenu.html class=="sone-reply-menu" sone=reply.sone>
+	<div class="avatar reply-avatar">
 		<img src="/WebOfTrust/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
 	</div>
 	<div class="inner-part">
