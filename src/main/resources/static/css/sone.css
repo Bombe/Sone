@@ -251,7 +251,7 @@ textarea {
 	border-bottom: none;
 }
 
-#sone .post .sone-post-menu {
+#sone .post .sone-menu {
 	position: absolute;
 	top: 0;
 	left: -1ex;
@@ -263,12 +263,12 @@ textarea {
 	z-index: 1;
 }
 
-#sone .post .sone-post-menu .avatar {
+#sone .post .sone-menu .avatar {
 	position: absolute;
 	margin-right: 1ex;
 }
 
-#sone .post .sone-post-menu .inner-menu {
+#sone .post .sone-menu .inner-menu {
 	margin-left: 64px;
 	padding-left: 1ex;
 	min-height: 64px;
