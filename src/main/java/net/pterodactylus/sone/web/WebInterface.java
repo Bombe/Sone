@@ -766,9 +766,6 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newReplyFound(Reply reply) {
-		if (reply.getPost().getSone() == null) {
-			return;
-		}
 		boolean isLocal = getCore().isLocalSone(reply.getSone());
 		if (isLocal) {
 			localReplyNotification.add(reply);
