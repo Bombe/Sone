@@ -6,9 +6,11 @@
 			<a class="author" href="viewSone.html?sone=<%sone.id|html>"><%sone.niceName|html></a>
 			<span class="author-wot-link">(<a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>"><% =View.Post.WebOfTrustLink|l10n|html></a>)</span>
 		</div>
-		<div>
-			<a class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></a>
-			<a class="unfollow<%if !sone.friend> hidden<%/if>"><%= View.Sone.Button.UnfollowSone|l10n|html></a>
-		</div>
+		<%if !sone.local>
+			<div>
+				<a class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></a>
+				<a class="unfollow<%if !sone.friend> hidden<%/if>"><%= View.Sone.Button.UnfollowSone|l10n|html></a>
+			</div>
+		<%/if>
 	</div>
 </div>
