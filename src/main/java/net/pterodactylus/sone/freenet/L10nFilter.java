@@ -53,6 +53,9 @@ public class L10nFilter implements Filter {
 	 */
 	@Override
 	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+		if (parameters.isEmpty()) {
+			return l10n.getString(String.valueOf(data));
+		}
 		List<Object> parameterValues = new ArrayList<Object>();
 		int parameterIndex = 0;
 		while (parameters.containsKey(String.valueOf(parameterIndex))) {
