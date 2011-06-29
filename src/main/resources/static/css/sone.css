@@ -512,7 +512,11 @@ textarea {
 }
 
 #sone .sone .profile-link {
-	display: block;
+	display: inline;
+}
+
+#sone .sone .sone-stats {
+	display: inline;
 }
 
 #sone .sone .short-request-uri {
