@@ -102,6 +102,7 @@ public class ListNotificationFilters {
 		}
 		ListNotification<Post> filteredNotification = new ListNotification<Post>(newPostNotification);
 		filteredNotification.setElements(newPosts);
+		filteredNotification.setLastUpdateTime(newPostNotification.getLastUpdatedTime());
 		return filteredNotification;
 	}
 
@@ -137,6 +138,7 @@ public class ListNotificationFilters {
 		}
 		ListNotification<Reply> filteredNotification = new ListNotification<Reply>(newReplyNotification);
 		filteredNotification.setElements(newReplies);
+		filteredNotification.setLastUpdateTime(newReplyNotification.getLastUpdatedTime());
 		return filteredNotification;
 	}
 
