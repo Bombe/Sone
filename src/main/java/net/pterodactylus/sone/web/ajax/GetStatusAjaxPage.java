@@ -132,7 +132,7 @@ public class GetStatusAjaxPage extends JsonPage {
 
 			@Override
 			public boolean filterObject(Reply reply) {
-				return reply.getPost() != null;
+				return (reply.getPost() != null) && (reply.getPost().getSone() != null);
 			}
 		});
 		JsonArray jsonReplies = new JsonArray();
