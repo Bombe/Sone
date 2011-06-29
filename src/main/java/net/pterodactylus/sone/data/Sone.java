@@ -71,6 +71,18 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 	};
 
+	/** Comparator that sorts Sones by numbers of posts (descending). */
+	public static final Comparator<Sone> POST_COUNT_COMPARATOR = new Comparator<Sone>() {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(Sone leftSone, Sone rightSone) {
+			return (leftSone.getPosts().size() != rightSone.getPosts().size()) ? (rightSone.getPosts().size() - leftSone.getPosts().size()) : (rightSone.getReplies().size() - leftSone.getReplies().size());
+		}
+	};
+
 	/** Filter to remove Sones that have not been downloaded. */
 	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
 
