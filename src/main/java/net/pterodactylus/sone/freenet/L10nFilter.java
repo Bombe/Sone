@@ -20,6 +20,7 @@ package net.pterodactylus.sone.freenet;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import net.pterodactylus.util.template.Filter;
@@ -64,6 +65,6 @@ public class L10nFilter implements Filter {
 			parameterValues.add(value);
 			++parameterIndex;
 		}
-		return new MessageFormat(l10n.getString(String.valueOf(data))).format(parameterValues.toArray());
+		return new MessageFormat(l10n.getString(String.valueOf(data)), new Locale(l10n.getSelectedLanguage().shortCode)).format(parameterValues.toArray());
 	}
 }
