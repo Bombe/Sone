@@ -50,10 +50,12 @@ public class UnfollowSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
-			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			currentSone.removeFriend(soneId);
+			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 2000);
+			for (String soneId : soneIds.split("[ ,]+")) {
+				currentSone.removeFriend(soneId);
+			}
 			webInterface.getCore().saveSone(currentSone);
 			throw new RedirectException(returnPage);
 		}
