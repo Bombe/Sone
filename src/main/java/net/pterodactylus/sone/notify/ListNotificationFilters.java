@@ -54,13 +54,18 @@ public class ListNotificationFilters {
 	public static List<Notification> filterNotifications(Collection<? extends Notification> notifications, Sone currentSone) {
 		List<Notification> filteredNotifications = new ArrayList<Notification>();
 		for (Notification notification : notifications) {
-			if (notification.getId().equals("new-post-notification") || notification.getId().equals("mention-notification")) {
+			if (notification.getId().equals("new-post-notification")) {
 				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
 			} else if (notification.getId().equals("new-reply-notification")) {
 				ListNotification<Reply> filteredNotification = filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+				if (filteredNotification != null) {
+					filteredNotifications.add(filteredNotification);
+				}
+			} else if (notification.getId().equals("mention-notification")) {
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
