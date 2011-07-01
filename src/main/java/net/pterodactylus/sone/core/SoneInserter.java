@@ -83,6 +83,9 @@ public class SoneInserter extends AbstractService {
 	/** The Sone to insert. */
 	private final Sone sone;
 
+	/** The insert listener manager. */
+	private SoneInsertListenerManager soneInsertListenerManager;
+
 	/** Whether a modification has been detected. */
 	private volatile boolean modified = false;
 
@@ -104,6 +107,31 @@ public class SoneInserter extends AbstractService {
 		this.core = core;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
+		this.soneInsertListenerManager = new SoneInsertListenerManager(sone);
+	}
+
+	//
+	// LISTENER MANAGEMENT
+	//
+
+	/**
+	 * Adds a listener for Sone insert events.
+	 *
+	 * @param soneInsertListener
+	 *            The Sone insert listener
+	 */
+	public void addSoneInsertListener(SoneInsertListener soneInsertListener) {
+		soneInsertListenerManager.addListener(soneInsertListener);
+	}
+
+	/**
+	 * Removes a listener for Sone insert events.
+	 *
+	 * @param soneInsertListener
+	 *            The Sone insert listener
+	 */
+	public void removeSoneInsertListener(SoneInsertListener soneInsertListener) {
+		soneInsertListenerManager.removeListener(soneInsertListener);
 	}
 
 	//
@@ -206,7 +234,9 @@ public class SoneInserter extends AbstractService {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					long insertTime = System.currentTimeMillis();
 					insertInformation.setTime(insertTime);
+					soneInsertListenerManager.fireInsertStarted();
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+					soneInsertListenerManager.fireInsertFinished(System.currentTimeMillis() - insertTime);
 					/* at this point we might already be stopped. */
 					if (shouldStop()) {
 						/* if so, bail out, don’t change anything. */
@@ -218,6 +248,7 @@ public class SoneInserter extends AbstractService {
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {
+					soneInsertListenerManager.fireInsertAborted(se1);
 					logger.log(Level.WARNING, "Could not insert Sone “" + sone.getName() + "”!", se1);
 				} finally {
 					core.setSoneStatus(sone, SoneStatus.idle);
