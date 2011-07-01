@@ -66,7 +66,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener, UpdateListener, SoneProvider, PostProvider {
+public class Core implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -882,6 +882,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
+			soneInserter.addSoneInsertListener(this);
 			soneInserters.put(sone, soneInserter);
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
@@ -1171,7 +1172,9 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 				return;
 			}
 			localSones.remove(sone.getId());
-			soneInserters.remove(sone).stop();
+			SoneInserter soneInserter = soneInserters.remove(sone);
+			soneInserter.removeSoneInsertListener(this);
+			soneInserter.stop();
 		}
 		try {
 			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
@@ -1732,6 +1735,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	public void stop() {
 		synchronized (localSones) {
 			for (SoneInserter soneInserter : soneInserters.values()) {
+				soneInserter.removeSoneInsertListener(this);
 				soneInserter.stop();
 			}
 			for (Sone localSone : localSones.values()) {
@@ -2085,6 +2089,33 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	@Override
 	public void updateFound(Version version, long releaseTime, long latestEdition) {
 		coreListenerManager.fireUpdateFound(version, releaseTime, latestEdition);
+	}
+
+	//
+	// SONEINSERTLISTENER METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public void insertStarted(Sone sone) {
+		coreListenerManager.fireSoneInserting(sone);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void insertFinished(Sone sone, long insertDuration) {
+		coreListenerManager.fireSoneInserted(sone, insertDuration);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void insertAborted(Sone sone, Throwable cause) {
+		coreListenerManager.fireSoneInsertAborted(sone, cause);
 	}
 
 	/**
