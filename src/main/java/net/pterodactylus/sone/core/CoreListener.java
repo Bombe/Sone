@@ -137,6 +137,38 @@ public interface CoreListener extends EventListener {
 	public void soneUnlocked(Sone sone);
 
 	/**
+	 * Notifies a listener that the insert of the given Sone has started.
+	 *
+	 * @see SoneInsertListener#insertStarted(Sone)
+	 * @param sone
+	 *            The Sone that is being inserted
+	 */
+	public void soneInserting(Sone sone);
+
+	/**
+	 * Notifies a listener that the insert of the given Sone has finished
+	 * successfully.
+	 *
+	 * @see SoneInsertListener#insertFinished(Sone, long)
+	 * @param sone
+	 *            The Sone that has been inserted
+	 * @param insertDuration
+	 *            The insert duration (in milliseconds)
+	 */
+	public void soneInserted(Sone sone, long insertDuration);
+
+	/**
+	 * Notifies a listener that the insert of the given Sone was aborted.
+	 *
+	 * @see SoneInsertListener#insertAborted(Sone, Throwable)
+	 * @param sone
+	 *            The Sone that was inserted
+	 * @param cause
+	 *            The cause for the abortion (may be {@code null})
+	 */
+	public void soneInsertAborted(Sone sone, Throwable cause);
+
+	/**
 	 * Notifies a listener that a new version has been found.
 	 *
 	 * @param version

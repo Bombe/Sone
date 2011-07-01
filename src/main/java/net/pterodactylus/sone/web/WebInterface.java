@@ -184,6 +184,9 @@ public class WebInterface implements CoreListener {
 	/** The “Sone rescued” notification. */
 	private final ListNotification<Sone> sonesRescuedNotification;
 
+	/** Notifications for sone inserts. */
+	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
+
 	/** Sone locked notification ticker objects. */
 	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
 
@@ -707,6 +710,27 @@ public class WebInterface implements CoreListener {
 		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}
 
+	/**
+	 * Returns the Sone insert notification for the given Sone. If no
+	 * notification for the given Sone exists, a new notification is created and
+	 * cached.
+	 *
+	 * @param sone
+	 *            The Sone to get the insert notification for
+	 * @return The Sone insert notification
+	 */
+	private TemplateNotification getSoneInsertNotification(Sone sone) {
+		synchronized (soneInsertNotifications) {
+			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
+			if (templateNotification == null) {
+				templateNotification = new TemplateNotification(TemplateParser.parse(createReader("/templates/notify/soneInsertNotification.html")));
+				templateNotification.set("sone", sone);
+				soneInsertNotifications.put(sone, templateNotification);
+			}
+			return templateNotification;
+		}
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
@@ -864,6 +888,35 @@ public class WebInterface implements CoreListener {
 	public void soneUnlocked(Sone sone) {
 		lockedSonesNotification.remove(sone);
 		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInserting(Sone sone) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "inserting");
+		notificationManager.addNotification(soneInsertNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInserted(Sone sone, long insertDuration) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "inserted");
+		soneInsertNotification.set("insertDuration", insertDuration / 1000);
+		notificationManager.addNotification(soneInsertNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInsertAborted(Sone sone, Throwable cause) {
+		notificationManager.addNotification(getSoneInsertNotification(sone).set("soneStatus", "insert-aborted").set("insert-error", cause));
 	}
 
 	/**
