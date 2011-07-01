@@ -178,12 +178,6 @@ public class WebInterface implements CoreListener {
 	/** The “you have been mentioned” notification. */
 	private final ListNotification<Post> mentionNotification;
 
-	/** The “rescuing Sone” notification. */
-	private final ListNotification<Sone> rescuingSonesNotification;
-
-	/** The “Sone rescued” notification. */
-	private final ListNotification<Sone> sonesRescuedNotification;
-
 	/** Notifications for sone inserts. */
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
 
@@ -257,12 +251,6 @@ public class WebInterface implements CoreListener {
 
 		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
 		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
-
-		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
-		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
-
-		Template sonesRescuedTemplate = TemplateParser.parse(createReader("/templates/notify/sonesRescuedNotification.html"));
-		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
 
 		Template lockedSonesTemplate = TemplateParser.parse(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
@@ -734,25 +722,6 @@ public class WebInterface implements CoreListener {
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rescuingSone(Sone sone) {
-		rescuingSonesNotification.add(sone);
-		notificationManager.addNotification(rescuingSonesNotification);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rescuedSone(Sone sone) {
-		rescuingSonesNotification.remove(sone);
-		sonesRescuedNotification.add(sone);
-		notificationManager.addNotification(sonesRescuedNotification);
-	}
 
 	/**
 	 * {@inheritDoc}
