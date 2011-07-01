@@ -212,6 +212,50 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	}
 
 	/**
+	 * Notifies all listeners that the insert of the given Sone has started.
+	 *
+	 * @see SoneInsertListener#insertStarted(Sone)
+	 * @param sone
+	 *            The Sone being inserted
+	 */
+	void fireSoneInserting(Sone sone) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneInserting(sone);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the insert of the given Sone has finished
+	 * successfully.
+	 *
+	 * @see SoneInsertListener#insertFinished(Sone, long)
+	 * @param sone
+	 *            The Sone that was inserted
+	 * @param insertDuration
+	 *            The insert duration (in milliseconds)
+	 */
+	void fireSoneInserted(Sone sone, long insertDuration) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneInserted(sone, insertDuration);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the insert of the given Sone was aborted.
+	 *
+	 * @see SoneInsertListener#insertStarted(Sone)
+	 * @param sone
+	 *            The Sone being inserted
+	 * @param cause
+	 *            The cause for the abortion (may be {@code null}
+	 */
+	void fireSoneInsertAborted(Sone sone, Throwable cause) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneInsertAborted(sone, cause);
+		}
+	}
+
+	/**
 	 * Notifies all listeners that a new version was found.
 	 *
 	 * @see CoreListener#updateFound(Version, long, long)
