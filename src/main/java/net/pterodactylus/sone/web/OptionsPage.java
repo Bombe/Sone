@@ -64,7 +64,7 @@ public class OptionsPage extends SoneTemplatePage {
 			if (currentSone != null) {
 				boolean autoFollow = request.getHttpRequest().isPartSet("auto-follow");
 				currentSone.getOptions().getBooleanOption("AutoFollow").set(autoFollow);
-				webInterface.getCore().saveSone(currentSone);
+				webInterface.getCore().touchConfiguration();
 			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			if (!preferences.validateInsertionDelay(insertionDelay)) {
@@ -112,7 +112,7 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setClearOnNextRestart(clearOnNextRestart);
 			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
 			preferences.setReallyClearOnNextRestart(reallyClearOnNextRestart);
-			webInterface.getCore().saveConfiguration();
+			webInterface.getCore().touchConfiguration();
 			if (fieldErrors.isEmpty()) {
 				throw new RedirectException(getPath());
 			}

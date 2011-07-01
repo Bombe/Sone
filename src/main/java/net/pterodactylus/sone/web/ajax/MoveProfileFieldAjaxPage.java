@@ -71,7 +71,7 @@ public class MoveProfileFieldAjaxPage extends JsonPage {
 			return createErrorJsonObject("not-possible");
 		}
 		currentSone.setProfile(profile);
-		webInterface.getCore().saveSone(currentSone);
+		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject();
 	}
 

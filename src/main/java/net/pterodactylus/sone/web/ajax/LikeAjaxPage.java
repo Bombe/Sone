@@ -55,10 +55,10 @@ public class LikeAjaxPage extends JsonPage {
 		}
 		if ("post".equals(type)) {
 			currentSone.addLikedPostId(id);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 		} else if ("reply".equals(type)) {
 			currentSone.addLikedReplyId(id);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 		} else {
 			return createErrorJsonObject("invalid-type");
 		}

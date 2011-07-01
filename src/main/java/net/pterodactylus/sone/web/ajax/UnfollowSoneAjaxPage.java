@@ -52,7 +52,7 @@ public class UnfollowSoneAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		currentSone.removeFriend(soneId);
-		webInterface.getCore().saveSone(currentSone);
+		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject();
 	}
 

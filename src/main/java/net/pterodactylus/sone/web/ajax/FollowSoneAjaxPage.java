@@ -52,7 +52,7 @@ public class FollowSoneAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		currentSone.addFriend(soneId);
-		webInterface.getCore().saveSone(currentSone);
+		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject();
 	}
 

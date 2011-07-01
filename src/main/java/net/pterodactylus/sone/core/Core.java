@@ -53,6 +53,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.validation.EqualityValidator;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
@@ -66,7 +67,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener {
+public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -123,10 +124,6 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 
 	/** The FCP interface. */
 	private volatile FcpInterface fcpInterface;
-
-	/** Whether the core has been stopped. */
-	@SuppressWarnings("unused")
-	private volatile boolean stopped;
 
 	/** The Sones’ statuses. */
 	/* synchronize access on itself. */
@@ -188,6 +185,9 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	/** Ticker for threads that mark own elements as known. */
 	private Ticker localElementTicker = new Ticker();
 
+	/** The time the configuration was last touched. */
+	private volatile long lastConfigurationUpdate;
+
 	/**
 	 * Creates a new core.
 	 *
@@ -199,6 +199,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	 *            The identity manager
 	 */
 	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager) {
+		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
@@ -243,7 +244,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	 */
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
-		saveConfiguration();
+		touchConfiguration();
 	}
 
 	/**
@@ -908,7 +909,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 		Sone sone = addLocalSone(ownIdentity);
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
 		sone.addFriend("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
-		saveSone(sone);
+		touchConfiguration();
 		return sone;
 	}
 
@@ -941,7 +942,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
 							localSone.addFriend(sone.getId());
-							saveSone(localSone);
+							touchConfiguration();
 						}
 					}
 				}
@@ -1201,7 +1202,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			if (newSones.remove(sone.getId())) {
 				knownSones.add(sone.getId());
 				coreListenerManager.fireMarkSoneKnown(sone);
-				saveConfiguration();
+				touchConfiguration();
 			}
 		}
 	}
@@ -1353,13 +1354,344 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	}
 
 	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, String text) {
+		return createPost(sone, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param time
+	 *            The time of the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, long time, String text) {
+		return createPost(sone, null, time, text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param recipient
+	 *            The recipient Sone, or {@code null} if this post does not have
+	 *            a recipient
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, Sone recipient, String text) {
+		return createPost(sone, recipient, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new post.
+	 *
+	 * @param sone
+	 *            The Sone that creates the post
+	 * @param recipient
+	 *            The recipient Sone, or {@code null} if this post does not have
+	 *            a recipient
+	 * @param time
+	 *            The time of the post
+	 * @param text
+	 *            The text of the post
+	 * @return The created post
+	 */
+	public Post createPost(Sone sone, Sone recipient, long time, String text) {
+		if (!isLocalSone(sone)) {
+			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
+			return null;
+		}
+		final Post post = new Post(sone, time, text);
+		if (recipient != null) {
+			post.setRecipient(recipient);
+		}
+		synchronized (posts) {
+			posts.put(post.getId(), post);
+		}
+		synchronized (newPosts) {
+			newPosts.add(post.getId());
+			coreListenerManager.fireNewPostFound(post);
+		}
+		sone.addPost(post);
+		touchConfiguration();
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markPostKnown(post);
+			}
+		}, "Mark " + post + " read.");
+		return post;
+	}
+
+	/**
+	 * Deletes the given post.
+	 *
+	 * @param post
+	 *            The post to delete
+	 */
+	public void deletePost(Post post) {
+		if (!isLocalSone(post.getSone())) {
+			logger.log(Level.WARNING, "Tried to delete post of non-local Sone: %s", post.getSone());
+			return;
+		}
+		post.getSone().removePost(post);
+		synchronized (posts) {
+			posts.remove(post.getId());
+		}
+		coreListenerManager.firePostRemoved(post);
+		synchronized (newPosts) {
+			markPostKnown(post);
+			knownPosts.remove(post.getId());
+		}
+		touchConfiguration();
+	}
+
+	/**
+	 * Marks the given post as known, if it is currently a new post (according
+	 * to {@link #isNewPost(String)}).
+	 *
+	 * @param post
+	 *            The post to mark as known
+	 */
+	public void markPostKnown(Post post) {
+		synchronized (newPosts) {
+			if (newPosts.remove(post.getId())) {
+				knownPosts.add(post.getId());
+				coreListenerManager.fireMarkPostKnown(post);
+				touchConfiguration();
+			}
+		}
+	}
+
+	/**
+	 * Bookmarks the given post.
+	 *
+	 * @param post
+	 *            The post to bookmark
+	 */
+	public void bookmark(Post post) {
+		bookmarkPost(post.getId());
+	}
+
+	/**
+	 * Bookmarks the post with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the post to bookmark
+	 */
+	public void bookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.add(id);
+		}
+	}
+
+	/**
+	 * Removes the given post from the bookmarks.
+	 *
+	 * @param post
+	 *            The post to unbookmark
+	 */
+	public void unbookmark(Post post) {
+		unbookmarkPost(post.getId());
+	}
+
+	/**
+	 * Removes the post with the given ID from the bookmarks.
+	 *
+	 * @param id
+	 *            The ID of the post to unbookmark
+	 */
+	public void unbookmarkPost(String id) {
+		synchronized (bookmarkedPosts) {
+			bookmarkedPosts.remove(id);
+		}
+	}
+
+	/**
+	 * Creates a new reply.
+	 *
+	 * @param sone
+	 *            The Sone that creates the reply
+	 * @param post
+	 *            The post that this reply refers to
+	 * @param text
+	 *            The text of the reply
+	 * @return The created reply
+	 */
+	public Reply createReply(Sone sone, Post post, String text) {
+		return createReply(sone, post, System.currentTimeMillis(), text);
+	}
+
+	/**
+	 * Creates a new reply.
+	 *
+	 * @param sone
+	 *            The Sone that creates the reply
+	 * @param post
+	 *            The post that this reply refers to
+	 * @param time
+	 *            The time of the reply
+	 * @param text
+	 *            The text of the reply
+	 * @return The created reply
+	 */
+	public Reply createReply(Sone sone, Post post, long time, String text) {
+		if (!isLocalSone(sone)) {
+			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
+			return null;
+		}
+		final Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
+		synchronized (replies) {
+			replies.put(reply.getId(), reply);
+		}
+		synchronized (newReplies) {
+			newReplies.add(reply.getId());
+			coreListenerManager.fireNewReplyFound(reply);
+		}
+		sone.addReply(reply);
+		touchConfiguration();
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markReplyKnown(reply);
+			}
+		}, "Mark " + reply + " read.");
+		return reply;
+	}
+
+	/**
+	 * Deletes the given reply.
+	 *
+	 * @param reply
+	 *            The reply to delete
+	 */
+	public void deleteReply(Reply reply) {
+		Sone sone = reply.getSone();
+		if (!isLocalSone(sone)) {
+			logger.log(Level.FINE, "Tried to delete non-local reply: %s", reply);
+			return;
+		}
+		synchronized (replies) {
+			replies.remove(reply.getId());
+		}
+		synchronized (newReplies) {
+			markReplyKnown(reply);
+			knownReplies.remove(reply.getId());
+		}
+		sone.removeReply(reply);
+		touchConfiguration();
+	}
+
+	/**
+	 * Marks the given reply as known, if it is currently a new reply (according
+	 * to {@link #isNewReply(String)}).
+	 *
+	 * @param reply
+	 *            The reply to mark as known
+	 */
+	public void markReplyKnown(Reply reply) {
+		synchronized (newReplies) {
+			if (newReplies.remove(reply.getId())) {
+				knownReplies.add(reply.getId());
+				coreListenerManager.fireMarkReplyKnown(reply);
+				touchConfiguration();
+			}
+		}
+	}
+
+	/**
+	 * Notifies the core that the configuration, either of the core or of a
+	 * single local Sone, has changed, and that the configuration should be
+	 * saved.
+	 */
+	public void touchConfiguration() {
+		lastConfigurationUpdate = System.currentTimeMillis();
+	}
+
+	//
+	// SERVICE METHODS
+	//
+
+	/**
+	 * Starts the core.
+	 */
+	@Override
+	public void serviceStart() {
+		loadConfiguration();
+		updateChecker.addUpdateListener(this);
+		updateChecker.start();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void serviceRun() {
+		long lastSaved = System.currentTimeMillis();
+		while (!shouldStop()) {
+			sleep(1000);
+			long now = System.currentTimeMillis();
+			if (shouldStop() || ((lastConfigurationUpdate > lastSaved) && ((now - lastConfigurationUpdate) > 5000))) {
+				for (Sone localSone : getLocalSones()) {
+					saveSone(localSone);
+				}
+				saveConfiguration();
+				lastSaved = now;
+			}
+		}
+	}
+
+	/**
+	 * Stops the core.
+	 */
+	@Override
+	public void serviceStop() {
+		synchronized (localSones) {
+			for (SoneInserter soneInserter : soneInserters.values()) {
+				soneInserter.removeSoneInsertListener(this);
+				soneInserter.stop();
+			}
+		}
+		updateChecker.stop();
+		updateChecker.removeUpdateListener(this);
+		soneDownloader.stop();
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
 	 * Saves the given Sone. This will persist all local settings for the given
 	 * Sone, such as the friends list and similar, private options.
 	 *
 	 * @param sone
 	 *            The Sone to save
 	 */
-	public synchronized void saveSone(Sone sone) {
+	private synchronized void saveSone(Sone sone) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
 			return;
@@ -1452,307 +1784,9 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	}
 
 	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, String text) {
-		return createPost(sone, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
-	 * @param time
-	 *            The time of the post
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, long time, String text) {
-		return createPost(sone, null, time, text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
-	 * @param recipient
-	 *            The recipient Sone, or {@code null} if this post does not have
-	 *            a recipient
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, Sone recipient, String text) {
-		return createPost(sone, recipient, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
-	 * @param recipient
-	 *            The recipient Sone, or {@code null} if this post does not have
-	 *            a recipient
-	 * @param time
-	 *            The time of the post
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, Sone recipient, long time, String text) {
-		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
-			return null;
-		}
-		final Post post = new Post(sone, time, text);
-		if (recipient != null) {
-			post.setRecipient(recipient);
-		}
-		synchronized (posts) {
-			posts.put(post.getId(), post);
-		}
-		synchronized (newPosts) {
-			newPosts.add(post.getId());
-			coreListenerManager.fireNewPostFound(post);
-		}
-		sone.addPost(post);
-		saveSone(sone);
-		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void run() {
-				markPostKnown(post);
-			}
-		}, "Mark " + post + " read.");
-		return post;
-	}
-
-	/**
-	 * Deletes the given post.
-	 *
-	 * @param post
-	 *            The post to delete
-	 */
-	public void deletePost(Post post) {
-		if (!isLocalSone(post.getSone())) {
-			logger.log(Level.WARNING, "Tried to delete post of non-local Sone: %s", post.getSone());
-			return;
-		}
-		post.getSone().removePost(post);
-		synchronized (posts) {
-			posts.remove(post.getId());
-		}
-		coreListenerManager.firePostRemoved(post);
-		synchronized (newPosts) {
-			markPostKnown(post);
-			knownPosts.remove(post.getId());
-		}
-		saveSone(post.getSone());
-	}
-
-	/**
-	 * Marks the given post as known, if it is currently a new post (according
-	 * to {@link #isNewPost(String)}).
-	 *
-	 * @param post
-	 *            The post to mark as known
-	 */
-	public void markPostKnown(Post post) {
-		synchronized (newPosts) {
-			if (newPosts.remove(post.getId())) {
-				knownPosts.add(post.getId());
-				coreListenerManager.fireMarkPostKnown(post);
-				saveConfiguration();
-			}
-		}
-	}
-
-	/**
-	 * Bookmarks the given post.
-	 *
-	 * @param post
-	 *            The post to bookmark
-	 */
-	public void bookmark(Post post) {
-		bookmarkPost(post.getId());
-	}
-
-	/**
-	 * Bookmarks the post with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the post to bookmark
-	 */
-	public void bookmarkPost(String id) {
-		synchronized (bookmarkedPosts) {
-			bookmarkedPosts.add(id);
-		}
-	}
-
-	/**
-	 * Removes the given post from the bookmarks.
-	 *
-	 * @param post
-	 *            The post to unbookmark
-	 */
-	public void unbookmark(Post post) {
-		unbookmarkPost(post.getId());
-	}
-
-	/**
-	 * Removes the post with the given ID from the bookmarks.
-	 *
-	 * @param id
-	 *            The ID of the post to unbookmark
-	 */
-	public void unbookmarkPost(String id) {
-		synchronized (bookmarkedPosts) {
-			bookmarkedPosts.remove(id);
-		}
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The Sone that creates the reply
-	 * @param post
-	 *            The post that this reply refers to
-	 * @param text
-	 *            The text of the reply
-	 * @return The created reply
-	 */
-	public Reply createReply(Sone sone, Post post, String text) {
-		return createReply(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The Sone that creates the reply
-	 * @param post
-	 *            The post that this reply refers to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 * @return The created reply
-	 */
-	public Reply createReply(Sone sone, Post post, long time, String text) {
-		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
-			return null;
-		}
-		final Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
-		synchronized (replies) {
-			replies.put(reply.getId(), reply);
-		}
-		synchronized (newReplies) {
-			newReplies.add(reply.getId());
-			coreListenerManager.fireNewReplyFound(reply);
-		}
-		sone.addReply(reply);
-		saveSone(sone);
-		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void run() {
-				markReplyKnown(reply);
-			}
-		}, "Mark " + reply + " read.");
-		return reply;
-	}
-
-	/**
-	 * Deletes the given reply.
-	 *
-	 * @param reply
-	 *            The reply to delete
-	 */
-	public void deleteReply(Reply reply) {
-		Sone sone = reply.getSone();
-		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to delete non-local reply: %s", reply);
-			return;
-		}
-		synchronized (replies) {
-			replies.remove(reply.getId());
-		}
-		synchronized (newReplies) {
-			markReplyKnown(reply);
-			knownReplies.remove(reply.getId());
-		}
-		sone.removeReply(reply);
-		saveSone(sone);
-	}
-
-	/**
-	 * Marks the given reply as known, if it is currently a new reply (according
-	 * to {@link #isNewReply(String)}).
-	 *
-	 * @param reply
-	 *            The reply to mark as known
-	 */
-	public void markReplyKnown(Reply reply) {
-		synchronized (newReplies) {
-			if (newReplies.remove(reply.getId())) {
-				knownReplies.add(reply.getId());
-				coreListenerManager.fireMarkReplyKnown(reply);
-				saveConfiguration();
-			}
-		}
-	}
-
-	/**
-	 * Starts the core.
-	 */
-	public void start() {
-		loadConfiguration();
-		updateChecker.addUpdateListener(this);
-		updateChecker.start();
-	}
-
-	/**
-	 * Stops the core.
-	 */
-	public void stop() {
-		synchronized (localSones) {
-			for (SoneInserter soneInserter : soneInserters.values()) {
-				soneInserter.removeSoneInsertListener(this);
-				soneInserter.stop();
-			}
-			for (Sone localSone : localSones.values()) {
-				saveSone(localSone);
-			}
-		}
-		updateChecker.stop();
-		updateChecker.removeUpdateListener(this);
-		soneDownloader.stop();
-		saveConfiguration();
-		stopped = true;
-	}
-
-	/**
 	 * Saves the current options.
 	 */
-	public void saveConfiguration() {
+	private void saveConfiguration() {
 		synchronized (configuration) {
 			if (storingConfiguration) {
 				logger.log(Level.FINE, "Already storing configuration…");
@@ -1824,10 +1858,6 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			}
 		}
 	}
-
-	//
-	// PRIVATE METHODS
-	//
 
 	/**
 	 * Loads the configuration.

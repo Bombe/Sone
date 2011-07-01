@@ -84,7 +84,7 @@ public class EditProfilePage extends SoneTemplatePage {
 					field.setValue(value);
 				}
 				currentSone.setProfile(profile);
-				webInterface.getCore().saveSone(currentSone);
+				webInterface.getCore().touchConfiguration();
 				throw new RedirectException("editProfile.html");
 			} else if (request.getHttpRequest().getPartAsStringFailsafe("add-field", 4).equals("true")) {
 				String fieldName = request.getHttpRequest().getPartAsStringFailsafe("field-name", 256).trim();
@@ -92,7 +92,7 @@ public class EditProfilePage extends SoneTemplatePage {
 					profile.addField(fieldName);
 					currentSone.setProfile(profile);
 					fields = profile.getFields();
-					webInterface.getCore().saveSone(currentSone);
+					webInterface.getCore().touchConfiguration();
 					throw new RedirectException("editProfile.html#profile-fields");
 				} catch (IllegalArgumentException iae1) {
 					templateContext.set("fieldName", fieldName);

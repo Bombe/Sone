@@ -55,10 +55,10 @@ public class UnlikeAjaxPage extends JsonPage {
 		}
 		if ("post".equals(type)) {
 			currentSone.removeLikedPostId(id);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 		} else if ("reply".equals(type)) {
 			currentSone.removeLikedReplyId(id);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 		} else {
 			return createErrorJsonObject("invalid-type");
 		}

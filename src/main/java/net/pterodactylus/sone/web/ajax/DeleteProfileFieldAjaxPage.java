@@ -54,7 +54,7 @@ public class DeleteProfileFieldAjaxPage extends JsonPage {
 		}
 		profile.removeField(field);
 		currentSone.setProfile(profile);
-		webInterface.getCore().saveSone(currentSone);
+		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject().put("field", new JsonObject().put("id", field.getId()));
 	}
 
