@@ -49,7 +49,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -60,7 +59,6 @@ import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.OrValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
-import freenet.client.FetchResult;
 import freenet.keys.FreenetURI;
 
 /**
@@ -127,6 +125,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	private volatile FcpInterface fcpInterface;
 
 	/** Whether the core has been stopped. */
+	@SuppressWarnings("unused")
 	private volatile boolean stopped;
 
 	/** The Sones’ statuses. */
@@ -140,6 +139,10 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	/** Sone inserters. */
 	/* synchronize access on this on localSones. */
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
+
+	/** Sone rescuers. */
+	/* synchronize access on this on localSones. */
+	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<Sone, SoneRescuer>();
 
 	/** All local Sones. */
 	/* synchronize access on this on itself. */
@@ -304,6 +307,26 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	public void setSoneStatus(Sone sone, SoneStatus soneStatus) {
 		synchronized (soneStatuses) {
 			soneStatuses.put(sone, soneStatus);
+		}
+	}
+
+	/**
+	 * Returns the Sone rescuer for the given local Sone.
+	 *
+	 * @param sone
+	 *            The local Sone to get the rescuer for
+	 * @return The Sone rescuer for the given Sone
+	 */
+	public SoneRescuer getSoneRescuer(Sone sone) {
+		Validation.begin().isNotNull("Sone", sone).check().is("Local Sone", isLocalSone(sone)).check();
+		synchronized (localSones) {
+			SoneRescuer soneRescuer = soneRescuers.get(sone);
+			if (soneRescuer == null) {
+				soneRescuer = new SoneRescuer(this, soneDownloader, sone);
+				soneRescuers.put(sone, soneRescuer);
+				soneRescuer.start();
+			}
+			return soneRescuer;
 		}
 	}
 
@@ -862,41 +885,7 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 			soneInserters.put(sone, soneInserter);
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
-			if (!preferences.isSoneRescueMode()) {
-				soneInserter.start();
-			}
-			new Thread(new Runnable() {
-
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public void run() {
-					if (!preferences.isSoneRescueMode()) {
-						return;
-					}
-					logger.log(Level.INFO, "Trying to restore Sone from Freenet…");
-					coreListenerManager.fireRescuingSone(sone);
-					lockSone(sone);
-					long edition = sone.getLatestEdition();
-					/* find the latest edition the node knows about. */
-					Pair<FreenetURI, FetchResult> currentUri = freenetInterface.fetchUri(sone.getRequestUri());
-					if (currentUri != null) {
-						long currentEdition = currentUri.getLeft().getEdition();
-						if (currentEdition > edition) {
-							edition = currentEdition;
-						}
-					}
-					while (!stopped && (edition >= 0) && preferences.isSoneRescueMode()) {
-						logger.log(Level.FINE, "Downloading edition " + edition + "…");
-						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
-						--edition;
-					}
-					logger.log(Level.INFO, "Finished restoring Sone from Freenet, starting Inserter…");
-					saveSone(sone);
-					coreListenerManager.fireRescuedSone(sone);
-					soneInserter.start();
-				}
-
-			}, "Sone Downloader").start();
+			soneInserter.start();
 			return sone;
 		}
 	}
@@ -1064,14 +1053,28 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 	}
 
 	/**
-	 * Updates the stores Sone with the given Sone.
+	 * Updates the stored Sone with the given Sone.
 	 *
 	 * @param sone
 	 *            The updated Sone
 	 */
 	public void updateSone(Sone sone) {
+		updateSone(sone, false);
+	}
+
+	/**
+	 * Updates the stored Sone with the given Sone. If {@code soneRescueMode} is
+	 * {@code true}, an older Sone than the current Sone can be given to restore
+	 * an old state.
+	 *
+	 * @param sone
+	 *            The Sone to update
+	 * @param soneRescueMode
+	 *            {@code true} if the stored Sone should be updated regardless
+	 *            of the age of the given Sone
+	 */
+	public void updateSone(Sone sone, boolean soneRescueMode) {
 		if (hasSone(sone.getId())) {
-			boolean soneRescueMode = isLocalSone(sone) && preferences.isSoneRescueMode();
 			Sone storedSone = getSone(sone.getId());
 			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
@@ -2367,29 +2370,6 @@ public class Core implements IdentityListener, UpdateListener, SoneProvider, Pos
 		 */
 		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
 			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
-			return this;
-		}
-
-		/**
-		 * Returns whether the rescue mode is active.
-		 *
-		 * @return {@code true} if the rescue mode is active, {@code false}
-		 *         otherwise
-		 */
-		public boolean isSoneRescueMode() {
-			return options.getBooleanOption("SoneRescueMode").get();
-		}
-
-		/**
-		 * Sets whether the rescue mode is active.
-		 *
-		 * @param soneRescueMode
-		 *            {@code true} if the rescue mode is active, {@code false}
-		 *            otherwise
-		 * @return This preferences
-		 */
-		public Preferences setSoneRescueMode(Boolean soneRescueMode) {
-			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
 			return this;
 		}
 

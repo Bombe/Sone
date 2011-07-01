@@ -568,6 +568,7 @@ public class WebInterface implements CoreListener {
 		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
 		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
+		Template rescueTemplate = TemplateParser.parse(createReader("/templates/rescue.html"));
 		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
 		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
 		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
@@ -606,6 +607,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
