@@ -712,7 +712,7 @@ public class WebInterface implements CoreListener {
 			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
 			if (templateNotification == null) {
 				templateNotification = new TemplateNotification(TemplateParser.parse(createReader("/templates/notify/soneInsertNotification.html")));
-				templateNotification.set("sone", sone);
+				templateNotification.set("insertSone", sone);
 				soneInsertNotifications.put(sone, templateNotification);
 			}
 			return templateNotification;
