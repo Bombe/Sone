@@ -43,6 +43,11 @@
 			<%= Page.Options.Option.AutoFollow.Description|l10n|html>
 		</p>
 
+		<p>
+			<input type="checkbox" name="enable-sone-insert-notifications"<%ifnull currentSone> disabled="disabled"<%/if><%if enable-sone-insert-notifications> checked="checked"<%/if> />
+			<%= Page.Options.Option.EnableSoneInsertNotifications.Description|l10n|html>
+		</p>
+
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
