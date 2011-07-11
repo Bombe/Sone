@@ -866,7 +866,9 @@ public class WebInterface implements CoreListener {
 	public void soneInserting(Sone sone) {
 		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
 		soneInsertNotification.set("soneStatus", "inserting");
-		notificationManager.addNotification(soneInsertNotification);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
 	}
 
 	/**
@@ -877,7 +879,9 @@ public class WebInterface implements CoreListener {
 		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
 		soneInsertNotification.set("soneStatus", "inserted");
 		soneInsertNotification.set("insertDuration", insertDuration / 1000);
-		notificationManager.addNotification(soneInsertNotification);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
 	}
 
 	/**
@@ -885,7 +889,12 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void soneInsertAborted(Sone sone, Throwable cause) {
-		notificationManager.addNotification(getSoneInsertNotification(sone).set("soneStatus", "insert-aborted").set("insert-error", cause));
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "insert-aborted");
+		soneInsertNotification.set("insert-error", cause);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
 	}
 
 	/**
