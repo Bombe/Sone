@@ -1222,6 +1222,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 		/* initialize options. */
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
 
 		/* load Sone. */
 		String sonePrefix = "Sone/" + sone.getId();
@@ -1324,6 +1325,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 		/* load options. */
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
+		sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
@@ -1773,6 +1775,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save options. */
 			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
+			configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").setValue(sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").getReal());
 
 			configuration.save();
 			logger.log(Level.INFO, "Sone %s saved.", sone);
