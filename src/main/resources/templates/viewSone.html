@@ -14,6 +14,10 @@
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
 
 		<p><%= Page.ViewSone.UnknownSone.Description|l10n|html></p>
+		<p>
+			<%= Page.ViewSone.UnknownSone.LinkToWebOfTrust|l10n|html>
+			<a href="/WebOfTrust/ShowIdentity?id=<% sone.id|html>"><%= Page.ViewSone.Profile.Name.WoTLink|l10n|html></a>
+		</p>
 
 	<%else>
 
