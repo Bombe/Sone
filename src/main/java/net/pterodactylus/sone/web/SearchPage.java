@@ -83,6 +83,9 @@ public class SearchPage extends SoneTemplatePage {
 		}
 
 		List<Phrase> phrases = parseSearchPhrases(query);
+		if (phrases.isEmpty()) {
+			throw new RedirectException("index.html");
+		}
 
 		Set<Sone> sones = webInterface.getCore().getSones();
 		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
