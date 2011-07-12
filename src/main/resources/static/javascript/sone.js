@@ -1479,7 +1479,7 @@ function markSoneAsKnown(soneElement, skipRequest) {
 function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
-		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
+		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined"))) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
@@ -1495,7 +1495,7 @@ function markPostAsKnown(postElements, skipRequest) {
 function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
-		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
+		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined"))) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
