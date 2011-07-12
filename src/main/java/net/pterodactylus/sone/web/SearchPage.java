@@ -32,9 +32,16 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.cache.Cache;
+import net.pterodactylus.util.cache.CacheException;
+import net.pterodactylus.util.cache.CacheItem;
+import net.pterodactylus.util.cache.DefaultCacheItem;
+import net.pterodactylus.util.cache.MemoryCache;
+import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.collection.Mapper;
 import net.pterodactylus.util.collection.Mappers;
 import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.collection.TimedMap;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
@@ -54,6 +61,20 @@ public class SearchPage extends SoneTemplatePage {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SearchPage.class);
+
+	/** Short-term cache. */
+	private final Cache<List<Phrase>, Set<Hit<Post>>> hitCache = new MemoryCache<List<Phrase>, Set<Hit<Post>>>(new ValueRetriever<List<Phrase>, Set<Hit<Post>>>() {
+
+		@SuppressWarnings("synthetic-access")
+		public CacheItem<Set<Hit<Post>>> retrieve(List<Phrase> phrases) throws CacheException {
+			Set<Post> posts = new HashSet<Post>();
+			for (Sone sone : webInterface.getCore().getSones()) {
+				posts.addAll(sone.getPosts());
+			}
+			return new DefaultCacheItem<Set<Hit<Post>>>(getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator()));
+		}
+
+	}, new TimedMap<List<Phrase>, CacheItem<Set<Hit<Post>>>>(300000));
 
 	/**
 	 * Creates a new search page.
@@ -90,12 +111,14 @@ public class SearchPage extends SoneTemplatePage {
 		Set<Sone> sones = webInterface.getCore().getSones();
 		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
-		Set<Post> posts = new HashSet<Post>();
-		for (Sone sone : sones) {
-			posts.addAll(sone.getPosts());
+		Set<Hit<Post>> postHits;
+		try {
+			postHits = hitCache.get(phrases);
+		} catch (CacheException ce1) {
+			/* should never happen. */
+			logger.log(Level.SEVERE, "Could not get search results from cache!", ce1);
+			postHits = Collections.emptySet();
 		}
-		@SuppressWarnings("synthetic-access")
-		Set<Hit<Post>> postHits = getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator());
 
 		/* now filter. */
 		soneHits = Filters.filteredSet(soneHits, Hit.POSITIVE_FILTER);
