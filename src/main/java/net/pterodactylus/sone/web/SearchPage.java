@@ -413,6 +413,30 @@ public class SearchPage extends SoneTemplatePage {
 			return optionality;
 		}
 
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return phrase.hashCode() ^ ((optionality == Optionality.FORBIDDEN) ? (0xaaaaaaaa) : ((optionality == Optionality.REQUIRED) ? 0x55555555 : 0));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof Phrase)) {
+				return false;
+			}
+			Phrase phrase = (Phrase) object;
+			return (this.optionality == phrase.optionality) && this.phrase.equals(phrase.phrase);
+		}
+
 	}
 
 	/**
