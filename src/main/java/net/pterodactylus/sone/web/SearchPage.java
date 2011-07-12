@@ -175,11 +175,20 @@ public class SearchPage extends SoneTemplatePage {
 		List<Phrase> phrases = new ArrayList<Phrase>();
 		for (String phrase : parsedPhrases) {
 			if (phrase.startsWith("+")) {
-				phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.REQUIRED));
+				if (phrase.length() > 1) {
+					phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.REQUIRED));
+				} else {
+					phrases.add(new Phrase("+", Phrase.Optionality.OPTIONAL));
+				}
 			} else if (phrase.startsWith("-")) {
-				phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.FORBIDDEN));
+				if (phrase.length() > 1) {
+					phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.FORBIDDEN));
+				} else {
+					phrases.add(new Phrase("-", Phrase.Optionality.OPTIONAL));
+				}
+			} else {
+				phrases.add(new Phrase(phrase, Phrase.Optionality.OPTIONAL));
 			}
-			phrases.add(new Phrase(phrase, Phrase.Optionality.OPTIONAL));
 		}
 		return phrases;
 	}
