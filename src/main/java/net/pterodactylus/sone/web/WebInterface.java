@@ -58,6 +58,7 @@ import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
+import net.pterodactylus.sone.template.UniqueElementFilter;
 import net.pterodactylus.sone.template.UnknownDateFilter;
 import net.pterodactylus.sone.text.Part;
 import net.pterodactylus.sone.text.SonePart;
@@ -228,6 +229,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
 		templateContextFactory.addFilter("in", new ContainsFilter());
+		templateContextFactory.addFilter("unique", new UniqueElementFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("webInterface", this);
