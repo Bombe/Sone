@@ -85,6 +85,8 @@ public class GetNotificationAjaxPage extends JsonPage {
 				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
 			} else if ("new-reply-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+			} else if ("mention-notification".equals(notificationId)) {
+				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
 			}
 			if (notification == null) {
 				// TODO - show error
