@@ -809,6 +809,15 @@ function ajaxifyPost(postElement) {
 		})
 	});
 
+	/* ajaxify author/post links */
+	$(".post-status-line .permalink a", postElement).click(function() {
+		if (!$(".create-reply", postElement).hasClass("hidden")) {
+			textArea = $("input.reply-input", postElement).focus().data("textarea");
+			$(textArea).replaceSelection($(this).attr("href"));
+		}
+		return false;
+	});
+
 	/* add “comment” link. */
 	addCommentLink(getPostId(postElement), getPostAuthor(postElement), postElement, $(postElement).find(".post-status-line .permalink-author"));
 
@@ -909,6 +918,16 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
+
+	/* ajaxify author links */
+	$(".reply-status-line .permalink a", replyElement).click(function() {
+		if (!$(".create-reply", getPostElement(replyElement)).hasClass("hidden")) {
+			textArea = $("input.reply-input", getPostElement(replyElement)).focus().data("textarea");
+			$(textArea).replaceSelection($(this).attr("href"));
+		}
+		return false;
+	});
+
 	addCommentLink(getPostId(replyElement), getReplyAuthor(replyElement), replyElement, $(replyElement).find(".reply-status-line .permalink-author"));
 
 	/* convert “show source” link into javascript function. */
@@ -1919,11 +1938,6 @@ $(document).ready(function() {
 	/* process all existing notifications, ajaxify dismiss buttons. */
 	$("#sone #notification-area .notification").each(function() {
 		ajaxifyNotification($(this));
-	});
-
-	/* disable all permalinks. */
-	$(".permalink").click(function() {
-		return false;
 	});
 
 	/* activate status polling. */
