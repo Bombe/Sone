@@ -55,7 +55,7 @@ public class ListNotificationFilters {
 		List<Notification> filteredNotifications = new ArrayList<Notification>();
 		for (Notification notification : notifications) {
 			if (notification.getId().equals("new-post-notification")) {
-				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone);
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone, true);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
@@ -65,7 +65,7 @@ public class ListNotificationFilters {
 					filteredNotifications.add(filteredNotification);
 				}
 			} else if (notification.getId().equals("mention-notification")) {
-				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null);
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null, false);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
@@ -78,19 +78,23 @@ public class ListNotificationFilters {
 
 	/**
 	 * Filters the new posts of the given notification. If {@code currentSone}
-	 * is {@code null}, {@code null} is returned and the notification is
-	 * subsequently removed. Otherwise only posts that are posted by friend
-	 * Sones of the given Sone are retained; all other posts are removed.
+	 * is {@code null} and {@code soneRequired} is {@code true}, {@code null} is
+	 * returned and the notification is subsequently removed. Otherwise only
+	 * posts that are posted by friend Sones of the given Sone are retained; all
+	 * other posts are removed.
 	 *
 	 * @param newPostNotification
 	 *            The new-post notification
 	 * @param currentSone
 	 *            The current Sone, or {@code null} if not logged in
+	 * @param soneRequired
+	 *            Whether a non-{@code null} Sone in {@code currentSone} is
+	 *            required
 	 * @return The filtered new-post notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	public static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone) {
-		if (currentSone == null) {
+	public static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone, boolean soneRequired) {
+		if (soneRequired && (currentSone == null)) {
 			return null;
 		}
 		List<Post> newPosts = new ArrayList<Post>();
