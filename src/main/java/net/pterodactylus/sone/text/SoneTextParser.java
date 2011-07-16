@@ -182,7 +182,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (line.length() >= (next + 7 + 43)) {
 						String soneId = line.substring(next + 7, next + 50);
 						Sone sone = soneProvider.getSone(soneId, false);
-						if (sone != null) {
+						if ((sone != null) && (sone.getName() != null)) {
 							parts.add(new SonePart(sone));
 						} else {
 							parts.add(new PlainTextPart(line.substring(next, next + 50)));
