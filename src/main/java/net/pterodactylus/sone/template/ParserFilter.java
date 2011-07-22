@@ -286,10 +286,11 @@ public class ParserFilter implements Filter {
 	 * @return The excerpt of the text
 	 */
 	private static String getExcerpt(String text, int length) {
-		if (text.length() > length) {
-			return text.substring(0, length) + "…";
+		String filteredText = text.replaceAll("(\r\n)+", "\r\n").replaceAll("\n+", "\n").replace("\r\n", " ").replace('\n', ' ');
+		if (filteredText.length() > length) {
+			return filteredText.substring(0, length) + "…";
 		}
-		return text;
+		return filteredText;
 	}
 
 }
