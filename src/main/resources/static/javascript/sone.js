@@ -858,6 +858,7 @@ function ajaxifyPost(postElement) {
 
 	/* show Sone menu when hovering over the avatar. */
 	$(postElement).find(".post-avatar").mouseover(function() {
+		$(".sone-menu:visible").fadeOut();
 		$(".sone-post-menu", postElement).mouseleave(function() {
 			$(this).fadeOut();
 		}).fadeIn();
@@ -987,6 +988,7 @@ function ajaxifyReply(replyElement) {
 
 	/* show Sone menu when hovering over the avatar. */
 	$(replyElement).find(".reply-avatar").mouseover(function() {
+		$(".sone-menu:visible").fadeOut();
 		$(".sone-reply-menu", replyElement).mouseleave(function() {
 			$(this).fadeOut();
 		}).fadeIn();
