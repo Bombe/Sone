@@ -1141,7 +1141,7 @@ function checkForRemovedPosts(oldNotification, newNotification) {
  *            The new notification element
  */
 function checkForRemovedReplies(oldNotification, newNotification) {
-	if (getNotificationId(oldNotification) != "new-replies-notification") {
+	if (getNotificationId(oldNotification) != "new-reply-notification") {
 		return;
 	}
 	oldIds = getElementIds(oldNotification, ".reply-id");
@@ -1185,7 +1185,7 @@ function getStatus() {
 							postId = $(this).text();
 							markPostAsKnown(getPost(postId), true);
 						});
-					} else if (notificationId == "new-replies-notification") {
+					} else if (notificationId == "new-reply-notification") {
 						$(".reply-id", this).each(function(index, element) {
 							replyId = $(this).text();
 							markReplyAsKnown(getReply(replyId), true);
