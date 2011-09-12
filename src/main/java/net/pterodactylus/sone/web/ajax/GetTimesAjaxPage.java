@@ -52,7 +52,6 @@ public class GetTimesAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonObject createJsonObject(Request request) {
-		long now = System.currentTimeMillis();
 		String allIds = request.getHttpRequest().getParam("posts");
 		JsonObject postTimes = new JsonObject();
 		if (allIds.length() > 0) {
@@ -79,9 +78,8 @@ public class GetTimesAjaxPage extends JsonPage {
 				if (reply == null) {
 					continue;
 				}
-				long age = now - reply.getTime();
 				JsonObject replyTime = new JsonObject();
-				Time time = getTime(age);
+				Time time = getTime(reply.getTime());
 				replyTime.put("timeText", time.getText());
 				replyTime.put("refreshTime", time.getRefresh() / Time.SECOND);
 				replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
