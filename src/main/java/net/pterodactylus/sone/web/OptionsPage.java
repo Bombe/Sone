@@ -64,7 +64,9 @@ public class OptionsPage extends SoneTemplatePage {
 			if (currentSone != null) {
 				boolean autoFollow = request.getHttpRequest().isPartSet("auto-follow");
 				currentSone.getOptions().getBooleanOption("AutoFollow").set(autoFollow);
-				webInterface.getCore().saveSone(currentSone);
+				boolean enableSoneInsertNotifications = request.getHttpRequest().isPartSet("enable-sone-insert-notifications");
+				currentSone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(enableSoneInsertNotifications);
+				webInterface.getCore().touchConfiguration();
 			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			if (!preferences.validateInsertionDelay(insertionDelay)) {
@@ -77,6 +79,12 @@ public class OptionsPage extends SoneTemplatePage {
 				fieldErrors.add("posts-per-page");
 			} else {
 				preferences.setPostsPerPage(postsPerPage);
+			}
+			Integer charactersPerPost = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
+			if (!preferences.validateCharactersPerPost(charactersPerPost)) {
+				fieldErrors.add("characters-per-post");
+			} else {
+				preferences.setCharactersPerPost(charactersPerPost);
 			}
 			boolean requireFullAccess = request.getHttpRequest().isPartSet("require-full-access");
 			preferences.setRequireFullAccess(requireFullAccess);
@@ -102,13 +110,11 @@ public class OptionsPage extends SoneTemplatePage {
 			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
 			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
 			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
-			boolean soneRescueMode = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("sone-rescue-mode", 5));
-			preferences.setSoneRescueMode(soneRescueMode);
 			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
 			preferences.setClearOnNextRestart(clearOnNextRestart);
 			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
 			preferences.setReallyClearOnNextRestart(reallyClearOnNextRestart);
-			webInterface.getCore().saveConfiguration();
+			webInterface.getCore().touchConfiguration();
 			if (fieldErrors.isEmpty()) {
 				throw new RedirectException(getPath());
 			}
@@ -116,16 +122,17 @@ public class OptionsPage extends SoneTemplatePage {
 		}
 		if (currentSone != null) {
 			templateContext.set("auto-follow", currentSone.getOptions().getBooleanOption("AutoFollow").get());
+			templateContext.set("enable-sone-insert-notifications", currentSone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());
+		templateContext.set("characters-per-post", preferences.getCharactersPerPost());
 		templateContext.set("require-full-access", preferences.isRequireFullAccess());
 		templateContext.set("positive-trust", preferences.getPositiveTrust());
 		templateContext.set("negative-trust", preferences.getNegativeTrust());
 		templateContext.set("trust-comment", preferences.getTrustComment());
 		templateContext.set("fcp-interface-active", preferences.isFcpInterfaceActive());
 		templateContext.set("fcp-full-access-required", preferences.getFcpFullAccessRequired().ordinal());
-		templateContext.set("sone-rescue-mode", preferences.isSoneRescueMode());
 		templateContext.set("clear-on-next-restart", preferences.isClearOnNextRestart());
 		templateContext.set("really-clear-on-next-restart", preferences.isReallyClearOnNextRestart());
 	}

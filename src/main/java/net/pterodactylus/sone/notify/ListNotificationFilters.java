@@ -55,12 +55,17 @@ public class ListNotificationFilters {
 		List<Notification> filteredNotifications = new ArrayList<Notification>();
 		for (Notification notification : notifications) {
 			if (notification.getId().equals("new-post-notification")) {
-				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone);
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone, true);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
 			} else if (notification.getId().equals("new-reply-notification")) {
 				ListNotification<Reply> filteredNotification = filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+				if (filteredNotification != null) {
+					filteredNotifications.add(filteredNotification);
+				}
+			} else if (notification.getId().equals("mention-notification")) {
+				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null, false);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
@@ -73,19 +78,23 @@ public class ListNotificationFilters {
 
 	/**
 	 * Filters the new posts of the given notification. If {@code currentSone}
-	 * is {@code null}, {@code null} is returned and the notification is
-	 * subsequently removed. Otherwise only posts that are posted by friend
-	 * Sones of the given Sone are retained; all other posts are removed.
+	 * is {@code null} and {@code soneRequired} is {@code true}, {@code null} is
+	 * returned and the notification is subsequently removed. Otherwise only
+	 * posts that are posted by friend Sones of the given Sone are retained; all
+	 * other posts are removed.
 	 *
 	 * @param newPostNotification
 	 *            The new-post notification
 	 * @param currentSone
 	 *            The current Sone, or {@code null} if not logged in
+	 * @param soneRequired
+	 *            Whether a non-{@code null} Sone in {@code currentSone} is
+	 *            required
 	 * @return The filtered new-post notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	public static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone) {
-		if (currentSone == null) {
+	public static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone, boolean soneRequired) {
+		if (soneRequired && (currentSone == null)) {
 			return null;
 		}
 		List<Post> newPosts = new ArrayList<Post>();
@@ -102,6 +111,7 @@ public class ListNotificationFilters {
 		}
 		ListNotification<Post> filteredNotification = new ListNotification<Post>(newPostNotification);
 		filteredNotification.setElements(newPosts);
+		filteredNotification.setLastUpdateTime(newPostNotification.getLastUpdatedTime());
 		return filteredNotification;
 	}
 
@@ -137,6 +147,7 @@ public class ListNotificationFilters {
 		}
 		ListNotification<Reply> filteredNotification = new ListNotification<Reply>(newReplyNotification);
 		filteredNotification.setElements(newReplies);
+		filteredNotification.setLastUpdateTime(newReplyNotification.getLastUpdatedTime());
 		return filteredNotification;
 	}
 
@@ -145,6 +156,13 @@ public class ListNotificationFilters {
 	 * considered visible if one of the following statements is true:
 	 * <ul>
 	 * <li>The post does not have a Sone.</li>
+	 * <li>The post’s {@link Post#getTime() time} is in the future.</li>
+	 * </ul>
+	 * <p>
+	 * If {@code post} is not {@code null} more checks are performed, and the
+	 * post will be invisible if:
+	 * </p>
+	 * <ul>
 	 * <li>The Sone of the post is not the given Sone, the given Sone does not
 	 * follow the post’s Sone, and the given Sone is not the recipient of the
 	 * post.</li>
@@ -153,36 +171,38 @@ public class ListNotificationFilters {
 	 * Sone.</li>
 	 * <li>The given Sone has not explicitely assigned negative trust to the
 	 * post’s Sone but the implicit trust is negative.</li>
-	 * <li>The post’s {@link Post#getTime() time} is in the future.</li>
 	 * </ul>
 	 * If none of these statements is true the post is considered visible.
 	 *
 	 * @param sone
-	 *            The Sone that checks for a post’s visibility
+	 *            The Sone that checks for a post’s visibility (may be
+	 *            {@code null} to skip Sone-specific checks, such as trust)
 	 * @param post
 	 *            The post to check for visibility
 	 * @return {@code true} if the post is considered visible, {@code false}
 	 *         otherwise
 	 */
 	public static boolean isPostVisible(Sone sone, Post post) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Post", post).check().isNotNull("Sone’s Identity", sone.getIdentity()).check().isInstanceOf("Sone’s Identity", sone.getIdentity(), OwnIdentity.class).check();
+		Validation.begin().isNotNull("Post", post).check();
 		Sone postSone = post.getSone();
 		if (postSone == null) {
 			return false;
 		}
-		Trust trust = postSone.getIdentity().getTrust((OwnIdentity) sone.getIdentity());
-		if (trust != null) {
-			if ((trust.getExplicit() != null) && (trust.getExplicit() < 0)) {
+		if (sone != null) {
+			Trust trust = postSone.getIdentity().getTrust((OwnIdentity) sone.getIdentity());
+			if (trust != null) {
+				if ((trust.getExplicit() != null) && (trust.getExplicit() < 0)) {
+					return false;
+				}
+				if ((trust.getExplicit() == null) && (trust.getImplicit() != null) && (trust.getImplicit() < 0)) {
+					return false;
+				}
+			} else {
 				return false;
 			}
-			if ((trust.getExplicit() == null) && (trust.getImplicit() != null) && (trust.getImplicit() < 0)) {
+			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
 				return false;
 			}
-		} else {
-			return false;
-		}
-		if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
-			return false;
 		}
 		if (post.getTime() > System.currentTimeMillis()) {
 			return false;
@@ -210,14 +230,15 @@ public class ListNotificationFilters {
 	 * If none of these statements is true the reply is considered visible.
 	 *
 	 * @param sone
-	 *            The Sone that checks for a post’s visibility
+	 *            The Sone that checks for a post’s visibility (may be
+	 *            {@code null} to skip Sone-specific checks, such as trust)
 	 * @param reply
 	 *            The reply to check for visibility
 	 * @return {@code true} if the reply is considered visible, {@code false}
 	 *         otherwise
 	 */
 	public static boolean isReplyVisible(Sone sone, Reply reply) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Reply", reply).check().isNotNull("Sone’s Identity", sone.getIdentity()).check().isInstanceOf("Sone’s Identity", sone.getIdentity(), OwnIdentity.class).check();
+		Validation.begin().isNotNull("Reply", reply).check();
 		Post post = reply.getPost();
 		if (post == null) {
 			return false;

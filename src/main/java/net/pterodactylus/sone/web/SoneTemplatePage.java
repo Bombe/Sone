@@ -250,6 +250,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		templateContext.set("core", webInterface.getCore());
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
 		templateContext.set("request", request);

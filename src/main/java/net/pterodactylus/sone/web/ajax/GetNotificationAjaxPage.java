@@ -82,9 +82,11 @@ public class GetNotificationAjaxPage extends JsonPage {
 		for (String notificationId : notificationIds) {
 			Notification notification = webInterface.getNotifications().getNotification(notificationId);
 			if ("new-post-notification".equals(notificationId)) {
-				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone);
+				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
 			} else if ("new-reply-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+			} else if ("mention-notification".equals(notificationId)) {
+				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
 			}
 			if (notification == null) {
 				// TODO - show error
@@ -115,6 +117,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 		try {
 			if (notification instanceof TemplateNotification) {
 				TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext());
+				templateContext.set("core", webInterface.getCore());
 				templateContext.set("currentSone", webInterface.getCurrentSone(request.getToadletContext(), false));
 				templateContext.set("localSones", webInterface.getCore().getLocalSones());
 				templateContext.set("request", request);

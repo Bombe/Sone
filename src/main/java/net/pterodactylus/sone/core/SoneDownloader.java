@@ -25,7 +25,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
@@ -124,8 +123,7 @@ public class SoneDownloader extends AbstractService {
 
 	/**
 	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
-	 * specific URI (which happens when {@link Preferences#isSoneRescueMode()
-	 * „Sone rescue mode“} is active).
+	 * specific URI.
 	 *
 	 * @param sone
 	 *            The Sone to fetch
@@ -133,6 +131,23 @@ public class SoneDownloader extends AbstractService {
 	 *            The URI to fetch the Sone from
 	 */
 	public void fetchSone(Sone sone, FreenetURI soneUri) {
+		fetchSone(sone, soneUri, false);
+	}
+
+	/**
+	 * Fetches the Sone from the given URI.
+	 *
+	 * @param sone
+	 *            The Sone to fetch
+	 * @param soneUri
+	 *            The URI of the Sone to fetch
+	 * @param fetchOnly
+	 *            {@code true} to only fetch and parse the Sone, {@code false}
+	 *            to {@link Core#updateSone(Sone) update} it in the core
+	 * @return The downloaded Sone, or {@code null} if the Sone could not be
+	 *         downloaded
+	 */
+	public Sone fetchSone(Sone sone, FreenetURI soneUri, boolean fetchOnly) {
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		core.setSoneStatus(sone, SoneStatus.downloading);
@@ -140,14 +155,17 @@ public class SoneDownloader extends AbstractService {
 			Pair<FreenetURI, FetchResult> fetchResults = freenetInterface.fetchUri(requestUri);
 			if (fetchResults == null) {
 				/* TODO - mark Sone as bad. */
-				return;
+				return null;
 			}
 			logger.log(Level.FINEST, "Got %d bytes back.", fetchResults.getRight().size());
 			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
 			if (parsedSone != null) {
-				addSone(parsedSone);
-				core.updateSone(parsedSone);
+				if (!fetchOnly) {
+					core.updateSone(parsedSone);
+					addSone(parsedSone);
+				}
 			}
+			return parsedSone;
 		} finally {
 			core.setSoneStatus(sone, (sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 		}

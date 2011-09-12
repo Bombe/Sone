@@ -100,7 +100,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
 		} else if (member.equals("lastUpdatedText")) {
-			return GetTimesAjaxPage.getTime((WebInterface) templateContext.get("webInterface"), System.currentTimeMillis() - sone.getTime());
+			return GetTimesAjaxPage.getTime((WebInterface) templateContext.get("webInterface"), sone.getTime());
 		} else if (member.equals("trust")) {
 			Sone currentSone = (Sone) templateContext.get("currentSone");
 			if (currentSone == null) {

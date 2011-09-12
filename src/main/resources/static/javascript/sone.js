@@ -283,6 +283,18 @@ function getSoneElement(element) {
 }
 
 /**
+ * Returns the ID of the sone of the context menu that contains the given
+ * element.
+ *
+ * @param element
+ *            The element within a context menu to get the Sone ID for
+ * @return The Sone ID
+ */
+function getMenuSone(element) {
+	return $(element).closest(".sone-menu").find(".sone-id").text();
+}
+
+/**
  * Generates a list of Sones by concatening the names of the given sones with a
  * new line character (“\n”).
  *
@@ -759,10 +771,51 @@ function ajaxifyPost(postElement) {
 	/* convert “show source” link into javascript function. */
 	$(postElement).find(".show-source").each(function() {
 		$("a", this).click(function() {
-			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
-			$(".post-text.raw-text", getPostElement(this)).toggleClass("hidden");
+			post = getPostElement(this);
+			rawPostText = $(".post-text.raw-text", post);
+			rawPostText.toggleClass("hidden");
+			if (rawPostText.hasClass("hidden")) {
+				$(".post-text.short-text", post).removeClass("hidden");
+				$(".post-text.text", post).addClass("hidden");
+				$(".expand-post-text", post).removeClass("hidden");
+				$(".shrink-post-text", post).addClass("hidden");
+			} else {
+				$(".post-text.short-text", post).addClass("hidden");
+				$(".post-text.text", post).addClass("hidden");
+				$(".expand-post-text", post).addClass("hidden");
+				$(".shrink-post-text", post).addClass("hidden");
+			}
 			return false;
 		});
+	});
+
+	/* convert “show more” link into javascript function. */
+	$(postElement).find(".expand-post-text").each(function() {
+		$(this).click(function() {
+			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
+			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
+			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+	$(postElement).find(".shrink-post-text").each(function() {
+		$(this).click(function() {
+			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
+			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
+			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
+			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
+			return false;
+		})
+	});
+
+	/* ajaxify author/post links */
+	$(".post-status-line .permalink a", postElement).click(function() {
+		if (!$(".create-reply", postElement).hasClass("hidden")) {
+			textArea = $("input.reply-input", postElement).focus().data("textarea");
+			$(textArea).replaceSelection($(this).attr("href"));
+		}
+		return false;
 	});
 
 	/* add “comment” link. */
@@ -802,6 +855,46 @@ function ajaxifyPost(postElement) {
 
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
+
+	/* show Sone menu when hovering over the avatar. */
+	$(postElement).find(".post-avatar").mouseover(function() {
+		$(".sone-menu:visible").fadeOut();
+		$(".sone-post-menu", postElement).mouseleave(function() {
+			$(this).fadeOut();
+		}).fadeIn();
+		return false;
+	});
+	(function(postElement) {
+		var soneId = $(".sone-id", postElement).text();
+		$(".sone-post-menu .follow", postElement).click(function() {
+			var followElement = this;
+			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+				$(followElement).addClass("hidden");
+				$(followElement).parent().find(".unfollow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", true);
+						$(".unfollow", this).toggleClass("hidden", false);
+					}
+				});
+			});
+			return false;
+		});
+		$(".sone-post-menu .unfollow", postElement).click(function() {
+			var unfollowElement = this;
+			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+				$(unfollowElement).addClass("hidden");
+				$(unfollowElement).parent().find(".follow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", false);
+						$(".unfollow", this).toggleClass("hidden", true);
+					}
+				});
+			});
+			return false;
+		});
+	})(postElement);
 }
 
 /**
@@ -826,13 +919,55 @@ function ajaxifyReply(replyElement) {
 			});
 		});
 	})(replyElement);
+
+	/* ajaxify author links */
+	$(".reply-status-line .permalink a", replyElement).click(function() {
+		if (!$(".create-reply", getPostElement(replyElement)).hasClass("hidden")) {
+			textArea = $("input.reply-input", getPostElement(replyElement)).focus().data("textarea");
+			$(textArea).replaceSelection($(this).attr("href"));
+		}
+		return false;
+	});
+
 	addCommentLink(getPostId(replyElement), getReplyAuthor(replyElement), replyElement, $(replyElement).find(".reply-status-line .permalink-author"));
 
 	/* convert “show source” link into javascript function. */
 	$(replyElement).find(".show-reply-source").each(function() {
 		$("a", this).click(function() {
+			reply = getReplyElement(this);
+			rawReplyText = $(".reply-text.raw-text", reply);
+			rawReplyText.toggleClass("hidden");
+			if (rawReplyText.hasClass("hidden")) {
+				$(".reply-text.short-text", reply).removeClass("hidden");
+				$(".reply-text.text", reply).addClass("hidden");
+				$(".expand-reply-text", reply).removeClass("hidden");
+				$(".shrink-reply-text", reply).addClass("hidden");
+			} else {
+				$(".reply-text.short-text", reply).addClass("hidden");
+				$(".reply-text.text", reply).addClass("hidden");
+				$(".expand-reply-text", reply).addClass("hidden");
+				$(".shrink-reply-text", reply).addClass("hidden");
+			}
+			return false;
+		});
+	});
+
+	/* convert “show more” link into javascript function. */
+	$(replyElement).find(".expand-reply-text").each(function() {
+		$(this).click(function() {
 			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
-			$(".reply-text.raw-text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
+			$(".expand-reply-text", getReplyElement(this)).toggleClass("hidden");
+			$(".shrink-reply-text", getReplyElement(this)).toggleClass("hidden");
+			return false;
+		});
+	});
+	$(replyElement).find(".shrink-reply-text").each(function() {
+		$(this).click(function() {
+			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
+			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
+			$(".expand-reply-text", getReplyElement(this)).toggleClass("hidden");
+			$(".shrink-reply-text", getReplyElement(this)).toggleClass("hidden");
 			return false;
 		});
 	});
@@ -850,6 +985,46 @@ function ajaxifyReply(replyElement) {
 		untrustSone(getReplyAuthor(this));
 		return false;
 	});
+
+	/* show Sone menu when hovering over the avatar. */
+	$(replyElement).find(".reply-avatar").mouseover(function() {
+		$(".sone-menu:visible").fadeOut();
+		$(".sone-reply-menu", replyElement).mouseleave(function() {
+			$(this).fadeOut();
+		}).fadeIn();
+		return false;
+	});
+	(function(replyElement) {
+		var soneId = $(".sone-id", replyElement).text();
+		$(".sone-menu .follow", replyElement).click(function() {
+			var followElement = this;
+			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+				$(followElement).addClass("hidden");
+				$(followElement).parent().find(".unfollow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", true);
+						$(".unfollow", this).toggleClass("hidden", false);
+					}
+				});
+			});
+			return false;
+		});
+		$(".sone-menu .unfollow", replyElement).click(function() {
+			var unfollowElement = this;
+			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+				$(unfollowElement).addClass("hidden");
+				$(unfollowElement).parent().find(".follow").removeClass("hidden");
+				$("#sone .sone-menu").each(function() {
+					if (getMenuSone(this) == soneId) {
+						$(".follow", this).toggleClass("hidden", false);
+						$(".unfollow", this).toggleClass("hidden", true);
+					}
+				});
+			});
+			return false;
+		});
+	})(replyElement);
 }
 
 /**
@@ -966,7 +1141,7 @@ function checkForRemovedPosts(oldNotification, newNotification) {
  *            The new notification element
  */
 function checkForRemovedReplies(oldNotification, newNotification) {
-	if (getNotificationId(oldNotification) != "new-replies-notification") {
+	if (getNotificationId(oldNotification) != "new-reply-notification") {
 		return;
 	}
 	oldIds = getElementIds(oldNotification, ".reply-id");
@@ -1010,7 +1185,7 @@ function getStatus() {
 							postId = $(this).text();
 							markPostAsKnown(getPost(postId), true);
 						});
-					} else if (notificationId == "new-replies-notification") {
+					} else if (notificationId == "new-reply-notification") {
 						$(".reply-id", this).each(function(index, element) {
 							replyId = $(this).text();
 							markReplyAsKnown(getReply(replyId), true);
@@ -1325,7 +1500,7 @@ function markSoneAsKnown(soneElement, skipRequest) {
 function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
 		postElement = this;
-		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
+		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined"))) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
@@ -1341,7 +1516,7 @@ function markPostAsKnown(postElements, skipRequest) {
 function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
 		replyElement = this;
-		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined") && !skipRequest)) {
+		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined"))) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
@@ -1765,11 +1940,6 @@ $(document).ready(function() {
 	/* process all existing notifications, ajaxify dismiss buttons. */
 	$("#sone #notification-area .notification").each(function() {
 		ajaxifyNotification($(this));
-	});
-
-	/* disable all permalinks. */
-	$(".permalink").click(function() {
-		return false;
 	});
 
 	/* activate status polling. */

@@ -3,7 +3,8 @@
 	<div class="post-time hidden"><% post.time|html></div>
 	<div class="post-author hidden"><% post.sone.id|html></div>
 	<div class="post-author-local hidden"><% post.sone.local></div>
-	<div class="avatar">
+	<%include include/soneMenu.html class=="sone-post-menu" sone=post.sone>
+	<div class="avatar post-avatar" >
 		<%if post.loaded>
 			<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
 		<%else>
@@ -23,8 +24,12 @@
 			<%/if>
 			<% post.text|html|store key=originalText text=true>
 			<% post.text|parse sone=post.sone|store key=parsedText text=true>
+			<% post.text|parse sone=post.sone length=core.preferences.charactersPerPost|store key=shortText text=true>
 			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
-			<div class="post-text text<%if raw> hidden<%/if>"><% parsedText></div>
+			<div class="post-text text<%if raw> hidden<%/if><%if !shortText|match key=parsedText> hidden<%/if>"><% parsedText></div>
+			<div class="post-text short-text<%if raw> hidden<%/if><%if shortText|match key=parsedText> hidden<%/if>"><% shortText></div>
+			<%if !shortText|match key=parsedText><%if !raw><a class="expand-post-text" href="viewPost.html?post=<% post.id|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
+			<%if !shortText|match key=parsedText><%if !raw><a class="shrink-post-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
 		</div>
 		<div class="post-status-line status-line<%if !post.loaded> hidden<%/if>">
 			<div class="bookmarks">

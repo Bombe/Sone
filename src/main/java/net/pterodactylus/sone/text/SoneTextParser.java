@@ -182,7 +182,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (line.length() >= (next + 7 + 43)) {
 						String soneId = line.substring(next + 7, next + 50);
 						Sone sone = soneProvider.getSone(soneId, false);
-						if (sone != null) {
+						if ((sone != null) && (sone.getName() != null)) {
 							parts.add(new SonePart(sone));
 						} else {
 							parts.add(new PlainTextPart(line.substring(next, next + 50)));
@@ -202,8 +202,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						String postId = line.substring(next + 7, next + 43);
 						Post post = postProvider.getPost(postId, false);
 						if ((post != null) && (post.getSone() != null)) {
-							String postText = post.getText();
-							postText = postText.substring(0, Math.min(postText.length(), 20)) + "…";
 							parts.add(new PostPart(post));
 						} else {
 							parts.add(new PlainTextPart(line.substring(next, next + 43)));

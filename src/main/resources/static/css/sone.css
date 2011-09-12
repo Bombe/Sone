@@ -145,7 +145,7 @@ textarea {
 
 #sone #notification-area #local-post-notification, #sone #notification-area #local-reply-notification {
 	display: none;
-} 
+}
 
 #sone #plugin-warning {
 	border: solid 0.5em red;
@@ -238,6 +238,7 @@ textarea {
 	padding: 1ex 0px;
 	border-bottom: solid 1px #ccc;
 	clear: both;
+	position: relative;
 }
 
 #sone .post.new {
@@ -248,6 +249,33 @@ textarea {
 #sone .post.last {
 	padding: 1ex 0px;
 	border-bottom: none;
+}
+
+#sone .post .sone-menu {
+	position: absolute;
+	top: 0;
+	left: -1ex;
+	padding: 1ex 1ex;
+	margin: -1px -1px;
+	display: none;
+	background-color: rgb(255, 255, 224);
+	border: solid 1px rgb(0, 0, 0);
+	z-index: 1;
+}
+
+#sone .post .sone-menu .avatar {
+	position: absolute;
+	margin-right: 1ex;
+}
+
+#sone .post .sone-menu .inner-menu {
+	margin-left: 64px;
+	padding-left: 1ex;
+	min-height: 64px;
+}
+
+#sone .sone-menu .follow, #sone .sone-menu .unfollow {
+	cursor: pointer;
 }
 
 #sone .post > .avatar {
@@ -265,14 +293,30 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .text, #sone .post .raw-text {
+#sone .post .author-wot-link {
+	font-size: 90%;
+}
+
+#sone .post .text, #sone .post .raw-text, #sone .post .short-text {
 	display: inline;
 	white-space: pre-wrap;
 	word-wrap: break-word;
 }
 
-#sone .post .text.hidden, #sone .post .raw-text.hidden {
+#sone .post .text.hidden, #sone .post .raw-text.hidden, #sone .post .short-text.hidden {
 	display: none;
+}
+
+#sone .post .expand-post-text:before, #sone .post .expand-reply-text:before {
+	content: "» ";
+}
+
+#sone .post .shrink-post-text:before, #sone .post .shrink-reply-text:before {
+	content: "« ";
+}
+
+#sone .post .shrink-post-text {
+	cursor: pointer;
 }
 
 #sone .post .status-line {
@@ -389,11 +433,15 @@ textarea {
 }
 
 #sone .post .reply {
+	position: relative;
 	clear: both;
 	background-color: #f0f0ff;
-	font-size: 85%;
 	margin: 1ex 0px;
 	padding: 1ex;
+}
+
+#sone .post .reply .inner-part {
+	font-size: 85%;
 }
 
 #sone .post .reply.new {
@@ -464,7 +512,11 @@ textarea {
 }
 
 #sone .sone .profile-link {
-	display: block;
+	display: inline;
+}
+
+#sone .sone .sone-stats {
+	display: inline;
 }
 
 #sone .sone .short-request-uri {
@@ -679,4 +731,8 @@ textarea {
 #sone .warning {
 	color: red;
 	font-style: italic;
+}
+
+#sone #sort-options {
+	margin-bottom: 1em;
 }

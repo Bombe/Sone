@@ -1,5 +1,5 @@
 /*
- * Sone - UnfollowSonePage.java - Copyright © 2010 David Roden
+ * Sone - RescuePage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,30 +17,35 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.core.SoneRescuer;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
 /**
- * This page lets the user unfollow another Sone.
+ * Page that lets the user control the rescue mode for a Sone.
  *
+ * @see SoneRescuer
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class UnfollowSonePage extends SoneTemplatePage {
+public class RescuePage extends SoneTemplatePage {
 
 	/**
+	 * Creates a new rescue page.
+	 *
 	 * @param template
 	 *            The template to render
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public UnfollowSonePage(Template template, WebInterface webInterface) {
-		super("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface, true);
+	public RescuePage(Template template, WebInterface webInterface) {
+		super("rescue.html", template, "Page.Rescue.Title", webInterface, true);
 	}
 
 	//
-	// TEMPLATEPAGE METHODS
+	// SONETEMPLATEPAGE METHODS
 	//
 
 	/**
@@ -49,16 +54,19 @@ public class UnfollowSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		SoneRescuer soneRescuer = webInterface.getCore().getSoneRescuer(currentSone);
 		if (request.getMethod() == Method.POST) {
-			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
-			Sone currentSone = getCurrentSone(request.getToadletContext());
-			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 2000);
-			for (String soneId : soneIds.split("[ ,]+")) {
-				currentSone.removeFriend(soneId);
+			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("fetch", 4))) {
+				long edition = Numbers.safeParseLong(request.getHttpRequest().getPartAsStringFailsafe("edition", 8), -1L);
+				if (edition > -1) {
+					soneRescuer.setEdition(edition);
+				}
+				soneRescuer.startNextFetch();
 			}
-			webInterface.getCore().touchConfiguration();
-			throw new RedirectException(returnPage);
+			throw new RedirectException("rescue.html");
 		}
+		templateContext.set("soneRescuer", soneRescuer);
 	}
 
 }

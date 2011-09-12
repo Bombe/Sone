@@ -50,11 +50,13 @@ public class FollowSonePage extends SoneTemplatePage {
 	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
-			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			currentSone.addFriend(soneId);
-			webInterface.getCore().saveSone(currentSone);
+			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 1200);
+			for (String soneId : soneIds.split("[ ,]+")) {
+				currentSone.addFriend(soneId);
+			}
+			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);
 		}
 	}

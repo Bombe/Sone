@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web.ajax;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.json.JsonObject;
 
@@ -60,6 +61,7 @@ public class CreateReplyAjaxPage extends JsonPage {
 		if ((post == null) || (post.getSone() == null)) {
 			return createErrorJsonObject("invalid-post-id");
 		}
+		text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
 		Reply reply = webInterface.getCore().createReply(sender, post, text);
 		return createSuccessJsonObject().put("reply", reply.getId()).put("sone", sender.getId());
 	}

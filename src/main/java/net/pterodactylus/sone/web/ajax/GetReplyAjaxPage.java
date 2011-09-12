@@ -99,6 +99,7 @@ public class GetReplyAjaxPage extends JsonPage {
 		jsonReply.put("time", reply.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("core", webInterface.getCore());
 		templateContext.set("request", request);
 		templateContext.set("reply", reply);
 		templateContext.set("currentSone", currentSone);

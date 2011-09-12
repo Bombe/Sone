@@ -62,9 +62,8 @@ public class GetTimesAjaxPage extends JsonPage {
 				if (post == null) {
 					continue;
 				}
-				long age = now - post.getTime();
 				JsonObject postTime = new JsonObject();
-				Time time = getTime(age);
+				Time time = getTime(post.getTime());
 				postTime.put("timeText", time.getText());
 				postTime.put("refreshTime", time.getRefresh() / Time.SECOND);
 				postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
@@ -113,14 +112,14 @@ public class GetTimesAjaxPage extends JsonPage {
 	//
 
 	/**
-	 * Returns the formatted relative time for a given age.
+	 * Returns the formatted relative time for a given time.
 	 *
-	 * @param age
-	 *            The age to format (in milliseconds)
+	 * @param time
+	 *            The time to format the difference from (in milliseconds)
 	 * @return The formatted age
 	 */
-	private Time getTime(long age) {
-		return getTime(webInterface, age);
+	private Time getTime(long time) {
+		return getTime(webInterface, time);
 	}
 
 	//
@@ -128,15 +127,19 @@ public class GetTimesAjaxPage extends JsonPage {
 	//
 
 	/**
-	 * Returns the formatted relative time for a given age.
+	 * Returns the formatted relative time for a given time.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface (for l10n access)
-	 * @param age
-	 *            The age to format (in milliseconds)
+	 * @param time
+	 *            The time to format the difference from (in milliseconds)
 	 * @return The formatted age
 	 */
-	public static Time getTime(WebInterface webInterface, long age) {
+	public static Time getTime(WebInterface webInterface, long time) {
+		if (time == 0) {
+			return new Time(webInterface.getL10n().getString("View.Sone.Text.UnknownDate"), 12 * Time.HOUR);
+		}
+		long age = System.currentTimeMillis() - time;
 		String text;
 		long refresh;
 		if (age < 0) {

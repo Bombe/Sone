@@ -58,6 +58,7 @@ import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
+import net.pterodactylus.sone.template.UniqueElementFilter;
 import net.pterodactylus.sone.template.UnknownDateFilter;
 import net.pterodactylus.sone.text.Part;
 import net.pterodactylus.sone.text.SonePart;
@@ -178,11 +179,8 @@ public class WebInterface implements CoreListener {
 	/** The “you have been mentioned” notification. */
 	private final ListNotification<Post> mentionNotification;
 
-	/** The “rescuing Sone” notification. */
-	private final ListNotification<Sone> rescuingSonesNotification;
-
-	/** The “Sone rescued” notification. */
-	private final ListNotification<Sone> sonesRescuedNotification;
+	/** Notifications for sone inserts. */
+	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
 
 	/** Sone locked notification ticker objects. */
 	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
@@ -231,6 +229,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
 		templateContextFactory.addFilter("in", new ContainsFilter());
+		templateContextFactory.addFilter("unique", new UniqueElementFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("webInterface", this);
@@ -254,12 +253,6 @@ public class WebInterface implements CoreListener {
 
 		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
 		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
-
-		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
-		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
-
-		Template sonesRescuedTemplate = TemplateParser.parse(createReader("/templates/notify/sonesRescuedNotification.html"));
-		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
 
 		Template lockedSonesTemplate = TemplateParser.parse(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
@@ -568,6 +561,7 @@ public class WebInterface implements CoreListener {
 		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
 		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
+		Template rescueTemplate = TemplateParser.parse(createReader("/templates/rescue.html"));
 		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
 		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
 		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
@@ -606,6 +600,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
@@ -705,28 +700,30 @@ public class WebInterface implements CoreListener {
 		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}
 
+	/**
+	 * Returns the Sone insert notification for the given Sone. If no
+	 * notification for the given Sone exists, a new notification is created and
+	 * cached.
+	 *
+	 * @param sone
+	 *            The Sone to get the insert notification for
+	 * @return The Sone insert notification
+	 */
+	private TemplateNotification getSoneInsertNotification(Sone sone) {
+		synchronized (soneInsertNotifications) {
+			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
+			if (templateNotification == null) {
+				templateNotification = new TemplateNotification(TemplateParser.parse(createReader("/templates/notify/soneInsertNotification.html")));
+				templateNotification.set("insertSone", sone);
+				soneInsertNotifications.put(sone, templateNotification);
+			}
+			return templateNotification;
+		}
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rescuingSone(Sone sone) {
-		rescuingSonesNotification.add(sone);
-		notificationManager.addNotification(rescuingSonesNotification);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rescuedSone(Sone sone) {
-		rescuingSonesNotification.remove(sone);
-		sonesRescuedNotification.add(sone);
-		notificationManager.addNotification(sonesRescuedNotification);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -766,9 +763,6 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newReplyFound(Reply reply) {
-		if (reply.getPost().getSone() == null) {
-			return;
-		}
 		boolean isLocal = getCore().isLocalSone(reply.getSone());
 		if (isLocal) {
 			localReplyNotification.add(reply);
@@ -865,6 +859,44 @@ public class WebInterface implements CoreListener {
 	public void soneUnlocked(Sone sone) {
 		lockedSonesNotification.remove(sone);
 		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInserting(Sone sone) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "inserting");
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInserted(Sone sone, long insertDuration) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "inserted");
+		soneInsertNotification.set("insertDuration", insertDuration / 1000);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInsertAborted(Sone sone, Throwable cause) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "insert-aborted");
+		soneInsertNotification.set("insert-error", cause);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
 	}
 
 	/**

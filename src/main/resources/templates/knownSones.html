@@ -1,8 +1,74 @@
 <%include include/head.html>
 
 	<div class="page-id hidden">known-sones</div>
+	
+	<script language="javascript">
+
+		$(document).ready(function() {
+			$("select[name=sort]").change(function() {
+				value = $(this).val();
+				if ((value == "activity") || (value == "posts")) {
+					$("select[name=order]").val("desc");
+				} else if (value == "name") {
+					$("select[name=order]").val("asc");
+				} 
+			});
+			$("#sort-options select").change(function() {
+				this.form.submit();
+			});
+		});
+	
+	</script>
 
 	<h1><%= Page.KnownSones.Page.Title|l10n|html></h1>
+	
+	<div id="sort-options">
+		<form action="knownSones.html" method="get">
+			<div>
+				Sort:
+				<select name="sort">
+					<option value="name"<%if sort|match value="name"> selected="selected"<%/if>>Name</option>
+					<option value="activity"<%if sort|match value="activity"> selected="selected"<%/if>>Last activity</option>
+					<option value="posts"<%if sort|match value="posts"> selected="selected"<%/if>>Number of posts</option>
+				</select>
+				<select name="order">
+					<option value="asc"<%if order|match value="asc"> selected="selected"<%/if>>Ascending</option>
+					<option value="desc"<%if order|match value="desc"> selected="selected"<%/if>>Descending</option>
+				</select>
+			</div>
+			<%ifnull !currentSone>
+				<div>
+					Followed Sones:
+					<select name="followedSones">
+						<option value="none"></option>
+						<option value="show-only"<%if followedSones|match value="show-only"> selected="selected"<%/if>>Show only followed Sones</option>
+						<option value="hide"<%if followedSones|match value="hide"> selected="selected"<%/if>>Hide followed Sones</option>
+					</select>
+				</div>
+			<%/if>
+			<div>
+				<button type="submit">Apply</button>
+			</div>
+		</form>
+	</div>
+
+	<div>
+		<form action="followSone.html" method="post">
+			<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+			<input type="hidden" name="returnPage" value="<%request.uri|html>" />
+			<input type="hidden" name="sone" value="<%foreach pagination.items sone><%if !sone.friend><%if !sone.current><%sone.id> <%/if><%/if><%/foreach>" />
+			<button type="submit"><%= Page.KnownSones.Button.FollowAllSones|l10n|html></button>
+		</form>
+	</div>
+
+	<div>
+		<form action="unfollowSone.html" method="post">
+			<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+			<input type="hidden" name="returnPage" value="<%request.uri|html>" />
+			<input type="hidden" name="sone" value="<%foreach pagination.items sone><%if sone.friend><%sone.id> <%/if><%/foreach>" />
+			<button type="submit"><%= Page.KnownSones.Button.UnfollowAllSones|l10n|html></button>
+		</form>
+	</div>
 
 	<div id="known-sones">
 		<%= page|store key=pageParameter>

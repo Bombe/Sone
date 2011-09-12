@@ -8,6 +8,9 @@
 			getTranslation("WebInterface.DefaultText.Option.PostsPerPage", function(postsPerPageText) {
 				registerInputTextareaSwap("#sone #options input[name=posts-per-page]", postsPerPageText, "posts-per-page", true, true);
 			});
+			getTranslation("WebInterface.DefaultText.Option.CharactersPerPost", function(postsPerPageText) {
+				registerInputTextareaSwap("#sone #options input[name=characters-per-post]", postsPerPageText, "characters-per-post", true, true);
+			});
 			getTranslation("WebInterface.DefaultText.Option.PositiveTrust", function(positiveTrustText) {
 				registerInputTextareaSwap("#sone #options input[name=positive-trust]", positiveTrustText, "positive-trust", true, true);
 			});
@@ -40,6 +43,11 @@
 			<%= Page.Options.Option.AutoFollow.Description|l10n|html>
 		</p>
 
+		<p>
+			<input type="checkbox" name="enable-sone-insert-notifications"<%ifnull currentSone> disabled="disabled"<%/if><%if enable-sone-insert-notifications> checked="checked"<%/if> />
+			<%= Page.Options.Option.EnableSoneInsertNotifications.Description|l10n|html>
+		</p>
+
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
@@ -53,6 +61,12 @@
 			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
 		<%/if>
 		<p><input type="text" name="posts-per-page" value="<% posts-per-page|html>" /></p>
+
+		<p><%= Page.Options.Option.CharactersPerPost.Description|l10n|html></p>
+		<%if =characters-per-post|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
+		<p><input type="text" name="characters-per-post" value="<% characters-per-post|html>" /></p>
 
 		<p>
 			<input type="checkbox" name="require-full-access"<%if require-full-access> checked="checked"<%/if> />
@@ -88,13 +102,6 @@
 				<option value="2"<%if fcp-full-access-required|match value="2"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Always|l10n|html></option>
 			</select>
 		</p>
-
-		<h2><%= Page.Options.Section.RescueOptions.Title|l10n|html></h2>
-
-		<p><%= Page.Options.Option.SoneRescueMode.Description1|l10n|html></p>
-		<p><%= Page.Options.Option.SoneRescueMode.Description2|l10n|html></p>
-		<p><%= Page.Options.Option.SoneRescueMode.Description3|l10n|html></p>
-		<p><select name="sone-rescue-mode"><option disabled="disabled"><%= WebInterface.SelectBox.Choose|l10n|html></option><option value="true"<%if sone-rescue-mode> selected="selected"<%/if>><%= WebInterface.SelectBox.Yes|l10n|html></option><option value="false"<%if !sone-rescue-mode> selected="selected"<%/if>><%= WebInterface.SelectBox.No|l10n|html></option></select>
 
 		<h2><%= Page.Options.Section.Cleaning.Title|l10n|html></h2>
 
