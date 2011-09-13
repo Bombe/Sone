@@ -1,4 +1,4 @@
-<div id="<% post.id|html>" class="post<%if loop.last> last<%/if><%if post.new> new<%/if>">
+<div id="<% post.id|html>" class="post<%if loop.last> last<%/if><%if !post.sone.local><%if post.new> new<%/if><%/if>">
 	<a name="post-<% post.id|html>"></a>
 	<div class="post-time hidden"><% post.time|html></div>
 	<div class="post-author hidden"><% post.sone.id|html></div>
