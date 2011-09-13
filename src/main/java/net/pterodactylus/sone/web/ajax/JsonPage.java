@@ -17,11 +17,15 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import java.io.IOException;
+
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
-import net.pterodactylus.sone.web.page.Page;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.json.JsonUtils;
+import net.pterodactylus.util.web.Page;
+import net.pterodactylus.util.web.Response;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 
@@ -31,7 +35,7 @@ import freenet.clients.http.ToadletContext;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class JsonPage implements Page {
+public abstract class JsonPage implements Page<FreenetRequest> {
 
 	/** The path of the page. */
 	private final String path;
@@ -124,7 +128,7 @@ public abstract class JsonPage implements Page {
 	 *            The request to handle
 	 * @return The created JSON object
 	 */
-	protected abstract JsonObject createJsonObject(Request request);
+	protected abstract JsonObject createJsonObject(FreenetRequest request);
 
 	/**
 	 * Returns whether this command needs the form password for authentication
@@ -187,23 +191,31 @@ public abstract class JsonPage implements Page {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(Request request) {
+	public boolean isPrefixPage() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Response handleRequest(FreenetRequest request, Response response) throws IOException {
 		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !request.getToadletContext().isAllowedFullAccess()) {
-			return new Response(403, "Forbidden", "application/json", JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
 		}
 		if (needsFormPassword()) {
 			String formPassword = request.getHttpRequest().getParam("formPassword");
 			if (!webInterface.getFormPassword().equals(formPassword)) {
-				return new Response(403, "Forbidden", "application/json", JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
 			}
 		}
 		if (requiresLogin()) {
 			if (getCurrentSone(request.getToadletContext(), false) == null) {
-				return new Response(403, "Forbidden", "application/json", JsonUtils.format(createErrorJsonObject("auth-required")));
+				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
 			}
 		}
 		JsonObject jsonObject = createJsonObject(request);
-		return new Response(200, "OK", "application/json", JsonUtils.format(jsonObject));
+		return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(JsonUtils.format(jsonObject));
 	}
 
 }

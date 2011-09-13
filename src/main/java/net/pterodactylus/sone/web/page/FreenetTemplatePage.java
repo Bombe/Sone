@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web.page;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Collections;
@@ -26,11 +27,14 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.web.page.Page.Request.Method;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
+import net.pterodactylus.util.web.Method;
+import net.pterodactylus.util.web.Page;
+import net.pterodactylus.util.web.RedirectResponse;
+import net.pterodactylus.util.web.Response;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.PageMaker;
 import freenet.clients.http.PageNode;
@@ -43,7 +47,7 @@ import freenet.support.HTMLNode;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FreenetTemplatePage implements Page, LinkEnabledCallback {
+public class FreenetTemplatePage implements Page<FreenetRequest>, LinkEnabledCallback {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FreenetTemplatePage.class);
@@ -95,7 +99,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 *            The request to serve
 	 * @return The title of the page
 	 */
-	protected String getPageTitle(Request request) {
+	protected String getPageTitle(FreenetRequest request) {
 		return null;
 	}
 
@@ -103,14 +107,22 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(Request request) {
+	public boolean isPrefixPage() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Response handleRequest(FreenetRequest request, Response response) throws IOException {
 		String redirectTarget = getRedirectTarget(request);
 		if (redirectTarget != null) {
 			return new RedirectResponse(redirectTarget);
 		}
 
 		if (isFullAccessOnly() && !request.getToadletContext().isAllowedFullAccess()) {
-			return new Response(401, "Not authorized", "text/html", "Not authorized");
+			return response.setStatusCode(401).setStatusText("Not authorized").setContentType("text/html");
 		}
 		ToadletContext toadletContext = request.getToadletContext();
 		if (request.getMethod() == Method.POST) {
@@ -153,7 +165,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 
 		postProcess(request, templateContext);
 
-		return new Response(200, "OK", "text/html", pageNode.outer.generate());
+		return response.setStatusCode(200).setStatusText("OK").setContentType("text/html").write(pageNode.outer.generate());
 	}
 
 	/**
@@ -186,7 +198,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 * @throws RedirectException
 	 *             if the processing page wants to redirect after processing
 	 */
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		/* do nothing. */
 	}
 
@@ -203,7 +215,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 * @param templateContext
 	 *            The template context that supplied the rendered data
 	 */
-	protected void postProcess(Request request, TemplateContext templateContext) {
+	protected void postProcess(FreenetRequest request, TemplateContext templateContext) {
 		/* do nothing. */
 	}
 
@@ -215,7 +227,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 *            The request that is processed
 	 * @return The URL to redirect to, or {@code null} to not redirect
 	 */
-	protected String getRedirectTarget(Page.Request request) {
+	protected String getRedirectTarget(FreenetRequest request) {
 		return null;
 	}
 
@@ -226,7 +238,7 @@ public class FreenetTemplatePage implements Page, LinkEnabledCallback {
 	 *            The request for which to return the link nodes
 	 * @return All link nodes that should be added to the HTML head
 	 */
-	protected List<Map<String, String>> getAdditionalLinkNodes(Request request) {
+	protected List<Map<String, String>> getAdditionalLinkNodes(FreenetRequest request) {
 		return Collections.emptyList();
 	}
 

@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.collection.ReverseComparator;
 import net.pterodactylus.util.filter.Filter;
@@ -57,7 +58,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String sortField = request.getHttpRequest().getParam("sort");
 		String sortOrder = request.getHttpRequest().getParam("order");

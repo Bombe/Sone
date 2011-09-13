@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web.page;
 
+import net.pterodactylus.util.web.Page;
 import freenet.client.HighLevelSimpleClient;
 
 /**
@@ -54,7 +55,7 @@ public class PageToadletFactory {
 	 *            The page to wrap
 	 * @return The toadlet wrapped around the page
 	 */
-	public PageToadlet createPageToadlet(Page page) {
+	public PageToadlet createPageToadlet(Page<FreenetRequest> page) {
 		return createPageToadlet(page, null);
 	}
 
@@ -68,7 +69,7 @@ public class PageToadletFactory {
 	 *            The name of the menu item
 	 * @return The toadlet wrapped around the page
 	 */
-	public PageToadlet createPageToadlet(Page page, String menuName) {
+	public PageToadlet createPageToadlet(Page<FreenetRequest> page, String menuName) {
 		return new PageToadlet(highLevelSimpleClient, menuName, page, pathPrefix);
 	}
 

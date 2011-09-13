@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
@@ -57,7 +58,7 @@ public class BookmarksPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Set<Post> allPosts = webInterface.getCore().getBookmarkedPosts();
 		Set<Post> loadedPosts = Filters.filteredSet(allPosts, new Filter<Post>() {

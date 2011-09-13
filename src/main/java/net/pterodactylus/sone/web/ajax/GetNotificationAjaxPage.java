@@ -27,6 +27,7 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.TemplateNotification;
@@ -75,7 +76,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String[] notificationIds = request.getHttpRequest().getParam("notifications").split(",");
 		JsonObject jsonNotifications = new JsonObject();
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
@@ -110,7 +111,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 	 *            The notification to create a JSON object
 	 * @return The JSON object
 	 */
-	private JsonObject createJsonNotification(Request request, Notification notification) {
+	private JsonObject createJsonNotification(FreenetRequest request, Notification notification) {
 		JsonObject jsonNotification = new JsonObject();
 		jsonNotification.put("id", notification.getId());
 		StringWriter notificationWriter = new StringWriter();

@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 
@@ -42,7 +43,7 @@ public class DismissNotificationAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String notificationId = request.getHttpRequest().getParam("notification");
 		Notification notification = webInterface.getNotifications().getNotification(notificationId);
 		if (notification == null) {

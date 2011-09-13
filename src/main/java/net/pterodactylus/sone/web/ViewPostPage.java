@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -49,7 +50,7 @@ public class ViewPostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getPageTitle(Request request) {
+	protected String getPageTitle(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
 		Post post = webInterface.getCore().getPost(postId, false);
 		String title = "";
@@ -65,7 +66,7 @@ public class ViewPostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String postId = request.getHttpRequest().getParam("post");
 		boolean raw = request.getHttpRequest().getParam("raw").equals("true");

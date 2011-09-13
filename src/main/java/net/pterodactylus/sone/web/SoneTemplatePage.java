@@ -27,8 +27,8 @@ import java.util.Map;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
-import net.pterodactylus.sone.web.page.Page;
 import net.pterodactylus.util.collection.ListBuilder;
 import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.template.Template;
@@ -202,7 +202,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getPageTitle(Request request) {
+	protected String getPageTitle(FreenetRequest request) {
 		if (pageTitleKey != null) {
 			return webInterface.getL10n().getString(pageTitleKey);
 		}
@@ -213,7 +213,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected List<Map<String, String>> getAdditionalLinkNodes(Request request) {
+	protected List<Map<String, String>> getAdditionalLinkNodes(FreenetRequest request) {
 		return new ListBuilder<Map<String, String>>().add(new MapBuilder<String, String>().put("rel", "search").put("type", "application/opensearchdescription+xml").put("title", "Sone").put("href", "http://" + request.getHttpRequest().getHeader("host") + "/Sone/OpenSearch.xml").get()).get();
 	}
 
@@ -247,7 +247,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		templateContext.set("core", webInterface.getCore());
@@ -266,7 +266,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectTarget(Page.Request request) {
+	protected String getRedirectTarget(FreenetRequest request) {
 		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
 			HTTPRequest httpRequest = request.getHttpRequest();
 			String originalUrl = httpRequest.getPath();

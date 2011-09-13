@@ -31,6 +31,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
@@ -62,7 +63,7 @@ public class GetStatusAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		/* load Sones. */
 		boolean loadAllSones = Boolean.parseBoolean(request.getHttpRequest().getParam("loadAllSones", "false"));
