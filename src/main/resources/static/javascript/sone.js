@@ -291,7 +291,7 @@ function getSoneElement(element) {
  * @return The Sone ID
  */
 function getMenuSone(element) {
-	return $(element).closest(".sone-menu").find(".sone-id").text();
+	return $(element).closest(".sone-menu").find(".sone-menu-id").text();
 }
 
 /**
@@ -865,7 +865,7 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	(function(postElement) {
-		var soneId = $(".sone-id", postElement).text();
+		var soneId = $(".sone-menu-id", postElement).text();
 		$(".sone-post-menu .follow", postElement).click(function() {
 			var followElement = this;
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
@@ -995,7 +995,7 @@ function ajaxifyReply(replyElement) {
 		return false;
 	});
 	(function(replyElement) {
-		var soneId = $(".sone-id", replyElement).text();
+		var soneId = $(".sone-menu-id", replyElement).text();
 		$(".sone-menu .follow", replyElement).click(function() {
 			var followElement = this;
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
