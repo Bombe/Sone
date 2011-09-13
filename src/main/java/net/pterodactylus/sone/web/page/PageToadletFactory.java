@@ -23,7 +23,7 @@ import freenet.client.HighLevelSimpleClient;
 /**
  * Factory that creates {@link PageToadlet}s using a given
  * {@link HighLevelSimpleClient}.
- * 
+ *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PageToadletFactory {
@@ -36,7 +36,7 @@ public class PageToadletFactory {
 
 	/**
 	 * Creates a new {@link PageToadlet} factory.
-	 * 
+	 *
 	 * @param highLevelSimpleClient
 	 *            The client to use when creating the toadlets
 	 * @param pathPrefix
@@ -50,7 +50,7 @@ public class PageToadletFactory {
 	/**
 	 * Creates a {@link PageToadlet} that wraps the given page and does not
 	 * appear in the node’s menu.
-	 * 
+	 *
 	 * @param page
 	 *            The page to wrap
 	 * @return The toadlet wrapped around the page
@@ -62,7 +62,7 @@ public class PageToadletFactory {
 	/**
 	 * Creates a {@link PageToadlet} that wraps the given page and appears in
 	 * the node’s menu under the given name.
-	 * 
+	 *
 	 * @param page
 	 *            The page to wrap
 	 * @param menuName

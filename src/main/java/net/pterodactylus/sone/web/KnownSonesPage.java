@@ -108,4 +108,5 @@ public class KnownSonesPage extends SoneTemplatePage {
 		templateContext.set("pagination", sonePagination);
 		templateContext.set("knownSones", sonePagination.getItems());
 	}
+
 }
