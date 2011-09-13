@@ -107,6 +107,7 @@ public class PartContainer implements Part, Iterable<Part> {
 				}
 				noNextPart = true;
 				while (!partStack.isEmpty()) {
+					@SuppressWarnings("hiding")
 					Iterator<Part> parts = partStack.pop();
 					if (parts.hasNext()) {
 						nextPart = parts.next();

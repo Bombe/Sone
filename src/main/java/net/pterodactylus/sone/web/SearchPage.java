@@ -457,6 +457,7 @@ public class SearchPage extends SoneTemplatePage {
 			if (!(object instanceof Phrase)) {
 				return false;
 			}
+			@SuppressWarnings("hiding")
 			Phrase phrase = (Phrase) object;
 			return (this.optionality == phrase.optionality) && this.phrase.equals(phrase.phrase);
 		}

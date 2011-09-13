@@ -77,6 +77,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if the own identities can not be loaded
 	 */
 	public Set<OwnIdentity> loadAllOwnIdentities() throws WebOfTrustException {
+		@SuppressWarnings("hiding")
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetOwnIdentities").get());
 		SimpleFieldSet fields = reply.getFields();
 		int ownIdentityCounter = -1;
@@ -124,6 +125,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
+		@SuppressWarnings("hiding")
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("TreeOwner", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).get());
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<Identity>();
@@ -183,6 +185,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public String getProperty(Identity identity, String name) throws PluginException {
+		@SuppressWarnings("hiding")
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetProperty").put("Identity", identity.getId()).put("Property", name).get());
 		return reply.getFields().get("Property");
 	}
@@ -396,7 +399,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
+	public void receivedReply(@SuppressWarnings("hiding") PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
 		String messageName = fields.get("Message");
 		logger.log(Level.FINEST, "Received Reply from Plugin: " + messageName);
 		synchronized (reply) {

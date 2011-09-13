@@ -145,7 +145,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void runPlugin(PluginRespirator pluginRespirator) {
+	public void runPlugin(@SuppressWarnings("hiding") PluginRespirator pluginRespirator) {
 		this.pluginRespirator = pluginRespirator;
 
 		/* create a configuration. */

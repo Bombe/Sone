@@ -696,6 +696,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public List<Reply> getReplies(Post post) {
 		Set<Sone> sones = getSones();
+		@SuppressWarnings("hiding")
 		List<Reply> replies = new ArrayList<Reply>();
 		for (Sone sone : sones) {
 			for (Reply reply : sone.getReplies()) {
@@ -788,6 +789,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return All bookmarked posts
 	 */
 	public Set<Post> getBookmarkedPosts() {
+		@SuppressWarnings("hiding")
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
@@ -1254,6 +1256,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 
 		/* load posts. */
+		@SuppressWarnings("hiding")
 		Set<Post> posts = new HashSet<Post>();
 		while (true) {
 			String postPrefix = sonePrefix + "/Posts/" + posts.size();
@@ -1276,6 +1279,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 
 		/* load replies. */
+		@SuppressWarnings("hiding")
 		Set<Reply> replies = new HashSet<Reply>();
 		while (true) {
 			String replyPrefix = sonePrefix + "/Replies/" + replies.size();
