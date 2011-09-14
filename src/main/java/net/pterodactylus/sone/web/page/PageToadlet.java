@@ -146,7 +146,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 		try {
 			pageBucket = pageRequest.getToadletContext().getBucketFactory().makeBucket(-1);
 			Response pageResponse = new Response(pageBucket.getOutputStream());
-			page.handleRequest(pageRequest, pageResponse);
+			pageResponse = page.handleRequest(pageRequest, pageResponse);
 			MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
 			if (pageResponse.getHeaders() != null) {
 				for (Header header : pageResponse.getHeaders()) {
