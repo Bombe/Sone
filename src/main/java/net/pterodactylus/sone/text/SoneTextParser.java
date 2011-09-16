@@ -177,7 +177,11 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				}
 				if (linkType == LinkType.SONE) {
 					if (next > 0) {
-						parts.add(new PlainTextPart(line.substring(0, next)));
+						if (lineComplete && !lastLineEmpty) {
+							parts.add(new PlainTextPart("\n" + line.substring(0, next)));
+						} else {
+							parts.add(new PlainTextPart(line.substring(0, next)));
+						}
 					}
 					if (line.length() >= (next + 7 + 43)) {
 						String soneId = line.substring(next + 7, next + 50);
@@ -192,6 +196,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						parts.add(new PlainTextPart(line.substring(next)));
 						line = "";
 					}
+					lineComplete = false;
 					continue;
 				}
 				if (linkType == LinkType.POST) {
