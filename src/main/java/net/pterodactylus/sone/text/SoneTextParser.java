@@ -123,6 +123,11 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				continue;
 			}
 			emptyLines = 0;
+			/*
+			 * lineComplete tracks whether the block you are parsing is the
+			 * first block of the line. this is important because sometimes you
+			 * have to add an additional line break.
+			 */
 			boolean lineComplete = true;
 			while (line.length() > 0) {
 				int nextKsk = line.indexOf("KSK@");
