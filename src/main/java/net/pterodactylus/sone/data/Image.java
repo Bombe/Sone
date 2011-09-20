@@ -187,7 +187,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setCreationTime(long creationTime) {
-		Validation.begin().isGreater("New Image Creation Time", creationTime, 0).isEither("Old Image Creation Time", this.creationTime, new long[] { 0, creationTime }).check();
+		Validation.begin().isGreater("New Image Creation Time", creationTime, 0).isEither("Old Image Creation Time", this.creationTime, 0L, creationTime).check();
 		this.creationTime = creationTime;
 		return this;
 	}
@@ -210,7 +210,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setWidth(int width) {
-		Validation.begin().isGreater("New Image Width", width, 0).isEither("Old Image Width", this.width, new long[] { 0, width }).check();
+		Validation.begin().isGreater("New Image Width", width, 0).isEither("Old Image Width", this.width, 0, width).check();
 		this.width = width;
 		return this;
 	}
@@ -233,7 +233,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setHeight(int height) {
-		Validation.begin().isGreater("New Image Height", height, 0).isEither("Old Image Height", this.height, new long[] { 0, height }).check();
+		Validation.begin().isGreater("New Image Height", height, 0).isEither("Old Image Height", this.height, 0, height).check();
 		this.height = height;
 		return this;
 	}
