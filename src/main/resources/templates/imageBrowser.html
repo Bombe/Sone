@@ -89,7 +89,7 @@
 				<% album.description|html>
 			</div>
 
-			<%if album.sone.current>
+			<%if album.sone.local>
 				<%include include/uploadImage.html>
 				<%include include/createAlbum.html>
 
@@ -240,7 +240,7 @@
 				</div>
 			<%/foreach>
 
-			<%if sone.current>
+			<%if sone.local>
 				<%include include/createAlbum.html>
 			<%/if>
 
