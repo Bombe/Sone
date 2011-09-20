@@ -21,6 +21,7 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -44,7 +45,7 @@ public class DeleteProfileFieldAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String fieldId = request.getHttpRequest().getParam("field");
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Profile profile = currentSone.getProfile();
@@ -54,7 +55,7 @@ public class DeleteProfileFieldAjaxPage extends JsonPage {
 		}
 		profile.removeField(field);
 		currentSone.setProfile(profile);
-		webInterface.getCore().saveSone(currentSone);
+		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject().put("field", new JsonObject().put("id", field.getId()));
 	}
 

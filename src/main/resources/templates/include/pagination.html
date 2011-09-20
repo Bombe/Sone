@@ -1,5 +1,5 @@
 <%if pagination.necessary>
-	<div class="navigation">
+	<div class="navigation <%paginationName|html>">
 		<div class="first"><%if ! pagination.first><a href="<% request|change nameKey=pageParameter value=0>">«</a><%else><span>«</span><%/if></div>
 		<div class="previous"><%if ! pagination.first><a href="<% request|change nameKey=pageParameter key=pagination.previousPage>">‹</a><%else><span>‹</span><%/if></div>
 		<div class="current-page"><% pagination.pageNumber></div>

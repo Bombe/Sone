@@ -18,9 +18,10 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * Page that lets the user delete an {@link Image}.
@@ -49,7 +50,7 @@ public class DeleteImagePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String imageId = (request.getMethod() == Method.POST) ? request.getHttpRequest().getPartAsStringFailsafe("image", 36) : request.getHttpRequest().getParam("image");
 		Image image = webInterface.getCore().getImage(imageId, false);

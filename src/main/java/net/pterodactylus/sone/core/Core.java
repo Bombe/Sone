@@ -25,6 +25,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,10 +39,12 @@ import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.data.Profile.Field;
+import net.pterodactylus.sone.fcp.FcpInterface;
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
@@ -51,6 +56,11 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.service.AbstractService;
+import net.pterodactylus.util.thread.Ticker;
+import net.pterodactylus.util.validation.EqualityValidator;
+import net.pterodactylus.util.validation.IntegerRangeValidator;
+import net.pterodactylus.util.validation.OrValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
 import freenet.keys.FreenetURI;
@@ -60,7 +70,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core implements IdentityListener, UpdateListener, ImageInsertListener {
+public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener, ImageInsertListener {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -112,11 +122,14 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	/** The image inserter. */
 	private final ImageInserter imageInserter;
 
+	/** Sone downloader thread-pool. */
+	private final ExecutorService soneDownloaders = Executors.newFixedThreadPool(10);
+
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
 
-	/** Whether the core has been stopped. */
-	private volatile boolean stopped;
+	/** The FCP interface. */
+	private volatile FcpInterface fcpInterface;
 
 	/** The Sones’ statuses. */
 	/* synchronize access on itself. */
@@ -129,6 +142,10 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	/** Sone inserters. */
 	/* synchronize access on this on localSones. */
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
+
+	/** Sone rescuers. */
+	/* synchronize access on this on localSones. */
+	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<Sone, SoneRescuer>();
 
 	/** All local Sones. */
 	/* synchronize access on this on itself. */
@@ -180,6 +197,12 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	/** All temporary images. */
 	private Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
 
+	/** Ticker for threads that mark own elements as known. */
+	private Ticker localElementTicker = new Ticker();
+
+	/** The time the configuration was last touched. */
+	private volatile long lastConfigurationUpdate;
+
 	/**
 	 * Creates a new core.
 	 *
@@ -191,6 +214,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 *            The identity manager
 	 */
 	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager) {
+		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
@@ -236,7 +260,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 */
 	public void setConfiguration(Configuration configuration) {
 		this.configuration = configuration;
-		saveConfiguration();
+		touchConfiguration();
 	}
 
 	/**
@@ -267,6 +291,16 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	}
 
 	/**
+	 * Sets the FCP interface to use.
+	 *
+	 * @param fcpInterface
+	 *            The FCP interface to use
+	 */
+	public void setFcpInterface(FcpInterface fcpInterface) {
+		this.fcpInterface = fcpInterface;
+	}
+
+	/**
 	 * Returns the status of the given Sone.
 	 *
 	 * @param sone
@@ -290,6 +324,26 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	public void setSoneStatus(Sone sone, SoneStatus soneStatus) {
 		synchronized (soneStatuses) {
 			soneStatuses.put(sone, soneStatus);
+		}
+	}
+
+	/**
+	 * Returns the Sone rescuer for the given local Sone.
+	 *
+	 * @param sone
+	 *            The local Sone to get the rescuer for
+	 * @return The Sone rescuer for the given Sone
+	 */
+	public SoneRescuer getSoneRescuer(Sone sone) {
+		Validation.begin().isNotNull("Sone", sone).check().is("Local Sone", isLocalSone(sone)).check();
+		synchronized (localSones) {
+			SoneRescuer soneRescuer = soneRescuers.get(sone);
+			if (soneRescuer == null) {
+				soneRescuer = new SoneRescuer(this, soneDownloader, sone);
+				soneRescuers.put(sone, soneRescuer);
+				soneRescuer.start();
+			}
+			return soneRescuer;
 		}
 	}
 
@@ -344,6 +398,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 * @return The Sone with the given ID, or {@code null} if there is no such
 	 *         Sone
 	 */
+	@Override
 	public Sone getSone(String id, boolean create) {
 		if (isLocalSone(id)) {
 			return getLocalSone(id);
@@ -566,6 +621,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 *            exists, {@code false} to return {@code null}
 	 * @return The post, or {@code null} if there is no such post
 	 */
+	@Override
 	public Post getPost(String postId, boolean create) {
 		synchronized (posts) {
 			Post post = posts.get(postId);
@@ -656,6 +712,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 */
 	public List<Reply> getReplies(Post post) {
 		Set<Sone> sones = getSones();
+		@SuppressWarnings("hiding")
 		List<Reply> replies = new ArrayList<Reply>();
 		for (Sone sone : sones) {
 			for (Reply reply : sone.getReplies()) {
@@ -748,6 +805,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	 * @return All bookmarked posts
 	 */
 	public Set<Post> getBookmarkedPosts() {
+		@SuppressWarnings("hiding")
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
@@ -926,36 +984,11 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
+			soneInserter.addSoneInsertListener(this);
 			soneInserters.put(sone, soneInserter);
 			setSoneStatus(sone, SoneStatus.idle);
 			loadSone(sone);
-			if (!preferences.isSoneRescueMode()) {
-				soneInserter.start();
-			}
-			new Thread(new Runnable() {
-
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public void run() {
-					if (!preferences.isSoneRescueMode()) {
-						return;
-					}
-					logger.log(Level.INFO, "Trying to restore Sone from Freenet…");
-					coreListenerManager.fireRescuingSone(sone);
-					lockSone(sone);
-					long edition = sone.getLatestEdition();
-					while (!stopped && (edition >= 0) && preferences.isSoneRescueMode()) {
-						logger.log(Level.FINE, "Downloading edition " + edition + "…");
-						soneDownloader.fetchSone(sone, sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + edition));
-						--edition;
-					}
-					logger.log(Level.INFO, "Finished restoring Sone from Freenet, starting Inserter…");
-					saveSone(sone);
-					coreListenerManager.fireRescuedSone(sone);
-					soneInserter.start();
-				}
-
-			}, "Sone Downloader").start();
+			soneInserter.start();
 			return sone;
 		}
 	}
@@ -976,7 +1009,8 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 		Sone sone = addLocalSone(ownIdentity);
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
-		saveSone(sone);
+		sone.addFriend("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
+		touchConfiguration();
 		return sone;
 	}
 
@@ -1009,6 +1043,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
 							localSone.addFriend(sone.getId());
+							touchConfiguration();
 						}
 					}
 				}
@@ -1016,15 +1051,15 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
 			setSoneStatus(sone, SoneStatus.unknown);
-			new Thread(new Runnable() {
+			soneDownloaders.execute(new Runnable() {
 
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void run() {
-					soneDownloader.fetchSone(sone);
+					soneDownloader.fetchSone(sone, sone.getRequestUri());
 				}
 
-			}, "Sone Downloader").start();
+			});
 			return sone;
 		}
 	}
@@ -1121,14 +1156,28 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	}
 
 	/**
-	 * Updates the stores Sone with the given Sone.
+	 * Updates the stored Sone with the given Sone.
 	 *
 	 * @param sone
 	 *            The updated Sone
 	 */
 	public void updateSone(Sone sone) {
+		updateSone(sone, false);
+	}
+
+	/**
+	 * Updates the stored Sone with the given Sone. If {@code soneRescueMode} is
+	 * {@code true}, an older Sone than the current Sone can be given to restore
+	 * an old state.
+	 *
+	 * @param sone
+	 *            The Sone to update
+	 * @param soneRescueMode
+	 *            {@code true} if the stored Sone should be updated regardless
+	 *            of the age of the given Sone
+	 */
+	public void updateSone(Sone sone, boolean soneRescueMode) {
 		if (hasSone(sone.getId())) {
-			boolean soneRescueMode = isLocalSone(sone) && preferences.isSoneRescueMode();
 			Sone storedSone = getSone(sone.getId());
 			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
@@ -1226,7 +1275,9 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 				return;
 			}
 			localSones.remove(sone.getId());
-			soneInserters.remove(sone).stop();
+			SoneInserter soneInserter = soneInserters.remove(sone);
+			soneInserter.removeSoneInsertListener(this);
+			soneInserter.stop();
 		}
 		try {
 			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
@@ -1253,7 +1304,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			if (newSones.remove(sone.getId())) {
 				knownSones.add(sone.getId());
 				coreListenerManager.fireMarkSoneKnown(sone);
-				saveConfiguration();
+				touchConfiguration();
 			}
 		}
 	}
@@ -1270,6 +1321,10 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			logger.log(Level.FINE, "Tried to load non-local Sone: %s", sone);
 			return;
 		}
+
+		/* initialize options. */
+		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
 
 		/* load Sone. */
 		String sonePrefix = "Sone/" + sone.getId();
@@ -1301,6 +1356,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/* load posts. */
+		@SuppressWarnings("hiding")
 		Set<Post> posts = new HashSet<Post>();
 		while (true) {
 			String postPrefix = sonePrefix + "/Posts/" + posts.size();
@@ -1323,6 +1379,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/* load replies. */
+		@SuppressWarnings("hiding")
 		Set<Reply> replies = new HashSet<Reply>();
 		while (true) {
 			String replyPrefix = sonePrefix + "/Replies/" + replies.size();
@@ -1429,8 +1486,8 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/* load options. */
-		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
+		sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
@@ -1458,138 +1515,6 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			for (Reply reply : replies) {
 				knownReplies.add(reply.getId());
 			}
-		}
-	}
-
-	/**
-	 * Saves the given Sone. This will persist all local settings for the given
-	 * Sone, such as the friends list and similar, private options.
-	 *
-	 * @param sone
-	 *            The Sone to save
-	 */
-	public synchronized void saveSone(Sone sone) {
-		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
-			return;
-		}
-		if (!(sone.getIdentity() instanceof OwnIdentity)) {
-			logger.log(Level.WARNING, "Local Sone without OwnIdentity found, refusing to save: %s", sone);
-			return;
-		}
-
-		logger.log(Level.INFO, "Saving Sone: %s", sone);
-		try {
-			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
-
-			/* save Sone into configuration. */
-			String sonePrefix = "Sone/" + sone.getId();
-			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
-			configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").setValue(soneInserters.get(sone).getLastInsertFingerprint());
-
-			/* save profile. */
-			Profile profile = sone.getProfile();
-			configuration.getStringValue(sonePrefix + "/Profile/FirstName").setValue(profile.getFirstName());
-			configuration.getStringValue(sonePrefix + "/Profile/MiddleName").setValue(profile.getMiddleName());
-			configuration.getStringValue(sonePrefix + "/Profile/LastName").setValue(profile.getLastName());
-			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
-			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
-			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
-
-			/* save profile fields. */
-			int fieldCounter = 0;
-			for (Field profileField : profile.getFields()) {
-				String fieldPrefix = sonePrefix + "/Profile/Fields/" + fieldCounter++;
-				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getName());
-				configuration.getStringValue(fieldPrefix + "/Value").setValue(profileField.getValue());
-			}
-			configuration.getStringValue(sonePrefix + "/Profile/Fields/" + fieldCounter + "/Name").setValue(null);
-
-			/* save posts. */
-			int postCounter = 0;
-			for (Post post : sone.getPosts()) {
-				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
-				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
-				configuration.getStringValue(postPrefix + "/Recipient").setValue((post.getRecipient() != null) ? post.getRecipient().getId() : null);
-				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
-				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
-			}
-			configuration.getStringValue(sonePrefix + "/Posts/" + postCounter + "/ID").setValue(null);
-
-			/* save replies. */
-			int replyCounter = 0;
-			for (Reply reply : sone.getReplies()) {
-				String replyPrefix = sonePrefix + "/Replies/" + replyCounter++;
-				configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
-				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPost().getId());
-				configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
-				configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
-			}
-			configuration.getStringValue(sonePrefix + "/Replies/" + replyCounter + "/ID").setValue(null);
-
-			/* save post likes. */
-			int postLikeCounter = 0;
-			for (String postId : sone.getLikedPostIds()) {
-				configuration.getStringValue(sonePrefix + "/Likes/Post/" + postLikeCounter++ + "/ID").setValue(postId);
-			}
-			configuration.getStringValue(sonePrefix + "/Likes/Post/" + postLikeCounter + "/ID").setValue(null);
-
-			/* save reply likes. */
-			int replyLikeCounter = 0;
-			for (String replyId : sone.getLikedReplyIds()) {
-				configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter++ + "/ID").setValue(replyId);
-			}
-			configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter + "/ID").setValue(null);
-
-			/* save friends. */
-			int friendCounter = 0;
-			for (String friendId : sone.getFriends()) {
-				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter++ + "/ID").setValue(friendId);
-			}
-			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
-
-			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = Sone.flattenAlbums(sone.getAlbums());
-
-			int albumCounter = 0;
-			for (Album album : albums) {
-				String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
-				configuration.getStringValue(albumPrefix + "/ID").setValue(album.getId());
-				configuration.getStringValue(albumPrefix + "/Title").setValue(album.getTitle());
-				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
-				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
-			}
-			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
-
-			/* save images. */
-			int imageCounter = 0;
-			for (Album album : albums) {
-				for (Image image : album.getImages()) {
-					if (!image.isInserted()) {
-						continue;
-					}
-					String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
-					configuration.getStringValue(imagePrefix + "/ID").setValue(image.getId());
-					configuration.getStringValue(imagePrefix + "/Album").setValue(album.getId());
-					configuration.getStringValue(imagePrefix + "/Key").setValue(image.getKey());
-					configuration.getStringValue(imagePrefix + "/Title").setValue(image.getTitle());
-					configuration.getStringValue(imagePrefix + "/Description").setValue(image.getDescription());
-					configuration.getLongValue(imagePrefix + "/CreationTime").setValue(image.getCreationTime());
-					configuration.getIntValue(imagePrefix + "/Width").setValue(image.getWidth());
-					configuration.getIntValue(imagePrefix + "/Height").setValue(image.getHeight());
-				}
-			}
-			configuration.getStringValue(sonePrefix + "/Images/" + imageCounter + "/ID").setValue(null);
-
-			/* save options. */
-			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
-
-			configuration.save();
-			logger.log(Level.INFO, "Sone %s saved.", sone);
-		} catch (ConfigurationException ce1) {
-			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not set WoT property for Sone: " + sone, wote1);
 		}
 	}
 
@@ -1656,7 +1581,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
 			return null;
 		}
-		Post post = new Post(sone, time, text);
+		final Post post = new Post(sone, time, text);
 		if (recipient != null) {
 			post.setRecipient(recipient);
 		}
@@ -1668,7 +1593,17 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			coreListenerManager.fireNewPostFound(post);
 		}
 		sone.addPost(post);
-		saveSone(sone);
+		touchConfiguration();
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markPostKnown(post);
+			}
+		}, "Mark " + post + " read.");
 		return post;
 	}
 
@@ -1687,11 +1622,12 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		synchronized (posts) {
 			posts.remove(post.getId());
 		}
+		coreListenerManager.firePostRemoved(post);
 		synchronized (newPosts) {
 			markPostKnown(post);
 			knownPosts.remove(post.getId());
 		}
-		saveSone(post.getSone());
+		touchConfiguration();
 	}
 
 	/**
@@ -1706,7 +1642,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			if (newPosts.remove(post.getId())) {
 				knownPosts.add(post.getId());
 				coreListenerManager.fireMarkPostKnown(post);
-				saveConfiguration();
+				touchConfiguration();
 			}
 		}
 	}
@@ -1788,7 +1724,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
 			return null;
 		}
-		Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
+		final Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
@@ -1797,7 +1733,17 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			coreListenerManager.fireNewReplyFound(reply);
 		}
 		sone.addReply(reply);
-		saveSone(sone);
+		touchConfiguration();
+		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+
+			/**
+			 * {@inheritDoc}
+			 */
+			@Override
+			public void run() {
+				markReplyKnown(reply);
+			}
+		}, "Mark " + reply + " read.");
 		return reply;
 	}
 
@@ -1821,7 +1767,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			knownReplies.remove(reply.getId());
 		}
 		sone.removeReply(reply);
-		saveSone(sone);
+		touchConfiguration();
 	}
 
 	/**
@@ -1836,7 +1782,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			if (newReplies.remove(reply.getId())) {
 				knownReplies.add(reply.getId());
 				coreListenerManager.fireMarkReplyKnown(reply);
-				saveConfiguration();
+				touchConfiguration();
 			}
 		}
 	}
@@ -1986,34 +1932,204 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	}
 
 	/**
+	 * Notifies the core that the configuration, either of the core or of a
+	 * single local Sone, has changed, and that the configuration should be
+	 * saved.
+	 */
+	public void touchConfiguration() {
+		lastConfigurationUpdate = System.currentTimeMillis();
+	}
+
+	//
+	// SERVICE METHODS
+	//
+
+	/**
 	 * Starts the core.
 	 */
-	public void start() {
+	@Override
+	public void serviceStart() {
 		loadConfiguration();
 		updateChecker.addUpdateListener(this);
 		updateChecker.start();
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void serviceRun() {
+		long lastSaved = System.currentTimeMillis();
+		while (!shouldStop()) {
+			sleep(1000);
+			long now = System.currentTimeMillis();
+			if (shouldStop() || ((lastConfigurationUpdate > lastSaved) && ((now - lastConfigurationUpdate) > 5000))) {
+				for (Sone localSone : getLocalSones()) {
+					saveSone(localSone);
+				}
+				saveConfiguration();
+				lastSaved = now;
+			}
+		}
+	}
+
+	/**
 	 * Stops the core.
 	 */
-	public void stop() {
+	@Override
+	public void serviceStop() {
 		synchronized (localSones) {
 			for (SoneInserter soneInserter : soneInserters.values()) {
+				soneInserter.removeSoneInsertListener(this);
 				soneInserter.stop();
 			}
 		}
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
 		soneDownloader.stop();
-		saveConfiguration();
-		stopped = true;
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Saves the given Sone. This will persist all local settings for the given
+	 * Sone, such as the friends list and similar, private options.
+	 *
+	 * @param sone
+	 *            The Sone to save
+	 */
+	private synchronized void saveSone(Sone sone) {
+		if (!isLocalSone(sone)) {
+			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
+			return;
+		}
+		if (!(sone.getIdentity() instanceof OwnIdentity)) {
+			logger.log(Level.WARNING, "Local Sone without OwnIdentity found, refusing to save: %s", sone);
+			return;
+		}
+
+		logger.log(Level.INFO, "Saving Sone: %s", sone);
+		try {
+			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+
+			/* save Sone into configuration. */
+			String sonePrefix = "Sone/" + sone.getId();
+			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
+			configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").setValue(soneInserters.get(sone).getLastInsertFingerprint());
+
+			/* save profile. */
+			Profile profile = sone.getProfile();
+			configuration.getStringValue(sonePrefix + "/Profile/FirstName").setValue(profile.getFirstName());
+			configuration.getStringValue(sonePrefix + "/Profile/MiddleName").setValue(profile.getMiddleName());
+			configuration.getStringValue(sonePrefix + "/Profile/LastName").setValue(profile.getLastName());
+			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
+			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
+			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
+
+			/* save profile fields. */
+			int fieldCounter = 0;
+			for (Field profileField : profile.getFields()) {
+				String fieldPrefix = sonePrefix + "/Profile/Fields/" + fieldCounter++;
+				configuration.getStringValue(fieldPrefix + "/Name").setValue(profileField.getName());
+				configuration.getStringValue(fieldPrefix + "/Value").setValue(profileField.getValue());
+			}
+			configuration.getStringValue(sonePrefix + "/Profile/Fields/" + fieldCounter + "/Name").setValue(null);
+
+			/* save posts. */
+			int postCounter = 0;
+			for (Post post : sone.getPosts()) {
+				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
+				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
+				configuration.getStringValue(postPrefix + "/Recipient").setValue((post.getRecipient() != null) ? post.getRecipient().getId() : null);
+				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
+				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
+			}
+			configuration.getStringValue(sonePrefix + "/Posts/" + postCounter + "/ID").setValue(null);
+
+			/* save replies. */
+			int replyCounter = 0;
+			for (Reply reply : sone.getReplies()) {
+				String replyPrefix = sonePrefix + "/Replies/" + replyCounter++;
+				configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
+				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPost().getId());
+				configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
+				configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
+			}
+			configuration.getStringValue(sonePrefix + "/Replies/" + replyCounter + "/ID").setValue(null);
+
+			/* save post likes. */
+			int postLikeCounter = 0;
+			for (String postId : sone.getLikedPostIds()) {
+				configuration.getStringValue(sonePrefix + "/Likes/Post/" + postLikeCounter++ + "/ID").setValue(postId);
+			}
+			configuration.getStringValue(sonePrefix + "/Likes/Post/" + postLikeCounter + "/ID").setValue(null);
+
+			/* save reply likes. */
+			int replyLikeCounter = 0;
+			for (String replyId : sone.getLikedReplyIds()) {
+				configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter++ + "/ID").setValue(replyId);
+			}
+			configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter + "/ID").setValue(null);
+
+			/* save friends. */
+			int friendCounter = 0;
+			for (String friendId : sone.getFriends()) {
+				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter++ + "/ID").setValue(friendId);
+			}
+			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
+
+			/* save albums. first, collect in a flat structure, top-level first. */
+			List<Album> albums = Sone.flattenAlbums(sone.getAlbums());
+
+			int albumCounter = 0;
+			for (Album album : albums) {
+				String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
+				configuration.getStringValue(albumPrefix + "/ID").setValue(album.getId());
+				configuration.getStringValue(albumPrefix + "/Title").setValue(album.getTitle());
+				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
+				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
+			}
+			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
+
+			/* save images. */
+			int imageCounter = 0;
+			for (Album album : albums) {
+				for (Image image : album.getImages()) {
+					if (!image.isInserted()) {
+						continue;
+					}
+					String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
+					configuration.getStringValue(imagePrefix + "/ID").setValue(image.getId());
+					configuration.getStringValue(imagePrefix + "/Album").setValue(album.getId());
+					configuration.getStringValue(imagePrefix + "/Key").setValue(image.getKey());
+					configuration.getStringValue(imagePrefix + "/Title").setValue(image.getTitle());
+					configuration.getStringValue(imagePrefix + "/Description").setValue(image.getDescription());
+					configuration.getLongValue(imagePrefix + "/CreationTime").setValue(image.getCreationTime());
+					configuration.getIntValue(imagePrefix + "/Width").setValue(image.getWidth());
+					configuration.getIntValue(imagePrefix + "/Height").setValue(image.getHeight());
+				}
+			}
+			configuration.getStringValue(sonePrefix + "/Images/" + imageCounter + "/ID").setValue(null);
+
+			/* save options. */
+			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
+			configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").setValue(sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").getReal());
+
+			configuration.save();
+			logger.log(Level.INFO, "Sone %s saved.", sone);
+		} catch (ConfigurationException ce1) {
+			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
+		} catch (WebOfTrustException wote1) {
+			logger.log(Level.WARNING, "Could not set WoT property for Sone: " + sone, wote1);
+		}
 	}
 
 	/**
 	 * Saves the current options.
 	 */
-	public void saveConfiguration() {
+	private void saveConfiguration() {
 		synchronized (configuration) {
 			if (storingConfiguration) {
 				logger.log(Level.FINE, "Already storing configuration…");
@@ -2027,9 +2143,13 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
+			configuration.getIntValue("Option/CharactersPerPost").setValue(options.getIntegerOption("CharactersPerPost").getReal());
+			configuration.getBooleanValue("Option/RequireFullAccess").setValue(options.getBooleanOption("RequireFullAccess").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
+			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
+			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
 			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
 			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
@@ -2082,17 +2202,13 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 	}
 
-	//
-	// PRIVATE METHODS
-	//
-
 	/**
 	 * Loads the configuration.
 	 */
 	@SuppressWarnings("unchecked")
 	private void loadConfiguration() {
 		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new OptionWatcher<Integer>() {
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangeValidator(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
 
 			@Override
 			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
@@ -2100,10 +2216,29 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			}
 
 		}));
-		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10));
-		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
+		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
+		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
+		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
+		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, new OptionWatcher<Boolean>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
+				fcpInterface.setActive(newValue);
+			}
+		}));
+		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, new OptionWatcher<Integer>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+				fcpInterface.setFullAccessRequired(FullAccessRequired.values()[newValue]);
+			}
+
+		}));
 		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
 		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
@@ -2119,11 +2254,15 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			return;
 		}
 
-		options.getIntegerOption("InsertionDelay").set(configuration.getIntValue("Option/InsertionDelay").getValue(null));
-		options.getIntegerOption("PostsPerPage").set(configuration.getIntValue("Option/PostsPerPage").getValue(null));
-		options.getIntegerOption("PositiveTrust").set(configuration.getIntValue("Option/PositiveTrust").getValue(null));
-		options.getIntegerOption("NegativeTrust").set(configuration.getIntValue("Option/NegativeTrust").getValue(null));
+		loadConfigurationValue("InsertionDelay");
+		loadConfigurationValue("PostsPerPage");
+		loadConfigurationValue("CharactersPerPost");
+		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
+		loadConfigurationValue("PositiveTrust");
+		loadConfigurationValue("NegativeTrust");
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
+		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
+		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
 		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
@@ -2174,6 +2313,21 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			}
 		}
 
+	}
+
+	/**
+	 * Loads an {@link Integer} configuration value for the option with the
+	 * given name, logging validation failures.
+	 *
+	 * @param optionName
+	 *            The name of the option to load
+	 */
+	private void loadConfigurationValue(String optionName) {
+		try {
+			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
+		} catch (IllegalArgumentException iae1) {
+			logger.log(Level.WARNING, "Invalid value for " + optionName + " in configuration, using default.");
+		}
 	}
 
 	/**
@@ -2240,6 +2394,7 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId());
 				sone.setIdentity(identity);
+				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
@@ -2252,6 +2407,49 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 	@Override
 	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
 		trustedIdentities.get(ownIdentity).remove(identity);
+		boolean foundIdentity = false;
+		for (Entry<OwnIdentity, Set<Identity>> trustedIdentity : trustedIdentities.entrySet()) {
+			if (trustedIdentity.getKey().equals(ownIdentity)) {
+				continue;
+			}
+			if (trustedIdentity.getValue().contains(identity)) {
+				foundIdentity = true;
+			}
+		}
+		if (foundIdentity) {
+			/* some local identity still trusts this identity, don’t remove. */
+			return;
+		}
+		Sone sone = getSone(identity.getId(), false);
+		if (sone == null) {
+			/* TODO - we don’t have the Sone anymore. should this happen? */
+			return;
+		}
+		synchronized (posts) {
+			synchronized (newPosts) {
+				for (Post post : sone.getPosts()) {
+					posts.remove(post.getId());
+					newPosts.remove(post.getId());
+					coreListenerManager.firePostRemoved(post);
+				}
+			}
+		}
+		synchronized (replies) {
+			synchronized (newReplies) {
+				for (Reply reply : sone.getReplies()) {
+					replies.remove(reply.getId());
+					newReplies.remove(reply.getId());
+					coreListenerManager.fireReplyRemoved(reply);
+				}
+			}
+		}
+		synchronized (remoteSones) {
+			remoteSones.remove(identity.getId());
+		}
+		synchronized (newSones) {
+			newSones.remove(identity.getId());
+			coreListenerManager.fireSoneRemoved(sone);
+		}
 	}
 
 	//
@@ -2268,6 +2466,34 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 
 	//
 	// INTERFACE ImageInsertListener
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void insertStarted(Sone sone) {
+		coreListenerManager.fireSoneInserting(sone);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void insertFinished(Sone sone, long insertDuration) {
+		coreListenerManager.fireSoneInserted(sone, insertDuration);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void insertAborted(Sone sone, Throwable cause) {
+		coreListenerManager.fireSoneInsertAborted(sone, cause);
+	}
+
+	//
+	// SONEINSERTLISTENER METHODS
 	//
 
 	/**
@@ -2340,6 +2566,18 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/**
+		 * Validates the given insertion delay.
+		 *
+		 * @param insertionDelay
+		 *            The insertion delay to validate
+		 * @return {@code true} if the given insertion delay was valid, {@code
+		 *         false} otherwise
+		 */
+		public boolean validateInsertionDelay(Integer insertionDelay) {
+			return options.getIntegerOption("InsertionDelay").validate(insertionDelay);
+		}
+
+		/**
 		 * Sets the insertion delay
 		 *
 		 * @param insertionDelay
@@ -2362,6 +2600,18 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/**
+		 * Validates the number of posts per page.
+		 *
+		 * @param postsPerPage
+		 *            The number of posts per page
+		 * @return {@code true} if the number of posts per page was valid,
+		 *         {@code false} otherwise
+		 */
+		public boolean validatePostsPerPage(Integer postsPerPage) {
+			return options.getIntegerOption("PostsPerPage").validate(postsPerPage);
+		}
+
+		/**
 		 * Sets the number of posts to show per page.
 		 *
 		 * @param postsPerPage
@@ -2374,12 +2624,80 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/**
+		 * Returns the number of characters per post, or <code>-1</code> if the
+		 * posts should not be cut off.
+		 *
+		 * @return The numbers of characters per post
+		 */
+		public int getCharactersPerPost() {
+			return options.getIntegerOption("CharactersPerPost").get();
+		}
+
+		/**
+		 * Validates the number of characters per post.
+		 *
+		 * @param charactersPerPost
+		 *            The number of characters per post
+		 * @return {@code true} if the number of characters per post was valid,
+		 *         {@code false} otherwise
+		 */
+		public boolean validateCharactersPerPost(Integer charactersPerPost) {
+			return options.getIntegerOption("CharactersPerPost").validate(charactersPerPost);
+		}
+
+		/**
+		 * Sets the number of characters per post.
+		 *
+		 * @param charactersPerPost
+		 *            The number of characters per post, or <code>-1</code> to
+		 *            not cut off the posts
+		 * @return This preferences objects
+		 */
+		public Preferences setCharactersPerPost(Integer charactersPerPost) {
+			options.getIntegerOption("CharactersPerPost").set(charactersPerPost);
+			return this;
+		}
+
+		/**
+		 * Returns whether Sone requires full access to be even visible.
+		 *
+		 * @return {@code true} if Sone requires full access, {@code false}
+		 *         otherwise
+		 */
+		public boolean isRequireFullAccess() {
+			return options.getBooleanOption("RequireFullAccess").get();
+		}
+
+		/**
+		 * Sets whether Sone requires full access to be even visible.
+		 *
+		 * @param requireFullAccess
+		 *            {@code true} if Sone requires full access, {@code false}
+		 *            otherwise
+		 */
+		public void setRequireFullAccess(Boolean requireFullAccess) {
+			options.getBooleanOption("RequireFullAccess").set(requireFullAccess);
+		}
+
+		/**
 		 * Returns the positive trust.
 		 *
 		 * @return The positive trust
 		 */
 		public int getPositiveTrust() {
 			return options.getIntegerOption("PositiveTrust").get();
+		}
+
+		/**
+		 * Validates the positive trust.
+		 *
+		 * @param positiveTrust
+		 *            The positive trust to validate
+		 * @return {@code true} if the positive trust was valid, {@code false}
+		 *         otherwise
+		 */
+		public boolean validatePositiveTrust(Integer positiveTrust) {
+			return options.getIntegerOption("PositiveTrust").validate(positiveTrust);
 		}
 
 		/**
@@ -2402,6 +2720,18 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		 */
 		public int getNegativeTrust() {
 			return options.getIntegerOption("NegativeTrust").get();
+		}
+
+		/**
+		 * Validates the negative trust.
+		 *
+		 * @param negativeTrust
+		 *            The negative trust to validate
+		 * @return {@code true} if the negative trust was valid, {@code false}
+		 *         otherwise
+		 */
+		public boolean validateNegativeTrust(Integer negativeTrust) {
+			return options.getIntegerOption("NegativeTrust").validate(negativeTrust);
 		}
 
 		/**
@@ -2441,25 +2771,53 @@ public class Core implements IdentityListener, UpdateListener, ImageInsertListen
 		}
 
 		/**
-		 * Returns whether the rescue mode is active.
+		 * Returns whether the {@link FcpInterface FCP interface} is currently
+		 * active.
 		 *
-		 * @return {@code true} if the rescue mode is active, {@code false}
-		 *         otherwise
+		 * @see FcpInterface#setActive(boolean)
+		 * @return {@code true} if the FCP interface is currently active,
+		 *         {@code false} otherwise
 		 */
-		public boolean isSoneRescueMode() {
-			return options.getBooleanOption("SoneRescueMode").get();
+		public boolean isFcpInterfaceActive() {
+			return options.getBooleanOption("ActivateFcpInterface").get();
 		}
 
 		/**
-		 * Sets whether the rescue mode is active.
+		 * Sets whether the {@link FcpInterface FCP interface} is currently
+		 * active.
 		 *
-		 * @param soneRescueMode
-		 *            {@code true} if the rescue mode is active, {@code false}
-		 *            otherwise
+		 * @see FcpInterface#setActive(boolean)
+		 * @param fcpInterfaceActive
+		 *            {@code true} to activate the FCP interface, {@code false}
+		 *            to deactivate the FCP interface
+		 * @return This preferences object
+		 */
+		public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
+			options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
+			return this;
+		}
+
+		/**
+		 * Returns the action level for which full access to the FCP interface
+		 * is required.
+		 *
+		 * @return The action level for which full access to the FCP interface
+		 *         is required
+		 */
+		public FullAccessRequired getFcpFullAccessRequired() {
+			return FullAccessRequired.values()[options.getIntegerOption("FcpFullAccessRequired").get()];
+		}
+
+		/**
+		 * Sets the action level for which full access to the FCP interface is
+		 * required
+		 *
+		 * @param fcpFullAccessRequired
+		 *            The action level
 		 * @return This preferences
 		 */
-		public Preferences setSoneRescueMode(Boolean soneRescueMode) {
-			options.getBooleanOption("SoneRescueMode").set(soneRescueMode);
+		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
+			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
 			return this;
 		}
 

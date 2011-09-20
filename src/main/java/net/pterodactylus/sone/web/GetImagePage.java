@@ -17,15 +17,19 @@
 
 package net.pterodactylus.sone.web;
 
+import java.io.IOException;
+
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.web.page.Page;
+import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.web.Page;
+import net.pterodactylus.util.web.Response;
 
 /**
  * Page that delivers a {@link TemporaryImage} to the browser.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class GetImagePage implements Page {
+public class GetImagePage implements Page<FreenetRequest> {
 
 	/** The Sone web interface. */
 	private final WebInterface webInterface;
@@ -52,13 +56,22 @@ public class GetImagePage implements Page {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(Request request) {
+	public boolean isPrefixPage() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Response handleRequest(FreenetRequest request, Response response) throws IOException {
 		String imageId = request.getHttpRequest().getParam("image");
 		TemporaryImage temporaryImage = webInterface.getCore().getTemporaryImage(imageId);
 		if (temporaryImage == null) {
-			return new Response(404, "Not found.", "text/plain; charset=utf-8", "");
+			return response.setStatusCode(404).setStatusText("Not found.").setContentType("text/html; charset=utf-8");
 		}
-		return new Response(200, "OK", temporaryImage.getMimeType(), temporaryImage.getImageData()).setHeader("Content-Disposition", "attachment; filename=" + temporaryImage.getId() + "." + temporaryImage.getMimeType().substring(temporaryImage.getMimeType().lastIndexOf("/") + 1));
+		String contentType= temporaryImage.getMimeType();
+		return response.setStatusCode(200).setStatusText("OK").setContentType(contentType).addHeader("Content-Disposition", "attachment; filename=" + temporaryImage.getId() + "." + contentType.substring(contentType.lastIndexOf('/') + 1)).write(temporaryImage.getImageData());
 	}
 
 }

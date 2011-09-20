@@ -1,5 +1,5 @@
 /*
- * Sone - TrustAjaxPage.java - Copyright © 2011 David Roden
+ * Sone - UntrustAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -45,7 +46,7 @@ public class UntrustAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		if (currentSone == null) {
 			return createErrorJsonObject("auth-required");

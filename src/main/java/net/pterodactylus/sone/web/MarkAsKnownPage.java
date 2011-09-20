@@ -1,5 +1,5 @@
 /*
- * Sone - MarkReadPage.java - Copyright © 2011 David Roden
+ * Sone - MarkAsKnownPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ import java.util.StringTokenizer;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -53,7 +54,7 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String type = request.getHttpRequest().getPartAsStringFailsafe("type", 5);
 		if (!type.equals("sone") && !type.equals("post") && !type.equals("reply")) {

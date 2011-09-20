@@ -1,5 +1,5 @@
 /*
- * Sone - FollowSonePage.java - Copyright © 2010 David Roden
+ * Sone - UnfollowSonePage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * This page lets the user unfollow another Sone.
@@ -47,14 +48,16 @@ public class UnfollowSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
-			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			currentSone.removeFriend(soneId);
-			webInterface.getCore().saveSone(currentSone);
+			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 2000);
+			for (String soneId : soneIds.split("[ ,]+")) {
+				currentSone.removeFriend(soneId);
+			}
+			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);
 		}
 	}

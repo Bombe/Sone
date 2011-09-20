@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.template.Template;
@@ -56,13 +57,13 @@ public class GetPostAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
 		Post post = webInterface.getCore().getPost(postId, false);
 		if (post == null) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		return createSuccessJsonObject().put("post", createJsonPost(post, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("post", createJsonPost(request, post, getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -81,13 +82,15 @@ public class GetPostAjaxPage extends JsonPage {
 	 * Creates a JSON object from the given post. The JSON object will only
 	 * contain the ID of the post, its time, and its rendered HTML code.
 	 *
+	 * @param request
+	 *            The request being processed
 	 * @param post
 	 *            The post to create a JSON object from
 	 * @param currentSone
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the post
 	 */
-	private JsonObject createJsonPost(Post post, Sone currentSone) {
+	private JsonObject createJsonPost(FreenetRequest request, Post post, Sone currentSone) {
 		JsonObject jsonPost = new JsonObject();
 		jsonPost.put("id", post.getId());
 		jsonPost.put("sone", post.getSone().getId());
@@ -95,6 +98,8 @@ public class GetPostAjaxPage extends JsonPage {
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("core", webInterface.getCore());
+		templateContext.set("request", request);
 		templateContext.set("post", post);
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());

@@ -4,7 +4,7 @@
 	<label for="sender"><%= Page.Index.Label.Sender|l10n|html></label>
 	<div class="sender">
 		<select name="sender" title="<%= View.UpdateStatus.Text.ChooseSenderIdentity|l10n|html>">
-			<%foreach localSones localSone>
+			<%foreach localSones localSone|sort>
 				<option value="<% localSone.id|html>"<%if localSone.current> selected="selected"<%/if>><% localSone.niceName|html></option>
 			<%/foreach>
 		</select>

@@ -24,6 +24,7 @@ import java.util.Date;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.number.Digits;
 
@@ -51,8 +52,7 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
-		long now = System.currentTimeMillis();
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String allIds = request.getHttpRequest().getParam("posts");
 		JsonObject postTimes = new JsonObject();
 		if (allIds.length() > 0) {
@@ -62,9 +62,8 @@ public class GetTimesAjaxPage extends JsonPage {
 				if (post == null) {
 					continue;
 				}
-				long age = now - post.getTime();
 				JsonObject postTime = new JsonObject();
-				Time time = getTime(age);
+				Time time = getTime(post.getTime());
 				postTime.put("timeText", time.getText());
 				postTime.put("refreshTime", time.getRefresh() / Time.SECOND);
 				postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
@@ -80,9 +79,8 @@ public class GetTimesAjaxPage extends JsonPage {
 				if (reply == null) {
 					continue;
 				}
-				long age = now - reply.getTime();
 				JsonObject replyTime = new JsonObject();
-				Time time = getTime(age);
+				Time time = getTime(reply.getTime());
 				replyTime.put("timeText", time.getText());
 				replyTime.put("refreshTime", time.getRefresh() / Time.SECOND);
 				replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
@@ -113,13 +111,34 @@ public class GetTimesAjaxPage extends JsonPage {
 	//
 
 	/**
-	 * Returns the formatted relative time for a given age.
+	 * Returns the formatted relative time for a given time.
 	 *
-	 * @param age
-	 *            The age to format (in milliseconds)
+	 * @param time
+	 *            The time to format the difference from (in milliseconds)
 	 * @return The formatted age
 	 */
-	private Time getTime(long age) {
+	private Time getTime(long time) {
+		return getTime(webInterface, time);
+	}
+
+	//
+	// STATIC METHODS
+	//
+
+	/**
+	 * Returns the formatted relative time for a given time.
+	 *
+	 * @param webInterface
+	 *            The Sone web interface (for l10n access)
+	 * @param time
+	 *            The time to format the difference from (in milliseconds)
+	 * @return The formatted age
+	 */
+	public static Time getTime(WebInterface webInterface, long time) {
+		if (time == 0) {
+			return new Time(webInterface.getL10n().getString("View.Sone.Text.UnknownDate"), 12 * Time.HOUR);
+		}
+		long age = System.currentTimeMillis() - time;
 		String text;
 		long refresh;
 		if (age < 0) {
@@ -135,7 +154,7 @@ public class GetTimesAjaxPage extends JsonPage {
 			text = webInterface.getL10n().getString("View.Time.AMinuteAgo");
 			refresh = Time.MINUTE;
 		} else if (age < 30 * Time.MINUTE) {
-			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf((int) Digits.round(age / Time.MINUTE, 1)));
+			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf((int) (Digits.round(age, Time.MINUTE) / Time.MINUTE)));
 			refresh = 1 * Time.MINUTE;
 		} else if (age < 45 * Time.MINUTE) {
 			text = webInterface.getL10n().getString("View.Time.HalfAnHourAgo");
@@ -144,31 +163,31 @@ public class GetTimesAjaxPage extends JsonPage {
 			text = webInterface.getL10n().getString("View.Time.AnHourAgo");
 			refresh = Time.HOUR;
 		} else if (age < 21 * Time.HOUR) {
-			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf((int) Digits.round(age / Time.HOUR, 1)));
+			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf((int) (Digits.round(age, Time.HOUR) / Time.HOUR)));
 			refresh = Time.HOUR;
 		} else if (age < 42 * Time.HOUR) {
 			text = webInterface.getL10n().getString("View.Time.ADayAgo");
 			refresh = Time.DAY;
 		} else if (age < 6 * Time.DAY) {
-			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf((int) Digits.round(age / Time.DAY, 1)));
+			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf((int) (Digits.round(age, Time.DAY) / Time.DAY)));
 			refresh = Time.DAY;
 		} else if (age < 11 * Time.DAY) {
 			text = webInterface.getL10n().getString("View.Time.AWeekAgo");
 			refresh = Time.DAY;
 		} else if (age < 4 * Time.WEEK) {
-			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((int) Digits.round(age / Time.WEEK, 1)));
+			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((int) (Digits.round(age, Time.WEEK) / Time.WEEK)));
 			refresh = Time.DAY;
 		} else if (age < 6 * Time.WEEK) {
 			text = webInterface.getL10n().getString("View.Time.AMonthAgo");
 			refresh = Time.DAY;
 		} else if (age < 11 * Time.MONTH) {
-			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((int) Digits.round(age / Time.MONTH, 1)));
+			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((int) (Digits.round(age, Time.MONTH) / Time.MONTH)));
 			refresh = Time.DAY;
 		} else if (age < 18 * Time.MONTH) {
 			text = webInterface.getL10n().getString("View.Time.AYearAgo");
 			refresh = Time.WEEK;
 		} else {
-			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((int) Digits.round(age / Time.YEAR, 1)));
+			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((int) (Digits.round(age, Time.YEAR) / Time.YEAR)));
 			refresh = Time.WEEK;
 		}
 		return new Time(text, refresh);
@@ -179,7 +198,7 @@ public class GetTimesAjaxPage extends JsonPage {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class Time {
+	public static class Time {
 
 		/** Number of milliseconds in a second. */
 		private static final long SECOND = 1000;
@@ -237,6 +256,14 @@ public class GetTimesAjaxPage extends JsonPage {
 		 */
 		public long getRefresh() {
 			return refresh;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return text;
 		}
 
 	}

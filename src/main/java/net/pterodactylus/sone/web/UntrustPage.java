@@ -1,5 +1,5 @@
 /*
- * Sone - TrustPage.java - Copyright © 2011 David Roden
+ * Sone - UntrustPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,10 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * Page that lets the user untrust another Sone. This will remove all trust
@@ -52,7 +53,7 @@ public class UntrustPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);

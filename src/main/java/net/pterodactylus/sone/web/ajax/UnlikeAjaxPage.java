@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web.ajax;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -43,7 +44,7 @@ public class UnlikeAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String type = request.getHttpRequest().getParam("type", null);
 		String id = request.getHttpRequest().getParam(type, null);
 		if ((id == null) || (id.length() == 0)) {
@@ -55,10 +56,10 @@ public class UnlikeAjaxPage extends JsonPage {
 		}
 		if ("post".equals(type)) {
 			currentSone.removeLikedPostId(id);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 		} else if ("reply".equals(type)) {
 			currentSone.removeLikedReplyId(id);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 		} else {
 			return createErrorJsonObject("invalid-type");
 		}

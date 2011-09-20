@@ -1,3 +1,20 @@
+/*
+ * Sone - Options.java - Copyright © 2010 David Roden
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package net.pterodactylus.sone.core;
 
 import java.util.ArrayList;
@@ -6,6 +23,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import net.pterodactylus.util.validation.Validator;
 
 /**
  * Stores various options that influence Sone’s behaviour.
@@ -47,12 +66,26 @@ public class Options {
 		public T getReal();
 
 		/**
+		 * Validates the given value. Note that {@code null} is always a valid
+		 * value!
+		 *
+		 * @param value
+		 *            The value to validate
+		 * @return {@code true} if this option does not have a {@link Validator}
+		 *         , or the {@link Validator} validates this object, {@code
+		 *         false} otherwise
+		 */
+		public boolean validate(T value);
+
+		/**
 		 * Sets the current value of the option.
 		 *
 		 * @param value
 		 *            The new value of the option
+		 * @throws IllegalArgumentException
+		 *             if the value is not valid for this option
 		 */
-		public void set(T value);
+		public void set(T value) throws IllegalArgumentException;
 
 	}
 
@@ -96,6 +129,9 @@ public class Options {
 		/** The current value. */
 		private volatile T value;
 
+		/** The validator. */
+		private Validator<T> validator;
+
 		/** The option watcher. */
 		private final List<OptionWatcher<T>> optionWatchers = new ArrayList<OptionWatcher<T>>();
 
@@ -108,7 +144,22 @@ public class Options {
 		 *            The option watchers
 		 */
 		public DefaultOption(T defaultValue, OptionWatcher<T>... optionWatchers) {
+			this(defaultValue, null, optionWatchers);
+		}
+
+		/**
+		 * Creates a new default option.
+		 *
+		 * @param defaultValue
+		 *            The default value of the option
+		 * @param validator
+		 *            The validator for value validation
+		 * @param optionWatchers
+		 *            The option watchers
+		 */
+		public DefaultOption(T defaultValue, Validator<T> validator, OptionWatcher<T>... optionWatchers) {
 			this.defaultValue = defaultValue;
+			this.validator = validator;
 			this.optionWatchers.addAll(Arrays.asList(optionWatchers));
 		}
 
@@ -143,7 +194,18 @@ public class Options {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public boolean validate(@SuppressWarnings("hiding") T value) {
+			return (validator == null) || (value == null) || validator.validate(value);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public void set(T value) {
+			if ((value != null) && (validator != null) && (!validator.validate(value))) {
+				throw new IllegalArgumentException("New Value (" + value + ") could not be validated.");
+			}
 			T oldValue = this.value;
 			this.value = value;
 			if (!get().equals(oldValue)) {

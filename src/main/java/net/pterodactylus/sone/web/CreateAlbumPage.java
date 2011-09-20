@@ -19,9 +19,10 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * Page that lets the user create a new album.
@@ -50,7 +51,7 @@ public class CreateAlbumPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String name = request.getHttpRequest().getPartAsStringFailsafe("name", 64).trim();
@@ -64,7 +65,7 @@ public class CreateAlbumPage extends SoneTemplatePage {
 			Album parent = webInterface.getCore().getAlbum(parentId, false);
 			Album album = webInterface.getCore().createAlbum(currentSone, parent);
 			album.setTitle(name).setDescription(description);
-			webInterface.getCore().saveSone(currentSone);
+			webInterface.getCore().touchConfiguration();
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}
 	}

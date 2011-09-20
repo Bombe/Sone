@@ -18,9 +18,10 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * This page lets the user follow another Sone.
@@ -47,14 +48,16 @@ public class FollowSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
-			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			currentSone.addFriend(soneId);
-			webInterface.getCore().saveSone(currentSone);
+			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 1200);
+			for (String soneId : soneIds.split("[ ,]+")) {
+				currentSone.addFriend(soneId);
+			}
+			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);
 		}
 	}

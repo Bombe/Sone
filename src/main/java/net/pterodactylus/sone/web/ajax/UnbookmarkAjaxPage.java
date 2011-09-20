@@ -1,5 +1,5 @@
 /*
- * Sone - BookmarkAjaxPage.java - Copyright © 2011 David Roden
+ * Sone - UnbookmarkAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -45,7 +46,7 @@ public class UnbookmarkAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String id = request.getHttpRequest().getParam("post", null);
 		if ((id == null) || (id.length() == 0)) {
 			return createErrorJsonObject("invalid-post-id");

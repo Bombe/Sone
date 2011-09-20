@@ -1,11 +1,15 @@
-<div id="sone" class="<%ifnull ! currentSone>online<%else>offline<%/if>">
+<div id="sone">
 
 	<div id="formPassword"><% formPassword|html></div>
 	<div id="currentSoneId" class="hidden"><% currentSone.id|html></div>
+	<div id="loggedIn" class="hidden"><%ifnull !currentSone>true<%else>false<%/if></div>
 
 	<script src="javascript/jquery-1.4.2.js" language="javascript"></script>
 	<script src="javascript/jquery.url.js" language="javascript"></script>
+	<script src="javascript/jquery.fieldselection.js" language="javascript"></script>
 	<script src="javascript/sone.js" language="javascript"></script>
+
+	<div id="offline-marker"></div>
 
 	<div id="main">
 
@@ -18,8 +22,8 @@
 				<button type="submit"><%= Notification.Button.Dismiss|l10n|html></button>
 			</form>
 
-			<%foreach webInterface.notifications.all notification>
-				<div class="notification" id="<% notification.id|html>">
+			<%foreach notifications notification>
+				<div class="notification" id="<% notification.id|html>" lastUpdatedTime="<%notification.lastUpdatedTime|html>">
 					<%if notification.dismissable>
 						<form class="dismiss" action="dismissNotification.html" method="post">
 							<input type="hidden" name="formPassword" value="<% formPassword|html>" />

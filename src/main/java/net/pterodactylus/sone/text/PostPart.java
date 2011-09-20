@@ -1,5 +1,5 @@
 /*
- * Sone - FreenetLinkParserContext.java - Copyright © 2011 David Roden
+ * Sone - PostLinkPart.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,37 +17,39 @@
 
 package net.pterodactylus.sone.text;
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.Post;
 
 /**
- * {@link ParserContext} implementation for the {@link FreenetLinkParser}. It
- * stores the {@link Sone} that provided the parsed text so that certain links
- * can be marked in a different way.
+ * {@link Part} implementation that stores a reference to a {@link Post}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FreenetLinkParserContext implements ParserContext {
+public class PostPart implements Part {
 
-	/** The posting Sone. */
-	private final Sone postingSone;
+	/** The post this part refers to. */
+	private final Post post;
 
 	/**
-	 * Creates a new link parser context.
+	 * Creates a new post part.
 	 *
-	 * @param postingSone
-	 *            The posting Sone
+	 * @param post
+	 *            The referenced post
 	 */
-	public FreenetLinkParserContext(Sone postingSone) {
-		this.postingSone = postingSone;
+	public PostPart(Post post) {
+		this.post = post;
 	}
 
+	//
+	// ACCESSORS
+	//
+
 	/**
-	 * Returns the Sone that provided the text that is being parsed.
+	 * Returns the post referenced by this part.
 	 *
-	 * @return The posting Sone
+	 * @return The post referenced by this part
 	 */
-	public Sone getPostingSone() {
-		return postingSone;
+	public Post getPost() {
+		return post;
 	}
 
 }

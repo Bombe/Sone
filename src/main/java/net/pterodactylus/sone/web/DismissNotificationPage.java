@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -48,7 +49,7 @@ public class DismissNotificationPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String notificationId = request.getHttpRequest().getPartAsStringFailsafe("notification", 36);
 		Notification notification = webInterface.getNotifications().getNotification(notificationId);

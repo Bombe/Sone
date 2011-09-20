@@ -33,12 +33,13 @@ import javax.imageio.stream.ImageInputStream;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.io.StreamCopier;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 import freenet.support.api.Bucket;
 import freenet.support.api.HTTPUploadedFile;
 
@@ -72,7 +73,7 @@ public class UploadImagePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());

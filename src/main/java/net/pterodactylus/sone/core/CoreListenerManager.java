@@ -46,32 +46,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that the given Sone is now being rescued.
-	 *
-	 * @see CoreListener#rescuingSone(Sone)
-	 * @param sone
-	 *            The Sone that is being rescued
-	 */
-	void fireRescuingSone(Sone sone) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.rescuingSone(sone);
-		}
-	}
-
-	/**
-	 * Notifies all listeners that the given Sone was rescued.
-	 *
-	 * @see CoreListener#rescuedSone(Sone)
-	 * @param sone
-	 *            The Sone that was rescued
-	 */
-	void fireRescuedSone(Sone sone) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.rescuedSone(sone);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that a new Sone has been discovered.
 	 *
 	 * @see CoreListener#newSoneFound(Sone)
@@ -148,6 +122,19 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	}
 
 	/**
+	 * Notifies all listener that the given Sone was removed.
+	 *
+	 * @see CoreListener#soneRemoved(Sone)
+	 * @param sone
+	 *            The removed Sone
+	 */
+	void fireSoneRemoved(Sone sone) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneRemoved(sone);
+		}
+	}
+
+	/**
 	 * Notifies all listener that the given post was removed.
 	 *
 	 * @see CoreListener#postRemoved(Post)
@@ -196,6 +183,50 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	void fireSoneUnlocked(Sone sone) {
 		for (CoreListener coreListener : getListeners()) {
 			coreListener.soneUnlocked(sone);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the insert of the given Sone has started.
+	 *
+	 * @see SoneInsertListener#insertStarted(Sone)
+	 * @param sone
+	 *            The Sone being inserted
+	 */
+	void fireSoneInserting(Sone sone) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneInserting(sone);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the insert of the given Sone has finished
+	 * successfully.
+	 *
+	 * @see SoneInsertListener#insertFinished(Sone, long)
+	 * @param sone
+	 *            The Sone that was inserted
+	 * @param insertDuration
+	 *            The insert duration (in milliseconds)
+	 */
+	void fireSoneInserted(Sone sone, long insertDuration) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneInserted(sone, insertDuration);
+		}
+	}
+
+	/**
+	 * Notifies all listeners that the insert of the given Sone was aborted.
+	 *
+	 * @see SoneInsertListener#insertStarted(Sone)
+	 * @param sone
+	 *            The Sone being inserted
+	 * @param cause
+	 *            The cause for the abortion (may be {@code null}
+	 */
+	void fireSoneInsertAborted(Sone sone, Throwable cause) {
+		for (CoreListener coreListener : getListeners()) {
+			coreListener.soneInsertAborted(sone, cause);
 		}
 	}
 

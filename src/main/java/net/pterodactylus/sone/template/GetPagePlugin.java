@@ -19,9 +19,10 @@ package net.pterodactylus.sone.template;
 
 import java.util.Map;
 
-import net.pterodactylus.sone.web.page.Page.Request;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Plugin;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Request;
 
 /**
  * Extracts a page number from a {@link Request}’s parameters and stores it in
@@ -50,7 +51,7 @@ public class GetPagePlugin implements Plugin {
 			pageKey = "page";
 		}
 
-		Request request = (Request) templateContext.get(requestKey);
+		FreenetRequest request = (FreenetRequest) templateContext.get(requestKey);
 		String pageString = request.getHttpRequest().getParam(parameter);
 		int page = 0;
 		try {

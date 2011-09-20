@@ -101,7 +101,8 @@ public class ListNotification<T> extends TemplateNotification {
 	}
 
 	/**
-	 * Sets the elements to show in this notification.
+	 * Sets the elements to show in this notification. This method will not call
+	 * {@link #touch()}.
 	 *
 	 * @param elements
 	 *            The elements to show

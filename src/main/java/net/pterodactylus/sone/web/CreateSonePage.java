@@ -1,5 +1,5 @@
 /*
- * FreenetSone - CreateSonePage.java - Copyright © 2010 David Roden
+ * Sone - CreateSonePage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,10 +28,11 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -94,7 +95,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.getCore());
 		templateContext.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
@@ -129,6 +130,9 @@ public class CreateSonePage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
+			return false;
+		}
 		return (getCurrentSone(toadletContext, false) == null) || (webInterface.getCore().getLocalSones().size() == 1);
 	}
 

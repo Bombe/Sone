@@ -1,5 +1,5 @@
 /*
- * Sone - OptionsPage.java - Copyright © 2010 David Roden
+ * Sone - SearchPage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,17 +24,28 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.collection.Converter;
-import net.pterodactylus.util.collection.Converters;
+import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.cache.Cache;
+import net.pterodactylus.util.cache.CacheException;
+import net.pterodactylus.util.cache.CacheItem;
+import net.pterodactylus.util.cache.DefaultCacheItem;
+import net.pterodactylus.util.cache.MemoryCache;
+import net.pterodactylus.util.cache.ValueRetriever;
+import net.pterodactylus.util.collection.Mapper;
+import net.pterodactylus.util.collection.Mappers;
 import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.collection.TimedMap;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -48,6 +59,23 @@ import net.pterodactylus.util.text.TextException;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SearchPage extends SoneTemplatePage {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(SearchPage.class);
+
+	/** Short-term cache. */
+	private final Cache<List<Phrase>, Set<Hit<Post>>> hitCache = new MemoryCache<List<Phrase>, Set<Hit<Post>>>(new ValueRetriever<List<Phrase>, Set<Hit<Post>>>() {
+
+		@SuppressWarnings("synthetic-access")
+		public CacheItem<Set<Hit<Post>>> retrieve(List<Phrase> phrases) throws CacheException {
+			Set<Post> posts = new HashSet<Post>();
+			for (Sone sone : webInterface.getCore().getSones()) {
+				posts.addAll(sone.getPosts());
+			}
+			return new DefaultCacheItem<Set<Hit<Post>>>(getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator()));
+		}
+
+	}, new TimedMap<List<Phrase>, CacheItem<Set<Hit<Post>>>>(300000));
 
 	/**
 	 * Creates a new search page.
@@ -69,7 +97,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String query = request.getHttpRequest().getParam("query").trim();
 		if (query.length() == 0) {
@@ -77,16 +105,21 @@ public class SearchPage extends SoneTemplatePage {
 		}
 
 		List<Phrase> phrases = parseSearchPhrases(query);
+		if (phrases.isEmpty()) {
+			throw new RedirectException("index.html");
+		}
 
 		Set<Sone> sones = webInterface.getCore().getSones();
 		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
-		Set<Post> posts = new HashSet<Post>();
-		for (Sone sone : sones) {
-			posts.addAll(sone.getPosts());
+		Set<Hit<Post>> postHits;
+		try {
+			postHits = hitCache.get(phrases);
+		} catch (CacheException ce1) {
+			/* should never happen. */
+			logger.log(Level.SEVERE, "Could not get search results from cache!", ce1);
+			postHits = Collections.emptySet();
 		}
-		@SuppressWarnings("synthetic-access")
-		Set<Hit<Post>> postHits = getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator());
 
 		/* now filter. */
 		soneHits = Filters.filteredSet(soneHits, Hit.POSITIVE_FILTER);
@@ -99,8 +132,8 @@ public class SearchPage extends SoneTemplatePage {
 		Collections.sort(sortedPostHits, Hit.DESCENDING_COMPARATOR);
 
 		/* extract Sones and posts. */
-		List<Sone> resultSones = Converters.convertList(sortedSoneHits, new HitConverter<Sone>());
-		List<Post> resultPosts = Converters.convertList(sortedPostHits, new HitConverter<Post>());
+		List<Sone> resultSones = Mappers.mappedList(sortedSoneHits, new HitMapper<Sone>());
+		List<Post> resultPosts = Mappers.mappedList(sortedPostHits, new HitMapper<Post>());
 
 		/* pagination. */
 		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
@@ -137,7 +170,7 @@ public class SearchPage extends SoneTemplatePage {
 		Set<Hit<T>> hits = new HashSet<Hit<T>>();
 		for (T object : objects) {
 			String objectString = stringGenerator.generateString(object);
-			int score = calculateScore(phrases, objectString);
+			double score = calculateScore(phrases, objectString);
 			hits.add(new Hit<T>(object, score));
 		}
 		return hits;
@@ -166,11 +199,20 @@ public class SearchPage extends SoneTemplatePage {
 		List<Phrase> phrases = new ArrayList<Phrase>();
 		for (String phrase : parsedPhrases) {
 			if (phrase.startsWith("+")) {
-				phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.REQUIRED));
+				if (phrase.length() > 1) {
+					phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.REQUIRED));
+				} else {
+					phrases.add(new Phrase("+", Phrase.Optionality.OPTIONAL));
+				}
 			} else if (phrase.startsWith("-")) {
-				phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.FORBIDDEN));
+				if (phrase.length() > 1) {
+					phrases.add(new Phrase(phrase.substring(1), Phrase.Optionality.FORBIDDEN));
+				} else {
+					phrases.add(new Phrase("-", Phrase.Optionality.OPTIONAL));
+				}
+			} else {
+				phrases.add(new Phrase(phrase, Phrase.Optionality.OPTIONAL));
 			}
-			phrases.add(new Phrase(phrase, Phrase.Optionality.OPTIONAL));
 		}
 		return phrases;
 	}
@@ -185,9 +227,10 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The expression to search
 	 * @return The score of the expression
 	 */
-	private int calculateScore(List<Phrase> phrases, String expression) {
-		int optionalHits = 0;
-		int requiredHits = 0;
+	private double calculateScore(List<Phrase> phrases, String expression) {
+		logger.log(Level.FINEST, "Calculating Score for “%s”…", expression);
+		double optionalHits = 0;
+		double requiredHits = 0;
 		int forbiddenHits = 0;
 		int requiredPhrases = 0;
 		for (Phrase phrase : phrases) {
@@ -197,22 +240,26 @@ public class SearchPage extends SoneTemplatePage {
 			}
 			int matches = 0;
 			int index = 0;
+			double score = 0;
 			while (index < expression.length()) {
 				int position = expression.toLowerCase().indexOf(phraseString, index);
 				if (position == -1) {
 					break;
 				}
+				score += Math.pow(1 - position / (double) expression.length(), 2);
 				index = position + phraseString.length();
+				logger.log(Level.FINEST, "Got hit at position %d.", position);
 				++matches;
 			}
+			logger.log(Level.FINEST, "Score: %f", score);
 			if (matches == 0) {
 				continue;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.REQUIRED) {
-				requiredHits += matches;
+				requiredHits += score;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.OPTIONAL) {
-				optionalHits += matches;
+				optionalHits += score;
 			}
 			if (phrase.getOptionality() == Phrase.Optionality.FORBIDDEN) {
 				forbiddenHits += matches;
@@ -390,6 +437,31 @@ public class SearchPage extends SoneTemplatePage {
 			return optionality;
 		}
 
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return phrase.hashCode() ^ ((optionality == Optionality.FORBIDDEN) ? (0xaaaaaaaa) : ((optionality == Optionality.REQUIRED) ? 0x55555555 : 0));
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof Phrase)) {
+				return false;
+			}
+			@SuppressWarnings("hiding")
+			Phrase phrase = (Phrase) object;
+			return (this.optionality == phrase.optionality) && this.phrase.equals(phrase.phrase);
+		}
+
 	}
 
 	/**
@@ -418,7 +490,7 @@ public class SearchPage extends SoneTemplatePage {
 
 			@Override
 			public int compare(Hit<?> leftHit, Hit<?> rightHit) {
-				return rightHit.getScore() - leftHit.getScore();
+				return (rightHit.getScore() < leftHit.getScore()) ? -1 : ((rightHit.getScore() > leftHit.getScore()) ? 1 : 0);
 			}
 
 		};
@@ -427,7 +499,7 @@ public class SearchPage extends SoneTemplatePage {
 		private final T object;
 
 		/** The score of the object. */
-		private final int score;
+		private final double score;
 
 		/**
 		 * Creates a new hit.
@@ -437,7 +509,7 @@ public class SearchPage extends SoneTemplatePage {
 		 * @param score
 		 *            The score of the object
 		 */
-		public Hit(T object, int score) {
+		public Hit(T object, double score) {
 			this.object = object;
 			this.score = score;
 		}
@@ -456,7 +528,7 @@ public class SearchPage extends SoneTemplatePage {
 		 *
 		 * @return The score of the object
 		 */
-		public int getScore() {
+		public double getScore() {
 			return score;
 		}
 
@@ -469,13 +541,13 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The type of the object to extract
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class HitConverter<T> implements Converter<Hit<T>, T> {
+	public static class HitMapper<T> implements Mapper<Hit<T>, T> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public T convert(Hit<T> input) {
+		public T map(Hit<T> input) {
 			return input.getObject();
 		}
 

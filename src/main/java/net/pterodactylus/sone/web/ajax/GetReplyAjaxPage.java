@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.template.Template;
@@ -59,13 +60,13 @@ public class GetReplyAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
 		Reply reply = webInterface.getCore().getReply(replyId);
 		if ((reply == null) || (reply.getSone() == null)) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		return createSuccessJsonObject().put("reply", createJsonReply(reply, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("reply", createJsonReply(request, reply, getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -83,13 +84,15 @@ public class GetReplyAjaxPage extends JsonPage {
 	/**
 	 * Creates a JSON representation of the given reply.
 	 *
+	 * @param request
+	 *            The request being processed
 	 * @param reply
 	 *            The reply to convert
 	 * @param currentSone
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the reply
 	 */
-	private JsonObject createJsonReply(Reply reply, Sone currentSone) {
+	private JsonObject createJsonReply(FreenetRequest request, Reply reply, Sone currentSone) {
 		JsonObject jsonReply = new JsonObject();
 		jsonReply.put("id", reply.getId());
 		jsonReply.put("postId", reply.getPost().getId());
@@ -97,6 +100,8 @@ public class GetReplyAjaxPage extends JsonPage {
 		jsonReply.put("time", reply.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();
+		templateContext.set("core", webInterface.getCore());
+		templateContext.set("request", request);
 		templateContext.set("reply", reply);
 		templateContext.set("currentSone", currentSone);
 		try {

@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -45,7 +46,7 @@ public class BookmarkAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String id = request.getHttpRequest().getParam("post", null);
 		if ((id == null) || (id.length() == 0)) {
 			return createErrorJsonObject("invalid-post-id");

@@ -22,10 +22,11 @@ import java.util.List;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -55,7 +56,7 @@ public class EditProfilePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		ToadletContext toadletContenxt = request.getToadletContext();
 		Sone currentSone = getCurrentSone(toadletContenxt);
@@ -84,7 +85,7 @@ public class EditProfilePage extends SoneTemplatePage {
 					field.setValue(value);
 				}
 				currentSone.setProfile(profile);
-				webInterface.getCore().saveSone(currentSone);
+				webInterface.getCore().touchConfiguration();
 				throw new RedirectException("editProfile.html");
 			} else if (request.getHttpRequest().getPartAsStringFailsafe("add-field", 4).equals("true")) {
 				String fieldName = request.getHttpRequest().getPartAsStringFailsafe("field-name", 256).trim();
@@ -92,7 +93,7 @@ public class EditProfilePage extends SoneTemplatePage {
 					profile.addField(fieldName);
 					currentSone.setProfile(profile);
 					fields = profile.getFields();
-					webInterface.getCore().saveSone(currentSone);
+					webInterface.getCore().touchConfiguration();
 					throw new RedirectException("editProfile.html#profile-fields");
 				} catch (IllegalArgumentException iae1) {
 					templateContext.set("fieldName", fieldName);
@@ -153,7 +154,7 @@ public class EditProfilePage extends SoneTemplatePage {
 	 * @return The parsed ID, or {@code null} if there was no part matching the
 	 *         given string
 	 */
-	private String getFieldId(Request request, String partNameStart) {
+	private String getFieldId(FreenetRequest request, String partNameStart) {
 		for (String partName : request.getHttpRequest().getParts()) {
 			if (partName.startsWith(partNameStart)) {
 				return partName.substring(partNameStart.length());

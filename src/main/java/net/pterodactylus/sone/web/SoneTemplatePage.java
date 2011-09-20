@@ -1,5 +1,5 @@
 /*
- * Freetalk - FreetalkTemplatePage.java - Copyright © 2010 David Roden
+ * Sone - SoneTemplatePage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,8 @@ import java.util.Map;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.web.page.Page;
+import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
 import net.pterodactylus.util.collection.ListBuilder;
 import net.pterodactylus.util.collection.MapBuilder;
@@ -37,7 +38,7 @@ import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
 /**
- * Base page for the Freetalk web interface.
+ * Base page for the Sone web interface.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -53,8 +54,8 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	private final boolean requireLogin;
 
 	/**
-	 * Creates a new template page for Freetalk that does not require the user
-	 * to be logged in.
+	 * Creates a new template page for Sone that does not require the user to be
+	 * logged in.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -68,8 +69,8 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Freetalk that does not require the user
-	 * to be logged in.
+	 * Creates a new template page for Sone that does not require the user to be
+	 * logged in.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -85,7 +86,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Freetalk.
+	 * Creates a new template page for Sone.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -101,7 +102,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	}
 
 	/**
-	 * Creates a new template page for Freetalk.
+	 * Creates a new template page for Sone.
 	 *
 	 * @param path
 	 *            The path of the page
@@ -119,7 +120,6 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		this.pageTitleKey = pageTitleKey;
 		this.webInterface = webInterface;
 		this.requireLogin = requireLogin;
-		template.getInitialContext().set("webInterface", webInterface);
 	}
 
 	//
@@ -202,7 +202,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getPageTitle(Request request) {
+	protected String getPageTitle(FreenetRequest request) {
 		if (pageTitleKey != null) {
 			return webInterface.getL10n().getString(pageTitleKey);
 		}
@@ -213,7 +213,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected List<Map<String, String>> getAdditionalLinkNodes(Request request) {
+	protected List<Map<String, String>> getAdditionalLinkNodes(FreenetRequest request) {
 		return new ListBuilder<Map<String, String>>().add(new MapBuilder<String, String>().put("rel", "search").put("type", "application/opensearchdescription+xml").put("title", "Sone").put("href", "http://" + request.getHttpRequest().getHeader("host") + "/Sone/OpenSearch.xml").get()).get();
 	}
 
@@ -247,9 +247,11 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		templateContext.set("currentSone", getCurrentSone(request.getToadletContext(), false));
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		templateContext.set("core", webInterface.getCore());
+		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
 		templateContext.set("request", request);
 		templateContext.set("currentVersion", SonePlugin.VERSION);
@@ -257,13 +259,14 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
 		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
+		templateContext.set("notifications", ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone));
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectTarget(Page.Request request) {
+	protected String getRedirectTarget(FreenetRequest request) {
 		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
 			HTTPRequest httpRequest = request.getHttpRequest();
 			String originalUrl = httpRequest.getPath();
@@ -293,7 +296,18 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
+	protected boolean isFullAccessOnly() {
+		return webInterface.getCore().getPreferences().isRequireFullAccess();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
+			return false;
+		}
 		if (requiresLogin()) {
 			return getCurrentSone(toadletContext, false) != null;
 		}

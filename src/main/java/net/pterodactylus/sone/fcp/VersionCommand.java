@@ -1,5 +1,5 @@
 /*
- * Sone - RedirectPage.java - Copyright © 2011 David Roden
+ * Sone - VersionCommand.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,48 +15,37 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.web.page;
+package net.pterodactylus.sone.fcp;
+
+import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
+import net.pterodactylus.sone.main.SonePlugin;
+import freenet.support.SimpleFieldSet;
+import freenet.support.api.Bucket;
 
 /**
- * Page implementation that redirects the user to another URL.
+ * Returns version information about the Sone plugin.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class RedirectPage implements Page {
-
-	/** The original path. */
-	private String originalPath;
-
-	/** The path to redirect the browser to. */
-	private String newPath;
+public class VersionCommand extends AbstractSoneCommand {
 
 	/**
-	 * Creates a new redirect page.
+	 * Creates a new “Version” FCP command.
 	 *
-	 * @param originalPath
-	 *            The original path
-	 * @param newPath
-	 *            The path to redirect the browser to
+	 * @param core
+	 *            The Sone core
 	 */
-	public RedirectPage(String originalPath, String newPath) {
-		this.originalPath = originalPath;
-		this.newPath = newPath;
+	protected VersionCommand(Core core) {
+		super(core);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String getPath() {
-		return originalPath;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Response handleRequest(Request request) {
-		return new RedirectResponse(newPath);
+	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
+		return new Response("Version", new SimpleFieldSetBuilder().put("Version", SonePlugin.VERSION.toString()).put("ProtocolVersion", 1).get());
 	}
 
 }

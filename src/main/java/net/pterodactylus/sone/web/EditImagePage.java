@@ -18,9 +18,10 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * Page that lets the user edit title and description of an {@link Image}.
@@ -49,7 +50,7 @@ public class EditImagePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String imageId = request.getHttpRequest().getPartAsStringFailsafe("image", 36);
@@ -67,7 +68,7 @@ public class EditImagePage extends SoneTemplatePage {
 			}
 			image.setTitle(title);
 			image.setDescription(description);
-			webInterface.getCore().saveSone(image.getSone());
+			webInterface.getCore().touchConfiguration();
 			throw new RedirectException("imageBrowser.html?image=" + image.getId());
 		}
 	}

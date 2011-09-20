@@ -1,18 +1,18 @@
+<form class="mark-as-read" action="markAsKnown.html" method="post">
+	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+	<input type="hidden" name="returnPage" value="<% request.uri|html>" />
+	<input type="hidden" name="type" value="sone" />
+	<input type="hidden" name="id" value="<%foreach sones sone><% sone.id|html><%notlast> <%/notlast><%/foreach>" />
+	<button type="submit" name="mark-read" value="true"><%= Notification.NewPost.Button.MarkRead|l10n|html></button>
+</form>
 <div class="short-text hidden">
 	<%= Notification.NewSone.ShortText|l10n|html>
 	<a class="link" onclick="showNotificationDetails('<%notification.id|html>'); return false;"><%= Notification.ClickHereToRead|l10n|html></a>
 </div>
 <div class="text">
-	<form class="mark-as-read" action="markAsKnown.html" method="post">
-		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-		<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-		<input type="hidden" name="type" value="sone" />
-		<input type="hidden" name="id" value="<%foreach sones sone><% sone.id|html><%notlast> <%/notlast><%/foreach>" />
-		<button type="submit" name="mark-read" value="true"><%= Notification.NewPost.Button.MarkRead|l10n|html></button>
-	</form>
 	<%= Notification.NewSone.Text|l10n|html>
 	<%foreach sones sone>
-		<div class="hidden sone-id"><% sone.id|html></div>
+		<div class="hidden new-sone-id"><% sone.id|html></div>
 		<a href="viewSone.html?sone=<% sone.id|html>" title="<% sone.requestUri|html>"><% sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
 	<%/foreach>
 </div>

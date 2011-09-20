@@ -1,5 +1,5 @@
 /*
- * FreenetSone - Sone.java - Copyright © 2010 David Roden
+ * Sone - Sone.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,10 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
@@ -59,6 +61,29 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	};
 
+	/**
+	 * Comparator that sorts Sones by last activity (least recent active first).
+	 */
+	public static final Comparator<Sone> LAST_ACTIVITY_COMPARATOR = new Comparator<Sone>() {
+
+		@Override
+		public int compare(Sone firstSone, Sone secondSone) {
+			return (int) Math.min(Integer.MAX_VALUE, Math.max(Integer.MIN_VALUE, secondSone.getTime() - firstSone.getTime()));
+		}
+	};
+
+	/** Comparator that sorts Sones by numbers of posts (descending). */
+	public static final Comparator<Sone> POST_COUNT_COMPARATOR = new Comparator<Sone>() {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(Sone leftSone, Sone rightSone) {
+			return (leftSone.getPosts().size() != rightSone.getPosts().size()) ? (rightSone.getPosts().size() - leftSone.getPosts().size()) : (rightSone.getReplies().size() - leftSone.getReplies().size());
+		}
+	};
+
 	/** Filter to remove Sones that have not been downloaded. */
 	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
 
@@ -66,6 +91,16 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		public boolean filterObject(Sone sone) {
 			return sone.getTime() != 0;
 		}
+	};
+
+	/** Filter that matches all {@link Core#isLocalSone(Sone) local Sones}. */
+	public static final Filter<Sone> LOCAL_SONE_FILTER = new Filter<Sone>() {
+
+		@Override
+		public boolean filterObject(Sone sone) {
+			return sone.getIdentity() instanceof OwnIdentity;
+		}
+
 	};
 
 	/** The logger. */
@@ -672,6 +707,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(")");
 
+		@SuppressWarnings("hiding")
 		List<Reply> replies = new ArrayList<Reply>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		fingerprint.append("Replies(");
@@ -680,6 +716,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(')');
 
+		@SuppressWarnings("hiding")
 		List<String> likedPostIds = new ArrayList<String>(getLikedPostIds());
 		Collections.sort(likedPostIds);
 		fingerprint.append("LikedPosts(");
@@ -688,6 +725,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(')');
 
+		@SuppressWarnings("hiding")
 		List<String> likedReplyIds = new ArrayList<String>(getLikedReplyIds());
 		Collections.sort(likedReplyIds);
 		fingerprint.append("LikedReplies(");

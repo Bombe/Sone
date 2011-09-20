@@ -1,5 +1,5 @@
 /*
- * FreenetSone - SoneInserter.java - Copyright © 2010 David Roden
+ * Sone - SoneInserter.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,8 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.util.collection.ListBuilder;
+import net.pterodactylus.util.collection.ReverseComparator;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -81,6 +83,9 @@ public class SoneInserter extends AbstractService {
 	/** The Sone to insert. */
 	private final Sone sone;
 
+	/** The insert listener manager. */
+	private SoneInsertListenerManager soneInsertListenerManager;
+
 	/** Whether a modification has been detected. */
 	private volatile boolean modified = false;
 
@@ -102,6 +107,31 @@ public class SoneInserter extends AbstractService {
 		this.core = core;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
+		this.soneInsertListenerManager = new SoneInsertListenerManager(sone);
+	}
+
+	//
+	// LISTENER MANAGEMENT
+	//
+
+	/**
+	 * Adds a listener for Sone insert events.
+	 *
+	 * @param soneInsertListener
+	 *            The Sone insert listener
+	 */
+	public void addSoneInsertListener(SoneInsertListener soneInsertListener) {
+		soneInsertListenerManager.addListener(soneInsertListener);
+	}
+
+	/**
+	 * Removes a listener for Sone insert events.
+	 *
+	 * @param soneInsertListener
+	 *            The Sone insert listener
+	 */
+	public void removeSoneInsertListener(SoneInsertListener soneInsertListener) {
+		soneInsertListenerManager.removeListener(soneInsertListener);
 	}
 
 	//
@@ -204,7 +234,9 @@ public class SoneInserter extends AbstractService {
 					core.setSoneStatus(sone, SoneStatus.inserting);
 					long insertTime = System.currentTimeMillis();
 					insertInformation.setTime(insertTime);
+					soneInsertListenerManager.fireInsertStarted();
 					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+					soneInsertListenerManager.fireInsertFinished(System.currentTimeMillis() - insertTime);
 					/* at this point we might already be stopped. */
 					if (shouldStop()) {
 						/* if so, bail out, don’t change anything. */
@@ -212,10 +244,11 @@ public class SoneInserter extends AbstractService {
 					}
 					sone.setTime(insertTime);
 					sone.setLatestEdition(finalUri.getEdition());
-					core.saveSone(sone);
+					core.touchConfiguration();
 					success = true;
 					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
 				} catch (SoneException se1) {
+					soneInsertListenerManager.fireInsertAborted(se1);
 					logger.log(Level.WARNING, "Could not insert Sone “" + sone.getName() + "”!", se1);
 				} finally {
 					core.setSoneStatus(sone, SoneStatus.idle);
@@ -229,7 +262,6 @@ public class SoneInserter extends AbstractService {
 					synchronized (sone) {
 						if (lastInsertFingerprint.equals(sone.getFingerprint())) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
-							core.saveSone(sone);
 							lastModificationTime = 0;
 							modified = false;
 						}
@@ -248,7 +280,7 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class InsertInformation {
+	private class InsertInformation {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
@@ -266,8 +298,8 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
-			soneProperties.put("posts", new ArrayList<Post>(sone.getPosts()));
-			soneProperties.put("replies", new HashSet<Reply>(sone.getReplies()));
+			soneProperties.put("posts", new ListBuilder<Post>(new ArrayList<Post>(sone.getPosts())).sort(Post.TIME_COMPARATOR).get());
+			soneProperties.put("replies", new ListBuilder<Reply>(new ArrayList<Reply>(sone.getReplies())).sort(new ReverseComparator<Reply>(Reply.TIME_COMPARATOR)).get());
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", Sone.flattenAlbums(sone.getAlbums()));
@@ -347,7 +379,9 @@ public class SoneInserter extends AbstractService {
 			}
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
+			templateContext.set("core", core);
 			templateContext.set("currentSone", soneProperties);
+			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
 			StringBucket bucket = null;

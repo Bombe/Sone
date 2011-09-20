@@ -1,5 +1,5 @@
 /*
- * FreenetSone - IndexPage.java - Copyright © 2010 David Roden
+ * Sone - IndexPage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,10 @@ import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -55,9 +58,9 @@ public class IndexPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		Sone currentSone = getCurrentSone(request.getToadletContext());
+		final Sone currentSone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(currentSone.getPosts());
 		for (String friendSoneId : currentSone.getFriends()) {
@@ -73,6 +76,13 @@ public class IndexPage extends SoneTemplatePage {
 				}
 			}
 		}
+		allPosts = Filters.filteredList(allPosts, new Filter<Post>() {
+
+			@Override
+			public boolean filterObject(Post post) {
+				return ListNotificationFilters.isPostVisible(currentSone, post);
+			}
+		});
 		allPosts = Filters.filteredList(allPosts, Post.FUTURE_POSTS_FILTER);
 		Collections.sort(allPosts, Post.TIME_COMPARATOR);
 		Pagination<Post> pagination = new Pagination<Post>(allPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));

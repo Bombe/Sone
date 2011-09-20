@@ -178,23 +178,21 @@ public class IdentityManager extends AbstractService {
 		Map<OwnIdentity, Map<String, Identity>> oldIdentities = Collections.emptyMap();
 		while (!shouldStop()) {
 			Map<OwnIdentity, Map<String, Identity>> currentIdentities = new HashMap<OwnIdentity, Map<String, Identity>>();
+			@SuppressWarnings("hiding")
 			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
+			Set<OwnIdentity> ownIdentities = null;
+			boolean identitiesLoaded = false;
 			try {
 				/* get all identities with the wanted context from WoT. */
-				Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
+				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
 
-				/* check for changes. */
-				for (OwnIdentity ownIdentity : ownIdentities) {
-					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
-				}
-				checkOwnIdentities(currentOwnIdentities);
-
-				/* now filter for context and get all identities. */
+				/* load trusted identities. */
 				for (OwnIdentity ownIdentity : ownIdentities) {
 					if ((context != null) && !ownIdentity.hasContext(context)) {
 						continue;
 					}
+					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
 
 					Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context);
 					Map<String, Identity> identities = new HashMap<String, Identity>();
@@ -202,6 +200,19 @@ public class IdentityManager extends AbstractService {
 					for (Identity identity : trustedIdentities) {
 						identities.put(identity.getId(), identity);
 					}
+				}
+				identitiesLoaded = true;
+			} catch (WebOfTrustException wote1) {
+				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
+			}
+
+			if (identitiesLoaded) {
+
+				/* check for changes. */
+				checkOwnIdentities(currentOwnIdentities);
+
+				/* now check for changes in remote identities. */
+				for (OwnIdentity ownIdentity : currentOwnIdentities.values()) {
 
 					/* find new identities. */
 					for (Identity currentIdentity : currentIdentities.get(ownIdentity).values()) {
@@ -258,13 +269,10 @@ public class IdentityManager extends AbstractService {
 							}
 						}
 					}
-
-					/* remember the current set of identities. */
-					oldIdentities = currentIdentities;
 				}
 
-			} catch (WebOfTrustException wote1) {
-				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
+				/* remember the current set of identities. */
+				oldIdentities = currentIdentities;
 			}
 
 			/* wait a minute before checking again. */

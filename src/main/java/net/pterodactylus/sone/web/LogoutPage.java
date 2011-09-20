@@ -1,5 +1,5 @@
 /*
- * FreenetSone - LogoutPage.java - Copyright © 2010 David Roden
+ * Sone - LogoutPage.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.ToadletContext;
@@ -46,7 +47,7 @@ public class LogoutPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		setCurrentSone(request.getToadletContext(), null);
 		super.processTemplate(request, templateContext);
 		throw new RedirectException("index.html");
@@ -57,6 +58,9 @@ public class LogoutPage extends SoneTemplatePage {
 	 */
 	@Override
 	public boolean isEnabled(ToadletContext toadletContext) {
+		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
+			return false;
+		}
 		return (getCurrentSone(toadletContext, false) != null) && (webInterface.getCore().getLocalSones().size() != 1);
 	}
 

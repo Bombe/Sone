@@ -1,7 +1,0 @@
-<div class="text">
-	<%= Notification.SoneRescued.Text|l10n|html>
-	<%foreach sones sone>
-		<a href="viewSone.html?sone=<% sone.id|html>" title="<% sone.requestUri|html>"><% sone.niceName|html></a><%notlast>,<%/notlast><%last>.<%/last>
-	<%/foreach>
-	<%= Notification.SoneRescued.Text.RememberToUnlock|l10n|html>
-</div>

@@ -1,5 +1,5 @@
 /*
- * FreenetSone - WebInterface.java - Copyright © 2010 David Roden
+ * Sone - WebInterface.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -53,7 +54,6 @@ import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
-import net.pterodactylus.sone.template.NotificationManagerAccessor;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ReplyAccessor;
@@ -62,7 +62,11 @@ import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
+import net.pterodactylus.sone.template.UniqueElementFilter;
 import net.pterodactylus.sone.template.UnknownDateFilter;
+import net.pterodactylus.sone.text.Part;
+import net.pterodactylus.sone.text.SonePart;
+import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
@@ -74,6 +78,7 @@ import net.pterodactylus.sone.web.ajax.DistrustAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetNotificationAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
@@ -89,22 +94,23 @@ import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
-import net.pterodactylus.sone.web.page.RedirectPage;
-import net.pterodactylus.sone.web.page.StaticPage;
-import net.pterodactylus.sone.web.page.TemplatePage;
 import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
 import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
+import net.pterodactylus.util.collection.SetBuilder;
+import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.CollectionSortFilter;
+import net.pterodactylus.util.template.ContainsFilter;
 import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
@@ -121,10 +127,13 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.version.Version;
+import net.pterodactylus.util.web.RedirectPage;
+import net.pterodactylus.util.web.StaticPage;
+import net.pterodactylus.util.web.TemplatePage;
 import freenet.clients.http.SessionManager;
-import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
+import freenet.clients.http.SessionManager.Session;
 import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
@@ -154,6 +163,9 @@ public class WebInterface implements CoreListener {
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
 
+	/** The Sone text parser. */
+	private final SoneTextParser soneTextParser;
+
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
 
@@ -163,11 +175,17 @@ public class WebInterface implements CoreListener {
 	/** The “new reply” notification. */
 	private final ListNotification<Reply> newReplyNotification;
 
-	/** The “rescuing Sone” notification. */
-	private final ListNotification<Sone> rescuingSonesNotification;
+	/** The invisible “local post” notification. */
+	private final ListNotification<Post> localPostNotification;
 
-	/** The “Sone rescued” notification. */
-	private final ListNotification<Sone> sonesRescuedNotification;
+	/** The invisible “local reply” notification. */
+	private final ListNotification<Reply> localReplyNotification;
+
+	/** The “you have been mentioned” notification. */
+	private final ListNotification<Post> mentionNotification;
+
+	/** Notifications for sone inserts. */
+	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
 
 	/** Sone locked notification ticker objects. */
 	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
@@ -197,6 +215,7 @@ public class WebInterface implements CoreListener {
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
+		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
@@ -206,7 +225,6 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
-		templateContextFactory.addAccessor(NotificationManager.class, new NotificationManagerAccessor());
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
 		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
 		templateContextFactory.addFilter("date", new DateFilter());
@@ -220,14 +238,17 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory));
+		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory, soneTextParser));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
 		templateContextFactory.addFilter("image-link", new ImageLinkFilter(templateContextFactory));
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
+		templateContextFactory.addFilter("in", new ContainsFilter());
+		templateContextFactory.addFilter("unique", new UniqueElementFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
+		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
@@ -237,14 +258,17 @@ public class WebInterface implements CoreListener {
 		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
+		Template localPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
+		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", localPostNotificationTemplate, false);
+
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
-		newReplyNotification = new ListNotification<Reply>("new-replies-notification", "replies", newReplyNotificationTemplate, false);
+		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
 
-		Template rescuingSonesTemplate = TemplateParser.parse(createReader("/templates/notify/rescuingSonesNotification.html"));
-		rescuingSonesNotification = new ListNotification<Sone>("sones-being-rescued-notification", "sones", rescuingSonesTemplate);
+		Template localReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
+		localReplyNotification = new ListNotification<Reply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 
-		Template sonesRescuedTemplate = TemplateParser.parse(createReader("/templates/notify/sonesRescuedNotification.html"));
-		sonesRescuedNotification = new ListNotification<Sone>("sones-rescued-notification", "sones", sonesRescuedTemplate);
+		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
+		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
 
 		Template lockedSonesTemplate = TemplateParser.parse(createReader("/templates/notify/lockedSonesNotification.html"));
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
@@ -427,7 +451,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new posts
 	 */
 	public Set<Post> getNewPosts() {
-		return new HashSet<Post>(newPostNotification.getElements());
+		return new SetBuilder<Post>().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).get();
 	}
 
 	/**
@@ -437,7 +461,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new replies
 	 */
 	public Set<Reply> getNewReplies() {
-		return new HashSet<Reply>(newReplyNotification.getElements());
+		return new SetBuilder<Reply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
 	}
 
 	/**
@@ -566,6 +590,7 @@ public class WebInterface implements CoreListener {
 		Template deleteImageTemplate = TemplateParser.parse(createReader("/templates/deleteImage.html"));
 		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
+		Template rescueTemplate = TemplateParser.parse(createReader("/templates/rescue.html"));
 		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
 		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
 		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
@@ -573,7 +598,7 @@ public class WebInterface implements CoreListener {
 		Template openSearchTemplate = TemplateParser.parse(createReader("/templates/xml/OpenSearch.xml"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage("", "index.html")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
@@ -611,17 +636,19 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("css/", "/static/css/", "text/css")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("javascript/", "/static/javascript/", "text/javascript")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("images/", "/static/images/", "image/png")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
@@ -682,33 +709,58 @@ public class WebInterface implements CoreListener {
 		try {
 			return new InputStreamReader(getClass().getResourceAsStream(resourceName), "UTF-8");
 		} catch (UnsupportedEncodingException uee1) {
-			System.out.println("  fail.");
 			return null;
+		}
+	}
+
+	/**
+	 * Returns all {@link Core#isLocalSone(Sone) local Sone}s that are
+	 * referenced by {@link SonePart}s in the given text (after parsing it using
+	 * {@link SoneTextParser}).
+	 *
+	 * @param text
+	 *            The text to parse
+	 * @return All mentioned local Sones
+	 */
+	private Set<Sone> getMentionedSones(String text) {
+		/* we need no context to find mentioned Sones. */
+		Set<Sone> mentionedSones = new HashSet<Sone>();
+		try {
+			for (Part part : soneTextParser.parse(null, new StringReader(text))) {
+				if (part instanceof SonePart) {
+					mentionedSones.add(((SonePart) part).getSone());
+				}
+			}
+		} catch (IOException ioe1) {
+			logger.log(Level.WARNING, "Could not parse post text: " + text, ioe1);
+		}
+		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
+	}
+
+	/**
+	 * Returns the Sone insert notification for the given Sone. If no
+	 * notification for the given Sone exists, a new notification is created and
+	 * cached.
+	 *
+	 * @param sone
+	 *            The Sone to get the insert notification for
+	 * @return The Sone insert notification
+	 */
+	private TemplateNotification getSoneInsertNotification(Sone sone) {
+		synchronized (soneInsertNotifications) {
+			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
+			if (templateNotification == null) {
+				templateNotification = new TemplateNotification(TemplateParser.parse(createReader("/templates/notify/soneInsertNotification.html")));
+				templateNotification.set("insertSone", sone);
+				soneInsertNotifications.put(sone, templateNotification);
+			}
+			return templateNotification;
 		}
 	}
 
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rescuingSone(Sone sone) {
-		rescuingSonesNotification.add(sone);
-		notificationManager.addNotification(rescuingSonesNotification);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void rescuedSone(Sone sone) {
-		rescuingSonesNotification.remove(sone);
-		sonesRescuedNotification.add(sone);
-		notificationManager.addNotification(sonesRescuedNotification);
-	}
 
 	/**
 	 * {@inheritDoc}
@@ -726,9 +778,18 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newPostFound(Post post) {
-		newPostNotification.add(post);
+		boolean isLocal = getCore().isLocalSone(post.getSone());
+		if (isLocal) {
+			localPostNotification.add(post);
+		} else {
+			newPostNotification.add(post);
+		}
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newPostNotification);
+			notificationManager.addNotification(isLocal ? localPostNotification : newPostNotification);
+			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
+				mentionNotification.add(post);
+				notificationManager.addNotification(mentionNotification);
+			}
 		} else {
 			getCore().markPostKnown(post);
 		}
@@ -739,12 +800,18 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newReplyFound(Reply reply) {
-		if (reply.getPost().getSone() == null) {
-			return;
+		boolean isLocal = getCore().isLocalSone(reply.getSone());
+		if (isLocal) {
+			localReplyNotification.add(reply);
+		} else {
+			newReplyNotification.add(reply);
 		}
-		newReplyNotification.add(reply);
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newReplyNotification);
+			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && (reply.getPost().getSone() != null)) {
+				mentionNotification.add(reply.getPost());
+				notificationManager.addNotification(mentionNotification);
+			}
 		} else {
 			getCore().markReplyKnown(reply);
 		}
@@ -764,6 +831,8 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markPostKnown(Post post) {
 		newPostNotification.remove(post);
+		localPostNotification.remove(post);
+		mentionNotification.remove(post);
 	}
 
 	/**
@@ -772,6 +841,16 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void markReplyKnown(Reply reply) {
 		newReplyNotification.remove(reply);
+		localReplyNotification.remove(reply);
+		mentionNotification.remove(reply.getPost());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneRemoved(Sone sone) {
+		newSoneNotification.remove(sone);
 	}
 
 	/**
@@ -780,6 +859,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void postRemoved(Post post) {
 		newPostNotification.remove(post);
+		localPostNotification.remove(post);
 	}
 
 	/**
@@ -788,6 +868,7 @@ public class WebInterface implements CoreListener {
 	@Override
 	public void replyRemoved(Reply reply) {
 		newReplyNotification.remove(reply);
+		localReplyNotification.remove(reply);
 	}
 
 	/**
@@ -815,6 +896,44 @@ public class WebInterface implements CoreListener {
 	public void soneUnlocked(Sone sone) {
 		lockedSonesNotification.remove(sone);
 		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInserting(Sone sone) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "inserting");
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInserted(Sone sone, long insertDuration) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "inserted");
+		soneInsertNotification.set("insertDuration", insertDuration / 1000);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void soneInsertAborted(Sone sone, Throwable cause) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+		soneInsertNotification.set("soneStatus", "insert-aborted");
+		soneInsertNotification.set("insert-error", cause);
+		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+			notificationManager.addNotification(soneInsertNotification);
+		}
 	}
 
 	/**

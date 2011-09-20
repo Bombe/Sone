@@ -1,5 +1,5 @@
 /*
- * shortener - PageToadlet.java - Copyright © 2010 David Roden
+ * Sone - PageToadlet.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,9 +19,11 @@ package net.pterodactylus.sone.web.page;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.Map.Entry;
 
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.util.web.Header;
+import net.pterodactylus.util.web.Method;
+import net.pterodactylus.util.web.Page;
+import net.pterodactylus.util.web.Response;
 import freenet.client.HighLevelSimpleClient;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.Toadlet;
@@ -30,7 +32,6 @@ import freenet.clients.http.ToadletContextClosedException;
 import freenet.support.MultiValueTable;
 import freenet.support.api.Bucket;
 import freenet.support.api.HTTPRequest;
-import freenet.support.io.BucketTools;
 import freenet.support.io.Closer;
 
 /**
@@ -44,7 +45,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	private final String menuName;
 
 	/** The page that handles processing. */
-	private final Page page;
+	private final Page<FreenetRequest> page;
 
 	/** The path prefix for the page. */
 	private final String pathPrefix;
@@ -62,7 +63,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 *            Prefix that is prepended to all {@link Page#getPath()} return
 	 *            values
 	 */
-	protected PageToadlet(HighLevelSimpleClient highLevelSimpleClient, String menuName, Page page, String pathPrefix) {
+	protected PageToadlet(HighLevelSimpleClient highLevelSimpleClient, String menuName, Page<FreenetRequest> page, String pathPrefix) {
 		super(highLevelSimpleClient);
 		this.menuName = menuName;
 		this.page = page;
@@ -101,7 +102,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodGET(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new Page.Request(uri, Method.GET, httpRequest, toadletContext));
+		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext));
 	}
 
 	/**
@@ -119,7 +120,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodPOST(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new Page.Request(uri, Method.POST, httpRequest, toadletContext));
+		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext));
 	}
 
 	/**
@@ -140,32 +141,25 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 	 * @throws ToadletContextClosedException
 	 *             if the toadlet context is closed
 	 */
-	private void handleRequest(Page.Request pageRequest) throws IOException, ToadletContextClosedException {
-		Bucket data = null;
+	private void handleRequest(FreenetRequest pageRequest) throws IOException, ToadletContextClosedException {
+		Bucket pageBucket = null;
 		try {
-			Page.Response pageResponse = page.handleRequest(pageRequest);
+			pageBucket = pageRequest.getToadletContext().getBucketFactory().makeBucket(-1);
+			Response pageResponse = new Response(pageBucket.getOutputStream());
+			pageResponse = page.handleRequest(pageRequest, pageResponse);
 			MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
 			if (pageResponse.getHeaders() != null) {
-				for (Entry<String, String> headerEntry : pageResponse.getHeaders().entrySet()) {
-					headers.put(headerEntry.getKey(), headerEntry.getValue());
+				for (Header header : pageResponse.getHeaders()) {
+					for (String value : header) {
+						headers.put(header.getName(), value);
+					}
 				}
 			}
-			data = pageRequest.getToadletContext().getBucketFactory().makeBucket(-1);
-			if (pageResponse.getContent() != null) {
-				try {
-					BucketTools.copyFrom(data, pageResponse.getContent(), -1);
-				} finally {
-					Closer.close(pageResponse.getContent());
-				}
-			} else {
-				/* get an OutputStream and close it immediately. */
-				Closer.close(data.getOutputStream());
-			}
-			writeReply(pageRequest.getToadletContext(), pageResponse.getStatusCode(), pageResponse.getContentType(), pageResponse.getStatusText(), headers, data);
+			writeReply(pageRequest.getToadletContext(), pageResponse.getStatusCode(), pageResponse.getContentType(), pageResponse.getStatusText(), headers, pageBucket);
 		} catch (Throwable t1) {
 			writeInternalError(t1, pageRequest.getToadletContext());
 		} finally {
-			Closer.close(data);
+			Closer.close(pageBucket);
 		}
 	}
 

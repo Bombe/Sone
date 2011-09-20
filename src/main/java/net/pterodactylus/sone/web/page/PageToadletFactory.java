@@ -1,5 +1,5 @@
 /*
- * shortener - PageToadletFactory.java - Copyright © 2010 David Roden
+ * Sone - PageToadletFactory.java - Copyright © 2010 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,13 @@
 
 package net.pterodactylus.sone.web.page;
 
+import net.pterodactylus.util.web.Page;
 import freenet.client.HighLevelSimpleClient;
 
 /**
  * Factory that creates {@link PageToadlet}s using a given
  * {@link HighLevelSimpleClient}.
- * 
+ *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PageToadletFactory {
@@ -35,7 +36,7 @@ public class PageToadletFactory {
 
 	/**
 	 * Creates a new {@link PageToadlet} factory.
-	 * 
+	 *
 	 * @param highLevelSimpleClient
 	 *            The client to use when creating the toadlets
 	 * @param pathPrefix
@@ -49,26 +50,26 @@ public class PageToadletFactory {
 	/**
 	 * Creates a {@link PageToadlet} that wraps the given page and does not
 	 * appear in the node’s menu.
-	 * 
+	 *
 	 * @param page
 	 *            The page to wrap
 	 * @return The toadlet wrapped around the page
 	 */
-	public PageToadlet createPageToadlet(Page page) {
+	public PageToadlet createPageToadlet(Page<FreenetRequest> page) {
 		return createPageToadlet(page, null);
 	}
 
 	/**
 	 * Creates a {@link PageToadlet} that wraps the given page and appears in
 	 * the node’s menu under the given name.
-	 * 
+	 *
 	 * @param page
 	 *            The page to wrap
 	 * @param menuName
 	 *            The name of the menu item
 	 * @return The toadlet wrapped around the page
 	 */
-	public PageToadlet createPageToadlet(Page page, String menuName) {
+	public PageToadlet createPageToadlet(Page<FreenetRequest> page, String menuName) {
 		return new PageToadlet(highLevelSimpleClient, menuName, page, pathPrefix);
 	}
 
