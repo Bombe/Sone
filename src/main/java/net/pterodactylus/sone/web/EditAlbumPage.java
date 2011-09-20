@@ -24,17 +24,19 @@ import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
 
 /**
- * TODO
+ * Page that lets the user edit the name and description of an album.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class EditAlbumPage extends SoneTemplatePage {
 
 	/**
-	 * TODO
+	 * Creates a new “edit album” page.
 	 *
 	 * @param template
+	 *            The template to render
 	 * @param webInterface
+	 *            The Sone web interface
 	 */
 	public EditAlbumPage(Template template, WebInterface webInterface) {
 		super("editAlbum.html", template, "Page.EditAlbum.Title", webInterface, true);
