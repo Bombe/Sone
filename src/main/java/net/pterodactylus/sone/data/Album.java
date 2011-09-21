@@ -18,7 +18,9 @@
 package net.pterodactylus.sone.data;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import net.pterodactylus.util.validation.Validation;
@@ -40,7 +42,7 @@ public class Album implements Fingerprintable {
 	private final List<Album> albums = new ArrayList<Album>();
 
 	/** The images in this album. */
-	private final List<Image> images = new ArrayList<Image>();
+	private final Map<String, Image> images = new LinkedHashMap<String, Image>();
 
 	/** The parent album. */
 	private Album parent;
@@ -149,7 +151,7 @@ public class Album implements Fingerprintable {
 	 * @return The images in this album
 	 */
 	public List<Image> getImages() {
-		return new ArrayList<Image>(images);
+		return new ArrayList<Image>(images.values());
 	}
 
 	/**
@@ -164,8 +166,8 @@ public class Album implements Fingerprintable {
 			image.getAlbum().removeImage(image);
 		}
 		image.setAlbum(this);
-		if (!images.contains(image)) {
-			images.add(image);
+		if (!images.containsKey(image.getId())) {
+			images.put(image.getId(), image);
 		}
 	}
 
@@ -303,7 +305,7 @@ public class Album implements Fingerprintable {
 
 		/* add images. */
 		fingerprint.append("Images(");
-		for (Image image : images) {
+		for (Image image : images.values()) {
 			if (image.isInserted()) {
 				fingerprint.append(image.getFingerprint());
 			}
