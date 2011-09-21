@@ -97,6 +97,10 @@ textarea {
 	border: none;
 }
 
+#sone .small-link {
+	font-size: 85%;
+}
+
 #sone .parsed {
 	white-space: pre-wrap;
 }

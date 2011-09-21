@@ -50,6 +50,20 @@
 							});
 						});
 						$("#edit-album label").hide();
+
+						/* hide all those forms. */
+						hideBlock = function(blockElement, clickElement) {
+							$(blockElement).hide();
+							$(clickElement).removeClass("hidden").click(function() {
+								$(blockElement).slideDown();
+								$(this).slideUp();
+								return false;
+							});
+						};
+
+						hideBlock(".edit-album", ".show-edit-album");
+						hideBlock(".create-album", ".show-create-album");
+						hideBlock(".upload-image", ".show-upload-image");
 					});
 				</script>
 			<%/if>
@@ -70,22 +84,25 @@
 			<p id="description"><% album.description|html></p>
 
 			<%if album.sone.local>
-				<h2><%= Page.ImageBrowser.Album.Edit.Title|l10n|html></h2>
+				<p><a class="show-edit-album hidden small-link">» <%= Page.ImageBrowser.Album.Edit.Title|l10n|html></a></p>
+				<div class="edit-album">
+					<h2><%= Page.ImageBrowser.Album.Edit.Title|l10n|html></h2>
 
-				<form id="edit-album" action="editAlbum.html" method="post">
-					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
-					<input type="hidden" name="album" value="<%album.id|html>" />
+					<form id="edit-album" action="editAlbum.html" method="post">
+						<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+						<input type="hidden" name="album" value="<%album.id|html>" />
 
-					<div>
-						<label for="title"><%= Page.ImageBrowser.Album.Label.Title|l10n|html></label>
-						<input type="text" name="title" value="<%album.title|html>" />
-					</div>
-					<div>
-						<label for="description"><%= Page.ImageBrowser.Album.Label.Description|l10n|html></label>
-						<textarea name="description"><%album.description|html></textarea>
-					</div>
-					<button type="submit"><%= Page.ImageBrowser.Album.Button.Save|l10n|html></button>
-				</form>
+						<div>
+							<label for="title"><%= Page.ImageBrowser.Album.Label.Title|l10n|html></label>
+							<input type="text" name="title" value="<%album.title|html>" />
+						</div>
+						<div>
+							<label for="description"><%= Page.ImageBrowser.Album.Label.Description|l10n|html></label>
+							<textarea name="description"><%album.description|html></textarea>
+						</div>
+						<button type="submit"><%= Page.ImageBrowser.Album.Button.Save|l10n|html></button>
+					</form>
+				</div>
 			<%/if>
 
 			<%foreach album.albums album>
@@ -109,7 +126,10 @@
 			<%/foreach>
 
 			<%if album.sone.local>
-				<%include include/createAlbum.html>
+				<p><a class="show-create-album hidden small-link">» <%= View.CreateAlbum.Title|l10n|html></a></p>
+				<div class="create-album">
+					<%include include/createAlbum.html>
+				</div>
 			<%/if>
 
 			<%foreach album.images image>
@@ -125,7 +145,10 @@
 			<%/foreach>
 
 			<%if album.sone.local>
-				<%include include/uploadImage.html>
+				<p><a class="show-upload-image hidden small-link">» <%= View.UploadImage.Title|l10n|html></a></p>
+				<div class="upload-image">
+					<%include include/uploadImage.html>
+				</div>
 
 				<%if album.empty>
 					<form id="delete-album" action="deleteAlbum.html" method="get">
@@ -171,6 +194,19 @@
 							});
 						});
 						$("#edit-image label").hide();
+
+						/* hide all those forms. */
+						hideBlock = function(blockElement, clickElement) {
+							$(blockElement).hide();
+							$(clickElement).removeClass("hidden").click(function() {
+								$(blockElement).slideDown();
+								$(this).slideUp();
+								return false;
+							});
+						};
+
+						hideBlock(".edit-image", ".show-edit-image");
+						hideBlock(".delete-image", ".show-delete-image");
 					});
 				</script>
 			<%/if>
@@ -187,31 +223,37 @@
 
 			<%if image.sone.local>
 
-				<h2><%= Page.ImageBrowser.Image.Edit.Title|l10n|html></h2>
+				<p><a class="show-edit-image hidden small-link">» <%= Page.ImageBrowser.Image.Edit.Title|l10n|html></a></p>
+				<div class="edit-image">
+					<h2><%= Page.ImageBrowser.Image.Edit.Title|l10n|html></h2>
 
-				<form id="edit-image" action="editImage.html" method="post">
-					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
-					<input type="hidden" name="image" value="<%image.id|html>" />
+					<form id="edit-image" action="editImage.html" method="post">
+						<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+						<input type="hidden" name="image" value="<%image.id|html>" />
 
-					<div>
-						<label for="title"><%= Page.ImageBrowser.Image.Title.Label|l10n|html></label>
-						<input type="text" name="title" value="<%image.title|html>" />
-					</div>
-					<div>
-						<label for="description"><%= Page.ImageBrowser.Image.Description.Label|l10n|html></label>
-						<textarea name="description"><%image.description|html></textarea>
-					</div>
-					<div>
-						<button type="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
-					</div>
-				</form>
+						<div>
+							<label for="title"><%= Page.ImageBrowser.Image.Title.Label|l10n|html></label>
+							<input type="text" name="title" value="<%image.title|html>" />
+						</div>
+						<div>
+							<label for="description"><%= Page.ImageBrowser.Image.Description.Label|l10n|html></label>
+							<textarea name="description"><%image.description|html></textarea>
+						</div>
+						<div>
+							<button type="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
+						</div>
+					</form>
+				</div>
 
-				<h2><%= Page.ImageBrowser.Image.Delete.Title|l10n|html></h2>
+				<p><a class="show-delete-image hidden small-link">» <%= Page.ImageBrowser.Image.Delete.Title|l10n|html></a></p>
+				<div class="delete-image">
+					<h2><%= Page.ImageBrowser.Image.Delete.Title|l10n|html></h2>
 
-				<form id="delete-image" action="deleteImage.html" method="get">
-					<input type="hidden" name="image" value="<%image.id|html>" />
-					<button type="submit"><%= Page.ImageBrowser.Image.Button.Delete|l10n|html></button>
-				</form>
+					<form id="delete-image" action="deleteImage.html" method="get">
+						<input type="hidden" name="image" value="<%image.id|html>" />
+						<button type="submit"><%= Page.ImageBrowser.Image.Button.Delete|l10n|html></button>
+					</form>
+				</div>
 
 			<%/if>
 
@@ -233,6 +275,18 @@
 						});
 					});
 					$("#create-album label").hide();
+
+					/* hide all those forms. */
+					hideBlock = function(blockElement, clickElement) {
+						$(blockElement).hide();
+						$(clickElement).removeClass("hidden").click(function() {
+							$(blockElement).slideDown();
+							$(this).slideUp();
+							return false;
+						});
+					};
+
+					hideBlock(".create-album", ".show-create-album");
 				});
 			</script>
 		<%/if>
@@ -265,7 +319,10 @@
 			<%/foreach>
 
 			<%if sone.local>
-				<%include include/createAlbum.html>
+				<p><a class="show-create-album hidden small-link">» <%= View.CreateAlbum.Title|l10n|html></a></p>
+				<div class="create-album">
+					<%include include/createAlbum.html>
+				</div>
 			<%/if>
 
 		<%/if>
