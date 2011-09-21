@@ -53,8 +53,8 @@ public class Album implements Fingerprintable {
 	/** The description of this album. */
 	private String description;
 
-	/** The index of the album picture. */
-	private int albumImage = -1;
+	/** The ID of the album picture. */
+	private String albumImage;
 
 	/**
 	 * Creates a new album with a random ID.
@@ -189,7 +189,7 @@ public class Album implements Fingerprintable {
 	 * @return The image to show when this album is listed
 	 */
 	public Image getAlbumImage() {
-		if (albumImage == -1) {
+		if (albumImage == null) {
 			return null;
 		}
 		return images.get(albumImage);
