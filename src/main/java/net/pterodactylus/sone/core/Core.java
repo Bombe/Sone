@@ -1435,11 +1435,12 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			String albumTitle = configuration.getStringValue(albumPrefix + "/Title").getValue(null);
 			String albumDescription = configuration.getStringValue(albumPrefix + "/Description").getValue(null);
 			String albumParentId = configuration.getStringValue(albumPrefix + "/Parent").getValue(null);
+			String albumImageId = configuration.getStringValue(albumPrefix + "/AlbumImage").getValue(null);
 			if ((albumTitle == null) || (albumDescription == null)) {
 				logger.log(Level.WARNING, "Invalid album found, aborting load!");
 				return;
 			}
-			Album album = getAlbum(albumId).setSone(sone).setTitle(albumTitle).setDescription(albumDescription);
+			Album album = getAlbum(albumId).setSone(sone).setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId);
 			if (albumParentId != null) {
 				Album parentAlbum = getAlbum(albumParentId, false);
 				if (parentAlbum == null) {
@@ -2086,6 +2087,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				configuration.getStringValue(albumPrefix + "/Title").setValue(album.getTitle());
 				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
 				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
+				configuration.getStringValue(albumPrefix + "/AlbumImage").setValue(album.getAlbumImage() == null ? null : album.getAlbumImage().getId());
 			}
 			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
 
