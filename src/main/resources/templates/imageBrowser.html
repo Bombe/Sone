@@ -70,6 +70,7 @@
 			<p id="description"><% album.description|html></p>
 
 			<%foreach album.albums album>
+				<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
 				<div class="album image">
 					<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 						<%ifnull album.albumImage>
@@ -84,6 +85,7 @@
 			<%/foreach>
 
 			<%foreach album.images image>
+				<%first><h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2><%/first>
 				<div class="image">
 					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=200 max-height=150></a>
 				</div>
