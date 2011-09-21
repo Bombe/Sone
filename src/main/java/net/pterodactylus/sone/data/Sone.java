@@ -707,7 +707,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(")");
 
-		@SuppressWarnings("hiding")
 		List<Reply> replies = new ArrayList<Reply>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		fingerprint.append("Replies(");
@@ -716,7 +715,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(')');
 
-		@SuppressWarnings("hiding")
 		List<String> likedPostIds = new ArrayList<String>(getLikedPostIds());
 		Collections.sort(likedPostIds);
 		fingerprint.append("LikedPosts(");
@@ -725,7 +723,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(')');
 
-		@SuppressWarnings("hiding")
 		List<String> likedReplyIds = new ArrayList<String>(getLikedReplyIds());
 		Collections.sort(likedReplyIds);
 		fingerprint.append("LikedReplies(");

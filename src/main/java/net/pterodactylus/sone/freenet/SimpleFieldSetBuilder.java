@@ -67,7 +67,7 @@ public class SimpleFieldSetBuilder {
 	 *            The simple field set to copy
 	 * @return This simple field set builder
 	 */
-	public SimpleFieldSetBuilder put(@SuppressWarnings("hiding") SimpleFieldSet simpleFieldSet) {
+	public SimpleFieldSetBuilder put(SimpleFieldSet simpleFieldSet) {
 		this.simpleFieldSet.putAllOverwrite(simpleFieldSet);
 		return this;
 	}
