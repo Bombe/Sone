@@ -69,7 +69,7 @@
 
 			<%foreach album.albums album>
 				<div class="album image">
-					<a href="imageBrowser.html?album=<% album.id|html>">
+					<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 						<%ifnull album.albumImage>
 							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 						<%else><!-- TODO -->
@@ -232,7 +232,7 @@
 
 			<%foreach sone.albums album>
 				<div class="album image">
-					<a href="imageBrowser.html?album=<% album.id|html>">
+					<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 						<%ifnull album.albumImage>
 							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 						<%else><!-- TODO -->
