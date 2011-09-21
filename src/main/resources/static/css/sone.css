@@ -638,6 +638,7 @@ textarea {
 
 #sone .backlinks {
 	font-size: 80%;
+	margin-bottom: 1em;
 }
 
 #sone .backlinks .backlink {
