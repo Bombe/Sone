@@ -75,6 +75,8 @@
 						<%else><!-- TODO -->
 							<% album.albumImage|image-link max-width=200 max-height=150 title==album.title>
 						<%/if>
+						<br/>
+						<% album.title|html>
 					</a>
 				</div>
 			<%/foreach>
@@ -236,6 +238,8 @@
 						<%else><!-- TODO -->
 							<% album.albumImage|image-link max-width=200 max-height=150 title==album.title>
 						<%/if>
+						<br/>
+						<% album.title|html>
 					</a>
 				</div>
 			<%/foreach>
