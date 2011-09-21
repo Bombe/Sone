@@ -736,6 +736,10 @@ textarea {
 	clear: both;
 }
 
+#sone h1.backlink {
+	margin-bottom: 0px;
+}
+
 #sone h2 {
 	font-family: inherit;
 	font-size: 150%;

@@ -54,7 +54,7 @@
 				</script>
 			<%/if>
 
-			<h1><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.title|html></h1>
+			<h1 class="backlink"><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.title|html></h1>
 
 			<div class="backlinks">
 				<%foreach album.backlinks backlink backlinks>
@@ -125,7 +125,7 @@
 
 	<%elseif imageRequested>
 
-		<h1><%image.title|html></h1>
+		<h1 class="backlink"><%image.title|html></h1>
 
 		<div class="backlinks">
 			<%foreach image.album.backlinks backlink backlinks>
