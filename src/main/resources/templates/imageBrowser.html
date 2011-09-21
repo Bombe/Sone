@@ -69,6 +69,25 @@
 
 			<p id="description"><% album.description|html></p>
 
+			<%if album.sone.local>
+				<h2><%= Page.ImageBrowser.Album.Edit.Title|l10n|html></h2>
+
+				<form id="edit-album" action="editAlbum.html" method="post">
+					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+					<input type="hidden" name="album" value="<%album.id|html>" />
+
+					<div>
+						<label for="title"><%= Page.ImageBrowser.Album.Label.Title|l10n|html></label>
+						<input type="text" name="title" value="<%album.title|html>" />
+					</div>
+					<div>
+						<label for="description"><%= Page.ImageBrowser.Album.Label.Description|l10n|html></label>
+						<textarea name="description"><%album.description|html></textarea>
+					</div>
+					<button type="submit"><%= Page.ImageBrowser.Album.Button.Save|l10n|html></button>
+				</form>
+			<%/if>
+
 			<%foreach album.albums album>
 				<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
 				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
@@ -89,6 +108,10 @@
 				<%if endRow></div><%/if>
 			<%/foreach>
 
+			<%if album.sone.local>
+				<%include include/createAlbum.html>
+			<%/if>
+
 			<%foreach album.images image>
 				<%first><h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2><%/first>
 				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
@@ -103,24 +126,6 @@
 
 			<%if album.sone.local>
 				<%include include/uploadImage.html>
-				<%include include/createAlbum.html>
-
-				<h2><%= Page.ImageBrowser.Album.Edit.Title|l10n|html></h2>
-
-				<form id="edit-album" action="editAlbum.html" method="post">
-					<input type="hidden" name="formPassword" value="<%formPassword|html>" />
-					<input type="hidden" name="album" value="<%album.id|html>" />
-
-					<div>
-						<label for="title"><%= Page.ImageBrowser.Album.Label.Title|l10n|html></label>
-						<input type="text" name="title" value="<%album.title|html>" />
-					</div>
-					<div>
-						<label for="description"><%= Page.ImageBrowser.Album.Label.Description|l10n|html></label>
-						<textarea name="description"><%album.description|html></textarea>
-					</div>
-					<button type="submit"><%= Page.ImageBrowser.Album.Button.Save|l10n|html></button>
-				</form>
 
 				<%if album.empty>
 					<form id="delete-album" action="deleteAlbum.html" method="get">
