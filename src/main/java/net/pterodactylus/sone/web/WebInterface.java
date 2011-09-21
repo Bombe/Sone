@@ -115,6 +115,7 @@ import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
+import net.pterodactylus.util.template.ModFilter;
 import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.ReplaceFilter;
@@ -246,6 +247,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
 		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addFilter("unique", new UniqueElementFilter());
+		templateContextFactory.addFilter("mod", new ModFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("webInterface", this);
