@@ -71,6 +71,7 @@
 
 			<%foreach album.albums album>
 				<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
+				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
 				<div class="album image">
 					<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 						<%ifnull album.albumImage>
@@ -82,15 +83,23 @@
 						<% album.title|html>
 					</a>
 				</div>
+				<%= false|store key=endRow>
+				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
+				<%last><%= true|store key=endRow><%/last>
+				<%if endRow></div><%/if>
 			<%/foreach>
 
 			<%foreach album.images image>
 				<%first><h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2><%/first>
+				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
 				<div class="image">
 					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=200 max-height=150></a>
 				</div>
+				<%= false|store key=endRow>
+				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
+				<%last><%= true|store key=endRow><%/last>
+				<%if endRow></div><%/if>
 			<%/foreach>
-
 
 			<%if album.sone.local>
 				<%include include/uploadImage.html>
@@ -232,6 +241,7 @@
 			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
 
 			<%foreach sone.albums album>
+				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
 				<div class="album image">
 					<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 						<%ifnull album.albumImage>
@@ -243,6 +253,10 @@
 						<% album.title|html>
 					</a>
 				</div>
+				<%= false|store key=endRow>
+				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
+				<%last><%= true|store key=endRow><%/last>
+				<%if endRow></div><%/if>
 			<%/foreach>
 
 			<%if sone.local>
