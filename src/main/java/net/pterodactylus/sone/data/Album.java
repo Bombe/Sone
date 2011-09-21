@@ -166,6 +166,9 @@ public class Album implements Fingerprintable {
 			image.getAlbum().removeImage(image);
 		}
 		image.setAlbum(this);
+		if (images.isEmpty()) {
+			albumImage = image.getId();
+		}
 		if (!images.containsKey(image.getId())) {
 			images.put(image.getId(), image);
 		}
@@ -180,6 +183,13 @@ public class Album implements Fingerprintable {
 	public void removeImage(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
 		images.remove(image);
+		if (image.getId().equals(albumImage)) {
+			if (images.isEmpty()) {
+				albumImage = null;
+			} else {
+				albumImage = images.values().iterator().next().getId();
+			}
+		}
 	}
 
 	/**
