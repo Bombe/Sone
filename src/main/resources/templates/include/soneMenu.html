@@ -7,6 +7,15 @@
 			<span class="author-wot-link">(<a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>"><% =View.Post.WebOfTrustLink|l10n|html></a>)</span>
 		</div>
 		<div><%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size></div>
+		<%foreach sone.albums album>
+			<%first>
+				<div><a href="imageBrowser.html?sone=<% sone.id|html>"><% =Page.ViewSone.Profile.Albums.Text.All|l10n|html></a>, 
+			<%/first>
+				<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.description|html>"><% album.title|html></a><%notlast>, <%/notlast>
+			<%last>
+				</div>
+			<%/last>
+		<%/foreach>
 		<%if !sone.local>
 			<div>
 				<a class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></a>
