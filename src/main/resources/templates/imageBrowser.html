@@ -67,6 +67,8 @@
 				<%/foreach>
 			</div>
 
+			<p id="description"><% album.description|html></p>
+
 			<%foreach album.albums album>
 				<div class="album image">
 					<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
@@ -87,9 +89,6 @@
 				</div>
 			<%/foreach>
 
-			<div id="description">
-				<% album.description|html>
-			</div>
 
 			<%if album.sone.local>
 				<%include include/uploadImage.html>
