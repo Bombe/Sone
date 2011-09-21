@@ -73,7 +73,7 @@
 						<%ifnull album.image>
 							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 						<%else><!-- TODO -->
-							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
+							<% album.albumImage|image-link max-width=200 max-height=150 title==album.title>
 						<%/if>
 					</a>
 				</div>
@@ -234,7 +234,7 @@
 						<%ifnull album.image>
 							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
 						<%else><!-- TODO -->
-							<img src="images/unknown-image-0.png" width="200" height="150" alt="<% album.title|html>" title="<% album.title|html>" />
+							<% album.albumImage|image-link max-width=200 max-height=150 title==album.title>
 						<%/if>
 					</a>
 				</div>
