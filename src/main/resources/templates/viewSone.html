@@ -37,6 +37,7 @@
 					<div class="profile-field">
 						<div class="name"><%= Page.ViewSone.Profile.Label.Albums|l10n|html></div>
 						<div class="value">
+							<a href="imageBrowser.html?sone=<% sone.id|html>"><% =Page.ViewSone.Profile.Albums.Text.All|l10n|html></a>,
 				<%/first>
 					<a href="imageBrowser.html?album=<%album.id|html>"><%album.title|html></a><%notlast>, <%/notlast>
 				<%last>
