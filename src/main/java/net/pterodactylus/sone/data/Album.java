@@ -196,6 +196,18 @@ public class Album implements Fingerprintable {
 	}
 
 	/**
+	 * Sets the ID of the album image.
+	 *
+	 * @param id
+	 *            The ID of the album image
+	 * @return This album
+	 */
+	public Album setAlbumImage(String id) {
+		this.albumImage = id;
+		return this;
+	}
+
+	/**
 	 * Returns whether this album contains any other albums or images.
 	 *
 	 * @return {@code true} if this album is empty, {@code false} otherwise
