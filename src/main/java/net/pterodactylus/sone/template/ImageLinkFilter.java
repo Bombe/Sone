@@ -23,6 +23,7 @@ import java.util.Map;
 
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.number.Numbers;
+import net.pterodactylus.util.object.Default;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -62,6 +63,10 @@ public class ImageLinkFilter implements Filter {
 		String imageClass = parameters.get("class");
 		int maxWidth = Numbers.safeParseInteger(parameters.get("max-width"), Integer.MAX_VALUE);
 		int maxHeight = Numbers.safeParseInteger(parameters.get("max-height"), Integer.MAX_VALUE);
+		String title = parameters.get("title");
+		if ((title != null) && title.startsWith("=")) {
+			title = String.valueOf(templateContext.get(title.substring(1)));
+		}
 
 		TemplateContext linkTemplateContext = templateContextFactory.createTemplateContext();
 		linkTemplateContext.set("class", imageClass);
@@ -78,8 +83,8 @@ public class ImageLinkFilter implements Filter {
 		}
 		linkTemplateContext.set("width", (int) (imageWidth * scale + 0.5));
 		linkTemplateContext.set("height", (int) (imageHeight * scale + 0.5));
-		linkTemplateContext.set("alt", image.getDescription());
-		linkTemplateContext.set("title", image.getTitle());
+		linkTemplateContext.set("alt", Default.forNull(title, image.getDescription()));
+		linkTemplateContext.set("title", Default.forNull(title, image.getTitle()));
 
 		StringWriter stringWriter = new StringWriter();
 		linkTemplate.render(linkTemplateContext, stringWriter);
