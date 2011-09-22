@@ -54,6 +54,7 @@ public class EditImagePage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String imageId = request.getHttpRequest().getPartAsStringFailsafe("image", 36);
+			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Image image = webInterface.getCore().getImage(imageId, false);
 			if (image == null) {
 				throw new RedirectException("invalid.html");
@@ -69,7 +70,7 @@ public class EditImagePage extends SoneTemplatePage {
 			image.setTitle(title);
 			image.setDescription(description);
 			webInterface.getCore().touchConfiguration();
-			throw new RedirectException("imageBrowser.html?image=" + image.getId());
+			throw new RedirectException(returnPage);
 		}
 	}
 

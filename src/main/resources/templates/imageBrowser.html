@@ -229,6 +229,7 @@
 
 					<form id="edit-image" action="editImage.html" method="post">
 						<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+						<input type="hidden" name="returnPage" value="<%request.uri|html>" />
 						<input type="hidden" name="image" value="<%image.id|html>" />
 
 						<div>
