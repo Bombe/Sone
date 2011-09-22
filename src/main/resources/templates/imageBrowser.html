@@ -2,6 +2,28 @@
 
 	<div class="page-id hidden">image-browser</div>
 
+	<script language="javascript">
+		$(function() {
+
+			/* hide all those forms. */
+			hideAndShowBlock = function(blockElement, clickToShowElement, clickToHideElement) {
+				$(blockElement).hide();
+				$(clickToShowElement).removeClass("hidden");
+				$(clickToShowElement).click(function() {
+					$(blockElement).slideDown();
+					$(clickToShowElement).addClass("hidden");
+					$(clickToHideElement).removeClass("hidden");
+				});
+				$(clickToHideElement).click(function() {
+					$(blockElement).slideUp();
+					$(clickToHideElement).addClass("hidden");
+					$(clickToShowElement).removeClass("hidden");
+				});
+			};
+
+		});
+	</script>
+
 	<%if albumRequested>
 
 		<%ifnull album>
@@ -51,19 +73,10 @@
 						});
 						$("#edit-album label").hide();
 
-						/* hide all those forms. */
-						hideBlock = function(blockElement, clickElement) {
-							$(blockElement).hide();
-							$(clickElement).removeClass("hidden").click(function() {
-								$(blockElement).slideDown();
-								$(this).slideUp();
-								return false;
-							});
-						};
-
-						hideBlock(".edit-album", ".show-edit-album");
-						hideBlock(".create-album", ".show-create-album");
-						hideBlock(".upload-image", ".show-upload-image");
+						hideAndShowBlock(".edit-album", ".show-edit-album", ".hide-edit-album");
+						hideAndShowBlock(".create-album", ".show-create-album", ".hide-create-album");
+						hideAndShowBlock(".upload-image", ".show-upload-image", ".hide-upload-image");
+						hideAndShowBlock(".delete-album", ".show-delete-album", ".hide-delete-album");
 					});
 				</script>
 			<%/if>
@@ -84,7 +97,8 @@
 			<p id="description"><% album.description|html></p>
 
 			<%if album.sone.local>
-				<p><a class="show-edit-album hidden small-link">» <%= Page.ImageBrowser.Album.Edit.Title|l10n|html></a></p>
+				<div class="show-edit-album hidden toggle-link"><a class="small-link">» <%= Page.ImageBrowser.Album.Edit.Title|l10n|html></a></div>
+				<div class="hide-edit-album hidden toggle-link"><a class="small-link">« <%= Page.ImageBrowser.Album.Edit.Title|l10n|html></a></div>
 				<div class="edit-album">
 					<h2><%= Page.ImageBrowser.Album.Edit.Title|l10n|html></h2>
 
@@ -126,7 +140,8 @@
 			<%/foreach>
 
 			<%if album.sone.local>
-				<p><a class="show-create-album hidden small-link">» <%= View.CreateAlbum.Title|l10n|html></a></p>
+				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>
+				<div class="hide-create-album hidden toggle-link"><a class="small-link">« <%= View.CreateAlbum.Title|l10n|html></a></div>
 				<div class="create-album">
 					<%include include/createAlbum.html>
 				</div>
@@ -163,16 +178,21 @@
 			<%/foreach>
 
 			<%if album.sone.local>
-				<p><a class="show-upload-image hidden small-link">» <%= View.UploadImage.Title|l10n|html></a></p>
+				<div class="show-upload-image hidden toggle-link"><a class="small-link">» <%= View.UploadImage.Title|l10n|html></a></div>
+				<div class="hide-upload-image hidden toggle-link"><a class="small-link">« <%= View.UploadImage.Title|l10n|html></a></div>
 				<div class="upload-image">
 					<%include include/uploadImage.html>
 				</div>
 
 				<%if album.empty>
-					<form id="delete-album" action="deleteAlbum.html" method="get">
-						<input type="hidden" name="album" value="<%album.id|html>" />
-						<button type="submit"><%= Page.ImageBrowser.Album.Button.Delete|l10n|html></button>
-					</form>
+					<div class="show-delete-album hidden toggle-link"><a class="small-link">» <%= Page.ImageBrowser.Album.Delete.Title|l10n|html></a></div>
+					<div class="hide-delete-album hidden toggle-link"><a class="small-link">« <%= Page.ImageBrowser.Album.Delete.Title|l10n|html></a></div>
+					<div class="delete-album">
+						<form id="delete-album" action="deleteAlbum.html" method="get">
+							<input type="hidden" name="album" value="<%album.id|html>" />
+							<button type="submit"><%= Page.ImageBrowser.Album.Button.Delete|l10n|html></button>
+						</form>
+					</div>
 				<%/if>
 
 			<%/if>
@@ -213,18 +233,8 @@
 						});
 						$("#edit-image label").hide();
 
-						/* hide all those forms. */
-						hideBlock = function(blockElement, clickElement) {
-							$(blockElement).hide();
-							$(clickElement).removeClass("hidden").click(function() {
-								$(blockElement).slideDown();
-								$(this).slideUp();
-								return false;
-							});
-						};
-
-						hideBlock(".edit-image", ".show-edit-image");
-						hideBlock(".delete-image", ".show-delete-image");
+						hideAndShowBlock(".edit-image", ".show-edit-image", ".hide-edit-image");
+						hideAndShowBlock(".delete-image", ".show-delete-image", ".hide-delete-image");
 					});
 				</script>
 			<%/if>
@@ -241,7 +251,8 @@
 
 			<%if image.sone.local>
 
-				<p><a class="show-edit-image hidden small-link">» <%= Page.ImageBrowser.Image.Edit.Title|l10n|html></a></p>
+				<div class="show-edit-image hidden toggle-link"><a class="small-link">» <%= Page.ImageBrowser.Image.Edit.Title|l10n|html></a></div>
+				<div class="hide-edit-image hidden toggle-link"><a class="small-link">« <%= Page.ImageBrowser.Image.Edit.Title|l10n|html></a></div>
 				<div class="edit-image">
 					<h2><%= Page.ImageBrowser.Image.Edit.Title|l10n|html></h2>
 
@@ -264,7 +275,8 @@
 					</form>
 				</div>
 
-				<p><a class="show-delete-image hidden small-link">» <%= Page.ImageBrowser.Image.Delete.Title|l10n|html></a></p>
+				<div class="show-delete-image hidden toggle-link"><a class="small-link">» <%= Page.ImageBrowser.Image.Delete.Title|l10n|html></a></div>
+				<div class="hide-delete-image hidden toggle-link"><a class="small-link">« <%= Page.ImageBrowser.Image.Delete.Title|l10n|html></a></div>
 				<div class="delete-image">
 					<h2><%= Page.ImageBrowser.Image.Delete.Title|l10n|html></h2>
 
@@ -295,17 +307,7 @@
 					});
 					$("#create-album label").hide();
 
-					/* hide all those forms. */
-					hideBlock = function(blockElement, clickElement) {
-						$(blockElement).hide();
-						$(clickElement).removeClass("hidden").click(function() {
-							$(blockElement).slideDown();
-							$(this).slideUp();
-							return false;
-						});
-					};
-
-					hideBlock(".create-album", ".show-create-album");
+					hideAndShowBlock(".create-album", ".show-create-album", ".hide-create-album");
 				});
 			</script>
 		<%/if>
@@ -338,7 +340,8 @@
 			<%/foreach>
 
 			<%if sone.local>
-				<p><a class="show-create-album hidden small-link">» <%= View.CreateAlbum.Title|l10n|html></a></p>
+				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>
+				<div class="hide-create-album hidden toggle-link"><a class="small-link">« <%= View.CreateAlbum.Title|l10n|html></a></div>
 				<div class="create-album">
 					<%include include/createAlbum.html>
 				</div>

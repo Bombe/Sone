@@ -51,6 +51,10 @@ textarea {
 	display: none;
 }
 
+#sone .toggle-link {
+	margin-top: 1em;
+}
+
 #sone #formPassword {
 	display: none;
 }
