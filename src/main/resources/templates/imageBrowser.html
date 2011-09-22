@@ -137,6 +137,24 @@
 				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
 				<div class="image">
 					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=200 max-height=150></a>
+					<%if album.sone.local>
+						<br/>
+						<form class="edit-image" action="editImage.html" method="post">
+							<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+							<input type="hidden" name="returnPage" value="<%request.uri|html>" />
+							<input type="hidden" name="image" value="<%image.id|html>" />
+
+							<div>
+								<input type="text" name="title" value="<%image.title|html>" />
+							</div>
+							<div>
+								<textarea name="description"><%image.description|html></textarea>
+							</div>
+							<div>
+								<button type="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
+							</div>
+						</form>
+					<%/if>
 				</div>
 				<%= false|store key=endRow>
 				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>

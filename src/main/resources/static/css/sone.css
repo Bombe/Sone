@@ -667,6 +667,14 @@ textarea {
 	background-color: #fff;
 }
 
+#sone .image .edit-image input {
+	width: 95%;
+}
+
+#sone .image .edit-image textarea {
+	width: 95%;
+}
+
 #sone .backlinks .separator {
 	display: inline;
 }
