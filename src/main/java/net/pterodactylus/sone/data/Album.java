@@ -214,15 +214,18 @@ public class Album implements Fingerprintable {
 	 *
 	 * @param image
 	 *            The image to move up
+	 * @return The image that the given image swapped the place with, or
+	 *         <code>null</code> if the image did not change its place
 	 */
-	public void moveImageUp(Image image) {
+	public Image moveImageUp(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isEqual("Image Album", image.getAlbum(), this).isEqual("Album Owner", image.getAlbum().getSone(), sone).check();
 		int oldIndex = imageIds.indexOf(image.getId());
 		if (oldIndex <= 0) {
-			return;
+			return null;
 		}
 		imageIds.remove(image.getId());
 		imageIds.add(oldIndex - 1, image.getId());
+		return images.get(imageIds.get(oldIndex));
 	}
 
 	/**
@@ -231,15 +234,18 @@ public class Album implements Fingerprintable {
 	 *
 	 * @param image
 	 *            The image to move down
+	 * @return The image that the given image swapped the place with, or
+	 *         <code>null</code> if the image did not change its place
 	 */
-	public void moveImageDown(Image image) {
+	public Image moveImageDown(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isEqual("Image Album", image.getAlbum(), this).isEqual("Album Owner", image.getAlbum().getSone(), sone).check();
 		int oldIndex = imageIds.indexOf(image.getId());
 		if ((oldIndex == -1) || (oldIndex >= (imageIds.size() - 1))) {
-			return;
+			return null;
 		}
 		imageIds.remove(image.getId());
 		imageIds.add(oldIndex + 1, image.getId());
+		return images.get(imageIds.get(oldIndex));
 	}
 
 	/**
