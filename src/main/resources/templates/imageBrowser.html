@@ -242,9 +242,9 @@
 					<div class="image-container">
 						<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 							<%ifnull album.albumImage>
-								<img src="images/unknown-image-0.png" width="266" height="200" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -33px;" />
+								<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -41px;" />
 							<%else><!-- TODO -->
-								<% album.albumImage|image-link max-width=200 max-height=200 mode=enlarge title==album.title>
+								<% album.albumImage|image-link max-width=250 max-height=250 mode=enlarge title==album.title>
 							<%/if>
 						</a>
 					</div>
@@ -273,7 +273,7 @@
 				<div id="image-<% image.id|html>" class="image">
 					<div class="image-id hidden"><% image.id|html></div>
 					<div class="image-container">
-						<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=200 max-height=200 mode=enlarge title==image.title></a>
+						<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=250 max-height=250 mode=enlarge title==image.title></a>
 					</div>
 					<div class="show-data">
 						<div class="image-title"><% image.title|html></div>
@@ -456,9 +456,9 @@
 					<div class="image-container">
 						<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
 							<%ifnull album.albumImage>
-								<img src="images/unknown-image-0.png" width="266" height="200" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -33px;"/>
+								<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -41px;"/>
 							<%else><!-- TODO -->
-								<% album.albumImage|image-link max-width=200 max-height=200 mode=enlarge title==album.title>
+								<% album.albumImage|image-link max-width=250 max-height=250 mode=enlarge title==album.title>
 							<%/if>
 						</a>
 					</div>

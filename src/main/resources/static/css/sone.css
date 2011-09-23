@@ -657,8 +657,8 @@ textarea {
 }
 
 #sone .image-container {
-	width: 200px;
-	height: 200px;
+	width: 250px;
+	height: 250px;
 	overflow: hidden;
 	padding: -1px;
 	border: solid 1px #000;
