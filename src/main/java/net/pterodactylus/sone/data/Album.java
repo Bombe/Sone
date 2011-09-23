@@ -208,6 +208,40 @@ public class Album implements Fingerprintable {
 	}
 
 	/**
+	 * Moves the given image up in this album’s images. If the image is already
+	 * the first image, nothing happens.
+	 *
+	 * @param image
+	 *            The image to move up
+	 */
+	public void moveImageUp(Image image) {
+		Validation.begin().isNotNull("Image", image).check().isEqual("Image Album", image.getAlbum(), this).isEqual("Album Owner", image.getAlbum().getSone(), sone).check();
+		int oldIndex = imageIds.indexOf(image.getId());
+		if (oldIndex <= 0) {
+			return;
+		}
+		imageIds.remove(image.getId());
+		imageIds.add(oldIndex - 1, image.getId());
+	}
+
+	/**
+	 * Move the given image down in this album’s images. If the image is already
+	 * the last image, nothing happens.
+	 *
+	 * @param image
+	 *            The image to move down
+	 */
+	public void moveImageDown(Image image) {
+		Validation.begin().isNotNull("Image", image).check().isEqual("Image Album", image.getAlbum(), this).isEqual("Album Owner", image.getAlbum().getSone(), sone).check();
+		int oldIndex = imageIds.indexOf(image.getId());
+		if ((oldIndex == -1) || (oldIndex >= (imageIds.size() - 1))) {
+			return;
+		}
+		imageIds.remove(image.getId());
+		imageIds.add(oldIndex + 1, image.getId());
+	}
+
+	/**
 	 * Returns the album image of this album, or {@code null} if no album image
 	 * has been set.
 	 *
