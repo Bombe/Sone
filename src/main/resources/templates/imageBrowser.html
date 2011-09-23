@@ -3,25 +3,249 @@
 	<div class="page-id hidden">image-browser</div>
 
 	<script language="javascript">
-		$(function() {
 
-			/* hide all those forms. */
-			hideAndShowBlock = function(blockElement, clickToShowElement, clickToHideElement) {
-				$(blockElement).hide();
+		/* hide all those forms. */
+		function hideAndShowBlock(blockElement, clickToShowElement, clickToHideElement) {
+			$(blockElement).hide();
+			$(clickToShowElement).removeClass("hidden");
+			$(clickToShowElement).click(function() {
+				$(blockElement).slideDown();
+				$(clickToShowElement).addClass("hidden");
+				$(clickToHideElement).removeClass("hidden");
+			});
+			$(clickToHideElement).click(function() {
+				$(blockElement).slideUp();
+				$(clickToHideElement).addClass("hidden");
 				$(clickToShowElement).removeClass("hidden");
-				$(clickToShowElement).click(function() {
-					$(blockElement).slideDown();
-					$(clickToShowElement).addClass("hidden");
-					$(clickToHideElement).removeClass("hidden");
-				});
-				$(clickToHideElement).click(function() {
-					$(blockElement).slideUp();
-					$(clickToHideElement).addClass("hidden");
-					$(clickToShowElement).removeClass("hidden");
-				});
-			};
+			});
+		}
 
-		});
+		/* ID of the image currently being edited. */
+		var editingImageId = null;
+
+		/**
+		 * Shows the form for editing an image.
+		 *
+		 * @param imageId The ID of the image to edit.
+		 */
+		function editImage(imageId) {
+			if (editingImageId != imageId) {
+				cancelImageEditing();
+			} else {
+				return;
+			}
+			editingImageId = imageId;
+			$(".show-data", getImage(imageId)).hide();
+			$(".edit-data", getImage(imageId)).show();
+			$(document).bind("click.sone", function(event) {
+				if ($(event.target).closest("#image-" + imageId).size() == 0) {
+					cancelImageEditing();
+				}
+			});
+		}
+
+		/**
+		 * Cancels all image editing.
+		 */
+		function cancelImageEditing() {
+			$(".image .show-data").show();
+			$(".image .edit-data").hide();
+			$("form.edit-image").each(function() {
+				this.reset();
+			});
+			$(document).unbind("click.sone");
+			editingImageId = null;
+		}
+
+		/**
+		 * Returns the image element with the given ID.
+		 *
+		 * @param imageId The ID of the image
+		 * @return The image element
+		 */
+		function getImage(imageId) {
+			return $("#sone .image .image-id:contains('" + imageId + "')").closest(".image");
+		}
+
+		/**
+		 * Swaps two images.
+		 *
+		 * @param sourceId The ID of the source image
+		 * @param destinationId The ID of the destionation image
+		 */
+		function swapImage(sourceId, destinationId) {
+			sourceElement = getImage(sourceId);
+			destinationElement = getImage(destinationId);
+			sourceParent = sourceElement.closest(".image-row");
+			sourcePrevSibling = sourceElement.prev();
+			sourceElement.detach();
+			destinationElement.before(sourceElement);
+			if (sourcePrevSibling.get(0) != destinationElement.get(0)) {
+				destinationElement.detach();
+				(sourcePrevSibling.size() > 0) ? sourcePrevSibling.after(destinationElement) : sourceParent.prepend(destinationElement);
+			}
+			if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") != $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
+				$("button[name='moveLeft']", sourceElement).toggleClass("hidden");
+				$("button[name='moveLeft']", destinationElement).toggleClass("hidden");
+			}
+			if ($("button[name='moveRight']", sourceElement).hasClass("hidden") != $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
+				$("button[name='moveRight']", sourceElement).toggleClass("hidden");
+				$("button[name='moveRight']", destinationElement).toggleClass("hidden");
+			}
+		}
+
+		/**
+		 * Prepare all images for inline editing.
+		 */
+		function prepareImages() {
+			$(".image").each(function() {
+				imageId = $(this).closest(".image").find(".image-id").text();
+				(function(element, imageId) {
+					$(".show-data", element).click(function() {
+						editImage(imageId);
+					});
+					$("button[name='moveLeft'], button[name='moveRight']", element).click(function() {
+						ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "moveLeft": this.name == "moveLeft", "moveRight": this.name == "moveRight" }, function(data) {
+							if (data && data.success) {
+								swapImage(data.sourceImageId, data.destinationImageId);
+							}
+						});
+						return false;
+					});
+					$("button[name='submit']", element).click(function() {
+						title = $(":input[name='title']:enabled", this.form).val();
+						description = $(":input[name='description']:enabled", this.form).val();
+						ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "title": title, "description": description }, function(data) {
+							if (data && data.success) {
+								getImage(data.imageId).find(".image-title").text(data.title);
+								getImage(data.imageId).find(".image-description").text(data.description);
+								getImage(data.imageId).find(":input[name='title']").attr("defaultValue", title);
+								getImage(data.imageId).find(":input[name='description']").attr("defaultValue", description);
+								cancelImageEditing();
+							}
+						});
+						return false;
+					});
+				})(this, imageId);
+			});
+		}
+
+		/* ID of the album currently being edited. */
+		var editingAlbumId = null;
+
+		/**
+		 * Shows the form for editing an album.
+		 *
+		 * @param albumId The ID of the album to edit.
+		 */
+		function editAlbum(albumId) {
+			if (editingAlbumId != albumId) {
+				if (editingAlbumId != null) {
+					cancelAlbumEditing();
+				}
+			} else {
+				console.log("already editing " + albumId);
+				return;
+			}
+			editingAlbumId = albumId;
+			$(".show-data", getAlbum(albumId)).hide();
+			$(".edit-data", getAlbum(albumId)).show();
+			console.log(getAlbum(albumId));
+			$(document).bind("click.sone", function(event) {
+				if ($(event.target).closest("#album-" + albumId).size() == 0) {
+					cancelAlbumEditing();
+				}
+			});
+		}
+
+		/**
+		 * Cancels all album editing.
+		 */
+		function cancelAlbumEditing() {
+			console.log("cancel-album-edit");
+			$(".album .show-data").show();
+			$(".album .edit-data").hide();
+			$("form.edit-album").each(function() {
+				this.reset();
+			});
+			$(document).unbind("click.sone");
+			editingAlbumId = null;
+		}
+
+		/**
+		 * Returns the album element with the given ID.
+		 *
+		 * @param albumId The ID of the album
+		 * @return The album element
+		 */
+		function getAlbum(albumId) {
+			return $("#sone .album .album-id:contains('" + albumId + "')").closest(".album");
+		}
+
+		/**
+		 * Swaps two albums.
+		 *
+		 * @param sourceId The ID of the source album
+		 * @param destinationId The ID of the destionation album
+		 */
+		function swapAlbum(sourceId, destinationId) {
+			sourceElement = getAlbum(sourceId);
+			destinationElement = getAlbum(destinationId);
+			sourceParent = sourceElement.closest(".album-row");
+			sourcePrevSibling = sourceElement.prev();
+			sourceElement.detach();
+			destinationElement.before(sourceElement);
+			if (sourcePrevSibling.get(0) != destinationElement.get(0)) {
+				destinationElement.detach();
+				(sourcePrevSibling.size() > 0) ? sourcePrevSibling.after(destinationElement) : sourceParent.prepend(destinationElement);
+			}
+			if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") != $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
+				$("button[name='moveLeft']", sourceElement).toggleClass("hidden");
+				$("button[name='moveLeft']", destinationElement).toggleClass("hidden");
+			}
+			if ($("button[name='moveRight']", sourceElement).hasClass("hidden") != $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
+				$("button[name='moveRight']", sourceElement).toggleClass("hidden");
+				$("button[name='moveRight']", destinationElement).toggleClass("hidden");
+			}
+		}
+
+		/**
+		 * Prepare all albums for inline editing.
+		 */
+		function prepareAlbums() {
+			$(".album").each(function() {
+				albumId = $(this).closest(".album").find(".album-id").text();
+				(function(element, albumId) {
+					$(".show-data", element).click(function() {
+						console.log("show-data");
+						editAlbum(albumId);
+					});
+					$("button[name='moveLeft'], button[name='moveRight']", element).click(function() {
+						ajaxGet("editAlbum.ajax", { "formPassword": getFormPassword(), "album": albumId, "moveLeft": this.name == "moveLeft", "moveRight": this.name == "moveRight" }, function(data) {
+							if (data && data.success) {
+								swapAlbum(data.sourceAlbumId, data.destinationAlbumId);
+							}
+						});
+						return false;
+					});
+					$("button[name='submit']", element).click(function() {
+						title = $(":input[name='title']:enabled", this.form).val();
+						description = $(":input[name='description']:enabled", this.form).val();
+						ajaxGet("editAlbum.ajax", { "formPassword": getFormPassword(), "album": albumId, "title": title, "description": description }, function(data) {
+							if (data && data.success) {
+								getAlbum(data.albumId).find(".album-title").text(data.title);
+								getAlbum(data.albumId).find(".album-description").text(data.description);
+								getAlbum(data.albumId).find(":input[name='title']").attr("defaultValue", title);
+								getAlbum(data.albumId).find(":input[name='description']").attr("defaultValue", description);
+								cancelAlbumEditing();
+							}
+						});
+						return false;
+					});
+				})(this, albumId);
+			});
+		}
+
 	</script>
 
 	<%if albumRequested>
@@ -38,79 +262,6 @@
 
 			<%if album.sone.local>
 				<script language="javascript">
-
-					/* ID of the image currently being edited. */
-					var editingImageId = null;
-
-					/**
-					 * Shows the form for editing an image.
-					 *
-					 * @param imageId The ID of the image to edit.
-					 */
-					function editImage(imageId) {
-						if (editingImageId != imageId) {
-							cancelEditing();
-						} else {
-							return;
-						}
-						$(".show-data", "#image-" + imageId).hide();
-						$(".edit-data", "#image-" + imageId).show();
-						$(document).bind("click.sone", function(event) {
-							if ($(event.target).closest("#image-" + imageId).size() == 0) {
-								cancelEditing();
-							}
-						});
-					}
-
-					/**
-					 * Cancels all image editing.
-					 */
-					function cancelEditing() {
-						$(".show-data").show();
-						$(".edit-data").hide();
-						$("form.edit-image").each(function() {
-							this.reset();
-						});
-						$(document).unbind("click.sone");
-						editingImageId = null;
-					}
-
-					/**
-					 * Returns the image element with the given ID.
-					 *
-					 * @param imageId The ID of the image
-					 * @return The image element
-					 */
-					function getImage(imageId) {
-						return $("#sone .image .image-id:contains('" + imageId + "')").closest(".image");
-					}
-
-					/**
-					 * Swaps two images.
-					 *
-					 * @param sourceId The ID of the source image
-					 * @param destinationId The ID of the destionation image
-					 */
-					function swapImage(sourceId, destinationId) {
-						sourceElement = getImage(sourceId);
-						destinationElement = getImage(destinationId);
-						sourceParent = sourceElement.closest(".image-row");
-						sourcePrevSibling = sourceElement.prev();
-						sourceElement.detach();
-						destinationElement.before(sourceElement);
-						if (sourcePrevSibling.get(0) != destinationElement.get(0)) {
-							destinationElement.detach();
-							(sourcePrevSibling.size() > 0) ? sourcePrevSibling.after(destinationElement) : sourceParent.prepend(destinationElement);
-						}
-						if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") != $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
-							$("button[name='moveLeft']", sourceElement).toggleClass("hidden");
-							$("button[name='moveLeft']", destinationElement).toggleClass("hidden");
-						}
-						if ($("button[name='moveRight']", sourceElement).hasClass("hidden") != $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
-							$("button[name='moveRight']", sourceElement).toggleClass("hidden");
-							$("button[name='moveRight']", destinationElement).toggleClass("hidden");
-						}
-					}
 
 					$(function() {
 						getTranslation("WebInterface.DefaultText.UploadImage.Title", function(text) {
@@ -147,41 +298,13 @@
 						});
 						$("#edit-album label").hide();
 
-						hideAndShowBlock(".edit-album", ".show-edit-album", ".hide-edit-album");
-						hideAndShowBlock(".create-album", ".show-create-album", ".hide-create-album");
-						hideAndShowBlock(".upload-image", ".show-upload-image", ".hide-upload-image");
-						hideAndShowBlock(".delete-album", ".show-delete-album", ".hide-delete-album");
+						hideAndShowBlock("div.edit-album", ".show-edit-album", ".hide-edit-album");
+						hideAndShowBlock("div.create-album", ".show-create-album", ".hide-create-album");
+						hideAndShowBlock("div.upload-image", ".show-upload-image", ".hide-upload-image");
+						hideAndShowBlock("div.delete-album", ".show-delete-album", ".hide-delete-album");
 
-						$(".image").each(function() {
-							imageId = $(this).closest(".image").find(".image-id").text();
-							(function(element, imageId) {
-								$(".show-data", element).click(function() {
-									editImage(imageId);
-								});
-								$("button[name='moveLeft'], button[name='moveRight']", element).click(function() {
-									ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "moveLeft": this.name == "moveLeft", "moveRight": this.name == "moveRight" }, function(data) {
-										if (data && data.success) {
-											swapImage(data.sourceImageId, data.destinationImageId);
-										}
-									});
-									return false;
-								});
-								$("button[name='submit']", element).click(function() {
-									title = $(":input[name='title']:enabled", this.form).val();
-									description = $(":input[name='description']:enabled", this.form).val();
-									ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "title": title, "description": description }, function(data) {
-										if (data && data.success) {
-											getImage(data.imageId).find(".image-title").text(data.title);
-											getImage(data.imageId).find(".image-description").text(data.description);
-											getImage(data.imageId).find(":input[name='title']").attr("defaultValue", title);
-											getImage(data.imageId).find(":input[name='description']").attr("defaultValue", description);
-											cancelEditing();
-										}
-									});
-									return false;
-								});
-							})(this, imageId);
-						});
+						prepareAlbums();
+						prepareImages();
 					});
 				</script>
 			<%/if>
@@ -235,29 +358,7 @@
 				</div>
 			<%/if>
 
-			<%foreach album.albums album>
-				<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
-				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
-				<div class="album image">
-					<div class="image-container">
-						<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
-							<%ifnull album.albumImage>
-								<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -41px;" />
-							<%else><!-- TODO -->
-								<% album.albumImage|image-link max-width=250 max-height=250 mode=enlarge title==album.title>
-							<%/if>
-						</a>
-					</div>
-					<div class="show-data">
-						<div class="album-title"><% album.title|html></div>
-						<div class="album-description"><% album.description|html></div>
-					</div>
-				</div>
-				<%= false|store key=endRow>
-				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
-				<%last><%= true|store key=endRow><%/last>
-				<%if endRow></div><%/if>
-			<%/foreach>
+			<%include include/browseAlbums.html>
 
 			<%if album.sone.local>
 				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>
@@ -438,6 +539,8 @@
 					$("#create-album label").hide();
 
 					hideAndShowBlock(".create-album", ".show-create-album", ".hide-create-album");
+
+					prepareAlbums();
 				});
 			</script>
 		<%/if>
@@ -450,28 +553,7 @@
 
 			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
 
-			<%foreach sone.albums album>
-				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
-				<div class="album image">
-					<div class="image-container">
-						<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
-							<%ifnull album.albumImage>
-								<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -41px;"/>
-							<%else><!-- TODO -->
-								<% album.albumImage|image-link max-width=250 max-height=250 mode=enlarge title==album.title>
-							<%/if>
-						</a>
-					</div>
-					<div class="show-data">
-						<div class="album-title"><% album.title|html></div>
-						<div class="album-description"><% album.description|html></div>
-					</div>
-				</div>
-				<%= false|store key=endRow>
-				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
-				<%last><%= true|store key=endRow><%/last>
-				<%if endRow></div><%/if>
-			<%/foreach>
+			<%include include/browseAlbums.html>
 
 			<%if sone.local>
 				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>
