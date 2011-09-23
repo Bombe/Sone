@@ -180,7 +180,7 @@ public class Album implements Fingerprintable {
 			image.getAlbum().removeImage(image);
 		}
 		image.setAlbum(this);
-		if (imageIds.isEmpty()) {
+		if (imageIds.isEmpty() && (albumImage == null)) {
 			albumImage = image.getId();
 		}
 		if (!imageIds.contains(image.getId())) {
