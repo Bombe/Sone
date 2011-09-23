@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import net.pterodactylus.util.collection.Mapper;
 import net.pterodactylus.util.collection.Mappers;
+import net.pterodactylus.util.object.Default;
 import net.pterodactylus.util.validation.Validation;
 
 /**
@@ -251,7 +252,7 @@ public class Album implements Fingerprintable {
 		if (albumImage == null) {
 			return null;
 		}
-		return images.get(albumImage);
+		return Default.forNull(images.get(albumImage), images.values().iterator().next());
 	}
 
 	/**
