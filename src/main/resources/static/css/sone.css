@@ -692,6 +692,8 @@ textarea {
 	text-align: left;
 	width: 195px;
 	word-wrap: break-word;
+	max-height: 5em;
+	overflow: auto;
 }
 
 #sone .backlinks .separator {
