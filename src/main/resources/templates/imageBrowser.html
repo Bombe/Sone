@@ -77,6 +77,23 @@
 						hideAndShowBlock(".create-album", ".show-create-album", ".hide-create-album");
 						hideAndShowBlock(".upload-image", ".show-upload-image", ".hide-upload-image");
 						hideAndShowBlock(".delete-album", ".show-delete-album", ".hide-delete-album");
+
+						hideAndShowData = function(activationElements, activeElements, hideElement, showElement) {
+							$(activationElements).click(function() {
+								imageId = $(this).closest(".image").find(".image-id").text();
+								$(hideElement, $("#image-" + imageId)).hide();
+								$(showElement, $("#image-" + imageId)).show();
+								$(document).click(function(event) {
+									if ($(event.target).closest("#image-" + imageId).size() == 0) {
+										$(showElement).hide();
+										$(hideElement).show();
+									}
+									return false;
+								});
+							});
+						};
+
+						hideAndShowData(".image-title, .image-description", ".image", ".show-data", ".edit-data");
 					});
 				</script>
 			<%/if>
