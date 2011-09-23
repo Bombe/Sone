@@ -57,6 +57,11 @@ public class EditAlbumPage extends SoneTemplatePage {
 			if (!webInterface.getCore().isLocalSone(album.getSone())) {
 				throw new RedirectException("noPermission.html");
 			}
+			String albumImageId = request.getHttpRequest().getPartAsStringFailsafe("album-image", 36);
+			if (webInterface.getCore().getImage(albumImageId, false) == null) {
+				albumImageId = null;
+			}
+			album.setAlbumImage(albumImageId);
 			String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
 			if (title.length() == 0) {
 				templateContext.set("titleMissing", true);
