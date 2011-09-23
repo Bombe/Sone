@@ -56,8 +56,6 @@
 						$(".show-data", "#image-" + imageId).hide();
 						$(".edit-data", "#image-" + imageId).show();
 						$(document).bind("click.sone", function(event) {
-							console.log("event: " + event);
-							console.log("closest: " + $(event.target).closest("#image-" + imageId));
 							if ($(event.target).closest("#image-" + imageId).size() == 0) {
 								cancelEditing();
 							}
