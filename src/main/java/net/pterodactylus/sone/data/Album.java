@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.pterodactylus.util.collection.Mapper;
+import net.pterodactylus.util.collection.Mappers;
 import net.pterodactylus.util.validation.Validation;
 
 /**
@@ -40,6 +42,9 @@ public class Album implements Fingerprintable {
 
 	/** Nested albums. */
 	private final List<Album> albums = new ArrayList<Album>();
+
+	/** The image IDs in order. */
+	private final List<String> imageIds = new ArrayList<String>();
 
 	/** The images in this album. */
 	private final Map<String, Image> images = new LinkedHashMap<String, Image>();
@@ -151,7 +156,15 @@ public class Album implements Fingerprintable {
 	 * @return The images in this album
 	 */
 	public List<Image> getImages() {
-		return new ArrayList<Image>(images.values());
+		return Mappers.mappedList(imageIds, new Mapper<String, Image>() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public Image map(String imageId) {
+				return images.get(imageId);
+			}
+
+		});
 	}
 
 	/**
@@ -166,10 +179,11 @@ public class Album implements Fingerprintable {
 			image.getAlbum().removeImage(image);
 		}
 		image.setAlbum(this);
-		if (images.isEmpty()) {
+		if (imageIds.isEmpty()) {
 			albumImage = image.getId();
 		}
-		if (!images.containsKey(image.getId())) {
+		if (!imageIds.contains(image.getId())) {
+			imageIds.add(image.getId());
 			images.put(image.getId(), image);
 		}
 	}
@@ -182,7 +196,8 @@ public class Album implements Fingerprintable {
 	 */
 	public void removeImage(Image image) {
 		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
-		images.remove(image);
+		imageIds.remove(image.getId());
+		images.remove(image.getId());
 		if (image.getId().equals(albumImage)) {
 			if (images.isEmpty()) {
 				albumImage = null;
