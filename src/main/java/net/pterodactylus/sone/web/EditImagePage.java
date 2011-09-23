@@ -62,13 +62,19 @@ public class EditImagePage extends SoneTemplatePage {
 			if (!webInterface.getCore().isLocalSone(image.getSone())) {
 				throw new RedirectException("noPermission.html");
 			}
-			String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
-			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 1024).trim();
-			if (title.length() == 0) {
-				templateContext.set("titleMissing", true);
+			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {
+				image.getAlbum().moveImageUp(image);
+			} else  if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
+				image.getAlbum().moveImageDown(image);
+			} else {
+				String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
+				String description = request.getHttpRequest().getPartAsStringFailsafe("description", 1024).trim();
+				if (title.length() == 0) {
+					templateContext.set("titleMissing", true);
+				}
+				image.setTitle(title);
+				image.setDescription(description);
 			}
-			image.setTitle(title);
-			image.setDescription(description);
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);
 		}

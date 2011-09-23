@@ -194,7 +194,9 @@
 									<textarea name="description"><%image.description|html></textarea>
 								</div>
 								<div>
+									<%notfirst><button type="submit" name="moveLeft" value="true"><%= Page.ImageBrowser.Image.Button.MoveLeft|l10n|html></button><%/notfirst>
 									<button type="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
+									<%notlast><button type="submit" name="moveRight" value="true"><%= Page.ImageBrowser.Image.Button.MoveRight|l10n|html></button><%/notlast>
 								</div>
 							</div>
 						</form>
