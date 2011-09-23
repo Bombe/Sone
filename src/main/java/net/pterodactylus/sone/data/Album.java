@@ -367,6 +367,9 @@ public class Album implements Fingerprintable {
 		fingerprint.append("ID(").append(id).append(')');
 		fingerprint.append("Title(").append(title).append(')');
 		fingerprint.append("Description(").append(description).append(')');
+		if (albumImage != null) {
+			fingerprint.append("AlbumImage(").append(albumImage).append(')');
+		}
 
 		/* add nested albums. */
 		fingerprint.append("Albums(");
