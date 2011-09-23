@@ -71,6 +71,7 @@
 			<%/if>
 			<title><%album.title|xml></title>
 			<description><%album.description|xml></description>
+			<album-image><%album.albumImage.id|xml></album-image>
 			<%foreach album.images image>
 			<%first>
 			<images>

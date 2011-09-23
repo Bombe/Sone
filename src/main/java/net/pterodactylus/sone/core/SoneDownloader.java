@@ -443,6 +443,7 @@ public class SoneDownloader extends AbstractService {
 				String parentId = albumXml.getValue("parent", null);
 				String title = albumXml.getValue("title", null);
 				String description = albumXml.getValue("description", null);
+				String albumImageId = albumXml.getValue("album-image", null);
 				if ((id == null) || (title == null) || (description == null)) {
 					logger.log(Level.WARNING, "Downloaded Sone %s contains invalid album!", new Object[] { sone });
 					return null;
@@ -455,7 +456,7 @@ public class SoneDownloader extends AbstractService {
 						return null;
 					}
 				}
-				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description);
+				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description).setAlbumImage(albumImageId);
 				if (parent != null) {
 					parent.addAlbum(album);
 				} else {
