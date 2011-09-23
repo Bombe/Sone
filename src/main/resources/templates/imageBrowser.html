@@ -40,7 +40,7 @@
 				<script language="javascript">
 
 					/* ID of the image currently being edited. */
-					editingImageId = null;
+					var editingImageId = null;
 
 					/**
 					 * Shows the form for editing an image.
@@ -118,9 +118,12 @@
 						hideAndShowBlock(".delete-album", ".show-delete-album", ".hide-delete-album");
 
 						$(".image").each(function() {
-							$(".show-data", this).click(function() {
-								imageId = $(this).closest(".image").find(".image-id").text();
-								editImage(imageId);
+							imageId = $(this).closest(".image").find(".image-id").text();
+							(function(element, imageId) {
+								$(".show-data", element).click(function() {
+									editImage(imageId);
+								});
+							})(this, imageId);
 							});
 						});
 					});
