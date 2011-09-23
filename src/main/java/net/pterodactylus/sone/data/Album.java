@@ -386,7 +386,7 @@ public class Album implements Fingerprintable {
 
 		/* add images. */
 		fingerprint.append("Images(");
-		for (Image image : images.values()) {
+		for (Image image : getImages()) {
 			if (image.isInserted()) {
 				fingerprint.append(image.getFingerprint());
 			}
