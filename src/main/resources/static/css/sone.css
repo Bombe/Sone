@@ -673,7 +673,7 @@ textarea {
 	padding: 0.5ex;
 }
 
-#sone .image img, #sone .single-image img {
+#sone .single-image img {
 	border: solid 1px #000;
 	background-color: #fff;
 }
