@@ -656,17 +656,24 @@ textarea {
 	display: table-row;
 }
 
+#sone .image-container {
+	width: 200px;
+	height: 200px;
+	overflow: hidden;
+	padding: -1px;
+	border: solid 1px #000;
+}
+
 #sone .image {
 	width: 200px;
 	height: 150px;
 	display: table-cell;
-	vertical-align: middle;
+	vertical-align: top;
 	text-align: center;
 	padding: 0.5ex;
 }
 
 #sone .image img, #sone .single-image img {
-	padding: 1ex;
 	border: solid 1px #000;
 	background-color: #fff;
 }
@@ -677,6 +684,14 @@ textarea {
 
 #sone .image .edit-image textarea {
 	width: 95%;
+}
+
+#sone .image .image-title {
+	font-weight: bold;
+}
+
+#sone .image .image-description {
+	text-align: left;
 }
 
 #sone .backlinks .separator {

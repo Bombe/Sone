@@ -39,7 +39,7 @@ import net.pterodactylus.util.template.TemplateParser;
 public class ImageLinkFilter implements Filter {
 
 	/** The template to render for the &lt;img%gt; tag. */
-	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<img<%ifnull !class> class=\"<%class|css>\"<%/if> src=\"<%src|html>\" alt=\"<%alt|html>\" title=\"<%title|html>\" width=\"<%width|html>\" height=\"<%height|html>\" />"));
+	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<img<%ifnull !class> class=\"<%class|css>\"<%/if> src=\"<%src|html>\" alt=\"<%alt|html>\" title=\"<%title|html>\" width=\"<%width|html>\" height=\"<%height|html>\" style=\"position: relative;<%ifnull ! top>top: <% top|html>;<%/if><%ifnull ! left>left: <% left|html>;<%/if>\"/>"));
 
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
@@ -63,6 +63,7 @@ public class ImageLinkFilter implements Filter {
 		String imageClass = parameters.get("class");
 		int maxWidth = Numbers.safeParseInteger(parameters.get("max-width"), Integer.MAX_VALUE);
 		int maxHeight = Numbers.safeParseInteger(parameters.get("max-height"), Integer.MAX_VALUE);
+		String mode = String.valueOf(parameters.get("mode"));
 		String title = parameters.get("title");
 		if ((title != null) && title.startsWith("=")) {
 			title = String.valueOf(templateContext.get(title.substring(1)));
@@ -77,12 +78,25 @@ public class ImageLinkFilter implements Filter {
 		}
 		int imageWidth = image.getWidth();
 		int imageHeight = image.getHeight();
-		double scale = 1;
-		if ((imageWidth > maxWidth) || (imageHeight > maxHeight)) {
-			scale = Math.min(maxWidth / (double) imageWidth, maxHeight / (double) imageHeight);
+		if ("enlarge".equals(mode)) {
+			double scale = Math.max(maxWidth / (double) imageWidth, maxHeight / (double) imageHeight);
+			linkTemplateContext.set("width", (int) (imageWidth * scale + 0.5));
+			linkTemplateContext.set("height", (int) (imageHeight * scale + 0.5));
+			if (scale >= 1) {
+				linkTemplateContext.set("left", String.format("%dpx", (int) ((imageWidth * scale) - maxWidth) / 2));
+				linkTemplateContext.set("top", String.format("%dpx", (int) ((imageHeight * scale) - maxHeight) / 2));
+			} else {
+				linkTemplateContext.set("left", String.format("%dpx", (int) (maxWidth - (imageWidth * scale)) / 2));
+				linkTemplateContext.set("top", String.format("%dpx", (int) (maxHeight - (imageHeight * scale)) / 2));
+			}
+		} else {
+			double scale = 1;
+			if ((imageWidth > maxWidth) || (imageHeight > maxHeight)) {
+				scale = Math.min(maxWidth / (double) imageWidth, maxHeight / (double) imageHeight);
+			}
+			linkTemplateContext.set("width", (int) (imageWidth * scale + 0.5));
+			linkTemplateContext.set("height", (int) (imageHeight * scale + 0.5));
 		}
-		linkTemplateContext.set("width", (int) (imageWidth * scale + 0.5));
-		linkTemplateContext.set("height", (int) (imageHeight * scale + 0.5));
 		linkTemplateContext.set("alt", Default.forNull(title, image.getDescription()));
 		linkTemplateContext.set("title", Default.forNull(title, image.getTitle()));
 
