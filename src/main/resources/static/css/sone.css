@@ -652,11 +652,11 @@ textarea {
 #sone .album {
 }
 
-#sone .image-row {
+#sone .image-row, #sone .album-row {
 	display: table-row;
 }
 
-#sone .image-container {
+#sone .image-container, #sone .album-container {
 	width: 250px;
 	height: 250px;
 	overflow: hidden;
@@ -664,7 +664,7 @@ textarea {
 	border: solid 1px #000;
 }
 
-#sone .image {
+#sone .image, #sone .album {
 	display: table-cell;
 	vertical-align: top;
 	text-align: center;
@@ -676,11 +676,11 @@ textarea {
 	background-color: #fff;
 }
 
-#sone .image .edit-image input {
+#sone .image .edit-image input, #sone .album .edit-album input {
 	width: 95%;
 }
 
-#sone .image .edit-image textarea {
+#sone .image .edit-image textarea, #sone .album .edit-album textarea {
 	width: 95%;
 }
 
