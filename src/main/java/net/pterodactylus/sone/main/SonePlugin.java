@@ -103,6 +103,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	/** The l10n helper. */
 	private PluginL10n l10n;
 
+	/** The web of trust connector. */
+	private WebOfTrustConnector webOfTrustConnector;
+
 	/** The identity manager. */
 	private IdentityManager identityManager;
 
@@ -181,7 +184,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			/* create web of trust connector. */
 			PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
-			WebOfTrustConnector webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
+			webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
 			identityManager = new IdentityManager(webOfTrustConnector);
 			identityManager.setContext("Sone");
 
@@ -236,6 +239,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			/* stop the identity manager. */
 			identityManager.stop();
+
+			/* stop the web of trust connector. */
+			webOfTrustConnector.stop();
 		} catch (Throwable t1) {
 			logger.log(Level.SEVERE, "Error while shutting down!", t1);
 		} finally {
