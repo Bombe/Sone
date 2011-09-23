@@ -358,7 +358,7 @@
 				</div>
 			<%/if>
 
-			<%include include/browseAlbums.html>
+			<%include include/browseAlbums.html albums=album.albums>
 
 			<%if album.sone.local>
 				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>
@@ -553,7 +553,7 @@
 
 			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
 
-			<%include include/browseAlbums.html>
+			<%include include/browseAlbums.html albums=sone.albums>
 
 			<%if sone.local>
 				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>

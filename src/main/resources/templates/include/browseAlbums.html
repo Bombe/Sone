@@ -1,4 +1,4 @@
-<%foreach album.albums album>
+<%foreach albums album>
 	<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
 	<%if loop.count|mod divisor=3><div class="album-row"><%/if>
 	<div id="album-<% album.id|html>" class="album">
