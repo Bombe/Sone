@@ -686,12 +686,14 @@ textarea {
 	width: 95%;
 }
 
-#sone .image .image-title {
+#sone .image .image-title, #sone .album .album-title {
 	font-weight: bold;
 }
 
-#sone .image .image-description {
+#sone .image .image-description, #sone .album .album-description {
 	text-align: left;
+	width: 195px;
+	word-wrap: break-word;
 }
 
 #sone .backlinks .separator {
