@@ -75,6 +75,7 @@ import net.pterodactylus.sone.web.ajax.DeleteProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DismissNotificationAjaxPage;
 import net.pterodactylus.sone.web.ajax.DistrustAjaxPage;
+import net.pterodactylus.sone.web.ajax.EditImageAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
@@ -664,6 +665,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));

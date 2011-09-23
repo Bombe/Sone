@@ -75,6 +75,43 @@
 						editingImageId = null;
 					}
 
+					/**
+					 * Returns the image element with the given ID.
+					 *
+					 * @param imageId The ID of the image
+					 * @return The image element
+					 */
+					function getImage(imageId) {
+						return $("#sone .image .image-id:contains('" + imageId + "')").closest(".image");
+					}
+
+					/**
+					 * Swaps two images.
+					 *
+					 * @param sourceId The ID of the source image
+					 * @param destinationId The ID of the destionation image
+					 */
+					function swapImage(sourceId, destinationId) {
+						sourceElement = getImage(sourceId);
+						destinationElement = getImage(destinationId);
+						sourceParent = sourceElement.closest(".image-row");
+						sourcePrevSibling = sourceElement.prev();
+						sourceElement.detach();
+						destinationElement.before(sourceElement);
+						if (sourcePrevSibling.get(0) != destinationElement.get(0)) {
+							destinationElement.detach();
+							(sourcePrevSibling.size() > 0) ? sourcePrevSibling.after(destinationElement) : sourceParent.prepend(destinationElement);
+						}
+						if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") != $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
+							$("button[name='moveLeft']", sourceElement).toggleClass("hidden");
+							$("button[name='moveLeft']", destinationElement).toggleClass("hidden");
+						}
+						if ($("button[name='moveRight']", sourceElement).hasClass("hidden") != $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
+							$("button[name='moveRight']", sourceElement).toggleClass("hidden");
+							$("button[name='moveRight']", destinationElement).toggleClass("hidden");
+						}
+					}
+
 					$(function() {
 						getTranslation("WebInterface.DefaultText.UploadImage.Title", function(text) {
 							$("#upload-image :input[name='title']").each(function() {
@@ -121,8 +158,29 @@
 								$(".show-data", element).click(function() {
 									editImage(imageId);
 								});
+								$("button[name='moveLeft'], button[name='moveRight']", element).click(function() {
+									ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "moveLeft": this.name == "moveLeft", "moveRight": this.name == "moveRight" }, function(data) {
+										if (data && data.success) {
+											swapImage(data.sourceImageId, data.destinationImageId);
+										}
+									});
+									return false;
+								});
+								$("button[name='submit']", element).click(function() {
+									title = $(":input[name='title']:enabled", this.form).val();
+									description = $(":input[name='description']:enabled", this.form).val();
+									ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "title": title, "description": description }, function(data) {
+										if (data && data.success) {
+											getImage(data.imageId).find(".image-title").text(data.title);
+											getImage(data.imageId).find(".image-description").text(data.description);
+											getImage(data.imageId).find(":input[name='title']").attr("defaultValue", title);
+											getImage(data.imageId).find(":input[name='description']").attr("defaultValue", description);
+											cancelEditing();
+										}
+									});
+									return false;
+								});
 							})(this, imageId);
-							});
 						});
 					});
 				</script>
@@ -235,9 +293,9 @@
 									<textarea name="description"><%image.description|html></textarea>
 								</div>
 								<div>
-									<%notfirst><button type="submit" name="moveLeft" value="true"><%= Page.ImageBrowser.Image.Button.MoveLeft|l10n|html></button><%/notfirst>
-									<button type="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
-									<%notlast><button type="submit" name="moveRight" value="true"><%= Page.ImageBrowser.Image.Button.MoveRight|l10n|html></button><%/notlast>
+									<button <%first>class="hidden" <%/first>type="submit" name="moveLeft" value="true"><%= Page.ImageBrowser.Image.Button.MoveLeft|l10n|html></button>
+									<button type="submit" name="submit"><%= Page.ImageBrowser.Image.Button.Save|l10n|html></button>
+									<button <%last>class="hidden" <%/last>type="submit" name="moveRight" value="true"><%= Page.ImageBrowser.Image.Button.MoveRight|l10n|html></button>
 								</div>
 							</div>
 						</form>
