@@ -70,6 +70,13 @@ public class WebOfTrustConnector implements ConnectorListener {
 	//
 
 	/**
+	 * Stops the web of trust connector.
+	 */
+	public void stop() {
+		pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, this);
+	}
+
+	/**
 	 * Loads all own identities from the Web of Trust plugin.
 	 *
 	 * @return All own identity
