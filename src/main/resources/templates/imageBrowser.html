@@ -38,6 +38,45 @@
 
 			<%if album.sone.local>
 				<script language="javascript">
+
+					/* ID of the image currently being edited. */
+					editingImageId = null;
+
+					/**
+					 * Shows the form for editing an image.
+					 *
+					 * @param imageId The ID of the image to edit.
+					 */
+					function editImage(imageId) {
+						if (editingImageId != imageId) {
+							cancelEditing();
+						} else {
+							return;
+						}
+						$(".show-data", "#image-" + imageId).hide();
+						$(".edit-data", "#image-" + imageId).show();
+						$(document).bind("click.sone", function(event) {
+							console.log("event: " + event);
+							console.log("closest: " + $(event.target).closest("#image-" + imageId));
+							if ($(event.target).closest("#image-" + imageId).size() == 0) {
+								cancelEditing();
+							}
+						});
+					}
+
+					/**
+					 * Cancels all image editing.
+					 */
+					function cancelEditing() {
+						$(".show-data").show();
+						$(".edit-data").hide();
+						$("form.edit-image").each(function() {
+							this.reset();
+						});
+						$(document).unbind("click.sone");
+						editingImageId = null;
+					}
+
 					$(function() {
 						getTranslation("WebInterface.DefaultText.UploadImage.Title", function(text) {
 							$("#upload-image :input[name='title']").each(function() {
@@ -78,22 +117,12 @@
 						hideAndShowBlock(".upload-image", ".show-upload-image", ".hide-upload-image");
 						hideAndShowBlock(".delete-album", ".show-delete-album", ".hide-delete-album");
 
-						hideAndShowData = function(activationElements, activeElements, hideElement, showElement) {
-							$(activationElements).click(function() {
+						$(".image").each(function() {
+							$(".show-data", this).click(function() {
 								imageId = $(this).closest(".image").find(".image-id").text();
-								$(hideElement, $("#image-" + imageId)).hide();
-								$(showElement, $("#image-" + imageId)).show();
-								$(document).click(function(event) {
-									if ($(event.target).closest("#image-" + imageId).size() == 0) {
-										$(showElement).hide();
-										$(hideElement).show();
-									}
-									return $(event.target).is("button");
-								});
+								editImage(imageId);
 							});
-						};
-
-						hideAndShowData(".image-title, .image-description", ".image", ".show-data", ".edit-data");
+						});
 					});
 				</script>
 			<%/if>
