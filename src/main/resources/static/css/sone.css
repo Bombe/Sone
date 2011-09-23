@@ -665,8 +665,6 @@ textarea {
 }
 
 #sone .image {
-	width: 200px;
-	height: 150px;
 	display: table-cell;
 	vertical-align: top;
 	text-align: center;
