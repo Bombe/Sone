@@ -269,8 +269,8 @@ public class Album implements Fingerprintable {
 	}
 
 	/**
-	 * Move the given image down in this album’s images. If the image is already
-	 * the last image, nothing happens.
+	 * Moves the given image down in this album’s images. If the image is
+	 * already the last image, nothing happens.
 	 *
 	 * @param image
 	 *            The image to move down
