@@ -57,12 +57,12 @@ public class EditAlbumAjaxPage extends JsonPage {
 			return createErrorJsonObject("not-authorized");
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveLeft"))) {
-			Album swappedAlbum = album.getParent().moveAlbumUp(album);
+			Album swappedAlbum = (album.getParent() != null) ? album.getParent().moveAlbumUp(album) : album.getSone().moveAlbumUp(album);
 			webInterface.getCore().touchConfiguration();
 			return createSuccessJsonObject().put("sourceAlbumId", album.getId()).put("destinationAlbumId", swappedAlbum.getId());
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveRight"))) {
-			Album swappedAlbum = album.getParent().moveAlbumDown(album);
+			Album swappedAlbum = (album.getParent() != null) ? album.getParent().moveAlbumDown(album) : album.getSone().moveAlbumDown(album);
 			webInterface.getCore().touchConfiguration();
 			return createSuccessJsonObject().put("sourceAlbumId", album.getId()).put("destinationAlbumId", swappedAlbum.getId());
 		}

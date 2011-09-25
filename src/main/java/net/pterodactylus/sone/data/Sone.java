@@ -681,6 +681,46 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
+	 * Moves the given album up in this album’s albums. If the album is already
+	 * the first album, nothing happens.
+	 *
+	 * @param album
+	 *            The album to move up
+	 * @return The album that the given album swapped the place with, or
+	 *         <code>null</code> if the album did not change its place
+	 */
+	public Album moveAlbumUp(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).isNull("Album Parent", album.getParent()).check();
+		int oldIndex = albums.indexOf(album);
+		if (oldIndex <= 0) {
+			return null;
+		}
+		albums.remove(oldIndex);
+		albums.add(oldIndex - 1, album);
+		return albums.get(oldIndex);
+	}
+
+	/**
+	 * Moves the given album down in this album’s albums. If the album is
+	 * already the last album, nothing happens.
+	 *
+	 * @param album
+	 *            The album to move down
+	 * @return The album that the given album swapped the place with, or
+	 *         <code>null</code> if the album did not change its place
+	 */
+	public Album moveAlbumDown(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).isNull("Album Parent", album.getParent()).check();
+		int oldIndex = albums.indexOf(album);
+		if ((oldIndex < 0) || (oldIndex >= (albums.size() - 1))) {
+			return null;
+		}
+		albums.remove(oldIndex);
+		albums.add(oldIndex + 1, album);
+		return albums.get(oldIndex);
+	}
+
+	/**
 	 * Returns Sone-specific options.
 	 *
 	 * @return The options of this Sone
