@@ -1223,6 +1223,22 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 			}
+			synchronized (albums) {
+				synchronized (images) {
+					for (Album album : storedSone.getAlbums()) {
+						albums.remove(album.getId());
+						for (Image image : album.getImages()) {
+							images.remove(image.getId());
+						}
+					}
+					for (Album album : sone.getAlbums()) {
+						albums.put(album.getId(), album);
+						for (Image image : album.getImages()) {
+							images.put(image.getId(), image);
+						}
+					}
+				}
+			}
 			synchronized (storedSone) {
 				if (!soneRescueMode || (sone.getTime() > storedSone.getTime())) {
 					storedSone.setTime(sone.getTime());
@@ -1241,6 +1257,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 					for (String likedReplyId : sone.getLikedReplyIds()) {
 						storedSone.addLikedReplyId(likedReplyId);
+					}
+					for (Album album : sone.getAlbums()) {
+						storedSone.addAlbum(album);
 					}
 				} else {
 					storedSone.setPosts(sone.getPosts());
