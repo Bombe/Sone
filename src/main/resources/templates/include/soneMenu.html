@@ -14,8 +14,8 @@
 		<%/foreach>
 		<%if !sone.local>
 			<div>
-				<a class="follow<%if sone.friend> hidden<%/if>">» <%= View.Sone.Button.FollowSone|l10n|html></a>
-				<a class="unfollow<%if !sone.friend> hidden<%/if>">» <%= View.Sone.Button.UnfollowSone|l10n|html></a>
+				<button class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></button>
+				<button class="unfollow<%if !sone.friend> hidden<%/if>"><%= View.Sone.Button.UnfollowSone|l10n|html></buton>
 			</div>
 		<%/if>
 	</div>
