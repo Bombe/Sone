@@ -814,7 +814,7 @@ public class WebInterface implements CoreListener {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && (reply.getPost().getSone() != null)) {
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && (reply.getPost().getSone() != null) && (reply.getTime() <= System.currentTimeMillis())) {
 				mentionNotification.add(reply.getPost());
 				notificationManager.addNotification(mentionNotification);
 			}
