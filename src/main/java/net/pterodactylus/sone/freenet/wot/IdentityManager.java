@@ -178,7 +178,6 @@ public class IdentityManager extends AbstractService {
 		Map<OwnIdentity, Map<String, Identity>> oldIdentities = Collections.emptyMap();
 		while (!shouldStop()) {
 			Map<OwnIdentity, Map<String, Identity>> currentIdentities = new HashMap<OwnIdentity, Map<String, Identity>>();
-			@SuppressWarnings("hiding")
 			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
 			Set<OwnIdentity> ownIdentities = null;

@@ -37,6 +37,9 @@ public class SoneException extends Exception {
 		/** An invalid URI was specified. */
 		INVALID_URI,
 
+		/** An insert failed. */
+		INSERT_FAILED,
+
 	}
 
 	/** The type of the exception. */

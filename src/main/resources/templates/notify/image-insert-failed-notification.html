@@ -1,0 +1,6 @@
+<div class="text">
+	<%= Notification.ImageInsertFailed.Text|l10n|html>
+	<%foreach images image>
+		<a href="imageBrowser.html?image=<%image.id|html>" title="<%image.title|html>"><%image.title|html></a><%notlast>,<%/notlast><%last>.<%/last>
+	<%/foreach>
+</div>

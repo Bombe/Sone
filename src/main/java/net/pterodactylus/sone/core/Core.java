@@ -34,12 +34,15 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -67,7 +70,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener {
+public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener, ImageInsertListener {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -115,6 +118,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** The Sone downloader. */
 	private final SoneDownloader soneDownloader;
+
+	/** The image inserter. */
+	private final ImageInserter imageInserter;
 
 	/** Sone downloader thread-pool. */
 	private final ExecutorService soneDownloaders = Executors.newFixedThreadPool(10);
@@ -182,6 +188,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/** Trusted identities, sorted by own identities. */
 	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
 
+	/** All known albums. */
+	private Map<String, Album> albums = new HashMap<String, Album>();
+
+	/** All known images. */
+	private Map<String, Image> images = new HashMap<String, Image>();
+
+	/** All temporary images. */
+	private Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
+
 	/** Ticker for threads that mark own elements as known. */
 	private Ticker localElementTicker = new Ticker();
 
@@ -204,6 +219,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
+		this.imageInserter = new ImageInserter(this, freenetInterface);
 		this.updateChecker = new UpdateChecker(freenetInterface);
 	}
 
@@ -696,7 +712,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public List<Reply> getReplies(Post post) {
 		Set<Sone> sones = getSones();
-		@SuppressWarnings("hiding")
 		List<Reply> replies = new ArrayList<Reply>();
 		for (Sone sone : sones) {
 			for (Reply reply : sone.getReplies()) {
@@ -789,7 +804,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return All bookmarked posts
 	 */
 	public Set<Post> getBookmarkedPosts() {
-		@SuppressWarnings("hiding")
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
@@ -800,6 +814,89 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 		}
 		return posts;
+	}
+
+	/**
+	 * Returns the album with the given ID, creating a new album if no album
+	 * with the given ID can be found.
+	 *
+	 * @param albumId
+	 *            The ID of the album
+	 * @return The album with the given ID
+	 */
+	public Album getAlbum(String albumId) {
+		return getAlbum(albumId, true);
+	}
+
+	/**
+	 * Returns the album with the given ID, optionally creating a new album if
+	 * an album with the given ID can not be found.
+	 *
+	 * @param albumId
+	 *            The ID of the album
+	 * @param create
+	 *            {@code true} to create a new album if none exists for the
+	 *            given ID
+	 * @return The album with the given ID, or {@code null} if no album with the
+	 *         given ID exists and {@code create} is {@code false}
+	 */
+	public Album getAlbum(String albumId, boolean create) {
+		synchronized (albums) {
+			Album album = albums.get(albumId);
+			if (create && (album == null)) {
+				album = new Album(albumId);
+				albums.put(albumId, album);
+			}
+			return album;
+		}
+	}
+
+	/**
+	 * Returns the image with the given ID, creating it if necessary.
+	 *
+	 * @param imageId
+	 *            The ID of the image
+	 * @return The image with the given ID
+	 */
+	public Image getImage(String imageId) {
+		return getImage(imageId, true);
+	}
+
+	/**
+	 * Returns the image with the given ID, optionally creating it if it does
+	 * not exist.
+	 *
+	 * @param imageId
+	 *            The ID of the image
+	 * @param create
+	 *            {@code true} to create an image if none exists with the given
+	 *            ID
+	 * @return The image with the given ID, or {@code null} if none exists and
+	 *         none was created
+	 */
+	public Image getImage(String imageId, boolean create) {
+		synchronized (images) {
+			Image image = images.get(imageId);
+			if (create && (image == null)) {
+				image = new Image(imageId);
+				images.put(imageId, image);
+			}
+			return image;
+		}
+	}
+
+	/**
+	 * Returns the temporary image with the given ID.
+	 *
+	 * @param imageId
+	 *            The ID of the temporary image
+	 * @return The temporary image, or {@code null} if there is no temporary
+	 *         image with the given ID
+	 */
+	public TemporaryImage getTemporaryImage(String imageId) {
+		synchronized (temporaryImages) {
+			return temporaryImages.get(imageId);
+		}
 	}
 
 	//
@@ -1126,6 +1223,22 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 			}
+			synchronized (albums) {
+				synchronized (images) {
+					for (Album album : storedSone.getAlbums()) {
+						albums.remove(album.getId());
+						for (Image image : album.getImages()) {
+							images.remove(image.getId());
+						}
+					}
+					for (Album album : sone.getAlbums()) {
+						albums.put(album.getId(), album);
+						for (Image image : album.getImages()) {
+							images.put(image.getId(), image);
+						}
+					}
+				}
+			}
 			synchronized (storedSone) {
 				if (!soneRescueMode || (sone.getTime() > storedSone.getTime())) {
 					storedSone.setTime(sone.getTime());
@@ -1145,11 +1258,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					for (String likedReplyId : sone.getLikedReplyIds()) {
 						storedSone.addLikedReplyId(likedReplyId);
 					}
+					for (Album album : sone.getAlbums()) {
+						storedSone.addAlbum(album);
+					}
 				} else {
 					storedSone.setPosts(sone.getPosts());
 					storedSone.setReplies(sone.getReplies());
 					storedSone.setLikePostIds(sone.getLikedPostIds());
 					storedSone.setLikeReplyIds(sone.getLikedReplyIds());
+					storedSone.setAlbums(sone.getAlbums());
 				}
 				storedSone.setLatestEdition(sone.getLatestEdition());
 			}
@@ -1256,7 +1373,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 
 		/* load posts. */
-		@SuppressWarnings("hiding")
 		Set<Post> posts = new HashSet<Post>();
 		while (true) {
 			String postPrefix = sonePrefix + "/Posts/" + posts.size();
@@ -1279,7 +1395,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 
 		/* load replies. */
-		@SuppressWarnings("hiding")
 		Set<Reply> replies = new HashSet<Reply>();
 		while (true) {
 			String replyPrefix = sonePrefix + "/Replies/" + replies.size();
@@ -1327,6 +1442,65 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			friends.add(friendId);
 		}
 
+		/* load albums. */
+		List<Album> topLevelAlbums = new ArrayList<Album>();
+		int albumCounter = 0;
+		while (true) {
+			String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
+			String albumId = configuration.getStringValue(albumPrefix + "/ID").getValue(null);
+			if (albumId == null) {
+				break;
+			}
+			String albumTitle = configuration.getStringValue(albumPrefix + "/Title").getValue(null);
+			String albumDescription = configuration.getStringValue(albumPrefix + "/Description").getValue(null);
+			String albumParentId = configuration.getStringValue(albumPrefix + "/Parent").getValue(null);
+			String albumImageId = configuration.getStringValue(albumPrefix + "/AlbumImage").getValue(null);
+			if ((albumTitle == null) || (albumDescription == null)) {
+				logger.log(Level.WARNING, "Invalid album found, aborting load!");
+				return;
+			}
+			Album album = getAlbum(albumId).setSone(sone).setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId);
+			if (albumParentId != null) {
+				Album parentAlbum = getAlbum(albumParentId, false);
+				if (parentAlbum == null) {
+					logger.log(Level.WARNING, "Invalid parent album ID: " + albumParentId);
+					return;
+				}
+				parentAlbum.addAlbum(album);
+			} else {
+				topLevelAlbums.add(album);
+			}
+		}
+
+		/* load images. */
+		int imageCounter = 0;
+		while (true) {
+			String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
+			String imageId = configuration.getStringValue(imagePrefix + "/ID").getValue(null);
+			if (imageId == null) {
+				break;
+			}
+			String albumId = configuration.getStringValue(imagePrefix + "/Album").getValue(null);
+			String key = configuration.getStringValue(imagePrefix + "/Key").getValue(null);
+			String title = configuration.getStringValue(imagePrefix + "/Title").getValue(null);
+			String description = configuration.getStringValue(imagePrefix + "/Description").getValue(null);
+			Long creationTime = configuration.getLongValue(imagePrefix + "/CreationTime").getValue(null);
+			Integer width = configuration.getIntValue(imagePrefix + "/Width").getValue(null);
+			Integer height = configuration.getIntValue(imagePrefix + "/Height").getValue(null);
+			if ((albumId == null) || (key == null) || (title == null) || (description == null) || (creationTime == null) || (width == null) || (height == null)) {
+				logger.log(Level.WARNING, "Invalid image found, aborting load!");
+				return;
+			}
+			Album album = getAlbum(albumId, false);
+			if (album == null) {
+				logger.log(Level.WARNING, "Invalid album image encountered, aborting load!");
+				return;
+			}
+			Image image = getImage(imageId).setSone(sone).setCreationTime(creationTime).setKey(key);
+			image.setTitle(title).setDescription(description).setWidth(width).setHeight(height);
+			album.addImage(image);
+		}
+
 		/* load options. */
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
 		sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
@@ -1340,6 +1514,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
 			sone.setFriends(friends);
+			sone.setAlbums(topLevelAlbums);
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
 		synchronized (newSones) {
@@ -1629,6 +1804,150 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
+	 * Creates a new top-level album for the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to create the album for
+	 * @return The new album
+	 */
+	public Album createAlbum(Sone sone) {
+		return createAlbum(sone, null);
+	}
+
+	/**
+	 * Creates a new album for the given Sone.
+	 *
+	 * @param sone
+	 *            The Sone to create the album for
+	 * @param parent
+	 *            The parent of the album (may be {@code null} to create a
+	 *            top-level album)
+	 * @return The new album
+	 */
+	public Album createAlbum(Sone sone, Album parent) {
+		Album album = new Album();
+		synchronized (albums) {
+			albums.put(album.getId(), album);
+		}
+		album.setSone(sone);
+		if (parent != null) {
+			parent.addAlbum(album);
+		} else {
+			sone.addAlbum(album);
+		}
+		return album;
+	}
+
+	/**
+	 * Deletes the given album. The owner of the album has to be a local Sone,
+	 * and the album has to be {@link Album#isEmpty() empty} to be deleted.
+	 *
+	 * @param album
+	 *            The album to remove
+	 */
+	public void deleteAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().is("Local Sone", isLocalSone(album.getSone())).check();
+		if (!album.isEmpty()) {
+			return;
+		}
+		if (album.getParent() == null) {
+			album.getSone().removeAlbum(album);
+		} else {
+			album.getParent().removeAlbum(album);
+		}
+		synchronized (albums) {
+			albums.remove(album.getId());
+		}
+		saveSone(album.getSone());
+	}
+
+	/**
+	 * Creates a new image.
+	 *
+	 * @param sone
+	 *            The Sone creating the image
+	 * @param album
+	 *            The album the image will be inserted into
+	 * @param temporaryImage
+	 *            The temporary image to create the image from
+	 * @return The newly created image
+	 */
+	public Image createImage(Sone sone, Album album, TemporaryImage temporaryImage) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Album", album).isNotNull("Temporary Image", temporaryImage).check().is("Local Sone", isLocalSone(sone)).check().isEqual("Owner and Album Owner", sone, album.getSone()).check();
+		Image image = new Image(temporaryImage.getId()).setSone(sone).setCreationTime(System.currentTimeMillis());
+		album.addImage(image);
+		synchronized (images) {
+			images.put(image.getId(), image);
+		}
+		imageInserter.insertImage(temporaryImage, image);
+		return image;
+	}
+
+	/**
+	 * Deletes the given image. This method will also delete a matching
+	 * temporary image.
+	 *
+	 * @see #deleteTemporaryImage(TemporaryImage)
+	 * @param image
+	 *            The image to delete
+	 */
+	public void deleteImage(Image image) {
+		Validation.begin().isNotNull("Image", image).check().is("Local Sone", isLocalSone(image.getSone())).check();
+		deleteTemporaryImage(image.getId());
+		image.getAlbum().removeImage(image);
+		synchronized (images) {
+			images.remove(image.getId());
+		}
+		saveSone(image.getSone());
+	}
+
+	/**
+	 * Creates a new temporary image.
+	 *
+	 * @param mimeType
+	 *            The MIME type of the temporary image
+	 * @param imageData
+	 *            The encoded data of the image
+	 * @return The temporary image
+	 */
+	public TemporaryImage createTemporaryImage(String mimeType, byte[] imageData) {
+		TemporaryImage temporaryImage = new TemporaryImage();
+		temporaryImage.setMimeType(mimeType).setImageData(imageData);
+		synchronized (temporaryImages) {
+			temporaryImages.put(temporaryImage.getId(), temporaryImage);
+		}
+		return temporaryImage;
+	}
+
+	/**
+	 * Deletes the given temporary image.
+	 *
+	 * @param temporaryImage
+	 *            The temporary image to delete
+	 */
+	public void deleteTemporaryImage(TemporaryImage temporaryImage) {
+		Validation.begin().isNotNull("Temporary Image", temporaryImage).check();
+		deleteTemporaryImage(temporaryImage.getId());
+	}
+
+	/**
+	 * Deletes the temporary image with the given ID.
+	 *
+	 * @param imageId
+	 *            The ID of the temporary image to delete
+	 */
+	public void deleteTemporaryImage(String imageId) {
+		Validation.begin().isNotNull("Temporary Image ID", imageId).check();
+		synchronized (temporaryImages) {
+			temporaryImages.remove(imageId);
+		}
+		Image image = getImage(imageId, false);
+		if (image != null) {
+			imageInserter.cancelImageInsert(image);
+		}
+	}
+
+	/**
 	 * Notifies the core that the configuration, either of the core or of a
 	 * single local Sone, has changed, and that the configuration should be
 	 * saved.
@@ -1776,6 +2095,40 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter++ + "/ID").setValue(friendId);
 			}
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
+
+			/* save albums. first, collect in a flat structure, top-level first. */
+			List<Album> albums = Sone.flattenAlbums(sone.getAlbums());
+
+			int albumCounter = 0;
+			for (Album album : albums) {
+				String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
+				configuration.getStringValue(albumPrefix + "/ID").setValue(album.getId());
+				configuration.getStringValue(albumPrefix + "/Title").setValue(album.getTitle());
+				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
+				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
+				configuration.getStringValue(albumPrefix + "/AlbumImage").setValue(album.getAlbumImage() == null ? null : album.getAlbumImage().getId());
+			}
+			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
+
+			/* save images. */
+			int imageCounter = 0;
+			for (Album album : albums) {
+				for (Image image : album.getImages()) {
+					if (!image.isInserted()) {
+						continue;
+					}
+					String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
+					configuration.getStringValue(imagePrefix + "/ID").setValue(image.getId());
+					configuration.getStringValue(imagePrefix + "/Album").setValue(album.getId());
+					configuration.getStringValue(imagePrefix + "/Key").setValue(image.getKey());
+					configuration.getStringValue(imagePrefix + "/Title").setValue(image.getTitle());
+					configuration.getStringValue(imagePrefix + "/Description").setValue(image.getDescription());
+					configuration.getLongValue(imagePrefix + "/CreationTime").setValue(image.getCreationTime());
+					configuration.getIntValue(imagePrefix + "/Width").setValue(image.getWidth());
+					configuration.getIntValue(imagePrefix + "/Height").setValue(image.getHeight());
+				}
+			}
+			configuration.getStringValue(sonePrefix + "/Images/" + imageCounter + "/ID").setValue(null);
 
 			/* save options. */
 			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
@@ -2129,12 +2482,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	//
-	// SONEINSERTLISTENER METHODS
+	// INTERFACE ImageInsertListener
 	//
 
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public void insertStarted(Sone sone) {
 		coreListenerManager.fireSoneInserting(sone);
 	}
@@ -2153,6 +2507,49 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void insertAborted(Sone sone, Throwable cause) {
 		coreListenerManager.fireSoneInsertAborted(sone, cause);
+	}
+
+	//
+	// SONEINSERTLISTENER METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertStarted(Image image) {
+		logger.log(Level.WARNING, "Image insert started for " + image);
+		coreListenerManager.fireImageInsertStarted(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertAborted(Image image) {
+		logger.log(Level.WARNING, "Image insert aborted for " + image);
+		coreListenerManager.fireImageInsertAborted(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFinished(Image image, FreenetURI key) {
+		logger.log(Level.WARNING, "Image insert finished for " + image + ": " + key);
+		image.setKey(key.toString());
+		deleteTemporaryImage(image.getId());
+		saveSone(image.getSone());
+		coreListenerManager.fireImageInsertFinished(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFailed(Image image, Throwable cause) {
+		logger.log(Level.WARNING, "Image insert failed for " + image, cause);
+		coreListenerManager.fireImageInsertFailed(image, cause);
 	}
 
 	/**

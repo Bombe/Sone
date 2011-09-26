@@ -194,7 +194,7 @@ public class Options {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean validate(@SuppressWarnings("hiding") T value) {
+		public boolean validate(T value) {
 			return (validator == null) || (value == null) || validator.validate(value);
 		}
 

@@ -1,0 +1,45 @@
+<%foreach albums album>
+	<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
+	<%if loop.count|mod divisor=3><div class="album-row"><%/if>
+	<div id="album-<% album.id|html>" class="album">
+		<div class="album-id hidden"><% album.id|html></div>
+		<div class="album-container">
+			<a href="imageBrowser.html?album=<% album.id|html>" title="<% album.title|html>">
+				<%ifnull album.albumImage>
+					<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html>" title="<% album.title|html>" style="position: relative; top: 0px; left: -41px;" />
+				<%else><!-- TODO -->
+					<% album.albumImage|image-link max-width=250 max-height=250 mode=enlarge title==album.title>
+				<%/if>
+			</a>
+		</div>
+		<div class="show-data">
+			<div class="album-title"><% album.title|html></div>
+			<div class="album-description"><% album.description|html></div>
+		</div>
+		<%if album.sone.local>
+			<form class="edit-album" action="editAlbum.html" method="post">
+				<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+				<input type="hidden" name="returnPage" value="<%request.uri|html>" />
+				<input type="hidden" name="album" value="<%album.id|html>" />
+
+				<div class="edit-data hidden">
+					<div>
+						<input type="text" name="title" value="<%album.title|html>" />
+					</div>
+					<div>
+						<textarea name="description"><%album.description|html></textarea>
+					</div>
+					<div>
+						<button <%first>class="hidden" <%/first>type="submit" name="moveLeft" value="true"><%= Page.ImageBrowser.Image.Button.MoveLeft|l10n|html></button>
+						<button type="submit" name="submit"><%= Page.ImageBrowser.Album.Button.Save|l10n|html></button>
+						<button <%last>class="hidden" <%/last>type="submit" name="moveRight" value="true"><%= Page.ImageBrowser.Image.Button.MoveRight|l10n|html></button>
+					</div>
+				</div>
+			</form>
+		<%/if>
+	</div>
+	<%= false|store key=endRow>
+	<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
+	<%last><%= true|store key=endRow><%/last>
+	<%if endRow></div><%/if>
+<%/foreach>

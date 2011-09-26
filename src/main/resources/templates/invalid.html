@@ -2,6 +2,14 @@
 
 	<h1><%= Page.Invalid.Page.Title|l10n|html></h1>
 
-	<p><%= Page.Invalid.Text|l10n|html|replace needle="{link}" replacement='<a href="index.html">'|replace needle="{/link}" replacement='</a>'></p>
+	<%foreach messages message>
+		<%if message|substring start=0 length=1|match value='!'>
+			<p class="error"><% message|substring start=1|parse></p>
+		<%else>
+			<p><% message|parse></p>
+		<%/if>
+	<%foreachelse>
+		<p><%= Page.Invalid.Text|l10n|html|replace needle="{link}" replacement='<a href="index.html">'|replace needle="{/link}" replacement='</a>'></p>
+	<%/foreach>
 
 <%include include/tail.html>

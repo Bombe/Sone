@@ -204,10 +204,9 @@ public class FreenetTemplatePage implements Page<FreenetRequest>, LinkEnabledCal
 
 	/**
 	 * This method will be called after
-	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
-	 * has processed the template and the template was rendered. This method
-	 * will not be called if
-	 * {@link #processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
+	 * {@link #processTemplate(FreenetRequest, TemplateContext)} has processed
+	 * the template and the template was rendered. This method will not be
+	 * called if {@link #processTemplate(FreenetRequest, TemplateContext)}
 	 * throws a {@link RedirectException}!
 	 *
 	 * @param request
@@ -268,7 +267,7 @@ public class FreenetTemplatePage implements Page<FreenetRequest>, LinkEnabledCal
 	/**
 	 * Exception that can be thrown to signal that a subclassed {@link Page}
 	 * wants to redirect the user during the
-	 * {@link FreenetTemplatePage#processTemplate(net.pterodactylus.sone.web.page.Page.Request, TemplateContext)}
+	 * {@link FreenetTemplatePage#processTemplate(FreenetRequest, TemplateContext)}
 	 * method call.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>

@@ -4,13 +4,18 @@
 	<div class="inner-menu">
 		<div>
 			<a class="author" href="viewSone.html?sone=<%sone.id|html>"><%sone.niceName|html></a>
-			<span class="author-wot-link">(<a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>"><% =View.Post.WebOfTrustLink|l10n|html></a>)</span>
+			(<%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size>)
 		</div>
-		<div><%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size></div>
+		<div><a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>">» <% =View.Post.WebOfTrustLink|l10n|html></a></div>
+		<%foreach sone.albums album>
+			<%first>
+				<div><a href="imageBrowser.html?sone=<% sone.id|html>">» <% =View.SoneMenu.Link.AllAlbums|l10n|html></a></div>
+			<%/first>
+		<%/foreach>
 		<%if !sone.local>
 			<div>
-				<a class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></a>
-				<a class="unfollow<%if !sone.friend> hidden<%/if>"><%= View.Sone.Button.UnfollowSone|l10n|html></a>
+				<button class="follow<%if sone.friend> hidden<%/if>"><%= View.Sone.Button.FollowSone|l10n|html></button>
+				<button class="unfollow<%if !sone.friend> hidden<%/if>"><%= View.Sone.Button.UnfollowSone|l10n|html></buton>
 			</div>
 		<%/if>
 	</div>
