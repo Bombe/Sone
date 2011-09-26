@@ -858,11 +858,20 @@ function ajaxifyPost(postElement) {
 
 	/* show Sone menu when hovering over the avatar. */
 	$(postElement).find(".post-avatar").mouseover(function() {
-		$(".sone-menu:visible").fadeOut();
-		$(".sone-post-menu", postElement).mouseleave(function() {
-			$(this).fadeOut();
-		}).fadeIn();
-		return false;
+		if (typeof currentSoneMenuTimeoutHandler != undefined) {
+			clearTimeout(currentSoneMenuTimeoutHandler);
+		}
+		currentSoneMenuId = getPostId(this);
+		currentSoneMenuTimeoutHandler = setTimeout(function() {
+			$(".sone-menu:visible").fadeOut();
+			$(".sone-post-menu", postElement).mouseleave(function() {
+				$(this).fadeOut();
+			}).fadeIn();
+		}, 1000);
+	}).mouseleave(function() {
+		if (currentSoneMenuId = getPostId(this)) {
+			clearTimeout(currentSoneMenuTimeoutHandler);
+		}
 	});
 	(function(postElement) {
 		var soneId = $(".sone-menu-id", postElement).text();
@@ -988,11 +997,20 @@ function ajaxifyReply(replyElement) {
 
 	/* show Sone menu when hovering over the avatar. */
 	$(replyElement).find(".reply-avatar").mouseover(function() {
-		$(".sone-menu:visible").fadeOut();
-		$(".sone-reply-menu", replyElement).mouseleave(function() {
-			$(this).fadeOut();
-		}).fadeIn();
-		return false;
+		if (typeof currentSoneMenuTimeoutHandler != undefined) {
+			clearTimeout(currentSoneMenuTimeoutHandler);
+		}
+		currentSoneMenuId = getPostId(this) + "-" + getReplyId(this);
+		currentSoneMenuTimeoutHandler = setTimeout(function() {
+			$(".sone-menu:visible").fadeOut();
+			$(".sone-reply-menu", replyElement).mouseleave(function() {
+				$(this).fadeOut();
+			}).fadeIn();
+		}, 1000);
+	}).mouseleave(function() {
+		if (currentSoneMenuId = getPostId(this) + "-" + getReplyId(this)) {
+			clearTimeout(currentSoneMenuTimeoutHandler);
+		}
 	});
 	(function(replyElement) {
 		var soneId = $(".sone-menu-id", replyElement).text();
@@ -1827,6 +1845,12 @@ var focus = true;
 var online = true;
 var initiallyLoggedIn = $("#sone #loggedIn").text() == "true";
 var notLoggedIn = !initiallyLoggedIn;
+
+/** ID of the next-to-show Sone context menu. */
+var currentSoneMenuId;
+
+/** Timeout handler for the next-to-show Sone context menu. */
+var currentSoneMenuTimeoutHandler;
 
 $(document).ready(function() {
 
