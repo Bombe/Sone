@@ -24,6 +24,7 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.filter.Filters;
@@ -57,7 +58,7 @@ public class IndexPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		final Sone currentSone = getCurrentSone(request.getToadletContext());
 		List<Post> allPosts = new ArrayList<Post>();

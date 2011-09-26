@@ -22,6 +22,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
 /**
@@ -46,7 +47,7 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String type = request.getHttpRequest().getParam("type");
 		if (!type.equals("sone") && !type.equals("post") && !type.equals("reply")) {
 			return createErrorJsonObject("invalid-type");

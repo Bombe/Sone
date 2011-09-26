@@ -302,6 +302,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", new ListBuilder<Reply>(new ArrayList<Reply>(sone.getReplies())).sort(new ReverseComparator<Reply>(Reply.TIME_COMPARATOR)).get());
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
+			soneProperties.put("albums", Sone.flattenAlbums(sone.getAlbums()));
 		}
 
 		//

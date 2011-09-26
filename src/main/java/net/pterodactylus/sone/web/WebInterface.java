@@ -37,6 +37,8 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -45,10 +47,12 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
+import net.pterodactylus.sone.template.AlbumAccessor;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
@@ -71,6 +75,8 @@ import net.pterodactylus.sone.web.ajax.DeleteProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.DeleteReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.DismissNotificationAjaxPage;
 import net.pterodactylus.sone.web.ajax.DistrustAjaxPage;
+import net.pterodactylus.sone.web.ajax.EditAlbumAjaxPage;
+import net.pterodactylus.sone.web.ajax.EditImageAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
@@ -90,11 +96,9 @@ import net.pterodactylus.sone.web.ajax.UnfollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
-import net.pterodactylus.sone.web.page.RedirectPage;
-import net.pterodactylus.sone.web.page.StaticPage;
-import net.pterodactylus.sone.web.page.TemplatePage;
 import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
 import net.pterodactylus.util.cache.CacheItem;
@@ -113,6 +117,7 @@ import net.pterodactylus.util.template.DateFilter;
 import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
+import net.pterodactylus.util.template.ModFilter;
 import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.ReplaceFilter;
@@ -125,10 +130,13 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.version.Version;
+import net.pterodactylus.util.web.RedirectPage;
+import net.pterodactylus.util.web.StaticPage;
+import net.pterodactylus.util.web.TemplatePage;
 import freenet.clients.http.SessionManager;
-import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
+import freenet.clients.http.SessionManager.Session;
 import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
@@ -191,6 +199,15 @@ public class WebInterface implements CoreListener {
 	/** The “new version” notification. */
 	private final TemplateNotification newVersionNotification;
 
+	/** The “inserting images” notification. */
+	private final ListNotification<Image> insertingImagesNotification;
+
+	/** The “inserted images” notification. */
+	private final ListNotification<Image> insertedImagesNotification;
+
+	/** The “image insert failed” notification. */
+	private final ListNotification<Image> imageInsertFailedNotification;
+
 	/**
 	 * Creates a new web interface.
 	 *
@@ -209,6 +226,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
 		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
+		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
 		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
@@ -227,9 +245,11 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
+		templateContextFactory.addFilter("image-link", new ImageLinkFilter(templateContextFactory));
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
 		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addFilter("unique", new UniqueElementFilter());
+		templateContextFactory.addFilter("mod", new ModFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("webInterface", this);
@@ -259,6 +279,15 @@ public class WebInterface implements CoreListener {
 
 		Template newVersionTemplate = TemplateParser.parse(createReader("/templates/notify/newVersionNotification.html"));
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
+
+		Template insertingImagesTemplate = TemplateParser.parse(createReader("/templates/notify/inserting-images-notification.html"));
+		insertingImagesNotification = new ListNotification<Image>("inserting-images-notification", "images", insertingImagesTemplate);
+
+		Template insertedImagesTemplate = TemplateParser.parse(createReader("/templates/notify/inserted-images-notification.html"));
+		insertedImagesNotification = new ListNotification<Image>("inserted-images-notification", "images", insertedImagesTemplate);
+
+		Template imageInsertFailedTemplate = TemplateParser.parse(createReader("/templates/notify/image-insert-failed-notification.html"));
+		imageInsertFailedNotification = new ListNotification<Image>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
 	}
 
 	//
@@ -559,6 +588,10 @@ public class WebInterface implements CoreListener {
 		Template deletePostTemplate = TemplateParser.parse(createReader("/templates/deletePost.html"));
 		Template deleteReplyTemplate = TemplateParser.parse(createReader("/templates/deleteReply.html"));
 		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
+		Template imageBrowserTemplate = TemplateParser.parse(createReader("/templates/imageBrowser.html"));
+		Template createAlbumTemplate = TemplateParser.parse(createReader("/templates/createAlbum.html"));
+		Template deleteAlbumTemplate = TemplateParser.parse(createReader("/templates/deleteAlbum.html"));
+		Template deleteImageTemplate = TemplateParser.parse(createReader("/templates/deleteImage.html"));
 		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
 		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
 		Template rescueTemplate = TemplateParser.parse(createReader("/templates/rescue.html"));
@@ -569,7 +602,7 @@ public class WebInterface implements CoreListener {
 		Template openSearchTemplate = TemplateParser.parse(createReader("/templates/xml/OpenSearch.xml"));
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage("", "index.html")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
@@ -588,6 +621,13 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSonePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImageBrowserPage(imageBrowserTemplate, this), "ImageBrowser"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateAlbumPage(createAlbumTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumPage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteAlbumPage(deleteAlbumTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new UploadImagePage(invalidTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImagePage(emptyTemplate, this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteImagePage(deleteImageTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustPage(emptyTemplate, this)));
@@ -605,10 +645,11 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("css/", "/static/css/", "text/css")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("javascript/", "/static/javascript/", "text/javascript")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage("images/", "/static/images/", "image/png")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("css/", "/static/css/", "text/css")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("javascript/", "/static/javascript/", "text/javascript")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("images/", "/static/images/", "image/png")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationAjaxPage(this)));
@@ -625,6 +666,8 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));
@@ -771,7 +814,7 @@ public class WebInterface implements CoreListener {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal) {
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && (reply.getPost().getSone() != null) && (reply.getTime() <= System.currentTimeMillis())) {
 				mentionNotification.add(reply.getPost());
 				notificationManager.addNotification(mentionNotification);
 			}
@@ -908,6 +951,43 @@ public class WebInterface implements CoreListener {
 		newVersionNotification.getTemplateContext().set("latestEdition", latestEdition);
 		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
 		notificationManager.addNotification(newVersionNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertStarted(Image image) {
+		insertingImagesNotification.add(image);
+		notificationManager.addNotification(insertingImagesNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertAborted(Image image) {
+		insertingImagesNotification.remove(image);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFinished(Image image) {
+		insertingImagesNotification.remove(image);
+		insertedImagesNotification.add(image);
+		notificationManager.addNotification(insertedImagesNotification);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void imageInsertFailed(Image image, Throwable cause) {
+		insertingImagesNotification.remove(image);
+		imageInsertFailedNotification.add(image);
+		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 
 	/**

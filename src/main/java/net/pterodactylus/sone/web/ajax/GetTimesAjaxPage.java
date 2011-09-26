@@ -24,6 +24,7 @@ import java.util.Date;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.number.Digits;
 
@@ -51,7 +52,7 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String allIds = request.getHttpRequest().getParam("posts");
 		JsonObject postTimes = new JsonObject();
 		if (allIds.length() > 0) {

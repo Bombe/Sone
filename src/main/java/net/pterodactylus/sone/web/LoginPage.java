@@ -24,10 +24,11 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -61,7 +62,7 @@ public class LoginPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		/* get all own identities. */
 		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
@@ -87,7 +88,7 @@ public class LoginPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getRedirectTarget(Request request) {
+	protected String getRedirectTarget(FreenetRequest request) {
 		if (getCurrentSone(request.getToadletContext(), false) != null) {
 			return "index.html";
 		}

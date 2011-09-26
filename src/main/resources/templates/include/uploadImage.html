@@ -1,0 +1,12 @@
+<h2><%= View.UploadImage.Title|l10n|html></h2>
+
+<form id="upload-image" method="post" action="uploadImage.html" enctype="multipart/form-data">
+	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+	<input type="hidden" name="parent" value="<% album.id|html>" />
+	<label for="title"><%= View.UploadImage.Label.Title|l10n|html></label>
+	<input type="text" name="title" value="" />
+	<label for="description"><%= View.UploadImage.Label.Description|l10n|html></label>
+	<textarea name="description"></textarea>
+	<input type="file" name="image" />
+	<button type="submit" name="uploadImage" value="1"><%= View.UploadImage.Button.UploadImage|l10n|html></button>
+</form>

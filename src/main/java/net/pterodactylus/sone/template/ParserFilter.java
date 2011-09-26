@@ -35,7 +35,7 @@ import net.pterodactylus.sone.text.PostPart;
 import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.text.SoneTextParserContext;
-import net.pterodactylus.sone.web.page.Page.Request;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -108,7 +108,7 @@ public class ParserFilter implements Filter {
 		if (sone == null) {
 			sone = core.getSone(soneKey, false);
 		}
-		Request request = (Request) templateContext.get("request");
+		FreenetRequest request = (FreenetRequest) templateContext.get("request");
 		SoneTextParserContext context = new SoneTextParserContext(request, sone);
 		StringWriter parsedTextWriter = new StringWriter();
 		try {

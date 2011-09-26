@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import junit.framework.TestCase;
+import net.pterodactylus.sone.core.SoneProvider;
+import net.pterodactylus.sone.data.Sone;
 
 /**
  * JUnit test case for {@link SoneTextParser}.
@@ -85,6 +87,23 @@ public class SoneTextParserTest extends TestCase {
 		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
 	}
 
+	/**
+	 * Test case for a bug that was discovered in 0.6.7.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	@SuppressWarnings("synthetic-access")
+	public void testEmptyLinesAndSoneLinks() throws IOException {
+		SoneTextParser soneTextParser = new SoneTextParser(new TestSoneProvider(), null);
+		Iterable<Part> parts;
+
+		/* check basic links. */
+		parts = soneTextParser.parse(null, new StringReader("Some text.\n\nLink to sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU and stuff."));
+		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", convertText(parts, PlainTextPart.class, SonePart.class));
+	}
+
 	//
 	// PRIVATE METHODS
 	//
@@ -122,9 +141,38 @@ public class SoneTextParserTest extends TestCase {
 			} else if (part instanceof LinkPart) {
 				LinkPart linkPart = (LinkPart) part;
 				text.append('[').append(linkPart.getLink()).append('|').append(linkPart.getTitle()).append('|').append(linkPart.getText()).append(']');
+			} else if (part instanceof SonePart) {
+				SonePart sonePart = (SonePart) part;
+				text.append("[Sone|").append(sonePart.getSone().getId()).append(']');
 			}
 		}
 		return text.toString();
+	}
+
+	/**
+	 * Mock Sone provider.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class TestSoneProvider implements SoneProvider {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public Sone getSone(final String soneId, boolean create) {
+			return new Sone(soneId) {
+
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				public String getName() {
+					return soneId;
+				}
+			};
+		}
+
 	}
 
 }

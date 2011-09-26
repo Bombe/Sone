@@ -60,4 +60,39 @@
 		<%/foreach>
 	</reply-likes>
 
+	<%foreach currentSone.albums album>
+	<%first>
+	<albums>
+		<%/first>
+		<album>
+			<id><%album.id|xml></id>
+			<%ifnull !album.parent>
+			<parent><%album.parent.id|xml></parent>
+			<%/if>
+			<title><%album.title|xml></title>
+			<description><%album.description|xml></description>
+			<album-image><%album.albumImage.id|xml></album-image>
+			<%foreach album.images image>
+			<%first>
+			<images>
+				<%/first>
+				<image>
+					<id><%image.id|xml></id>
+					<creation-time><%image.creationTime|xml></creation-time>
+					<key><%image.key|xml></key>
+					<title><%image.title|xml></title>
+					<description><%image.description|xml></description>
+					<width><%image.width|xml></width>
+					<height><%image.height|xml></height>
+				</image>
+				<%last>
+			</images>
+			<%/last>
+			<%/foreach>
+		</album>
+		<%last>
+	</albums>
+	<%/last>
+	<%/foreach>
+
 </sone>

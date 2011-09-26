@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -49,7 +50,7 @@ public class LockSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 		Sone sone = webInterface.getCore().getLocalSone(soneId, false);

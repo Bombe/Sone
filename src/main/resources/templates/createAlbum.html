@@ -1,0 +1,11 @@
+<%include include/head.html>
+
+	<h1><%= Page.CreateAlbum.Page.Title|l10n|html></h1>
+
+	<%if nameMissing>
+		<p><%= Page.CreateAlbum.Error.NameMissing|l10n|html></p>
+	<%/if>
+
+	<%include include/createAlbum.html>
+
+<%include include/tail.html>

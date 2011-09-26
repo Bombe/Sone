@@ -1,4 +1,4 @@
-<div id="<% reply.id|html>" class="reply<%if reply.new> new<%/if>">
+<div id="<% reply.id|html>" class="reply<%if !reply.sone.local><%if reply.new> new<%/if><%/if>">
 	<a name="reply-<% reply.id|html>"></a>
 	<div class="reply-time hidden"><% reply.time|html></div>
 	<div class="reply-author hidden"><% reply.sone.id|html></div>

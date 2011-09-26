@@ -29,6 +29,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -61,7 +62,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected String getPageTitle(Request request) {
+	protected String getPageTitle(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);
 		if ((sone != null) && (sone.getTime() > 0)) {
@@ -75,7 +76,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getSone(soneId, false);

@@ -23,10 +23,11 @@ import java.util.List;
 import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
-import net.pterodactylus.sone.web.page.Page.Request.Method;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.web.Method;
 
 /**
  * This page lets the user edit the options of the Sone plugin.
@@ -55,7 +56,7 @@ public class OptionsPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Preferences preferences = webInterface.getCore().getPreferences();
 		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);

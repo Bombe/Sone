@@ -1,0 +1,11 @@
+<h2><%= View.CreateAlbum.Title|l10n|html></h2>
+
+<form id="create-album" method="post" action="createAlbum.html">
+	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
+	<input type="hidden" name="parent" value="<%ifnull ! album><% album.id|html><%/if>" />
+	<label for="album"><%= View.CreateAlbum.Label.Name|l10n|html></label>
+	<input type="text" name="name" value="" />
+	<label for="description"><%= View.CreateAlbum.Label.Description|l10n|html></label>
+	<input type="text" name="description" value="" />
+	<button type="submit" name="uploadImage" value="1"><%= Page.ImageBrowser.CreateAlbum.Button.CreateAlbum|l10n|html></button>
+</form>

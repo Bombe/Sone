@@ -17,16 +17,19 @@
 
 package net.pterodactylus.sone.core;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core.SoneStatus;
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
@@ -198,8 +201,8 @@ public class SoneDownloader extends AbstractService {
 				}
 			}
 			return parsedSone;
-		} catch (IOException ioe1) {
-			logger.log(Level.WARNING, "Could not parse Sone from " + requestUri + "!", ioe1);
+		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Could not parse Sone from " + requestUri + "!", e1);
 		} finally {
 			Closer.close(soneInputStream);
 			soneBucket.free();
@@ -431,6 +434,64 @@ public class SoneDownloader extends AbstractService {
 			}
 		}
 
+		/* parse albums. */
+		SimpleXML albumsXml = soneXml.getNode("albums");
+		List<Album> topLevelAlbums = new ArrayList<Album>();
+		if (albumsXml != null) {
+			for (SimpleXML albumXml : albumsXml.getNodes("album")) {
+				String id = albumXml.getValue("id", null);
+				String parentId = albumXml.getValue("parent", null);
+				String title = albumXml.getValue("title", null);
+				String description = albumXml.getValue("description", null);
+				String albumImageId = albumXml.getValue("album-image", null);
+				if ((id == null) || (title == null) || (description == null)) {
+					logger.log(Level.WARNING, "Downloaded Sone %s contains invalid album!", new Object[] { sone });
+					return null;
+				}
+				Album parent = null;
+				if (parentId != null) {
+					parent = core.getAlbum(parentId, false);
+					if (parent == null) {
+						logger.log(Level.WARNING, "Downloaded Sone %s has album with invalid parent!", new Object[] { sone });
+						return null;
+					}
+				}
+				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description).setAlbumImage(albumImageId);
+				if (parent != null) {
+					parent.addAlbum(album);
+				} else {
+					topLevelAlbums.add(album);
+				}
+				SimpleXML imagesXml = albumXml.getNode("images");
+				if (imagesXml != null) {
+					for (SimpleXML imageXml : imagesXml.getNodes("image")) {
+						String imageId = imageXml.getValue("id", null);
+						String imageCreationTimeString = imageXml.getValue("creation-time", null);
+						String imageKey = imageXml.getValue("key", null);
+						String imageTitle = imageXml.getValue("title", null);
+						String imageDescription = imageXml.getValue("description", "");
+						String imageWidthString = imageXml.getValue("width", null);
+						String imageHeightString = imageXml.getValue("height", null);
+						if ((imageId == null) || (imageCreationTimeString == null) || (imageKey == null) || (imageTitle == null) || (imageWidthString == null) || (imageHeightString == null)) {
+							logger.log(Level.WARNING, "Downloaded Sone %s contains invalid images!", new Object[] { sone });
+							return null;
+						}
+						long creationTime = Numbers.safeParseLong(imageCreationTimeString, 0L);
+						int imageWidth = Numbers.safeParseInteger(imageWidthString, 0);
+						int imageHeight = Numbers.safeParseInteger(imageHeightString, 0);
+						if ((imageWidth < 1) || (imageHeight < 1)) {
+							logger.log(Level.WARNING, "Downloaded Sone %s contains image %s with invalid dimensions (%s, %s)!", new Object[] { sone, imageId, imageWidthString, imageHeightString });
+							return null;
+						}
+						Image image = core.getImage(imageId).setSone(sone).setKey(imageKey).setCreationTime(creationTime);
+						image.setTitle(imageTitle).setDescription(imageDescription);
+						image.setWidth(imageWidth).setHeight(imageHeight);
+						album.addImage(image);
+					}
+				}
+			}
+		}
+
 		/* okay, apparently everything was parsed correctly. Now import. */
 		/* atomic setter operation on the Sone. */
 		synchronized (sone) {
@@ -439,6 +500,7 @@ public class SoneDownloader extends AbstractService {
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
+			sone.setAlbums(topLevelAlbums);
 		}
 
 		return sone;

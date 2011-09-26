@@ -32,6 +32,20 @@
 				<div class="value"><% sone.niceName|html> (<a href="/WebOfTrust/ShowIdentity?id=<% sone.id|html>"><%= Page.ViewSone.Profile.Name.WoTLink|l10n|html></a>)</div>
 			</div>
 
+			<%foreach sone.albums album>
+				<%first>
+					<div class="profile-field">
+						<div class="name"><%= Page.ViewSone.Profile.Label.Albums|l10n|html></div>
+						<div class="value">
+							<a href="imageBrowser.html?sone=<% sone.id|html>"><% =Page.ViewSone.Profile.Albums.Text.All|l10n|html></a>,
+				<%/first>
+					<a href="imageBrowser.html?album=<%album.id|html>"><%album.title|html></a><%notlast>, <%/notlast>
+				<%last>
+						</div>
+					</div>
+				<%/last>
+			<%/foreach>
+
 			<%foreach sone.profile.fields field>
 				<div class="profile-field">
 					<div class="name"><% field.name|html></div>

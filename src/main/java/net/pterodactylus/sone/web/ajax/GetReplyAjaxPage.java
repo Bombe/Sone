@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.template.Template;
@@ -59,7 +60,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(Request request) {
+	protected JsonObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
 		Reply reply = webInterface.getCore().getReply(replyId);
 		if ((reply == null) || (reply.getSone() == null)) {
@@ -91,7 +92,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the reply
 	 */
-	private JsonObject createJsonReply(Request request, Reply reply, Sone currentSone) {
+	private JsonObject createJsonReply(FreenetRequest request, Reply reply, Sone currentSone) {
 		JsonObject jsonReply = new JsonObject();
 		jsonReply.put("id", reply.getId());
 		jsonReply.put("postId", reply.getPost().getId());

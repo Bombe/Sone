@@ -32,6 +32,7 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.cache.Cache;
 import net.pterodactylus.util.cache.CacheException;
 import net.pterodactylus.util.cache.CacheItem;
@@ -96,7 +97,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(Request request, TemplateContext templateContext) throws RedirectException {
+	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String query = request.getHttpRequest().getParam("query").trim();
 		if (query.length() == 0) {

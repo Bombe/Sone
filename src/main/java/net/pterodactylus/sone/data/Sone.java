@@ -34,6 +34,7 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.validation.Validation;
 import freenet.keys.FreenetURI;
 
 /**
@@ -144,6 +145,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/** The IDs of all liked replies. */
 	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
+
+	/** The albums of this Sone. */
+	private final List<Album> albums = Collections.synchronizedList(new ArrayList<Album>());
 
 	/** Sone-specific options. */
 	private final Options options = new Options();
@@ -282,7 +286,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public void setLatestEdition(long latestEdition) {
 		if (!(latestEdition > this.latestEdition)) {
-			logger.log(Level.INFO, "New latest edition %d is not greater than current latest edition %d!", new Object[] { latestEdition, this.latestEdition });
+			logger.log(Level.FINE, "New latest edition %d is not greater than current latest edition %d!", new Object[] { latestEdition, this.latestEdition });
 			return;
 		}
 		this.latestEdition = latestEdition;
@@ -632,6 +636,91 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
+	 * Returns the albums of this Sone.
+	 *
+	 * @return The albums of this Sone
+	 */
+	public List<Album> getAlbums() {
+		return Collections.unmodifiableList(albums);
+	}
+
+	/**
+	 * Adds an album to this Sone.
+	 *
+	 * @param album
+	 *            The album to add
+	 */
+	public synchronized void addAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
+		albums.add(album);
+	}
+
+	/**
+	 * Sets the albums of this Sone.
+	 *
+	 * @param albums
+	 *            The albums of this Sone
+	 */
+	public synchronized void setAlbums(Collection<? extends Album> albums) {
+		Validation.begin().isNotNull("Albums", albums).check();
+		this.albums.clear();
+		for (Album album : albums) {
+			addAlbum(album);
+		}
+	}
+
+	/**
+	 * Removes an album from this Sone.
+	 *
+	 * @param album
+	 *            The album to remove
+	 */
+	public synchronized void removeAlbum(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
+		albums.remove(album);
+	}
+
+	/**
+	 * Moves the given album up in this album’s albums. If the album is already
+	 * the first album, nothing happens.
+	 *
+	 * @param album
+	 *            The album to move up
+	 * @return The album that the given album swapped the place with, or
+	 *         <code>null</code> if the album did not change its place
+	 */
+	public Album moveAlbumUp(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).isNull("Album Parent", album.getParent()).check();
+		int oldIndex = albums.indexOf(album);
+		if (oldIndex <= 0) {
+			return null;
+		}
+		albums.remove(oldIndex);
+		albums.add(oldIndex - 1, album);
+		return albums.get(oldIndex);
+	}
+
+	/**
+	 * Moves the given album down in this album’s albums. If the album is
+	 * already the last album, nothing happens.
+	 *
+	 * @param album
+	 *            The album to move down
+	 * @return The album that the given album swapped the place with, or
+	 *         <code>null</code> if the album did not change its place
+	 */
+	public Album moveAlbumDown(Album album) {
+		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).isNull("Album Parent", album.getParent()).check();
+		int oldIndex = albums.indexOf(album);
+		if ((oldIndex < 0) || (oldIndex >= (albums.size() - 1))) {
+			return null;
+		}
+		albums.remove(oldIndex);
+		albums.add(oldIndex + 1, album);
+		return albums.get(oldIndex);
+	}
+
+	/**
 	 * Returns Sone-specific options.
 	 *
 	 * @return The options of this Sone
@@ -682,7 +771,40 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(')');
 
+		fingerprint.append("Albums(");
+		for (Album album : albums) {
+			fingerprint.append(album.getFingerprint());
+		}
+		fingerprint.append(')');
+
 		return fingerprint.toString();
+	}
+
+	//
+	// STATIC METHODS
+	//
+
+	/**
+	 * Flattens the given top-level albums so that the resulting list contains
+	 * parent albums before child albums and the resulting list can be parsed in
+	 * a single pass.
+	 *
+	 * @param albums
+	 *            The albums to flatten
+	 * @return The flattened albums
+	 */
+	public static List<Album> flattenAlbums(Collection<? extends Album> albums) {
+		List<Album> flatAlbums = new ArrayList<Album>();
+		flatAlbums.addAll(albums);
+		int lastAlbumIndex = 0;
+		while (lastAlbumIndex < flatAlbums.size()) {
+			int previousAlbumCount = flatAlbums.size();
+			for (Album album : new ArrayList<Album>(flatAlbums.subList(lastAlbumIndex, flatAlbums.size()))) {
+				flatAlbums.addAll(album.getAlbums());
+			}
+			lastAlbumIndex = previousAlbumCount;
+		}
+		return flatAlbums;
 	}
 
 	//

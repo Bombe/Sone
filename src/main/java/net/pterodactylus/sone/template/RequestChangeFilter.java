@@ -26,15 +26,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.pterodactylus.sone.web.page.Page.Request;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
 
 /**
- * This filter expects a {@link Request} as input and outputs a {@link URI} that
- * is modified by the parameters. The name of the parameter is handed in as
- * “name”, the value may either be stored in “value”, or in a template variable
- * whose key is stored in “key”.
+ * This filter expects a {@link FreenetRequest} as input and outputs a
+ * {@link URI} that is modified by the parameters. The name of the parameter is
+ * handed in as “name”, the value may either be stored in “value”, or in a
+ * template variable whose key is stored in “key”.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -45,7 +45,7 @@ public class RequestChangeFilter implements Filter {
 	 */
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		Request request = (Request) data;
+		FreenetRequest request = (FreenetRequest) data;
 		String name = parameters.get("name");
 		String nameKey = parameters.get("nameKey");
 		if (nameKey != null) {

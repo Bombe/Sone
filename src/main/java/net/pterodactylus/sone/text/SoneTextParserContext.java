@@ -18,7 +18,7 @@
 package net.pterodactylus.sone.text;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.Page.Request;
+import net.pterodactylus.sone.web.page.FreenetRequest;
 
 /**
  * {@link ParserContext} implementation for the {@link SoneTextParser}. It
@@ -30,7 +30,7 @@ import net.pterodactylus.sone.web.page.Page.Request;
 public class SoneTextParserContext implements ParserContext {
 
 	/** The request being processed. */
-	private final Request request;
+	private final FreenetRequest request;
 
 	/** The posting Sone. */
 	private final Sone postingSone;
@@ -43,7 +43,7 @@ public class SoneTextParserContext implements ParserContext {
 	 * @param postingSone
 	 *            The posting Sone
 	 */
-	public SoneTextParserContext(Request request, Sone postingSone) {
+	public SoneTextParserContext(FreenetRequest request, Sone postingSone) {
 		this.request = request;
 		this.postingSone = postingSone;
 	}
@@ -53,7 +53,7 @@ public class SoneTextParserContext implements ParserContext {
 	 *
 	 * @return The request being processed
 	 */
-	public Request getRequest() {
+	public FreenetRequest getRequest() {
 		return request;
 	}
 
