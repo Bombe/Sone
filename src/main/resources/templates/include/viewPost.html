@@ -24,7 +24,7 @@
 			<%/if>
 			<% post.text|html|store key=originalText text=true>
 			<% post.text|parse sone=post.sone|store key=parsedText text=true>
-			<% post.text|parse sone=post.sone length=core.preferences.charactersPerPost|store key=shortText text=true>
+			<% post.text|parse sone=post.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|store key=shortText text=true>
 			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="post-text text<%if raw> hidden<%/if><%if !shortText|match key=parsedText> hidden<%/if>"><% parsedText></div>
 			<div class="post-text short-text<%if raw> hidden<%/if><%if shortText|match key=parsedText> hidden<%/if>"><% shortText></div>

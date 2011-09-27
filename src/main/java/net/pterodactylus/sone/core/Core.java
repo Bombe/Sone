@@ -2161,6 +2161,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
 			configuration.getIntValue("Option/CharactersPerPost").setValue(options.getIntegerOption("CharactersPerPost").getReal());
+			configuration.getIntValue("Option/PostCutOffLength").setValue(options.getIntegerOption("PostCutOffLength").getReal());
 			configuration.getBooleanValue("Option/RequireFullAccess").setValue(options.getBooleanOption("RequireFullAccess").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
@@ -2235,6 +2236,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
+		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
@@ -2274,6 +2276,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
 		loadConfigurationValue("CharactersPerPost");
+		loadConfigurationValue("PostCutOffLength");
 		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
 		loadConfigurationValue("PositiveTrust");
 		loadConfigurationValue("NegativeTrust");
@@ -2672,6 +2675,39 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 */
 		public Preferences setCharactersPerPost(Integer charactersPerPost) {
 			options.getIntegerOption("CharactersPerPost").set(charactersPerPost);
+			return this;
+		}
+
+		/**
+		 * Returns the number of characters the shortened post should have.
+		 *
+		 * @return The number of characters of the snippet
+		 */
+		public int getPostCutOffLength() {
+			return options.getIntegerOption("PostCutOffLength").get();
+		}
+
+		/**
+		 * Validates the number of characters after which to cut off the post.
+		 *
+		 * @param postCutOffLength
+		 *            The number of characters of the snippet
+		 * @return {@code true} if the number of characters of the snippet is
+		 *         valid, {@code false} otherwise
+		 */
+		public boolean validatePostCutOffLength(Integer postCutOffLength) {
+			return options.getIntegerOption("PostCutOffLength").validate(postCutOffLength);
+		}
+
+		/**
+		 * Sets the number of characters the shortened post should have.
+		 *
+		 * @param postCutOffLength
+		 *            The number of characters of the snippet
+		 * @return This preferences
+		 */
+		public Preferences setPostCutOffLength(Integer postCutOffLength) {
+			options.getIntegerOption("PostCutOffLength").set(postCutOffLength);
 			return this;
 		}
 
