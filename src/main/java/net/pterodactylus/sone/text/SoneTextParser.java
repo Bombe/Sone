@@ -202,11 +202,14 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (line.length() >= (7 + 43)) {
 						String soneId = line.substring(7, 50);
 						Sone sone = soneProvider.getSone(soneId, false);
-						if ((sone != null) && (sone.getName() != null)) {
-							parts.add(new SonePart(sone));
-						} else {
-							parts.add(new PlainTextPart(line.substring(0, 50)));
+						if (sone == null) {
+							/*
+							 * don’t use create=true above, we don’t want the
+							 * empty shell.
+							 */
+							sone = new Sone(soneId);
 						}
+						parts.add(new SonePart(sone));
 						line = line.substring(50);
 					} else {
 						parts.add(new PlainTextPart(line));
