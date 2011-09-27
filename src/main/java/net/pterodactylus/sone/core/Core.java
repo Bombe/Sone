@@ -2097,7 +2097,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = Sone.flattenAlbums(sone.getAlbums());
+			List<Album> albums = sone.getAllAlbums();
 
 			int albumCounter = 0;
 			for (Album album : albums) {
