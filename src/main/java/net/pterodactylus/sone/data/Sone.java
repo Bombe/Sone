@@ -666,6 +666,20 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
+	 * Returns all images of a Sone. Images of a album are inserted into this
+	 * list before images of all child albums.
+	 *
+	 * @return The list of all images
+	 */
+	public List<Image> getAllImages() {
+		List<Image> allImages = new ArrayList<Image>();
+		for (Album album : getAllAlbums()) {
+			allImages.addAll(album.getImages());
+		}
+		return allImages;
+	}
+
+	/**
 	 * Adds an album to this Sone.
 	 *
 	 * @param album
