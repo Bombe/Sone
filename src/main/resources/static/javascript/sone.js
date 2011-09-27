@@ -70,7 +70,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 	commentElement = (function(postId, author) {
 		separator = $("<span> · </span>").addClass("separator");
 		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
-			replyElement = $("#sone .post#" + postId + " .create-reply");
+			replyElement = $("#sone .post#post-" + postId + " .create-reply");
 			replyElement.removeClass("hidden");
 			replyElement.removeClass("light");
 			(function(replyElement) {
@@ -214,7 +214,7 @@ function enhanceDeletePostButton(button, postId, text) {
 				return;
 			}
 			if (data.success) {
-				$("#sone .post#" + postId).slideUp();
+				$("#sone .post#post-" + postId).slideUp();
 			} else if (data.error == "invalid-post-id") {
 				/* pretend the post is already gone. */
 				getPost(postId).slideUp();
@@ -246,7 +246,7 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 				return;
 			}
 			if (data.success) {
-				$("#sone .reply#" + replyId).slideUp();
+				$("#sone .reply#reply-" + replyId).slideUp();
 			} else if (data.error == "invalid-reply-id") {
 				/* pretend the reply is already gone. */
 				getReply(replyId).slideUp();
@@ -332,7 +332,7 @@ function getSoneId(element) {
  * @returns The element of the post
  */
 function getPost(postId) {
-	return $("#sone .post#" + postId);
+	return $("#sone .post#post-" + postId);
 }
 
 function getPostElement(element) {
@@ -340,7 +340,7 @@ function getPostElement(element) {
 }
 
 function getPostId(element) {
-	return getPostElement(element).attr("id");
+	return getPostElement(element).attr("id").substr(5);
 }
 
 function getPostTime(element) {
@@ -366,7 +366,7 @@ function getPostAuthor(element) {
  * @returns The element of the reply
  */
 function getReply(replyId) {
-	return $("#sone .reply#" + replyId);
+	return $("#sone .reply#reply-" + replyId);
 }
 
 function getReplyElement(element) {
@@ -374,7 +374,7 @@ function getReplyElement(element) {
 }
 
 function getReplyId(element) {
-	return getReplyElement(element).attr("id");
+	return getReplyElement(element).attr("id").substr(6);
 }
 
 function getReplyTime(element) {
@@ -441,8 +441,8 @@ function likePost(postId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .post#" + postId + " > .inner-part > .status-line .like").addClass("hidden");
-		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
+		$("#sone .post#post-" + postId + " > .inner-part > .status-line .like").addClass("hidden");
+		$("#sone .post#post-" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -454,8 +454,8 @@ function unlikePost(postId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .post#" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
-		$("#sone .post#" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
+		$("#sone .post#post-" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
+		$("#sone .post#post-" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -465,9 +465,9 @@ function unlikePost(postId) {
 function updatePostLikes(postId) {
 	ajaxGet("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			$("#sone .post#" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
-			$("#sone .post#" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
-			$("#sone .post#" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			$("#sone .post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
+			$("#sone .post#post-" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
+			$("#sone .post#post-" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -479,8 +479,8 @@ function likeReply(replyId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .reply#" + replyId + " .status-line .like").addClass("hidden");
-		$("#sone .reply#" + replyId + " .status-line .unlike").removeClass("hidden");
+		$("#sone .reply#reply-" + replyId + " .status-line .like").addClass("hidden");
+		$("#sone .reply#reply-" + replyId + " .status-line .unlike").removeClass("hidden");
 		updateReplyLikes(replyId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -492,8 +492,8 @@ function unlikeReply(replyId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .reply#" + replyId + " .status-line .unlike").addClass("hidden");
-		$("#sone .reply#" + replyId + " .status-line .like").removeClass("hidden");
+		$("#sone .reply#reply-" + replyId + " .status-line .unlike").addClass("hidden");
+		$("#sone .reply#reply-" + replyId + " .status-line .like").removeClass("hidden");
 		updateReplyLikes(replyId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -603,9 +603,9 @@ function unbookmarkPost(postId) {
 function updateReplyLikes(replyId) {
 	ajaxGet("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			$("#sone .reply#" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
-			$("#sone .reply#" + replyId + " .status-line .likes span.like-count").text(data.likes);
-			$("#sone .reply#" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			$("#sone .reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
+			$("#sone .reply#reply-" + replyId + " .status-line .likes span.like-count").text(data.likes);
+			$("#sone .reply#reply-" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -713,10 +713,10 @@ function ajaxifyPost(postElement) {
 				if (success) {
 					$(inputField).val("");
 					loadNewReply(replyId, soneId, postId);
-					$("#sone .post#" + postId + " .create-reply").addClass("hidden");
-					$("#sone .post#" + postId + " .create-reply .sender").hide();
-					$("#sone .post#" + postId + " .create-reply .select-sender").show();
-					$("#sone .post#" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
+					$("#sone .post#post-" + postId + " .create-reply").addClass("hidden");
+					$("#sone .post#post-" + postId + " .create-reply .sender").hide();
+					$("#sone .post#post-" + postId + " .create-reply .select-sender").show();
+					$("#sone .post#post-" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
 				} else {
 					alert(error);
 				}
@@ -1389,7 +1389,7 @@ function isKnownSonesPage() {
  *          exists on the page, <code>false</code> otherwise
  */
 function hasPost(postId) {
-	return $(".post#" + postId).length > 0;
+	return $(".post#post-" + postId).length > 0;
 }
 
 /**
@@ -1401,7 +1401,7 @@ function hasPost(postId) {
  *          exists on the page, <code>false</code> otherwise
  */
 function hasReply(replyId) {
-	return $("#sone .reply#" + replyId).length > 0;
+	return $("#sone .reply#reply-" + replyId).length > 0;
 }
 
 function loadNewPost(postId, soneId, recipientId, time) {
@@ -1461,7 +1461,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 			if (hasReply(data.reply.id)) {
 				return;
 			}
-			$("#sone .post#" + data.reply.postId).each(function() {
+			$("#sone .post#post-" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
 					if (getReplyTime(this) > data.reply.time) {

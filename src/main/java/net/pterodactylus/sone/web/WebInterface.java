@@ -681,11 +681,11 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MoveProfileFieldAjaxPage(this)));
 
 		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
-		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Name", "Navigation.Menu.Tooltip", sonePlugin);
+		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Sone.Name", "Navigation.Menu.Sone.Tooltip", sonePlugin);
 		for (PageToadlet toadlet : pageToadlets) {
 			String menuName = toadlet.getMenuName();
 			if (menuName != null) {
-				toadletContainer.register(toadlet, "Navigation.Menu.Name", toadlet.path(), true, "Navigation.Menu.Item." + menuName + ".Name", "Navigation.Menu.Item." + menuName + ".Tooltip", false, toadlet);
+				toadletContainer.register(toadlet, "Navigation.Menu.Sone.Name", toadlet.path(), true, "Navigation.Menu.Sone.Item." + menuName + ".Name", "Navigation.Menu.Sone.Item." + menuName + ".Tooltip", false, toadlet);
 			} else {
 				toadletContainer.register(toadlet, null, toadlet.path(), true, false);
 			}
@@ -700,7 +700,7 @@ public class WebInterface implements CoreListener {
 		for (PageToadlet pageToadlet : pageToadlets) {
 			toadletContainer.unregister(pageToadlet);
 		}
-		toadletContainer.getPageMaker().removeNavigationCategory("Navigation.Menu.Name");
+		toadletContainer.getPageMaker().removeNavigationCategory("Navigation.Menu.Sone.Name");
 	}
 
 	/**
