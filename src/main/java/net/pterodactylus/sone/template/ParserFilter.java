@@ -87,19 +87,7 @@ public class ParserFilter implements Filter {
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String text = String.valueOf(data);
-		int length = -1;
-		try {
-			length = Integer.parseInt(parameters.get("length"));
-		} catch (NumberFormatException nfe1) {
-			/* ignore. */
-		}
-		if ((length == -1) && (parameters.get("length") != null)) {
-			try {
-				length = Integer.parseInt(String.valueOf(templateContext.get(parameters.get("length"))));
-			} catch (NumberFormatException nfe1) {
-				/* ignore. */
-			}
-		}
+		int length = Numbers.safeParseInteger(parameters.get("length"), Numbers.safeParseInteger(templateContext.get(parameters.get("length")), -1));
 		String soneKey = parameters.get("sone");
 		if (soneKey == null) {
 			soneKey = "sone";
