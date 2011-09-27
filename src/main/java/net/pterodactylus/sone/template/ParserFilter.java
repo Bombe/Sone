@@ -233,7 +233,11 @@ public class ParserFilter implements Filter {
 	 *            The part to render
 	 */
 	private void render(Writer writer, SonePart sonePart) {
-		renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
+		if ((sonePart.getSone() != null) && (sonePart.getSone().getName() != null)) {
+			renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
+		} else {
+			renderLink(writer, "/WebOfTrust/ShowIdentity?id=" + sonePart.getSone().getId(), sonePart.getSone().getId(), sonePart.getSone().getId(), "in-sone");
+		}
 	}
 
 	/**
