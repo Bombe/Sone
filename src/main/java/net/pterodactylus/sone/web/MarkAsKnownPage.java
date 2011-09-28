@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web;
 import java.util.StringTokenizer;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -70,7 +71,7 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 				}
 				webInterface.getCore().markPostKnown(post);
 			} else if (type.equals("reply")) {
-				Reply reply = webInterface.getCore().getReply(id, false);
+				PostReply reply = webInterface.getCore().getReply(id, false);
 				if (reply == null) {
 					continue;
 				}

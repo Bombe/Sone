@@ -28,6 +28,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
@@ -365,7 +366,7 @@ public class SearchPage extends SoneTemplatePage {
 			if (post.getRecipient() != null) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient()));
 			}
-			for (Reply reply : Filters.filteredList(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLIES_FILTER)) {
+			for (PostReply reply : Filters.filteredList(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLY_FILTER)) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(reply.getSone()));
 				postString.append(' ').append(reply.getText());
 			}

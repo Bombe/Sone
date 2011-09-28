@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
@@ -62,7 +63,7 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 				}
 				core.markPostKnown(post);
 			} else if (type.equals("reply")) {
-				Reply reply = core.getReply(id, false);
+				PostReply reply = core.getReply(id, false);
 				if (reply == null) {
 					continue;
 				}

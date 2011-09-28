@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
@@ -67,7 +67,7 @@ public class GetLikesAjaxPage extends JsonPage {
 			Set<Sone> sones = webInterface.getCore().getLikes(post);
 			return createSuccessJsonObject().put("likes", sones.size()).put("sones", getSones(sones));
 		} else if ("reply".equals(type)) {
-			Reply reply = webInterface.getCore().getReply(id);
+			PostReply reply = webInterface.getCore().getReply(id);
 			Set<Sone> sones = webInterface.getCore().getLikes(reply);
 			return createSuccessJsonObject().put("likes", sones.size()).put("sones", getSones(sones));
 		}

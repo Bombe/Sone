@@ -17,7 +17,7 @@
 
 package net.pterodactylus.sone.web.ajax;
 
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
@@ -49,7 +49,7 @@ public class DeleteReplyAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
-		Reply reply = webInterface.getCore().getReply(replyId);
+		PostReply reply = webInterface.getCore().getReply(replyId);
 		if (reply == null) {
 			return createErrorJsonObject("invalid-reply-id");
 		}

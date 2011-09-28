@@ -138,7 +138,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	private final Set<Post> posts = Collections.synchronizedSet(new HashSet<Post>());
 
 	/** All replies. */
-	private final Set<Reply> replies = Collections.synchronizedSet(new HashSet<Reply>());
+	private final Set<PostReply> replies = Collections.synchronizedSet(new HashSet<PostReply>());
 
 	/** The IDs of all liked posts. */
 	private final Set<String> likedPostIds = Collections.synchronizedSet(new HashSet<String>());
@@ -477,7 +477,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return All replies this Sone made
 	 */
-	public synchronized Set<Reply> getReplies() {
+	public synchronized Set<PostReply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
 
@@ -488,7 +488,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setReplies(Collection<Reply> replies) {
+	public synchronized Sone setReplies(Collection<PostReply> replies) {
 		this.replies.clear();
 		this.replies.addAll(replies);
 		return this;
@@ -501,7 +501,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to add
 	 */
-	public synchronized void addReply(Reply reply) {
+	public synchronized void addReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.add(reply);
 		}
@@ -513,7 +513,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to remove
 	 */
-	public synchronized void removeReply(Reply reply) {
+	public synchronized void removeReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.remove(reply);
 		}
@@ -782,10 +782,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(")");
 
-		List<Reply> replies = new ArrayList<Reply>(getReplies());
+		List<PostReply> replies = new ArrayList<PostReply>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		fingerprint.append("Replies(");
-		for (Reply reply : replies) {
+		for (PostReply reply : replies) {
 			fingerprint.append("Reply(").append(reply.getId()).append(')');
 		}
 		fingerprint.append(')');

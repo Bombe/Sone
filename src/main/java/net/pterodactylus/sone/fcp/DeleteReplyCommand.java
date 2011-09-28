@@ -18,16 +18,16 @@
 package net.pterodactylus.sone.fcp;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
 /**
- * FCP command that deletes a {@link Reply}.
+ * FCP command that deletes a {@link PostReply}.
  *
- * @see Core#deleteReply(Reply)
+ * @see Core#deleteReply(PostReply)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DeleteReplyCommand extends AbstractSoneCommand {
@@ -47,7 +47,7 @@ public class DeleteReplyCommand extends AbstractSoneCommand {
 	 */
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
-		Reply reply = getReply(parameters, "Reply");
+		PostReply reply = getReply(parameters, "Reply");
 		if (!getCore().isLocalSone(reply.getSone())) {
 			return new ErrorResponse(401, "Not allowed.");
 		}

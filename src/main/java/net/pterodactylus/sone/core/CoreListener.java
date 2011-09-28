@@ -21,7 +21,7 @@ import java.util.EventListener;
 
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.version.Version;
 
@@ -55,7 +55,7 @@ public interface CoreListener extends EventListener {
 	 * @param reply
 	 *            The new reply
 	 */
-	public void newReplyFound(Reply reply);
+	public void newReplyFound(PostReply reply);
 
 	/**
 	 * Notifies a listener that the given Sone is now marked as known.
@@ -79,7 +79,7 @@ public interface CoreListener extends EventListener {
 	 * @param reply
 	 *            The known reply
 	 */
-	public void markReplyKnown(Reply reply);
+	public void markReplyKnown(PostReply reply);
 
 	/**
 	 * Notifies a listener that the given Sone was removed.
@@ -103,7 +103,7 @@ public interface CoreListener extends EventListener {
 	 * @param reply
 	 *            The removed reply
 	 */
-	public void replyRemoved(Reply reply);
+	public void replyRemoved(PostReply reply);
 
 	/**
 	 * Notifies a listener when a Sone was locked.

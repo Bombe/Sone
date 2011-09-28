@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
@@ -44,10 +44,10 @@ public class ReplyGroupFilter implements Filter {
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		@SuppressWarnings("unchecked")
-		List<Reply> allReplies = (List<Reply>) data;
+		List<PostReply> allReplies = (List<PostReply>) data;
 		Map<Post, Set<Sone>> postSones = new HashMap<Post, Set<Sone>>();
-		Map<Post, Set<Reply>> postReplies = new HashMap<Post, Set<Reply>>();
-		for (Reply reply : allReplies) {
+		Map<Post, Set<PostReply>> postReplies = new HashMap<Post, Set<PostReply>>();
+		for (PostReply reply : allReplies) {
 			Post post = reply.getPost();
 			Set<Sone> sones = postSones.get(post);
 			if (sones == null) {
@@ -55,9 +55,9 @@ public class ReplyGroupFilter implements Filter {
 				postSones.put(post, sones);
 			}
 			sones.add(reply.getSone());
-			Set<Reply> replies = postReplies.get(post);
+			Set<PostReply> replies = postReplies.get(post);
 			if (replies == null) {
-				replies = new HashSet<Reply>();
+				replies = new HashSet<PostReply>();
 				postReplies.put(post, replies);
 			}
 			replies.add(reply);

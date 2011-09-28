@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.StringBucket;
@@ -299,7 +300,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", new ListBuilder<Post>(new ArrayList<Post>(sone.getPosts())).sort(Post.TIME_COMPARATOR).get());
-			soneProperties.put("replies", new ListBuilder<Reply>(new ArrayList<Reply>(sone.getReplies())).sort(new ReverseComparator<Reply>(Reply.TIME_COMPARATOR)).get());
+			soneProperties.put("replies", new ListBuilder<PostReply>(new ArrayList<PostReply>(sone.getReplies())).sort(new ReverseComparator<Reply<?>>(Reply.TIME_COMPARATOR)).get());
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", sone.getAllAlbums());

@@ -31,8 +31,8 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
@@ -383,7 +383,7 @@ public class SoneDownloader extends AbstractService {
 
 		/* parse replies. */
 		SimpleXML repliesXml = soneXml.getNode("replies");
-		Set<Reply> replies = new HashSet<Reply>();
+		Set<PostReply> replies = new HashSet<PostReply>();
 		if (repliesXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, "Downloaded Sone %s has no replies!", new Object[] { sone });

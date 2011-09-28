@@ -19,6 +19,7 @@ package net.pterodactylus.sone.fcp;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
@@ -52,7 +53,7 @@ public class CreateReplyCommand extends AbstractSoneCommand {
 		Sone sone = getSone(parameters, "Sone", true);
 		Post post = getPost(parameters, "Post");
 		String text = getString(parameters, "Text");
-		Reply reply = getCore().createReply(sone, post, text);
+		PostReply reply = getCore().createReply(sone, post, text);
 		return new Response("ReplyCreated", new SimpleFieldSetBuilder().put("Reply", reply.getId()).get());
 	}
 
