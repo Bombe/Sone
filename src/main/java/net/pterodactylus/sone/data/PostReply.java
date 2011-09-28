@@ -27,20 +27,8 @@ import java.util.UUID;
  */
 public class PostReply extends Reply<PostReply> {
 
-	/** The ID of the reply. */
-	private final UUID id;
-
-	/** The Sone that posted this reply. */
-	private volatile Sone sone;
-
 	/** The Post this reply refers to. */
 	private volatile Post post;
-
-	/** The time of the reply. */
-	private volatile long time;
-
-	/** The text of the reply. */
-	private volatile String text;
 
 	/**
 	 * Creates a new reply.
@@ -97,44 +85,13 @@ public class PostReply extends Reply<PostReply> {
 	 *            The text of the reply
 	 */
 	public PostReply(String id, Sone sone, Post post, long time, String text) {
-		this.id = UUID.fromString(id);
-		this.sone = sone;
+		super(id, sone, time, text);
 		this.post = post;
-		this.time = time;
-		this.text = text;
 	}
 
 	//
 	// ACCESSORS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getId() {
-		return id.toString();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public Sone getSone() {
-		return sone;
-	}
-
-	/**
-	 * Sets the Sone that posted this reply.
-	 *
-	 * @param sone
-	 *            The Sone that posted this reply
-	 * @return This reply (for method chaining)
-	 */
-	public PostReply setSone(Sone sone) {
-		this.sone = sone;
-		return this;
-	}
 
 	/**
 	 * Returns the post this reply refers to.
@@ -155,78 +112,6 @@ public class PostReply extends Reply<PostReply> {
 	public PostReply setPost(Post post) {
 		this.post = post;
 		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public long getTime() {
-		return time;
-	}
-
-	/**
-	 * Sets the time of this reply.
-	 *
-	 * @param time
-	 *            The time of this reply (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This reply (for method chaining)
-	 */
-	public PostReply setTime(long time) {
-		this.time = time;
-		return this;
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String getText() {
-		return text;
-	}
-
-	/**
-	 * Sets the text of this reply.
-	 *
-	 * @param text
-	 *            The text of this reply
-	 * @return This reply (for method chaining)
-	 */
-	public PostReply setText(String text) {
-		this.text = text;
-		return this;
-	}
-
-	//
-	// OBJECT METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof PostReply)) {
-			return false;
-		}
-		PostReply reply = (PostReply) object;
-		return reply.id.equals(id);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",post=" + post + ",time=" + time + ",text=" + text + "]";
 	}
 
 }

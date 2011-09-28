@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.data;
 
 import java.util.Comparator;
+import java.util.UUID;
 
 import net.pterodactylus.util.filter.Filter;
 
@@ -56,32 +57,166 @@ public abstract class Reply<T extends Reply<T>> {
 
 	};
 
+	/** The ID of the reply. */
+	private final String id;
+
+	/** The Sone that created this reply. */
+	private volatile Sone sone;
+
+	/** The time of the reply. */
+	private volatile long time;
+
+	/** The text of the reply. */
+	private volatile String text;
+
+	/**
+	 * Creates a new reply with the given ID.
+	 *
+	 * @param id
+	 *            The ID of the reply
+	 */
+	protected Reply(String id) {
+		this(id, null, 0, null);
+	}
+
+	/**
+	 * Creates a new reply with a new random ID.
+	 *
+	 * @param sone
+	 *            The Sone of the reply
+	 * @param time
+	 *            The time of the reply
+	 * @param text
+	 *            The text of the reply
+	 */
+	protected Reply(Sone sone, long time, String text) {
+		this(UUID.randomUUID().toString(), sone, time, text);
+	}
+
+	/**
+	 * Creates a new reply.
+	 *
+	 * @param id
+	 *            The ID of the reply
+	 * @param sone
+	 *            The Sone of the reply
+	 * @param time
+	 *            The time of the reply
+	 * @param text
+	 *            The text of the reply
+	 */
+	protected Reply(String id, Sone sone, long time, String text) {
+		this.id = id;
+		this.sone = sone;
+		this.time = time;
+		this.text = text;
+	}
+
 	/**
 	 * Returns the ID of the reply.
 	 *
 	 * @return The ID of the reply
 	 */
-	public abstract String getId();
+	public String getId() {
+		return id;
+	}
 
 	/**
 	 * Returns the Sone that posted this reply.
 	 *
 	 * @return The Sone that posted this reply
 	 */
-	public abstract Sone getSone();
+	public Sone getSone() {
+		return sone;
+	}
+
+	/**
+	 * Sets the Sone that posted this reply.
+	 *
+	 * @param sone
+	 *            The Sone that posted this reply
+	 * @return This reply (for method chaining)
+	 */
+	@SuppressWarnings("unchecked")
+	public T setSone(Sone sone) {
+		this.sone = sone;
+		return (T) this;
+	}
 
 	/**
 	 * Returns the time of the reply.
 	 *
 	 * @return The time of the reply (in milliseconds since Jan 1, 1970 UTC)
 	 */
-	public abstract long getTime();
+	public long getTime() {
+		return time;
+	}
+
+	/**
+	 * Sets the time of this reply.
+	 *
+	 * @param time
+	 *            The time of this reply (in milliseconds since Jan 1, 1970 UTC)
+	 * @return This reply (for method chaining)
+	 */
+	@SuppressWarnings("unchecked")
+	public T setTime(long time) {
+		this.time = time;
+		return (T) this;
+	}
 
 	/**
 	 * Returns the text of the reply.
 	 *
 	 * @return The text of the reply
 	 */
-	public abstract String getText();
+	public String getText() {
+		return text;
+	}
+
+	/**
+	 * Sets the text of this reply.
+	 *
+	 * @param text
+	 *            The text of this reply
+	 * @return This reply (for method chaining)
+	 */
+	@SuppressWarnings("unchecked")
+	public T setText(String text) {
+		this.text = text;
+		return (T) this;
+	}
+
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Reply<?>)) {
+			return false;
+		}
+		Reply<?> reply = (Reply<?>) object;
+		return reply.id.equals(id);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
+	}
 
 }
