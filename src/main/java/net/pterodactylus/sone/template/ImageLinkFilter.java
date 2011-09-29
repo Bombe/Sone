@@ -82,13 +82,8 @@ public class ImageLinkFilter implements Filter {
 			double scale = Math.max(maxWidth / (double) imageWidth, maxHeight / (double) imageHeight);
 			linkTemplateContext.set("width", (int) (imageWidth * scale + 0.5));
 			linkTemplateContext.set("height", (int) (imageHeight * scale + 0.5));
-			if (scale >= 1) {
-				linkTemplateContext.set("left", String.format("%dpx", (int) ((imageWidth * scale) - maxWidth) / 2));
-				linkTemplateContext.set("top", String.format("%dpx", (int) ((imageHeight * scale) - maxHeight) / 2));
-			} else {
-				linkTemplateContext.set("left", String.format("%dpx", (int) (maxWidth - (imageWidth * scale)) / 2));
-				linkTemplateContext.set("top", String.format("%dpx", (int) (maxHeight - (imageHeight * scale)) / 2));
-			}
+			linkTemplateContext.set("left", String.format("%dpx", (int) (maxWidth - (imageWidth * scale)) / 2));
+			linkTemplateContext.set("top", String.format("%dpx", (int) (maxHeight - (imageHeight * scale)) / 2));
 		} else {
 			double scale = 1;
 			if ((imageWidth > maxWidth) || (imageHeight > maxHeight)) {
