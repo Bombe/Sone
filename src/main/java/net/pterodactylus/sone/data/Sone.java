@@ -84,6 +84,18 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 	};
 
+	/** Comparator that sorts Sones by number of images (descending). */
+	public static final Comparator<Sone> IMAGE_COUNT_COMPARATOR = new Comparator<Sone>() {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(Sone leftSone, Sone rightSone) {
+			return rightSone.getAllImages().size() - leftSone.getAllImages().size();
+		}
+	};
+
 	/** Filter to remove Sones that have not been downloaded. */
 	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
 
