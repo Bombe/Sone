@@ -7,7 +7,7 @@
 		$(document).ready(function() {
 			$("select[name=sort]").change(function() {
 				value = $(this).val();
-				if ((value == "activity") || (value == "posts")) {
+				if ((value == "activity") || (value == "posts") || (value == "images")) {
 					$("select[name=order]").val("desc");
 				} else if (value == "name") {
 					$("select[name=order]").val("asc");
@@ -30,6 +30,7 @@
 					<option value="name"<%if sort|match value="name"> selected="selected"<%/if>>Name</option>
 					<option value="activity"<%if sort|match value="activity"> selected="selected"<%/if>>Last activity</option>
 					<option value="posts"<%if sort|match value="posts"> selected="selected"<%/if>>Number of posts</option>
+					<option value="images"<%if sort|match value="images"> selected="selected"<%/if>>Number of images</option>
 				</select>
 				<select name="order">
 					<option value="asc"<%if order|match value="asc"> selected="selected"<%/if>>Ascending</option>
