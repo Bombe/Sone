@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -205,10 +206,10 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *             if there is no reply ID stored under the given parameter
 	 *             name, or if the reply ID is invalid
 	 */
-	protected Reply getReply(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
+	protected PostReply getReply(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
 		try {
 			String replyId = simpleFieldSet.getString(parameterName);
-			Reply reply = core.getReply(replyId, false);
+			PostReply reply = core.getReply(replyId, false);
 			if (reply == null) {
 				throw new FcpException("Could not load reply from “" + replyId + "”.");
 			}
@@ -305,7 +306,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		postBuilder.put(encodeLikes(core.getLikes(post), prefix + "Likes."));
 
 		if (includeReplies) {
-			List<Reply> replies = core.getReplies(post);
+			List<PostReply> replies = core.getReplies(post);
 			postBuilder.put(encodeReplies(replies, prefix));
 		}
 
@@ -334,7 +335,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			String postPrefix = prefix + postIndex++;
 			postBuilder.put(encodePost(post, postPrefix + ".", includeReplies));
 			if (includeReplies) {
-				postBuilder.put(encodeReplies(Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLIES_FILTER), postPrefix + "."));
+				postBuilder.put(encodeReplies(Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
 			}
 		}
 
@@ -351,12 +352,12 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the replies
 	 */
-	protected SimpleFieldSet encodeReplies(Collection<? extends Reply> replies, String prefix) {
+	protected SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
 		SimpleFieldSetBuilder replyBuilder = new SimpleFieldSetBuilder();
 
 		int replyIndex = 0;
 		replyBuilder.put(prefix + "Replies.Count", replies.size());
-		for (Reply reply : replies) {
+		for (PostReply reply : replies) {
 			String replyPrefix = prefix + "Replies." + replyIndex++ + ".";
 			replyBuilder.put(replyPrefix + "ID", reply.getId());
 			replyBuilder.put(replyPrefix + "Sone", reply.getSone().getId());

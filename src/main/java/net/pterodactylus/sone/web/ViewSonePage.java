@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -91,9 +91,9 @@ public class ViewSonePage extends SoneTemplatePage {
 		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());
-		Set<Reply> replies = sone.getReplies();
-		final Map<Post, List<Reply>> repliedPosts = new HashMap<Post, List<Reply>>();
-		for (Reply reply : replies) {
+		Set<PostReply> replies = sone.getReplies();
+		final Map<Post, List<PostReply>> repliedPosts = new HashMap<Post, List<PostReply>>();
+		for (PostReply reply : replies) {
 			Post post = reply.getPost();
 			if (repliedPosts.containsKey(post) || sone.equals(post.getSone()) || (sone.equals(post.getRecipient()))) {
 				continue;

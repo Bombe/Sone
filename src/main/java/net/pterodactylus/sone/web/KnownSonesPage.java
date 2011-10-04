@@ -97,6 +97,12 @@ public class KnownSonesPage extends SoneTemplatePage {
 			} else {
 				Collections.sort(knownSones, Sone.POST_COUNT_COMPARATOR);
 			}
+		} else if ("images".equals(sortField)) {
+			if ("asc".equals(sortOrder)) {
+				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.IMAGE_COUNT_COMPARATOR));
+			} else {
+				Collections.sort(knownSones, Sone.IMAGE_COUNT_COMPARATOR);
+			}
 		} else {
 			if ("desc".equals(sortOrder)) {
 				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.NICE_NAME_COMPARATOR));

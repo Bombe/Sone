@@ -56,7 +56,7 @@ public class PostAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Post post = (Post) object;
 		if ("replies".equals(member)) {
-			return Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLIES_FILTER);
+			return Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLY_FILTER);
 		} else if (member.equals("likes")) {
 			return core.getLikes(post);
 		} else if (member.equals("liked")) {

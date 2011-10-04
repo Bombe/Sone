@@ -40,6 +40,7 @@ import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
@@ -176,13 +177,13 @@ public class WebInterface implements CoreListener {
 	private final ListNotification<Post> newPostNotification;
 
 	/** The “new reply” notification. */
-	private final ListNotification<Reply> newReplyNotification;
+	private final ListNotification<PostReply> newReplyNotification;
 
 	/** The invisible “local post” notification. */
 	private final ListNotification<Post> localPostNotification;
 
 	/** The invisible “local reply” notification. */
-	private final ListNotification<Reply> localReplyNotification;
+	private final ListNotification<PostReply> localReplyNotification;
 
 	/** The “you have been mentioned” notification. */
 	private final ListNotification<Post> mentionNotification;
@@ -266,10 +267,10 @@ public class WebInterface implements CoreListener {
 		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", localPostNotificationTemplate, false);
 
 		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
-		newReplyNotification = new ListNotification<Reply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
+		newReplyNotification = new ListNotification<PostReply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
 
 		Template localReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
-		localReplyNotification = new ListNotification<Reply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
+		localReplyNotification = new ListNotification<PostReply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 
 		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
 		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
@@ -464,8 +465,8 @@ public class WebInterface implements CoreListener {
 	 *
 	 * @return The new replies
 	 */
-	public Set<Reply> getNewReplies() {
-		return new SetBuilder<Reply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
+	public Set<PostReply> getNewReplies() {
+		return new SetBuilder<PostReply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
 	}
 
 	/**
@@ -805,7 +806,7 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void newReplyFound(Reply reply) {
+	public void newReplyFound(PostReply reply) {
 		boolean isLocal = getCore().isLocalSone(reply.getSone());
 		if (isLocal) {
 			localReplyNotification.add(reply);
@@ -845,7 +846,7 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void markReplyKnown(Reply reply) {
+	public void markReplyKnown(PostReply reply) {
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
 		mentionNotification.remove(reply.getPost());
@@ -872,7 +873,7 @@ public class WebInterface implements CoreListener {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void replyRemoved(Reply reply) {
+	public void replyRemoved(PostReply reply) {
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
 	}

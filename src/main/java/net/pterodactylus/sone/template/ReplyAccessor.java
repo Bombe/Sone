@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.template;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Accessor;
@@ -50,7 +51,7 @@ public class ReplyAccessor extends ReflectionAccessor {
 	 */
 	@Override
 	public Object get(TemplateContext templateContext, Object object, String member) {
-		Reply reply = (Reply) object;
+		PostReply reply = (PostReply) object;
 		if ("likes".equals(member)) {
 			return core.getLikes(reply);
 		} else if (member.equals("liked")) {

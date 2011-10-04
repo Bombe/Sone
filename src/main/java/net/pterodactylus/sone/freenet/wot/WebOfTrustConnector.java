@@ -74,6 +74,9 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 */
 	public void stop() {
 		pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, this);
+		synchronized (reply) {
+			reply.notifyAll();
+		}
 	}
 
 	/**

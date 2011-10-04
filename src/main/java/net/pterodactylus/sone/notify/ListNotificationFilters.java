@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
@@ -60,7 +61,7 @@ public class ListNotificationFilters {
 					filteredNotifications.add(filteredNotification);
 				}
 			} else if (notification.getId().equals("new-reply-notification")) {
-				ListNotification<Reply> filteredNotification = filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+				ListNotification<PostReply> filteredNotification = filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
@@ -129,12 +130,12 @@ public class ListNotificationFilters {
 	 * @return The filtered new-reply notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	public static ListNotification<Reply> filterNewReplyNotification(ListNotification<Reply> newReplyNotification, Sone currentSone) {
+	public static ListNotification<PostReply> filterNewReplyNotification(ListNotification<PostReply> newReplyNotification, Sone currentSone) {
 		if (currentSone == null) {
 			return null;
 		}
-		List<Reply> newReplies = new ArrayList<Reply>();
-		for (Reply reply : newReplyNotification.getElements()) {
+		List<PostReply> newReplies = new ArrayList<PostReply>();
+		for (PostReply reply : newReplyNotification.getElements()) {
 			if (isReplyVisible(currentSone, reply)) {
 				newReplies.add(reply);
 			}
@@ -145,7 +146,7 @@ public class ListNotificationFilters {
 		if (newReplies.size() == newReplyNotification.getElements().size()) {
 			return newReplyNotification;
 		}
-		ListNotification<Reply> filteredNotification = new ListNotification<Reply>(newReplyNotification);
+		ListNotification<PostReply> filteredNotification = new ListNotification<PostReply>(newReplyNotification);
 		filteredNotification.setElements(newReplies);
 		filteredNotification.setLastUpdateTime(newReplyNotification.getLastUpdatedTime());
 		return filteredNotification;
@@ -237,7 +238,7 @@ public class ListNotificationFilters {
 	 * @return {@code true} if the reply is considered visible, {@code false}
 	 *         otherwise
 	 */
-	public static boolean isReplyVisible(Sone sone, Reply reply) {
+	public static boolean isReplyVisible(Sone sone, PostReply reply) {
 		Validation.begin().isNotNull("Reply", reply).check();
 		Post post = reply.getPost();
 		if (post == null) {

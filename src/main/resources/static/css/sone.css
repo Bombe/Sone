@@ -690,7 +690,7 @@ textarea {
 
 #sone .image .image-description, #sone .album .album-description {
 	text-align: left;
-	width: 195px;
+	width: 98%;
 	word-wrap: break-word;
 	max-height: 5em;
 	overflow: auto;

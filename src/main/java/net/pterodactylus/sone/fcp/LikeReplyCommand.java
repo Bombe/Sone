@@ -18,7 +18,7 @@
 package net.pterodactylus.sone.fcp;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
@@ -47,7 +47,7 @@ public class LikeReplyCommand extends AbstractSoneCommand {
 	 */
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
-		Reply reply = getReply(parameters, "Reply");
+		PostReply reply = getReply(parameters, "Reply");
 		Sone sone = getSone(parameters, "Sone", true);
 		sone.addLikedReplyId(reply.getId());
 		return new Response("ReplyLiked", new SimpleFieldSetBuilder().put("LikeCount", getCore().getLikes(reply).size()).get());

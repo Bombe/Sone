@@ -1,5 +1,5 @@
 /*
- * Sone - Reply.java - Copyright © 2010 David Roden
+ * Sone - Reply.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,41 +23,45 @@ import java.util.UUID;
 import net.pterodactylus.util.filter.Filter;
 
 /**
- * A reply is like a {@link Post} but can never be posted on its own, it always
- * refers to another {@link Post}.
+ * Abstract base class for all replies.
  *
+ * @param <T>
+ *            The type of the reply
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Reply {
+public abstract class Reply<T extends Reply<T>> {
 
 	/** Comparator that sorts replies ascending by time. */
-	public static final Comparator<Reply> TIME_COMPARATOR = new Comparator<Reply>() {
+	public static final Comparator<Reply<?>> TIME_COMPARATOR = new Comparator<Reply<?>>() {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
-		public int compare(Reply leftReply, Reply rightReply) {
+		public int compare(Reply<?> leftReply, Reply<?> rightReply) {
 			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, leftReply.getTime() - rightReply.getTime()));
 		}
 
 	};
 
 	/** Filter for replies with timestamps from the future. */
-	public static final Filter<Reply> FUTURE_REPLIES_FILTER = new Filter<Reply>() {
+	public static final Filter<Reply<?>> FUTURE_REPLY_FILTER = new Filter<Reply<?>>() {
 
+		/**
+		 * {@inheritDoc}
+		 */
 		@Override
-		public boolean filterObject(Reply reply) {
+		public boolean filterObject(Reply<?> reply) {
 			return reply.getTime() <= System.currentTimeMillis();
 		}
 
 	};
 
 	/** The ID of the reply. */
-	private final UUID id;
+	private final String id;
 
-	/** The Sone that posted this reply. */
+	/** The Sone that created this reply. */
 	private volatile Sone sone;
-
-	/** The Post this reply refers to. */
-	private volatile Post post;
 
 	/** The time of the reply. */
 	private volatile long time;
@@ -66,70 +70,47 @@ public class Reply {
 	private volatile String text;
 
 	/**
-	 * Creates a new reply.
+	 * Creates a new reply with the given ID.
 	 *
 	 * @param id
 	 *            The ID of the reply
 	 */
-	public Reply(String id) {
-		this(id, null, null, 0, null);
+	protected Reply(String id) {
+		this(id, null, 0, null);
 	}
 
 	/**
-	 * Creates a new reply.
+	 * Creates a new reply with a new random ID.
 	 *
 	 * @param sone
-	 *            The sone that posted the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param text
-	 *            The text of the reply
-	 */
-	public Reply(Sone sone, Post post, String text) {
-		this(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply-
-	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param post
-	 *            The post to reply to
+	 *            The Sone of the reply
 	 * @param time
 	 *            The time of the reply
 	 * @param text
 	 *            The text of the reply
 	 */
-	public Reply(Sone sone, Post post, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, post, time, text);
+	protected Reply(Sone sone, long time, String text) {
+		this(UUID.randomUUID().toString(), sone, time, text);
 	}
 
 	/**
-	 * Creates a new reply-
+	 * Creates a new reply.
 	 *
-	 * @param sone
-	 *            The sone that posted the reply
 	 * @param id
 	 *            The ID of the reply
-	 * @param post
-	 *            The post to reply to
+	 * @param sone
+	 *            The Sone of the reply
 	 * @param time
 	 *            The time of the reply
 	 * @param text
 	 *            The text of the reply
 	 */
-	public Reply(String id, Sone sone, Post post, long time, String text) {
-		this.id = UUID.fromString(id);
+	protected Reply(String id, Sone sone, long time, String text) {
+		this.id = id;
 		this.sone = sone;
-		this.post = post;
 		this.time = time;
 		this.text = text;
 	}
-
-	//
-	// ACCESSORS
-	//
 
 	/**
 	 * Returns the ID of the reply.
@@ -137,7 +118,7 @@ public class Reply {
 	 * @return The ID of the reply
 	 */
 	public String getId() {
-		return id.toString();
+		return id;
 	}
 
 	/**
@@ -156,30 +137,10 @@ public class Reply {
 	 *            The Sone that posted this reply
 	 * @return This reply (for method chaining)
 	 */
-	public Reply setSone(Sone sone) {
+	@SuppressWarnings("unchecked")
+	public T setSone(Sone sone) {
 		this.sone = sone;
-		return this;
-	}
-
-	/**
-	 * Returns the post this reply refers to.
-	 *
-	 * @return The post this reply refers to
-	 */
-	public Post getPost() {
-		return post;
-	}
-
-	/**
-	 * Sets the post this reply refers to.
-	 *
-	 * @param post
-	 *            The post this reply refers to
-	 * @return This reply (for method chaining)
-	 */
-	public Reply setPost(Post post) {
-		this.post = post;
-		return this;
+		return (T) this;
 	}
 
 	/**
@@ -198,9 +159,10 @@ public class Reply {
 	 *            The time of this reply (in milliseconds since Jan 1, 1970 UTC)
 	 * @return This reply (for method chaining)
 	 */
-	public Reply setTime(long time) {
+	@SuppressWarnings("unchecked")
+	public T setTime(long time) {
 		this.time = time;
-		return this;
+		return (T) this;
 	}
 
 	/**
@@ -219,9 +181,10 @@ public class Reply {
 	 *            The text of this reply
 	 * @return This reply (for method chaining)
 	 */
-	public Reply setText(String text) {
+	@SuppressWarnings("unchecked")
+	public T setText(String text) {
 		this.text = text;
-		return this;
+		return (T) this;
 	}
 
 	//
@@ -241,10 +204,10 @@ public class Reply {
 	 */
 	@Override
 	public boolean equals(Object object) {
-		if (!(object instanceof Reply)) {
+		if (!(object instanceof Reply<?>)) {
 			return false;
 		}
-		Reply reply = (Reply) object;
+		Reply<?> reply = (Reply<?>) object;
 		return reply.id.equals(id);
 	}
 
@@ -253,7 +216,7 @@ public class Reply {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",post=" + post + ",time=" + time + ",text=" + text + "]";
+		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
 	}
 
 }

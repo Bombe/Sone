@@ -1,53 +1,54 @@
 <%include include/head.html>
 
 	<div class="page-id hidden">known-sones</div>
-	
+
 	<script language="javascript">
 
 		$(document).ready(function() {
 			$("select[name=sort]").change(function() {
 				value = $(this).val();
-				if ((value == "activity") || (value == "posts")) {
+				if ((value == "activity") || (value == "posts") || (value == "images")) {
 					$("select[name=order]").val("desc");
 				} else if (value == "name") {
 					$("select[name=order]").val("asc");
-				} 
+				}
 			});
 			$("#sort-options select").change(function() {
 				this.form.submit();
 			});
 		});
-	
+
 	</script>
 
 	<h1><%= Page.KnownSones.Page.Title|l10n|html></h1>
-	
+
 	<div id="sort-options">
 		<form action="knownSones.html" method="get">
 			<div>
-				Sort:
+				<%= Page.KnownSones.Label.Sort|l10n|html>
 				<select name="sort">
-					<option value="name"<%if sort|match value="name"> selected="selected"<%/if>>Name</option>
-					<option value="activity"<%if sort|match value="activity"> selected="selected"<%/if>>Last activity</option>
-					<option value="posts"<%if sort|match value="posts"> selected="selected"<%/if>>Number of posts</option>
+					<option value="name"<%if sort|match value="name"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Name|l10n|html></option>
+					<option value="activity"<%if sort|match value="activity"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.LastActivity|l10n|html></option>
+					<option value="posts"<%if sort|match value="posts"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Posts|l10n|html></option>
+					<option value="images"<%if sort|match value="images"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Images|l10n|html></option>
 				</select>
 				<select name="order">
-					<option value="asc"<%if order|match value="asc"> selected="selected"<%/if>>Ascending</option>
-					<option value="desc"<%if order|match value="desc"> selected="selected"<%/if>>Descending</option>
+					<option value="asc"<%if order|match value="asc"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Order.Ascending|l10n|html></option>
+					<option value="desc"<%if order|match value="desc"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Order.Descending|l10n|html></option>
 				</select>
 			</div>
 			<%ifnull !currentSone>
 				<div>
-					Followed Sones:
+					<%= Page.KnownSones.Label.FollowedSones|l10n|html>
 					<select name="followedSones">
 						<option value="none"></option>
-						<option value="show-only"<%if followedSones|match value="show-only"> selected="selected"<%/if>>Show only followed Sones</option>
-						<option value="hide"<%if followedSones|match value="hide"> selected="selected"<%/if>>Hide followed Sones</option>
+						<option value="show-only"<%if followedSones|match value="show-only"> selected="selected"<%/if>><%= Page.KnownSones.FollowedSones.ShowOnly|l10n|html></option>
+						<option value="hide"<%if followedSones|match value="hide"> selected="selected"<%/if>><%= Page.KnownSones.FollowedSones.Hide|l10n|html></option>
 					</select>
 				</div>
 			<%/if>
 			<div>
-				<button type="submit">Apply</button>
+				<button type="submit"><%= Page.KnownSones.Button.Apply|l10n|html></button>
 			</div>
 		</form>
 	</div>

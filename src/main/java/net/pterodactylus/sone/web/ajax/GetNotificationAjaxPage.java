@@ -21,7 +21,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
@@ -89,7 +89,7 @@ public class GetNotificationAjaxPage extends JsonPage {
 			if ("new-post-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
 			} else if ("new-reply-notification".equals(notificationId)) {
-				notification = ListNotificationFilters.filterNewReplyNotification((ListNotification<Reply>) notification, currentSone);
+				notification = ListNotificationFilters.filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
 			} else if ("mention-notification".equals(notificationId)) {
 				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
 			}

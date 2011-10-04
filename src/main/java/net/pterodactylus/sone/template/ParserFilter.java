@@ -36,6 +36,7 @@ import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.text.SoneTextParserContext;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -87,19 +88,8 @@ public class ParserFilter implements Filter {
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		String text = String.valueOf(data);
-		int length = -1;
-		try {
-			length = Integer.parseInt(parameters.get("length"));
-		} catch (NumberFormatException nfe1) {
-			/* ignore. */
-		}
-		if ((length == -1) && (parameters.get("length") != null)) {
-			try {
-				length = Integer.parseInt(String.valueOf(templateContext.get(parameters.get("length"))));
-			} catch (NumberFormatException nfe1) {
-				/* ignore. */
-			}
-		}
+		int length = Numbers.safeParseInteger(parameters.get("length"), Numbers.safeParseInteger(templateContext.get(parameters.get("length")), -1));
+		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(parameters.get("cut-off-length")), length));
 		String soneKey = parameters.get("sone");
 		if (soneKey == null) {
 			soneKey = "sone";
@@ -114,27 +104,33 @@ public class ParserFilter implements Filter {
 		try {
 			Iterable<Part> parts = soneTextParser.parse(context, new StringReader(text));
 			if (length > -1) {
+				int allPartsLength = 0;
 				List<Part> shortenedParts = new ArrayList<Part>();
 				for (Part part : parts) {
 					if (part instanceof PlainTextPart) {
 						String longText = ((PlainTextPart) part).getText();
-						if (length >= longText.length()) {
-							shortenedParts.add(part);
-						} else {
-							shortenedParts.add(new PlainTextPart(longText.substring(0, length) + "…"));
+						if (allPartsLength < cutOffLength) {
+							if ((allPartsLength + longText.length()) > cutOffLength) {
+								shortenedParts.add(new PlainTextPart(longText.substring(0, cutOffLength - allPartsLength) + "…"));
+							} else {
+								shortenedParts.add(part);
+							}
 						}
-						length -= longText.length();
+						allPartsLength += longText.length();
 					} else if (part instanceof LinkPart) {
-						shortenedParts.add(part);
-						length -= ((LinkPart) part).getText().length();
+						if (allPartsLength < cutOffLength) {
+							shortenedParts.add(part);
+						}
+						allPartsLength += ((LinkPart) part).getText().length();
 					} else {
-						shortenedParts.add(part);
-					}
-					if (length <= 0) {
-						break;
+						if (allPartsLength < cutOffLength) {
+							shortenedParts.add(part);
+						}
 					}
 				}
-				parts = shortenedParts;
+				if (allPartsLength >= length) {
+					parts = shortenedParts;
+				}
 			}
 			render(parsedTextWriter, parts);
 		} catch (IOException ioe1) {
@@ -233,7 +229,11 @@ public class ParserFilter implements Filter {
 	 *            The part to render
 	 */
 	private void render(Writer writer, SonePart sonePart) {
-		renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
+		if ((sonePart.getSone() != null) && (sonePart.getSone().getName() != null)) {
+			renderLink(writer, "viewSone.html?sone=" + sonePart.getSone().getId(), SoneAccessor.getNiceName(sonePart.getSone()), SoneAccessor.getNiceName(sonePart.getSone()), "in-sone");
+		} else {
+			renderLink(writer, "/WebOfTrust/ShowIdentity?id=" + sonePart.getSone().getId(), sonePart.getSone().getId(), sonePart.getSone().getId(), "in-sone");
+		}
 	}
 
 	/**

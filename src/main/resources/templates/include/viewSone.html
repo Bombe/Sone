@@ -8,7 +8,7 @@
 	<div class="last-update"><%= View.Sone.Label.LastUpdate|l10n|html> <span class="time" title="<% sone.time|unknown|date format="MMM d, yyyy, HH:mm:ss">"><%sone.lastUpdatedText|html></span></div>
 	<div>
 		<div class="profile-link"><a href="viewSone.html?sone=<% sone.id|html>" title="<% sone.requestUri|html>"><% sone.niceName|html></a></div>
-		<div class="sone-stats">(<%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size>)</div>
+		<div class="sone-stats">(<%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size><%if ! sone.allImages.size|match value=0>, <%= View.Sone.Stats.Images|l10n 0=sone.allImages.size><%/if>)</div>
 	</div>
 	<div class="short-request-uri"><% sone.requestUri|substring start=4 length=43|html></div>
 	<div class="hidden"><% sone.blacklisted></div>

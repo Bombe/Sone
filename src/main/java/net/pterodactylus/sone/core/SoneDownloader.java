@@ -31,8 +31,8 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
@@ -383,7 +383,7 @@ public class SoneDownloader extends AbstractService {
 
 		/* parse replies. */
 		SimpleXML repliesXml = soneXml.getNode("replies");
-		Set<Reply> replies = new HashSet<Reply>();
+		Set<PostReply> replies = new HashSet<PostReply>();
 		if (repliesXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, "Downloaded Sone %s has no replies!", new Object[] { sone });
@@ -442,7 +442,7 @@ public class SoneDownloader extends AbstractService {
 				String id = albumXml.getValue("id", null);
 				String parentId = albumXml.getValue("parent", null);
 				String title = albumXml.getValue("title", null);
-				String description = albumXml.getValue("description", null);
+				String description = albumXml.getValue("description", "");
 				String albumImageId = albumXml.getValue("album-image", null);
 				if ((id == null) || (title == null) || (description == null)) {
 					logger.log(Level.WARNING, "Downloaded Sone %s contains invalid album!", new Object[] { sone });
@@ -456,7 +456,7 @@ public class SoneDownloader extends AbstractService {
 						return null;
 					}
 				}
-				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description).setAlbumImage(albumImageId);
+				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description);
 				if (parent != null) {
 					parent.addAlbum(album);
 				} else {
@@ -489,6 +489,7 @@ public class SoneDownloader extends AbstractService {
 						album.addImage(image);
 					}
 				}
+				album.setAlbumImage(albumImageId);
 			}
 		}
 

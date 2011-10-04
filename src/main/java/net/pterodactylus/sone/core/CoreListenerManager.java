@@ -19,7 +19,7 @@ package net.pterodactylus.sone.core;
 
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.event.AbstractListenerManager;
 import net.pterodactylus.util.version.Version;
@@ -74,11 +74,11 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	/**
 	 * Notifies all listeners that a new reply has been found.
 	 *
-	 * @see CoreListener#newReplyFound(Reply)
+	 * @see CoreListener#newReplyFound(PostReply)
 	 * @param reply
 	 *            The new reply
 	 */
-	void fireNewReplyFound(Reply reply) {
+	void fireNewReplyFound(PostReply reply) {
 		for (CoreListener coreListener : getListeners()) {
 			coreListener.newReplyFound(reply);
 		}
@@ -115,7 +115,7 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	 * @param reply
 	 *            The known reply
 	 */
-	void fireMarkReplyKnown(Reply reply) {
+	void fireMarkReplyKnown(PostReply reply) {
 		for (CoreListener coreListener : getListeners()) {
 			coreListener.markReplyKnown(reply);
 		}
@@ -150,11 +150,11 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	/**
 	 * Notifies all listener that the given reply was removed.
 	 *
-	 * @see CoreListener#replyRemoved(Reply)
+	 * @see CoreListener#replyRemoved(PostReply)
 	 * @param reply
 	 *            The removed reply
 	 */
-	void fireReplyRemoved(Reply reply) {
+	void fireReplyRemoved(PostReply reply) {
 		for (CoreListener coreListener : getListeners()) {
 			coreListener.replyRemoved(reply);
 		}

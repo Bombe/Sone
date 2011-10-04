@@ -38,6 +38,7 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -173,7 +174,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	private Set<String> knownPosts = new HashSet<String>();
 
 	/** All replies. */
-	private Map<String, Reply> replies = new HashMap<String, Reply>();
+	private Map<String, PostReply> replies = new HashMap<String, PostReply>();
 
 	/** All new replies. */
 	private Set<String> newReplies = new HashSet<String>();
@@ -676,7 +677,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The ID of the reply to get
 	 * @return The reply
 	 */
-	public Reply getReply(String replyId) {
+	public PostReply getReply(String replyId) {
 		return getReply(replyId, true);
 	}
 
@@ -692,11 +693,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            to return {@code null} if no reply can be found
 	 * @return The reply, or {@code null} if there is no such reply
 	 */
-	public Reply getReply(String replyId, boolean create) {
+	public PostReply getReply(String replyId, boolean create) {
 		synchronized (replies) {
-			Reply reply = replies.get(replyId);
+			PostReply reply = replies.get(replyId);
 			if (create && (reply == null)) {
-				reply = new Reply(replyId);
+				reply = new PostReply(replyId);
 				replies.put(replyId, reply);
 			}
 			return reply;
@@ -710,11 +711,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The post to get all replies for
 	 * @return All replies for the given post
 	 */
-	public List<Reply> getReplies(Post post) {
+	public List<PostReply> getReplies(Post post) {
 		Set<Sone> sones = getSones();
-		List<Reply> replies = new ArrayList<Reply>();
+		List<PostReply> replies = new ArrayList<PostReply>();
 		for (Sone sone : sones) {
-			for (Reply reply : sone.getReplies()) {
+			for (PostReply reply : sone.getReplies()) {
 				if (reply.getPost().equals(post)) {
 					replies.add(reply);
 				}
@@ -762,7 +763,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The reply to get the liking Sones for
 	 * @return The Sones that like the given reply
 	 */
-	public Set<Sone> getLikes(Reply reply) {
+	public Set<Sone> getLikes(PostReply reply) {
 		Set<Sone> sones = new HashSet<Sone>();
 		for (Sone sone : getSones()) {
 			if (sone.getLikedReplyIds().contains(reply.getId())) {
@@ -1204,16 +1205,16 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 			synchronized (replies) {
 				if (!soneRescueMode) {
-					for (Reply reply : storedSone.getReplies()) {
+					for (PostReply reply : storedSone.getReplies()) {
 						replies.remove(reply.getId());
 						if (!sone.getReplies().contains(reply)) {
 							coreListenerManager.fireReplyRemoved(reply);
 						}
 					}
 				}
-				Set<Reply> storedReplies = storedSone.getReplies();
+				Set<PostReply> storedReplies = storedSone.getReplies();
 				synchronized (newReplies) {
-					for (Reply reply : sone.getReplies()) {
+					for (PostReply reply : sone.getReplies()) {
 						reply.setSone(storedSone);
 						if (!storedReplies.contains(reply) && !knownReplies.contains(reply.getId())) {
 							newReplies.add(reply.getId());
@@ -1249,7 +1250,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					for (Post post : sone.getPosts()) {
 						storedSone.addPost(post);
 					}
-					for (Reply reply : sone.getReplies()) {
+					for (PostReply reply : sone.getReplies()) {
 						storedSone.addReply(reply);
 					}
 					for (String likedPostId : sone.getLikedPostIds()) {
@@ -1395,7 +1396,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 
 		/* load replies. */
-		Set<Reply> replies = new HashSet<Reply>();
+		Set<PostReply> replies = new HashSet<PostReply>();
 		while (true) {
 			String replyPrefix = sonePrefix + "/Replies/" + replies.size();
 			String replyId = configuration.getStringValue(replyPrefix + "/ID").getValue(null);
@@ -1528,7 +1529,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 		}
 		synchronized (newReplies) {
-			for (Reply reply : replies) {
+			for (PostReply reply : replies) {
 				knownReplies.add(reply.getId());
 			}
 		}
@@ -1718,7 +1719,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The text of the reply
 	 * @return The created reply
 	 */
-	public Reply createReply(Sone sone, Post post, String text) {
+	public PostReply createReply(Sone sone, Post post, String text) {
 		return createReply(sone, post, System.currentTimeMillis(), text);
 	}
 
@@ -1735,12 +1736,12 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The text of the reply
 	 * @return The created reply
 	 */
-	public Reply createReply(Sone sone, Post post, long time, String text) {
+	public PostReply createReply(Sone sone, Post post, long time, String text) {
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
 			return null;
 		}
-		final Reply reply = new Reply(sone, post, System.currentTimeMillis(), text);
+		final PostReply reply = new PostReply(sone, post, System.currentTimeMillis(), text);
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
@@ -1769,7 +1770,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @param reply
 	 *            The reply to delete
 	 */
-	public void deleteReply(Reply reply) {
+	public void deleteReply(PostReply reply) {
 		Sone sone = reply.getSone();
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, "Tried to delete non-local reply: %s", reply);
@@ -1793,7 +1794,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @param reply
 	 *            The reply to mark as known
 	 */
-	public void markReplyKnown(Reply reply) {
+	public void markReplyKnown(PostReply reply) {
 		synchronized (newReplies) {
 			if (newReplies.remove(reply.getId())) {
 				knownReplies.add(reply.getId());
@@ -2028,8 +2029,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 		logger.log(Level.INFO, "Saving Sone: %s", sone);
 		try {
-			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
-
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
 			configuration.getLongValue(sonePrefix + "/Time").setValue(sone.getTime());
@@ -2066,7 +2065,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save replies. */
 			int replyCounter = 0;
-			for (Reply reply : sone.getReplies()) {
+			for (PostReply reply : sone.getReplies()) {
 				String replyPrefix = sonePrefix + "/Replies/" + replyCounter++;
 				configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
 				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPost().getId());
@@ -2097,7 +2096,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = Sone.flattenAlbums(sone.getAlbums());
+			List<Album> albums = sone.getAllAlbums();
 
 			int albumCounter = 0;
 			for (Album album : albums) {
@@ -2135,6 +2134,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").setValue(sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").getReal());
 
 			configuration.save();
+
+			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+
 			logger.log(Level.INFO, "Sone %s saved.", sone);
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
@@ -2161,6 +2163,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
 			configuration.getIntValue("Option/CharactersPerPost").setValue(options.getIntegerOption("CharactersPerPost").getReal());
+			configuration.getIntValue("Option/PostCutOffLength").setValue(options.getIntegerOption("PostCutOffLength").getReal());
 			configuration.getBooleanValue("Option/RequireFullAccess").setValue(options.getBooleanOption("RequireFullAccess").getReal());
 			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
 			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
@@ -2234,7 +2237,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 		}));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
-		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
+		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
+		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
@@ -2274,6 +2278,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
 		loadConfigurationValue("CharactersPerPost");
+		loadConfigurationValue("PostCutOffLength");
 		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
 		loadConfigurationValue("PositiveTrust");
 		loadConfigurationValue("NegativeTrust");
@@ -2453,7 +2458,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 		synchronized (replies) {
 			synchronized (newReplies) {
-				for (Reply reply : sone.getReplies()) {
+				for (PostReply reply : sone.getReplies()) {
 					replies.remove(reply.getId());
 					newReplies.remove(reply.getId());
 					coreListenerManager.fireReplyRemoved(reply);
@@ -2672,6 +2677,39 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 */
 		public Preferences setCharactersPerPost(Integer charactersPerPost) {
 			options.getIntegerOption("CharactersPerPost").set(charactersPerPost);
+			return this;
+		}
+
+		/**
+		 * Returns the number of characters the shortened post should have.
+		 *
+		 * @return The number of characters of the snippet
+		 */
+		public int getPostCutOffLength() {
+			return options.getIntegerOption("PostCutOffLength").get();
+		}
+
+		/**
+		 * Validates the number of characters after which to cut off the post.
+		 *
+		 * @param postCutOffLength
+		 *            The number of characters of the snippet
+		 * @return {@code true} if the number of characters of the snippet is
+		 *         valid, {@code false} otherwise
+		 */
+		public boolean validatePostCutOffLength(Integer postCutOffLength) {
+			return options.getIntegerOption("PostCutOffLength").validate(postCutOffLength);
+		}
+
+		/**
+		 * Sets the number of characters the shortened post should have.
+		 *
+		 * @param postCutOffLength
+		 *            The number of characters of the snippet
+		 * @return This preferences
+		 */
+		public Preferences setPostCutOffLength(Integer postCutOffLength) {
+			options.getIntegerOption("PostCutOffLength").set(postCutOffLength);
 			return this;
 		}
 

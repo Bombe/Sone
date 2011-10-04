@@ -84,6 +84,18 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 	};
 
+	/** Comparator that sorts Sones by number of images (descending). */
+	public static final Comparator<Sone> IMAGE_COUNT_COMPARATOR = new Comparator<Sone>() {
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int compare(Sone leftSone, Sone rightSone) {
+			return rightSone.getAllImages().size() - leftSone.getAllImages().size();
+		}
+	};
+
 	/** Filter to remove Sones that have not been downloaded. */
 	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
 
@@ -138,7 +150,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	private final Set<Post> posts = Collections.synchronizedSet(new HashSet<Post>());
 
 	/** All replies. */
-	private final Set<Reply> replies = Collections.synchronizedSet(new HashSet<Reply>());
+	private final Set<PostReply> replies = Collections.synchronizedSet(new HashSet<PostReply>());
 
 	/** The IDs of all liked posts. */
 	private final Set<String> likedPostIds = Collections.synchronizedSet(new HashSet<String>());
@@ -477,7 +489,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return All replies this Sone made
 	 */
-	public synchronized Set<Reply> getReplies() {
+	public synchronized Set<PostReply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
 
@@ -488,7 +500,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setReplies(Collection<Reply> replies) {
+	public synchronized Sone setReplies(Collection<PostReply> replies) {
 		this.replies.clear();
 		this.replies.addAll(replies);
 		return this;
@@ -501,7 +513,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to add
 	 */
-	public synchronized void addReply(Reply reply) {
+	public synchronized void addReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.add(reply);
 		}
@@ -513,7 +525,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to remove
 	 */
-	public synchronized void removeReply(Reply reply) {
+	public synchronized void removeReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.remove(reply);
 		}
@@ -645,6 +657,41 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
+	 * Returns a flattened list of all albums of this Sone. The resulting list
+	 * contains parent albums before child albums so that the resulting list can
+	 * be parsed in a single pass.
+	 *
+	 * @return The flattened albums
+	 */
+	public List<Album> getAllAlbums() {
+		List<Album> flatAlbums = new ArrayList<Album>();
+		flatAlbums.addAll(albums);
+		int lastAlbumIndex = 0;
+		while (lastAlbumIndex < flatAlbums.size()) {
+			int previousAlbumCount = flatAlbums.size();
+			for (Album album : new ArrayList<Album>(flatAlbums.subList(lastAlbumIndex, flatAlbums.size()))) {
+				flatAlbums.addAll(album.getAlbums());
+			}
+			lastAlbumIndex = previousAlbumCount;
+		}
+		return flatAlbums;
+	}
+
+	/**
+	 * Returns all images of a Sone. Images of a album are inserted into this
+	 * list before images of all child albums.
+	 *
+	 * @return The list of all images
+	 */
+	public List<Image> getAllImages() {
+		List<Image> allImages = new ArrayList<Image>();
+		for (Album album : getAllAlbums()) {
+			allImages.addAll(album.getImages());
+		}
+		return allImages;
+	}
+
+	/**
 	 * Adds an album to this Sone.
 	 *
 	 * @param album
@@ -747,10 +794,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 		fingerprint.append(")");
 
-		List<Reply> replies = new ArrayList<Reply>(getReplies());
+		List<PostReply> replies = new ArrayList<PostReply>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		fingerprint.append("Replies(");
-		for (Reply reply : replies) {
+		for (PostReply reply : replies) {
 			fingerprint.append("Reply(").append(reply.getId()).append(')');
 		}
 		fingerprint.append(')');
@@ -778,33 +825,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		fingerprint.append(')');
 
 		return fingerprint.toString();
-	}
-
-	//
-	// STATIC METHODS
-	//
-
-	/**
-	 * Flattens the given top-level albums so that the resulting list contains
-	 * parent albums before child albums and the resulting list can be parsed in
-	 * a single pass.
-	 *
-	 * @param albums
-	 *            The albums to flatten
-	 * @return The flattened albums
-	 */
-	public static List<Album> flattenAlbums(Collection<? extends Album> albums) {
-		List<Album> flatAlbums = new ArrayList<Album>();
-		flatAlbums.addAll(albums);
-		int lastAlbumIndex = 0;
-		while (lastAlbumIndex < flatAlbums.size()) {
-			int previousAlbumCount = flatAlbums.size();
-			for (Album album : new ArrayList<Album>(flatAlbums.subList(lastAlbumIndex, flatAlbums.size()))) {
-				flatAlbums.addAll(album.getAlbums());
-			}
-			lastAlbumIndex = previousAlbumCount;
-		}
-		return flatAlbums;
 	}
 
 	//

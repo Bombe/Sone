@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.template.SoneAccessor;
@@ -117,27 +117,27 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
-		Set<Reply> newReplies = webInterface.getNewReplies();
+		Set<PostReply> newReplies = webInterface.getNewReplies();
 		if (currentSone != null) {
-			newReplies = Filters.filteredSet(newReplies, new Filter<Reply>() {
+			newReplies = Filters.filteredSet(newReplies, new Filter<PostReply>() {
 
 				@Override
-				public boolean filterObject(Reply reply) {
+				public boolean filterObject(PostReply reply) {
 					return ListNotificationFilters.isReplyVisible(currentSone, reply);
 				}
 
 			});
 		}
 		/* remove replies to unknown posts. */
-		newReplies = Filters.filteredSet(newReplies, new Filter<Reply>() {
+		newReplies = Filters.filteredSet(newReplies, new Filter<PostReply>() {
 
 			@Override
-			public boolean filterObject(Reply reply) {
+			public boolean filterObject(PostReply reply) {
 				return (reply.getPost() != null) && (reply.getPost().getSone() != null);
 			}
 		});
 		JsonArray jsonReplies = new JsonArray();
-		for (Reply reply : newReplies) {
+		for (PostReply reply : newReplies) {
 			JsonObject jsonReply = new JsonObject();
 			jsonReply.put("id", reply.getId());
 			jsonReply.put("sone", reply.getSone().getId());
