@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web.page;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +48,7 @@ import freenet.support.HTMLNode;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FreenetTemplatePage implements Page<FreenetRequest>, LinkEnabledCallback {
+public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FreenetTemplatePage.class);
@@ -249,6 +250,14 @@ public class FreenetTemplatePage implements Page<FreenetRequest>, LinkEnabledCal
 	 *         full access, {@code false} to allow this page for any host
 	 */
 	protected boolean isFullAccessOnly() {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
 		return false;
 	}
 
