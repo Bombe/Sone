@@ -452,6 +452,14 @@ public class FreenetInterface {
 		 * {@inheritDoc}
 		 */
 		@Override
+		public void onGeneratedMetadata(Bucket metadata, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+			/* ignore, we don’t care. */
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
 		public void onGeneratedURI(FreenetURI generatedUri, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
 			resultingUri = generatedUri;
 		}
