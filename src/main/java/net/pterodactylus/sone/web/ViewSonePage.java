@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -113,6 +114,14 @@ public class ViewSonePage extends SoneTemplatePage {
 		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
 		templateContext.set("repliedPostPagination", repliedPostPagination);
 		templateContext.set("repliedPosts", repliedPostPagination.getItems());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
+		return true;
 	}
 
 }
