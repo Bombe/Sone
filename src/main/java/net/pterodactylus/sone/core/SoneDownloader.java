@@ -336,8 +336,8 @@ public class SoneDownloader extends AbstractService {
 		if (profileFieldsXml != null) {
 			for (SimpleXML fieldXml : profileFieldsXml.getNodes("field")) {
 				String fieldName = fieldXml.getValue("field-name", null);
-				String fieldValue = fieldXml.getValue("field-value", null);
-				if ((fieldName == null) || (fieldValue == null)) {
+				String fieldValue = fieldXml.getValue("field-value", "");
+				if (fieldName == null) {
 					logger.log(Level.WARNING, "Downloaded profile field for Sone %s with missing data! Name: %s, Value: %s", new Object[] { sone, fieldName, fieldValue });
 					return null;
 				}
