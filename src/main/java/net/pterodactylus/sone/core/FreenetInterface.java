@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.SoneException.Type;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
@@ -154,7 +153,7 @@ public class FreenetInterface {
 			ClientPutter clientPutter = client.insert(insertBlock, false, null, false, insertContext, insertToken, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
 			insertToken.setClientPutter(clientPutter);
 		} catch (InsertException ie1) {
-			throw new SoneException(Type.INSERT_FAILED, "Could not start image insert.", ie1);
+			throw new SoneInsertException("Could not start image insert.", ie1);
 		}
 	}
 
@@ -175,7 +174,7 @@ public class FreenetInterface {
 		try {
 			return client.insertManifest(insertUri, manifestEntries, defaultFile);
 		} catch (InsertException ie1) {
-			throw new SoneException(null, ie1);
+			throw new SoneException(ie1);
 		}
 	}
 
