@@ -220,7 +220,7 @@ public class SoneDownloader extends AbstractService {
 	 *            The input stream to parse the Sone from
 	 * @return The parsed Sone
 	 */
-	public Sone parseSone(Sone originalSone, InputStream soneInputStream) {
+	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
 		/* TODO - impose a size limit? */
 
 		Document document;
