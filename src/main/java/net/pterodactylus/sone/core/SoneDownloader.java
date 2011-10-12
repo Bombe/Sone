@@ -219,6 +219,8 @@ public class SoneDownloader extends AbstractService {
 	 * @param soneInputStream
 	 *            The input stream to parse the Sone from
 	 * @return The parsed Sone
+	 * @throws SoneException
+	 *             if a parse error occurs, or the protocol is invalid
 	 */
 	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
 		/* TODO - impose a size limit? */
