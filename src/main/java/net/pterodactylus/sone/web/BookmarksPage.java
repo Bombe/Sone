@@ -70,7 +70,7 @@ public class BookmarksPage extends SoneTemplatePage {
 		});
 		List<Post> sortedPosts = new ArrayList<Post>(loadedPosts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
-		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 		templateContext.set("postsNotLoaded", allPosts.size() != loadedPosts.size());
