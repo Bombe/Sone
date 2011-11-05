@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import java.net.URI;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
@@ -74,6 +76,14 @@ public class ImageBrowserPage extends SoneTemplatePage {
 		}
 		templateContext.set("soneRequested", true);
 		templateContext.set("sone", sone);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
+		return true;
 	}
 
 }

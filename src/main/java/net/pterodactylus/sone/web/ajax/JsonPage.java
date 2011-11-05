@@ -18,16 +18,18 @@
 package net.pterodactylus.sone.web.ajax;
 
 import java.io.IOException;
+import java.net.URI;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.json.JsonUtils;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
-import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
+import freenet.clients.http.SessionManager.Session;
 
 /**
  * A JSON page is a specialized {@link Page} that will always return a JSON
@@ -35,7 +37,7 @@ import freenet.clients.http.ToadletContext;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class JsonPage implements Page<FreenetRequest> {
+public abstract class JsonPage implements FreenetPage {
 
 	/** The path of the page. */
 	private final String path;
@@ -216,6 +218,14 @@ public abstract class JsonPage implements Page<FreenetRequest> {
 		}
 		JsonObject jsonObject = createJsonObject(request);
 		return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(JsonUtils.format(jsonObject));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
+		return false;
 	}
 
 }
