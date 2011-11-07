@@ -190,6 +190,7 @@ public class SoneInserter extends AbstractService {
 	@Override
 	protected void serviceRun() {
 		long lastModificationTime = 0;
+		String lastInsertedFingerprint = lastInsertFingerprint;
 		String lastFingerprint = "";
 		while (!shouldStop()) { try {
 			/* check every seconds. */
@@ -199,7 +200,7 @@ public class SoneInserter extends AbstractService {
 			if (core.isLocked(sone)) {
 				/* trigger redetection when the Sone is unlocked. */
 				synchronized (sone) {
-					modified = !sone.getFingerprint().equals(lastInsertFingerprint);
+					modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
 				}
 				lastFingerprint = "";
 				lastModificationTime = 0;
@@ -210,7 +211,7 @@ public class SoneInserter extends AbstractService {
 			synchronized (sone) {
 				String fingerprint = sone.getFingerprint();
 				if (!fingerprint.equals(lastFingerprint)) {
-					if (fingerprint.equals(lastInsertFingerprint)) {
+					if (fingerprint.equals(lastInsertedFingerprint)) {
 						modified = false;
 						lastModificationTime = 0;
 						logger.log(Level.FINE, "Sone %s has been reverted to last insert state.", sone);
@@ -222,7 +223,7 @@ public class SoneInserter extends AbstractService {
 					lastFingerprint = fingerprint;
 				}
 				if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
-					lastInsertFingerprint = fingerprint;
+					lastInsertedFingerprint = fingerprint;
 					insertInformation = new InsertInformation(sone);
 				}
 			}
@@ -261,9 +262,11 @@ public class SoneInserter extends AbstractService {
 				 */
 				if (success) {
 					synchronized (sone) {
-						if (lastInsertFingerprint.equals(sone.getFingerprint())) {
+						if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
 							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
 							lastModificationTime = 0;
+							lastInsertFingerprint = lastInsertedFingerprint;
+							core.touchConfiguration();
 							modified = false;
 						}
 					}
