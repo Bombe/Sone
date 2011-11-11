@@ -55,14 +55,23 @@ public class ListNotificationFilters {
 	public static List<Notification> filterNotifications(Collection<? extends Notification> notifications, Sone currentSone) {
 		List<Notification> filteredNotifications = new ArrayList<Notification>();
 		for (Notification notification : notifications) {
-			if (notification.getId().equals("new-sone-notification") && ((currentSone == null) || (currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get()))) {
+			if (notification.getId().equals("new-sone-notification")) {
+				if ((currentSone != null) && (!currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get())) {
+					continue;
+				}
 				filteredNotifications.add(notification);
-			} else if (notification.getId().equals("new-post-notification") && ((currentSone == null) || (currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get()))) {
+			} else if (notification.getId().equals("new-post-notification")) {
+				if ((currentSone != null) && (!currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get())) {
+					continue;
+				}
 				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone, true);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
 				}
-			} else if (notification.getId().equals("new-reply-notification") && ((currentSone == null) || (currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get()))) {
+			} else if (notification.getId().equals("new-reply-notification")) {
+				if ((currentSone != null) && (!currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get())) {
+					continue;
+				}
 				ListNotification<PostReply> filteredNotification = filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
 				if (filteredNotification != null) {
 					filteredNotifications.add(filteredNotification);
