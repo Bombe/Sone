@@ -1512,6 +1512,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		/* load options. */
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
 		sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
+		sone.getOptions().getBooleanOption("ShowNotification/NewSones").set(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(null));
+		sone.getOptions().getBooleanOption("ShowNotification/NewPosts").set(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(null));
+		sone.getOptions().getBooleanOption("ShowNotification/NewReplies").set(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(null));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
