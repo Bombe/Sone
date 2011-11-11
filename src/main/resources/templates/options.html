@@ -51,6 +51,21 @@
 			<%= Page.Options.Option.EnableSoneInsertNotifications.Description|l10n|html>
 		</p>
 
+		<p>
+			<input type="checkbox" name="show-notification-new-sones"<%ifnull currentSone> disabled="disabled"<%/if><%if show-notification-new-sones> checked="checked"<%/if>/>
+			<%= Page.Options.Option.ShowNotificationNewSones.Description|l10n|html>
+		</p>
+
+		<p>
+			<input type="checkbox" name="show-notification-new-posts"<%ifnull currentSone> disabled="disabled"<%/if><%if show-notification-new-posts> checked="checked"<%/if>/>
+			<%= Page.Options.Option.ShowNotificationNewPosts.Description|l10n|html>
+		</p>
+
+		<p>
+			<input type="checkbox" name="show-notification-new-replies"<%ifnull currentSone> disabled="disabled"<%/if><%if show-notification-new-replies> checked="checked"<%/if>/>
+			<%= Page.Options.Option.ShowNotificationNewReplies.Description|l10n|html>
+		</p>
+
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>
