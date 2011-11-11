@@ -145,7 +145,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("sones", jsonSones).put("notifications", jsonNotificationInformations).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notifications", jsonNotificationInformations).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**
@@ -207,6 +207,25 @@ public class GetStatusAjaxPage extends JsonPage {
 		jsonNotification.put("id", notification.getId());
 		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
 		return jsonNotification;
+	}
+
+	/**
+	 * Creates a JSON object that contains all options that are currently in
+	 * effect for the given Sone (or overall, if the given Sone is {@code null}
+	 * ).
+	 *
+	 * @param currentSone
+	 *            The current Sone (may be {@code null})
+	 * @return The current options
+	 */
+	private JsonObject createJsonOptions(Sone currentSone) {
+		JsonObject options = new JsonObject();
+		if (currentSone != null) {
+			options.put("ShowNotification/NewSones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
+			options.put("ShowNotification/NewPosts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());
+			options.put("ShowNotification/NewReplies", currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get());
+		}
+		return options;
 	}
 
 }

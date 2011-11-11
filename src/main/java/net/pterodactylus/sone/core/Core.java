@@ -1009,6 +1009,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		Sone sone = addLocalSone(ownIdentity);
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
 		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
+		sone.getOptions().addBooleanOption("ShowNotification/NewSones", new DefaultOption<Boolean>(true));
+		sone.getOptions().addBooleanOption("ShowNotification/NewPosts", new DefaultOption<Boolean>(true));
+		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
 		sone.addFriend("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
 		touchConfiguration();
 		return sone;
@@ -1344,6 +1347,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		/* initialize options. */
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
 		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
+		sone.getOptions().addBooleanOption("ShowNotification/NewSones", new DefaultOption<Boolean>(true));
+		sone.getOptions().addBooleanOption("ShowNotification/NewPosts", new DefaultOption<Boolean>(true));
+		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
 
 		/* load Sone. */
 		String sonePrefix = "Sone/" + sone.getId();
@@ -2132,6 +2138,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save options. */
 			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
+			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").setValue(sone.getOptions().getBooleanOption("ShowNotification/NewSones").getReal());
+			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").setValue(sone.getOptions().getBooleanOption("ShowNotification/NewPosts").getReal());
+			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").setValue(sone.getOptions().getBooleanOption("ShowNotification/NewReplies").getReal());
 			configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").setValue(sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").getReal());
 
 			configuration.save();
