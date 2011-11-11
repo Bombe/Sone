@@ -1008,6 +1008,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 		Sone sone = addLocalSone(ownIdentity);
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
+		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
 		sone.addFriend("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
 		touchConfiguration();
 		return sone;
