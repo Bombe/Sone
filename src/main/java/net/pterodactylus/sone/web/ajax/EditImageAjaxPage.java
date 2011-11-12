@@ -18,10 +18,13 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.json.JsonObject;
+import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that stores a user’s image modifications.
@@ -30,14 +33,20 @@ import net.pterodactylus.util.json.JsonObject;
  */
 public class EditImageAjaxPage extends JsonPage {
 
+	/** Parser for image descriptions. */
+	private final ParserFilter parserFilter;
+
 	/**
 	 * Creates a new edit image AJAX page.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface
+	 * @param parserFilter
+	 *            The parser filter for image descriptions
 	 */
-	public EditImageAjaxPage(WebInterface webInterface) {
+	public EditImageAjaxPage(WebInterface webInterface, ParserFilter parserFilter) {
 		super("editImage.ajax", webInterface);
+		this.parserFilter = parserFilter;
 	}
 
 	//
@@ -71,7 +80,7 @@ public class EditImageAjaxPage extends JsonPage {
 		String description = request.getHttpRequest().getParam("description").trim();
 		image.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 		webInterface.getCore().touchConfiguration();
-		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription());
+		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", (String) parserFilter.format(new TemplateContext(), image.getDescription(), new MapBuilder<String, String>().put("sone", image.getSone().getId()).get()));
 	}
 
 }
