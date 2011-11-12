@@ -33,6 +33,7 @@ import javax.imageio.stream.ImageInputStream;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.io.StreamCopier;
@@ -120,7 +121,7 @@ public class UploadImagePage extends SoneTemplatePage {
 				String mimeType = getMimeType(imageData);
 				TemporaryImage temporaryImage = webInterface.getCore().createTemporaryImage(mimeType, imageData);
 				image = webInterface.getCore().createImage(currentSone, parent, temporaryImage);
-				image.setTitle(name).setDescription(description).setWidth(uploadedImage.getWidth(null)).setHeight(uploadedImage.getHeight(null));
+				image.setTitle(name).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).setWidth(uploadedImage.getWidth(null)).setHeight(uploadedImage.getHeight(null));
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
 				return;

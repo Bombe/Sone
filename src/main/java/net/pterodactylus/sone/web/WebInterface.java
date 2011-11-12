@@ -170,6 +170,9 @@ public class WebInterface implements CoreListener {
 	/** The Sone text parser. */
 	private final SoneTextParser soneTextParser;
 
+	/** The parser filter. */
+	private final ParserFilter parserFilter;
+
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
 
@@ -242,7 +245,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory, soneTextParser));
+		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), templateContextFactory, soneTextParser));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
@@ -668,7 +671,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));
