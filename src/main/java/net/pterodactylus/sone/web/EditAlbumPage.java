@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
@@ -50,6 +51,7 @@ public class EditAlbumPage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
+			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String albumId = request.getHttpRequest().getPartAsStringFailsafe("album", 36);
 			Album album = webInterface.getCore().getAlbum(albumId, false);
 			if (album == null) {
@@ -57,6 +59,25 @@ public class EditAlbumPage extends SoneTemplatePage {
 			}
 			if (!webInterface.getCore().isLocalSone(album.getSone())) {
 				throw new RedirectException("noPermission.html");
+			}
+			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {
+				if (album.getParent() == null) {
+					currentSone.moveAlbumUp(album);
+					webInterface.getCore().touchConfiguration();
+					throw new RedirectException("imageBrowser.html?sone=" + currentSone.getId());
+				}
+				album.getParent().moveAlbumUp(album);
+				webInterface.getCore().touchConfiguration();
+				throw new RedirectException("imageBrowser.html?album=" + album.getParent().getId());
+			} else if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
+				if (album.getParent() == null) {
+					currentSone.moveAlbumDown(album);
+					webInterface.getCore().touchConfiguration();
+					throw new RedirectException("imageBrowser.html?sone=" + currentSone.getId());
+				}
+				album.getParent().moveAlbumDown(album);
+				webInterface.getCore().touchConfiguration();
+				throw new RedirectException("imageBrowser.html?album=" + album.getParent().getId());
 			}
 			String albumImageId = request.getHttpRequest().getPartAsStringFailsafe("album-image", 36);
 			if (webInterface.getCore().getImage(albumImageId, false) == null) {

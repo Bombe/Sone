@@ -22,6 +22,11 @@
 				<input type="hidden" name="returnPage" value="<%request.uri|html>" />
 				<input type="hidden" name="album" value="<%album.id|html>" />
 
+				<div class="move-buttons">
+						<button <%first>class="hidden" <%/first>type="submit" name="moveLeft" value="true"><%= Page.ImageBrowser.Image.Button.MoveLeft|l10n|html></button>
+						<button <%last>class="hidden" <%/last>type="submit" name="moveRight" value="true"><%= Page.ImageBrowser.Image.Button.MoveRight|l10n|html></button>
+				</div>
+
 				<div class="edit-data hidden">
 					<div>
 						<input type="text" name="title" value="<%album.title|html>" />

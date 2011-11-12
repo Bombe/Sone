@@ -298,6 +298,9 @@
 						});
 						$("#edit-album label").hide();
 
+						/* hide non-js image move buttons. */
+						$(".move-buttons").hide();
+
 						hideAndShowBlock("div.edit-album", ".show-edit-album", ".hide-edit-album");
 						hideAndShowBlock("div.create-album", ".show-create-album", ".hide-create-album");
 						hideAndShowBlock("div.upload-image", ".show-upload-image", ".hide-upload-image");
@@ -385,6 +388,11 @@
 							<input type="hidden" name="formPassword" value="<%formPassword|html>" />
 							<input type="hidden" name="returnPage" value="<%request.uri|html>" />
 							<input type="hidden" name="image" value="<%image.id|html>" />
+
+							<div class="move-buttons">
+									<button <%first>class="hidden" <%/first>type="submit" name="moveLeft" value="true"><%= Page.ImageBrowser.Image.Button.MoveLeft|l10n|html></button>
+									<button <%last>class="hidden" <%/last>type="submit" name="moveRight" value="true"><%= Page.ImageBrowser.Image.Button.MoveRight|l10n|html></button>
+							</div>
 
 							<div class="edit-data hidden">
 								<div>
@@ -537,6 +545,9 @@
 						});
 					});
 					$("#create-album label").hide();
+
+					/* hide non-js move buttons. */
+					$(".move-buttons").hide();
 
 					hideAndShowBlock(".create-album", ".show-create-album", ".hide-create-album");
 
