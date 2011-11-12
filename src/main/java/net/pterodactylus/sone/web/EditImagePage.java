@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -73,7 +74,7 @@ public class EditImagePage extends SoneTemplatePage {
 					templateContext.set("titleMissing", true);
 				}
 				image.setTitle(title);
-				image.setDescription(description);
+				image.setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 			}
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);

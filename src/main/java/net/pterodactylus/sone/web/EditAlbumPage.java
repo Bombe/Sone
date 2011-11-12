@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -68,7 +69,7 @@ public class EditAlbumPage extends SoneTemplatePage {
 				return;
 			}
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 1000).trim();
-			album.setTitle(title).setDescription(description);
+			album.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}

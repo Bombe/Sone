@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -64,7 +65,7 @@ public class CreateAlbumPage extends SoneTemplatePage {
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
 			Album parent = webInterface.getCore().getAlbum(parentId, false);
 			Album album = webInterface.getCore().createAlbum(currentSone, parent);
-			album.setTitle(name).setDescription(description);
+			album.setTitle(name).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}
