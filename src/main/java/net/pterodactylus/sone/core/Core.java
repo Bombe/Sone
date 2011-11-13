@@ -1302,9 +1302,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
 						post.setSone(storedSone);
-						if (!storedPosts.contains(post) && !knownPosts.contains(post.getId())) {
-							newPosts.add(post.getId());
-							coreListenerManager.fireNewPostFound(post);
+						if (!storedPosts.contains(post)) {
+							if (post.getTime() < getSoneFollowingTime(sone)) {
+								knownPosts.add(post.getId());
+							} else if (!knownPosts.contains(post.getId())) {
+								newPosts.add(post.getId());
+								coreListenerManager.fireNewPostFound(post);
+							}
 						}
 						posts.put(post.getId(), post);
 					}
@@ -1323,9 +1327,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				synchronized (newReplies) {
 					for (PostReply reply : sone.getReplies()) {
 						reply.setSone(storedSone);
-						if (!storedReplies.contains(reply) && !knownReplies.contains(reply.getId())) {
-							newReplies.add(reply.getId());
-							coreListenerManager.fireNewReplyFound(reply);
+						if (!storedReplies.contains(reply)) {
+							if (reply.getTime() < getSoneFollowingTime(sone)) {
+								knownReplies.add(reply.getId());
+							} else if (!knownReplies.contains(reply.getId())) {
+								newReplies.add(reply.getId());
+								coreListenerManager.fireNewReplyFound(reply);
+							}
 						}
 						replies.put(reply.getId(), reply);
 					}
