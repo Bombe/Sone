@@ -1070,7 +1070,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 			}
-			remoteSones.put(identity.getId(), sone);
 			soneDownloader.addSone(sone);
 			setSoneStatus(sone, SoneStatus.unknown);
 			soneDownloaders.execute(new Runnable() {
