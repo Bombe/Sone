@@ -57,6 +57,20 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 		this.insertUri = insertUri;
 	}
 
+	/**
+	 * Copy constructor for an own identity.
+	 *
+	 * @param webOfTrustConnector
+	 *            The web of trust connector
+	 * @param ownIdentity
+	 *            The own identity to copy
+	 */
+	public DefaultOwnIdentity(WebOfTrustConnector webOfTrustConnector, OwnIdentity ownIdentity) {
+		super(webOfTrustConnector, ownIdentity.getId(), ownIdentity.getNickname(), ownIdentity.getRequestUri());
+		this.webOfTrustConnector = webOfTrustConnector;
+		this.insertUri = ownIdentity.getInsertUri();
+	}
+
 	//
 	// ACCESSORS
 	//
