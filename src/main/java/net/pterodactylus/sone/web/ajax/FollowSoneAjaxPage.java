@@ -52,8 +52,8 @@ public class FollowSoneAjaxPage extends JsonPage {
 		if (currentSone == null) {
 			return createErrorJsonObject("auth-required");
 		}
-		currentSone.addFriend(soneId);
-		webInterface.getCore().touchConfiguration();
+		webInterface.getCore().followSone(currentSone, soneId);
+		webInterface.getCore().markSoneKnown(webInterface.getCore().getSone(soneId));
 		return createSuccessJsonObject();
 	}
 

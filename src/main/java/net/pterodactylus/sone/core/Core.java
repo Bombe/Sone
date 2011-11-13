@@ -136,6 +136,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/* synchronize access on itself. */
 	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
 
+	/** The times Sones were followed. */
+	private final Map<Sone, Long> soneFollowingTimes = new HashMap<Sone, Long>();
+
 	/** Locked local Sones. */
 	/* synchronize on itself. */
 	private final Set<Sone> lockedSones = new HashSet<Sone>();
@@ -588,6 +591,23 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
+	 * Returns the time when the given was first followed by any local Sone.
+	 *
+	 * @param sone
+	 *            The Sone to get the time for
+	 * @return The time (in milliseconds since Jan 1, 1970) the Sone has first
+	 *         been followed, or {@link Long#MAX_VALUE}
+	 */
+	public long getSoneFollowingTime(Sone sone) {
+		synchronized (soneFollowingTimes) {
+			if (soneFollowingTimes.containsKey(sone)) {
+				return soneFollowingTimes.get(sone);
+			}
+			return Long.MAX_VALUE;
+		}
+	}
+
+	/**
 	 * Returns whether the target Sone is trusted by the origin Sone.
 	 *
 	 * @param origin
@@ -1012,7 +1032,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		sone.getOptions().addBooleanOption("ShowNotification/NewSones", new DefaultOption<Boolean>(true));
 		sone.getOptions().addBooleanOption("ShowNotification/NewPosts", new DefaultOption<Boolean>(true));
 		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
-		sone.addFriend("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
+		followSone(sone, getSone("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"));
 		touchConfiguration();
 		return sone;
 	}
@@ -1045,8 +1065,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					coreListenerManager.fireNewSoneFound(sone);
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
-							localSone.addFriend(sone.getId());
-							touchConfiguration();
+							followSone(localSone, sone);
 						}
 					}
 				}
@@ -1065,6 +1084,90 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			});
 			return sone;
 		}
+	}
+
+	/**
+	 * Lets the given local Sone follow the Sone with the given ID.
+	 *
+	 * @param sone
+	 *            The local Sone that should follow another Sone
+	 * @param soneId
+	 *            The ID of the Sone to follow
+	 */
+	public void followSone(Sone sone, String soneId) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		followSone(sone, getSone(soneId));
+	}
+
+	/**
+	 * Lets the given local Sone follow the other given Sone. If the given Sone
+	 * was not followed by any local Sone before, this will mark all elements of
+	 * the followed Sone as read that have been created before the current
+	 * moment.
+	 *
+	 * @param sone
+	 *            The local Sone that should follow the other Sone
+	 * @param followedSone
+	 *            The Sone that should be followed
+	 */
+	public void followSone(Sone sone, Sone followedSone) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Followed Sone", followedSone).check();
+		sone.addFriend(followedSone.getId());
+		synchronized (soneFollowingTimes) {
+			if (!soneFollowingTimes.containsKey(followedSone)) {
+				long now = System.currentTimeMillis();
+				soneFollowingTimes.put(followedSone, now);
+				for (Post post : followedSone.getPosts()) {
+					if (post.getTime() < now) {
+						markPostKnown(post);
+					}
+				}
+				for (PostReply reply : followedSone.getReplies()) {
+					if (reply.getTime() < now) {
+						markReplyKnown(reply);
+					}
+				}
+			}
+		}
+		touchConfiguration();
+	}
+
+	/**
+	 * Lets the given local Sone unfollow the Sone with the given ID.
+	 *
+	 * @param sone
+	 *            The local Sone that should unfollow another Sone
+	 * @param soneId
+	 *            The ID of the Sone being unfollowed
+	 */
+	public void unfollowSone(Sone sone, String soneId) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		unfollowSone(sone, getSone(soneId, false));
+	}
+
+	/**
+	 * Lets the given local Sone unfollow the other given Sone. If the given
+	 * local Sone is the last local Sone that followed the given Sone, its
+	 * following time will be removed.
+	 *
+	 * @param sone
+	 *            The local Sone that should unfollow another Sone
+	 * @param unfollowedSone
+	 *            The Sone being unfollowed
+	 */
+	public void unfollowSone(Sone sone, Sone unfollowedSone) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Unfollowed Sone", unfollowedSone).check();
+		sone.removeFriend(unfollowedSone.getId());
+		boolean unfollowedSoneStillFollowed = false;
+		for (Sone localSone : getLocalSones()) {
+			unfollowedSoneStillFollowed |= localSone.hasFriend(unfollowedSone.getId());
+		}
+		if (!unfollowedSoneStillFollowed) {
+			synchronized (soneFollowingTimes) {
+				soneFollowingTimes.remove(unfollowedSone);
+			}
+		}
+		touchConfiguration();
 	}
 
 	/**
@@ -1199,9 +1302,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				synchronized (newPosts) {
 					for (Post post : sone.getPosts()) {
 						post.setSone(storedSone);
-						if (!storedPosts.contains(post) && !knownPosts.contains(post.getId())) {
-							newPosts.add(post.getId());
-							coreListenerManager.fireNewPostFound(post);
+						if (!storedPosts.contains(post)) {
+							if (post.getTime() < getSoneFollowingTime(sone)) {
+								knownPosts.add(post.getId());
+							} else if (!knownPosts.contains(post.getId())) {
+								newPosts.add(post.getId());
+								coreListenerManager.fireNewPostFound(post);
+							}
 						}
 						posts.put(post.getId(), post);
 					}
@@ -1220,9 +1327,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				synchronized (newReplies) {
 					for (PostReply reply : sone.getReplies()) {
 						reply.setSone(storedSone);
-						if (!storedReplies.contains(reply) && !knownReplies.contains(reply.getId())) {
-							newReplies.add(reply.getId());
-							coreListenerManager.fireNewReplyFound(reply);
+						if (!storedReplies.contains(reply)) {
+							if (reply.getTime() < getSoneFollowingTime(sone)) {
+								knownReplies.add(reply.getId());
+							} else if (!knownReplies.contains(reply.getId())) {
+								newReplies.add(reply.getId());
+								coreListenerManager.fireNewReplyFound(reply);
+							}
 						}
 						replies.put(reply.getId(), reply);
 					}
@@ -1524,7 +1635,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
-			sone.setFriends(friends);
+			for (String friendId : friends) {
+				followSone(sone, friendId);
+			}
 			sone.setAlbums(topLevelAlbums);
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
@@ -2196,6 +2309,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
 			}
 
+			/* save Sone following times. */
+			soneCounter = 0;
+			synchronized (soneFollowingTimes) {
+				for (Entry<Sone, Long> soneFollowingTime : soneFollowingTimes.entrySet()) {
+					configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(soneFollowingTime.getKey().getId());
+					configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").setValue(soneFollowingTime.getValue());
+					++soneCounter;
+				}
+				configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(null);
+			}
+
 			/* save known posts. */
 			int postCounter = 0;
 			synchronized (newPosts) {
@@ -2310,6 +2434,20 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			synchronized (newSones) {
 				knownSones.add(knownSoneId);
 			}
+		}
+
+		/* load Sone following times. */
+		soneCounter = 0;
+		while (true) {
+			String soneId = configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").getValue(null);
+			if (soneId == null) {
+				break;
+			}
+			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
+			synchronized (soneFollowingTimes) {
+				soneFollowingTimes.put(getSone(soneId), time);
+			}
+			++soneCounter;
 		}
 
 		/* load known posts. */

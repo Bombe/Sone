@@ -380,19 +380,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Sets all friends of this Sone at once.
-	 *
-	 * @param friends
-	 *            The new (and only) friends of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone setFriends(Collection<String> friends) {
-		friendSones.clear();
-		friendSones.addAll(friends);
-		return this;
-	}
-
-	/**
 	 * Returns whether this Sone has the given Sone as a friend Sone.
 	 *
 	 * @param friendSoneId
