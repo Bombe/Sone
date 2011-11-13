@@ -1088,6 +1088,90 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
+	 * Lets the given local Sone follow the Sone with the given ID.
+	 *
+	 * @param sone
+	 *            The local Sone that should follow another Sone
+	 * @param soneId
+	 *            The ID of the Sone to follow
+	 */
+	public void followSone(Sone sone, String soneId) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		followSone(sone, getSone(soneId));
+	}
+
+	/**
+	 * Lets the given local Sone follow the other given Sone. If the given Sone
+	 * was not followed by any local Sone before, this will mark all elements of
+	 * the followed Sone as read that have been created before the current
+	 * moment.
+	 *
+	 * @param sone
+	 *            The local Sone that should follow the other Sone
+	 * @param followedSone
+	 *            The Sone that should be followed
+	 */
+	public void followSone(Sone sone, Sone followedSone) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Followed Sone", followedSone).check();
+		sone.addFriend(followedSone.getId());
+		synchronized (soneFollowingTimes) {
+			if (!soneFollowingTimes.containsKey(followedSone)) {
+				long now = System.currentTimeMillis();
+				soneFollowingTimes.put(followedSone, now);
+				for (Post post : followedSone.getPosts()) {
+					if (post.getTime() < now) {
+						markPostKnown(post);
+					}
+				}
+				for (PostReply reply : followedSone.getReplies()) {
+					if (reply.getTime() < now) {
+						markReplyKnown(reply);
+					}
+				}
+			}
+		}
+		touchConfiguration();
+	}
+
+	/**
+	 * Lets the given local Sone unfollow the Sone with the given ID.
+	 *
+	 * @param sone
+	 *            The local Sone that should unfollow another Sone
+	 * @param soneId
+	 *            The ID of the Sone being unfollowed
+	 */
+	public void unfollowSone(Sone sone, String soneId) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		unfollowSone(sone, getSone(soneId, false));
+	}
+
+	/**
+	 * Lets the given local Sone unfollow the other given Sone. If the given
+	 * local Sone is the last local Sone that followed the given Sone, its
+	 * following time will be removed.
+	 *
+	 * @param sone
+	 *            The local Sone that should unfollow another Sone
+	 * @param unfollowedSone
+	 *            The Sone being unfollowed
+	 */
+	public void unfollowSone(Sone sone, Sone unfollowedSone) {
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Unfollowed Sone", unfollowedSone).check();
+		sone.removeFriend(unfollowedSone.getId());
+		boolean unfollowedSoneStillFollowed = false;
+		for (Sone localSone : getLocalSones()) {
+			unfollowedSoneStillFollowed |= localSone.hasFriend(unfollowedSone.getId());
+		}
+		if (!unfollowedSoneStillFollowed) {
+			synchronized (soneFollowingTimes) {
+				soneFollowingTimes.remove(unfollowedSone);
+			}
+		}
+		touchConfiguration();
+	}
+
+	/**
 	 * Retrieves the trust relationship from the origin to the target. If the
 	 * trust relationship can not be retrieved, {@code null} is returned.
 	 *
