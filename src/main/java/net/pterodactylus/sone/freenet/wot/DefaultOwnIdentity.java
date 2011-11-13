@@ -69,6 +69,8 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 		super(webOfTrustConnector, ownIdentity.getId(), ownIdentity.getNickname(), ownIdentity.getRequestUri());
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.insertUri = ownIdentity.getInsertUri();
+		setContextsPrivate(ownIdentity.getContexts());
+		setPropertiesPrivate(ownIdentity.getProperties());
 	}
 
 	//
