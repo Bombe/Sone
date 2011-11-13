@@ -136,6 +136,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/* synchronize access on itself. */
 	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
 
+	/** The times Sones were followed. */
+	private final Map<Sone, Long> soneFollowingTimes = new HashMap<Sone, Long>();
+
 	/** Locked local Sones. */
 	/* synchronize on itself. */
 	private final Set<Sone> lockedSones = new HashSet<Sone>();
@@ -2196,6 +2199,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
 			}
 
+			/* save Sone following times. */
+			soneCounter = 0;
+			synchronized (soneFollowingTimes) {
+				for (Entry<Sone, Long> soneFollowingTime : soneFollowingTimes.entrySet()) {
+					configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(soneFollowingTime.getKey().getId());
+					configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").setValue(soneFollowingTime.getValue());
+					++soneCounter;
+				}
+				configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(null);
+			}
+
 			/* save known posts. */
 			int postCounter = 0;
 			synchronized (newPosts) {
@@ -2310,6 +2324,20 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			synchronized (newSones) {
 				knownSones.add(knownSoneId);
 			}
+		}
+
+		/* load Sone following times. */
+		soneCounter = 0;
+		while (true) {
+			String soneId = configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").getValue(null);
+			if (soneId == null) {
+				break;
+			}
+			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
+			synchronized (soneFollowingTimes) {
+				soneFollowingTimes.put(getSone(soneId), time);
+			}
+			++soneCounter;
 		}
 
 		/* load known posts. */
