@@ -295,14 +295,16 @@ public class IdentityManager extends AbstractService {
 
 			/* find removed own identities: */
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
-				if (!newOwnIdentities.containsKey(oldOwnIdentity.getId())) {
+				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
+				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
 					identityListenerManager.fireOwnIdentityRemoved(oldOwnIdentity);
 				}
 			}
 
 			/* find added own identities. */
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
-				if (!currentOwnIdentities.containsKey(currentOwnIdentity.getId())) {
+				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
+				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
 					identityListenerManager.fireOwnIdentityAdded(currentOwnIdentity);
 				}
 			}
