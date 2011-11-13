@@ -591,6 +591,23 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
+	 * Returns the time when the given was first followed by any local Sone.
+	 *
+	 * @param sone
+	 *            The Sone to get the time for
+	 * @return The time (in milliseconds since Jan 1, 1970) the Sone has first
+	 *         been followed, or {@link Long#MAX_VALUE}
+	 */
+	public long getSoneFollowingTime(Sone sone) {
+		synchronized (soneFollowingTimes) {
+			if (soneFollowingTimes.containsKey(sone)) {
+				return soneFollowingTimes.get(sone);
+			}
+			return Long.MAX_VALUE;
+		}
+	}
+
+	/**
 	 * Returns whether the target Sone is trusted by the origin Sone.
 	 *
 	 * @param origin
