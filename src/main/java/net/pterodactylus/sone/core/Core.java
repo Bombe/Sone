@@ -1032,7 +1032,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		sone.getOptions().addBooleanOption("ShowNotification/NewSones", new DefaultOption<Boolean>(true));
 		sone.getOptions().addBooleanOption("ShowNotification/NewPosts", new DefaultOption<Boolean>(true));
 		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
-		sone.addFriend("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
+		followSone(sone, getSone("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"));
 		touchConfiguration();
 		return sone;
 	}
@@ -1065,8 +1065,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					coreListenerManager.fireNewSoneFound(sone);
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
-							localSone.addFriend(sone.getId());
-							touchConfiguration();
+							followSone(localSone, sone);
 						}
 					}
 				}
@@ -1628,7 +1627,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
-			sone.setFriends(friends);
+			for (String friendId : friends) {
+				followSone(sone, friendId);
+			}
 			sone.setAlbums(topLevelAlbums);
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
