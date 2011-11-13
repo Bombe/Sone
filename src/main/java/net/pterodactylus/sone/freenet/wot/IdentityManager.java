@@ -297,7 +297,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
 				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
 				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
-					identityListenerManager.fireOwnIdentityRemoved(oldOwnIdentity);
+					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(webOfTrustConnector, oldOwnIdentity));
 				}
 			}
 
@@ -305,7 +305,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
 				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
 				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
-					identityListenerManager.fireOwnIdentityAdded(currentOwnIdentity);
+					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(webOfTrustConnector, currentOwnIdentity));
 				}
 			}
 
