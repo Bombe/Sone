@@ -26,6 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
+import net.pterodactylus.util.collection.Mapper;
+import net.pterodactylus.util.collection.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
@@ -140,7 +142,7 @@ public class IdentityManager extends AbstractService {
 		Set<OwnIdentity> allOwnIdentities = getAllOwnIdentities();
 		for (OwnIdentity ownIdentity : allOwnIdentities) {
 			if (ownIdentity.getId().equals(id)) {
-				return ownIdentity;
+				return new DefaultOwnIdentity(webOfTrustConnector, ownIdentity);
 			}
 		}
 		return null;
@@ -159,7 +161,17 @@ public class IdentityManager extends AbstractService {
 				newOwnIdentities.put(ownIdentity.getId(), ownIdentity);
 			}
 			checkOwnIdentities(newOwnIdentities);
-			return ownIdentities;
+			return Mappers.mappedSet(ownIdentities, new Mapper<OwnIdentity, OwnIdentity>() {
+
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				@SuppressWarnings("synthetic-access")
+				public OwnIdentity map(OwnIdentity input) {
+					return new DefaultOwnIdentity(webOfTrustConnector, input);
+				}
+			});
 		} catch (WebOfTrustException wote1) {
 			logger.log(Level.WARNING, "Could not load all own identities!", wote1);
 			return Collections.emptySet();
@@ -295,15 +307,17 @@ public class IdentityManager extends AbstractService {
 
 			/* find removed own identities: */
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
-				if (!newOwnIdentities.containsKey(oldOwnIdentity.getId())) {
-					identityListenerManager.fireOwnIdentityRemoved(oldOwnIdentity);
+				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
+				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
+					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(webOfTrustConnector, oldOwnIdentity));
 				}
 			}
 
 			/* find added own identities. */
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
-				if (!currentOwnIdentities.containsKey(currentOwnIdentity.getId())) {
-					identityListenerManager.fireOwnIdentityAdded(currentOwnIdentity);
+				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
+				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
+					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(webOfTrustConnector, currentOwnIdentity));
 				}
 			}
 
