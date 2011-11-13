@@ -1347,7 +1347,7 @@ function isViewSonePage() {
  * @returns The ID of the currently shown Sone
  */
 function getShownSoneId() {
-	return $("#sone .sone-id").text();
+	return $("#sone .sone-id").first().text();
 }
 
 /**
