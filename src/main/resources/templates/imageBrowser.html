@@ -451,6 +451,8 @@
 					<div class="separator">&gt;</div>
 				<%/if>
 			<%/foreach>
+			<%ifnull !image.previous><div class="backlink"><a href="imageBrowser.html?image=<%image.previous.id|html>">« <%image.previous.title|html></a></div><%/if>
+			<%ifnull !image.next><div class="backlink"><a href="imageBrowser.html?image=<%image.next.id|html>">» <%image.next.title|html></a></div><%/if>
 		</div>
 
 		<%ifnull image>
