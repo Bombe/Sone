@@ -53,6 +53,7 @@ import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.ImageAccessor;
 import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.ParserFilter;
@@ -231,6 +232,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
+		templateContextFactory.addAccessor(Image.class, new ImageAccessor());
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
 		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
