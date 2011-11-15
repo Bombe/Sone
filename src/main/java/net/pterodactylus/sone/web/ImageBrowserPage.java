@@ -18,6 +18,8 @@
 package net.pterodactylus.sone.web;
 
 import java.net.URI;
+import java.util.HashSet;
+import java.util.Set;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -69,11 +71,24 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			templateContext.set("image", image);
 			return;
 		}
-		Sone sone = getCurrentSone(request.getToadletContext(), false);
 		String soneId = request.getHttpRequest().getParam("sone", null);
 		if (soneId != null) {
-			sone = webInterface.getCore().getSone(soneId, false);
+			Sone sone = webInterface.getCore().getSone(soneId, false);
+			templateContext.set("soneRequested", true);
+			templateContext.set("sone", sone);
+			return;
 		}
+		String mode = request.getHttpRequest().getParam("mode", null);
+		if ("gallery".equals(mode)) {
+			templateContext.set("galleryRequested", true);
+			Set<Album> albums = new HashSet<Album>();
+			for (Sone sone : webInterface.getCore().getSones()) {
+				albums.addAll(sone.getAllAlbums());
+			}
+			templateContext.set("albums", albums);
+			return;
+		}
+		Sone sone = getCurrentSone(request.getToadletContext(), false);
 		templateContext.set("soneRequested", true);
 		templateContext.set("sone", sone);
 	}
