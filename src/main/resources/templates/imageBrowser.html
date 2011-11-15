@@ -315,6 +315,8 @@
 			<h1 class="backlink"><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.title|html></h1>
 
 			<div class="backlinks">
+				<div class="backlink"><a href="imageBrowser.html?mode=gallery"><%= Page.ImageBrowser.Link.All|l10n|html></a></div>
+				<div class="separator">&gt;</div>
 				<%foreach album.backlinks backlink backlinks>
 					<div class="backlink">
 						<a href="<% backlink.target|html>"><% backlink.name|html></a>
@@ -443,6 +445,8 @@
 		<h1 class="backlink"><%image.title|html></h1>
 
 		<div class="backlinks">
+			<div class="backlink"><a href="imageBrowser.html?mode=gallery"><%= Page.ImageBrowser.Link.All|l10n|html></a></div>
+			<div class="separator">&gt;</div>
 			<%foreach image.album.backlinks backlink backlinks>
 				<div class="backlink">
 					<a href="<% backlink.target|html>"><% backlink.name|html></a>
@@ -565,6 +569,12 @@
 		<%else>
 
 			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
+
+			<div class="backlinks">
+				<div class="backlink"><a href="imageBrowser.html?mode=gallery"><%= Page.ImageBrowser.Link.All|l10n|html></a></div>
+				<div class="separator">&gt;</div>
+				<div class="backlink"><a href="imageBrowser.html?sone=<%sone.id|html>"><%sone.niceName|l10n|html></a></div>
+			</div>
 
 			<%include include/browseAlbums.html albums=sone.albums>
 
