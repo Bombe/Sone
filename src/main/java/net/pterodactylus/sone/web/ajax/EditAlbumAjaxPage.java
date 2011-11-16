@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
@@ -68,7 +69,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 		}
 		String title = request.getHttpRequest().getParam("title").trim();
 		String description = request.getHttpRequest().getParam("description").trim();
-		album.setTitle(title).setDescription(description);
+		album.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject().put("albumId", album.getId()).put("title", album.getTitle()).put("description", album.getDescription());
 	}

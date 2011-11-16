@@ -5,6 +5,7 @@
 	<h1><%= Page.Bookmarks.Page.Title|l10n|html></h1>
 
 	<div id="posts">
+		<%= page|store key=pageParameter>
 		<%include include/pagination.html>
 		<%foreach posts post>
 			<%include include/viewPost.html>

@@ -52,8 +52,7 @@ public class UnfollowSoneAjaxPage extends JsonPage {
 		if (currentSone == null) {
 			return createErrorJsonObject("auth-required");
 		}
-		currentSone.removeFriend(soneId);
-		webInterface.getCore().touchConfiguration();
+		webInterface.getCore().unfollowSone(currentSone, soneId);
 		return createSuccessJsonObject();
 	}
 

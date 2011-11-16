@@ -55,9 +55,11 @@ public class FollowSonePage extends SoneTemplatePage {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 1200);
 			for (String soneId : soneIds.split("[ ,]+")) {
-				currentSone.addFriend(soneId);
+				if (webInterface.getCore().hasSone(soneId)) {
+					webInterface.getCore().followSone(currentSone, soneId);
+					webInterface.getCore().markSoneKnown(webInterface.getCore().getSone(soneId));
+				}
 			}
-			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);
 		}
 	}

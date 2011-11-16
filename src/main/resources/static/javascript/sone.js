@@ -1193,17 +1193,17 @@ function getStatus() {
 					}
 				});
 				if (!foundNotification) {
-					if (notificationId == "new-sone-notification") {
+					if (notificationId == "new-sone-notification" && (data.options["ShowNotification/NewSones"] == true)) {
 						$(".new-sone-id", this).each(function(index, element) {
 							soneId = $(this).text();
 							markSoneAsKnown(getSone(soneId), true);
 						});
-					} else if (notificationId == "new-post-notification") {
+					} else if (notificationId == "new-post-notification" && (data.options["ShowNotification/NewPosts"] == true)) {
 						$(".post-id", this).each(function(index, element) {
 							postId = $(this).text();
 							markPostAsKnown(getPost(postId), true);
 						});
-					} else if (notificationId == "new-reply-notification") {
+					} else if (notificationId == "new-reply-notification" && (data.options["ShowNotification/NewReplies"] == true)) {
 						$(".reply-id", this).each(function(index, element) {
 							replyId = $(this).text();
 							markReplyAsKnown(getReply(replyId), true);
@@ -1347,7 +1347,7 @@ function isViewSonePage() {
  * @returns The ID of the currently shown Sone
  */
 function getShownSoneId() {
-	return $("#sone .sone-id").text();
+	return $("#sone .sone-id").first().text();
 }
 
 /**

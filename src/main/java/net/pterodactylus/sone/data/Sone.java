@@ -115,6 +115,15 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	};
 
+	/** Filter that matches Sones that have at least one album. */
+	public static final Filter<Sone> HAS_ALBUM_FILTER = new Filter<Sone>() {
+
+		@Override
+		public boolean filterObject(Sone sone) {
+			return !sone.getAlbums().isEmpty();
+		}
+	};
+
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Sone.class);
 
@@ -377,19 +386,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	public List<String> getFriends() {
 		List<String> friends = new ArrayList<String>(friendSones);
 		return friends;
-	}
-
-	/**
-	 * Sets all friends of this Sone at once.
-	 *
-	 * @param friends
-	 *            The new (and only) friends of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone setFriends(Collection<String> friends) {
-		friendSones.clear();
-		friendSones.addAll(friends);
-		return this;
 	}
 
 	/**

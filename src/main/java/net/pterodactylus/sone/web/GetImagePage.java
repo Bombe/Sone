@@ -18,10 +18,11 @@
 package net.pterodactylus.sone.web;
 
 import java.io.IOException;
+import java.net.URI;
 
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 
 /**
@@ -29,7 +30,7 @@ import net.pterodactylus.util.web.Response;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class GetImagePage implements Page<FreenetRequest> {
+public class GetImagePage implements FreenetPage {
 
 	/** The Sone web interface. */
 	private final WebInterface webInterface;
@@ -72,6 +73,14 @@ public class GetImagePage implements Page<FreenetRequest> {
 		}
 		String contentType= temporaryImage.getMimeType();
 		return response.setStatusCode(200).setStatusText("OK").setContentType(contentType).addHeader("Content-Disposition", "attachment; filename=" + temporaryImage.getId() + "." + contentType.substring(contentType.lastIndexOf('/') + 1)).write(temporaryImage.getImageData());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
+		return false;
 	}
 
 }

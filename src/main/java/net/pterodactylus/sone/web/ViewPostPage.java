@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import java.net.URI;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -73,6 +75,14 @@ public class ViewPostPage extends SoneTemplatePage {
 		Post post = webInterface.getCore().getPost(postId);
 		templateContext.set("post", post);
 		templateContext.set("raw", raw);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
+		return true;
 	}
 
 }

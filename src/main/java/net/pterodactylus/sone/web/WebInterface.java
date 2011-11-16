@@ -53,6 +53,7 @@ import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
 import net.pterodactylus.sone.template.HttpRequestAccessor;
 import net.pterodactylus.sone.template.IdentityAccessor;
+import net.pterodactylus.sone.template.ImageAccessor;
 import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.ParserFilter;
@@ -170,6 +171,9 @@ public class WebInterface implements CoreListener {
 	/** The Sone text parser. */
 	private final SoneTextParser soneTextParser;
 
+	/** The parser filter. */
+	private final ParserFilter parserFilter;
+
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
 
@@ -228,6 +232,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
+		templateContextFactory.addAccessor(Image.class, new ImageAccessor());
 		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
 		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
 		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
@@ -242,7 +247,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", new ParserFilter(getCore(), templateContextFactory, soneTextParser));
+		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), templateContextFactory, soneTextParser));
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
@@ -668,7 +673,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));

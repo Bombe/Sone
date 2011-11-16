@@ -26,6 +26,7 @@ import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 import freenet.client.HighLevelSimpleClient;
 import freenet.clients.http.LinkEnabledCallback;
+import freenet.clients.http.LinkFilterExceptedToadlet;
 import freenet.clients.http.Toadlet;
 import freenet.clients.http.ToadletContext;
 import freenet.clients.http.ToadletContextClosedException;
@@ -39,7 +40,7 @@ import freenet.support.io.Closer;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PageToadlet extends Toadlet implements LinkEnabledCallback {
+public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFilterExceptedToadlet {
 
 	/** The name of the menu item. */
 	private final String menuName;
@@ -172,6 +173,18 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback {
 			return ((LinkEnabledCallback) page).isEnabled(toadletContext);
 		}
 		return true;
+	}
+
+	//
+	// LINKFILTEREXCEPTEDTOADLET METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isLinkExcepted(URI link) {
+		return (page instanceof FreenetPage) ? ((FreenetPage) page).isLinkExcepted(link) : false;
 	}
 
 }

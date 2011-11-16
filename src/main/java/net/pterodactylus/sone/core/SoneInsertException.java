@@ -1,5 +1,5 @@
 /*
- * Sone - SoneException.java - Copyright © 2010 David Roden
+ * Sone - SoneInsertException.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,48 +18,48 @@
 package net.pterodactylus.sone.core;
 
 /**
- * A Sone exception.
+ * Exception that signals a problem with an insert.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SoneException extends Exception {
+public class SoneInsertException extends SoneException {
 
 	/**
-	 * Creates a new Sone exception.
+	 * Creates a new Sone insert exception.
 	 */
-	public SoneException() {
+	public SoneInsertException() {
 		super();
 	}
 
 	/**
-	 * Creates a new Sone exception.
+	 * Creates a new Sone insert exception.
 	 *
 	 * @param message
 	 *            The message of the exception
 	 */
-	public SoneException(String message) {
+	public SoneInsertException(String message) {
 		super(message);
 	}
 
 	/**
-	 * Creates a new Sone exception.
+	 * Creates a new Sone insert exception.
 	 *
 	 * @param cause
 	 *            The cause of the exception
 	 */
-	public SoneException(Throwable cause) {
+	public SoneInsertException(Throwable cause) {
 		super(cause);
 	}
 
 	/**
-	 * Creates a new Sone exception.
+	 * Creates a new Sone insert exception.
 	 *
 	 * @param message
 	 *            The message of the exception
 	 * @param cause
 	 *            The cause of the exception
 	 */
-	public SoneException(String message, Throwable cause) {
+	public SoneInsertException(String message, Throwable cause) {
 		super(message, cause);
 	}
 
