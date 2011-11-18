@@ -509,17 +509,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *
 	 * @param id
 	 *            The ID of the remote Sone to get
-	 * @return The Sone with the given ID
-	 */
-	public Sone getRemoteSone(String id) {
-		return getRemoteSone(id, true);
-	}
-
-	/**
-	 * Returns the remote Sone with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the remote Sone to get
 	 * @param create
 	 *            {@code true} to always create a Sone, {@code false} to return
 	 *            {@code null} if no Sone with the given ID exists
@@ -1050,7 +1039,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			return null;
 		}
 		synchronized (remoteSones) {
-			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
+			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
@@ -2564,7 +2553,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
-				Sone sone = getRemoteSone(identity.getId());
+				Sone sone = getRemoteSone(identity.getId(), false);
 				sone.setIdentity(identity);
 				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 				soneDownloader.addSone(sone);
