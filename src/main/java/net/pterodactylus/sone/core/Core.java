@@ -528,7 +528,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public Sone getRemoteSone(String id, boolean create) {
 		synchronized (remoteSones) {
 			Sone sone = remoteSones.get(id);
-			if ((sone == null) && create) {
+			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
 				setSoneStatus(sone, SoneStatus.unknown);
