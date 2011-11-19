@@ -945,29 +945,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Adds a local Sone from the given ID which has to be the ID of an own
-	 * identity.
-	 *
-	 * @param id
-	 *            The ID of an own identity to add a Sone for
-	 * @return The added (or already existing) Sone
-	 */
-	public Sone addLocalSone(String id) {
-		synchronized (localSones) {
-			if (localSones.containsKey(id)) {
-				logger.log(Level.FINE, "Tried to add known local Sone: %s", id);
-				return localSones.get(id);
-			}
-			OwnIdentity ownIdentity = identityManager.getOwnIdentity(id);
-			if (ownIdentity == null) {
-				logger.log(Level.INFO, "Invalid Sone ID: %s", id);
-				return null;
-			}
-			return addLocalSone(ownIdentity);
-		}
-	}
-
-	/**
 	 * Adds a local Sone from the given own identity.
 	 *
 	 * @param ownIdentity
