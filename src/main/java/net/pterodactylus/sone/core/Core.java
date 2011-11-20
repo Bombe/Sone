@@ -1061,7 +1061,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void followSone(Sone sone, String soneId) {
 		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
-		Sone followedSone = getSone(soneId);
+		Sone followedSone = getSone(soneId, true);
 		if (followedSone == null) {
 			logger.log(Level.INFO, String.format("Ignored Sone with invalid ID: %s", soneId));
 			return;
