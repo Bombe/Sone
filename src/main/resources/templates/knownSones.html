@@ -57,23 +57,25 @@
 		</form>
 	</div>
 
-	<div>
-		<form action="followSone.html" method="post">
-			<input type="hidden" name="formPassword" value="<%formPassword|html>" />
-			<input type="hidden" name="returnPage" value="<%request.uri|html>" />
-			<input type="hidden" name="sone" value="<%foreach pagination.items sone><%if !sone.friend><%if !sone.current><%sone.id> <%/if><%/if><%/foreach>" />
-			<button type="submit"><%= Page.KnownSones.Button.FollowAllSones|l10n|html></button>
-		</form>
-	</div>
+	<%if !pagination.items.empty>
+		<div>
+			<form action="followSone.html" method="post">
+				<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+				<input type="hidden" name="returnPage" value="<%request.uri|html>" />
+				<input type="hidden" name="sone" value="<%foreach pagination.items sone><%if !sone.friend><%if !sone.current><%sone.id> <%/if><%/if><%/foreach>" />
+				<button type="submit"><%= Page.KnownSones.Button.FollowAllSones|l10n|html></button>
+			</form>
+		</div>
 
-	<div>
-		<form action="unfollowSone.html" method="post">
-			<input type="hidden" name="formPassword" value="<%formPassword|html>" />
-			<input type="hidden" name="returnPage" value="<%request.uri|html>" />
-			<input type="hidden" name="sone" value="<%foreach pagination.items sone><%if sone.friend><%sone.id> <%/if><%/foreach>" />
-			<button type="submit"><%= Page.KnownSones.Button.UnfollowAllSones|l10n|html></button>
-		</form>
-	</div>
+		<div>
+			<form action="unfollowSone.html" method="post">
+				<input type="hidden" name="formPassword" value="<%formPassword|html>" />
+				<input type="hidden" name="returnPage" value="<%request.uri|html>" />
+				<input type="hidden" name="sone" value="<%foreach pagination.items sone><%if sone.friend><%sone.id> <%/if><%/foreach>" />
+				<button type="submit"><%= Page.KnownSones.Button.UnfollowAllSones|l10n|html></button>
+			</form>
+		</div>
+	<%/if>
 
 	<div id="known-sones">
 		<%= page|store key=pageParameter>
