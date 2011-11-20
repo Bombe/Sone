@@ -39,11 +39,15 @@
 			</div>
 			<%ifnull !currentSone>
 				<div>
-					<%= Page.KnownSones.Label.FollowedSones|l10n|html>
-					<select name="followedSones">
+					<%= Page.KnownSones.Label.FilterSones|l10n|html>
+					<select name="filter">
 						<option value="none"></option>
-						<option value="show-only"<%if followedSones|match value="show-only"> selected="selected"<%/if>><%= Page.KnownSones.FollowedSones.ShowOnly|l10n|html></option>
-						<option value="hide"<%if followedSones|match value="hide"> selected="selected"<%/if>><%= Page.KnownSones.FollowedSones.Hide|l10n|html></option>
+						<%ifnull !currentSone>
+							<option value="followed"<%if filter|match value="followed"> selected="selected"<%/if>><%= Page.KnownSones.Filter.Followed|l10n|html></option>
+							<option value="not-followed"<%if filter|match value="not-followed"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotFollowed|l10n|html></option>
+						<%/if>
+						<option value="new"<%if filter|match value="new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.New|l10n|html></option>
+						<option value="not-new"<%if filter|match value="not-new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotNew|l10n|html></option>
 					</select>
 				</div>
 			<%/if>
