@@ -2414,8 +2414,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				break;
 			}
 			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
-			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.put(getSone(soneId), time);
+			Sone followedSone = getSone(soneId);
+			if (followedSone == null) {
+				logger.log(Level.WARNING, String.format("Ignoring Sone with invalid ID: %s", soneId));
+			} else {
+				synchronized (soneFollowingTimes) {
+					soneFollowingTimes.put(getSone(soneId), time);
+				}
 			}
 			++soneCounter;
 		}
