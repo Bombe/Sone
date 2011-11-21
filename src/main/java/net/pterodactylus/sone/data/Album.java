@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.data;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +35,15 @@ import net.pterodactylus.util.validation.Validation;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Album implements Fingerprintable {
+
+	/** Compares two {@link Album}s by {@link #getTitle()}. */
+	public static final Comparator<Album> TITLE_COMPARATOR = new Comparator<Album>() {
+
+		@Override
+		public int compare(Album leftAlbum, Album rightAlbum) {
+			return leftAlbum.getTitle().compareToIgnoreCase(rightAlbum.getTitle());
+		}
+	};
 
 	/** The ID of this album. */
 	private final String id;

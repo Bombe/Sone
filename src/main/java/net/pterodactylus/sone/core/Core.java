@@ -509,17 +509,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *
 	 * @param id
 	 *            The ID of the remote Sone to get
-	 * @return The Sone with the given ID
-	 */
-	public Sone getRemoteSone(String id) {
-		return getRemoteSone(id, true);
-	}
-
-	/**
-	 * Returns the remote Sone with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the remote Sone to get
 	 * @param create
 	 *            {@code true} to always create a Sone, {@code false} to return
 	 *            {@code null} if no Sone with the given ID exists
@@ -528,7 +517,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public Sone getRemoteSone(String id, boolean create) {
 		synchronized (remoteSones) {
 			Sone sone = remoteSones.get(id);
-			if ((sone == null) && create) {
+			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
 				setSoneStatus(sone, SoneStatus.unknown);
@@ -956,29 +945,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Adds a local Sone from the given ID which has to be the ID of an own
-	 * identity.
-	 *
-	 * @param id
-	 *            The ID of an own identity to add a Sone for
-	 * @return The added (or already existing) Sone
-	 */
-	public Sone addLocalSone(String id) {
-		synchronized (localSones) {
-			if (localSones.containsKey(id)) {
-				logger.log(Level.FINE, "Tried to add known local Sone: %s", id);
-				return localSones.get(id);
-			}
-			OwnIdentity ownIdentity = identityManager.getOwnIdentity(id);
-			if (ownIdentity == null) {
-				logger.log(Level.INFO, "Invalid Sone ID: %s", id);
-				return null;
-			}
-			return addLocalSone(ownIdentity);
-		}
-	}
-
-	/**
 	 * Adds a local Sone from the given own identity.
 	 *
 	 * @param ownIdentity
@@ -1050,7 +1016,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			return null;
 		}
 		synchronized (remoteSones) {
-			final Sone sone = getRemoteSone(identity.getId()).setIdentity(identity);
+			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
@@ -1095,6 +1061,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void followSone(Sone sone, String soneId) {
 		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		Sone followedSone = getSone(soneId, true);
+		if (followedSone == null) {
+			logger.log(Level.INFO, String.format("Ignored Sone with invalid ID: %s", soneId));
+			return;
+		}
 		followSone(sone, getSone(soneId));
 	}
 
@@ -2443,8 +2414,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				break;
 			}
 			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
-			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.put(getSone(soneId), time);
+			Sone followedSone = getSone(soneId);
+			if (followedSone == null) {
+				logger.log(Level.WARNING, String.format("Ignoring Sone with invalid ID: %s", soneId));
+			} else {
+				synchronized (soneFollowingTimes) {
+					soneFollowingTimes.put(getSone(soneId), time);
+				}
 			}
 			++soneCounter;
 		}
@@ -2564,7 +2540,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
-				Sone sone = getRemoteSone(identity.getId());
+				Sone sone = getRemoteSone(identity.getId(), false);
 				sone.setIdentity(identity);
 				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 				soneDownloader.addSone(sone);

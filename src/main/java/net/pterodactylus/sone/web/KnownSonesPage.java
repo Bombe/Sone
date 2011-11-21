@@ -62,13 +62,13 @@ public class KnownSonesPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		String sortField = request.getHttpRequest().getParam("sort");
 		String sortOrder = request.getHttpRequest().getParam("order");
-		String followedSones = request.getHttpRequest().getParam("followedSones");
+		String filter = request.getHttpRequest().getParam("filter");
 		templateContext.set("sort", (sortField != null) ? sortField : "name");
 		templateContext.set("order", (sortOrder != null) ? sortOrder : "asc");
-		templateContext.set("followedSones", followedSones);
+		templateContext.set("filter", filter);
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		List<Sone> knownSones = Filters.filteredList(new ArrayList<Sone>(webInterface.getCore().getSones()), Sone.EMPTY_SONE_FILTER);
-		if ((currentSone != null) && "show-only".equals(followedSones)) {
+		if ((currentSone != null) && "followed".equals(filter)) {
 			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
 
 				@Override
@@ -76,12 +76,32 @@ public class KnownSonesPage extends SoneTemplatePage {
 					return currentSone.hasFriend(sone.getId());
 				}
 			});
-		} else if ((currentSone != null) && "hide".equals(followedSones)) {
+		} else if ((currentSone != null) && "not-followed".equals(filter)) {
 			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
 
 				@Override
 				public boolean filterObject(Sone sone) {
 					return !currentSone.hasFriend(sone.getId());
+				}
+			});
+		} else if ("new".equals(filter)) {
+			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				public boolean filterObject(Sone sone) {
+					return webInterface.getCore().isNewSone(sone.getId());
+				}
+			});
+		} else if ("not-new".equals(filter)) {
+			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
+				/**
+				 * {@inheritDoc}
+				 */
+				@Override
+				public boolean filterObject(Sone sone) {
+					return !webInterface.getCore().isNewSone(sone.getId());
 				}
 			});
 		}
