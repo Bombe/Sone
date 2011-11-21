@@ -573,7 +573,7 @@
 			<div class="backlinks">
 				<div class="backlink"><a href="imageBrowser.html?mode=gallery"><%= Page.ImageBrowser.Link.All|l10n|html></a></div>
 				<div class="separator">&gt;</div>
-				<div class="backlink"><a href="imageBrowser.html?sone=<%sone.id|html>"><%sone.niceName|l10n|html></a></div>
+				<div class="backlink"><a href="imageBrowser.html?sone=<%sone.id|html>"><%sone.niceName|html></a></div>
 			</div>
 
 			<%include include/browseAlbums.html albums=sone.albums>
