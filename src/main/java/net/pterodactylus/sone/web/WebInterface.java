@@ -872,6 +872,7 @@ public class WebInterface implements CoreListener {
 	public void postRemoved(Post post) {
 		newPostNotification.remove(post);
 		localPostNotification.remove(post);
+		mentionNotification.remove(post);
 	}
 
 	/**
@@ -881,6 +882,15 @@ public class WebInterface implements CoreListener {
 	public void replyRemoved(PostReply reply) {
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
+		if (!getMentionedSones(reply.getText()).isEmpty()) {
+			boolean isMentioned = false;
+			for (PostReply existingReply : getCore().getReplies(reply.getPost())) {
+				isMentioned |= getCore().isNewReply(reply.getId()) && !getMentionedSones(existingReply.getText()).isEmpty();
+			}
+			if (!isMentioned) {
+				mentionNotification.remove(reply.getPost());
+			}
+		}
 	}
 
 	/**
