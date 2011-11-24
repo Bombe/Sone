@@ -170,7 +170,7 @@ public class ListNotification<T> extends TemplateNotification {
 	 */
 	@Override
 	public int hashCode() {
-		int hashCode = key.hashCode();
+		int hashCode = super.hashCode();
 		for (T element : elements) {
 			hashCode ^= element.hashCode();
 		}
