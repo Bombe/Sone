@@ -37,6 +37,7 @@ import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
+import net.pterodactylus.util.object.HashCode;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -90,6 +91,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		}
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
+		int notificationHash = HashCode.hashCode(notifications);
 		Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
 		JsonArray jsonNotificationInformations = new JsonArray();
 		for (Notification notification : notifications) {
@@ -145,7 +147,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notifications", jsonNotificationInformations).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notificationHash).put("notifications", jsonNotificationInformations).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**
