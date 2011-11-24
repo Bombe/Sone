@@ -186,6 +186,9 @@ public class ListNotification<T> extends TemplateNotification {
 			return false;
 		}
 		ListNotification<?> listNotification = (ListNotification<?>) object;
+		if (!super.equals(listNotification)) {
+			return false;
+		}
 		if (!key.equals(listNotification.key)) {
 			return false;
 		}
