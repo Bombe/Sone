@@ -15,7 +15,7 @@
 
 		<div id="notification-area">
 
-			<div id="notification-hash" class="hidden"><%= notificationHash|html></div>
+			<div id="notification-hash" class="hidden"><% notificationHash|html></div>
 
 			<form id="notification-dismiss-template" class="hidden dismiss" action="dismissNotification.html" method="post">
 				<input type="hidden" name="formPassword" value="<% formPassword|html>" />
