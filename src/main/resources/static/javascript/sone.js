@@ -1088,6 +1088,14 @@ function ajaxifyNotification(notification) {
 }
 
 /**
+ * Returns the notification hash. This hash is used in {@link #getStatus()} to
+ * determine whether the notifications changed and need to be reloaded.
+ */
+public getNotificationHash() {
+	return $("#sone #notification-area #notification-hash").text();
+}
+
+/**
  * Retrieves element IDs from notification elements.
  *
  * @param notification
