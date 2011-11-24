@@ -1200,6 +1200,10 @@ function getStatus() {
 			if (!notLoggedIn) {
 				showOfflineMarker(!online);
 			}
+			if (data.notificationHash != getNotificationHash()) {
+				console.log("Old hash: ", getNotificationHash(), ", new hash: ", data.notificationHash);
+				setNotificationHash(data.notificationHash);
+			}
 			/* search for removed notifications. */
 			$("#sone #notification-area .notification").each(function() {
 				notificationId = $(this).attr("id");
