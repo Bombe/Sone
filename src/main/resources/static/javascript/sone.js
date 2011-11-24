@@ -1096,6 +1096,16 @@ public getNotificationHash() {
 }
 
 /**
+ * Sets the notification hash.
+ *
+ * @param notificationHash
+ *            The new notification hash
+ */
+public setNotificationHash(notificationHash) {
+	$("#sone #notification-area #notification-hash").text(notificationHash);
+}
+
+/**
  * Retrieves element IDs from notification elements.
  *
  * @param notification
