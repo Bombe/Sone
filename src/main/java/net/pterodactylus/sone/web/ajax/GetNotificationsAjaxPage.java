@@ -1,5 +1,5 @@
 /*
- * Sone - GetNotificationAjaxPage.java - Copyright © 2010 David Roden
+ * Sone - GetNotificationsAjaxPage.java - Copyright © 2011 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,36 +19,36 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.Collection;
+import java.util.List;
 
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.TemplateNotification;
+import net.pterodactylus.util.object.HashCode;
 import net.pterodactylus.util.template.TemplateContext;
 
 /**
- * The “get notification” AJAX handler returns a number of rendered
- * notifications.
+ * AJAX handler to return all current notifications.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class GetNotificationAjaxPage extends JsonPage {
+public class GetNotificationsAjaxPage extends JsonPage {
 
 	/**
-	 * Creates a new “get notification” AJAX page.
+	 * Creates a new “get notifications” AJAX handler.
 	 *
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public GetNotificationAjaxPage(WebInterface webInterface) {
-		super("getNotification.ajax", webInterface);
+	public GetNotificationsAjaxPage(WebInterface webInterface) {
+		super("getNotifications.ajax", webInterface);
 	}
 
 	//
@@ -75,31 +75,16 @@ public class GetNotificationAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	protected JsonObject createJsonObject(FreenetRequest request) {
-		String[] notificationIds = request.getHttpRequest().getParam("notifications").split(",");
-		JsonObject jsonNotifications = new JsonObject();
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
-		for (String notificationId : notificationIds) {
-			Notification notification = webInterface.getNotifications().getNotification(notificationId);
-			if (notification == null) {
-				// TODO - show error
-				continue;
-			}
-			if ("new-post-notification".equals(notificationId)) {
-				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
-			} else if ("new-reply-notification".equals(notificationId)) {
-				notification = ListNotificationFilters.filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
-			} else if ("mention-notification".equals(notificationId)) {
-				notification = ListNotificationFilters.filterNewPostNotification((ListNotification<Post>) notification, currentSone, false);
-			}
-			if (notification == null) {
-				// TODO - show error
-				continue;
-			}
-			jsonNotifications.put(notificationId, createJsonNotification(request, notification));
+		Collection<Notification> notifications = webInterface.getNotifications().getNotifications();
+		List<Notification> filteredNotifications = ListNotificationFilters.filterNotifications(notifications, currentSone);
+		int notificationHash = HashCode.hashCode(filteredNotifications);
+		JsonArray jsonNotifications = new JsonArray();
+		for (Notification notification : filteredNotifications) {
+			jsonNotifications.add(createJsonNotification(request, notification));
 		}
-		return createSuccessJsonObject().put("notifications", jsonNotifications);
+		return createSuccessJsonObject().put("notificationHash", notificationHash).put("notifications", jsonNotifications).put("options", createJsonOptions(currentSone));
 	}
 
 	//
@@ -144,6 +129,25 @@ public class GetNotificationAjaxPage extends JsonPage {
 		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
 		jsonNotification.put("dismissable", notification.isDismissable());
 		return jsonNotification;
+	}
+
+	/**
+	 * Creates a JSON object that contains all options that are currently in
+	 * effect for the given Sone (or overall, if the given Sone is {@code null}
+	 * ).
+	 *
+	 * @param currentSone
+	 *            The current Sone (may be {@code null})
+	 * @return The current options
+	 */
+	private JsonObject createJsonOptions(Sone currentSone) {
+		JsonObject options = new JsonObject();
+		if (currentSone != null) {
+			options.put("ShowNotification/NewSones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
+			options.put("ShowNotification/NewPosts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());
+			options.put("ShowNotification/NewReplies", currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get());
+		}
+		return options;
 	}
 
 }
