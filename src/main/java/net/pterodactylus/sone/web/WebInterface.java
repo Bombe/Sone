@@ -82,6 +82,7 @@ import net.pterodactylus.sone.web.ajax.EditImageAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetNotificationsAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetNotificationAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
@@ -658,6 +659,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
