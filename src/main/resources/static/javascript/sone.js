@@ -1202,8 +1202,31 @@ function getStatus() {
 			}
 			if (data.notificationHash != getNotificationHash()) {
 				console.log("Old hash: ", getNotificationHash(), ", new hash: ", data.notificationHash);
-				setNotificationHash(data.notificationHash);
+				requestNotifications();
 			}
+			/* process new posts. */
+			$.each(data.newPosts, function(index, value) {
+				loadNewPost(value.id, value.sone, value.recipient, value.time);
+			});
+			/* process new replies. */
+			$.each(data.newReplies, function(index, value) {
+				loadNewReply(value.id, value.sone, value.post, value.postSone);
+			});
+			/* do it again in 5 seconds. */
+			setTimeout(getStatus, 5000);
+		} else {
+			/* data.success was false, wait 30 seconds. */
+			setTimeout(getStatus, 30000);
+		}
+	}, function() {
+		statusRequestQueued = false;
+		ajaxError();
+	});
+}
+
+function requestNotifications() {
+	ajaxGet("getNotifications.ajax", {}, function(data, textStatus) {
+		if (data && data.success) {
 			/* search for removed notifications. */
 			$("#sone #notification-area .notification").each(function() {
 				notificationId = $(this).attr("id");
@@ -1241,69 +1264,29 @@ function getStatus() {
 				}
 			});
 			/* process notifications. */
-			notificationIds = [];
 			$.each(data.notifications, function(index, value) {
 				oldNotification = getNotification(value.id);
-				if ((oldNotification.length == 0) || (value.lastUpdatedTime > getNotificationLastUpdatedTime(oldNotification))) {
-					notificationIds.push(value.id);
+				notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
+				if (oldNotification.length != 0) {
+					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
+						opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
+						notification.find(".short-text").toggleClass("hidden", opened);
+						notification.find(".text").toggleClass("hidden", !opened);
+					}
+					checkForRemovedSones(oldNotification, notification);
+					checkForRemovedPosts(oldNotification, notification);
+					checkForRemovedReplies(oldNotification, notification);
+					oldNotification.replaceWith(notification.show());
+				} else {
+					$("#sone #notification-area").append(notification);
+					if (value.id.substring(0, 5) != "local") {
+						notification.slideDown();
+						setActivity();
+					}
 				}
 			});
-			if (notificationIds.length > 0) {
-				loadNotifications(notificationIds);
-			}
-			/* process new posts. */
-			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value.id, value.sone, value.recipient, value.time);
-			});
-			/* process new replies. */
-			$.each(data.newReplies, function(index, value) {
-				loadNewReply(value.id, value.sone, value.post, value.postSone);
-			});
-			/* do it again in 5 seconds. */
-			setTimeout(getStatus, 5000);
-		} else {
-			/* data.success was false, wait 30 seconds. */
-			setTimeout(getStatus, 30000);
+			setNotificationHash(data.notificationHash);
 		}
-	}, function() {
-		statusRequestQueued = false;
-		ajaxError();
-	});
-}
-
-/**
- * Requests multiple notifications from Sone and displays them.
- *
- * @param notificationIds
- *            Array of IDs of the notifications to load
- */
-function loadNotifications(notificationIds) {
-	ajaxGet("getNotification.ajax", {"notifications": notificationIds.join(",")}, function(data, textStatus) {
-		if (!data || !data.success) {
-			// TODO - show error
-			return;
-		}
-		$.each(data.notifications, function(index, value) {
-			oldNotification = getNotification(value.id);
-			notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
-			if (oldNotification.length != 0) {
-				if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
-					opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
-					notification.find(".short-text").toggleClass("hidden", opened);
-					notification.find(".text").toggleClass("hidden", !opened);
-				}
-				checkForRemovedSones(oldNotification, notification);
-				checkForRemovedPosts(oldNotification, notification);
-				checkForRemovedReplies(oldNotification, notification);
-				oldNotification.replaceWith(notification.show());
-			} else {
-				$("#sone #notification-area").append(notification);
-				if (value.id.substring(0, 5) != "local") {
-					notification.slideDown();
-					setActivity();
-				}
-			}
-		});
 	});
 }
 
