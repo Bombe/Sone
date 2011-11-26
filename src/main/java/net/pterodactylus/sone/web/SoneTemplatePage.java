@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -262,6 +263,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
 		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
+		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		templateContext.set("notifications", notifications);
 		templateContext.set("notificationHash", HashCode.hashCode(notifications));
 	}

@@ -20,6 +20,7 @@ package net.pterodactylus.sone.web.ajax;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
@@ -79,6 +80,7 @@ public class GetNotificationsAjaxPage extends JsonPage {
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		Collection<Notification> notifications = webInterface.getNotifications().getNotifications();
 		List<Notification> filteredNotifications = ListNotificationFilters.filterNotifications(notifications, currentSone);
+		Collections.sort(filteredNotifications, Notification.CREATED_TIME_SORTER);
 		int notificationHash = HashCode.hashCode(filteredNotifications);
 		JsonArray jsonNotifications = new JsonArray();
 		for (Notification notification : filteredNotifications) {
