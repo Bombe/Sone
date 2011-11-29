@@ -1516,6 +1516,7 @@ function markSoneAsKnown(soneElement, skipRequest) {
 		$(soneElement).removeClass("new");
 		if ((typeof skipRequest == "undefined") || !skipRequest) {
 			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)});
+			requestNotifications();
 		}
 	}
 }
@@ -1528,6 +1529,7 @@ function markPostAsKnown(postElements, skipRequest) {
 				$(postElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
 					ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "post", "id": getPostId(postElement)});
+					requestNotifications();
 				}
 			})(postElement);
 		}
@@ -1544,6 +1546,7 @@ function markReplyAsKnown(replyElements, skipRequest) {
 				$(replyElement).removeClass("new");
 				if ((typeof skipRequest == "undefined") || !skipRequest) {
 					ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "reply", "id": getReplyId(replyElement)});
+					requestNotifications();
 				}
 			})(replyElement);
 		}
