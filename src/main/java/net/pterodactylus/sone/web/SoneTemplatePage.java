@@ -21,6 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +32,8 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
 import net.pterodactylus.util.collection.ListBuilder;
 import net.pterodactylus.util.collection.MapBuilder;
+import net.pterodactylus.util.notify.Notification;
+import net.pterodactylus.util.object.HashCode;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import freenet.clients.http.SessionManager.Session;
@@ -259,7 +262,10 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
 		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
-		templateContext.set("notifications", ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone));
+		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
+		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
+		templateContext.set("notifications", notifications);
+		templateContext.set("notificationHash", HashCode.hashCode(notifications));
 	}
 
 	/**

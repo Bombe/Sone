@@ -37,6 +37,7 @@ import net.pterodactylus.util.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
+import net.pterodactylus.util.object.HashCode;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -90,11 +91,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		}
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
-		Collections.sort(notifications, Notification.LAST_UPDATED_TIME_SORTER);
-		JsonArray jsonNotificationInformations = new JsonArray();
-		for (Notification notification : notifications) {
-			jsonNotificationInformations.add(createJsonNotificationInformation(notification));
-		}
+		int notificationHash = HashCode.hashCode(notifications);
 		/* load new posts. */
 		Set<Post> newPosts = webInterface.getNewPosts();
 		if (currentSone != null) {
@@ -145,7 +142,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notifications", jsonNotificationInformations).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notificationHash).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**
@@ -189,24 +186,6 @@ public class GetStatusAjaxPage extends JsonPage {
 		}
 		jsonSone.put("lastUpdatedText", GetTimesAjaxPage.getTime(webInterface, sone.getTime()).getText());
 		return jsonSone;
-	}
-
-	/**
-	 * Creates a JSON object that only contains the ID and the last-updated time
-	 * of the given notification.
-	 *
-	 * @see Notification#getId()
-	 * @see Notification#getLastUpdatedTime()
-	 * @param notification
-	 *            The notification
-	 * @return A JSON object containing the notification ID and last-updated
-	 *         time
-	 */
-	private JsonObject createJsonNotificationInformation(Notification notification) {
-		JsonObject jsonNotification = new JsonObject();
-		jsonNotification.put("id", notification.getId());
-		jsonNotification.put("lastUpdatedTime", notification.getLastUpdatedTime());
-		return jsonNotification;
 	}
 
 	/**

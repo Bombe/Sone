@@ -82,7 +82,7 @@ import net.pterodactylus.sone.web.ajax.EditImageAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
-import net.pterodactylus.sone.web.ajax.GetNotificationAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetNotificationsAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
@@ -658,7 +658,7 @@ public class WebInterface implements CoreListener {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
@@ -872,6 +872,7 @@ public class WebInterface implements CoreListener {
 	public void postRemoved(Post post) {
 		newPostNotification.remove(post);
 		localPostNotification.remove(post);
+		mentionNotification.remove(post);
 	}
 
 	/**
@@ -881,6 +882,15 @@ public class WebInterface implements CoreListener {
 	public void replyRemoved(PostReply reply) {
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
+		if (!getMentionedSones(reply.getText()).isEmpty()) {
+			boolean isMentioned = false;
+			for (PostReply existingReply : getCore().getReplies(reply.getPost())) {
+				isMentioned |= getCore().isNewReply(reply.getId()) && !getMentionedSones(existingReply.getText()).isEmpty();
+			}
+			if (!isMentioned) {
+				mentionNotification.remove(reply.getPost());
+			}
+		}
 	}
 
 	/**

@@ -161,4 +161,46 @@ public class ListNotification<T> extends TemplateNotification {
 		elements.clear();
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		int hashCode = super.hashCode();
+		for (T element : elements) {
+			hashCode ^= element.hashCode();
+		}
+		return hashCode;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof ListNotification)) {
+			return false;
+		}
+		ListNotification<?> listNotification = (ListNotification<?>) object;
+		if (!super.equals(listNotification)) {
+			return false;
+		}
+		if (!key.equals(listNotification.key)) {
+			return false;
+		}
+		if (elements.size() != listNotification.elements.size()) {
+			return false;
+		}
+		for (int index = 0; index < elements.size(); ++index) {
+			if (!elements.get(index).equals(listNotification.elements.get(index))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 }
