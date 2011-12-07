@@ -171,6 +171,14 @@ textarea {
 	margin-bottom: 1ex;
 }
 
+#sone .profile-avatar {
+	display: inline-block;
+	width: 80px;
+	height: 80px;
+	overflow: hidden;
+	position: absolute;
+}
+
 #sone .profile-link {
 	font-weight: bold;
 	color: rgb(28, 131, 191);
@@ -278,6 +286,13 @@ textarea {
 #sone .post .sone-menu .avatar {
 	position: absolute;
 	margin-right: 1ex;
+}
+
+#sone .menu-avatar {
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+	overflow: hidden;
 }
 
 #sone .post .sone-menu .inner-menu {
@@ -443,6 +458,13 @@ textarea {
 
 #sone .post .reply > .avatar {
 	position: absolute;
+}
+
+#sone .reply-avatar {
+	display: inline-block;
+	width: 36px;
+	height: 36px;
+	overflow: hidden;
 }
 
 #sone .post .reply > .inner-part {

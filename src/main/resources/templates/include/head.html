@@ -40,13 +40,19 @@
 		</div>
 
 		<div id="profile" class="<%ifnull currentSone>offline<%else>online<%/if>">
-			<a class="picture" href="index.html">
-				<%ifnull !currentSone>
-					<img src="/WebOfTrust/GetIdenticon?identity=<% currentSone.id|html>&amp;width=80&amp;height=80" width="80" height="80" alt="Profile Avatar" />
-				<%else>
-					<img src="images/sone.png" width="80" height="80" alt="Sone is offline" />
-				<%/if>
-			</a>
+			<div class="avatar profile-avatar">
+				<a class="picture" href="index.html">
+					<%ifnull !currentSone>
+						<%ifnull !currentSone.avatar>
+							<%currentSone.avatar|image-link max-width=80 max-height=80 mode=enlarge title="Profile Avatar">
+						<%else>
+							<img src="/WebOfTrust/GetIdenticon?identity=<% currentSone.id|html>&amp;width=80&amp;height=80" width="80" height="80" alt="Profile Avatar" />
+						<%/if>
+					<%else>
+						<img src="images/sone.png" width="80" height="80" alt="Sone is offline" />
+					<%/if>
+				</a>
+			</div>
 			<%ifnull ! currentSone>
 				<div id="home-sone">
 					<% currentSone|store key=sone>
