@@ -251,7 +251,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
-		templateContextFactory.addFilter("image-link", new ImageLinkFilter(templateContextFactory));
+		templateContextFactory.addFilter("image-link", new ImageLinkFilter(getCore(), templateContextFactory));
 		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
 		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addFilter("unique", new UniqueElementFilter());
