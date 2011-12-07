@@ -307,6 +307,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", sone.getAllAlbums());
+			soneProperties.put("avatar", sone.getAvatar());
 		}
 
 		//

@@ -24,6 +24,7 @@
 			</field>
 			<%/foreach>
 		</fields>
+		<avatar><%currentSone.avatar|xml></avatar>
 	</profile>
 
 	<posts>
