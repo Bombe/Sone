@@ -862,3 +862,11 @@ textarea {
 #sone #avatar-selection li#no-avatar {
 	display: block;
 }
+
+#sone form#options ul {
+	padding-left: 1em;
+}
+
+#sone form#options li {
+	list-style-type: none;
+}

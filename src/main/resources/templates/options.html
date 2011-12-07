@@ -66,8 +66,32 @@
 			<%= Page.Options.Option.ShowNotificationNewReplies.Description|l10n|html>
 		</p>
 
-		<%ifnull !currentSone>
-		<%/if>
+		<h2><%= Page.Options.Section.AvatarOptions.Title|l10n|html></h2>
+
+		<p><%= Page.Options.Option.ShowAvatars.Description|l10n|html></p>
+		
+		<ul>
+			<li>
+				<input type="radio" name="show-custom-avatars" value="NEVER"<%if show-custom-avatars|match value=NEVER> checked="checked"<%/if>/>
+				<%=Page.Options.Option.ShowAvatars.Never.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="show-custom-avatars" value="FOLLOWED"<%if show-custom-avatars|match value=FOLLOWED> checked="checked"<%/if>/>
+				<%=Page.Options.Option.ShowAvatars.Followed.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="show-custom-avatars" value="MANUALLY_TRUSTED"<%if show-custom-avatars|match value=MANUALLY_TRUSTED> checked="checked"<%/if>/>
+				<%=Page.Options.Option.ShowAvatars.ManuallyTrusted.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="show-custom-avatars" value="TRUSTED"<%if show-custom-avatars|match value=TRUSTED> checked="checked"<%/if>/>
+				<%=Page.Options.Option.ShowAvatars.Trusted.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="show-custom-avatars" value="ALWAYS"<%if show-custom-avatars|match value=ALWAYS> checked="checked"<%/if>/>
+				<%=Page.Options.Option.ShowAvatars.Always.Description|l10n|html>
+			</li>
+		</ul>
 
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
