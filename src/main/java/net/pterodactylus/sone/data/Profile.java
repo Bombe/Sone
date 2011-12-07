@@ -92,6 +92,15 @@ public class Profile implements Fingerprintable {
 	//
 
 	/**
+	 * Returns the Sone this profile belongs to.
+	 *
+	 * @return The Sone this profile belongs to
+	 */
+	public Sone getSone() {
+		return sone;
+	}
+
+	/**
 	 * Returns the first name.
 	 *
 	 * @return The first name
