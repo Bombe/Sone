@@ -112,6 +112,12 @@ public class SoneAccessor extends ReflectionAccessor {
 				return new Trust(null, null, null);
 			}
 			return trust;
+		} else if (member.equals("avatar")) {
+			String avatarId = sone.getAvatar();
+			if (avatarId == null) {
+				return null;
+			}
+			return core.getImage(avatarId);
 		}
 		return super.get(templateContext, object, member);
 	}
