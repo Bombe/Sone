@@ -856,5 +856,9 @@ textarea {
 
 #sone #avatar-selection li .post-avatar {
 	vertical-align: middle;
-	margin-bottom: 0.5em;
+	margin-top: 0.5em;
+}
+
+#sone #avatar-selection li#no-avatar {
+	display: block;
 }

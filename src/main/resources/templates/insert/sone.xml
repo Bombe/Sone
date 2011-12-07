@@ -16,6 +16,7 @@
 		<birth-day><% currentSone.profile.birthDay|xml></birth-day>
 		<birth-month><% currentSone.profile.birthMonth|xml></birth-month>
 		<birth-year><% currentSone.profile.birthYear|xml></birth-year>
+		<avatar><%currentSone.profile.avatar|xml></avatar>
 		<fields>
 			<%foreach currentSone.profile.fields field>
 			<field>
@@ -24,7 +25,6 @@
 			</field>
 			<%/foreach>
 		</fields>
-		<avatar><%currentSone.avatar|xml></avatar>
 	</profile>
 
 	<posts>

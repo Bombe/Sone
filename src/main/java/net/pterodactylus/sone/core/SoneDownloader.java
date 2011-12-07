@@ -330,7 +330,7 @@ public class SoneDownloader extends AbstractService {
 		Integer profileBirthDay = Numbers.safeParseInteger(profileXml.getValue("birth-day", null));
 		Integer profileBirthMonth = Numbers.safeParseInteger(profileXml.getValue("birth-month", null));
 		Integer profileBirthYear = Numbers.safeParseInteger(profileXml.getValue("birth-year", null));
-		Profile profile = new Profile().setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
+		Profile profile = new Profile(sone).setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
 		profile.setBirthDay(profileBirthDay).setBirthMonth(profileBirthMonth).setBirthYear(profileBirthYear);
 		/* avatar is processed after images are loaded. */
 		String avatarId = profileXml.getValue("avatar", null);
@@ -499,7 +499,7 @@ public class SoneDownloader extends AbstractService {
 
 		/* process avatar. */
 		if (avatarId != null) {
-			sone.setAvatar(core.getImage(avatarId, false));
+			profile.setAvatar(core.getImage(avatarId, false));
 		}
 
 		/* okay, apparently everything was parsed correctly. Now import. */

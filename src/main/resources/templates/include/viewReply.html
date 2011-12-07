@@ -5,8 +5,8 @@
 	<div class="reply-author-local hidden"><% reply.sone.local></div>
 	<%include include/soneMenu.html class=="sone-reply-menu" sone=reply.sone>
 	<div class="avatar reply-avatar">
-		<%ifnull !reply.sone.avatar>
-			<% reply.sone.avatar|image-link max-width=36 max-height=36 mode=enlarge title="Avatar Image">
+		<%ifnull !reply.sone.profile.avatar>
+			<% reply.sone.profile.avatar|image-link max-width=36 max-height=36 mode=enlarge title="Avatar Image">
 		<%else>
 			<img src="/WebOfTrust/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
 		<%/if>

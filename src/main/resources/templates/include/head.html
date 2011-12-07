@@ -43,8 +43,8 @@
 			<div class="avatar profile-avatar">
 				<a class="picture" href="index.html">
 					<%ifnull !currentSone>
-						<%ifnull !currentSone.avatar>
-							<%currentSone.avatar|image-link max-width=80 max-height=80 mode=enlarge title="Profile Avatar">
+						<%ifnull !currentSone.profile.avatar>
+							<%currentSone.profile.avatar|image-link max-width=80 max-height=80 mode=enlarge title="Profile Avatar">
 						<%else>
 							<img src="/WebOfTrust/GetIdenticon?identity=<% currentSone.id|html>&amp;width=80&amp;height=80" width="80" height="80" alt="Profile Avatar" />
 						<%/if>

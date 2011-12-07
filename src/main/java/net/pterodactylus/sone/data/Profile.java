@@ -32,6 +32,9 @@ import net.pterodactylus.util.validation.Validation;
  */
 public class Profile implements Fingerprintable {
 
+	/** The Sone this profile belongs to. */
+	private final Sone sone;
+
 	/** The first name. */
 	private volatile String firstName;
 
@@ -50,14 +53,20 @@ public class Profile implements Fingerprintable {
 	/** The year of the birth date. */
 	private volatile Integer birthYear;
 
+	/** The ID of the avatar image. */
+	private volatile String avatar;
+
 	/** Additional fields in the profile. */
 	private final List<Field> fields = Collections.synchronizedList(new ArrayList<Field>());
 
 	/**
 	 * Creates a new empty profile.
+	 *
+	 * @param sone
+	 *            The Sone this profile belongs to
 	 */
-	public Profile() {
-		/* do nothing. */
+	public Profile(Sone sone) {
+		this.sone = sone;
 	}
 
 	/**
@@ -67,15 +76,14 @@ public class Profile implements Fingerprintable {
 	 *            The profile to copy
 	 */
 	public Profile(Profile profile) {
-		if (profile == null) {
-			return;
-		}
+		this.sone = profile.sone;
 		this.firstName = profile.firstName;
 		this.middleName = profile.middleName;
 		this.lastName = profile.lastName;
 		this.birthDay = profile.birthDay;
 		this.birthMonth = profile.birthMonth;
 		this.birthYear = profile.birthYear;
+		this.avatar = profile.avatar;
 		this.fields.addAll(profile.fields);
 	}
 
@@ -195,6 +203,34 @@ public class Profile implements Fingerprintable {
 	 */
 	public Integer getBirthYear() {
 		return birthYear;
+	}
+
+	/**
+	 * Returns the ID of the currently selected avatar image.
+	 *
+	 * @return The ID of the currently selected avatar image, or {@code null} if
+	 *         no avatar is selected.
+	 */
+	public String getAvatar() {
+		return avatar;
+	}
+
+	/**
+	 * Sets the avatar image.
+	 *
+	 * @param avatar
+	 *            The new avatar image, or {@code null} to not select an avatar
+	 *            image.
+	 * @return This Sone
+	 */
+	public Profile setAvatar(Image avatar) {
+		if (avatar == null) {
+			this.avatar = null;
+			return this;
+		}
+		Validation.begin().isEqual("Image Owner", avatar.getSone(), sone).check();
+		this.avatar = avatar.getId();
+		return this;
 	}
 
 	/**
@@ -366,6 +402,9 @@ public class Profile implements Fingerprintable {
 		}
 		if (birthYear != null) {
 			fingerprint.append("BirthYear(").append(birthYear).append(')');
+		}
+		if (avatar != null) {
+			fingerprint.append("Avatar(").append(avatar).append(')');
 		}
 		fingerprint.append("ContactInformation(");
 		for (Field field : fields) {

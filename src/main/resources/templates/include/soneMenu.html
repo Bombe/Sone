@@ -1,8 +1,8 @@
 <div class="sone-menu <% class|css|html>">
 	<div class="sone-menu-id hidden"><%sone.id|html></div>
 	<div class="avatar menu-avatar">
-		<%ifnull !sone.avatar>
-			<%sone.avatar|image-link max-width=64 max-height=64 mode=enlarge title==sone.niceName>
+		<%ifnull !sone.profile.avatar>
+			<%sone.profile.avatar|image-link max-width=64 max-height=64 mode=enlarge title==sone.niceName>
 		<%else>
 			<img src="/WebOfTrust/GetIdenticon?identity=<%sone.id|html>&amp;width=64&amp;height=64" width="64" height="64" alt="Avatar Image" />
 		<%/if>

@@ -147,7 +147,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	private volatile long time;
 
 	/** The profile of this Sone. */
-	private volatile Profile profile = new Profile();
+	private volatile Profile profile = new Profile(this);
 
 	/** The client used by the Sone. */
 	private volatile Client client;
@@ -172,9 +172,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/** Sone-specific options. */
 	private final Options options = new Options();
-
-	/** The avatar of this Sone. */
-	private volatile String avatar;
 
 	/**
 	 * Creates a new Sone.
@@ -767,34 +764,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Returns the ID of the currently selected avatar image.
-	 *
-	 * @return The ID of the currently selected avatar image, or {@code null} if
-	 *         no avatar is selected.
-	 */
-	public String getAvatar() {
-		return avatar;
-	}
-
-	/**
-	 * Sets the avatar image.
-	 *
-	 * @param avatar
-	 *            The new avatar image, or {@code null} to not select an avatar
-	 *            image.
-	 * @return This Sone
-	 */
-	public Sone setAvatar(Image avatar) {
-		if (avatar == null) {
-			this.avatar = null;
-			return this;
-		}
-		Validation.begin().isEqual("Image Owner", avatar.getSone(), this).check();
-		this.avatar = avatar.getId();
-		return this;
-	}
-
-	/**
 	 * Returns Sone-specific options.
 	 *
 	 * @return The options of this Sone
@@ -850,8 +819,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 			fingerprint.append(album.getFingerprint());
 		}
 		fingerprint.append(')');
-
-		fingerprint.append("Avatar(").append(avatar).append(')');
 
 		return fingerprint.toString();
 	}

@@ -1442,7 +1442,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		String lastInsertFingerprint = configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").getValue("");
 
 		/* load profile. */
-		Profile profile = new Profile();
+		Profile profile = new Profile(sone);
 		profile.setFirstName(configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null));
 		profile.setMiddleName(configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null));
 		profile.setLastName(configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null));
@@ -1593,7 +1593,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		/* load avatar. */
 		String avatarId = configuration.getStringValue(sonePrefix + "/Profile/Avatar").getValue(null);
 		if (avatarId != null) {
-			sone.setAvatar(getImage(avatarId, false));
+			profile.setAvatar(getImage(avatarId, false));
 		}
 
 		/* load options. */
@@ -2141,7 +2141,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
-			configuration.getStringValue(sonePrefix + "/Profile/Avatar").setValue(sone.getAvatar());
+			configuration.getStringValue(sonePrefix + "/Profile/Avatar").setValue(profile.getAvatar());
 
 			/* save profile fields. */
 			int fieldCounter = 0;

@@ -67,15 +67,6 @@
 		</p>
 
 		<%ifnull !currentSone>
-			<ul id="avatar-selection">
-				<li><input type="radio" name="avatar-image" value="none"<%ifnull avatar-image> checked="checked"<%/if>/><%= Page.Options.Option.Avatar.Delete|l10n|html></input></li>
-				<%foreach currentSone.allImages image>
-					<li>
-						<input type="radio" name="avatar-image" value="<%image.id|html>"<%if avatar-image|match key=image.id> checked="checked"<%/if>/>
-						<div class="post-avatar"><% image|image-link max-width=48 max-height=48 mode=enlarge title==image.title></div>
-					</li>
-				<%/foreach>
-			</ul>
 		<%/if>
 
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
