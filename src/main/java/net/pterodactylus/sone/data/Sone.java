@@ -47,6 +47,30 @@ import freenet.keys.FreenetURI;
  */
 public class Sone implements Fingerprintable, Comparable<Sone> {
 
+	/**
+	 * The possible values for the “show custom avatars” option.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static enum ShowCustomAvatars {
+
+		/** Never show custom avatars. */
+		NEVER,
+
+		/** Only show custom avatars of followed Sones. */
+		FOLLOWED,
+
+		/** Only show custom avatars of Sones you manually trust. */
+		MANUALLY_TRUSTED,
+
+		/** Only show custom avatars of automatically trusted Sones. */
+		TRUSTED,
+
+		/** Always show custom avatars. */
+		ALWAYS,
+
+	}
+
 	/** comparator that sorts Sones by their nice name. */
 	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
 
