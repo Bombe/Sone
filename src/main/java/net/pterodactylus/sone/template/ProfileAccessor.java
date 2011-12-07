@@ -60,6 +60,10 @@ public class ProfileAccessor extends ReflectionAccessor {
 				/* not logged in? don’t show custom avatars, then. */
 				return null;
 			}
+			if (profile.getSone().equals(currentSone)) {
+				/* always show your own avatar. */
+				return profile.getAvatar();
+			}
 			ShowCustomAvatars showCustomAvatars = currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get();
 			if (showCustomAvatars == ShowCustomAvatars.NEVER) {
 				return null;
