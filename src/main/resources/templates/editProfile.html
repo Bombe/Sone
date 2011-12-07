@@ -180,6 +180,23 @@
 			<input type="text" name="birth-year" value="<% birthYear|html>" />
 		</div>
 
+		<h1><%= Page.EditProfile.Avatar.Title|l10n|html></h1>
+
+		<p><%= Page.EditProfile.Avatar.Description|l10n|html></p>
+
+		<ul id="avatar-selection">
+			<li id="no-avatar">
+				<input type="radio" name="avatar-id" value="none"<%ifnull avatar-image> checked="checked"<%/if>/>
+				<%= Page.EditProfile.Avatar.Delete|l10n|html>
+			</li>
+			<%foreach currentSone.allImages image>
+				<li>
+					<input type="radio" name="avatar-id" value="<%image.id|html>"<%if avatar-id|match key=image.id> checked="checked"<%/if>/>
+					<div class="post-avatar"><% image|image-link max-width=48 max-height=48 mode=enlarge title==image.title></div>
+				</li>
+			<%/foreach>
+		</ul>
+
 		<div>
 			<button type="submit" name="save-profile" value="true"><%= Page.EditProfile.Button.Save|l10n|html></button>
 		</div>

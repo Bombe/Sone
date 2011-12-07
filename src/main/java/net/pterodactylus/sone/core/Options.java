@@ -226,6 +226,9 @@ public class Options {
 	/** Holds all {@link String} {@link Option}s. */
 	private final Map<String, Option<String>> stringOptions = Collections.synchronizedMap(new HashMap<String, Option<String>>());
 
+	/** Holds all {@link Enum} {@link Option}s. */
+	private final Map<String, Option<? extends Enum<?>>> enumOptions = Collections.synchronizedMap(new HashMap<String, Option<? extends Enum<?>>>());
+
 	/**
 	 * Adds a boolean option.
 	 *
@@ -302,6 +305,39 @@ public class Options {
 	 */
 	public Option<String> getStringOption(String name) {
 		return stringOptions.get(name);
+	}
+
+	/**
+	 * Adds an {@link Enum} {@link Option}.
+	 *
+	 * @param name
+	 *            The name of the option
+	 * @param enumOption
+	 *            The option
+	 * @return The given option
+	 */
+	public <T extends Enum<T>> Option<T> addEnumOption(String name, Option<T> enumOption) {
+		enumOptions.put(name, enumOption);
+		return enumOption;
+	}
+
+	/**
+	 * Returns a {@link Enum} {@link Option}. As the type can probably not be
+	 * interred correctly you could help the compiler by calling this method
+	 * like this:
+	 * <p>
+	 *
+	 * <pre>
+	 * options.&lt;SomeEnum&gt; getEnumOption(&quot;SomeEnumOption&quot;).get();
+	 * </pre>
+	 *
+	 * @param name
+	 *            The name of the option
+	 * @return The enum option, or {@code null} if there is no enum option with
+	 *         the given name
+	 */
+	public <T extends Enum<T>> Option<T> getEnumOption(String name) {
+		return (Option<T>) enumOptions.get(name);
 	}
 
 }

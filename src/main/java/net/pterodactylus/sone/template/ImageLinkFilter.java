@@ -21,6 +21,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.object.Default;
@@ -41,16 +42,22 @@ public class ImageLinkFilter implements Filter {
 	/** The template to render for the &lt;img&gt; tag. */
 	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<img<%ifnull !class> class=\"<%class|css>\"<%/if> src=\"<%src|html><%if forceDownload>?forcedownload=true<%/if>\" alt=\"<%alt|html>\" title=\"<%title|html>\" width=\"<%width|html>\" height=\"<%height|html>\" style=\"position: relative;<%ifnull ! top>top: <% top|html>;<%/if><%ifnull ! left>left: <% left|html>;<%/if>\"/>"));
 
+	/** The core. */
+	private final Core core;
+
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
 
 	/**
 	 * Creates a new image link filter.
 	 *
+	 * @param core
+	 *            The core
 	 * @param templateContextFactory
 	 *            The template context factory
 	 */
-	public ImageLinkFilter(TemplateContextFactory templateContextFactory) {
+	public ImageLinkFilter(Core core, TemplateContextFactory templateContextFactory) {
+		this.core = core;
 		this.templateContextFactory = templateContextFactory;
 	}
 
@@ -59,7 +66,14 @@ public class ImageLinkFilter implements Filter {
 	 */
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		Image image = (Image) data;
+		Image image = null;
+		if (data instanceof String) {
+			image = core.getImage((String) data, false);
+		} else if (data instanceof Image) {
+			image = (Image) data;
+		} else {
+			return null;
+		}
 		String imageClass = parameters.get("class");
 		int maxWidth = Numbers.safeParseInteger(parameters.get("max-width"), Integer.MAX_VALUE);
 		int maxHeight = Numbers.safeParseInteger(parameters.get("max-height"), Integer.MAX_VALUE);
