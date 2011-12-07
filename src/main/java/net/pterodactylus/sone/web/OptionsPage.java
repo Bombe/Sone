@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.pterodactylus.sone.core.Core.Preferences;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.number.Numbers;
@@ -73,6 +74,8 @@ public class OptionsPage extends SoneTemplatePage {
 				currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").set(showNotificationNewPosts);
 				boolean showNotificationNewReplies = request.getHttpRequest().isPartSet("show-notification-new-replies");
 				currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").set(showNotificationNewReplies);
+				String showCustomAvatars = request.getHttpRequest().getPartAsStringFailsafe("show-custom-avatars", 32);
+				currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").set(ShowCustomAvatars.valueOf(showCustomAvatars));
 				webInterface.getCore().touchConfiguration();
 			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
@@ -139,6 +142,7 @@ public class OptionsPage extends SoneTemplatePage {
 			templateContext.set("show-notification-new-sones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
 			templateContext.set("show-notification-new-posts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());
 			templateContext.set("show-notification-new-replies", currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get());
+			templateContext.set("show-custom-avatars", currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get().name());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());

@@ -67,6 +67,7 @@ public class EditProfilePage extends SoneTemplatePage {
 		Integer birthDay = profile.getBirthDay();
 		Integer birthMonth = profile.getBirthMonth();
 		Integer birthYear = profile.getBirthYear();
+		String avatarId = profile.getAvatar();
 		List<Field> fields = profile.getFields();
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().getPartAsStringFailsafe("save-profile", 4).equals("true")) {
@@ -76,10 +77,12 @@ public class EditProfilePage extends SoneTemplatePage {
 				birthDay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
 				birthMonth = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
 				birthYear = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
+				avatarId = request.getHttpRequest().getPartAsStringFailsafe("avatar-id", 36);
 				profile.setFirstName(firstName.length() > 0 ? firstName : null);
 				profile.setMiddleName(middleName.length() > 0 ? middleName : null);
 				profile.setLastName(lastName.length() > 0 ? lastName : null);
 				profile.setBirthDay(birthDay).setBirthMonth(birthMonth).setBirthYear(birthYear);
+				profile.setAvatar(webInterface.getCore().getImage(avatarId, false));
 				for (Field field : fields) {
 					String value = request.getHttpRequest().getPartAsStringFailsafe("field-" + field.getId(), 400);
 					field.setValue(value);
@@ -136,6 +139,7 @@ public class EditProfilePage extends SoneTemplatePage {
 		templateContext.set("birthDay", birthDay);
 		templateContext.set("birthMonth", birthMonth);
 		templateContext.set("birthYear", birthYear);
+		templateContext.set("avatar-id", avatarId);
 		templateContext.set("fields", fields);
 	}
 

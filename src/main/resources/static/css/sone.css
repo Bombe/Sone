@@ -171,6 +171,14 @@ textarea {
 	margin-bottom: 1ex;
 }
 
+#sone .profile-avatar {
+	display: inline-block;
+	width: 80px;
+	height: 80px;
+	overflow: hidden;
+	position: absolute;
+}
+
 #sone .profile-link {
 	font-weight: bold;
 	color: rgb(28, 131, 191);
@@ -280,6 +288,13 @@ textarea {
 	margin-right: 1ex;
 }
 
+#sone .menu-avatar {
+	display: inline-block;
+	width: 64px;
+	height: 64px;
+	overflow: hidden;
+}
+
 #sone .post .sone-menu .inner-menu {
 	margin-left: 64px;
 	padding-left: 1ex;
@@ -292,6 +307,13 @@ textarea {
 
 #sone .post > .avatar {
 	position: absolute;
+}
+
+#sone .post-avatar {
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+	overflow: hidden;
 }
 
 #sone .post > .inner-part {
@@ -436,6 +458,13 @@ textarea {
 
 #sone .post .reply > .avatar {
 	position: absolute;
+}
+
+#sone .reply-avatar {
+	display: inline-block;
+	width: 36px;
+	height: 36px;
+	overflow: hidden;
 }
 
 #sone .post .reply > .inner-part {
@@ -815,4 +844,29 @@ textarea {
 
 #sone #sort-options {
 	margin-bottom: 1em;
+}
+
+#sone ul#avatar-selection {
+	padding: 0;
+}
+
+#sone #avatar-selection li {
+	display: inline-block;
+}
+
+#sone #avatar-selection li .post-avatar {
+	vertical-align: middle;
+	margin-top: 0.5em;
+}
+
+#sone #avatar-selection li#no-avatar {
+	display: block;
+}
+
+#sone form#options ul {
+	padding-left: 1em;
+}
+
+#sone form#options li {
+	list-style-type: none;
 }
