@@ -1590,6 +1590,12 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			album.addImage(image);
 		}
 
+		/* load avatar. */
+		String avatarId = configuration.getStringValue(sonePrefix + "/Profile/Avatar").getValue(null);
+		if (avatarId != null) {
+			sone.setAvatar(getImage(avatarId, false));
+		}
+
 		/* load options. */
 		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
 		sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
@@ -2135,6 +2141,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getIntValue(sonePrefix + "/Profile/BirthDay").setValue(profile.getBirthDay());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").setValue(profile.getBirthMonth());
 			configuration.getIntValue(sonePrefix + "/Profile/BirthYear").setValue(profile.getBirthYear());
+			configuration.getStringValue(sonePrefix + "/Profile/Avatar").setValue(sone.getAvatar());
 
 			/* save profile fields. */
 			int fieldCounter = 0;
