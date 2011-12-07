@@ -294,6 +294,13 @@ textarea {
 	position: absolute;
 }
 
+#sone .post-avatar {
+	display: inline-block;
+	width: 48px;
+	height: 48px;
+	overflow: hidden;
+}
+
 #sone .post > .inner-part {
 	margin-left: 48px;
 	padding-left: 0.5em;
@@ -815,4 +822,17 @@ textarea {
 
 #sone #sort-options {
 	margin-bottom: 1em;
+}
+
+#sone ul#avatar-selection {
+	padding: 0;
+}
+
+#sone #avatar-selection li {
+	display: inline-block;
+}
+
+#sone #avatar-selection li .post-avatar {
+	vertical-align: middle;
+	margin-bottom: 0.5em;
 }
