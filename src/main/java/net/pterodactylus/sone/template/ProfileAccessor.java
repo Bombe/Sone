@@ -60,16 +60,22 @@ public class ProfileAccessor extends ReflectionAccessor {
 				/* not logged in? don’t show custom avatars, then. */
 				return null;
 			}
+			String avatarId = profile.getAvatar();
+			if (avatarId != null) {
+				if (core.getImage(avatarId, false) == null) {
+					/* avatar ID but no matching image? show nothing. */
+					return null;
+				}
+			}
 			Sone remoteSone = profile.getSone();
 			if (core.isLocalSone(remoteSone)) {
 				/* always show your own avatars. */
-				return profile.getAvatar();
+				return avatarId;
 			}
 			ShowCustomAvatars showCustomAvatars = currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get();
 			if (showCustomAvatars == ShowCustomAvatars.NEVER) {
 				return null;
 			}
-			String avatarId = profile.getAvatar();
 			if ((showCustomAvatars == ShowCustomAvatars.ALWAYS) || (avatarId == null)) {
 				return avatarId;
 			}
