@@ -89,7 +89,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 			if ((showCustomAvatars == ShowCustomAvatars.MANUALLY_TRUSTED) && (trust.getExplicit() != null) && (trust.getExplicit() > 0)) {
 				return avatarId;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.TRUSTED) && ((trust.getExplicit() != null) && (trust.getExplicit() > 0)) || ((trust.getImplicit() != null) && (trust.getImplicit() > 0))) {
+			if ((showCustomAvatars == ShowCustomAvatars.TRUSTED) && (((trust.getExplicit() != null) && (trust.getExplicit() > 0)) || ((trust.getImplicit() != null) && (trust.getImplicit() > 0)))) {
 				return avatarId;
 			}
 			return null;
