@@ -79,8 +79,8 @@ public class ProfileAccessor extends ReflectionAccessor {
 			if ((showCustomAvatars == ShowCustomAvatars.ALWAYS) || (avatarId == null)) {
 				return avatarId;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.FOLLOWED) && currentSone.hasFriend(remoteSone.getId())) {
-				return avatarId;
+			if (showCustomAvatars == ShowCustomAvatars.FOLLOWED) {
+				return currentSone.hasFriend(remoteSone.getId()) ? avatarId : null;
 			}
 			Trust trust = core.getTrust(currentSone, remoteSone);
 			if (trust == null) {
