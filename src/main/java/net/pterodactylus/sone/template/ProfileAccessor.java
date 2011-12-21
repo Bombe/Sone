@@ -61,11 +61,12 @@ public class ProfileAccessor extends ReflectionAccessor {
 				return null;
 			}
 			String avatarId = profile.getAvatar();
-			if (avatarId != null) {
-				if (core.getImage(avatarId, false) == null) {
-					/* avatar ID but no matching image? show nothing. */
-					return null;
-				}
+			if (avatarId == null) {
+				return null;
+			}
+			if (core.getImage(avatarId, false) == null) {
+				/* avatar ID but no matching image? show nothing. */
+				return null;
 			}
 			Sone remoteSone = profile.getSone();
 			if (core.isLocalSone(remoteSone)) {
@@ -76,7 +77,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 			if (showCustomAvatars == ShowCustomAvatars.NEVER) {
 				return null;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.ALWAYS) || (avatarId == null)) {
+			if (showCustomAvatars == ShowCustomAvatars.ALWAYS) {
 				return avatarId;
 			}
 			if (showCustomAvatars == ShowCustomAvatars.FOLLOWED) {
