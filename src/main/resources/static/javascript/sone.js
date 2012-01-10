@@ -874,7 +874,7 @@ function ajaxifyPost(postElement) {
 		}
 	});
 	(function(postElement) {
-		var soneId = $(".sone-menu-id", postElement).text();
+		var soneId = $(".sone-menu-id:first", postElement).text();
 		$(".sone-post-menu .follow", postElement).click(function() {
 			var followElement = this;
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
