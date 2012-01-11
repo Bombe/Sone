@@ -49,6 +49,26 @@ import freenet.keys.FreenetURI;
 public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/**
+	 * Enumeration for the possible states of a {@link Sone}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public enum SoneStatus {
+
+		/** The Sone is unknown, i.e. not yet downloaded. */
+		unknown,
+
+		/** The Sone is idle, i.e. not being downloaded or inserted. */
+		idle,
+
+		/** The Sone is currently being inserted. */
+		inserting,
+
+		/** The Sone is currently being downloaded. */
+		downloading,
+	}
+
+	/**
 	 * The possible values for the “show custom avatars” option.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -170,6 +190,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/** The time of the last inserted update. */
 	private volatile long time;
+
+	/** The status of this Sone. */
+	private volatile SoneStatus status = SoneStatus.unknown;
 
 	/** The profile of this Sone. */
 	private volatile Profile profile = new Profile(this);
@@ -356,6 +379,30 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public Sone setTime(long time) {
 		this.time = time;
+		return this;
+	}
+
+	/**
+	 * Returns the status of this Sone.
+	 *
+	 * @return The status of this Sone
+	 */
+	public SoneStatus getStatus() {
+		return status;
+	}
+
+	/**
+	 * Sets the new status of this Sone.
+	 *
+	 * @param status
+	 *            The new status of this Sone
+	 * @return This Sone
+	 * @throws IllegalArgumentException
+	 *             if {@code status} is {@code null}
+	 */
+	public Sone setStatus(SoneStatus status) {
+		Validation.begin().isNotNull("Sone Status", status).check();
+		this.status = status;
 		return this;
 	}
 

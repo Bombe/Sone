@@ -177,7 +177,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		jsonSone.put("id", sone.getId());
 		jsonSone.put("name", SoneAccessor.getNiceName(sone));
 		jsonSone.put("local", sone.getInsertUri() != null);
-		jsonSone.put("status", webInterface.getCore().getSoneStatus(sone).name());
+		jsonSone.put("status", sone.getStatus().name());
 		jsonSone.put("modified", webInterface.getCore().isModifiedSone(sone));
 		jsonSone.put("locked", webInterface.getCore().isLocked(sone));
 		jsonSone.put("lastUpdatedUnknown", sone.getTime() == 0);

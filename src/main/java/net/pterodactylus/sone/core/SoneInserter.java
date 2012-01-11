@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.collection.ListBuilder;
@@ -233,7 +233,7 @@ public class SoneInserter extends AbstractService {
 
 				boolean success = false;
 				try {
-					core.setSoneStatus(sone, SoneStatus.inserting);
+					sone.setStatus(SoneStatus.inserting);
 					long insertTime = System.currentTimeMillis();
 					insertInformation.setTime(insertTime);
 					soneInsertListenerManager.fireInsertStarted();
@@ -253,7 +253,7 @@ public class SoneInserter extends AbstractService {
 					soneInsertListenerManager.fireInsertAborted(se1);
 					logger.log(Level.WARNING, "Could not insert Sone “" + sone.getName() + "”!", se1);
 				} finally {
-					core.setSoneStatus(sone, SoneStatus.idle);
+					sone.setStatus(SoneStatus.idle);
 				}
 
 				/*

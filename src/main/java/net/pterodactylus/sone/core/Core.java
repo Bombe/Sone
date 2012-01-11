@@ -42,9 +42,10 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.data.Profile.Field;
+import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -73,26 +74,6 @@ import freenet.keys.FreenetURI;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener, ImageInsertListener {
-
-	/**
-	 * Enumeration for the possible states of a {@link Sone}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	public enum SoneStatus {
-
-		/** The Sone is unknown, i.e. not yet downloaded. */
-		unknown,
-
-		/** The Sone is idle, i.e. not being downloaded or inserted. */
-		idle,
-
-		/** The Sone is currently being inserted. */
-		inserting,
-
-		/** The Sone is currently being downloaded. */
-		downloading,
-	}
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -132,10 +113,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** The FCP interface. */
 	private volatile FcpInterface fcpInterface;
-
-	/** The Sones’ statuses. */
-	/* synchronize access on itself. */
-	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
 
 	/** The times Sones were followed. */
 	private final Map<Sone, Long> soneFollowingTimes = new HashMap<Sone, Long>();
@@ -306,33 +283,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Returns the status of the given Sone.
-	 *
-	 * @param sone
-	 *            The Sone to get the status for
-	 * @return The status of the Sone
-	 */
-	public SoneStatus getSoneStatus(Sone sone) {
-		synchronized (soneStatuses) {
-			return soneStatuses.get(sone);
-		}
-	}
-
-	/**
-	 * Sets the status of the given Sone.
-	 *
-	 * @param sone
-	 *            The Sone to set the status of
-	 * @param soneStatus
-	 *            The status to set
-	 */
-	public void setSoneStatus(Sone sone, SoneStatus soneStatus) {
-		synchronized (soneStatuses) {
-			soneStatuses.put(sone, soneStatus);
-		}
-	}
-
-	/**
 	 * Returns the Sone rescuer for the given local Sone.
 	 *
 	 * @param sone
@@ -488,7 +438,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				localSones.put(id, sone);
-				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -521,7 +470,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
-				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -972,7 +920,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserter.addSoneInsertListener(this);
 			soneInserters.put(sone, soneInserter);
-			setSoneStatus(sone, SoneStatus.idle);
+			sone.setStatus(SoneStatus.idle);
 			loadSone(sone);
 			soneInserter.start();
 			return sone;
@@ -1040,7 +988,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				}
 			}
 			soneDownloader.addSone(sone);
-			setSoneStatus(sone, SoneStatus.unknown);
 			soneDownloaders.execute(new Runnable() {
 
 				@Override
