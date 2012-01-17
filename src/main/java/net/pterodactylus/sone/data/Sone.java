@@ -366,7 +366,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return A copy of the profile
 	 */
-	public synchronized Profile getProfile() {
+	public Profile getProfile() {
 		return new Profile(profile);
 	}
 
@@ -378,7 +378,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param profile
 	 *            The profile to set
 	 */
-	public synchronized void setProfile(Profile profile) {
+	public void setProfile(Profile profile) {
 		this.profile = new Profile(profile);
 	}
 
@@ -472,7 +472,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The new (and only) posts of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setPosts(Collection<Post> posts) {
+	public Sone setPosts(Collection<Post> posts) {
 		synchronized (this) {
 			this.posts.clear();
 			this.posts.addAll(posts);
@@ -487,7 +487,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param post
 	 *            The post to add
 	 */
-	public synchronized void addPost(Post post) {
+	public void addPost(Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
 			logger.log(Level.FINEST, "Adding %s to “%s”.", new Object[] { post, getName() });
 		}
@@ -499,7 +499,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param post
 	 *            The post to remove
 	 */
-	public synchronized void removePost(Post post) {
+	public void removePost(Post post) {
 		if (post.getSone().equals(this)) {
 			posts.remove(post);
 		}
@@ -510,7 +510,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return All replies this Sone made
 	 */
-	public synchronized Set<PostReply> getReplies() {
+	public Set<PostReply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
 
@@ -521,7 +521,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setReplies(Collection<PostReply> replies) {
+	public Sone setReplies(Collection<PostReply> replies) {
 		this.replies.clear();
 		this.replies.addAll(replies);
 		return this;
@@ -534,7 +534,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to add
 	 */
-	public synchronized void addReply(PostReply reply) {
+	public void addReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.add(reply);
 		}
@@ -546,7 +546,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to remove
 	 */
-	public synchronized void removeReply(PostReply reply) {
+	public void removeReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.remove(reply);
 		}
@@ -568,7 +568,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            All liked posts’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setLikePostIds(Set<String> likedPostIds) {
+	public Sone setLikePostIds(Set<String> likedPostIds) {
 		this.likedPostIds.clear();
 		this.likedPostIds.addAll(likedPostIds);
 		return this;
@@ -593,7 +593,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone addLikedPostId(String postId) {
+	public Sone addLikedPostId(String postId) {
 		likedPostIds.add(postId);
 		return this;
 	}
@@ -605,7 +605,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone removeLikedPostId(String postId) {
+	public Sone removeLikedPostId(String postId) {
 		likedPostIds.remove(postId);
 		return this;
 	}
@@ -626,7 +626,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            All liked replies’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setLikeReplyIds(Set<String> likedReplyIds) {
+	public Sone setLikeReplyIds(Set<String> likedReplyIds) {
 		this.likedReplyIds.clear();
 		this.likedReplyIds.addAll(likedReplyIds);
 		return this;
@@ -651,7 +651,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone addLikedReplyId(String replyId) {
+	public Sone addLikedReplyId(String replyId) {
 		likedReplyIds.add(replyId);
 		return this;
 	}
@@ -663,7 +663,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone removeLikedReplyId(String replyId) {
+	public Sone removeLikedReplyId(String replyId) {
 		likedReplyIds.remove(replyId);
 		return this;
 	}
@@ -718,7 +718,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param album
 	 *            The album to add
 	 */
-	public synchronized void addAlbum(Album album) {
+	public void addAlbum(Album album) {
 		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
 		albums.add(album);
 	}
@@ -729,7 +729,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param albums
 	 *            The albums of this Sone
 	 */
-	public synchronized void setAlbums(Collection<? extends Album> albums) {
+	public void setAlbums(Collection<? extends Album> albums) {
 		Validation.begin().isNotNull("Albums", albums).check();
 		this.albums.clear();
 		for (Album album : albums) {
@@ -743,7 +743,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param album
 	 *            The album to remove
 	 */
-	public synchronized void removeAlbum(Album album) {
+	public void removeAlbum(Album album) {
 		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
 		albums.remove(album);
 	}
