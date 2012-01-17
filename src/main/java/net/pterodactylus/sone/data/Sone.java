@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -177,22 +178,22 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	private volatile Client client;
 
 	/** All friend Sones. */
-	private final Set<String> friendSones = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> friendSones = new CopyOnWriteArraySet<String>();
 
 	/** All posts. */
-	private final Set<Post> posts = Collections.synchronizedSet(new HashSet<Post>());
+	private final Set<Post> posts = new CopyOnWriteArraySet<Post>();
 
 	/** All replies. */
-	private final Set<PostReply> replies = Collections.synchronizedSet(new HashSet<PostReply>());
+	private final Set<PostReply> replies = new CopyOnWriteArraySet<PostReply>();
 
 	/** The IDs of all liked posts. */
-	private final Set<String> likedPostIds = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> likedPostIds = new CopyOnWriteArraySet<String>();
 
 	/** The IDs of all liked replies. */
-	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
 
 	/** The albums of this Sone. */
-	private final List<Album> albums = Collections.synchronizedList(new ArrayList<Album>());
+	private final List<Album> albums = new CopyOnWriteArrayList<Album>();
 
 	/** Sone-specific options. */
 	private final Options options = new Options();
