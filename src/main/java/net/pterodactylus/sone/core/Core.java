@@ -137,11 +137,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/* synchronize access on this on itself. */
 	private Map<String, Sone> remoteSones = new HashMap<String, Sone>();
 
-	/** All new Sones. */
-	private Set<String> newSones = new HashSet<String>();
-
 	/** All known Sones. */
-	/* synchronize access on {@link #newSones}. */
 	private Set<String> knownSones = new HashSet<String>();
 
 	/** All posts. */
@@ -500,19 +496,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public boolean isRemoteSone(String id) {
 		synchronized (remoteSones) {
 			return remoteSones.containsKey(id);
-		}
-	}
-
-	/**
-	 * Returns whether the Sone with the given ID is a new Sone.
-	 *
-	 * @param soneId
-	 *            The ID of the sone to check for
-	 * @return {@code true} if the given Sone is new, false otherwise
-	 */
-	public boolean isNewSone(String soneId) {
-		synchronized (newSones) {
-			return !knownSones.contains(soneId) && newSones.contains(soneId);
 		}
 	}
 
@@ -972,12 +955,10 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
-				synchronized (newSones) {
+				synchronized (knownSones) {
 					newSone = !knownSones.contains(sone.getId());
-					if (newSone) {
-						newSones.add(sone.getId());
-					}
 				}
+				sone.setKnown(!newSone);
 				if (newSone) {
 					coreListenerManager.fireNewSoneFound(sone);
 					for (Sone localSone : getLocalSones()) {
@@ -1353,12 +1334,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The Sone to mark as known
 	 */
 	public void markSoneKnown(Sone sone) {
-		synchronized (newSones) {
-			if (newSones.remove(sone.getId())) {
+		if (!sone.isKnown()) {
+			sone.setKnown(true);
+			synchronized (knownSones) {
 				knownSones.add(sone.getId());
-				coreListenerManager.fireMarkSoneKnown(sone);
-				touchConfiguration();
 			}
+			coreListenerManager.fireMarkSoneKnown(sone);
+			touchConfiguration();
 		}
 	}
 
@@ -1569,7 +1551,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setAlbums(topLevelAlbums);
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
-		synchronized (newSones) {
+		synchronized (knownSones) {
 			for (String friend : friends) {
 				knownSones.add(friend);
 			}
@@ -2232,7 +2214,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save known Sones. */
 			int soneCounter = 0;
-			synchronized (newSones) {
+			synchronized (knownSones) {
 				for (String knownSoneId : knownSones) {
 					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSoneId);
 				}
@@ -2361,7 +2343,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (knownSoneId == null) {
 				break;
 			}
-			synchronized (newSones) {
+			synchronized (knownSones) {
 				knownSones.add(knownSoneId);
 			}
 		}
@@ -2554,10 +2536,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (remoteSones) {
 			remoteSones.remove(identity.getId());
 		}
-		synchronized (newSones) {
-			newSones.remove(identity.getId());
-			coreListenerManager.fireSoneRemoved(sone);
-		}
+		coreListenerManager.fireSoneRemoved(sone);
 	}
 
 	//

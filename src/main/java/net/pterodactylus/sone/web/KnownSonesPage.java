@@ -91,7 +91,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 				 */
 				@Override
 				public boolean filterObject(Sone sone) {
-					return webInterface.getCore().isNewSone(sone.getId());
+					return !sone.isKnown();
 				}
 			});
 		} else if ("not-new".equals(filter)) {
@@ -101,7 +101,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 				 */
 				@Override
 				public boolean filterObject(Sone sone) {
-					return !webInterface.getCore().isNewSone(sone.getId());
+					return sone.isKnown();
 				}
 			});
 		}

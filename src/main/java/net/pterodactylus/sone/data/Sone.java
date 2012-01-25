@@ -200,6 +200,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	/** The client used by the Sone. */
 	private volatile Client client;
 
+	/** Whether this Sone is known. */
+	private volatile boolean known;
+
 	/** All friend Sones. */
 	private final Set<String> friendSones = new CopyOnWriteArraySet<String>();
 
@@ -447,6 +450,27 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public Sone setClient(Client client) {
 		this.client = client;
+		return this;
+	}
+
+	/**
+	 * Returns whether this Sone is known.
+	 *
+	 * @return {@code true} if this Sone is known, {@code false} otherwise
+	 */
+	public boolean isKnown() {
+		return known;
+	}
+
+	/**
+	 * Sets whether this Sone is known.
+	 *
+	 * @param known
+	 *            {@code true} if this Sone is known, {@code false} otherwise
+	 * @return This Sone
+	 */
+	public Sone setKnown(boolean known) {
+		this.known = known;
 		return this;
 	}
 
