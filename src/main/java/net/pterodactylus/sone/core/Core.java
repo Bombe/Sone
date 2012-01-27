@@ -143,11 +143,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/** All posts. */
 	private Map<String, Post> posts = new HashMap<String, Post>();
 
-	/** All new posts. */
-	private Set<String> newPosts = new HashSet<String>();
-
 	/** All known posts. */
-	/* synchronize access on {@link #newPosts}. */
 	private Set<String> knownPosts = new HashSet<String>();
 
 	/** All replies. */
@@ -572,20 +568,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				posts.put(postId, post);
 			}
 			return post;
-		}
-	}
-
-	/**
-	 * Returns whether the given post ID is new.
-	 *
-	 * @param postId
-	 *            The post ID
-	 * @return {@code true} if the post is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewPost(String postId) {
-		synchronized (newPosts) {
-			return !knownPosts.contains(postId) && newPosts.contains(postId);
 		}
 	}
 
@@ -1200,15 +1182,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 				List<Post> storedPosts = storedSone.getPosts();
-				synchronized (newPosts) {
+				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
 						post.setSone(storedSone);
 						if (!storedPosts.contains(post)) {
 							if (post.getTime() < getSoneFollowingTime(sone)) {
+								sone.setKnown(true);
 								knownPosts.add(post.getId());
 							} else if (!knownPosts.contains(post.getId())) {
-								newPosts.add(post.getId());
 								coreListenerManager.fireNewPostFound(post);
+							} else {
+								sone.setKnown(true);
 							}
 						}
 						posts.put(post.getId(), post);
@@ -1556,7 +1540,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				knownSones.add(friend);
 			}
 		}
-		synchronized (newPosts) {
+		synchronized (knownPosts) {
 			for (Post post : posts) {
 				knownPosts.add(post.getId());
 			}
@@ -1638,10 +1622,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}
-		synchronized (newPosts) {
-			newPosts.add(post.getId());
-			coreListenerManager.fireNewPostFound(post);
-		}
+		coreListenerManager.fireNewPostFound(post);
 		sone.addPost(post);
 		touchConfiguration();
 		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
@@ -1673,10 +1654,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			posts.remove(post.getId());
 		}
 		coreListenerManager.firePostRemoved(post);
-		synchronized (newPosts) {
-			markPostKnown(post);
-			knownPosts.remove(post.getId());
-		}
+		markPostKnown(post);
 		touchConfiguration();
 	}
 
@@ -1688,8 +1666,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The post to mark as known
 	 */
 	public void markPostKnown(Post post) {
-		synchronized (newPosts) {
-			newPosts.remove(post.getId());
+		post.setKnown(true);
+		synchronized (knownPosts) {
 			if (knownPosts.add(post.getId())) {
 				coreListenerManager.fireMarkPostKnown(post);
 				touchConfiguration();
@@ -2234,7 +2212,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save known posts. */
 			int postCounter = 0;
-			synchronized (newPosts) {
+			synchronized (knownPosts) {
 				for (String knownPostId : knownPosts) {
 					configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
 				}
@@ -2374,7 +2352,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (knownPostId == null) {
 				break;
 			}
-			synchronized (newPosts) {
+			synchronized (knownPosts) {
 				knownPosts.add(knownPostId);
 			}
 		}
@@ -2516,10 +2494,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			return;
 		}
 		synchronized (posts) {
-			synchronized (newPosts) {
+			synchronized (knownPosts) {
 				for (Post post : sone.getPosts()) {
 					posts.remove(post.getId());
-					newPosts.remove(post.getId());
 					coreListenerManager.firePostRemoved(post);
 				}
 			}
@@ -2657,8 +2634,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 *
 		 * @param insertionDelay
 		 *            The insertion delay to validate
-		 * @return {@code true} if the given insertion delay was valid, {@code
-		 *         false} otherwise
+		 * @return {@code true} if the given insertion delay was valid,
+		 *         {@code false} otherwise
 		 */
 		public boolean validateInsertionDelay(Integer insertionDelay) {
 			return options.getIntegerOption("InsertionDelay").validate(insertionDelay);

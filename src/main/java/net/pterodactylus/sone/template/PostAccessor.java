@@ -63,7 +63,7 @@ public class PostAccessor extends ReflectionAccessor {
 			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && (currentSone.isLikedPostId(post.getId()));
 		} else if (member.equals("new")) {
-			return core.isNewPost(post.getId());
+			return !post.isKnown();
 		} else if (member.equals("bookmarked")) {
 			return core.isBookmarked(post);
 		} else if (member.equals("loaded")) {

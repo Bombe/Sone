@@ -65,6 +65,9 @@ public class Post {
 	/** The text of the post. */
 	private volatile String text;
 
+	/** Whether the post is known. */
+	private volatile boolean known;
+
 	/**
 	 * Creates a new post.
 	 *
@@ -216,6 +219,27 @@ public class Post {
 	 */
 	public Post setText(String text) {
 		this.text = text;
+		return this;
+	}
+
+	/**
+	 * Returns whether this post is known.
+	 *
+	 * @return {@code true} if this post is known, {@code false} otherwise
+	 */
+	public boolean isKnown() {
+		return known;
+	}
+
+	/**
+	 * Sets whether this post is known.
+	 *
+	 * @param known
+	 *            {@code true} if this post is known, {@code false} otherwise
+	 * @return This post
+	 */
+	public Post setKnown(boolean known) {
+		this.known = known;
 		return this;
 	}
 
