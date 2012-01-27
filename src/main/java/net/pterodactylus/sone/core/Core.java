@@ -149,9 +149,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/** All replies. */
 	private Map<String, PostReply> replies = new HashMap<String, PostReply>();
 
-	/** All new replies. */
-	private Set<String> newReplies = new HashSet<String>();
-
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
 
@@ -646,20 +643,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		return replies;
-	}
-
-	/**
-	 * Returns whether the reply with the given ID is new.
-	 *
-	 * @param replyId
-	 *            The ID of the reply to check
-	 * @return {@code true} if the reply is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewReply(String replyId) {
-		synchronized (newReplies) {
-			return !knownReplies.contains(replyId) && newReplies.contains(replyId);
-		}
 	}
 
 	/**
@@ -1209,15 +1192,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 				Set<PostReply> storedReplies = storedSone.getReplies();
-				synchronized (newReplies) {
+				synchronized (knownReplies) {
 					for (PostReply reply : sone.getReplies()) {
 						reply.setSone(storedSone);
 						if (!storedReplies.contains(reply)) {
 							if (reply.getTime() < getSoneFollowingTime(sone)) {
+								reply.setKnown(true);
 								knownReplies.add(reply.getId());
 							} else if (!knownReplies.contains(reply.getId())) {
-								newReplies.add(reply.getId());
 								coreListenerManager.fireNewReplyFound(reply);
+							} else {
+								reply.setKnown(true);
 							}
 						}
 						replies.put(reply.getId(), reply);
@@ -1545,7 +1530,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				knownPosts.add(post.getId());
 			}
 		}
-		synchronized (newReplies) {
+		synchronized (knownReplies) {
 			for (PostReply reply : replies) {
 				knownReplies.add(reply.getId());
 			}
@@ -1756,8 +1741,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
-		synchronized (newReplies) {
-			newReplies.add(reply.getId());
+		synchronized (knownReplies) {
 			coreListenerManager.fireNewReplyFound(reply);
 		}
 		sone.addReply(reply);
@@ -1790,7 +1774,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (replies) {
 			replies.remove(reply.getId());
 		}
-		synchronized (newReplies) {
+		synchronized (knownReplies) {
 			markReplyKnown(reply);
 			knownReplies.remove(reply.getId());
 		}
@@ -1806,8 +1790,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The reply to mark as known
 	 */
 	public void markReplyKnown(PostReply reply) {
-		synchronized (newReplies) {
-			newReplies.remove(reply.getId());
+		reply.setKnown(true);
+		synchronized (knownReplies) {
 			if (knownReplies.add(reply.getId())) {
 				coreListenerManager.fireMarkReplyKnown(reply);
 				touchConfiguration();
@@ -2221,7 +2205,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save known replies. */
 			int replyCounter = 0;
-			synchronized (newReplies) {
+			synchronized (knownReplies) {
 				for (String knownReplyId : knownReplies) {
 					configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
 				}
@@ -2364,7 +2348,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (knownReplyId == null) {
 				break;
 			}
-			synchronized (newReplies) {
+			synchronized (knownReplies) {
 				knownReplies.add(knownReplyId);
 			}
 		}
@@ -2502,10 +2486,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 		}
 		synchronized (replies) {
-			synchronized (newReplies) {
+			synchronized (knownReplies) {
 				for (PostReply reply : sone.getReplies()) {
 					replies.remove(reply.getId());
-					newReplies.remove(reply.getId());
 					coreListenerManager.fireReplyRemoved(reply);
 				}
 			}

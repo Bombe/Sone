@@ -69,6 +69,9 @@ public abstract class Reply<T extends Reply<T>> {
 	/** The text of the reply. */
 	private volatile String text;
 
+	/** Whether the reply is known. */
+	private volatile boolean known;
+
 	/**
 	 * Creates a new reply with the given ID.
 	 *
@@ -184,6 +187,28 @@ public abstract class Reply<T extends Reply<T>> {
 	@SuppressWarnings("unchecked")
 	public T setText(String text) {
 		this.text = text;
+		return (T) this;
+	}
+
+	/**
+	 * Returns whether this reply is known.
+	 *
+	 * @return {@code true} if this reply is known, {@code false} otherwise
+	 */
+	public boolean isKnown() {
+		return known;
+	}
+
+	/**
+	 * Sets whether this reply is known.
+	 *
+	 * @param known
+	 *            {@code true} if this reply is known, {@code false} otherwise
+	 * @return This reply
+	 */
+	@SuppressWarnings("unchecked")
+	public T setKnown(boolean known) {
+		this.known = known;
 		return (T) this;
 	}
 

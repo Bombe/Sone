@@ -888,7 +888,7 @@ public class WebInterface implements CoreListener {
 		if (!getMentionedSones(reply.getText()).isEmpty()) {
 			boolean isMentioned = false;
 			for (PostReply existingReply : getCore().getReplies(reply.getPost())) {
-				isMentioned |= getCore().isNewReply(reply.getId()) && !getMentionedSones(existingReply.getText()).isEmpty();
+				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
 			}
 			if (!isMentioned) {
 				mentionNotification.remove(reply.getPost());
