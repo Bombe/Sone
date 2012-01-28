@@ -863,6 +863,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 			sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
+			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
