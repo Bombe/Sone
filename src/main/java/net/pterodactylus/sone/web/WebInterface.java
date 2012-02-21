@@ -583,6 +583,7 @@ public class WebInterface implements CoreListener {
 		Template emptyTemplate = TemplateParser.parse(new StringReader(""));
 		Template loginTemplate = TemplateParser.parse(createReader("/templates/login.html"));
 		Template indexTemplate = TemplateParser.parse(createReader("/templates/index.html"));
+		Template newTemplate = TemplateParser.parse(createReader("/templates/new.html"));
 		Template knownSonesTemplate = TemplateParser.parse(createReader("/templates/knownSones.html"));
 		Template createSoneTemplate = TemplateParser.parse(createReader("/templates/createSone.html"));
 		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
@@ -613,6 +614,7 @@ public class WebInterface implements CoreListener {
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new NewPage(newTemplate, this), "New"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
