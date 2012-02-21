@@ -1650,8 +1650,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public void markPostKnown(Post post) {
 		post.setKnown(true);
 		synchronized (knownPosts) {
+			coreListenerManager.fireMarkPostKnown(post);
 			if (knownPosts.add(post.getId())) {
-				coreListenerManager.fireMarkPostKnown(post);
 				touchConfiguration();
 			}
 		}
@@ -1789,8 +1789,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public void markReplyKnown(PostReply reply) {
 		reply.setKnown(true);
 		synchronized (knownReplies) {
+			coreListenerManager.fireMarkReplyKnown(reply);
 			if (knownReplies.add(reply.getId())) {
-				coreListenerManager.fireMarkReplyKnown(reply);
 				touchConfiguration();
 			}
 		}
