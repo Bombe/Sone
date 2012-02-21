@@ -164,6 +164,29 @@ public class ListNotificationFilters {
 	}
 
 	/**
+	 * Filters the given posts, using {@link #isPostVisible(Sone, Post)} to
+	 * decide whether a post should be contained in the returned list. If
+	 * {@code currentSone} is not {@code null} it is used to filter out posts
+	 * that are from Sones that are not followed or not trusted by the given
+	 * Sone.
+	 *
+	 * @param posts
+	 *            The posts to filter
+	 * @param currentSone
+	 *            The current Sone (may be {@code null})
+	 * @return The filtered posts
+	 */
+	public static List<Post> filterPosts(Collection<Post> posts, Sone currentSone) {
+		List<Post> filteredPosts = new ArrayList<Post>();
+		for (Post post : posts) {
+			if (isPostVisible(currentSone, post)) {
+				filteredPosts.add(post);
+			}
+		}
+		return filteredPosts;
+	}
+
+	/**
 	 * Checks whether a post is visible to the given Sone. A post is not
 	 * considered visible if one of the following statements is true:
 	 * <ul>
