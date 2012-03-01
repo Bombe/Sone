@@ -243,7 +243,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("html", new HtmlFilter());
 		templateContextFactory.addFilter("replace", new ReplaceFilter());
 		templateContextFactory.addFilter("store", new StoreFilter());
-		templateContextFactory.addFilter("l10n", new L10nFilter(getL10n()));
+		templateContextFactory.addFilter("l10n", new L10nFilter(this));
 		templateContextFactory.addFilter("substring", new SubstringFilter());
 		templateContextFactory.addFilter("xml", new XmlFilter());
 		templateContextFactory.addFilter("change", new RequestChangeFilter());
