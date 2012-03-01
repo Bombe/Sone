@@ -67,30 +67,31 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
-	commentElement = (function(postId, author) {
+	(function(postId, author, insertAfterThisElement) {
 		separator = $("<span> · </span>").addClass("separator");
-		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
-			replyElement = $("#sone .post#post-" + postId + " .create-reply");
-			replyElement.removeClass("hidden");
-			replyElement.removeClass("light");
-			(function(replyElement) {
-				replyElement.find("input.reply-input").blur(function() {
-					if ($(this).hasClass("default")) {
-						replyElement.addClass("light");
-					}
-				}).focus(function() {
-					replyElement.removeClass("light");
-				});
-			})(replyElement);
-			textArea = replyElement.find("input.reply-input").focus().data("textarea");
-			if (author != getCurrentSoneId()) {
-				textArea.val(textArea.val() + "@sone://" + author + " ");
-			}
+		getTranslation("WebInterface.Button.Comment", function(text) {
+			commentElement = $("<div><span>" + text + "</span></div>").addClass("show-reply-form").click(function() {
+				replyElement = $("#sone .post#post-" + postId + " .create-reply");
+				replyElement.removeClass("hidden");
+				replyElement.removeClass("light");
+				(function(replyElement) {
+					replyElement.find("input.reply-input").blur(function() {
+						if ($(this).hasClass("default")) {
+							replyElement.addClass("light");
+						}
+					}).focus(function() {
+						replyElement.removeClass("light");
+					});
+				})(replyElement);
+				textArea = replyElement.find("input.reply-input").focus().data("textarea");
+				if (author != getCurrentSoneId()) {
+					textArea.val(textArea.val() + "@sone://" + author + " ");
+				}
+			});
+			$(insertAfterThisElement).after(commentElement.clone(true));
+			$(insertAfterThisElement).after(separator);
 		});
-		return commentElement;
-	})(postId, author);
-	$(insertAfterThisElement).after(commentElement.clone(true));
-	$(insertAfterThisElement).after(separator);
+	})(postId, author, insertAfterThisElement);
 }
 
 var translations = {};
@@ -1923,8 +1924,10 @@ $(document).ready(function() {
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
 		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
 			getTranslation("WebInterface.DefaultText.Reply", function(text) {
-				$("#sone .post").each(function() {
-					ajaxifyPost(this);
+				getTranslation("WebInterface.Button.Comment", function(text) {
+					$("#sone .post").each(function() {
+						ajaxifyPost(this);
+					});
 				});
 			});
 		});
