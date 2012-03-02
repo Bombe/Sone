@@ -1293,8 +1293,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Marks the given Sone as known. If the Sone was {@link #isNewPost(String)
-	 * new} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
+	 * Marks the given Sone as known. If the Sone was not {@link Post#isKnown()
+	 * known} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
 	 *
 	 * @param sone
 	 *            The Sone to mark as known
@@ -1641,8 +1641,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Marks the given post as known, if it is currently a new post (according
-	 * to {@link #isNewPost(String)}).
+	 * Marks the given post as known, if it is currently not a known post
+	 * (according to {@link Post#isKnown()}).
 	 *
 	 * @param post
 	 *            The post to mark as known
@@ -1780,8 +1780,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Marks the given reply as known, if it is currently a new reply (according
-	 * to {@link #isNewReply(String)}).
+	 * Marks the given reply as known, if it is currently not a known reply
+	 * (according to {@link Reply#isKnown()}).
 	 *
 	 * @param reply
 	 *            The reply to mark as known
