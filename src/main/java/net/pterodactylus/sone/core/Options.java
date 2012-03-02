@@ -17,11 +17,8 @@
 
 package net.pterodactylus.sone.core;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.pterodactylus.util.validation.Validator;
@@ -133,7 +130,29 @@ public class Options {
 		private Validator<T> validator;
 
 		/** The option watcher. */
-		private final List<OptionWatcher<T>> optionWatchers = new ArrayList<OptionWatcher<T>>();
+		private final OptionWatcher<T> optionWatcher;
+
+		/**
+		 * Creates a new default option.
+		 *
+		 * @param defaultValue
+		 *            The default value of the option
+		 */
+		public DefaultOption(T defaultValue) {
+			this(defaultValue, (OptionWatcher<T>) null);
+		}
+
+		/**
+		 * Creates a new default option.
+		 *
+		 * @param defaultValue
+		 *            The default value of the option
+		 * @param validator
+		 *            The validator for value validation (may be {@code null})
+		 */
+		public DefaultOption(T defaultValue, Validator<T> validator) {
+			this(defaultValue, validator, null);
+		}
 
 		/**
 		 * Creates a new default option.
@@ -141,9 +160,9 @@ public class Options {
 		 * @param defaultValue
 		 *            The default value of the option
 		 * @param optionWatchers
-		 *            The option watchers
+		 *            The option watchers (may be {@code null})
 		 */
-		public DefaultOption(T defaultValue, OptionWatcher<T>... optionWatchers) {
+		public DefaultOption(T defaultValue, OptionWatcher<T> optionWatchers) {
 			this(defaultValue, null, optionWatchers);
 		}
 
@@ -153,14 +172,14 @@ public class Options {
 		 * @param defaultValue
 		 *            The default value of the option
 		 * @param validator
-		 *            The validator for value validation
-		 * @param optionWatchers
-		 *            The option watchers
+		 *            The validator for value validation (may be {@code null})
+		 * @param optionWatcher
+		 *            The option watcher (may be {@code null})
 		 */
-		public DefaultOption(T defaultValue, Validator<T> validator, OptionWatcher<T>... optionWatchers) {
+		public DefaultOption(T defaultValue, Validator<T> validator, OptionWatcher<T> optionWatcher) {
 			this.defaultValue = defaultValue;
 			this.validator = validator;
-			this.optionWatchers.addAll(Arrays.asList(optionWatchers));
+			this.optionWatcher = optionWatcher;
 		}
 
 		/**
@@ -209,7 +228,7 @@ public class Options {
 			T oldValue = this.value;
 			this.value = value;
 			if (!get().equals(oldValue)) {
-				for (OptionWatcher<T> optionWatcher : optionWatchers) {
+				if (optionWatcher != null) {
 					optionWatcher.optionChanged(this, oldValue, get());
 				}
 			}
