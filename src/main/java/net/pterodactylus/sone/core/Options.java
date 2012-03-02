@@ -355,6 +355,7 @@ public class Options {
 	 * @return The enum option, or {@code null} if there is no enum option with
 	 *         the given name
 	 */
+	@SuppressWarnings("unchecked")
 	public <T extends Enum<T>> Option<T> getEnumOption(String name) {
 		return (Option<T>) enumOptions.get(name);
 	}
