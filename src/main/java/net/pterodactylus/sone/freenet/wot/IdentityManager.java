@@ -45,6 +45,7 @@ import net.pterodactylus.util.service.AbstractService;
 public class IdentityManager extends AbstractService {
 
 	/** Object used for synchronization. */
+	@SuppressWarnings("hiding")
 	private final Object syncObject = new Object() {
 		/* inner class for better lock names. */
 	};
