@@ -807,7 +807,7 @@ function ajaxifyPost(postElement) {
 			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
 			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
 			return false;
-		})
+		});
 	});
 
 	/* ajaxify author/post links */
@@ -1063,7 +1063,7 @@ function ajaxifyNotification(notification) {
 	}
 	notification.find("form.mark-as-read button").click(function() {
 		allIds = $(":input[name=id]", this.form).val().split(" ");
-		for (index = 0; index < allIds.length; index += 16) {
+		for (var index = 0; index < allIds.length; index += 16) {
 			ids = allIds.slice(index, index + 16).join(" ");
 			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": ids});
 		}
