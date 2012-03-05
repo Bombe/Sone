@@ -138,9 +138,9 @@ import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
 import freenet.clients.http.SessionManager;
+import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
-import freenet.clients.http.SessionManager.Session;
 import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
