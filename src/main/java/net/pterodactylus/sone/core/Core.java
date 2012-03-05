@@ -1655,6 +1655,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				touchConfiguration();
 			}
 		}
+		for (PostReply reply : getReplies(post)) {
+			markReplyKnown(reply);
+		}
 	}
 
 	/**

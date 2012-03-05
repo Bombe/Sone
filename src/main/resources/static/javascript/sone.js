@@ -847,12 +847,14 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* mark everything as known on click. */
-	$(postElement).click(function(event) {
-		if ($(event.target).hasClass("click-to-show")) {
-			return false;
-		}
-		markPostAsKnown(this);
-	});
+	(function(postElement) {
+		$(postElement).click(function(event) {
+			if ($(event.target).hasClass("click-to-show")) {
+				return false;
+			}
+			markPostAsKnown(postElement, false);
+		});
+	})(postElement);
 
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
@@ -1536,7 +1538,7 @@ function markPostAsKnown(postElements, skipRequest) {
 		}
 		$(".click-to-show", postElement).removeClass("new");
 	});
-	markReplyAsKnown($(postElements).find(".reply"));
+	markReplyAsKnown($(postElements).find(".reply"), true);
 }
 
 function markReplyAsKnown(replyElements, skipRequest) {
