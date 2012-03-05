@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
-import freenet.l10n.BaseL10n;
 
 /**
  * {@link Filter} implementation replaces {@link String} values with their
@@ -35,17 +35,17 @@ import freenet.l10n.BaseL10n;
  */
 public class L10nFilter implements Filter {
 
-	/** The l10n handler. */
-	private final BaseL10n l10n;
+	/** The web interface. */
+	private final WebInterface webInterface;
 
 	/**
 	 * Creates a new L10n filter.
 	 *
-	 * @param l10n
-	 *            The l10n handler
+	 * @param webInterface
+	 *            The Sone web interface
 	 */
-	public L10nFilter(BaseL10n l10n) {
-		this.l10n = l10n;
+	public L10nFilter(WebInterface webInterface) {
+		this.webInterface = webInterface;
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class L10nFilter implements Filter {
 	@Override
 	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
 		if (parameters.isEmpty()) {
-			return l10n.getString(String.valueOf(data));
+			return webInterface.getL10n().getString(String.valueOf(data));
 		}
 		List<Object> parameterValues = new ArrayList<Object>();
 		int parameterIndex = 0;
@@ -68,6 +68,6 @@ public class L10nFilter implements Filter {
 			parameterValues.add(value);
 			++parameterIndex;
 		}
-		return new MessageFormat(l10n.getString(String.valueOf(data)), new Locale(l10n.getSelectedLanguage().shortCode)).format(parameterValues.toArray());
+		return new MessageFormat(webInterface.getL10n().getString(String.valueOf(data)), new Locale(webInterface.getL10n().getSelectedLanguage().shortCode)).format(parameterValues.toArray());
 	}
 }

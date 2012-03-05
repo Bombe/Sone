@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -40,11 +40,12 @@ import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -73,26 +74,6 @@ import freenet.keys.FreenetURI;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener, ImageInsertListener {
-
-	/**
-	 * Enumeration for the possible states of a {@link Sone}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	public enum SoneStatus {
-
-		/** The Sone is unknown, i.e. not yet downloaded. */
-		unknown,
-
-		/** The Sone is idle, i.e. not being downloaded or inserted. */
-		idle,
-
-		/** The Sone is currently being inserted. */
-		inserting,
-
-		/** The Sone is currently being downloaded. */
-		downloading,
-	}
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -133,10 +114,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/** The FCP interface. */
 	private volatile FcpInterface fcpInterface;
 
-	/** The Sones’ statuses. */
-	/* synchronize access on itself. */
-	private final Map<Sone, SoneStatus> soneStatuses = new HashMap<Sone, SoneStatus>();
-
 	/** The times Sones were followed. */
 	private final Map<Sone, Long> soneFollowingTimes = new HashMap<Sone, Long>();
 
@@ -160,28 +137,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/* synchronize access on this on itself. */
 	private Map<String, Sone> remoteSones = new HashMap<String, Sone>();
 
-	/** All new Sones. */
-	private Set<String> newSones = new HashSet<String>();
-
 	/** All known Sones. */
-	/* synchronize access on {@link #newSones}. */
 	private Set<String> knownSones = new HashSet<String>();
 
 	/** All posts. */
 	private Map<String, Post> posts = new HashMap<String, Post>();
 
-	/** All new posts. */
-	private Set<String> newPosts = new HashSet<String>();
-
 	/** All known posts. */
-	/* synchronize access on {@link #newPosts}. */
 	private Set<String> knownPosts = new HashSet<String>();
 
 	/** All replies. */
 	private Map<String, PostReply> replies = new HashMap<String, PostReply>();
-
-	/** All new replies. */
-	private Set<String> newReplies = new HashSet<String>();
 
 	/** All known replies. */
 	private Set<String> knownReplies = new HashSet<String>();
@@ -303,33 +269,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void setFcpInterface(FcpInterface fcpInterface) {
 		this.fcpInterface = fcpInterface;
-	}
-
-	/**
-	 * Returns the status of the given Sone.
-	 *
-	 * @param sone
-	 *            The Sone to get the status for
-	 * @return The status of the Sone
-	 */
-	public SoneStatus getSoneStatus(Sone sone) {
-		synchronized (soneStatuses) {
-			return soneStatuses.get(sone);
-		}
-	}
-
-	/**
-	 * Sets the status of the given Sone.
-	 *
-	 * @param sone
-	 *            The Sone to set the status of
-	 * @param soneStatus
-	 *            The status to set
-	 */
-	public void setSoneStatus(Sone sone, SoneStatus soneStatus) {
-		synchronized (soneStatuses) {
-			soneStatuses.put(sone, soneStatus);
-		}
 	}
 
 	/**
@@ -488,7 +427,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if ((sone == null) && create) {
 				sone = new Sone(id);
 				localSones.put(id, sone);
-				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -521,7 +459,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
 				sone = new Sone(id);
 				remoteSones.put(id, sone);
-				setSoneStatus(sone, SoneStatus.unknown);
 			}
 			return sone;
 		}
@@ -552,19 +489,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public boolean isRemoteSone(String id) {
 		synchronized (remoteSones) {
 			return remoteSones.containsKey(id);
-		}
-	}
-
-	/**
-	 * Returns whether the Sone with the given ID is a new Sone.
-	 *
-	 * @param soneId
-	 *            The ID of the sone to check for
-	 * @return {@code true} if the given Sone is new, false otherwise
-	 */
-	public boolean isNewSone(String soneId) {
-		synchronized (newSones) {
-			return !knownSones.contains(soneId) && newSones.contains(soneId);
 		}
 	}
 
@@ -645,20 +569,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Returns whether the given post ID is new.
-	 *
-	 * @param postId
-	 *            The post ID
-	 * @return {@code true} if the post is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewPost(String postId) {
-		synchronized (newPosts) {
-			return !knownPosts.contains(postId) && newPosts.contains(postId);
-		}
-	}
-
-	/**
 	 * Returns all posts that have the given Sone as recipient.
 	 *
 	 * @see Post#getRecipient()
@@ -733,20 +643,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		}
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		return replies;
-	}
-
-	/**
-	 * Returns whether the reply with the given ID is new.
-	 *
-	 * @param replyId
-	 *            The ID of the reply to check
-	 * @return {@code true} if the reply is considered to be new, {@code false}
-	 *         otherwise
-	 */
-	public boolean isNewReply(String replyId) {
-		synchronized (newReplies) {
-			return !knownReplies.contains(replyId) && newReplies.contains(replyId);
-		}
 	}
 
 	/**
@@ -967,12 +863,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 			sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
+			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
 			localSones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserter.addSoneInsertListener(this);
 			soneInserters.put(sone, soneInserter);
-			setSoneStatus(sone, SoneStatus.idle);
+			sone.setStatus(SoneStatus.idle);
 			loadSone(sone);
 			soneInserter.start();
 			return sone;
@@ -1024,12 +921,10 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
-				synchronized (newSones) {
+				synchronized (knownSones) {
 					newSone = !knownSones.contains(sone.getId());
-					if (newSone) {
-						newSones.add(sone.getId());
-					}
 				}
+				sone.setKnown(!newSone);
 				if (newSone) {
 					coreListenerManager.fireNewSoneFound(sone);
 					for (Sone localSone : getLocalSones()) {
@@ -1040,7 +935,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				}
 			}
 			soneDownloader.addSone(sone);
-			setSoneStatus(sone, SoneStatus.unknown);
 			soneDownloaders.execute(new Runnable() {
 
 				@Override
@@ -1272,14 +1166,14 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 				List<Post> storedPosts = storedSone.getPosts();
-				synchronized (newPosts) {
+				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
-						post.setSone(storedSone);
+						post.setSone(storedSone).setKnown(knownPosts.contains(post.getId()));
 						if (!storedPosts.contains(post)) {
 							if (post.getTime() < getSoneFollowingTime(sone)) {
 								knownPosts.add(post.getId());
 							} else if (!knownPosts.contains(post.getId())) {
-								newPosts.add(post.getId());
+								sone.setKnown(false);
 								coreListenerManager.fireNewPostFound(post);
 							}
 						}
@@ -1297,14 +1191,14 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					}
 				}
 				Set<PostReply> storedReplies = storedSone.getReplies();
-				synchronized (newReplies) {
+				synchronized (knownReplies) {
 					for (PostReply reply : sone.getReplies()) {
-						reply.setSone(storedSone);
+						reply.setSone(storedSone).setKnown(knownReplies.contains(reply.getId()));
 						if (!storedReplies.contains(reply)) {
 							if (reply.getTime() < getSoneFollowingTime(sone)) {
 								knownReplies.add(reply.getId());
 							} else if (!knownReplies.contains(reply.getId())) {
-								newReplies.add(reply.getId());
+								reply.setKnown(false);
 								coreListenerManager.fireNewReplyFound(reply);
 							}
 						}
@@ -1399,19 +1293,20 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Marks the given Sone as known. If the Sone was {@link #isNewPost(String)
-	 * new} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
+	 * Marks the given Sone as known. If the Sone was not {@link Post#isKnown()
+	 * known} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
 	 *
 	 * @param sone
 	 *            The Sone to mark as known
 	 */
 	public void markSoneKnown(Sone sone) {
-		synchronized (newSones) {
-			if (newSones.remove(sone.getId())) {
+		if (!sone.isKnown()) {
+			sone.setKnown(true);
+			synchronized (knownSones) {
 				knownSones.add(sone.getId());
-				coreListenerManager.fireMarkSoneKnown(sone);
-				touchConfiguration();
 			}
+			coreListenerManager.fireMarkSoneKnown(sone);
+			touchConfiguration();
 		}
 	}
 
@@ -1622,17 +1517,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setAlbums(topLevelAlbums);
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
-		synchronized (newSones) {
+		synchronized (knownSones) {
 			for (String friend : friends) {
 				knownSones.add(friend);
 			}
 		}
-		synchronized (newPosts) {
+		synchronized (knownPosts) {
 			for (Post post : posts) {
 				knownPosts.add(post.getId());
 			}
 		}
-		synchronized (newReplies) {
+		synchronized (knownReplies) {
 			for (PostReply reply : replies) {
 				knownReplies.add(reply.getId());
 			}
@@ -1709,10 +1604,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}
-		synchronized (newPosts) {
-			newPosts.add(post.getId());
-			coreListenerManager.fireNewPostFound(post);
-		}
+		coreListenerManager.fireNewPostFound(post);
 		sone.addPost(post);
 		touchConfiguration();
 		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
@@ -1744,27 +1636,27 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			posts.remove(post.getId());
 		}
 		coreListenerManager.firePostRemoved(post);
-		synchronized (newPosts) {
-			markPostKnown(post);
-			knownPosts.remove(post.getId());
-		}
+		markPostKnown(post);
 		touchConfiguration();
 	}
 
 	/**
-	 * Marks the given post as known, if it is currently a new post (according
-	 * to {@link #isNewPost(String)}).
+	 * Marks the given post as known, if it is currently not a known post
+	 * (according to {@link Post#isKnown()}).
 	 *
 	 * @param post
 	 *            The post to mark as known
 	 */
 	public void markPostKnown(Post post) {
-		synchronized (newPosts) {
-			if (newPosts.remove(post.getId())) {
-				knownPosts.add(post.getId());
-				coreListenerManager.fireMarkPostKnown(post);
+		post.setKnown(true);
+		synchronized (knownPosts) {
+			coreListenerManager.fireMarkPostKnown(post);
+			if (knownPosts.add(post.getId())) {
 				touchConfiguration();
 			}
+		}
+		for (PostReply reply : getReplies(post)) {
+			markReplyKnown(reply);
 		}
 	}
 
@@ -1849,8 +1741,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
-		synchronized (newReplies) {
-			newReplies.add(reply.getId());
+		synchronized (knownReplies) {
 			coreListenerManager.fireNewReplyFound(reply);
 		}
 		sone.addReply(reply);
@@ -1883,7 +1774,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (replies) {
 			replies.remove(reply.getId());
 		}
-		synchronized (newReplies) {
+		synchronized (knownReplies) {
 			markReplyKnown(reply);
 			knownReplies.remove(reply.getId());
 		}
@@ -1892,17 +1783,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Marks the given reply as known, if it is currently a new reply (according
-	 * to {@link #isNewReply(String)}).
+	 * Marks the given reply as known, if it is currently not a known reply
+	 * (according to {@link Reply#isKnown()}).
 	 *
 	 * @param reply
 	 *            The reply to mark as known
 	 */
 	public void markReplyKnown(PostReply reply) {
-		synchronized (newReplies) {
-			if (newReplies.remove(reply.getId())) {
-				knownReplies.add(reply.getId());
-				coreListenerManager.fireMarkReplyKnown(reply);
+		reply.setKnown(true);
+		synchronized (knownReplies) {
+			coreListenerManager.fireMarkReplyKnown(reply);
+			if (knownReplies.add(reply.getId())) {
 				touchConfiguration();
 			}
 		}
@@ -2285,7 +2176,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save known Sones. */
 			int soneCounter = 0;
-			synchronized (newSones) {
+			synchronized (knownSones) {
 				for (String knownSoneId : knownSones) {
 					configuration.getStringValue("KnownSone/" + soneCounter++ + "/ID").setValue(knownSoneId);
 				}
@@ -2305,7 +2196,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save known posts. */
 			int postCounter = 0;
-			synchronized (newPosts) {
+			synchronized (knownPosts) {
 				for (String knownPostId : knownPosts) {
 					configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
 				}
@@ -2314,7 +2205,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			/* save known replies. */
 			int replyCounter = 0;
-			synchronized (newReplies) {
+			synchronized (knownReplies) {
 				for (String knownReplyId : knownReplies) {
 					configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
 				}
@@ -2414,7 +2305,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (knownSoneId == null) {
 				break;
 			}
-			synchronized (newSones) {
+			synchronized (knownSones) {
 				knownSones.add(knownSoneId);
 			}
 		}
@@ -2445,7 +2336,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (knownPostId == null) {
 				break;
 			}
-			synchronized (newPosts) {
+			synchronized (knownPosts) {
 				knownPosts.add(knownPostId);
 			}
 		}
@@ -2457,7 +2348,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (knownReplyId == null) {
 				break;
 			}
-			synchronized (newReplies) {
+			synchronized (knownReplies) {
 				knownReplies.add(knownReplyId);
 			}
 		}
@@ -2587,19 +2478,17 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			return;
 		}
 		synchronized (posts) {
-			synchronized (newPosts) {
+			synchronized (knownPosts) {
 				for (Post post : sone.getPosts()) {
 					posts.remove(post.getId());
-					newPosts.remove(post.getId());
 					coreListenerManager.firePostRemoved(post);
 				}
 			}
 		}
 		synchronized (replies) {
-			synchronized (newReplies) {
+			synchronized (knownReplies) {
 				for (PostReply reply : sone.getReplies()) {
 					replies.remove(reply.getId());
-					newReplies.remove(reply.getId());
 					coreListenerManager.fireReplyRemoved(reply);
 				}
 			}
@@ -2607,10 +2496,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (remoteSones) {
 			remoteSones.remove(identity.getId());
 		}
-		synchronized (newSones) {
-			newSones.remove(identity.getId());
-			coreListenerManager.fireSoneRemoved(sone);
-		}
+		coreListenerManager.fireSoneRemoved(sone);
 	}
 
 	//
@@ -2731,8 +2617,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 *
 		 * @param insertionDelay
 		 *            The insertion delay to validate
-		 * @return {@code true} if the given insertion delay was valid, {@code
-		 *         false} otherwise
+		 * @return {@code true} if the given insertion delay was valid,
+		 *         {@code false} otherwise
 		 */
 		public boolean validateInsertionDelay(Integer insertionDelay) {
 			return options.getIntegerOption("InsertionDelay").validate(insertionDelay);

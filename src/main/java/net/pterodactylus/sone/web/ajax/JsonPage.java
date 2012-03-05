@@ -28,8 +28,8 @@ import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.json.JsonUtils;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
-import freenet.clients.http.ToadletContext;
 import freenet.clients.http.SessionManager.Session;
+import freenet.clients.http.ToadletContext;
 
 /**
  * A JSON page is a specialized {@link Page} that will always return a JSON

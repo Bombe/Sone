@@ -71,7 +71,8 @@ public class ImageLinkFilter implements Filter {
 			image = core.getImage((String) data, false);
 		} else if (data instanceof Image) {
 			image = (Image) data;
-		} else {
+		}
+		if (image == null) {
 			return null;
 		}
 		String imageClass = parameters.get("class");

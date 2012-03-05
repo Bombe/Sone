@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -34,6 +33,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
@@ -153,7 +153,7 @@ public class SoneDownloader extends AbstractService {
 	public Sone fetchSone(Sone sone, FreenetURI soneUri, boolean fetchOnly) {
 		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
-		core.setSoneStatus(sone, SoneStatus.downloading);
+		sone.setStatus(SoneStatus.downloading);
 		try {
 			Pair<FreenetURI, FetchResult> fetchResults = freenetInterface.fetchUri(requestUri);
 			if (fetchResults == null) {
@@ -170,7 +170,7 @@ public class SoneDownloader extends AbstractService {
 			}
 			return parsedSone;
 		} finally {
-			core.setSoneStatus(sone, (sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
+			sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 		}
 	}
 

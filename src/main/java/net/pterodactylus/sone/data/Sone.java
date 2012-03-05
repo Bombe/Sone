@@ -21,9 +21,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,6 +47,26 @@ import freenet.keys.FreenetURI;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Sone implements Fingerprintable, Comparable<Sone> {
+
+	/**
+	 * Enumeration for the possible states of a {@link Sone}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public enum SoneStatus {
+
+		/** The Sone is unknown, i.e. not yet downloaded. */
+		unknown,
+
+		/** The Sone is idle, i.e. not being downloaded or inserted. */
+		idle,
+
+		/** The Sone is currently being inserted. */
+		inserting,
+
+		/** The Sone is currently being downloaded. */
+		downloading,
+	}
 
 	/**
 	 * The possible values for the “show custom avatars” option.
@@ -170,29 +191,35 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	/** The time of the last inserted update. */
 	private volatile long time;
 
+	/** The status of this Sone. */
+	private volatile SoneStatus status = SoneStatus.unknown;
+
 	/** The profile of this Sone. */
 	private volatile Profile profile = new Profile(this);
 
 	/** The client used by the Sone. */
 	private volatile Client client;
 
+	/** Whether this Sone is known. */
+	private volatile boolean known;
+
 	/** All friend Sones. */
-	private final Set<String> friendSones = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> friendSones = new CopyOnWriteArraySet<String>();
 
 	/** All posts. */
-	private final Set<Post> posts = Collections.synchronizedSet(new HashSet<Post>());
+	private final Set<Post> posts = new CopyOnWriteArraySet<Post>();
 
 	/** All replies. */
-	private final Set<PostReply> replies = Collections.synchronizedSet(new HashSet<PostReply>());
+	private final Set<PostReply> replies = new CopyOnWriteArraySet<PostReply>();
 
 	/** The IDs of all liked posts. */
-	private final Set<String> likedPostIds = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> likedPostIds = new CopyOnWriteArraySet<String>();
 
 	/** The IDs of all liked replies. */
-	private final Set<String> likedReplyIds = Collections.synchronizedSet(new HashSet<String>());
+	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
 
 	/** The albums of this Sone. */
-	private final List<Album> albums = Collections.synchronizedList(new ArrayList<Album>());
+	private final List<Album> albums = new CopyOnWriteArrayList<Album>();
 
 	/** Sone-specific options. */
 	private final Options options = new Options();
@@ -359,13 +386,37 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
+	 * Returns the status of this Sone.
+	 *
+	 * @return The status of this Sone
+	 */
+	public SoneStatus getStatus() {
+		return status;
+	}
+
+	/**
+	 * Sets the new status of this Sone.
+	 *
+	 * @param status
+	 *            The new status of this Sone
+	 * @return This Sone
+	 * @throws IllegalArgumentException
+	 *             if {@code status} is {@code null}
+	 */
+	public Sone setStatus(SoneStatus status) {
+		Validation.begin().isNotNull("Sone Status", status).check();
+		this.status = status;
+		return this;
+	}
+
+	/**
 	 * Returns a copy of the profile. If you want to update values in the
 	 * profile of this Sone, update the values in the returned {@link Profile}
 	 * and use {@link #setProfile(Profile)} to change the profile in this Sone.
 	 *
 	 * @return A copy of the profile
 	 */
-	public synchronized Profile getProfile() {
+	public Profile getProfile() {
 		return new Profile(profile);
 	}
 
@@ -377,7 +428,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param profile
 	 *            The profile to set
 	 */
-	public synchronized void setProfile(Profile profile) {
+	public void setProfile(Profile profile) {
 		this.profile = new Profile(profile);
 	}
 
@@ -399,6 +450,27 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public Sone setClient(Client client) {
 		this.client = client;
+		return this;
+	}
+
+	/**
+	 * Returns whether this Sone is known.
+	 *
+	 * @return {@code true} if this Sone is known, {@code false} otherwise
+	 */
+	public boolean isKnown() {
+		return known;
+	}
+
+	/**
+	 * Sets whether this Sone is known.
+	 *
+	 * @param known
+	 *            {@code true} if this Sone is known, {@code false} otherwise
+	 * @return This Sone
+	 */
+	public Sone setKnown(boolean known) {
+		this.known = known;
 		return this;
 	}
 
@@ -471,7 +543,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The new (and only) posts of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setPosts(Collection<Post> posts) {
+	public Sone setPosts(Collection<Post> posts) {
 		synchronized (this) {
 			this.posts.clear();
 			this.posts.addAll(posts);
@@ -486,7 +558,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param post
 	 *            The post to add
 	 */
-	public synchronized void addPost(Post post) {
+	public void addPost(Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
 			logger.log(Level.FINEST, "Adding %s to “%s”.", new Object[] { post, getName() });
 		}
@@ -498,7 +570,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param post
 	 *            The post to remove
 	 */
-	public synchronized void removePost(Post post) {
+	public void removePost(Post post) {
 		if (post.getSone().equals(this)) {
 			posts.remove(post);
 		}
@@ -509,7 +581,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return All replies this Sone made
 	 */
-	public synchronized Set<PostReply> getReplies() {
+	public Set<PostReply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
 
@@ -520,7 +592,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setReplies(Collection<PostReply> replies) {
+	public Sone setReplies(Collection<PostReply> replies) {
 		this.replies.clear();
 		this.replies.addAll(replies);
 		return this;
@@ -533,7 +605,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to add
 	 */
-	public synchronized void addReply(PostReply reply) {
+	public void addReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.add(reply);
 		}
@@ -545,7 +617,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 *            The reply to remove
 	 */
-	public synchronized void removeReply(PostReply reply) {
+	public void removeReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.remove(reply);
 		}
@@ -567,7 +639,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            All liked posts’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setLikePostIds(Set<String> likedPostIds) {
+	public Sone setLikePostIds(Set<String> likedPostIds) {
 		this.likedPostIds.clear();
 		this.likedPostIds.addAll(likedPostIds);
 		return this;
@@ -592,7 +664,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone addLikedPostId(String postId) {
+	public Sone addLikedPostId(String postId) {
 		likedPostIds.add(postId);
 		return this;
 	}
@@ -604,7 +676,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone removeLikedPostId(String postId) {
+	public Sone removeLikedPostId(String postId) {
 		likedPostIds.remove(postId);
 		return this;
 	}
@@ -625,7 +697,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            All liked replies’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone setLikeReplyIds(Set<String> likedReplyIds) {
+	public Sone setLikeReplyIds(Set<String> likedReplyIds) {
 		this.likedReplyIds.clear();
 		this.likedReplyIds.addAll(likedReplyIds);
 		return this;
@@ -650,7 +722,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone addLikedReplyId(String replyId) {
+	public Sone addLikedReplyId(String replyId) {
 		likedReplyIds.add(replyId);
 		return this;
 	}
@@ -662,7 +734,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	public synchronized Sone removeLikedReplyId(String replyId) {
+	public Sone removeLikedReplyId(String replyId) {
 		likedReplyIds.remove(replyId);
 		return this;
 	}
@@ -717,7 +789,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param album
 	 *            The album to add
 	 */
-	public synchronized void addAlbum(Album album) {
+	public void addAlbum(Album album) {
 		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
 		albums.add(album);
 	}
@@ -728,7 +800,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param albums
 	 *            The albums of this Sone
 	 */
-	public synchronized void setAlbums(Collection<? extends Album> albums) {
+	public void setAlbums(Collection<? extends Album> albums) {
 		Validation.begin().isNotNull("Albums", albums).check();
 		this.albums.clear();
 		for (Album album : albums) {
@@ -742,7 +814,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * @param album
 	 *            The album to remove
 	 */
-	public synchronized void removeAlbum(Album album) {
+	public void removeAlbum(Album album) {
 		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
 		albums.remove(album);
 	}

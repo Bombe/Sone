@@ -1,0 +1,20 @@
+<%include include/head.html>
+
+	<div class="page-id hidden">new</div>
+
+	<h1><%= Page.New.Page.Title|l10n|html></h1>
+
+	<%include include/updateStatus.html>
+
+	<div id="posts">
+		<%= page|store key=pageParameter>
+		<%include include/pagination.html paginationName==pagination-index>
+		<%foreach pagination.items post>
+			<%include include/viewPost.html>
+		<%foreachelse>
+			<div><%= Page.New.NothingNew|l10n|html></div>
+		<%/foreach>
+		<%include include/pagination.html>
+	</div>
+
+<%include include/tail.html>

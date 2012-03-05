@@ -60,21 +60,28 @@ public class ProfileAccessor extends ReflectionAccessor {
 				/* not logged in? don’t show custom avatars, then. */
 				return null;
 			}
+			String avatarId = profile.getAvatar();
+			if (avatarId == null) {
+				return null;
+			}
+			if (core.getImage(avatarId, false) == null) {
+				/* avatar ID but no matching image? show nothing. */
+				return null;
+			}
 			Sone remoteSone = profile.getSone();
 			if (core.isLocalSone(remoteSone)) {
 				/* always show your own avatars. */
-				return profile.getAvatar();
+				return avatarId;
 			}
 			ShowCustomAvatars showCustomAvatars = currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get();
 			if (showCustomAvatars == ShowCustomAvatars.NEVER) {
 				return null;
 			}
-			String avatarId = profile.getAvatar();
-			if ((showCustomAvatars == ShowCustomAvatars.ALWAYS) || (avatarId == null)) {
+			if (showCustomAvatars == ShowCustomAvatars.ALWAYS) {
 				return avatarId;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.FOLLOWED) && currentSone.hasFriend(remoteSone.getId())) {
-				return avatarId;
+			if (showCustomAvatars == ShowCustomAvatars.FOLLOWED) {
+				return currentSone.hasFriend(remoteSone.getId()) ? avatarId : null;
 			}
 			Trust trust = core.getTrust(currentSone, remoteSone);
 			if (trust == null) {
@@ -83,7 +90,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 			if ((showCustomAvatars == ShowCustomAvatars.MANUALLY_TRUSTED) && (trust.getExplicit() != null) && (trust.getExplicit() > 0)) {
 				return avatarId;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.TRUSTED) && ((trust.getExplicit() != null) && (trust.getExplicit() > 0)) || ((trust.getImplicit() != null) && (trust.getImplicit() > 0))) {
+			if ((showCustomAvatars == ShowCustomAvatars.TRUSTED) && (((trust.getExplicit() != null) && (trust.getExplicit() > 0)) || ((trust.getImplicit() != null) && (trust.getImplicit() > 0)))) {
 				return avatarId;
 			}
 			return null;

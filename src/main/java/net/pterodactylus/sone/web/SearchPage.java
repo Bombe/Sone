@@ -67,6 +67,7 @@ public class SearchPage extends SoneTemplatePage {
 	/** Short-term cache. */
 	private final Cache<List<Phrase>, Set<Hit<Post>>> hitCache = new MemoryCache<List<Phrase>, Set<Hit<Post>>>(new ValueRetriever<List<Phrase>, Set<Hit<Post>>>() {
 
+		@Override
 		@SuppressWarnings("synthetic-access")
 		public CacheItem<Set<Hit<Post>>> retrieve(List<Phrase> phrases) throws CacheException {
 			Set<Post> posts = new HashSet<Post>();

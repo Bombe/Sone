@@ -67,30 +67,31 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
 		return;
 	}
-	commentElement = (function(postId, author) {
+	(function(postId, author, insertAfterThisElement) {
 		separator = $("<span> · </span>").addClass("separator");
-		var commentElement = $("<div><span>Comment</span></div>").addClass("show-reply-form").click(function() {
-			replyElement = $("#sone .post#post-" + postId + " .create-reply");
-			replyElement.removeClass("hidden");
-			replyElement.removeClass("light");
-			(function(replyElement) {
-				replyElement.find("input.reply-input").blur(function() {
-					if ($(this).hasClass("default")) {
-						replyElement.addClass("light");
-					}
-				}).focus(function() {
-					replyElement.removeClass("light");
-				});
-			})(replyElement);
-			textArea = replyElement.find("input.reply-input").focus().data("textarea");
-			if (author != getCurrentSoneId()) {
-				textArea.val(textArea.val() + "@sone://" + author + " ");
-			}
+		getTranslation("WebInterface.Button.Comment", function(text) {
+			commentElement = $("<div><span>" + text + "</span></div>").addClass("show-reply-form").click(function() {
+				replyElement = $("#sone .post#post-" + postId + " .create-reply");
+				replyElement.removeClass("hidden");
+				replyElement.removeClass("light");
+				(function(replyElement) {
+					replyElement.find("input.reply-input").blur(function() {
+						if ($(this).hasClass("default")) {
+							replyElement.addClass("light");
+						}
+					}).focus(function() {
+						replyElement.removeClass("light");
+					});
+				})(replyElement);
+				textArea = replyElement.find("input.reply-input").focus().data("textarea");
+				if (author != getCurrentSoneId()) {
+					textArea.val(textArea.val() + "@sone://" + author + " ");
+				}
+			});
+			$(insertAfterThisElement).after(commentElement.clone(true));
+			$(insertAfterThisElement).after(separator);
 		});
-		return commentElement;
-	})(postId, author);
-	$(insertAfterThisElement).after(commentElement.clone(true));
-	$(insertAfterThisElement).after(separator);
+	})(postId, author, insertAfterThisElement);
 }
 
 var translations = {};
@@ -806,7 +807,7 @@ function ajaxifyPost(postElement) {
 			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
 			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
 			return false;
-		})
+		});
 	});
 
 	/* ajaxify author/post links */
@@ -846,12 +847,14 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* mark everything as known on click. */
-	$(postElement).click(function(event) {
-		if ($(event.target).hasClass("click-to-show")) {
-			return false;
-		}
-		markPostAsKnown(this);
-	});
+	(function(postElement) {
+		$(postElement).click(function(event) {
+			if ($(event.target).hasClass("click-to-show")) {
+				return false;
+			}
+			markPostAsKnown(postElement, false);
+		});
+	})(postElement);
 
 	/* hide reply input field. */
 	$(postElement).find(".create-reply").addClass("hidden");
@@ -874,7 +877,7 @@ function ajaxifyPost(postElement) {
 		}
 	});
 	(function(postElement) {
-		var soneId = $(".sone-menu-id", postElement).text();
+		var soneId = $(".sone-menu-id:first", postElement).text();
 		$(".sone-post-menu .follow", postElement).click(function() {
 			var followElement = this;
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
@@ -1062,7 +1065,7 @@ function ajaxifyNotification(notification) {
 	}
 	notification.find("form.mark-as-read button").click(function() {
 		allIds = $(":input[name=id]", this.form).val().split(" ");
-		for (index = 0; index < allIds.length; index += 16) {
+		for (var index = 0; index < allIds.length; index += 16) {
 			ids = allIds.slice(index, index + 16).join(" ");
 			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": ids});
 		}
@@ -1535,7 +1538,7 @@ function markPostAsKnown(postElements, skipRequest) {
 		}
 		$(".click-to-show", postElement).removeClass("new");
 	});
-	markReplyAsKnown($(postElements).find(".reply"));
+	markReplyAsKnown($(postElements).find(".reply"), true);
 }
 
 function markReplyAsKnown(replyElements, skipRequest) {
@@ -1923,8 +1926,10 @@ $(document).ready(function() {
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
 		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
 			getTranslation("WebInterface.DefaultText.Reply", function(text) {
-				$("#sone .post").each(function() {
-					ajaxifyPost(this);
+				getTranslation("WebInterface.Button.Comment", function(text) {
+					$("#sone .post").each(function() {
+						ajaxifyPost(this);
+					});
 				});
 			});
 		});

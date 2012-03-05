@@ -21,9 +21,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.core.Core.SoneStatus;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
@@ -86,17 +86,17 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("modified")) {
 			return core.isModifiedSone(sone);
 		} else if (member.equals("status")) {
-			return core.getSoneStatus(sone);
+			return sone.getStatus();
 		} else if (member.equals("unknown")) {
-			return core.getSoneStatus(sone) == SoneStatus.unknown;
+			return sone.getStatus() == SoneStatus.unknown;
 		} else if (member.equals("idle")) {
-			return core.getSoneStatus(sone) == SoneStatus.idle;
+			return sone.getStatus() == SoneStatus.idle;
 		} else if (member.equals("inserting")) {
-			return core.getSoneStatus(sone) == SoneStatus.inserting;
+			return sone.getStatus() == SoneStatus.inserting;
 		} else if (member.equals("downloading")) {
-			return core.getSoneStatus(sone) == SoneStatus.downloading;
+			return sone.getStatus() == SoneStatus.downloading;
 		} else if (member.equals("new")) {
-			return core.isNewSone(sone.getId());
+			return !sone.isKnown();
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
 		} else if (member.equals("lastUpdatedText")) {

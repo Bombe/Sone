@@ -138,9 +138,9 @@ import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
 import freenet.clients.http.SessionManager;
+import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
-import freenet.clients.http.SessionManager.Session;
 import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
@@ -243,7 +243,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("html", new HtmlFilter());
 		templateContextFactory.addFilter("replace", new ReplaceFilter());
 		templateContextFactory.addFilter("store", new StoreFilter());
-		templateContextFactory.addFilter("l10n", new L10nFilter(getL10n()));
+		templateContextFactory.addFilter("l10n", new L10nFilter(this));
 		templateContextFactory.addFilter("substring", new SubstringFilter());
 		templateContextFactory.addFilter("xml", new XmlFilter());
 		templateContextFactory.addFilter("change", new RequestChangeFilter());
@@ -583,6 +583,7 @@ public class WebInterface implements CoreListener {
 		Template emptyTemplate = TemplateParser.parse(new StringReader(""));
 		Template loginTemplate = TemplateParser.parse(createReader("/templates/login.html"));
 		Template indexTemplate = TemplateParser.parse(createReader("/templates/index.html"));
+		Template newTemplate = TemplateParser.parse(createReader("/templates/new.html"));
 		Template knownSonesTemplate = TemplateParser.parse(createReader("/templates/knownSones.html"));
 		Template createSoneTemplate = TemplateParser.parse(createReader("/templates/createSone.html"));
 		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
@@ -613,6 +614,7 @@ public class WebInterface implements CoreListener {
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new NewPage(newTemplate, this), "New"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
@@ -888,7 +890,7 @@ public class WebInterface implements CoreListener {
 		if (!getMentionedSones(reply.getText()).isEmpty()) {
 			boolean isMentioned = false;
 			for (PostReply existingReply : getCore().getReplies(reply.getPost())) {
-				isMentioned |= getCore().isNewReply(reply.getId()) && !getMentionedSones(existingReply.getText()).isEmpty();
+				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
 			}
 			if (!isMentioned) {
 				mentionNotification.remove(reply.getPost());
