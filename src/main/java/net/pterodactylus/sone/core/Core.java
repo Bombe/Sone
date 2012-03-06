@@ -1456,7 +1456,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				}
 				parentAlbum.addAlbum(album);
 			} else {
-				topLevelAlbums.add(album);
+				if (!topLevelAlbums.contains(album)) {
+					topLevelAlbums.add(album);
+				}
 			}
 		}
 
