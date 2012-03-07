@@ -131,45 +131,45 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** All local Sones. */
 	/* synchronize access on this on itself. */
-	private Map<String, Sone> localSones = new HashMap<String, Sone>();
+	private final Map<String, Sone> localSones = new HashMap<String, Sone>();
 
 	/** All remote Sones. */
 	/* synchronize access on this on itself. */
-	private Map<String, Sone> remoteSones = new HashMap<String, Sone>();
+	private final Map<String, Sone> remoteSones = new HashMap<String, Sone>();
 
 	/** All known Sones. */
-	private Set<String> knownSones = new HashSet<String>();
+	private final Set<String> knownSones = new HashSet<String>();
 
 	/** All posts. */
-	private Map<String, Post> posts = new HashMap<String, Post>();
+	private final Map<String, Post> posts = new HashMap<String, Post>();
 
 	/** All known posts. */
-	private Set<String> knownPosts = new HashSet<String>();
+	private final Set<String> knownPosts = new HashSet<String>();
 
 	/** All replies. */
-	private Map<String, PostReply> replies = new HashMap<String, PostReply>();
+	private final Map<String, PostReply> replies = new HashMap<String, PostReply>();
 
 	/** All known replies. */
-	private Set<String> knownReplies = new HashSet<String>();
+	private final Set<String> knownReplies = new HashSet<String>();
 
 	/** All bookmarked posts. */
 	/* synchronize access on itself. */
-	private Set<String> bookmarkedPosts = new HashSet<String>();
+	private final Set<String> bookmarkedPosts = new HashSet<String>();
 
 	/** Trusted identities, sorted by own identities. */
-	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+	private final Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
 
 	/** All known albums. */
-	private Map<String, Album> albums = new HashMap<String, Album>();
+	private final Map<String, Album> albums = new HashMap<String, Album>();
 
 	/** All known images. */
-	private Map<String, Image> images = new HashMap<String, Image>();
+	private final Map<String, Image> images = new HashMap<String, Image>();
 
 	/** All temporary images. */
-	private Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
+	private final Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
 
 	/** Ticker for threads that mark own elements as known. */
-	private Ticker localElementTicker = new Ticker();
+	private final Ticker localElementTicker = new Ticker();
 
 	/** The time the configuration was last touched. */
 	private volatile long lastConfigurationUpdate;
