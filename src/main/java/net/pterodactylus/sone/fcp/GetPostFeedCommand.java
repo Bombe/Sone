@@ -27,7 +27,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filters;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 

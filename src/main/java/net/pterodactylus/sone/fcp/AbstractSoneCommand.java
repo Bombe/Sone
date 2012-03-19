@@ -32,7 +32,7 @@ import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
 import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filters;
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
 

@@ -20,7 +20,7 @@ package net.pterodactylus.sone.data;
 import java.util.Comparator;
 import java.util.UUID;
 
-import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filter;
 
 /**
  * Abstract base class for all replies.

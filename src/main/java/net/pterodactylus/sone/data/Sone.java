@@ -33,7 +33,7 @@ import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.validation.Validation;
 import freenet.keys.FreenetURI;
