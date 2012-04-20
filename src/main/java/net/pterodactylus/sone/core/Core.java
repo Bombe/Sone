@@ -2408,7 +2408,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void ownIdentityAdded(OwnIdentity ownIdentity) {
-		logger.log(Level.FINEST, "Adding OwnIdentity: " + ownIdentity);
+		logger.log(Level.FINEST, "Adding OwnIdentity: %s", ownIdentity);
 		if (ownIdentity.hasContext("Sone")) {
 			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			addLocalSone(ownIdentity);
@@ -2429,7 +2429,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
-		logger.log(Level.FINEST, "Adding Identity: " + identity);
+		logger.log(Level.FINEST, "Adding Identity: %s", identity);
 		trustedIdentities.get(ownIdentity).add(identity);
 		addRemoteSone(identity);
 	}
