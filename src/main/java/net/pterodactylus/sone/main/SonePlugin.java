@@ -68,22 +68,22 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				Class<?> loggerClass = Logging.getLoggerClass(logRecord.getLoggerName());
 				int recordLevel = logRecord.getLevel().intValue();
 				if (recordLevel < Level.FINE.intValue()) {
-					freenet.support.Logger.debug(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
+					freenet.support.Logger.debug(loggerClass, logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.INFO.intValue()) {
-					freenet.support.Logger.minor(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
+					freenet.support.Logger.minor(loggerClass, logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.WARNING.intValue()) {
-					freenet.support.Logger.normal(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
+					freenet.support.Logger.normal(loggerClass, logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.SEVERE.intValue()) {
-					freenet.support.Logger.warning(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
+					freenet.support.Logger.warning(loggerClass, logRecord.getMessage(), logRecord.getThrown());
 				} else {
-					freenet.support.Logger.error(loggerClass, String.format(logRecord.getMessage(), logRecord.getParameters()), logRecord.getThrown());
+					freenet.support.Logger.error(loggerClass, logRecord.getMessage(), logRecord.getThrown());
 				}
 			}
 		});
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 8);
+	public static final Version VERSION = new Version(0, 8, 1);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);

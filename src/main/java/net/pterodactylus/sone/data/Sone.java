@@ -305,7 +305,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 			return this;
 		}
 		if (!this.requestUri.equalsKeypair(requestUri)) {
-			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { requestUri, this.requestUri });
+			logger.log(Level.WARNING, String.format("Request URI %s tried to overwrite %s!", requestUri, this.requestUri));
 			return this;
 		}
 		return this;
@@ -333,7 +333,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 			return this;
 		}
 		if (!this.insertUri.equalsKeypair(insertUri)) {
-			logger.log(Level.WARNING, "Request URI %s tried to overwrite %s!", new Object[] { insertUri, this.insertUri });
+			logger.log(Level.WARNING, String.format("Request URI %s tried to overwrite %s!", insertUri, this.insertUri));
 			return this;
 		}
 		return this;
@@ -358,7 +358,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public void setLatestEdition(long latestEdition) {
 		if (!(latestEdition > this.latestEdition)) {
-			logger.log(Level.FINE, "New latest edition %d is not greater than current latest edition %d!", new Object[] { latestEdition, this.latestEdition });
+			logger.log(Level.FINE, String.format("New latest edition %d is not greater than current latest edition %d!", latestEdition, this.latestEdition));
 			return;
 		}
 		this.latestEdition = latestEdition;
@@ -560,7 +560,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public void addPost(Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
-			logger.log(Level.FINEST, "Adding %s to “%s”.", new Object[] { post, getName() });
+			logger.log(Level.FINEST, String.format("Adding %s to “%s”.", post, getName()));
 		}
 	}
 

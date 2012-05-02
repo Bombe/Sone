@@ -858,7 +858,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			try {
 				sone = getLocalSone(ownIdentity.getId()).setIdentity(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
 			} catch (MalformedURLException mue1) {
-				logger.log(Level.SEVERE, "Could not convert the Identity’s URIs to Freenet URIs: " + ownIdentity.getInsertUri() + ", " + ownIdentity.getRequestUri(), mue1);
+				logger.log(Level.SEVERE, String.format("Could not convert the Identity’s URIs to Freenet URIs: %s, %s", ownIdentity.getInsertUri(), ownIdentity.getRequestUri()), mue1);
 				return null;
 			}
 			sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
@@ -887,7 +887,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		try {
 			ownIdentity.addContext("Sone");
 		} catch (WebOfTrustException wote1) {
-			logger.log(Level.SEVERE, "Could not add “Sone” context to own identity: " + ownIdentity, wote1);
+			logger.log(Level.SEVERE, String.format("Could not add “Sone” context to own identity: %s", ownIdentity), wote1);
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
@@ -1050,7 +1050,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public Trust getTrust(Sone origin, Sone target) {
 		if (!isLocalSone(origin)) {
-			logger.log(Level.WARNING, "Tried to get trust from remote Sone: %s", origin);
+			logger.log(Level.WARNING, String.format("Tried to get trust from remote Sone: %s", origin));
 			return null;
 		}
 		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
@@ -1071,7 +1071,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		try {
 			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, preferences.getTrustComment());
 		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not set trust for Sone: " + target, wote1);
+			logger.log(Level.WARNING, String.format("Could not set trust for Sone: %s", target), wote1);
 		}
 	}
 
@@ -1088,7 +1088,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		try {
 			((OwnIdentity) origin.getIdentity()).removeTrust(target.getIdentity());
 		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not remove trust for Sone: " + target, wote1);
+			logger.log(Level.WARNING, String.format("Could not remove trust for Sone: %s", target), wote1);
 		}
 	}
 
@@ -1153,7 +1153,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		if (hasSone(sone.getId())) {
 			Sone storedSone = getSone(sone.getId());
 			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
-				logger.log(Level.FINE, "Downloaded Sone %s is not newer than stored Sone %s.", new Object[] { sone, storedSone });
+				logger.log(Level.FINE, String.format("Downloaded Sone %s is not newer than stored Sone %s.", sone, storedSone));
 				return;
 			}
 			synchronized (posts) {
@@ -1266,12 +1266,12 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void deleteSone(Sone sone) {
 		if (!(sone.getIdentity() instanceof OwnIdentity)) {
-			logger.log(Level.WARNING, "Tried to delete Sone of non-own identity: %s", sone);
+			logger.log(Level.WARNING, String.format("Tried to delete Sone of non-own identity: %s", sone));
 			return;
 		}
 		synchronized (localSones) {
 			if (!localSones.containsKey(sone.getId())) {
-				logger.log(Level.WARNING, "Tried to delete non-local Sone: %s", sone);
+				logger.log(Level.WARNING, String.format("Tried to delete non-local Sone: %s", sone));
 				return;
 			}
 			localSones.remove(sone.getId());
@@ -1283,7 +1283,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
 			((OwnIdentity) sone.getIdentity()).removeProperty("Sone.LatestEdition");
 		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not remove context and properties from Sone: " + sone, wote1);
+			logger.log(Level.WARNING, String.format("Could not remove context and properties from Sone: %s", sone), wote1);
 		}
 		try {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
@@ -1319,7 +1319,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void loadSone(Sone sone) {
 		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to load non-local Sone: %s", sone);
+			logger.log(Level.FINE, String.format("Tried to load non-local Sone: %s", sone));
 			return;
 		}
 
@@ -1451,7 +1451,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			if (albumParentId != null) {
 				Album parentAlbum = getAlbum(albumParentId, false);
 				if (parentAlbum == null) {
-					logger.log(Level.WARNING, "Invalid parent album ID: " + albumParentId);
+					logger.log(Level.WARNING, String.format("Invalid parent album ID: %s", albumParentId));
 					return;
 				}
 				parentAlbum.addAlbum(album);
@@ -1594,7 +1594,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public Post createPost(Sone sone, Sone recipient, long time, String text) {
 		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to create post for non-local Sone: %s", sone);
+			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
 		final Post post = new Post(sone, time, text);
@@ -1628,7 +1628,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void deletePost(Post post) {
 		if (!isLocalSone(post.getSone())) {
-			logger.log(Level.WARNING, "Tried to delete post of non-local Sone: %s", post.getSone());
+			logger.log(Level.WARNING, String.format("Tried to delete post of non-local Sone: %s", post.getSone()));
 			return;
 		}
 		post.getSone().removePost(post);
@@ -1734,7 +1734,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public PostReply createReply(Sone sone, Post post, long time, String text) {
 		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to create reply for non-local Sone: %s", sone);
+			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
 		final PostReply reply = new PostReply(sone, post, System.currentTimeMillis(), text);
@@ -1768,7 +1768,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public void deleteReply(PostReply reply) {
 		Sone sone = reply.getSone();
 		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to delete non-local reply: %s", reply);
+			logger.log(Level.FINE, String.format("Tried to delete non-local reply: %s", reply));
 			return;
 		}
 		synchronized (replies) {
@@ -2014,15 +2014,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	private synchronized void saveSone(Sone sone) {
 		if (!isLocalSone(sone)) {
-			logger.log(Level.FINE, "Tried to save non-local Sone: %s", sone);
+			logger.log(Level.FINE, String.format("Tried to save non-local Sone: %s", sone));
 			return;
 		}
 		if (!(sone.getIdentity() instanceof OwnIdentity)) {
-			logger.log(Level.WARNING, "Local Sone without OwnIdentity found, refusing to save: %s", sone);
+			logger.log(Level.WARNING, String.format("Local Sone without OwnIdentity found, refusing to save: %s", sone));
 			return;
 		}
 
-		logger.log(Level.INFO, "Saving Sone: %s", sone);
+		logger.log(Level.INFO, String.format("Saving Sone: %s", sone));
 		try {
 			/* save Sone into configuration. */
 			String sonePrefix = "Sone/" + sone.getId();
@@ -2137,11 +2137,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 
-			logger.log(Level.INFO, "Sone %s saved.", sone);
+			logger.log(Level.INFO, String.format("Sone %s saved.", sone));
 		} catch (ConfigurationException ce1) {
-			logger.log(Level.WARNING, "Could not save Sone: " + sone, ce1);
+			logger.log(Level.WARNING, String.format("Could not save Sone: %s", sone), ce1);
 		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not set WoT property for Sone: " + sone, wote1);
+			logger.log(Level.WARNING, String.format("Could not set WoT property for Sone: %s", sone), wote1);
 		}
 	}
 
@@ -2378,7 +2378,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		try {
 			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
 		} catch (IllegalArgumentException iae1) {
-			logger.log(Level.WARNING, "Invalid value for " + optionName + " in configuration, using default.");
+			logger.log(Level.WARNING, String.format("Invalid value for %s in configuration, using default.", optionName));
 		}
 	}
 
@@ -2394,7 +2394,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
 			return uri;
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, "Could not create Sone URI from URI: " + uriString, mue1);
+			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString, mue1));
 			return null;
 		}
 	}
@@ -2408,7 +2408,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void ownIdentityAdded(OwnIdentity ownIdentity) {
-		logger.log(Level.FINEST, "Adding OwnIdentity: " + ownIdentity);
+		logger.log(Level.FINEST, String.format("Adding OwnIdentity: %s", ownIdentity));
 		if (ownIdentity.hasContext("Sone")) {
 			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			addLocalSone(ownIdentity);
@@ -2420,7 +2420,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void ownIdentityRemoved(OwnIdentity ownIdentity) {
-		logger.log(Level.FINEST, "Removing OwnIdentity: " + ownIdentity);
+		logger.log(Level.FINEST, String.format("Removing OwnIdentity: %s", ownIdentity));
 		trustedIdentities.remove(ownIdentity);
 	}
 
@@ -2429,7 +2429,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
-		logger.log(Level.FINEST, "Adding Identity: " + identity);
+		logger.log(Level.FINEST, String.format("Adding Identity: %s", identity));
 		trustedIdentities.get(ownIdentity).add(identity);
 		addRemoteSone(identity);
 	}
@@ -2548,7 +2548,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void imageInsertStarted(Image image) {
-		logger.log(Level.WARNING, "Image insert started for " + image);
+		logger.log(Level.WARNING, String.format("Image insert started for %s...", image));
 		coreListenerManager.fireImageInsertStarted(image);
 	}
 
@@ -2557,7 +2557,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void imageInsertAborted(Image image) {
-		logger.log(Level.WARNING, "Image insert aborted for " + image);
+		logger.log(Level.WARNING, String.format("Image insert aborted for %s.", image));
 		coreListenerManager.fireImageInsertAborted(image);
 	}
 
@@ -2566,7 +2566,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void imageInsertFinished(Image image, FreenetURI key) {
-		logger.log(Level.WARNING, "Image insert finished for " + image + ": " + key);
+		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", image, key));
 		image.setKey(key.toString());
 		deleteTemporaryImage(image.getId());
 		saveSone(image.getSone());
@@ -2578,7 +2578,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void imageInsertFailed(Image image, Throwable cause) {
-		logger.log(Level.WARNING, "Image insert failed for " + image, cause);
+		logger.log(Level.WARNING, String.format("Image insert failed for %s." + image), cause);
 		coreListenerManager.fireImageInsertFailed(image, cause);
 	}
 

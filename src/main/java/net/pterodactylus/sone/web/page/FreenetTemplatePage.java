@@ -155,7 +155,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 			long start = System.nanoTime();
 			processTemplate(request, templateContext);
 			long finish = System.nanoTime();
-			logger.log(Level.FINEST, "Template was rendered in " + ((finish - start) / 1000) / 1000.0 + "ms.");
+			logger.log(Level.FINEST, "Template was rendered in %dms.", ((finish - start) / 1000) / 1000.0);
 		} catch (RedirectException re1) {
 			return new RedirectResponse(re1.getTarget());
 		}

@@ -254,7 +254,7 @@ public class DefaultIdentity implements Identity {
 				return trustCache.get(ownIdentity);
 			}
 		} catch (CacheException ce1) {
-			logger.log(Level.WARNING, "Could not get trust for OwnIdentity: " + ownIdentity, ce1);
+			logger.log(Level.WARNING, String.format("Could not get trust for OwnIdentity: %s", ownIdentity), ce1);
 			return null;
 		}
 	}
