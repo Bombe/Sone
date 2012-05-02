@@ -151,7 +151,7 @@ public class SoneDownloader extends AbstractService {
 	 *         downloaded
 	 */
 	public Sone fetchSone(Sone sone, FreenetURI soneUri, boolean fetchOnly) {
-		logger.log(Level.FINE, "Starting fetch for Sone “%s” from %s…", new Object[] { sone, soneUri });
+		logger.log(Level.FINE, String.format("Starting fetch for Sone “%s” from %s…", sone, soneUri));
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		sone.setStatus(SoneStatus.downloading);
 		try {
@@ -160,7 +160,7 @@ public class SoneDownloader extends AbstractService {
 				/* TODO - mark Sone as bad. */
 				return null;
 			}
-			logger.log(Level.FINEST, "Got %d bytes back.", fetchResults.getRight().size());
+			logger.log(Level.FINEST, String.format("Got %d bytes back.", fetchResults.getRight().size()));
 			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
 			if (parsedSone != null) {
 				if (!fetchOnly) {
@@ -186,7 +186,7 @@ public class SoneDownloader extends AbstractService {
 	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
 	 */
 	public Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
-		logger.log(Level.FINEST, "Parsing FetchResult (%d bytes, %s) for %s…", new Object[] { fetchResult.size(), fetchResult.getMimeType(), originalSone });
+		logger.log(Level.FINEST, String.format("Parsing FetchResult (%d bytes, %s) for %s…", fetchResult.size(), fetchResult.getMimeType(), originalSone));
 		Bucket soneBucket = fetchResult.asBucket();
 		InputStream soneInputStream = null;
 		try {
@@ -202,7 +202,7 @@ public class SoneDownloader extends AbstractService {
 			}
 			return parsedSone;
 		} catch (Exception e1) {
-			logger.log(Level.WARNING, "Could not parse Sone from " + requestUri + "!", e1);
+			logger.log(Level.WARNING, String.format("Could not parse Sone from %s!", requestUri), e1);
 		} finally {
 			Closer.close(soneInputStream);
 			soneBucket.free();
@@ -232,7 +232,7 @@ public class SoneDownloader extends AbstractService {
 		}
 		if (document == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Could not parse XML for Sone %s!", new Object[] { originalSone });
+			logger.log(Level.WARNING, String.format("Could not parse XML for Sone %s!", originalSone));
 			return null;
 		}
 
@@ -243,7 +243,7 @@ public class SoneDownloader extends AbstractService {
 			soneXml = SimpleXML.fromDocument(document);
 		} catch (NullPointerException npe1) {
 			/* for some reason, invalid XML can cause NPEs. */
-			logger.log(Level.WARNING, "XML for Sone " + sone + " can not be parsed!", npe1);
+			logger.log(Level.WARNING, String.format("XML for Sone %s can not be parsed!", sone), npe1);
 			return null;
 		}
 
@@ -258,27 +258,27 @@ public class SoneDownloader extends AbstractService {
 		}
 
 		if (protocolVersion < 0) {
-			logger.log(Level.WARNING, "Invalid protocol version: " + protocolVersion + "! Not parsing Sone.");
+			logger.log(Level.WARNING, String.format("Invalid protocol version: %d! Not parsing Sone.", protocolVersion));
 			return null;
 		}
 
 		/* check for valid versions. */
 		if (protocolVersion > MAX_PROTOCOL_VERSION) {
-			logger.log(Level.WARNING, "Unknown protocol version: " + protocolVersion + "! Not parsing Sone.");
+			logger.log(Level.WARNING, String.format("Unknown protocol version: %d! Not parsing Sone.", protocolVersion));
 			return null;
 		}
 
 		String soneTime = soneXml.getValue("time", null);
 		if (soneTime == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded time for Sone %s was null!", new Object[] { sone });
+			logger.log(Level.WARNING, String.format("Downloaded time for Sone %s was null!", sone));
 			return null;
 		}
 		try {
 			sone.setTime(Long.parseLong(soneTime));
 		} catch (NumberFormatException nfe1) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s with invalid time: %s", new Object[] { sone, soneTime });
+			logger.log(Level.WARNING, String.format("Downloaded Sone %s with invalid time: %s", sone, soneTime));
 			return null;
 		}
 
@@ -287,7 +287,7 @@ public class SoneDownloader extends AbstractService {
 			String clientName = clientXml.getValue("name", null);
 			String clientVersion = clientXml.getValue("version", null);
 			if ((clientName == null) || (clientVersion == null)) {
-				logger.log(Level.WARNING, "Download Sone %s with client XML but missing name or version!", sone);
+				logger.log(Level.WARNING, String.format("Download Sone %s with client XML but missing name or version!", sone));
 				return null;
 			}
 			sone.setClient(new Client(clientName, clientVersion));
@@ -299,7 +299,7 @@ public class SoneDownloader extends AbstractService {
 				sone.setRequestUri(new FreenetURI(soneRequestUri));
 			} catch (MalformedURLException mue1) {
 				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, "Downloaded Sone " + sone + " has invalid request URI: " + soneRequestUri, mue1);
+				logger.log(Level.WARNING, String.format("Downloaded Sone %s has invalid request URI: %s", sone, soneRequestUri), mue1);
 				return null;
 			}
 		}
@@ -311,7 +311,7 @@ public class SoneDownloader extends AbstractService {
 				sone.setLatestEdition(Math.max(sone.getRequestUri().getEdition(), sone.getInsertUri().getEdition()));
 			} catch (MalformedURLException mue1) {
 				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, "Downloaded Sone " + sone + " has invalid insert URI: " + soneInsertUri, mue1);
+				logger.log(Level.WARNING, String.format("Downloaded Sone %s has invalid insert URI: %s", sone, soneInsertUri), mue1);
 				return null;
 			}
 		}
@@ -319,7 +319,7 @@ public class SoneDownloader extends AbstractService {
 		SimpleXML profileXml = soneXml.getNode("profile");
 		if (profileXml == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s has no profile!", new Object[] { sone });
+			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no profile!", sone));
 			return null;
 		}
 
@@ -342,13 +342,13 @@ public class SoneDownloader extends AbstractService {
 				String fieldName = fieldXml.getValue("field-name", null);
 				String fieldValue = fieldXml.getValue("field-value", "");
 				if (fieldName == null) {
-					logger.log(Level.WARNING, "Downloaded profile field for Sone %s with missing data! Name: %s, Value: %s", new Object[] { sone, fieldName, fieldValue });
+					logger.log(Level.WARNING, String.format("Downloaded profile field for Sone %s with missing data! Name: %s, Value: %s", sone, fieldName, fieldValue));
 					return null;
 				}
 				try {
 					profile.addField(fieldName).setValue(fieldValue);
 				} catch (IllegalArgumentException iae1) {
-					logger.log(Level.WARNING, "Duplicate field: " + fieldName, iae1);
+					logger.log(Level.WARNING, String.format("Duplicate field: %s", fieldName), iae1);
 					return null;
 				}
 			}
@@ -359,7 +359,7 @@ public class SoneDownloader extends AbstractService {
 		Set<Post> posts = new HashSet<Post>();
 		if (postsXml == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s has no posts!", new Object[] { sone });
+			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no posts!", sone));
 		} else {
 			for (SimpleXML postXml : postsXml.getNodes("post")) {
 				String postId = postXml.getValue("id", null);
@@ -368,7 +368,7 @@ public class SoneDownloader extends AbstractService {
 				String postText = postXml.getValue("text", null);
 				if ((postId == null) || (postTime == null) || (postText == null)) {
 					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded post for Sone %s with missing data! ID: %s, Time: %s, Text: %s", new Object[] { sone, postId, postTime, postText });
+					logger.log(Level.WARNING, String.format("Downloaded post for Sone %s with missing data! ID: %s, Time: %s, Text: %s", sone, postId, postTime, postText));
 					return null;
 				}
 				try {
@@ -379,7 +379,7 @@ public class SoneDownloader extends AbstractService {
 					posts.add(post);
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded post for Sone %s with invalid time: %s", new Object[] { sone, postTime });
+					logger.log(Level.WARNING, String.format("Downloaded post for Sone %s with invalid time: %s", sone, postTime));
 					return null;
 				}
 			}
@@ -390,7 +390,7 @@ public class SoneDownloader extends AbstractService {
 		Set<PostReply> replies = new HashSet<PostReply>();
 		if (repliesXml == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s has no replies!", new Object[] { sone });
+			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no replies!", sone));
 		} else {
 			for (SimpleXML replyXml : repliesXml.getNodes("reply")) {
 				String replyId = replyXml.getValue("id", null);
@@ -399,14 +399,14 @@ public class SoneDownloader extends AbstractService {
 				String replyText = replyXml.getValue("text", null);
 				if ((replyId == null) || (replyPostId == null) || (replyTime == null) || (replyText == null)) {
 					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded reply for Sone %s with missing data! ID: %s, Post: %s, Time: %s, Text: %s", new Object[] { sone, replyId, replyPostId, replyTime, replyText });
+					logger.log(Level.WARNING, String.format("Downloaded reply for Sone %s with missing data! ID: %s, Post: %s, Time: %s, Text: %s", sone, replyId, replyPostId, replyTime, replyText));
 					return null;
 				}
 				try {
 					replies.add(core.getReply(replyId).setSone(sone).setPost(core.getPost(replyPostId)).setTime(Long.parseLong(replyTime)).setText(replyText));
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
-					logger.log(Level.WARNING, "Downloaded reply for Sone %s with invalid time: %s", new Object[] { sone, replyTime });
+					logger.log(Level.WARNING, String.format("Downloaded reply for Sone %s with invalid time: %s", sone, replyTime));
 					return null;
 				}
 			}
@@ -417,7 +417,7 @@ public class SoneDownloader extends AbstractService {
 		Set<String> likedPostIds = new HashSet<String>();
 		if (likePostIdsXml == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s has no post likes!", new Object[] { sone });
+			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no post likes!", sone));
 		} else {
 			for (SimpleXML likedPostIdXml : likePostIdsXml.getNodes("post-like")) {
 				String postId = likedPostIdXml.getValue();
@@ -430,7 +430,7 @@ public class SoneDownloader extends AbstractService {
 		Set<String> likedReplyIds = new HashSet<String>();
 		if (likeReplyIdsXml == null) {
 			/* TODO - mark Sone as bad. */
-			logger.log(Level.WARNING, "Downloaded Sone %s has no reply likes!", new Object[] { sone });
+			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no reply likes!", sone));
 		} else {
 			for (SimpleXML likedReplyIdXml : likeReplyIdsXml.getNodes("reply-like")) {
 				String replyId = likedReplyIdXml.getValue();
@@ -449,14 +449,14 @@ public class SoneDownloader extends AbstractService {
 				String description = albumXml.getValue("description", "");
 				String albumImageId = albumXml.getValue("album-image", null);
 				if ((id == null) || (title == null) || (description == null)) {
-					logger.log(Level.WARNING, "Downloaded Sone %s contains invalid album!", new Object[] { sone });
+					logger.log(Level.WARNING, String.format("Downloaded Sone %s contains invalid album!", sone));
 					return null;
 				}
 				Album parent = null;
 				if (parentId != null) {
 					parent = core.getAlbum(parentId, false);
 					if (parent == null) {
-						logger.log(Level.WARNING, "Downloaded Sone %s has album with invalid parent!", new Object[] { sone });
+						logger.log(Level.WARNING, String.format("Downloaded Sone %s has album with invalid parent!", sone));
 						return null;
 					}
 				}
@@ -477,14 +477,14 @@ public class SoneDownloader extends AbstractService {
 						String imageWidthString = imageXml.getValue("width", null);
 						String imageHeightString = imageXml.getValue("height", null);
 						if ((imageId == null) || (imageCreationTimeString == null) || (imageKey == null) || (imageTitle == null) || (imageWidthString == null) || (imageHeightString == null)) {
-							logger.log(Level.WARNING, "Downloaded Sone %s contains invalid images!", new Object[] { sone });
+							logger.log(Level.WARNING, String.format("Downloaded Sone %s contains invalid images!", sone));
 							return null;
 						}
 						long creationTime = Numbers.safeParseLong(imageCreationTimeString, 0L);
 						int imageWidth = Numbers.safeParseInteger(imageWidthString, 0);
 						int imageHeight = Numbers.safeParseInteger(imageHeightString, 0);
 						if ((imageWidth < 1) || (imageHeight < 1)) {
-							logger.log(Level.WARNING, "Downloaded Sone %s contains image %s with invalid dimensions (%s, %s)!", new Object[] { sone, imageId, imageWidthString, imageHeightString });
+							logger.log(Level.WARNING, String.format("Downloaded Sone %s contains image %s with invalid dimensions (%s, %s)!", sone, imageId, imageWidthString, imageHeightString));
 							return null;
 						}
 						Image image = core.getImage(imageId).setSone(sone).setKey(imageKey).setCreationTime(creationTime);

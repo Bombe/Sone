@@ -382,16 +382,16 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 */
 	private synchronized Reply performRequest(SimpleFieldSet fields, Bucket data) throws PluginException {
 		reply = new Reply();
-		logger.log(Level.FINE, "Sending FCP Request: " + fields.get("Message"));
+		logger.log(Level.FINE, String.format("Sending FCP Request: %s", fields.get("Message")));
 		synchronized (reply) {
 			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
 			try {
 				reply.wait();
 			} catch (InterruptedException ie1) {
-				logger.log(Level.WARNING, "Got interrupted while waiting for reply on " + fields.get("Message") + ".", ie1);
+				logger.log(Level.WARNING, String.format("Got interrupted while waiting for reply on %s.", fields.get("Message")), ie1);
 			}
 		}
-		logger.log(Level.FINEST, "Received FCP Response for %s: %s", new Object[] { fields.get("Message"), (reply.getFields() != null) ? reply.getFields().get("Message") : null });
+		logger.log(Level.FINEST, String.format("Received FCP Response for %s: %s", fields.get("Message"), (reply.getFields() != null) ? reply.getFields().get("Message") : null));
 		if ((reply.getFields() == null) || "Error".equals(reply.getFields().get("Message"))) {
 			throw new PluginException("Could not perform request for " + fields.get("Message"));
 		}
@@ -408,7 +408,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	@Override
 	public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
 		String messageName = fields.get("Message");
-		logger.log(Level.FINEST, "Received Reply from Plugin: " + messageName);
+		logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", messageName));
 		synchronized (reply) {
 			reply.setFields(fields);
 			reply.setData(data);

@@ -111,7 +111,7 @@ public class FreenetInterface {
 					currentUri = fe1.newURI;
 					continue;
 				}
-				logger.log(Level.WARNING, "Could not fetch “" + uri + "”!", fe1);
+				logger.log(Level.WARNING, String.format("Could not fetch “%s”!", uri), fe1);
 				return null;
 			}
 		}
@@ -189,13 +189,13 @@ public class FreenetInterface {
 	 */
 	public void registerUsk(final Sone sone, final SoneDownloader soneDownloader) {
 		try {
-			logger.log(Level.FINE, "Registering Sone “%s” for USK updates at %s…", new Object[] { sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" }) });
+			logger.log(Level.FINE, String.format("Registering Sone “%s” for USK updates at %s…", sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" })));
 			USKCallback uskCallback = new USKCallback() {
 
 				@Override
 				@SuppressWarnings("synthetic-access")
 				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
-					logger.log(Level.FINE, "Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", new Object[] { sone, key, newKnownGood, newSlotToo });
+					logger.log(Level.FINE, String.format("Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", sone, key, newKnownGood, newSlotToo));
 					if (edition > sone.getLatestEdition()) {
 						sone.setLatestEdition(edition);
 						new Thread(new Runnable() {
@@ -221,7 +221,7 @@ public class FreenetInterface {
 			soneUskCallbacks.put(sone.getId(), uskCallback);
 			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, (System.currentTimeMillis() - sone.getTime()) < 7 * 24 * 60 * 60 * 1000, (HighLevelSimpleClientImpl) client);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, "Could not subscribe USK “" + sone.getRequestUri() + "”!", mue1);
+			logger.log(Level.WARNING, String.format("Could not subscribe USK “%s”!", sone.getRequestUri()), mue1);
 		}
 	}
 
@@ -237,10 +237,10 @@ public class FreenetInterface {
 			return;
 		}
 		try {
-			logger.log(Level.FINEST, "Unsubscribing from USK for %s…", new Object[] { sone });
+			logger.log(Level.FINEST, String.format("Unsubscribing from USK for %s…", sone));
 			node.clientCore.uskManager.unsubscribe(USK.create(sone.getRequestUri()), uskCallback);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.FINE, "Could not unsubscribe USK “" + sone.getRequestUri() + "”!", mue1);
+			logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", sone.getRequestUri()), mue1);
 		}
 	}
 
@@ -276,7 +276,7 @@ public class FreenetInterface {
 			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (HighLevelSimpleClientImpl) client);
 			uriUskCallbacks.put(uri, uskCallback);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, "Could not subscribe to USK: " + uri, uri);
+			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
 		}
 	}
 
@@ -289,13 +289,13 @@ public class FreenetInterface {
 	public void unregisterUsk(FreenetURI uri) {
 		USKCallback uskCallback = uriUskCallbacks.remove(uri);
 		if (uskCallback == null) {
-			logger.log(Level.INFO, "Could not unregister unknown USK: " + uri);
+			logger.log(Level.INFO, String.format("Could not unregister unknown USK: %s", uri));
 			return;
 		}
 		try {
 			node.clientCore.uskManager.unsubscribe(USK.create(uri), uskCallback);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.INFO, "Could not unregister invalid USK: " + uri);
+			logger.log(Level.INFO, String.format("Could not unregister invalid USK: %s", uri), mue1);
 		}
 	}
 

@@ -214,11 +214,11 @@ public class SoneInserter extends AbstractService {
 					if (fingerprint.equals(lastInsertedFingerprint)) {
 						modified = false;
 						lastModificationTime = 0;
-						logger.log(Level.FINE, "Sone %s has been reverted to last insert state.", sone);
+						logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
 					} else {
 						lastModificationTime = System.currentTimeMillis();
 						modified = true;
-						logger.log(Level.FINE, "Sone %s has been modified, waiting %d seconds before inserting.", new Object[] { sone.getName(), insertionDelay });
+						logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
 					}
 					lastFingerprint = fingerprint;
 				}
@@ -229,7 +229,7 @@ public class SoneInserter extends AbstractService {
 			}
 
 			if (insertInformation != null) {
-				logger.log(Level.INFO, "Inserting Sone “%s”…", new Object[] { sone.getName() });
+				logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
 
 				boolean success = false;
 				try {
@@ -248,10 +248,10 @@ public class SoneInserter extends AbstractService {
 					sone.setLatestEdition(finalUri.getEdition());
 					core.touchConfiguration();
 					success = true;
-					logger.log(Level.INFO, "Inserted Sone “%s” at %s.", new Object[] { sone.getName(), finalUri });
+					logger.log(Level.INFO, String.format("Inserted Sone “%s” at %s.", sone.getName(), finalUri));
 				} catch (SoneException se1) {
 					soneInsertListenerManager.fireInsertAborted(se1);
-					logger.log(Level.WARNING, "Could not insert Sone “" + sone.getName() + "”!", se1);
+					logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
 				} finally {
 					sone.setStatus(SoneStatus.idle);
 				}
@@ -263,7 +263,7 @@ public class SoneInserter extends AbstractService {
 				if (success) {
 					synchronized (sone) {
 						if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
-							logger.log(Level.FINE, "Sone “%s” was not modified further, resetting counter…", new Object[] { sone });
+							logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
 							lastModificationTime = 0;
 							lastInsertFingerprint = lastInsertedFingerprint;
 							core.touchConfiguration();
@@ -376,7 +376,7 @@ public class SoneInserter extends AbstractService {
 				templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset);
 				template = TemplateParser.parse(templateInputStreamReader);
 			} catch (TemplateException te1) {
-				logger.log(Level.SEVERE, "Could not parse template “" + templateName + "”!", te1);
+				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), te1);
 				return null;
 			} finally {
 				Closer.close(templateInputStreamReader);
@@ -394,7 +394,7 @@ public class SoneInserter extends AbstractService {
 				bucket = new StringBucket(writer.toString(), utf8Charset);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
 			} catch (TemplateException te1) {
-				logger.log(Level.SEVERE, "Could not render template “" + templateName + "”!", te1);
+				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), te1);
 				return null;
 			} finally {
 				Closer.close(writer);
