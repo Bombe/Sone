@@ -230,7 +230,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * @return The score of the expression
 	 */
 	private double calculateScore(List<Phrase> phrases, String expression) {
-		logger.log(Level.FINEST, "Calculating Score for “%s”…", expression);
+		logger.log(Level.FINEST, String.format("Calculating Score for “%s”…", expression));
 		double optionalHits = 0;
 		double requiredHits = 0;
 		int forbiddenHits = 0;
@@ -250,10 +250,10 @@ public class SearchPage extends SoneTemplatePage {
 				}
 				score += Math.pow(1 - position / (double) expression.length(), 2);
 				index = position + phraseString.length();
-				logger.log(Level.FINEST, "Got hit at position %d.", position);
+				logger.log(Level.FINEST, String.format("Got hit at position %d.", position));
 				++matches;
 			}
-			logger.log(Level.FINEST, "Score: %f", score);
+			logger.log(Level.FINEST, String.format("Score: %f", score));
 			if (matches == 0) {
 				continue;
 			}

@@ -749,7 +749,7 @@ public class WebInterface implements CoreListener {
 				}
 			}
 		} catch (IOException ioe1) {
-			logger.log(Level.WARNING, "Could not parse post text: " + text, ioe1);
+			logger.log(Level.WARNING, String.format("Could not parse post text: %s", text), ioe1);
 		}
 		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}
@@ -1043,7 +1043,7 @@ public class WebInterface implements CoreListener {
 			try {
 				return templateCache.get(templateName);
 			} catch (CacheException ce1) {
-				logger.log(Level.WARNING, "Could not get template for " + templateName + "!", ce1);
+				logger.log(Level.WARNING, String.format("Could not get template for %s!", templateName), ce1);
 				return null;
 			}
 		}
@@ -1066,7 +1066,7 @@ public class WebInterface implements CoreListener {
 			try {
 				template = TemplateParser.parse(templateReader);
 			} catch (TemplateException te1) {
-				logger.log(Level.WARNING, "Could not parse template “" + templateName + "” for inclusion!", te1);
+				logger.log(Level.WARNING, String.format("Could not parse template “%s” for inclusion!", templateName), te1);
 			}
 			return template;
 		}

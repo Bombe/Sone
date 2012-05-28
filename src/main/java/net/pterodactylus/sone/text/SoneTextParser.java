@@ -237,8 +237,8 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				int nextSpace = matcher.find(0) ? matcher.start() : line.length();
 				String link = line.substring(0, nextSpace);
 				String name = link;
-				logger.log(Level.FINER, "Found link: %s", link);
-				logger.log(Level.FINEST, "CHK: %d, SSK: %d, USK: %d", new Object[] { nextChk, nextSsk, nextUsk });
+				logger.log(Level.FINER, String.format("Found link: %s", link));
+				logger.log(Level.FINEST, String.format("CHK: %d, SSK: %d, USK: %d", nextChk, nextSsk, nextUsk));
 
 				if ((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
 					FreenetURI uri;

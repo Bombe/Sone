@@ -107,7 +107,7 @@ public class SoneAccessor extends ReflectionAccessor {
 				return null;
 			}
 			Trust trust = core.getTrust(currentSone, sone);
-			logger.log(Level.FINEST, "Trust for %s by %s: %s", new Object[] { sone, currentSone, trust });
+			logger.log(Level.FINEST, String.format("Trust for %s by %s: %s", sone, currentSone, trust));
 			if (trust == null) {
 				return new Trust(null, null, null);
 			}

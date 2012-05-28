@@ -115,7 +115,7 @@ public class CreateSonePage extends SoneTemplatePage {
 			/* create Sone. */
 			Sone sone = webInterface.getCore().createSone(selectedIdentity);
 			if (sone == null) {
-				logger.log(Level.SEVERE, "Could not create Sone for OwnIdentity: %s", selectedIdentity);
+				logger.log(Level.SEVERE, String.format("Could not create Sone for OwnIdentity: %s", selectedIdentity));
 				/* TODO - go somewhere else */
 			}
 

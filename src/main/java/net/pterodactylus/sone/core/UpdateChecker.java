@@ -166,11 +166,11 @@ public class UpdateChecker {
 			@Override
 			@SuppressWarnings("synthetic-access")
 			public void editionFound(FreenetURI uri, long edition, boolean newKnownGood, boolean newSlot) {
-				logger.log(Level.FINEST, "Found update for %s: %d, %s, %s", new Object[] { uri, edition, newKnownGood, newSlot });
+				logger.log(Level.FINEST, String.format("Found update for %s: %d, %s, %s", uri, edition, newKnownGood, newSlot));
 				if (newKnownGood || newSlot) {
 					Pair<FreenetURI, FetchResult> uriResult = freenetInterface.fetchUri(uri.setMetaString(new String[] { "sone.properties" }));
 					if (uriResult == null) {
-						logger.log(Level.WARNING, "Could not fetch properties of latest homepage: %s", uri);
+						logger.log(Level.WARNING, String.format("Could not fetch properties of latest homepage: %s", uri));
 						return;
 					}
 					Bucket resultBucket = uriResult.getRight().asBucket();
@@ -178,7 +178,7 @@ public class UpdateChecker {
 						parseProperties(resultBucket.getInputStream(), edition);
 						latestEdition = edition;
 					} catch (IOException ioe1) {
-						logger.log(Level.WARNING, "Could not parse sone.properties of " + uri, ioe1);
+						logger.log(Level.WARNING, String.format("Could not parse sone.properties of %s!", uri), ioe1);
 					} finally {
 						resultBucket.free();
 					}
@@ -240,7 +240,7 @@ public class UpdateChecker {
 		if (version.compareTo(currentLatestVersion) > 0) {
 			currentLatestVersion = version;
 			latestVersionDate = releaseTime;
-			logger.log(Level.INFO, "Found new version: %s (%tc)", new Object[] { version, new Date(releaseTime) });
+			logger.log(Level.INFO, String.format("Found new version: %s (%tc)", version, new Date(releaseTime)));
 			updateListenerManager.fireUpdateFound(version, releaseTime, edition);
 		}
 	}
