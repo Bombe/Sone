@@ -1949,7 +1949,7 @@ $(document).ready(function() {
 				allReplies = $(this).find(".reply");
 				if (allReplies.length > 2) {
 					newHidden = false;
-					for (replyIndex = 0; !newHidden && (replyIndex < (allReplies.length - 2)); ++replyIndex) {
+					for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
 						$(allReplies[replyIndex]).addClass("hidden");
 						newHidden |= $(allReplies[replyIndex]).hasClass("new");
 					}
