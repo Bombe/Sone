@@ -1865,6 +1865,14 @@ var currentSoneMenuTimeoutHandler;
 
 $(document).ready(function() {
 
+	/* rip out the status update textarea. */
+	$("#sone .rip-out").each(function() {
+		var oldElement = $(this);
+		newElement = $("<input type='text'/>");
+		newElement.attr("class", oldElement.attr("class")).attr("name", oldElement.attr("name"));
+		oldElement.before(newElement).remove();
+	});
+
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
