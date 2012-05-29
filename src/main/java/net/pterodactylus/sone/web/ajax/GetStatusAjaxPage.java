@@ -91,6 +91,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		}
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
+		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		int notificationHash = HashCode.hashCode(notifications);
 		/* load new posts. */
 		Set<Post> newPosts = webInterface.getNewPosts();

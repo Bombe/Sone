@@ -1206,15 +1206,15 @@ function getStatus() {
 			if (data.notificationHash != getNotificationHash()) {
 				console.log("Old hash: ", getNotificationHash(), ", new hash: ", data.notificationHash);
 				requestNotifications();
+				/* process new posts. */
+				$.each(data.newPosts, function(index, value) {
+					loadNewPost(value.id, value.sone, value.recipient, value.time);
+				});
+				/* process new replies. */
+				$.each(data.newReplies, function(index, value) {
+					loadNewReply(value.id, value.sone, value.post, value.postSone);
+				});
 			}
-			/* process new posts. */
-			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value.id, value.sone, value.recipient, value.time);
-			});
-			/* process new replies. */
-			$.each(data.newReplies, function(index, value) {
-				loadNewReply(value.id, value.sone, value.post, value.postSone);
-			});
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
 		} else {
