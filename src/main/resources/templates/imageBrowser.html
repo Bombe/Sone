@@ -591,7 +591,10 @@
 	<%elseif galleryRequested>
 
 		<%foreach albums album>
-			<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
+			<%first>
+				<h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2>
+				<%include include/pagination.html pagination=albumPagination pageParameter=="page">
+			<%/first>
 			<%if loop.count|mod divisor=3><div class="album-row"><%/if>
 			<div id="album-<% album.id|html>" class="album">
 				<div class="album-id hidden"><% album.id|html></div>
@@ -613,7 +616,10 @@
 			<%= false|store key=endRow>
 			<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
 			<%last><%= true|store key=endRow><%/last>
-			<%if endRow></div><%/if>
+			<%if endRow>
+				</div>
+				<%include include/pagination.html pagination=albumPagination pageParameter=="page">
+			<%/if>
 		<%/foreach>
 
 	<%/if>
