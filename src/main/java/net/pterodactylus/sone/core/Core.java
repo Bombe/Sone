@@ -46,6 +46,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.data.impl.PostImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -561,7 +562,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (posts) {
 			Post post = posts.get(postId);
 			if ((post == null) && create) {
-				post = new Post(postId);
+				post = new PostImpl(postId);
 				posts.put(postId, post);
 			}
 			return post;
@@ -1599,7 +1600,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
-		final Post post = new Post(sone, time, text);
+		final Post post = new PostImpl(sone, time, text);
 		if (recipient != null) {
 			post.setRecipient(recipient);
 		}
