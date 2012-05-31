@@ -800,6 +800,10 @@ textarea {
 	float: right;
 }
 
+#sone .clear {
+	clear: both;
+}
+
 #sone h1 {
 	font-family: inherit;
 	font-size: 200%;
