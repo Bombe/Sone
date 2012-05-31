@@ -373,8 +373,11 @@
 				</div>
 			<%/if>
 
-			<%foreach album.images image>
-				<%first><h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2><%/first>
+			<%foreach album.images image|paginate pageSize=core.preferences.imagesPerPage page=request.page>
+				<%first>
+					<h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2>
+					<%include include/pagination.html pageParameter=="page">
+				<%/first>
 				<%if loop.count|mod divisor==3><div class="image-row"><%/if>
 				<div id="image-<% image.id|html>" class="image">
 					<div class="image-id hidden"><% image.id|html></div>
@@ -415,7 +418,10 @@
 				<%= false|store key==endRow>
 				<%if loop.count|mod divisor==3 offset==1><%= true|store key==endRow><%/if>
 				<%last><%= true|store key==endRow><%/last>
-				<%if endRow></div><%/if>
+				<%if endRow>
+					</div>
+					<%include include/pagination.html pageParameter=="page">
+				<%/if>
 			<%/foreach>
 
 			<%if album.sone.local>
