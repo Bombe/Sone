@@ -8,6 +8,9 @@
 			getTranslation("WebInterface.DefaultText.Option.PostsPerPage", function(postsPerPageText) {
 				registerInputTextareaSwap("#sone #options input[name=posts-per-page]", postsPerPageText, "posts-per-page", true, true);
 			});
+			getTranslation("WebInterface.DefaultText.Option.ImagesPerPage", function(imagesPerPageText) {
+				registerInputTextareaSwap("#sone #options input[name=images-per-page]", imagesPerPageText, "images-per-page", true, true);
+			});
 			getTranslation("WebInterface.DefaultText.Option.CharactersPerPost", function(postsPerPageText) {
 				registerInputTextareaSwap("#sone #options input[name=characters-per-post]", postsPerPageText, "characters-per-post", true, true);
 			});
@@ -106,6 +109,12 @@
 			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
 		<%/if>
 		<p><input type="text" name="posts-per-page" value="<% posts-per-page|html>" /></p>
+
+		<p><%= Page.Options.Option.ImagesPerPage.Description|l10n|html></p>
+		<%if =images-per-page|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
+		<p><input type="text" name="images-per-page" value="<% images-per-page|html>" /></p>
 
 		<p><%= Page.Options.Option.CharactersPerPost.Description|l10n|html></p>
 		<%if =characters-per-post|in collection=fieldErrors>

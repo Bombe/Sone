@@ -90,6 +90,12 @@ public class OptionsPage extends SoneTemplatePage {
 			} else {
 				preferences.setPostsPerPage(postsPerPage);
 			}
+			Integer imagesPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4), null);
+			if (!preferences.validateImagesPerPage(imagesPerPage)) {
+				fieldErrors.add("images-per-page");
+			} else {
+				preferences.setImagesPerPage(imagesPerPage);
+			}
 			Integer charactersPerPost = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
 			if (!preferences.validateCharactersPerPost(charactersPerPost)) {
 				fieldErrors.add("characters-per-post");
@@ -146,6 +152,7 @@ public class OptionsPage extends SoneTemplatePage {
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());
+		templateContext.set("images-per-page", preferences.getImagesPerPage());
 		templateContext.set("characters-per-post", preferences.getCharactersPerPost());
 		templateContext.set("post-cut-off-length", preferences.getPostCutOffLength());
 		templateContext.set("require-full-access", preferences.isRequireFullAccess());
