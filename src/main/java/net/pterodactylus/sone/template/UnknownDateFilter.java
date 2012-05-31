@@ -54,7 +54,7 @@ public class UnknownDateFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		if (data instanceof Long) {
 			if ((Long) data == 0) {
 				return l10nHandler.getString(unknownKey);

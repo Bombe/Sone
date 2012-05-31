@@ -65,7 +65,7 @@ public class ImageLinkFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		Image image = null;
 		if (data instanceof String) {
 			image = core.getImage((String) data, false);
@@ -75,14 +75,11 @@ public class ImageLinkFilter implements Filter {
 		if (image == null) {
 			return null;
 		}
-		String imageClass = parameters.get("class");
+		String imageClass = String.valueOf(parameters.get("class"));
 		int maxWidth = Numbers.safeParseInteger(parameters.get("max-width"), Integer.MAX_VALUE);
 		int maxHeight = Numbers.safeParseInteger(parameters.get("max-height"), Integer.MAX_VALUE);
 		String mode = String.valueOf(parameters.get("mode"));
-		String title = parameters.get("title");
-		if ((title != null) && title.startsWith("=")) {
-			title = String.valueOf(templateContext.get(title.substring(1)));
-		}
+		String title = String.valueOf(parameters.get("title"));
 
 		TemplateContext linkTemplateContext = templateContextFactory.createTemplateContext();
 		linkTemplateContext.set("class", imageClass);

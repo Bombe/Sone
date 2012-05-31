@@ -39,7 +39,7 @@
 		<h2><%= Page.Options.Section.SoneSpecificOptions.Title|l10n|html></h2>
 
 		<%ifnull currentSone>
-			<p><%= Page.Options.Section.SoneSpecificOptions.NotLoggedIn|l10n|html|replace needle="{link}" replacement='<a href="login.html">'|replace needle="{/link}" replacement='</a>'></p>
+			<p><%= Page.Options.Section.SoneSpecificOptions.NotLoggedIn|l10n|html|replace needle=="{link}" replacement=='<a href="login.html">'|replace needle=="{/link}" replacement=='</a>'></p>
 		<%else>
 			<p><%= Page.Options.Section.SoneSpecificOptions.LoggedIn|l10n|html></p>
 		<%/if>
@@ -72,26 +72,26 @@
 		<h2><%= Page.Options.Section.AvatarOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.ShowAvatars.Description|l10n|html></p>
-		
+
 		<ul>
 			<li>
-				<input type="radio" name="show-custom-avatars" value="NEVER"<%if show-custom-avatars|match value=NEVER> checked="checked"<%/if>/>
+				<input type="radio" name="show-custom-avatars" value="NEVER"<%if show-custom-avatars|match value==NEVER> checked="checked"<%/if>/>
 				<%=Page.Options.Option.ShowAvatars.Never.Description|l10n|html>
 			</li>
 			<li>
-				<input type="radio" name="show-custom-avatars" value="FOLLOWED"<%if show-custom-avatars|match value=FOLLOWED> checked="checked"<%/if>/>
+				<input type="radio" name="show-custom-avatars" value="FOLLOWED"<%if show-custom-avatars|match value==FOLLOWED> checked="checked"<%/if>/>
 				<%=Page.Options.Option.ShowAvatars.Followed.Description|l10n|html>
 			</li>
 			<li>
-				<input type="radio" name="show-custom-avatars" value="MANUALLY_TRUSTED"<%if show-custom-avatars|match value=MANUALLY_TRUSTED> checked="checked"<%/if>/>
+				<input type="radio" name="show-custom-avatars" value="MANUALLY_TRUSTED"<%if show-custom-avatars|match value==MANUALLY_TRUSTED> checked="checked"<%/if>/>
 				<%=Page.Options.Option.ShowAvatars.ManuallyTrusted.Description|l10n|html>
 			</li>
 			<li>
-				<input type="radio" name="show-custom-avatars" value="TRUSTED"<%if show-custom-avatars|match value=TRUSTED> checked="checked"<%/if>/>
+				<input type="radio" name="show-custom-avatars" value="TRUSTED"<%if show-custom-avatars|match value==TRUSTED> checked="checked"<%/if>/>
 				<%=Page.Options.Option.ShowAvatars.Trusted.Description|l10n|html>
 			</li>
 			<li>
-				<input type="radio" name="show-custom-avatars" value="ALWAYS"<%if show-custom-avatars|match value=ALWAYS> checked="checked"<%/if>/>
+				<input type="radio" name="show-custom-avatars" value="ALWAYS"<%if show-custom-avatars|match value==ALWAYS> checked="checked"<%/if>/>
 				<%=Page.Options.Option.ShowAvatars.Always.Description|l10n|html>
 			</li>
 		</ul>
@@ -155,20 +155,20 @@
 		<p><input type="checkbox" name="fcp-interface-active"<%if fcp-interface-active> checked="checked"<%/if> /> <%= Page.Options.Option.FcpInterfaceActive.Description|l10n|html></p>
 
 		<p>
-			<%= Page.Options.Option.FcpFullAccessRequired.Description|l10n|html|replace needle="{link}" replacement='<a href="/config/fcp">'|replace needle="{/link}" replacement='</a>'>
+			<%= Page.Options.Option.FcpFullAccessRequired.Description|l10n|html|replace needle=="{link}" replacement=='<a href="/config/fcp">'|replace needle=="{/link}" replacement=='</a>'>
 			<select name="fcp-full-access-required">
-				<option value="0"<%if fcp-full-access-required|match value="0"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.No|l10n|html></option>
-				<option value="1"<%if fcp-full-access-required|match value="1"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Writing|l10n|html></option>
-				<option value="2"<%if fcp-full-access-required|match value="2"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Always|l10n|html></option>
+				<option value="0"<%if fcp-full-access-required|match value=="0"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.No|l10n|html></option>
+				<option value="1"<%if fcp-full-access-required|match value=="1"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Writing|l10n|html></option>
+				<option value="2"<%if fcp-full-access-required|match value=="2"> selected="selected"<%/if>><%= Page.Options.Option.FcpFullAccessRequired.Value.Always|l10n|html></option>
 			</select>
 		</p>
 
 		<h2><%= Page.Options.Section.Cleaning.Title|l10n|html></h2>
 
-		<p><%= Page.Options.Option.ClearOnNextRestart.Description|l10n|html|replace needle="{strong}" replacement="<strong>"|replace needle="{/strong}" replacement="</strong>"></p>
+		<p><%= Page.Options.Option.ClearOnNextRestart.Description|l10n|html|replace needle=="{strong}" replacement=="<strong>"|replace needle=="{/strong}" replacement=="</strong>"></p>
 		<p><select name="clear-on-next-restart"><option disabled="disabled"><%= WebInterface.SelectBox.Choose|l10n|html></option><option value="true"<%if clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.Yes|l10n|html></option><option value="false"<%if ! clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.No|l10n|html></option></select>
 
-		<p><%= Page.Options.Option.ReallyClearOnNextRestart.Description|l10n|html|replace needle="{strong}" replacement="<strong>"|replace needle="{/strong}" replacement="</strong>"></p>
+		<p><%= Page.Options.Option.ReallyClearOnNextRestart.Description|l10n|html|replace needle=="{strong}" replacement=="<strong>"|replace needle=="{/strong}" replacement=="</strong>"></p>
 		<p><select name="really-clear-on-next-restart"><option disabled="disabled"><%= WebInterface.SelectBox.Choose|l10n|html></option><option value="true"<%if really-clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.Yes|l10n|html></option><option value="false"<%if ! really-clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.No|l10n|html></option></select>
 
 		<p><button type="submit"><%= Page.Options.Button.Save|l10n|html></button></p>

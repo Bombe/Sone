@@ -36,7 +36,7 @@ public class JavascriptFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		StringBuilder javascriptString = new StringBuilder();
 		javascriptString.append('"');
 		for (char c : String.valueOf(data).toCharArray()) {

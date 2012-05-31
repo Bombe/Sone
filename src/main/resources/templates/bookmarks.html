@@ -5,14 +5,13 @@
 	<h1><%= Page.Bookmarks.Page.Title|l10n|html></h1>
 
 	<div id="posts">
-		<%= page|store key=pageParameter>
-		<%include include/pagination.html>
+		<%include include/pagination.html pageParameter==page>
 		<%foreach posts post>
 			<%include include/viewPost.html>
 		<%/foreach>
-		<%include include/pagination.html>
+		<%include include/pagination.html pageParameter==page>
 		<%if postsNotLoaded>
-			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html|replace needle='{link}' replacement='<a href="unbookmark.html?post=allNotLoaded">'|replace needle='{/link}' replacement='</a>'></p>
+			<p><%= Page.Bookmarks.Text.PostsNotLoaded|l10n|html|replace needle=='{link}' replacement=='<a href="unbookmark.html?post=allNotLoaded">'|replace needle=='{/link}' replacement=='</a>'></p>
 		<%elseif posts.empty>
 			<p><%= Page.Bookmarks.Text.NoBookmarks|l10n|html></p>
 		<%/if>

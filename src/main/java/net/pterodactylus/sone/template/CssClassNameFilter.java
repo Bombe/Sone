@@ -35,7 +35,7 @@ public class CssClassNameFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		return String.valueOf(data).replaceAll("[^a-zA-Z0-9-]", "_");
 	}
 

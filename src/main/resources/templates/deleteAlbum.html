@@ -2,7 +2,7 @@
 
 	<h1><%= Page.DeleteAlbum.Page.Title|l10n|html></h1>
 
-	<p><%= Page.DeleteAlbum.Text.AlbumWillBeGone|l10n|replace needle="{title}" replacementKey=album.title|html></p>
+	<p><%= Page.DeleteAlbum.Text.AlbumWillBeGone|l10n|replace needle=="{title}" replacementKey==album.title|html></p>
 
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />

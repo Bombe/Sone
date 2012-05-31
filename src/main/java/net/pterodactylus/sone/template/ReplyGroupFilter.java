@@ -42,7 +42,7 @@ public class ReplyGroupFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		@SuppressWarnings("unchecked")
 		List<PostReply> allReplies = (List<PostReply>) data;
 		Map<Post, Set<Sone>> postSones = new HashMap<Post, Set<Sone>>();

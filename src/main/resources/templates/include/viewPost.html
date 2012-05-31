@@ -7,7 +7,7 @@
 	<div class="avatar post-avatar" >
 		<%if post.loaded>
 			<%ifnull !post.sone.profile.avatar>
-				<%post.sone.profile.avatar|image-link max-width=48 max-height=48 mode=enlarge title="Avatar Image">
+				<%post.sone.profile.avatar|image-link max-width==48 max-height==48 mode==enlarge title=="Avatar Image">
 			<%else>
 				<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
 			<%/if>
@@ -26,14 +26,14 @@
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
 				<%/if>
 			<%/if>
-			<% post.text|html|store key=originalText text=true>
-			<% post.text|parse sone=post.sone|store key=parsedText text=true>
-			<% post.text|parse sone=post.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|store key=shortText text=true>
+			<% post.text|html|store key==originalText text==true>
+			<% post.text|parse sone=post.sone|store key==parsedText text==true>
+			<% post.text|parse sone=post.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|store key==shortText text==true>
 			<div class="post-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="post-text text<%if raw> hidden<%/if><%if !shortText|match key=parsedText> hidden<%/if>"><% parsedText></div>
 			<div class="post-text short-text<%if raw> hidden<%/if><%if shortText|match key=parsedText> hidden<%/if>"><% shortText></div>
-			<%if !shortText|match key=parsedText><%if !raw><a class="expand-post-text" href="viewPost.html?post=<% post.id|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
-			<%if !shortText|match key=parsedText><%if !raw><a class="shrink-post-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
+			<%if !shortText|match value=parsedText><%if !raw><a class="expand-post-text" href="viewPost.html?post=<% post.id|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
+			<%if !shortText|match value=parsedText><%if !raw><a class="shrink-post-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
 		</div>
 		<div class="post-status-line status-line<%if !post.loaded> hidden<%/if>">
 			<div class="bookmarks">
@@ -51,16 +51,16 @@
 				</form>
 			</div>
 			<span class='separator'>·</span>
-			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format="MMM d, yyyy, HH:mm:ss"></a></div>
+			<div class="time"><a href="viewPost.html?post=<% post.id|html>"><% post.time|date format=="MMM d, yyyy, HH:mm:ss"></a></div>
 			<span class='separator'>·</span>
 			<div class="permalink permalink-post"><a href="post://<%post.id|html>">[<%= View.Post.Permalink|l10n|html>]</a></div>
 			<span class='separator'>·</span>
 			<div class="permalink permalink-author"><a href="sone://<%post.sone.id|html>">[<%= View.Post.PermalinkAuthor|l10n|html>]</a></div>
-			<%if ! originalText|match key=parsedText>
+			<%if ! originalText|match value=parsedText>
 				<span class='separator'>·</span>
 				<div class="show-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
 			<%/if>
-			<div class="likes<%if post.likes.size|match value=0> hidden<%/if>">
+			<div class="likes<%if post.likes.size|match value==0> hidden<%/if>">
 				<span class='separator'>·</span>
 				<span title="<% post.likes.soneNames|html>">↑<span class="like-count"><% post.likes.size></span></span>
 			</div>

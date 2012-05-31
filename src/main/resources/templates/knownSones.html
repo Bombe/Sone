@@ -27,14 +27,14 @@
 			<div>
 				<%= Page.KnownSones.Label.Sort|l10n|html>
 				<select name="sort">
-					<option value="name"<%if sort|match value="name"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Name|l10n|html></option>
-					<option value="activity"<%if sort|match value="activity"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.LastActivity|l10n|html></option>
-					<option value="posts"<%if sort|match value="posts"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Posts|l10n|html></option>
-					<option value="images"<%if sort|match value="images"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Images|l10n|html></option>
+					<option value="name"<%if sort|match value=="name"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Name|l10n|html></option>
+					<option value="activity"<%if sort|match value=="activity"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.LastActivity|l10n|html></option>
+					<option value="posts"<%if sort|match value=="posts"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Posts|l10n|html></option>
+					<option value="images"<%if sort|match value=="images"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Field.Images|l10n|html></option>
 				</select>
 				<select name="order">
-					<option value="asc"<%if order|match value="asc"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Order.Ascending|l10n|html></option>
-					<option value="desc"<%if order|match value="desc"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Order.Descending|l10n|html></option>
+					<option value="asc"<%if order|match value=="asc"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Order.Ascending|l10n|html></option>
+					<option value="desc"<%if order|match value=="desc"> selected="selected"<%/if>><%= Page.KnownSones.Sort.Order.Descending|l10n|html></option>
 				</select>
 			</div>
 			<%ifnull !currentSone>
@@ -43,11 +43,11 @@
 					<select name="filter">
 						<option value="none"></option>
 						<%ifnull !currentSone>
-							<option value="followed"<%if filter|match value="followed"> selected="selected"<%/if>><%= Page.KnownSones.Filter.Followed|l10n|html></option>
-							<option value="not-followed"<%if filter|match value="not-followed"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotFollowed|l10n|html></option>
+							<option value="followed"<%if filter|match value=="followed"> selected="selected"<%/if>><%= Page.KnownSones.Filter.Followed|l10n|html></option>
+							<option value="not-followed"<%if filter|match value=="not-followed"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotFollowed|l10n|html></option>
 						<%/if>
-						<option value="new"<%if filter|match value="new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.New|l10n|html></option>
-						<option value="not-new"<%if filter|match value="not-new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotNew|l10n|html></option>
+						<option value="new"<%if filter|match value=="new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.New|l10n|html></option>
+						<option value="not-new"<%if filter|match value=="not-new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotNew|l10n|html></option>
 					</select>
 				</div>
 			<%/if>
@@ -78,14 +78,13 @@
 	<%/if>
 
 	<div id="known-sones">
-		<%= page|store key=pageParameter>
-		<%include include/pagination.html>
+		<%include include/pagination.html pageParameter==page>
 		<%foreach pagination.items sone>
 			<%include include/viewSone.html>
 		<%foreachelse>
 			<div><%= Page.KnownSones.Text.NoKnownSones|l10n|html></div>
 		<%/foreach>
-		<%include include/pagination.html>
+		<%include include/pagination.html pageParameter==page>
 	</div>
 
 <%include include/tail.html>

@@ -1,7 +1,7 @@
 <%if !identitiesWithoutSone.empty>
 	<h1><%= Page.Login.CreateSone.Title|l10n|html></h1>
 
-	<p><%= View.CreateSone.Text.WotIdentityRequired|l10n|html|replace needle="{link}" replacement='<a href="/WebOfTrust/">'|replace needle="{/link}" replacement='</a>'></p>
+	<p><%= View.CreateSone.Text.WotIdentityRequired|l10n|html|replace needle=="{link}" replacement=='<a href="/WebOfTrust/">'|replace needle=="{/link}" replacement=='</a>'></p>
 
 	<form id="create-sone" action="createSone.html" method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
@@ -23,8 +23,8 @@
 	</form>
 <%else>
 	<%if !sones.empty>
-		<p><%= View.CreateSone.Text.NoNonSoneIdentities|l10n|html|replace needle="{link}" replacement='<a href="/WebOfTrust/OwnIdentities">'|replace needle="{/link}" replacement="</a>"></p>
+		<p><%= View.CreateSone.Text.NoNonSoneIdentities|l10n|html|replace needle=="{link}" replacement=='<a href="/WebOfTrust/OwnIdentities">'|replace needle=="{/link}" replacement=="</a>"></p>
 	<%else>
-		<p><%= View.CreateSone.Text.NoIdentities|l10n|html|replace needle="{link}" replacement='<a href="/WebOfTrust/OwnIdentities">'|replace needle="{/link}" replacement="</a>"></p>
+		<p><%= View.CreateSone.Text.NoIdentities|l10n|html|replace needle=="{link}" replacement=='<a href="/WebOfTrust/OwnIdentities">'|replace needle=="{/link}" replacement=="</a>"></p>
 	<%/if>
 <%/if>

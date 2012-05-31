@@ -37,9 +37,9 @@ public class SubstringFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String startString = parameters.get("start");
-		String lengthString = parameters.get("length");
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String startString = String.valueOf(parameters.get("start"));
+		String lengthString = String.valueOf(parameters.get("length"));
 		int start = 0;
 		try {
 			start = Integer.parseInt(startString);
