@@ -9,7 +9,7 @@
 
 		<p>
 			<%= Page.ViewSone.NoSone.Description|l10n|replace needle=="{sone}" replacement=soneId|html>
-			<a href="/WebOfTrust/ShowIdentity?id=<% sone.id|html>"><%= Page.ViewSone.Profile.Name.WoTLink|l10n|html></a>
+			<a href="/WebOfTrust/ShowIdentity?id=<% soneId|html>"><%= Page.ViewSone.Profile.Name.WoTLink|l10n|html></a>
 		</p>
 
 	<%elseifnull sone.name>
