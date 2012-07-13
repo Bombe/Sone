@@ -9,7 +9,7 @@
 			<%ifnull !post.sone.profile.avatar>
 				<%post.sone.profile.avatar|image-link max-width==48 max-height==48 mode==enlarge title=="Avatar Image">
 			<%else>
-				<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&height=48" width="48" height="48" alt="Avatar Image" />
+				<img src="/WebOfTrust/GetIdenticon?identity=<% post.sone.id|html>&amp;width=48&amp;height=48" width="48" height="48" alt="Avatar Image" />
 			<%/if>
 		<%else>
 			<img src="images/sone-avatar.png" width="48" height="48" alt="Avatar Image" />
