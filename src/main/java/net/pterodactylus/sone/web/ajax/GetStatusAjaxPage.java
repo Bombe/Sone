@@ -66,19 +66,14 @@ public class GetStatusAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
-		/* load Sones. */
-		boolean loadAllSones = Boolean.parseBoolean(request.getHttpRequest().getParam("loadAllSones", "false"));
+		/* load Sones. always return the status of the current Sone. */
 		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSone(request.getToadletContext(), false)));
-		if (loadAllSones) {
-			sones.addAll(webInterface.getCore().getSones());
-		} else {
-			String loadSoneIds = request.getHttpRequest().getParam("soneIds");
-			if (loadSoneIds.length() > 0) {
-				String[] soneIds = loadSoneIds.split(",");
-				for (String soneId : soneIds) {
-					/* just add it, we skip null further down. */
-					sones.add(webInterface.getCore().getSone(soneId, false));
-				}
+		String loadSoneIds = request.getHttpRequest().getParam("soneIds");
+		if (loadSoneIds.length() > 0) {
+			String[] soneIds = loadSoneIds.split(",");
+			for (String soneId : soneIds) {
+				/* just add it, we skip null further down. */
+				sones.add(webInterface.getCore().getSone(soneId, false));
 			}
 		}
 		JsonArray jsonSones = new JsonArray();
