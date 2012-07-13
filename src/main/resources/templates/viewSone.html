@@ -8,8 +8,8 @@
 		<h1><%= Page.ViewSone.Page.TitleWithoutSone|l10n|html></h1>
 
 		<p>
-			<%= Page.ViewSone.NoSone.Description|l10n|replace needle="{sone}" replacementKey=soneId|html>
-			<a href="/WebOfTrust/ShowIdentity?id=<% sone.id|html>"><%= Page.ViewSone.Profile.Name.WoTLink|l10n|html></a>
+			<%= Page.ViewSone.NoSone.Description|l10n|replace needle=="{sone}" replacement=soneId|html>
+			<a href="/WebOfTrust/ShowIdentity?id=<% soneId|html>"><%= Page.ViewSone.Profile.Name.WoTLink|l10n|html></a>
 		</p>
 
 	<%elseifnull sone.name>
@@ -79,7 +79,7 @@
 			<%/if>
 		<%/if>
 
-		<h1><%= Page.ViewSone.PostList.Title|l10n|replace needle="{sone}" replacementKey=sone.niceName|html></h1>
+		<h1><%= Page.ViewSone.PostList.Title|l10n|replace needle=="{sone}" replacement=sone.niceName|html></h1>
 
 		<%foreach posts post>
 			<%first>
@@ -97,7 +97,7 @@
 
 		<%foreach repliedPosts post>
 			<%first>
-				<h2><%= Page.ViewSone.Replies.Title|l10n|html|replace needle="{sone}" replacementKey=sone.niceName></h2>
+				<h2><%= Page.ViewSone.Replies.Title|l10n|html|replace needle=="{sone}" replacement=sone.niceName></h2>
 				<div id="replied-posts">
 					<%include include/pagination.html pagination=repliedPostPagination pageParameter==repliedPostPage paginationName==reply-navigation>
 			<%/first>

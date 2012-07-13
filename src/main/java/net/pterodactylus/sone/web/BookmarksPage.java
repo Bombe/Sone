@@ -1,5 +1,5 @@
 /*
- * Sone - BookmarksPage.java - Copyright © 2011 David Roden
+ * Sone - BookmarksPage.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,8 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.filter.Filter;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;

@@ -1,5 +1,5 @@
 /*
- * Sone - PostAccessor.java - Copyright © 2010 David Roden
+ * Sone - PostAccessor.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateContext;
 

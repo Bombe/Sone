@@ -1,5 +1,5 @@
 /*
- * Sone - ReplyGroupFilter.java - Copyright © 2010 David Roden
+ * Sone - ReplyGroupFilter.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ public class ReplyGroupFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		@SuppressWarnings("unchecked")
 		List<PostReply> allReplies = (List<PostReply>) data;
 		Map<Post, Set<Sone>> postSones = new HashMap<Post, Set<Sone>>();

@@ -1,5 +1,5 @@
 /*
- * Sone - ImageBrowserPage.java - Copyright © 2011 David Roden
+ * Sone - ImageBrowserPage.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -87,7 +89,9 @@ public class ImageBrowserPage extends SoneTemplatePage {
 				albums.addAll(sone.getAllAlbums());
 			}
 			Collections.sort(albums, Album.TITLE_COMPARATOR);
-			templateContext.set("albums", albums);
+			Pagination<Album> albumPagination = new Pagination<Album>(albums, 12).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+			templateContext.set("albumPagination", albumPagination);
+			templateContext.set("albums", albumPagination.getItems());
 			return;
 		}
 		Sone sone = getCurrentSone(request.getToadletContext(), false);

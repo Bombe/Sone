@@ -1,5 +1,5 @@
 /*
- * Sone - Album.java - Copyright © 2011 David Roden
+ * Sone - Album.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.pterodactylus.util.collection.Mapper;
-import net.pterodactylus.util.collection.Mappers;
+import net.pterodactylus.util.collection.IterableWrapper;
+import net.pterodactylus.util.collection.filter.NotNullFilter;
+import net.pterodactylus.util.collection.mapper.Mapper;
 import net.pterodactylus.util.object.Default;
 import net.pterodactylus.util.validation.Validation;
 
@@ -207,7 +208,7 @@ public class Album implements Fingerprintable {
 	 * @return The images in this album
 	 */
 	public List<Image> getImages() {
-		return Mappers.mappedList(imageIds, new Mapper<String, Image>() {
+		return IterableWrapper.wrap(imageIds).map(new Mapper<String, Image>() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -215,7 +216,7 @@ public class Album implements Fingerprintable {
 				return images.get(imageId);
 			}
 
-		});
+		}).filter(new NotNullFilter()).list();
 	}
 
 	/**

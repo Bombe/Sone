@@ -1,10 +1,10 @@
 <%if pagination.necessary>
 	<div class="navigation <%paginationName|html>">
-		<div class="first"><%if ! pagination.first><a href="<% request|change nameKey=pageParameter value=0>">«</a><%else><span>«</span><%/if></div>
-		<div class="previous"><%if ! pagination.first><a href="<% request|change nameKey=pageParameter key=pagination.previousPage>">‹</a><%else><span>‹</span><%/if></div>
+		<div class="first"><%if ! pagination.first><a href="<% request|change name=pageParameter value==0>">«</a><%else><span>«</span><%/if></div>
+		<div class="previous"><%if ! pagination.first><a href="<% request|change name=pageParameter value=pagination.previousPage>">‹</a><%else><span>‹</span><%/if></div>
 		<div class="current-page"><% pagination.pageNumber></div>
 		<div class="total-pages"><% pagination.pageCount></div>
-		<div class="last"><%if ! pagination.last><a href="<% request|change nameKey=pageParameter key=pagination.lastPage>">»</a><%else><span>»</span><%/if></div>
-		<div class="next"><%if ! pagination.last><a href="<% request|change nameKey=pageParameter key=pagination.nextPage>">›</a><%else><span>›</span><%/if></div>
+		<div class="last"><%if ! pagination.last><a href="<% request|change name=pageParameter value=pagination.lastPage>">»</a><%else><span>»</span><%/if></div>
+		<div class="next"><%if ! pagination.last><a href="<% request|change name=pageParameter value=pagination.nextPage>">›</a><%else><span>›</span><%/if></div>
 	</div>
 <%/if>

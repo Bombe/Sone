@@ -1,5 +1,5 @@
 /*
- * Sone - Reply.java - Copyright © 2011 David Roden
+ * Sone - Reply.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package net.pterodactylus.sone.data;
 import java.util.Comparator;
 import java.util.UUID;
 
-import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filter;
 
 /**
  * Abstract base class for all replies.

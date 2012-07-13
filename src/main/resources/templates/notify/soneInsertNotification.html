@@ -1,7 +1,7 @@
-<%if soneStatus|match value="inserting">
+<%if soneStatus|match value=="inserting">
 	Your Sone <a href="viewSone.html?sone=<%insertSone.id|html>"><%insertSone.niceName|html></a> is now being inserted.
-<%elseif soneStatus|match value="inserted">
+<%elseif soneStatus|match value=="inserted">
 	Your Sone <a href="viewSone.html?sone=<%insertSone.id|html>"><%insertSone.niceName|html></a> has been inserted in <%= Notification.SoneInsert.Duration|l10n 0=insertDuration>.
-<%elseif soneStatus|match value="insert-aborted">
+<%elseif soneStatus|match value=="insert-aborted">
 	Inserting your Sone <a href="viewSone.html?sone=<%insertSone.id|html>"><%insertSone.niceName|html></a> has failed.
 <%/if>

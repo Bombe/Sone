@@ -1,5 +1,5 @@
 /*
- * Sone - Post.java - Copyright © 2010 David Roden
+ * Sone - Post.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,9 +18,8 @@
 package net.pterodactylus.sone.data;
 
 import java.util.Comparator;
-import java.util.UUID;
 
-import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filter;
 
 /**
  * A post is a short message that a user writes in his Sone to let other users
@@ -28,7 +27,7 @@ import net.pterodactylus.util.filter.Filter;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Post {
+public interface Post {
 
 	/** Comparator for posts, sorts descending by time. */
 	public static final Comparator<Post> TIME_COMPARATOR = new Comparator<Post>() {
@@ -50,79 +49,6 @@ public class Post {
 
 	};
 
-	/** The GUID of the post. */
-	private final UUID id;
-
-	/** The Sone this post belongs to. */
-	private volatile Sone sone;
-
-	/** The Sone of the recipient. */
-	private volatile Sone recipient;
-
-	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
-	private volatile long time;
-
-	/** The text of the post. */
-	private volatile String text;
-
-	/** Whether the post is known. */
-	private volatile boolean known;
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param id
-	 *            The ID of the post
-	 */
-	public Post(String id) {
-		this(id, null, 0, null);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone this post belongs to
-	 * @param text
-	 *            The text of the post
-	 */
-	public Post(Sone sone, String text) {
-		this(sone, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone this post belongs to
-	 * @param time
-	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
-	 * @param text
-	 *            The text of the post
-	 */
-	public Post(Sone sone, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, time, text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param id
-	 *            The ID of the post
-	 * @param sone
-	 *            The Sone this post belongs to
-	 * @param time
-	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
-	 * @param text
-	 *            The text of the post
-	 */
-	public Post(String id, Sone sone, long time, String text) {
-		this.id = UUID.fromString(id);
-		this.sone = sone;
-		this.time = time;
-		this.text = text;
-	}
-
 	//
 	// ACCESSORS
 	//
@@ -132,18 +58,14 @@ public class Post {
 	 *
 	 * @return The ID of the post
 	 */
-	public String getId() {
-		return id.toString();
-	}
+	public String getId();
 
 	/**
 	 * Returns the Sone this post belongs to.
 	 *
 	 * @return The Sone of this post
 	 */
-	public Sone getSone() {
-		return sone;
-	}
+	public Sone getSone();
 
 	/**
 	 * Sets the Sone of this post.
@@ -152,19 +74,14 @@ public class Post {
 	 *            The Sone of this post
 	 * @return This post (for method chaining)
 	 */
-	public Post setSone(Sone sone) {
-		this.sone = sone;
-		return this;
-	}
+	public Post setSone(Sone sone);
 
 	/**
 	 * Returns the recipient of this post, if any.
 	 *
 	 * @return The recipient of this post, or {@code null}
 	 */
-	public Sone getRecipient() {
-		return recipient;
-	}
+	public Sone getRecipient();
 
 	/**
 	 * Sets the recipient of this post.
@@ -173,21 +90,14 @@ public class Post {
 	 *            The recipient of this post, or {@code null}
 	 * @return This post (for method chaining)
 	 */
-	public Post setRecipient(Sone recipient) {
-		if (!sone.equals(recipient)) {
-			this.recipient = recipient;
-		}
-		return this;
-	}
+	public Post setRecipient(Sone recipient);
 
 	/**
 	 * Returns the time of the post.
 	 *
 	 * @return The time of the post (in milliseconds since Jan 1, 1970 UTC)
 	 */
-	public long getTime() {
-		return time;
-	}
+	public long getTime();
 
 	/**
 	 * Sets the time of this post.
@@ -196,19 +106,14 @@ public class Post {
 	 *            The time of this post (in milliseconds since Jan 1, 1970 UTC)
 	 * @return This post (for method chaining)
 	 */
-	public Post setTime(long time) {
-		this.time = time;
-		return this;
-	}
+	public Post setTime(long time);
 
 	/**
 	 * Returns the text of the post.
 	 *
 	 * @return The text of the post
 	 */
-	public String getText() {
-		return text;
-	}
+	public String getText();
 
 	/**
 	 * Sets the text of this post.
@@ -217,19 +122,14 @@ public class Post {
 	 *            The text of this post
 	 * @return This post (for method chaining)
 	 */
-	public Post setText(String text) {
-		this.text = text;
-		return this;
-	}
+	public Post setText(String text);
 
 	/**
 	 * Returns whether this post is known.
 	 *
 	 * @return {@code true} if this post is known, {@code false} otherwise
 	 */
-	public boolean isKnown() {
-		return known;
-	}
+	public boolean isKnown();
 
 	/**
 	 * Sets whether this post is known.
@@ -238,41 +138,6 @@ public class Post {
 	 *            {@code true} if this post is known, {@code false} otherwise
 	 * @return This post
 	 */
-	public Post setKnown(boolean known) {
-		this.known = known;
-		return this;
-	}
-
-	//
-	// OBJECT METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof Post)) {
-			return false;
-		}
-		Post post = (Post) object;
-		return post.id.equals(id);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
-	}
+	public Post setKnown(boolean known);
 
 }

@@ -1193,7 +1193,7 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 }
 
 function getStatus() {
-	ajaxGet("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : {"loadAllSones": isKnownSonesPage()}, function(data, textStatus) {
+	ajaxGet("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {}, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
@@ -1206,15 +1206,15 @@ function getStatus() {
 			if (data.notificationHash != getNotificationHash()) {
 				console.log("Old hash: ", getNotificationHash(), ", new hash: ", data.notificationHash);
 				requestNotifications();
+				/* process new posts. */
+				$.each(data.newPosts, function(index, value) {
+					loadNewPost(value.id, value.sone, value.recipient, value.time);
+				});
+				/* process new replies. */
+				$.each(data.newReplies, function(index, value) {
+					loadNewReply(value.id, value.sone, value.post, value.postSone);
+				});
 			}
-			/* process new posts. */
-			$.each(data.newPosts, function(index, value) {
-				loadNewPost(value.id, value.sone, value.recipient, value.time);
-			});
-			/* process new replies. */
-			$.each(data.newReplies, function(index, value) {
-				loadNewReply(value.id, value.sone, value.post, value.postSone);
-			});
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
 		} else {
@@ -1356,6 +1356,20 @@ function isViewSonePage() {
  */
 function getShownSoneId() {
 	return $("#sone .sone-id").first().text();
+}
+
+/**
+ * Returns the ID of all currently visible Sones. This is mainly used on the
+ * “Known Sones” page.
+ *
+ * @returns The ID of the currently shown Sones
+ */
+function getShownSoneIds() {
+	var soneIds = new Array();
+	$("#sone #known-sones .sone .id").each(function() {
+		soneIds.push($(this).text());
+	});
+	return soneIds.join(",");
 }
 
 /**
@@ -1865,6 +1879,14 @@ var currentSoneMenuTimeoutHandler;
 
 $(document).ready(function() {
 
+	/* rip out the status update textarea. */
+	$("#sone .rip-out").each(function() {
+		var oldElement = $(this);
+		newElement = $("<input type='text'/>");
+		newElement.attr("class", oldElement.attr("class")).attr("name", oldElement.attr("name"));
+		oldElement.before(newElement).remove();
+	});
+
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
@@ -1949,7 +1971,7 @@ $(document).ready(function() {
 				allReplies = $(this).find(".reply");
 				if (allReplies.length > 2) {
 					newHidden = false;
-					for (replyIndex = 0; !newHidden && (replyIndex < (allReplies.length - 2)); ++replyIndex) {
+					for (replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
 						$(allReplies[replyIndex]).addClass("hidden");
 						newHidden |= $(allReplies[replyIndex]).hasClass("new");
 					}

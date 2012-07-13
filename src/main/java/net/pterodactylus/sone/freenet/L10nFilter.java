@@ -1,5 +1,5 @@
 /*
- * Sone - L10nFilter.java - Copyright © 2010 David Roden
+ * Sone - L10nFilter.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@ public class L10nFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public String format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		if (parameters.isEmpty()) {
 			return webInterface.getL10n().getString(String.valueOf(data));
 		}
@@ -60,11 +60,6 @@ public class L10nFilter implements Filter {
 		int parameterIndex = 0;
 		while (parameters.containsKey(String.valueOf(parameterIndex))) {
 			Object value = parameters.get(String.valueOf(parameterIndex));
-			if (((String) value).startsWith("=")) {
-				value = ((String) value).substring(1);
-			} else {
-				value = templateContext.get((String) value);
-			}
 			parameterValues.add(value);
 			++parameterIndex;
 		}

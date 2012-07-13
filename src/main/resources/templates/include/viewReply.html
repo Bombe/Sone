@@ -6,7 +6,7 @@
 	<%include include/soneMenu.html class=="sone-reply-menu" sone=reply.sone>
 	<div class="avatar reply-avatar">
 		<%ifnull !reply.sone.profile.avatar>
-			<% reply.sone.profile.avatar|image-link max-width=36 max-height=36 mode=enlarge title="Avatar Image">
+			<% reply.sone.profile.avatar|image-link max-width==36 max-height==36 mode==enlarge title=="Avatar Image">
 		<%else>
 			<img src="/WebOfTrust/GetIdenticon?identity=<% reply.sone.id|html>&amp;width=36&height=36" width="36" height="36" alt="Avatar Image" />
 		<%/if>
@@ -14,24 +14,24 @@
 	<div class="inner-part">
 		<div>
 			<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id|html>"><% reply.sone.niceName|html></a></div>
-			<% reply.text|html|store key=originalText text=true>
-			<% reply.text|parse sone=reply.sone|store key=parsedText text=true>
-			<% reply.text|parse sone=reply.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|store key=shortText text=true>
+			<% reply.text|html|store key==originalText text==true>
+			<% reply.text|parse sone=reply.sone|store key==parsedText text==true>
+			<% reply.text|parse sone=reply.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|store key==shortText text==true>
 			<div class="reply-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="reply-text text<%if raw> hidden<%/if><%if !shortText|match key=parsedText> hidden<%/if>"><% parsedText></div>
 			<div class="reply-text short-text<%if raw> hidden<%/if><%if shortText|match key=parsedText> hidden<%/if>"><% shortText></div>
-			<%if !shortText|match key=parsedText><%if !raw><a class="expand-reply-text" href="viewPost.html?post=<% reply.post.id|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
-			<%if !shortText|match key=parsedText><%if !raw><a class="shrink-reply-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
+			<%if !shortText|match value=parsedText><%if !raw><a class="expand-reply-text" href="viewPost.html?post=<% reply.post.id|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
+			<%if !shortText|match value=parsedText><%if !raw><a class="shrink-reply-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
 		</div>
 		<div class="reply-status-line status-line">
-			<div class="time"><% reply.time|date format="MMM d, yyyy, HH:mm:ss"></div>
+			<div class="time"><% reply.time|date format=="MMM d, yyyy, HH:mm:ss"></div>
 			<span class='separator'>·</span>
 			<div class="permalink permalink-author"><a href="sone://<%reply.sone.id|html>">[<%= View.Post.PermalinkAuthor|l10n|html>]</a></div>
-			<%if ! originalText|match key=parsedText>
+			<%if ! originalText|match value=parsedText>
 				<span class='separator'>·</span>
 				<div class="show-reply-source"><a href="viewPost.html?post=<% post.id|html>&amp;raw=<%if raw>false<%else>true<%/if>"><%= View.Post.ShowSource|l10n|html></a></div>
 			<%/if>
-			<div class="likes<%if reply.likes.size|match value=0> hidden<%/if>">
+			<div class="likes<%if reply.likes.size|match value==0> hidden<%/if>">
 				<span class='separator'>·</span>
 				<span title="<% reply.likes.soneNames|html>">↑<span class="like-count"><% reply.likes.size></span></span>
 			</div>

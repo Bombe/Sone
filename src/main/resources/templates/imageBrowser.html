@@ -312,7 +312,7 @@
 				</script>
 			<%/if>
 
-			<h1 class="backlink"><%= Page.ImageBrowser.Album.Title|l10n|replace needle='{album}' replacementKey=album.title|html></h1>
+			<h1 class="backlink"><%= Page.ImageBrowser.Album.Title|l10n|replace needle=='{album}' replacement=album.title|html></h1>
 
 			<div class="backlinks">
 				<div class="backlink"><a href="imageBrowser.html?mode=gallery"><%= Page.ImageBrowser.Link.All|l10n|html></a></div>
@@ -345,7 +345,7 @@
 								<select name="album-image">
 									<option disabled="disabled"><%= Page.ImageBrowser.Album.AlbumImage.Choose|l10n|html></option>
 									<%foreach album.images image>
-										<option value="<% image.id|html>"<%if album.albumImage.id|match key=image.id> selected="selected"<%/if>><% image.title|html></option>
+										<option value="<% image.id|html>"<%if album.albumImage.id|match value=image.id> selected="selected"<%/if>><% image.title|html></option>
 									<%/foreach>
 								</select>
 							</div>
@@ -373,13 +373,16 @@
 				</div>
 			<%/if>
 
-			<%foreach album.images image>
-				<%first><h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2><%/first>
-				<%if loop.count|mod divisor=3><div class="image-row"><%/if>
+			<%foreach album.images image|paginate pageSize=core.preferences.imagesPerPage page=request.page>
+				<%first>
+					<h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2>
+					<%include include/pagination.html pageParameter=="page">
+				<%/first>
+				<%if loop.count|mod divisor==3><div class="image-row"><%/if>
 				<div id="image-<% image.id|html>" class="image">
 					<div class="image-id hidden"><% image.id|html></div>
 					<div class="image-container">
-						<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=250 max-height=250 mode=enlarge title==image.title></a>
+						<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width==250 max-height==250 mode==enlarge title=image.title></a>
 					</div>
 					<div class="show-data">
 						<div class="image-title"><% image.title|html></div>
@@ -412,15 +415,18 @@
 						</form>
 					<%/if>
 				</div>
-				<%= false|store key=endRow>
-				<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
-				<%last><%= true|store key=endRow><%/last>
-				<%if endRow></div><%/if>
+				<%= false|store key==endRow>
+				<%if loop.count|mod divisor==3 offset==1><%= true|store key==endRow><%/if>
+				<%last><%= true|store key==endRow><%/last>
+				<%if endRow>
+					</div>
+					<%include include/pagination.html pageParameter=="page">
+				<%/if>
 			<%/foreach>
 
 			<%if album.sone.local>
-				<div class="show-upload-image hidden toggle-link"><a class="small-link">» <%= View.UploadImage.Title|l10n|html></a></div>
-				<div class="hide-upload-image hidden toggle-link"><a class="small-link">« <%= View.UploadImage.Title|l10n|html></a></div>
+				<div class="clear show-upload-image hidden toggle-link"><a class="small-link">» <%= View.UploadImage.Title|l10n|html></a></div>
+				<div class="clear hide-upload-image hidden toggle-link"><a class="small-link">« <%= View.UploadImage.Title|l10n|html></a></div>
 				<div class="upload-image">
 					<%include include/uploadImage.html>
 				</div>
@@ -486,9 +492,9 @@
 
 			<div class="single-image">
 				<%ifnull !image.key>
-					<a href="/<%image.key|html>"><% image|image-link max-width=640 max-height=480></a>
+					<a href="/<%image.key|html>"><% image|image-link max-width==640 max-height==480></a>
 				<%else>
-					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width=640 max-height=480></a>
+					<a href="imageBrowser.html?image=<%image.id|html>"><% image|image-link max-width==640 max-height==480></a>
 				<%/if>
 			</div>
 
@@ -568,7 +574,7 @@
 
 		<%else>
 
-			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle='{sone}' replacementKey=sone.niceName|html></h1>
+			<h1><%= Page.ImageBrowser.Sone.Title|l10n|replace needle=='{sone}' replacement=sone.niceName|html></h1>
 
 			<div class="backlinks">
 				<div class="backlink"><a href="imageBrowser.html?mode=gallery"><%= Page.ImageBrowser.Link.All|l10n|html></a></div>
@@ -590,9 +596,12 @@
 
 	<%elseif galleryRequested>
 
-		<%foreach albums album>
-			<%first><h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2><%/first>
-			<%if loop.count|mod divisor=3><div class="album-row"><%/if>
+		<%foreach albums album|paginate pageSize=core.preferences.imagesPerPage pageParameter=request.page pagination=albumPagination>
+			<%first>
+				<h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2>
+				<%include include/pagination.html pagination=albumPagination pageParameter=="page">
+			<%/first>
+			<%if loop.count|mod divisor==3><div class="album-row"><%/if>
 			<div id="album-<% album.id|html>" class="album">
 				<div class="album-id hidden"><% album.id|html></div>
 				<div class="album-container">
@@ -600,7 +609,7 @@
 						<%ifnull album.albumImage>
 							<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html> (<%album.sone.niceName|html>)" title="<% album.title|html> (<%album.sone.niceName|html>)" style="position: relative; top: 0px; left: -41px;" />
 						<%else><!-- TODO -->
-							<% album.albumImage|image-link max-width=250 max-height=250 mode=enlarge title==album.title>
+							<% album.albumImage|image-link max-width==250 max-height==250 mode==enlarge title=album.title>
 						<%/if>
 					</a>
 				</div>
@@ -610,10 +619,15 @@
 					<div class="album-description"><% album.description|parse sone=album.sone></div>
 				</div>
 			</div>
-			<%= false|store key=endRow>
-			<%if loop.count|mod divisor=3 offset=1><%= true|store key=endRow><%/if>
-			<%last><%= true|store key=endRow><%/last>
-			<%if endRow></div><%/if>
+			<%= false|store key==endRow>
+			<%if loop.count|mod divisor==3 offset==1><%= true|store key==endRow><%/if>
+			<%last><%= true|store key==endRow><%/last>
+			<%if endRow>
+				</div>
+			<%/if>
+			<%last>
+				<%include include/pagination.html pagination=albumPagination pageParameter=="page">
+			<%/last>
 		<%/foreach>
 
 	<%/if>

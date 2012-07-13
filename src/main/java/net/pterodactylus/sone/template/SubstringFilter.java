@@ -1,5 +1,5 @@
 /*
- * Sone - SubstringFilter.java - Copyright © 2010 David Roden
+ * Sone - SubstringFilter.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,9 +37,9 @@ public class SubstringFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
-		String startString = parameters.get("start");
-		String lengthString = parameters.get("length");
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		String startString = String.valueOf(parameters.get("start"));
+		String lengthString = String.valueOf(parameters.get("length"));
 		int start = 0;
 		try {
 			start = Integer.parseInt(startString);

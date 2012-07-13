@@ -1,5 +1,5 @@
 /*
- * Sone - EditImageAjaxPage.java - Copyright © 2011 David Roden
+ * Sone - EditImageAjaxPage.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ public class EditImageAjaxPage extends JsonPage {
 		String description = request.getHttpRequest().getParam("description").trim();
 		image.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 		webInterface.getCore().touchConfiguration();
-		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", (String) parserFilter.format(new TemplateContext(), image.getDescription(), new MapBuilder<String, String>().put("sone", image.getSone().getId()).get()));
+		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", (String) parserFilter.format(new TemplateContext(), image.getDescription(), new MapBuilder<String, Object>().put("sone", image.getSone()).get()));
 	}
 
 }

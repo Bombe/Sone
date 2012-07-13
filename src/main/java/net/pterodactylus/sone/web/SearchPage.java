@@ -1,5 +1,5 @@
 /*
- * Sone - SearchPage.java - Copyright © 2010 David Roden
+ * Sone - SearchPage.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,12 +40,12 @@ import net.pterodactylus.util.cache.CacheItem;
 import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
-import net.pterodactylus.util.collection.Mapper;
-import net.pterodactylus.util.collection.Mappers;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.collection.TimedMap;
-import net.pterodactylus.util.filter.Filter;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filters;
+import net.pterodactylus.util.collection.mapper.Mapper;
+import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;

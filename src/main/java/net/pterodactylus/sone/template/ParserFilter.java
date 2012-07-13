@@ -1,5 +1,5 @@
 /*
- * Sone - ParserFilter.java - Copyright © 2011 David Roden
+ * Sone - ParserFilter.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -86,20 +86,16 @@ public class ParserFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		String text = String.valueOf(data);
-		int length = Numbers.safeParseInteger(parameters.get("length"), Numbers.safeParseInteger(templateContext.get(parameters.get("length")), -1));
-		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(parameters.get("cut-off-length")), length));
-		String soneKey = parameters.get("sone");
-		if (soneKey == null) {
-			soneKey = "sone";
-		}
-		Sone sone = (Sone) templateContext.get(soneKey);
-		if (sone == null) {
-			sone = core.getSone(soneKey, false);
+		int length = Numbers.safeParseInteger(parameters.get("length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("length"))), -1));
+		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("cut-off-length"))), length));
+		Object sone = parameters.get("sone");
+		if (sone instanceof String) {
+			sone = core.getSone((String) sone, false);
 		}
 		FreenetRequest request = (FreenetRequest) templateContext.get("request");
-		SoneTextParserContext context = new SoneTextParserContext(request, sone);
+		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);
 		StringWriter parsedTextWriter = new StringWriter();
 		try {
 			Iterable<Part> parts = soneTextParser.parse(context, new StringReader(text));

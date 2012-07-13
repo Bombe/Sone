@@ -1,5 +1,5 @@
 /*
- * Sone - Sone.java - Copyright © 2010 David Roden
+ * Sone - Sone.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.util.filter.Filter;
+import net.pterodactylus.util.collection.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.validation.Validation;
 import freenet.keys.FreenetURI;

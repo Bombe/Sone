@@ -1,5 +1,5 @@
 /*
- * Sone - FcpInterface.java - Copyright © 2011 David Roden
+ * Sone - FcpInterface.java - Copyright © 2011–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
 import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filters;
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
 

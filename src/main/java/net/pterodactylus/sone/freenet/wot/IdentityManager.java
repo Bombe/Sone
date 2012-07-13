@@ -1,5 +1,5 @@
 /*
- * Sone - IdentityManager.java - Copyright © 2010 David Roden
+ * Sone - IdentityManager.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.util.collection.Mapper;
-import net.pterodactylus.util.collection.Mappers;
+import net.pterodactylus.util.collection.mapper.Mapper;
+import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 

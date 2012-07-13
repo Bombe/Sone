@@ -1,5 +1,5 @@
 /*
- * Sone - Core.java - Copyright © 2010 David Roden
+ * Sone - Core.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +46,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.data.impl.PostImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -131,45 +132,45 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** All local Sones. */
 	/* synchronize access on this on itself. */
-	private Map<String, Sone> localSones = new HashMap<String, Sone>();
+	private final Map<String, Sone> localSones = new HashMap<String, Sone>();
 
 	/** All remote Sones. */
 	/* synchronize access on this on itself. */
-	private Map<String, Sone> remoteSones = new HashMap<String, Sone>();
+	private final Map<String, Sone> remoteSones = new HashMap<String, Sone>();
 
 	/** All known Sones. */
-	private Set<String> knownSones = new HashSet<String>();
+	private final Set<String> knownSones = new HashSet<String>();
 
 	/** All posts. */
-	private Map<String, Post> posts = new HashMap<String, Post>();
+	private final Map<String, Post> posts = new HashMap<String, Post>();
 
 	/** All known posts. */
-	private Set<String> knownPosts = new HashSet<String>();
+	private final Set<String> knownPosts = new HashSet<String>();
 
 	/** All replies. */
-	private Map<String, PostReply> replies = new HashMap<String, PostReply>();
+	private final Map<String, PostReply> replies = new HashMap<String, PostReply>();
 
 	/** All known replies. */
-	private Set<String> knownReplies = new HashSet<String>();
+	private final Set<String> knownReplies = new HashSet<String>();
 
 	/** All bookmarked posts. */
 	/* synchronize access on itself. */
-	private Set<String> bookmarkedPosts = new HashSet<String>();
+	private final Set<String> bookmarkedPosts = new HashSet<String>();
 
 	/** Trusted identities, sorted by own identities. */
-	private Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+	private final Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
 
 	/** All known albums. */
-	private Map<String, Album> albums = new HashMap<String, Album>();
+	private final Map<String, Album> albums = new HashMap<String, Album>();
 
 	/** All known images. */
-	private Map<String, Image> images = new HashMap<String, Image>();
+	private final Map<String, Image> images = new HashMap<String, Image>();
 
 	/** All temporary images. */
-	private Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
+	private final Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
 
 	/** Ticker for threads that mark own elements as known. */
-	private Ticker localElementTicker = new Ticker();
+	private final Ticker localElementTicker = new Ticker();
 
 	/** The time the configuration was last touched. */
 	private volatile long lastConfigurationUpdate;
@@ -561,7 +562,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (posts) {
 			Post post = posts.get(postId);
 			if ((post == null) && create) {
-				post = new Post(postId);
+				post = new PostImpl(postId);
 				posts.put(postId, post);
 			}
 			return post;
@@ -1456,7 +1457,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				}
 				parentAlbum.addAlbum(album);
 			} else {
-				topLevelAlbums.add(album);
+				if (!topLevelAlbums.contains(album)) {
+					topLevelAlbums.add(album);
+				}
 			}
 		}
 
@@ -1597,7 +1600,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
-		final Post post = new Post(sone, time, text);
+		final Post post = new PostImpl(sone, time, text);
 		if (recipient != null) {
 			post.setRecipient(recipient);
 		}
@@ -2162,6 +2165,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
 			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
 			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
+			configuration.getIntValue("Option/ImagesPerPage").setValue(options.getIntegerOption("ImagesPerPage").getReal());
 			configuration.getIntValue("Option/CharactersPerPost").setValue(options.getIntegerOption("CharactersPerPost").getReal());
 			configuration.getIntValue("Option/PostCutOffLength").setValue(options.getIntegerOption("PostCutOffLength").getReal());
 			configuration.getBooleanValue("Option/RequireFullAccess").setValue(options.getBooleanOption("RequireFullAccess").getReal());
@@ -2248,6 +2252,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 		}));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
+		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
 		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
@@ -2288,6 +2293,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
+		loadConfigurationValue("ImagesPerPage");
 		loadConfigurationValue("CharactersPerPost");
 		loadConfigurationValue("PostCutOffLength");
 		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
@@ -2667,6 +2673,39 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 */
 		public Preferences setPostsPerPage(Integer postsPerPage) {
 			options.getIntegerOption("PostsPerPage").set(postsPerPage);
+			return this;
+		}
+
+		/**
+		 * Returns the number of images to show per page.
+		 *
+		 * @return The number of images to show per page
+		 */
+		public int getImagesPerPage() {
+			return options.getIntegerOption("ImagesPerPage").get();
+		}
+
+		/**
+		 * Validates the number of images per page.
+		 *
+		 * @param imagesPerPage
+		 *            The number of images per page
+		 * @return {@code true} if the number of images per page was valid,
+		 *         {@code false} otherwise
+		 */
+		public boolean validateImagesPerPage(Integer imagesPerPage) {
+			return options.getIntegerOption("ImagesPerPage").validate(imagesPerPage);
+		}
+
+		/**
+		 * Sets the number of images per page.
+		 *
+		 * @param imagesPerPage
+		 *            The number of images per page
+		 * @return This preferences object
+		 */
+		public Preferences setImagesPerPage(Integer imagesPerPage) {
+			options.getIntegerOption("ImagesPerPage").set(imagesPerPage);
 			return this;
 		}
 

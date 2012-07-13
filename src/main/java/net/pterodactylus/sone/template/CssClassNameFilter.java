@@ -1,5 +1,5 @@
 /*
- * Sone - CssClassNameFilter.java - Copyright © 2010 David Roden
+ * Sone - CssClassNameFilter.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ public class CssClassNameFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		return String.valueOf(data).replaceAll("[^a-zA-Z0-9-]", "_");
 	}
 

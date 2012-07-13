@@ -192,7 +192,7 @@
 			<%foreach currentSone.allImages image>
 				<li>
 					<input type="radio" name="avatar-id" value="<%image.id|html>"<%if avatar-id|match key=image.id> checked="checked"<%/if>/>
-					<div class="post-avatar"><% image|image-link max-width=48 max-height=48 mode=enlarge title==image.title></div>
+					<div class="post-avatar"><% image|image-link max-width==48 max-height==48 mode==enlarge title=image.title></div>
 				</li>
 			<%/foreach>
 		</ul>
@@ -232,7 +232,7 @@
 		<h2><%= Page.EditProfile.Fields.AddField.Title|l10n|html></h2>
 
 		<%if duplicateFieldName>
-			<p><%= Page.EditProfile.Error.DuplicateFieldName|l10n|replace needle="{fieldName}" replacementKey="fieldName"|html></p>
+			<p><%= Page.EditProfile.Error.DuplicateFieldName|l10n|replace needle=="{fieldName}" replacement=fieldName|html></p>
 		<%/if>
 
 		<div id="new-field">

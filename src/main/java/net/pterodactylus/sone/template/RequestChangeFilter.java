@@ -1,5 +1,5 @@
 /*
- * Sone - RequestChangeFilter.java - Copyright © 2010 David Roden
+ * Sone - RequestChangeFilter.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,7 @@ import net.pterodactylus.util.template.TemplateContext;
 /**
  * This filter expects a {@link FreenetRequest} as input and outputs a
  * {@link URI} that is modified by the parameters. The name of the parameter is
- * handed in as “name”, the value may either be stored in “value”, or in a
- * template variable whose key is stored in “key”.
+ * handed in as “name”, the new value is stored in “value”.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -44,24 +43,10 @@ public class RequestChangeFilter implements Filter {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Object format(TemplateContext templateContext, Object data, Map<String, String> parameters) {
+	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		FreenetRequest request = (FreenetRequest) data;
-		String name = parameters.get("name");
-		String nameKey = parameters.get("nameKey");
-		if (nameKey != null) {
-			name = String.valueOf(templateContext.get(nameKey));
-		}
-		String key = parameters.get("key");
-		String value = null;
-		if (key != null) {
-			value = String.valueOf(templateContext.get(key));
-		}
-		if (value == null) {
-			value = parameters.get("value");
-		}
-		if (value == null) {
-			return request.getUri();
-		}
+		String name = String.valueOf(parameters.get("name"));
+		String value = String.valueOf(parameters.get("value"));
 
 		Map<String, String> values = new HashMap<String, String>();
 		Collection<String> parameterNames = request.getHttpRequest().getParameterNames();

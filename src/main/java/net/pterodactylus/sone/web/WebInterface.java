@@ -1,5 +1,5 @@
 /*
- * Sone - WebInterface.java - Copyright © 2010 David Roden
+ * Sone - WebInterface.java - Copyright © 2010–2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ import net.pterodactylus.util.cache.DefaultCacheItem;
 import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.collection.SetBuilder;
-import net.pterodactylus.util.filter.Filters;
+import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -122,6 +122,7 @@ import net.pterodactylus.util.template.FormatFilter;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
 import net.pterodactylus.util.template.ModFilter;
+import net.pterodactylus.util.template.PaginationFilter;
 import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.ReplaceFilter;
@@ -259,6 +260,7 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("in", new ContainsFilter());
 		templateContextFactory.addFilter("unique", new UniqueElementFilter());
 		templateContextFactory.addFilter("mod", new ModFilter());
+		templateContextFactory.addFilter("paginate", new PaginationFilter());
 		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
 		templateContextFactory.addProvider(new ClassPathTemplateProvider());
 		templateContextFactory.addTemplateObject("webInterface", this);
