@@ -65,6 +65,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			Album album = webInterface.getCore().getAlbum(albumId, false);
 			templateContext.set("albumRequested", true);
 			templateContext.set("album", album);
+			templateContext.set("page", request.getHttpRequest().getParam("page"));
 			return;
 		}
 		String imageId = request.getHttpRequest().getParam("image", null);

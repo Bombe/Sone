@@ -373,7 +373,7 @@
 				</div>
 			<%/if>
 
-			<%foreach album.images image|paginate pageSize=core.preferences.imagesPerPage page=request.page>
+			<%foreach album.images image|paginate pageSize=core.preferences.imagesPerPage page=page>
 				<%first>
 					<h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2>
 					<%include include/pagination.html pageParameter=="page">
