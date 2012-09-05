@@ -132,7 +132,11 @@ public class TrustUpdater extends AbstractService {
 				if (shouldStop() || (updateJob == stopJob)) {
 					break;
 				}
+				logger.log(Level.FINE, "Running Trust Update Job: " + updateJob);
+				long startTime = System.currentTimeMillis();
 				updateJob.run();
+				long endTime = System.currentTimeMillis();
+				logger.log(Level.FINE, "Trust Update Job finished, took " + (endTime - startTime) + " ms.");
 			} catch (InterruptedException ie1) {
 				/* happens, ignore, loop. */
 			}
