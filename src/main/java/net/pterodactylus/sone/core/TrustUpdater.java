@@ -105,7 +105,16 @@ public class TrustUpdater extends AbstractService {
 	 *            The comment of the trust relation
 	 */
 	public void setTrust(OwnIdentity truster, Identity trustee, Integer score, String comment) {
-		updateJobs.add(new SetTrustJob(truster, trustee, score, comment));
+		SetTrustJob setTrustJob = new SetTrustJob(truster, trustee, score, comment);
+		if (updateJobs.contains(setTrustJob)) {
+			updateJobs.remove(setTrustJob);
+		}
+		logger.log(Level.FINER, "Adding Trust Update Job: " + setTrustJob);
+		try {
+			updateJobs.put(setTrustJob);
+		} catch (InterruptedException e) {
+			/* the queue is unbounded so it should never block. */
+		}
 	}
 
 	//
