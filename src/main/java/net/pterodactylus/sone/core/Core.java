@@ -2174,9 +2174,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
 			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
-			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
-			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
-			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
 
 			/* save known Sones. */
 			int soneCounter = 0;
@@ -2276,20 +2273,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 
 		}));
-		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
-		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
-		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
-
-		/* read options from configuration. */
-		options.getBooleanOption("ClearOnNextRestart").set(configuration.getBooleanValue("Option/ClearOnNextRestart").getValue(null));
-		options.getBooleanOption("ReallyClearOnNextRestart").set(configuration.getBooleanValue("Option/ReallyClearOnNextRestart").getValue(null));
-		boolean clearConfiguration = options.getBooleanOption("ClearOnNextRestart").get() && options.getBooleanOption("ReallyClearOnNextRestart").get();
-		options.getBooleanOption("ClearOnNextRestart").set(null);
-		options.getBooleanOption("ReallyClearOnNextRestart").set(null);
-		if (clearConfiguration) {
-			/* stop loading the configuration. */
-			return;
-		}
 
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
@@ -2302,7 +2285,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
 		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
-		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
 		int soneCounter = 0;
@@ -2937,58 +2919,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 */
 		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
 			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
-			return this;
-		}
-
-		/**
-		 * Returns whether Sone should clear its settings on the next restart.
-		 * In order to be effective, {@link #isReallyClearOnNextRestart()} needs
-		 * to return {@code true} as well!
-		 *
-		 * @return {@code true} if Sone should clear its settings on the next
-		 *         restart, {@code false} otherwise
-		 */
-		public boolean isClearOnNextRestart() {
-			return options.getBooleanOption("ClearOnNextRestart").get();
-		}
-
-		/**
-		 * Sets whether Sone will clear its settings on the next restart.
-		 *
-		 * @param clearOnNextRestart
-		 *            {@code true} if Sone should clear its settings on the next
-		 *            restart, {@code false} otherwise
-		 * @return This preferences
-		 */
-		public Preferences setClearOnNextRestart(Boolean clearOnNextRestart) {
-			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
-			return this;
-		}
-
-		/**
-		 * Returns whether Sone should really clear its settings on next
-		 * restart. This is a confirmation option that needs to be set in
-		 * addition to {@link #isClearOnNextRestart()} in order to clear Sone’s
-		 * settings on the next restart.
-		 *
-		 * @return {@code true} if Sone should really clear its settings on the
-		 *         next restart, {@code false} otherwise
-		 */
-		public boolean isReallyClearOnNextRestart() {
-			return options.getBooleanOption("ReallyClearOnNextRestart").get();
-		}
-
-		/**
-		 * Sets whether Sone should really clear its settings on the next
-		 * restart.
-		 *
-		 * @param reallyClearOnNextRestart
-		 *            {@code true} if Sone should really clear its settings on
-		 *            the next restart, {@code false} otherwise
-		 * @return This preferences
-		 */
-		public Preferences setReallyClearOnNextRestart(Boolean reallyClearOnNextRestart) {
-			options.getBooleanOption("ReallyClearOnNextRestart").set(reallyClearOnNextRestart);
 			return this;
 		}
 
