@@ -167,7 +167,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 		Validation.begin().isNotNull("Trust Target", target).isNotNull("Trust Comment", comment).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
 		webOfTrustConnector.setTrust(this, target, trustValue, comment);
 		if (target instanceof DefaultIdentity) {
-			((DefaultIdentity) target).setTrustPrivate(this, new Trust(trustValue, trustValue, 0));
+			((DefaultIdentity) target).setTrust(this, new Trust(trustValue, trustValue, 0));
 		}
 	}
 
@@ -179,7 +179,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 		Validation.begin().isNotNull("Trust Target", target).check();
 		webOfTrustConnector.removeTrust(this, target);
 		if (target instanceof DefaultIdentity) {
-			((DefaultIdentity) target).setTrustPrivate(this, new Trust(null, null, null));
+			((DefaultIdentity) target).setTrust(this, new Trust(null, null, null));
 		}
 	}
 
