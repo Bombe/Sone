@@ -60,10 +60,10 @@ public class ParserFilter implements Filter {
 	private final TemplateContextFactory templateContextFactory;
 
 	/** The template for {@link PlainTextPart}s. */
-	private final Template plainTextTemplate = TemplateParser.parse(new StringReader("<%text|html>"));
+	private static final Template plainTextTemplate = TemplateParser.parse(new StringReader("<%text|html>"));
 
 	/** The template for {@link FreenetLinkPart}s. */
-	private final Template linkTemplate = TemplateParser.parse(new StringReader("<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>"));
+	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>"));
 
 	/**
 	 * Creates a new filter that runs its input through a {@link SoneTextParser}
