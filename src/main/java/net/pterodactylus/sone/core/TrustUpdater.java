@@ -180,7 +180,7 @@ public class TrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class SetTrustJob extends TrustUpdateJob {
+	private class SetTrustJob extends TrustUpdateJob {
 
 		/** The score of the relation. */
 		private final Integer score;
@@ -215,9 +215,15 @@ public class TrustUpdater extends AbstractService {
 		public void run() {
 			try {
 				if (score != null) {
-					truster.setTrust(trustee, score, comment);
+					if (trustee instanceof DefaultIdentity) {
+						((DefaultIdentity) trustee).setTrust(truster, new Trust(score, null, 0));
+					}
+					webOfTrustConnector.setTrust(truster, trustee, score, comment);
 				} else {
-					truster.removeTrust(trustee);
+					if (trustee instanceof DefaultIdentity) {
+						((DefaultIdentity) trustee).setTrust(truster, null);
+					}
+					webOfTrustConnector.removeTrust(truster, trustee);
 				}
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "Could not set Trust value for " + truster + " -> " + trustee + " to " + score + " (" + comment + ")!", wote1);
