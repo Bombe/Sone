@@ -1058,6 +1058,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.WARNING, String.format("Tried to get trust from remote Sone: %s", origin));
 			return null;
 		}
+		trustUpdater.getTrust((OwnIdentity) origin.getIdentity(), target.getIdentity());
 		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
 	}
 
