@@ -78,7 +78,15 @@ public class TrustUpdater extends AbstractService {
 	 *            The identity receiving the trust
 	 */
 	public void getTrust(OwnIdentity truster, Identity trustee) {
-		updateJobs.add(new GetTrustJob(truster, trustee));
+		GetTrustJob getTrustJob = new GetTrustJob(truster, trustee);
+		if (!updateJobs.contains(getTrustJob)) {
+			logger.log(Level.FINER, "Adding Trust Update Job: " + getTrustJob);
+			try {
+				updateJobs.put(getTrustJob);
+			} catch (InterruptedException ie1) {
+				/* the queue is unbounded so it should never block. */
+			}
+		}
 	}
 
 	/**
