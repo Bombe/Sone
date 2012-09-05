@@ -1074,11 +1074,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void setTrust(Sone origin, Sone target, int trustValue) {
 		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
-		try {
-			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, preferences.getTrustComment());
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not set trust for Sone: %s", target), wote1);
-		}
+		trustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), trustValue, preferences.getTrustComment());
 	}
 
 	/**
@@ -1091,11 +1087,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void removeTrust(Sone origin, Sone target) {
 		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
-		try {
-			((OwnIdentity) origin.getIdentity()).removeTrust(target.getIdentity());
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not remove trust for Sone: %s", target), wote1);
-		}
+		trustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), null, null);
 	}
 
 	/**
