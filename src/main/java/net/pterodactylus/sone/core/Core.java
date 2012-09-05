@@ -2174,7 +2174,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
 			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
-			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
 
 			/* save known Sones. */
 			int soneCounter = 0;
@@ -2274,7 +2273,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 
 		}));
-		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
 
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
@@ -2287,7 +2285,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
 		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
-		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
 		int soneCounter = 0;
