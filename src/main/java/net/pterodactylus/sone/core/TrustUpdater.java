@@ -215,7 +215,7 @@ public class TrustUpdater extends AbstractService {
 		 */
 		@Override
 		public int hashCode() {
-			return ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
+			return getClass().hashCode() ^ ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
 		}
 
 		/**
