@@ -26,6 +26,12 @@ package net.pterodactylus.sone.text;
  */
 public interface Part {
 
-	/* no methods. */
+	/**
+	 * Returns the text contained in this part. This should return plain text
+	 * without any format information.
+	 *
+	 * @return The plain text of this part
+	 */
+	public String getText();
 
 }
