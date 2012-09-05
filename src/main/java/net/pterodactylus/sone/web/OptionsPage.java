@@ -132,10 +132,6 @@ public class OptionsPage extends SoneTemplatePage {
 			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
 			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
 			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
-			boolean clearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("clear-on-next-restart", 5));
-			preferences.setClearOnNextRestart(clearOnNextRestart);
-			boolean reallyClearOnNextRestart = Boolean.parseBoolean(request.getHttpRequest().getPartAsStringFailsafe("really-clear-on-next-restart", 5));
-			preferences.setReallyClearOnNextRestart(reallyClearOnNextRestart);
 			webInterface.getCore().touchConfiguration();
 			if (fieldErrors.isEmpty()) {
 				throw new RedirectException(getPath());
@@ -161,8 +157,6 @@ public class OptionsPage extends SoneTemplatePage {
 		templateContext.set("trust-comment", preferences.getTrustComment());
 		templateContext.set("fcp-interface-active", preferences.isFcpInterfaceActive());
 		templateContext.set("fcp-full-access-required", preferences.getFcpFullAccessRequired().ordinal());
-		templateContext.set("clear-on-next-restart", preferences.isClearOnNextRestart());
-		templateContext.set("really-clear-on-next-restart", preferences.isReallyClearOnNextRestart());
 	}
 
 }

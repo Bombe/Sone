@@ -163,14 +163,6 @@
 			</select>
 		</p>
 
-		<h2><%= Page.Options.Section.Cleaning.Title|l10n|html></h2>
-
-		<p><%= Page.Options.Option.ClearOnNextRestart.Description|l10n|html|replace needle=="{strong}" replacement=="<strong>"|replace needle=="{/strong}" replacement=="</strong>"></p>
-		<p><select name="clear-on-next-restart"><option disabled="disabled"><%= WebInterface.SelectBox.Choose|l10n|html></option><option value="true"<%if clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.Yes|l10n|html></option><option value="false"<%if ! clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.No|l10n|html></option></select>
-
-		<p><%= Page.Options.Option.ReallyClearOnNextRestart.Description|l10n|html|replace needle=="{strong}" replacement=="<strong>"|replace needle=="{/strong}" replacement=="</strong>"></p>
-		<p><select name="really-clear-on-next-restart"><option disabled="disabled"><%= WebInterface.SelectBox.Choose|l10n|html></option><option value="true"<%if really-clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.Yes|l10n|html></option><option value="false"<%if ! really-clear-on-next-restart> selected="selected"<%/if>><%= WebInterface.SelectBox.No|l10n|html></option></select>
-
 		<p><button type="submit"><%= Page.Options.Button.Save|l10n|html></button></p>
 
 	</form>
