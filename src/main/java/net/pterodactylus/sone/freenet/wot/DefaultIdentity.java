@@ -22,17 +22,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.util.cache.CacheException;
-import net.pterodactylus.util.cache.CacheItem;
-import net.pterodactylus.util.cache.DefaultCacheItem;
-import net.pterodactylus.util.cache.MemoryCache;
-import net.pterodactylus.util.cache.ValueRetriever;
-import net.pterodactylus.util.cache.WritableCache;
-import net.pterodactylus.util.collection.TimedMap;
 import net.pterodactylus.util.logging.Logging;
 
 /**
@@ -65,19 +56,7 @@ public class DefaultIdentity implements Identity {
 
 	/** Cached trust. */
 	/* synchronize on itself. */
-	private final WritableCache<OwnIdentity, Trust> trustCache = new MemoryCache<OwnIdentity, Trust>(new ValueRetriever<OwnIdentity, Trust>() {
-
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public CacheItem<Trust> retrieve(OwnIdentity ownIdentity) throws CacheException {
-			try {
-				return new DefaultCacheItem<Trust>(webOfTrustConnector.getTrust(ownIdentity, DefaultIdentity.this));
-			} catch (PluginException pe1) {
-				throw new CacheException("Could not retrieve trust for OwnIdentity: " + ownIdentity, pe1);
-			}
-		}
-
-	}, new TimedMap<OwnIdentity, CacheItem<Trust>>(60 * 60 * 1000));
+	private final Map<OwnIdentity, Trust> trustCache = new HashMap<OwnIdentity, Trust>();
 
 	/**
 	 * Creates a new identity.
@@ -249,13 +228,8 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public Trust getTrust(OwnIdentity ownIdentity) {
-		try {
-			synchronized (trustCache) {
-				return trustCache.get(ownIdentity);
-			}
-		} catch (CacheException ce1) {
-			logger.log(Level.WARNING, String.format("Could not get trust for OwnIdentity: %s", ownIdentity), ce1);
-			return null;
+		synchronized (trustCache) {
+			return trustCache.get(ownIdentity);
 		}
 	}
 
@@ -267,7 +241,7 @@ public class DefaultIdentity implements Identity {
 	 * @param trust
 	 *            The trust received for this identity
 	 */
-	void setTrustPrivate(OwnIdentity ownIdentity, Trust trust) {
+	public void setTrust(OwnIdentity ownIdentity, Trust trust) {
 		synchronized (trustCache) {
 			trustCache.put(ownIdentity, trust);
 		}

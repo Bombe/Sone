@@ -233,7 +233,14 @@ public class ListNotificationFilters {
 					return false;
 				}
 			} else {
-				return false;
+				/*
+				 * a null trust means that the trust updater has not yet
+				 * received a trust value for this relation. if we return false,
+				 * the post feed will stay empty until the trust updater has
+				 * received trust values. to prevent this we simply assume that
+				 * posts are visible if there is no trust.
+				 */
+				return true;
 			}
 			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
 				return false;

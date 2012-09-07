@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
+import net.pterodactylus.sone.core.TrustUpdater;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
@@ -188,8 +189,12 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			identityManager = new IdentityManager(webOfTrustConnector);
 			identityManager.setContext("Sone");
 
+			/* create trust updater. */
+			TrustUpdater trustUpdater = new TrustUpdater(webOfTrustConnector);
+			trustUpdater.init();
+
 			/* create core. */
-			core = new Core(oldConfiguration, freenetInterface, identityManager);
+			core = new Core(oldConfiguration, freenetInterface, identityManager, trustUpdater);
 
 			/* create the web interface. */
 			webInterface = new WebInterface(this);
