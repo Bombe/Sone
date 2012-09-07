@@ -77,21 +77,26 @@ public class LinkPart implements Part {
 	}
 
 	/**
-	 * Returns the text of this part.
-	 *
-	 * @return The text of this part
-	 */
-	public String getText() {
-		return text;
-	}
-
-	/**
 	 * Returns the title of this part.
 	 *
 	 * @return The title of this part
 	 */
 	public String getTitle() {
 		return title;
+	}
+
+	//
+	// PART METHODS
+	//
+
+	/**
+	 * Returns the text of this part.
+	 *
+	 * @return The text of this part
+	 */
+	@Override
+	public String getText() {
+		return text;
 	}
 
 }

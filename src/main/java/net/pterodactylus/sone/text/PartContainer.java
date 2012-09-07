@@ -81,6 +81,22 @@ public class PartContainer implements Part, Iterable<Part> {
 	}
 
 	//
+	// PART METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getText() {
+		StringBuilder partText = new StringBuilder();
+		for (Part part : parts) {
+			partText.append(part.getText());
+		}
+		return partText.toString();
+	}
+
+	//
 	// ITERABLE METHODS
 	//
 

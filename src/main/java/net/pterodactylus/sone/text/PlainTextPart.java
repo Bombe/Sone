@@ -38,7 +38,7 @@ public class PlainTextPart implements Part {
 	}
 
 	//
-	// ACCESSORS
+	// PART METHODS
 	//
 
 	/**
@@ -46,6 +46,7 @@ public class PlainTextPart implements Part {
 	 *
 	 * @return The text of this part
 	 */
+	@Override
 	public String getText() {
 		return text;
 	}

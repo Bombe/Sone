@@ -60,10 +60,10 @@ public class ParserFilter implements Filter {
 	private final TemplateContextFactory templateContextFactory;
 
 	/** The template for {@link PlainTextPart}s. */
-	private final Template plainTextTemplate = TemplateParser.parse(new StringReader("<%text|html>"));
+	private static final Template plainTextTemplate = TemplateParser.parse(new StringReader("<%text|html>"));
 
 	/** The template for {@link FreenetLinkPart}s. */
-	private final Template linkTemplate = TemplateParser.parse(new StringReader("<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>"));
+	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>"));
 
 	/**
 	 * Creates a new filter that runs its input through a {@link SoneTextParser}
@@ -241,7 +241,22 @@ public class ParserFilter implements Filter {
 	 *            The part to render
 	 */
 	private void render(Writer writer, PostPart postPart) {
-		renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), getExcerpt(postPart.getPost().getText(), 20), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
+		SoneTextParser parser = new SoneTextParser(core, core);
+		SoneTextParserContext parserContext = new SoneTextParserContext(null, postPart.getPost().getSone());
+		try {
+			Iterable<Part> parts = parser.parse(parserContext, new StringReader(postPart.getPost().getText()));
+			StringBuilder excerpt = new StringBuilder();
+			for (Part part : parts) {
+				excerpt.append(part.getText());
+				if (excerpt.length() > 20) {
+					excerpt.setLength(20);
+					break;
+				}
+			}
+			renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), excerpt.toString(), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
+		} catch (IOException ioe1) {
+			/* StringReader shouldn’t throw. */
+		}
 	}
 
 	/**
