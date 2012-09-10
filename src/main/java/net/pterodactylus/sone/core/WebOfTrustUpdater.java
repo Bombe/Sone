@@ -183,6 +183,26 @@ public class WebOfTrustUpdater extends AbstractService {
 		return false;
 	}
 
+	/**
+	 * Removes the given context from the given own identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to remove the context from
+	 * @param context
+	 *            The context to remove
+	 */
+	public void removeContext(OwnIdentity ownIdentity, String context) {
+		RemoveContextJob removeContextJob = new RemoveContextJob(ownIdentity, context);
+		if (!updateJobs.contains(removeContextJob)) {
+			logger.log(Level.FINER, "Adding Context Job: " + removeContextJob);
+			try {
+				updateJobs.put(removeContextJob);
+			} catch (InterruptedException ie1) {
+				/* the queue is unbounded so it should never block. */
+			}
+		}
+	}
+
 	//
 	// SERVICE METHODS
 	//
@@ -547,6 +567,43 @@ public class WebOfTrustUpdater extends AbstractService {
 				finish(true);
 			} catch (PluginException pe1) {
 				logger.log(Level.WARNING, String.format("Could not add Context “%2$s” to Own Identity %1$s!", ownIdentity, context), pe1);
+				finish(false);
+			}
+		}
+
+	}
+
+	/**
+	 * Job that removes a context from an {@link OwnIdentity}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class RemoveContextJob extends WebOfTrustContextUpdateJob {
+
+		/**
+		 * Creates a new remove-context job.
+		 *
+		 * @param ownIdentity
+		 *            The own identity whose contexts to manage
+		 * @param context
+		 *            The context to remove
+		 */
+		public RemoveContextJob(OwnIdentity ownIdentity, String context) {
+			super(ownIdentity, context);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@SuppressWarnings("synthetic-access")
+		public void run() {
+			try {
+				webOfTrustConnector.removeContext(ownIdentity, context);
+				ownIdentity.removeContext(context);
+				finish(true);
+			} catch (PluginException pe1) {
+				logger.log(Level.WARNING, String.format("Could not remove Context “%2$s” to Own Identity %1$s!", ownIdentity, context), pe1);
 				finish(false);
 			}
 		}
