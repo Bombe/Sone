@@ -1,5 +1,5 @@
 /*
- * Sone - TrustUpdater.java - Copyright © 2012 David Roden
+ * Sone - WebOfTrustUpdater.java - Copyright © 2012 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,24 +33,25 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
 /**
- * Updates identity’s trust in a background thread because getting updates from
- * the WebOfTrust plugin can potentially last quite long.
+ * Updates WebOfTrust identity data in a background thread because communicating
+ * with the WebOfTrust plugin can potentially last quite long.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TrustUpdater extends AbstractService {
+public class WebOfTrustUpdater extends AbstractService {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(TrustUpdater.class);
+	private static final Logger logger = Logging.getLogger(WebOfTrustUpdater.class);
 
 	/** Stop job. */
-	private static final TrustUpdateJob stopJob = new TrustUpdateJob(null, null);
+	@SuppressWarnings("synthetic-access")
+	private static final WebOfTrustUpdateJob stopJob = new WebOfTrustUpdateJob();
 
 	/** The web of trust connector. */
 	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The queue for jobs. */
-	private final BlockingQueue<TrustUpdateJob> updateJobs = new LinkedBlockingQueue<TrustUpdateJob>();
+	private final BlockingQueue<WebOfTrustUpdateJob> updateJobs = new LinkedBlockingQueue<WebOfTrustUpdateJob>();
 
 	/**
 	 * Creates a new trust updater.
@@ -58,7 +59,7 @@ public class TrustUpdater extends AbstractService {
 	 * @param webOfTrustConnector
 	 *            The web of trust connector
 	 */
-	public TrustUpdater(WebOfTrustConnector webOfTrustConnector) {
+	public WebOfTrustUpdater(WebOfTrustConnector webOfTrustConnector) {
 		super("Trust Updater");
 		this.webOfTrustConnector = webOfTrustConnector;
 	}
@@ -128,7 +129,7 @@ public class TrustUpdater extends AbstractService {
 	protected void serviceRun() {
 		while (!shouldStop()) {
 			try {
-				TrustUpdateJob updateJob = updateJobs.take();
+				WebOfTrustUpdateJob updateJob = updateJobs.take();
 				if (shouldStop() || (updateJob == stopJob)) {
 					break;
 				}
@@ -156,11 +157,33 @@ public class TrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Base class for trust update jobs.
+	 * Base class for WebOfTrust update jobs.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class TrustUpdateJob {
+	private static class WebOfTrustUpdateJob {
+
+		//
+		// ACTIONS
+		//
+
+		/**
+		 * Performs the actual update operation.
+		 * <p>
+		 * The implementation of this class does nothing.
+		 */
+		public void run() {
+			/* does nothing. */
+		}
+
+	}
+
+	/**
+	 * Base class for WebOfTrust trust update jobs.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private static class WebOfTrustTrustUpdateJob extends WebOfTrustUpdateJob {
 
 		/** The identity giving the trust. */
 		protected final OwnIdentity truster;
@@ -176,22 +199,11 @@ public class TrustUpdater extends AbstractService {
 		 * @param trustee
 		 *            The identity receiving the trust
 		 */
-		public TrustUpdateJob(OwnIdentity truster, Identity trustee) {
+		@SuppressWarnings("synthetic-access")
+		public WebOfTrustTrustUpdateJob(OwnIdentity truster, Identity trustee) {
+			super();
 			this.truster = truster;
 			this.trustee = trustee;
-		}
-
-		//
-		// ACCESSORS
-		//
-
-		/**
-		 * Performs the actual update operation.
-		 * <p>
-		 * The implementation of this class does nothing.
-		 */
-		public void run() {
-			/* does nothing. */
 		}
 
 		//
@@ -206,7 +218,7 @@ public class TrustUpdater extends AbstractService {
 			if ((object == null) || !object.getClass().equals(getClass())) {
 				return false;
 			}
-			TrustUpdateJob updateJob = (TrustUpdateJob) object;
+			WebOfTrustTrustUpdateJob updateJob = (WebOfTrustTrustUpdateJob) object;
 			return ((truster == null) ? (updateJob.truster == null) : updateJob.truster.equals(truster)) && ((trustee == null) ? (updateJob.trustee == null) : updateJob.trustee.equals(trustee));
 		}
 
@@ -233,7 +245,7 @@ public class TrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetTrustJob extends TrustUpdateJob {
+	private class SetTrustJob extends WebOfTrustTrustUpdateJob {
 
 		/** The score of the relation. */
 		private final Integer score;
@@ -290,7 +302,7 @@ public class TrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class GetTrustJob extends TrustUpdateJob {
+	private class GetTrustJob extends WebOfTrustTrustUpdateJob {
 
 		/**
 		 * Creates a new trust update job.

@@ -113,7 +113,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	private final UpdateChecker updateChecker;
 
 	/** The trust updater. */
-	private final TrustUpdater trustUpdater;
+	private final WebOfTrustUpdater trustUpdater;
 
 	/** The FCP interface. */
 	private volatile FcpInterface fcpInterface;
@@ -188,7 +188,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @param identityManager
 	 *            The identity manager
 	 */
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, TrustUpdater trustUpdater) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater trustUpdater) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
