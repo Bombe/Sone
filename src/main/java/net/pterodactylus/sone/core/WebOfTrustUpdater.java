@@ -45,7 +45,7 @@ public class WebOfTrustUpdater extends AbstractService {
 
 	/** Stop job. */
 	@SuppressWarnings("synthetic-access")
-	private static final WebOfTrustUpdateJob stopJob = new WebOfTrustUpdateJob();
+	private final WebOfTrustUpdateJob stopJob = new WebOfTrustUpdateJob();
 
 	/** The web of trust connector. */
 	private final WebOfTrustConnector webOfTrustConnector;
@@ -161,7 +161,14 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class WebOfTrustUpdateJob {
+	private class WebOfTrustUpdateJob {
+
+		/** Object for synchronization. */
+		@SuppressWarnings("hiding")
+		private final Object syncObject = new Object();
+
+		/** Whether the job has finished. */
+		private boolean finished;
 
 		//
 		// ACTIONS
@@ -176,6 +183,39 @@ public class WebOfTrustUpdater extends AbstractService {
 			/* does nothing. */
 		}
 
+		/**
+		 * Waits for completion of this job or stopping of the WebOfTrust
+		 * updater.
+		 *
+		 * @see WebOfTrustUpdater#stop()
+		 */
+		@SuppressWarnings("synthetic-access")
+		public void waitForCompletion() {
+			synchronized (syncObject) {
+				while (!finished && !shouldStop()) {
+					try {
+						syncObject.wait();
+					} catch (InterruptedException ie1) {
+						/* we’re looping, ignore. */
+					}
+				}
+			}
+		}
+
+		//
+		// PROTECTED METHODS
+		//
+
+		/**
+		 * Signals that this job has finished.
+		 */
+		protected void finish() {
+			synchronized (syncObject) {
+				finished = true;
+				syncObject.notifyAll();
+			}
+		}
+
 	}
 
 	/**
@@ -183,7 +223,7 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static class WebOfTrustTrustUpdateJob extends WebOfTrustUpdateJob {
+	private class WebOfTrustTrustUpdateJob extends WebOfTrustUpdateJob {
 
 		/** The identity giving the trust. */
 		protected final OwnIdentity truster;
@@ -201,7 +241,6 @@ public class WebOfTrustUpdater extends AbstractService {
 		 */
 		@SuppressWarnings("synthetic-access")
 		public WebOfTrustTrustUpdateJob(OwnIdentity truster, Identity trustee) {
-			super();
 			this.truster = truster;
 			this.trustee = trustee;
 		}
@@ -293,6 +332,7 @@ public class WebOfTrustUpdater extends AbstractService {
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "Could not set Trust value for " + truster + " -> " + trustee + " to " + score + " (" + comment + ")!", wote1);
 			}
+			finish();
 		}
 
 	}
@@ -330,6 +370,7 @@ public class WebOfTrustUpdater extends AbstractService {
 			} catch (PluginException pe1) {
 				logger.log(Level.WARNING, "Could not get Trust value for " + truster + " -> " + trustee + "!", pe1);
 			}
+			finish();
 		}
 	}
 
