@@ -143,7 +143,7 @@ public class IdentityManager extends AbstractService {
 		Set<OwnIdentity> allOwnIdentities = getAllOwnIdentities();
 		for (OwnIdentity ownIdentity : allOwnIdentities) {
 			if (ownIdentity.getId().equals(id)) {
-				return new DefaultOwnIdentity(webOfTrustConnector, ownIdentity);
+				return new DefaultOwnIdentity(ownIdentity);
 			}
 		}
 		return null;
@@ -168,9 +168,8 @@ public class IdentityManager extends AbstractService {
 				 * {@inheritDoc}
 				 */
 				@Override
-				@SuppressWarnings("synthetic-access")
 				public OwnIdentity map(OwnIdentity input) {
-					return new DefaultOwnIdentity(webOfTrustConnector, input);
+					return new DefaultOwnIdentity(input);
 				}
 			});
 		} catch (WebOfTrustException wote1) {
@@ -310,7 +309,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
 				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
 				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
-					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(webOfTrustConnector, oldOwnIdentity));
+					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(oldOwnIdentity));
 				}
 			}
 
@@ -318,7 +317,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
 				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
 				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
-					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(webOfTrustConnector, currentOwnIdentity));
+					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(currentOwnIdentity));
 				}
 			}
 

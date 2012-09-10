@@ -17,14 +17,12 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
-
-import net.pterodactylus.util.logging.Logging;
 
 /**
  * A Web of Trust identity.
@@ -32,12 +30,6 @@ import net.pterodactylus.util.logging.Logging;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultIdentity implements Identity {
-
-	/** The logger. */
-	private static final Logger logger = Logging.getLogger(DefaultIdentity.class);
-
-	/** The web of trust connector. */
-	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The ID of the identity. */
 	private final String id;
@@ -55,14 +47,11 @@ public class DefaultIdentity implements Identity {
 	private final Map<String, String> properties = Collections.synchronizedMap(new HashMap<String, String>());
 
 	/** Cached trust. */
-	/* synchronize on itself. */
-	private final Map<OwnIdentity, Trust> trustCache = new HashMap<OwnIdentity, Trust>();
+	private final Map<OwnIdentity, Trust> trustCache = Collections.synchronizedMap(new HashMap<OwnIdentity, Trust>());
 
 	/**
 	 * Creates a new identity.
 	 *
-	 * @param webOfTrustConnector
-	 *            The web of trust connector
 	 * @param id
 	 *            The ID of the identity
 	 * @param nickname
@@ -70,8 +59,7 @@ public class DefaultIdentity implements Identity {
 	 * @param requestUri
 	 *            The request URI of the identity
 	 */
-	public DefaultIdentity(WebOfTrustConnector webOfTrustConnector, String id, String nickname, String requestUri) {
-		this.webOfTrustConnector = webOfTrustConnector;
+	public DefaultIdentity(String id, String nickname, String requestUri) {
 		this.id = id;
 		this.nickname = nickname;
 		this.requestUri = requestUri;
@@ -114,19 +102,6 @@ public class DefaultIdentity implements Identity {
 	}
 
 	/**
-	 * Sets the contexts of this identity.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
-	 *
-	 * @param contexts
-	 *            The contexts to set
-	 */
-	void setContextsPrivate(Set<String> contexts) {
-		this.contexts.clear();
-		this.contexts.addAll(contexts);
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -135,26 +110,27 @@ public class DefaultIdentity implements Identity {
 	}
 
 	/**
-	 * Adds the given context to this identity.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
-	 *
-	 * @param context
-	 *            The context to add
+	 * {@inheritDoc}
 	 */
-	void addContextPrivate(String context) {
+	@Override
+	public void setContexts(Collection<String> contexts) {
+		this.contexts.clear();
+		this.contexts.addAll(contexts);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void addContext(String context) {
 		contexts.add(context);
 	}
 
 	/**
-	 * Removes the given context from this identity.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
-	 *
-	 * @param context
-	 *            The context to remove
+	 * {@inheritDoc}
 	 */
-	public void removeContextPrivate(String context) {
+	@Override
+	public void removeContext(String context) {
 		contexts.remove(context);
 	}
 
@@ -163,40 +139,16 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public Map<String, String> getProperties() {
-		synchronized (properties) {
-			return Collections.unmodifiableMap(properties);
-		}
+		return Collections.unmodifiableMap(properties);
 	}
 
 	/**
-	 * Sets all properties of this identity.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
-	 *
-	 * @param properties
-	 *            The new properties of this identity
+	 * {@inheritDoc}
 	 */
-	void setPropertiesPrivate(Map<String, String> properties) {
-		synchronized (this.properties) {
-			this.properties.clear();
-			this.properties.putAll(properties);
-		}
-	}
-
-	/**
-	 * Sets the property with the given name to the given value.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
-	 *
-	 * @param name
-	 *            The name of the property
-	 * @param value
-	 *            The value of the property
-	 */
-	void setPropertyPrivate(String name, String value) {
-		synchronized (properties) {
-			properties.put(name, value);
-		}
+	@Override
+	public void setProperties(Map<String, String> properties) {
+		this.properties.clear();
+		this.properties.putAll(properties);
 	}
 
 	/**
@@ -204,23 +156,23 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public String getProperty(String name) {
-		synchronized (properties) {
-			return properties.get(name);
-		}
+		return properties.get(name);
 	}
 
 	/**
-	 * Removes the property with the given name.
-	 * <p>
-	 * This method is only called by the {@link IdentityManager}.
-	 *
-	 * @param name
-	 *            The name of the property to remove
+	 * {@inheritDoc}
 	 */
-	void removePropertyPrivate(String name) {
-		synchronized (properties) {
-			properties.remove(name);
-		}
+	@Override
+	public void setProperty(String name, String value) {
+		properties.put(name, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeProperty(String name) {
+		properties.remove(name);
 	}
 
 	/**
@@ -228,23 +180,23 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public Trust getTrust(OwnIdentity ownIdentity) {
-		synchronized (trustCache) {
-			return trustCache.get(ownIdentity);
-		}
+		return trustCache.get(ownIdentity);
 	}
 
 	/**
-	 * Sets the trust received for this identity by the given own identity.
-	 *
-	 * @param ownIdentity
-	 *            The own identity that gives the trust
-	 * @param trust
-	 *            The trust received for this identity
+	 * {@inheritDoc}
 	 */
+	@Override
 	public void setTrust(OwnIdentity ownIdentity, Trust trust) {
-		synchronized (trustCache) {
-			trustCache.put(ownIdentity, trust);
-		}
+		trustCache.put(ownIdentity, trust);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void removeTrust(OwnIdentity ownIdentity) {
+		trustCache.remove(ownIdentity);
 	}
 
 	//
