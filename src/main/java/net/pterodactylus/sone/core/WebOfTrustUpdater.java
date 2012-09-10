@@ -203,6 +203,41 @@ public class WebOfTrustUpdater extends AbstractService {
 		}
 	}
 
+	/**
+	 * Sets a property on the given own identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to set the property on
+	 * @param propertyName
+	 *            The name of the property to set
+	 * @param propertyValue
+	 *            The value of the property to set
+	 */
+	public void setProperty(OwnIdentity ownIdentity, String propertyName, String propertyValue) {
+		SetPropertyJob setPropertyJob = new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		if (updateJobs.contains(setPropertyJob)) {
+			updateJobs.remove(setPropertyJob);
+		}
+		logger.log(Level.FINER, "Adding Property Job: " + setPropertyJob);
+		try {
+			updateJobs.put(setPropertyJob);
+		} catch (InterruptedException e) {
+			/* the queue is unbounded so it should never block. */
+		}
+	}
+
+	/**
+	 * Removes a property from the given own identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to remove the property from
+	 * @param propertyName
+	 *            The name of the property to remove
+	 */
+	public void removeProperty(OwnIdentity ownIdentity, String propertyName) {
+		setProperty(ownIdentity, propertyName, null);
+	}
+
 	//
 	// SERVICE METHODS
 	//
@@ -604,6 +639,115 @@ public class WebOfTrustUpdater extends AbstractService {
 				finish(true);
 			} catch (PluginException pe1) {
 				logger.log(Level.WARNING, String.format("Could not remove Context “%2$s” to Own Identity %1$s!", ownIdentity, context), pe1);
+				finish(false);
+			}
+		}
+
+	}
+
+	/**
+	 * Base class for update jobs that deal with properties.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class WebOfTrustPropertyUpdateJob extends WebOfTrustUpdateJob {
+
+		/** The own identity to update properties on. */
+		protected final OwnIdentity ownIdentity;
+
+		/** The name of the property to update. */
+		protected final String propertyName;
+
+		/**
+		 * Creates a new property update job.
+		 *
+		 * @param ownIdentity
+		 *            The own identity to update the property on
+		 * @param propertyName
+		 *            The name of the property to update
+		 */
+		@SuppressWarnings("synthetic-access")
+		public WebOfTrustPropertyUpdateJob(OwnIdentity ownIdentity, String propertyName) {
+			this.ownIdentity = ownIdentity;
+			this.propertyName = propertyName;
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if ((object == null) || !object.getClass().equals(getClass())) {
+				return false;
+			}
+			WebOfTrustContextUpdateJob updateJob = (WebOfTrustContextUpdateJob) object;
+			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.context.equals(propertyName);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return getClass().hashCode() ^ ownIdentity.hashCode() ^ propertyName.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.format("%s[ownIdentity=%s,propertyName=%s]", getClass().getSimpleName(), ownIdentity, propertyName);
+		}
+
+	}
+
+	/**
+	 * WebOfTrust update job that sets a property on an {@link OwnIdentity}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class SetPropertyJob extends WebOfTrustPropertyUpdateJob {
+
+		/** The value of the property to set. */
+		private final String propertyValue;
+
+		/**
+		 * Creates a new set-property job.
+		 *
+		 * @param ownIdentity
+		 *            The own identity to set the property on
+		 * @param propertyName
+		 *            The name of the property to set
+		 * @param propertyValue
+		 *            The value of the property to set
+		 */
+		public SetPropertyJob(OwnIdentity ownIdentity, String propertyName, String propertyValue) {
+			super(ownIdentity, propertyName);
+			this.propertyValue = propertyValue;
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@SuppressWarnings("synthetic-access")
+		public void run() {
+			try {
+				if (propertyValue == null) {
+					webOfTrustConnector.removeProperty(ownIdentity, propertyName);
+					ownIdentity.removeProperty(propertyName);
+				} else {
+					webOfTrustConnector.setProperty(ownIdentity, propertyName, propertyValue);
+					ownIdentity.setProperty(propertyName, propertyValue);
+				}
+				finish(true);
+			} catch (PluginException pe1) {
+				logger.log(Level.WARNING, String.format("Could not set Property “%2$s” to “%3$s” on Own Identity %1$s!", ownIdentity, propertyName, propertyValue), pe1);
 				finish(false);
 			}
 		}
