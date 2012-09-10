@@ -31,6 +31,7 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
+import net.pterodactylus.util.validation.Validation;
 
 /**
  * Updates WebOfTrust identity data in a background thread because communicating
@@ -116,6 +117,70 @@ public class WebOfTrustUpdater extends AbstractService {
 		} catch (InterruptedException e) {
 			/* the queue is unbounded so it should never block. */
 		}
+	}
+
+	/**
+	 * Adds the given context to the given own identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to add the context to
+	 * @param context
+	 *            The context to add
+	 */
+	public void addContext(OwnIdentity ownIdentity, String context) {
+		addContextWait(ownIdentity, context, false);
+	}
+
+	/**
+	 * Adds the given context to the given own identity, waiting for completion
+	 * of the operation.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to add the context to
+	 * @param context
+	 *            The context to add
+	 * @return {@code true} if the context was added successfully, {@code false}
+	 *         otherwise
+	 */
+	public boolean addContextWait(OwnIdentity ownIdentity, String context) {
+		return addContextWait(ownIdentity, context, true);
+	}
+
+	/**
+	 * Adds the given context to the given own identity, waiting for completion
+	 * of the operation.
+	 *
+	 * @param ownIdentity
+	 *            The own identity to add the context to
+	 * @param context
+	 *            The context to add
+	 * @param wait
+	 *            {@code true} to wait for the end of the operation,
+	 *            {@code false} to return immediately
+	 * @return {@code true} if the context was added successfully, {@code false}
+	 *         if the context was not added successfully, or if the job should
+	 *         not wait for completion
+	 */
+	private boolean addContextWait(OwnIdentity ownIdentity, String context, boolean wait) {
+		AddContextJob addContextJob = new AddContextJob(ownIdentity, context);
+		if (!updateJobs.contains(addContextJob)) {
+			logger.log(Level.FINER, "Adding Context Job: " + addContextJob);
+			try {
+				updateJobs.put(addContextJob);
+			} catch (InterruptedException ie1) {
+				/* the queue is unbounded so it should never block. */
+			}
+			if (wait) {
+				return addContextJob.waitForCompletion();
+			}
+		} else if (wait) {
+			for (WebOfTrustUpdateJob updateJob : updateJobs) {
+				if (updateJob.equals(addContextJob)) {
+					return updateJob.waitForCompletion();
+				}
+			}
+		}
+		return false;
 	}
 
 	//
@@ -386,6 +451,106 @@ public class WebOfTrustUpdater extends AbstractService {
 				finish(false);
 			}
 		}
+
+	}
+
+	/**
+	 * Base class for context updates of an {@link OwnIdentity}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class WebOfTrustContextUpdateJob extends WebOfTrustUpdateJob {
+
+		/** The own identity whose contexts to manage. */
+		protected final OwnIdentity ownIdentity;
+
+		/** The context to update. */
+		protected final String context;
+
+		/**
+		 * Creates a new context update job.
+		 *
+		 * @param ownIdentity
+		 *            The own identity to update
+		 * @param context
+		 *            The context to update
+		 */
+		@SuppressWarnings("synthetic-access")
+		public WebOfTrustContextUpdateJob(OwnIdentity ownIdentity, String context) {
+			Validation.begin().isNotNull("OwnIdentity", ownIdentity).isNotNull("Context", context).check();
+			this.ownIdentity = ownIdentity;
+			this.context = context;
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if ((object == null) || !object.getClass().equals(getClass())) {
+				return false;
+			}
+			WebOfTrustContextUpdateJob updateJob = (WebOfTrustContextUpdateJob) object;
+			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.context.equals(context);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return getClass().hashCode() ^ ownIdentity.hashCode() ^ context.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public String toString() {
+			return String.format("%s[ownIdentity=%s,context=%s]", getClass().getSimpleName(), ownIdentity, context);
+		}
+
+	}
+
+	/**
+	 * Job that adds a context to an {@link OwnIdentity}.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class AddContextJob extends WebOfTrustContextUpdateJob {
+
+		/**
+		 * Creates a new add-context job.
+		 *
+		 * @param ownIdentity
+		 *            The own identity whose contexts to manage
+		 * @param context
+		 *            The context to add
+		 */
+		public AddContextJob(OwnIdentity ownIdentity, String context) {
+			super(ownIdentity, context);
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		@SuppressWarnings("synthetic-access")
+		public void run() {
+			try {
+				webOfTrustConnector.addContext(ownIdentity, context);
+				ownIdentity.addContext(context);
+				finish(true);
+			} catch (PluginException pe1) {
+				logger.log(Level.WARNING, String.format("Could not add Context “%2$s” to Own Identity %1$s!", ownIdentity, context), pe1);
+				finish(false);
+			}
+		}
+
 	}
 
 }
