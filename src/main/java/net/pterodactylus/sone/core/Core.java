@@ -54,7 +54,6 @@ import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
-import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -891,10 +890,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The created Sone
 	 */
 	public Sone createSone(OwnIdentity ownIdentity) {
-		try {
-			ownIdentity.addContext("Sone");
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.SEVERE, String.format("Could not add “Sone” context to own identity: %s", ownIdentity), wote1);
+		if (!webOfTrustUpdater.addContextWait(ownIdentity, "Sone")) {
+			logger.log(Level.SEVERE, String.format("Could not add “Sone” context to own identity: %s", ownIdentity));
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
@@ -1279,12 +1276,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			soneInserter.removeSoneInsertListener(this);
 			soneInserter.stop();
 		}
-		try {
-			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
-			((OwnIdentity) sone.getIdentity()).removeProperty("Sone.LatestEdition");
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not remove context and properties from Sone: %s", sone), wote1);
-		}
+		webOfTrustUpdater.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
+		webOfTrustUpdater.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
 		try {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
@@ -2139,13 +2132,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			configuration.save();
 
-			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+			webOfTrustUpdater.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 
 			logger.log(Level.INFO, String.format("Sone %s saved.", sone));
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, String.format("Could not save Sone: %s", sone), ce1);
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not set WoT property for Sone: %s", sone), wote1);
 		}
 	}
 
