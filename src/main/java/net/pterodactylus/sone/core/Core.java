@@ -113,7 +113,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	private final UpdateChecker updateChecker;
 
 	/** The trust updater. */
-	private final WebOfTrustUpdater trustUpdater;
+	private final WebOfTrustUpdater webOfTrustUpdater;
 
 	/** The FCP interface. */
 	private volatile FcpInterface fcpInterface;
@@ -187,8 +187,10 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The freenet interface
 	 * @param identityManager
 	 *            The identity manager
+	 * @param webOfTrustUpdater
+	 *            The WebOfTrust updater
 	 */
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater trustUpdater) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -196,7 +198,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
 		this.imageInserter = new ImageInserter(this, freenetInterface);
 		this.updateChecker = new UpdateChecker(freenetInterface);
-		this.trustUpdater = trustUpdater;
+		this.webOfTrustUpdater = webOfTrustUpdater;
 	}
 
 	//
@@ -1058,7 +1060,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.WARNING, String.format("Tried to get trust from remote Sone: %s", origin));
 			return null;
 		}
-		trustUpdater.getTrust((OwnIdentity) origin.getIdentity(), target.getIdentity());
+		webOfTrustUpdater.getTrust((OwnIdentity) origin.getIdentity(), target.getIdentity());
 		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
 	}
 
@@ -1074,7 +1076,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void setTrust(Sone origin, Sone target, int trustValue) {
 		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
-		trustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), trustValue, preferences.getTrustComment());
+		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), trustValue, preferences.getTrustComment());
 	}
 
 	/**
@@ -1087,7 +1089,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void removeTrust(Sone origin, Sone target) {
 		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
-		trustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), null, null);
+		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), null, null);
 	}
 
 	/**
@@ -1964,7 +1966,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		loadConfiguration();
 		updateChecker.addUpdateListener(this);
 		updateChecker.start();
-		trustUpdater.start();
+		webOfTrustUpdater.start();
 	}
 
 	/**
@@ -1997,7 +1999,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				soneInserter.stop();
 			}
 		}
-		trustUpdater.stop();
+		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
 		soneDownloader.stop();
