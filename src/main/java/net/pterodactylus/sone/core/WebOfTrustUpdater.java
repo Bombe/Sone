@@ -170,6 +170,9 @@ public class WebOfTrustUpdater extends AbstractService {
 		/** Whether the job has finished. */
 		private boolean finished;
 
+		/** Whether the job was successful. */
+		private boolean success;
+
 		//
 		// ACTIONS
 		//
@@ -187,10 +190,13 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Waits for completion of this job or stopping of the WebOfTrust
 		 * updater.
 		 *
+		 * @return {@code true} if this job finished successfully, {@code false}
+		 *         otherwise
+		 *
 		 * @see WebOfTrustUpdater#stop()
 		 */
 		@SuppressWarnings("synthetic-access")
-		public void waitForCompletion() {
+		public boolean waitForCompletion() {
 			synchronized (syncObject) {
 				while (!finished && !shouldStop()) {
 					try {
@@ -199,6 +205,7 @@ public class WebOfTrustUpdater extends AbstractService {
 						/* we’re looping, ignore. */
 					}
 				}
+				return success;
 			}
 		}
 
@@ -208,10 +215,15 @@ public class WebOfTrustUpdater extends AbstractService {
 
 		/**
 		 * Signals that this job has finished.
+		 *
+		 * @param success
+		 *            {@code true} if this job finished successfully,
+		 *            {@code false} otherwise
 		 */
-		protected void finish() {
+		protected void finish(boolean success) {
 			synchronized (syncObject) {
 				finished = true;
+				this.success = success;
 				syncObject.notifyAll();
 			}
 		}
@@ -329,10 +341,11 @@ public class WebOfTrustUpdater extends AbstractService {
 					}
 					webOfTrustConnector.removeTrust(truster, trustee);
 				}
+				finish(true);
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "Could not set Trust value for " + truster + " -> " + trustee + " to " + score + " (" + comment + ")!", wote1);
+				finish(false);
 			}
-			finish();
 		}
 
 	}
@@ -367,10 +380,11 @@ public class WebOfTrustUpdater extends AbstractService {
 				if (trustee instanceof DefaultIdentity) {
 					((DefaultIdentity) trustee).setTrust(truster, trust);
 				}
+				finish(true);
 			} catch (PluginException pe1) {
 				logger.log(Level.WARNING, "Could not get Trust value for " + truster + " -> " + trustee + "!", pe1);
+				finish(false);
 			}
-			finish();
 		}
 	}
 
