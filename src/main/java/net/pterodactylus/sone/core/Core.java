@@ -1849,7 +1849,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (albums) {
 			albums.remove(album.getId());
 		}
-		saveSone(album.getSone());
+		touchConfiguration();
 	}
 
 	/**
@@ -1889,7 +1889,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (images) {
 			images.remove(image.getId());
 		}
-		saveSone(image.getSone());
+		touchConfiguration();
 	}
 
 	/**
@@ -2549,7 +2549,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", image, key));
 		image.setKey(key.toString());
 		deleteTemporaryImage(image.getId());
-		saveSone(image.getSone());
+		touchConfiguration();
 		coreListenerManager.fireImageInsertFinished(image);
 	}
 
