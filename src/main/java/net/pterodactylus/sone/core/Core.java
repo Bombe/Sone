@@ -1966,11 +1966,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void serviceStop() {
 		synchronized (localSones) {
-			for (SoneInserter soneInserter : soneInserters.values()) {
-				soneInserter.removeSoneInsertListener(this);
-				soneInserter.stop();
+			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
+				soneInserter.getValue().removeSoneInsertListener(this);
+				soneInserter.getValue().stop();
+				saveSone(soneInserter.getKey());
 			}
 		}
+		saveConfiguration();
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
