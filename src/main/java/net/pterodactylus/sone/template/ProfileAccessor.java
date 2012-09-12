@@ -21,6 +21,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -83,7 +84,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 			if (showCustomAvatars == ShowCustomAvatars.FOLLOWED) {
 				return currentSone.hasFriend(remoteSone.getId()) ? avatarId : null;
 			}
-			Trust trust = core.getTrust(currentSone, remoteSone);
+			Trust trust = remoteSone.getIdentity().getTrust((OwnIdentity) currentSone.getIdentity());
 			if (trust == null) {
 				return null;
 			}
