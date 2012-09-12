@@ -2350,7 +2350,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The URI to derive the Sone URI from
 	 * @return The derived URI
 	 */
-	private FreenetURI getSoneUri(String uriString) {
+	private static FreenetURI getSoneUri(String uriString) {
 		try {
 			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
 			return uri;
