@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,7 +37,7 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebOfTrustConnector implements ConnectorListener {
+public class WebOfTrustConnector {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebOfTrustConnector.class);
@@ -44,11 +45,8 @@ public class WebOfTrustConnector implements ConnectorListener {
 	/** The name of the WoT plugin. */
 	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";
 
-	/** A random connection identifier. */
-	private static final String PLUGIN_CONNECTION_IDENTIFIER = "Sone-WoT-Connector-" + Math.abs(Math.random());
-
-	/** The current reply. */
-	private Reply reply;
+	/** Counter for connection identifiers. */
+	private final AtomicLong counter = new AtomicLong();
 
 	/** The plugin connector. */
 	private final PluginConnector pluginConnector;
@@ -62,7 +60,6 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 */
 	public WebOfTrustConnector(PluginConnector pluginConnector) {
 		this.pluginConnector = pluginConnector;
-		pluginConnector.addConnectorListener(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, this);
 	}
 
 	//
@@ -73,10 +70,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * Stops the web of trust connector.
 	 */
 	public void stop() {
-		pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, this);
-		synchronized (reply) {
-			reply.notifyAll();
-		}
+		/* does nothing. */
 	}
 
 	/**
@@ -380,40 +374,39 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * @throws PluginException
 	 *             if the request could not be sent
 	 */
-	private synchronized Reply performRequest(SimpleFieldSet fields, Bucket data) throws PluginException {
-		reply = new Reply();
+	private Reply performRequest(SimpleFieldSet fields, Bucket data) throws PluginException {
+		final String identifier = "FCP-Command-" + System.currentTimeMillis() + "-" + counter.getAndIncrement();
+		final Reply reply = new Reply();
 		logger.log(Level.FINE, String.format("Sending FCP Request: %s", fields.get("Message")));
+		ConnectorListener connectorListener = new ConnectorListener() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
+				String messageName = fields.get("Message");
+				logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", messageName));
+				synchronized (reply) {
+					reply.setFields(fields);
+					reply.setData(data);
+					reply.notify();
+				}
+			}
+		};
+		pluginConnector.addConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 		synchronized (reply) {
-			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
+			pluginConnector.sendRequest(WOT_PLUGIN_NAME, identifier, fields, data);
 			try {
 				reply.wait();
 			} catch (InterruptedException ie1) {
 				logger.log(Level.WARNING, String.format("Got interrupted while waiting for reply on %s.", fields.get("Message")), ie1);
 			}
 		}
+		pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 		logger.log(Level.FINEST, String.format("Received FCP Response for %s: %s", fields.get("Message"), (reply.getFields() != null) ? reply.getFields().get("Message") : null));
 		if ((reply.getFields() == null) || "Error".equals(reply.getFields().get("Message"))) {
 			throw new PluginException("Could not perform request for " + fields.get("Message"));
 		}
 		return reply;
-	}
-
-	//
-	// INTERFACE ConnectorListener
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
-		String messageName = fields.get("Message");
-		logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", messageName));
-		synchronized (reply) {
-			reply.setFields(fields);
-			reply.setData(data);
-			reply.notify();
-		}
 	}
 
 	/**
