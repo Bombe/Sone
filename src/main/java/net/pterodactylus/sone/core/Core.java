@@ -2374,7 +2374,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
 			return uri;
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString, mue1));
+			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString), mue1);
 			return null;
 		}
 	}
