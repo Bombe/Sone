@@ -53,7 +53,6 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -1042,26 +1041,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Retrieves the trust relationship from the origin to the target. If the
-	 * trust relationship can not be retrieved, {@code null} is returned.
-	 *
-	 * @see Identity#getTrust(OwnIdentity)
-	 * @param origin
-	 *            The origin of the trust tree
-	 * @param target
-	 *            The target of the trust
-	 * @return The trust relationship
-	 */
-	public Trust getTrust(Sone origin, Sone target) {
-		if (!isLocalSone(origin)) {
-			logger.log(Level.WARNING, String.format("Tried to get trust from remote Sone: %s", origin));
-			return null;
-		}
-		webOfTrustUpdater.getTrust((OwnIdentity) origin.getIdentity(), target.getIdentity());
-		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
-	}
-
-	/**
 	 * Sets the trust value of the given origin Sone for the target Sone.
 	 *
 	 * @param origin
@@ -1987,11 +1966,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void serviceStop() {
 		synchronized (localSones) {
-			for (SoneInserter soneInserter : soneInserters.values()) {
-				soneInserter.removeSoneInsertListener(this);
-				soneInserter.stop();
+			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
+				soneInserter.getValue().removeSoneInsertListener(this);
+				soneInserter.getValue().stop();
+				saveSone(soneInserter.getKey());
 			}
 		}
+		saveConfiguration();
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
@@ -2369,7 +2350,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The URI to derive the Sone URI from
 	 * @return The derived URI
 	 */
-	private FreenetURI getSoneUri(String uriString) {
+	private static FreenetURI getSoneUri(String uriString) {
 		try {
 			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
 			return uri;

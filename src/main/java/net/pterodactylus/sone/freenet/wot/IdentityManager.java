@@ -19,6 +19,7 @@ package net.pterodactylus.sone.freenet.wot;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,8 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.util.collection.mapper.Mapper;
-import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
@@ -155,27 +154,7 @@ public class IdentityManager extends AbstractService {
 	 * @return All own identities
 	 */
 	public Set<OwnIdentity> getAllOwnIdentities() {
-		try {
-			Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
-			Map<String, OwnIdentity> newOwnIdentities = new HashMap<String, OwnIdentity>();
-			for (OwnIdentity ownIdentity : ownIdentities) {
-				newOwnIdentities.put(ownIdentity.getId(), ownIdentity);
-			}
-			checkOwnIdentities(newOwnIdentities);
-			return Mappers.mappedSet(ownIdentities, new Mapper<OwnIdentity, OwnIdentity>() {
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				public OwnIdentity map(OwnIdentity input) {
-					return new DefaultOwnIdentity(input);
-				}
-			});
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not load all own identities!", wote1);
-			return Collections.emptySet();
-		}
+		return new HashSet<OwnIdentity>(currentOwnIdentities.values());
 	}
 
 	//
