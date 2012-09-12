@@ -312,7 +312,7 @@ public class WebOfTrustConnector {
 	 *            The fields to parse the contexts from
 	 * @return The parsed contexts
 	 */
-	private Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
+	private static Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
 		Set<String> contexts = new HashSet<String>();
 		int contextCounter = -1;
 		while (true) {
@@ -334,7 +334,7 @@ public class WebOfTrustConnector {
 	 *            The fields to parse the properties from
 	 * @return The parsed properties
 	 */
-	private Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
+	private static Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
 		Map<String, String> properties = new HashMap<String, String>();
 		int propertiesCounter = -1;
 		while (true) {
