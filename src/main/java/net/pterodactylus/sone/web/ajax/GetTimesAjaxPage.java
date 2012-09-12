@@ -66,7 +66,9 @@ public class GetTimesAjaxPage extends JsonPage {
 				Time time = getTime(post.getTime());
 				postTime.put("timeText", time.getText());
 				postTime.put("refreshTime", time.getRefresh() / Time.SECOND);
-				postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
+				synchronized (dateFormat) {
+					postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
+				}
 				postTimes.put(id, postTime);
 			}
 		}
@@ -83,7 +85,9 @@ public class GetTimesAjaxPage extends JsonPage {
 				Time time = getTime(reply.getTime());
 				replyTime.put("timeText", time.getText());
 				replyTime.put("refreshTime", time.getRefresh() / Time.SECOND);
-				replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
+				synchronized (dateFormat) {
+					replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
+				}
 				replyTimes.put(id, replyTime);
 			}
 		}
