@@ -684,8 +684,8 @@ public class WebOfTrustUpdater extends AbstractService {
 			if ((object == null) || !object.getClass().equals(getClass())) {
 				return false;
 			}
-			WebOfTrustContextUpdateJob updateJob = (WebOfTrustContextUpdateJob) object;
-			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.context.equals(propertyName);
+			WebOfTrustPropertyUpdateJob updateJob = (WebOfTrustPropertyUpdateJob) object;
+			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.propertyName.equals(propertyName);
 		}
 
 		/**
