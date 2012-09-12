@@ -29,6 +29,7 @@ import net.pterodactylus.sone.freenet.plugin.ConnectorListener;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.number.Numbers;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -128,7 +129,7 @@ public class WebOfTrustConnector {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).get());
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<Identity>();
 		int identityCounter = -1;
@@ -142,6 +143,10 @@ public class WebOfTrustConnector {
 			DefaultIdentity identity = new DefaultIdentity(id, nickname, requestUri);
 			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
 			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
+			Integer trust = Numbers.safeParseInteger(fields.get("Trust" + identityCounter), null);
+			int score = Numbers.safeParseInteger(fields.get("Score" + identityCounter));
+			int rank = Numbers.safeParseInteger(fields.get("Rank" + identityCounter));
+			identity.setTrust(ownIdentity, new Trust(trust, score, rank));
 			identities.add(identity);
 		}
 		return identities;
