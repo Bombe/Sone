@@ -70,28 +70,6 @@ public class WebOfTrustUpdater extends AbstractService {
 	//
 
 	/**
-	 * Retrieves the trust relation between the truster and the trustee. This
-	 * method will return immediately and perform a trust update in the
-	 * background.
-	 *
-	 * @param truster
-	 *            The identity giving the trust
-	 * @param trustee
-	 *            The identity receiving the trust
-	 */
-	public void getTrust(OwnIdentity truster, Identity trustee) {
-		GetTrustJob getTrustJob = new GetTrustJob(truster, trustee);
-		if (!updateJobs.contains(getTrustJob)) {
-			logger.log(Level.FINER, "Adding Trust Update Job: " + getTrustJob);
-			try {
-				updateJobs.put(getTrustJob);
-			} catch (InterruptedException ie1) {
-				/* the queue is unbounded so it should never block. */
-			}
-		}
-	}
-
-	/**
 	 * Updates the trust relation between the truster and the trustee. This
 	 * method will return immediately and perform a trust update in the
 	 * background.
@@ -464,45 +442,6 @@ public class WebOfTrustUpdater extends AbstractService {
 				finish(true);
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "Could not set Trust value for " + truster + " -> " + trustee + " to " + score + " (" + comment + ")!", wote1);
-				finish(false);
-			}
-		}
-
-	}
-
-	/**
-	 * Update job that retrieves the trust relation between two identities.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class GetTrustJob extends WebOfTrustTrustUpdateJob {
-
-		/**
-		 * Creates a new trust update job.
-		 *
-		 * @param truster
-		 *            The identity giving the trust
-		 * @param trustee
-		 *            The identity receiving the trust
-		 */
-		public GetTrustJob(OwnIdentity truster, Identity trustee) {
-			super(truster, trustee);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public void run() {
-			try {
-				Trust trust = webOfTrustConnector.getTrust(truster, trustee);
-				if (trustee instanceof DefaultIdentity) {
-					((DefaultIdentity) trustee).setTrust(truster, trust);
-				}
-				finish(true);
-			} catch (PluginException pe1) {
-				logger.log(Level.WARNING, "Could not get Trust value for " + truster + " -> " + trustee + "!", pe1);
 				finish(false);
 			}
 		}

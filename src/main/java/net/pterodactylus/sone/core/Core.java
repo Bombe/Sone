@@ -53,7 +53,6 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -1039,26 +1038,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 		}
 		touchConfiguration();
-	}
-
-	/**
-	 * Retrieves the trust relationship from the origin to the target. If the
-	 * trust relationship can not be retrieved, {@code null} is returned.
-	 *
-	 * @see Identity#getTrust(OwnIdentity)
-	 * @param origin
-	 *            The origin of the trust tree
-	 * @param target
-	 *            The target of the trust
-	 * @return The trust relationship
-	 */
-	public Trust getTrust(Sone origin, Sone target) {
-		if (!isLocalSone(origin)) {
-			logger.log(Level.WARNING, String.format("Tried to get trust from remote Sone: %s", origin));
-			return null;
-		}
-		webOfTrustUpdater.getTrust((OwnIdentity) origin.getIdentity(), target.getIdentity());
-		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
 	}
 
 	/**
