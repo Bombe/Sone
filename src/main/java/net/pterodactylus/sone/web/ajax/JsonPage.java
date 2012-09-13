@@ -139,6 +139,7 @@ public abstract class JsonPage implements FreenetPage {
 	 * @return {@code true} if the form password (given as “formPassword”) is
 	 *         required, {@code false} otherwise
 	 */
+	@SuppressWarnings("static-method")
 	protected boolean needsFormPassword() {
 		return true;
 	}
@@ -149,6 +150,7 @@ public abstract class JsonPage implements FreenetPage {
 	 * @return {@code true} if the user needs to be logged in to use this page,
 	 *         {@code false} otherwise
 	 */
+	@SuppressWarnings("static-method")
 	protected boolean requiresLogin() {
 		return true;
 	}

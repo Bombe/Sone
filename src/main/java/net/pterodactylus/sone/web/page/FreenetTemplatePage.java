@@ -100,6 +100,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 *            The request to serve
 	 * @return The title of the page
 	 */
+	@SuppressWarnings("static-method")
 	protected String getPageTitle(FreenetRequest request) {
 		return null;
 	}
@@ -175,6 +176,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 *
 	 * @return Additional style sheets to load
 	 */
+	@SuppressWarnings("static-method")
 	protected Collection<String> getStyleSheets() {
 		return Collections.emptySet();
 	}
@@ -184,6 +186,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 *
 	 * @return The URL of the shortcut icon, or {@code null} for no icon
 	 */
+	@SuppressWarnings("static-method")
 	protected String getShortcutIcon() {
 		return null;
 	}
@@ -227,6 +230,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 *            The request that is processed
 	 * @return The URL to redirect to, or {@code null} to not redirect
 	 */
+	@SuppressWarnings("static-method")
 	protected String getRedirectTarget(FreenetRequest request) {
 		return null;
 	}
@@ -238,6 +242,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 *            The request for which to return the link nodes
 	 * @return All link nodes that should be added to the HTML head
 	 */
+	@SuppressWarnings("static-method")
 	protected List<Map<String, String>> getAdditionalLinkNodes(FreenetRequest request) {
 		return Collections.emptyList();
 	}
@@ -249,6 +254,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 * @return {@code true} if this page should only be allowed for hosts with
 	 *         full access, {@code false} to allow this page for any host
 	 */
+	@SuppressWarnings("static-method")
 	protected boolean isFullAccessOnly() {
 		return false;
 	}
