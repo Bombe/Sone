@@ -399,14 +399,19 @@ public class WebOfTrustConnector {
 		};
 		pluginConnector.addConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 		synchronized (reply) {
-			pluginConnector.sendRequest(WOT_PLUGIN_NAME, identifier, fields, data);
 			try {
-				reply.wait();
-			} catch (InterruptedException ie1) {
-				logger.log(Level.WARNING, String.format("Got interrupted while waiting for reply on %s.", fields.get("Message")), ie1);
+				pluginConnector.sendRequest(WOT_PLUGIN_NAME, identifier, fields, data);
+				while (reply.getFields() == null) {
+					try {
+						reply.wait();
+					} catch (InterruptedException ie1) {
+						logger.log(Level.WARNING, String.format("Got interrupted while waiting for reply on %s.", fields.get("Message")), ie1);
+					}
+				}
+			} finally {
+				pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 			}
 		}
-		pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 		logger.log(Level.FINEST, String.format("Received FCP Response for %s: %s", fields.get("Message"), (reply.getFields() != null) ? reply.getFields().get("Message") : null));
 		if ((reply.getFields() == null) || "Error".equals(reply.getFields().get("Message"))) {
 			throw new PluginException("Could not perform request for " + fields.get("Message"));
