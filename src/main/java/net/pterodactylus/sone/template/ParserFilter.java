@@ -282,26 +282,4 @@ public class ParserFilter implements Filter {
 		linkTemplate.render(templateContext, writer);
 	}
 
-	//
-	// STATIC METHODS
-	//
-
-	/**
-	 * Returns up to {@code length} characters from the given text, appending
-	 * “…” if the text is longer.
-	 *
-	 * @param text
-	 *            The text to get an excerpt from
-	 * @param length
-	 *            The maximum length of the excerpt (without the ellipsis)
-	 * @return The excerpt of the text
-	 */
-	private static String getExcerpt(String text, int length) {
-		String filteredText = text.replaceAll("(\r\n)+", "\r\n").replaceAll("\n+", "\n").replace("\r\n", " ").replace('\n', ' ');
-		if (filteredText.length() > length) {
-			return filteredText.substring(0, length) + "…";
-		}
-		return filteredText;
-	}
-
 }
