@@ -145,7 +145,7 @@ public class UploadImagePage extends SoneTemplatePage {
 	 * @return The MIME type of the image, or “application/octet-stream” if the
 	 *         image type could not be detected
 	 */
-	private String getMimeType(byte[] imageData) {
+	private static String getMimeType(byte[] imageData) {
 		ByteArrayInputStream imageDataInputStream = new ByteArrayInputStream(imageData);
 		try {
 			ImageInputStream imageInputStream = ImageIO.createImageInputStream(imageDataInputStream);

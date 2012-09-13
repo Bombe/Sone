@@ -93,7 +93,7 @@ public class IdentityAccessor extends ReflectionAccessor {
 	 *            append to the nickname
 	 * @return The nickname with optional ID appendage
 	 */
-	private String getAbbreviatedNickname(Identity identity, int length) {
+	private static String getAbbreviatedNickname(Identity identity, int length) {
 		return identity.getNickname() + ((length > 0) ? "@" + identity.getId().substring(0, length) : "");
 	}
 

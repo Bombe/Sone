@@ -193,7 +193,7 @@ public class GetStatusAjaxPage extends JsonPage {
 	 *            The current Sone (may be {@code null})
 	 * @return The current options
 	 */
-	private JsonObject createJsonOptions(Sone currentSone) {
+	private static JsonObject createJsonOptions(Sone currentSone) {
 		JsonObject options = new JsonObject();
 		if (currentSone != null) {
 			options.put("ShowNotification/NewSones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());

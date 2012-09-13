@@ -168,7 +168,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The string generator for the objects
 	 * @return The hits for the given phrases
 	 */
-	private <T> Set<Hit<T>> getHits(Collection<T> objects, List<Phrase> phrases, StringGenerator<T> stringGenerator) {
+	private static <T> Set<Hit<T>> getHits(Collection<T> objects, List<Phrase> phrases, StringGenerator<T> stringGenerator) {
 		Set<Hit<T>> hits = new HashSet<Hit<T>>();
 		for (T object : objects) {
 			String objectString = stringGenerator.generateString(object);
@@ -189,7 +189,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The query to parse
 	 * @return The parsed phrases
 	 */
-	private List<Phrase> parseSearchPhrases(String query) {
+	private static List<Phrase> parseSearchPhrases(String query) {
 		List<String> parsedPhrases = null;
 		try {
 			parsedPhrases = StringEscaper.parseLine(query);
@@ -229,7 +229,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The expression to search
 	 * @return The score of the expression
 	 */
-	private double calculateScore(List<Phrase> phrases, String expression) {
+	private static double calculateScore(List<Phrase> phrases, String expression) {
 		logger.log(Level.FINEST, String.format("Calculating Score for “%s”…", expression));
 		double optionalHits = 0;
 		double requiredHits = 0;

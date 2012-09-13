@@ -162,7 +162,7 @@ public abstract class JsonPage implements FreenetPage {
 	 *
 	 * @return A reply signaling success
 	 */
-	protected JsonObject createSuccessJsonObject() {
+	protected static JsonObject createSuccessJsonObject() {
 		return new JsonObject().put("success", true);
 	}
 
@@ -173,7 +173,7 @@ public abstract class JsonPage implements FreenetPage {
 	 *            The error that has occured
 	 * @return The JSON object, signalling failure and the error code
 	 */
-	protected JsonObject createErrorJsonObject(String error) {
+	protected static JsonObject createErrorJsonObject(String error) {
 		return new JsonObject().put("success", false).put("error", error);
 	}
 
