@@ -63,7 +63,7 @@ public class IdentityManager extends AbstractService {
 
 	/** The currently known own identities. */
 	/* synchronize access on syncObject. */
-	private Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
+	private final Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
 	/**
 	 * Creates a new identity manager.
