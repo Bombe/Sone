@@ -59,7 +59,7 @@ public class IdentityManager extends AbstractService {
 	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The context to filter for. */
-	private volatile String context;
+	private final String context;
 
 	/** The currently known own identities. */
 	/* synchronize access on syncObject. */
@@ -70,10 +70,14 @@ public class IdentityManager extends AbstractService {
 	 *
 	 * @param webOfTrustConnector
 	 *            The Web of Trust connector
+	 * @param context
+	 *            The context to focus on (may be {@code null} to ignore
+	 *            contexts)
 	 */
-	public IdentityManager(WebOfTrustConnector webOfTrustConnector) {
+	public IdentityManager(WebOfTrustConnector webOfTrustConnector, String context) {
 		super("Sone Identity Manager", false);
 		this.webOfTrustConnector = webOfTrustConnector;
+		this.context = context;
 	}
 
 	//
@@ -103,16 +107,6 @@ public class IdentityManager extends AbstractService {
 	//
 	// ACCESSORS
 	//
-
-	/**
-	 * Sets the context to filter own identities and trusted identities for.
-	 *
-	 * @param context
-	 *            The context to filter for, or {@code null} to not filter
-	 */
-	public void setContext(String context) {
-		this.context = context;
-	}
 
 	/**
 	 * Returns whether the Web of Trust plugin could be reached during the last

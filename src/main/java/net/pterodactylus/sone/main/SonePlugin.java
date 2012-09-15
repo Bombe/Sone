@@ -186,8 +186,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			/* create web of trust connector. */
 			PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
 			webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
-			identityManager = new IdentityManager(webOfTrustConnector);
-			identityManager.setContext("Sone");
+			identityManager = new IdentityManager(webOfTrustConnector, "Sone");
 
 			/* create trust updater. */
 			WebOfTrustUpdater trustUpdater = new WebOfTrustUpdater(webOfTrustConnector);
