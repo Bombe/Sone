@@ -121,7 +121,7 @@ public class SoneTextParserTest extends TestCase {
 	 *            valid
 	 * @return The converted text
 	 */
-	private String convertText(Iterable<Part> parts, Class<?>... validClasses) {
+	private static String convertText(Iterable<Part> parts, Class<?>... validClasses) {
 		StringBuilder text = new StringBuilder();
 		for (Part part : parts) {
 			assertNotNull("Part", part);
