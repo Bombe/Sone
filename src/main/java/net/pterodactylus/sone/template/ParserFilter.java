@@ -249,7 +249,13 @@ public class ParserFilter implements Filter {
 			for (Part part : parts) {
 				excerpt.append(part.getText());
 				if (excerpt.length() > 20) {
-					excerpt.setLength(20);
+					int lastSpace = excerpt.lastIndexOf(" ", 20);
+					if (lastSpace > -1) {
+						excerpt.setLength(lastSpace);
+					} else {
+						excerpt.setLength(20);
+					}
+					excerpt.append("…");
 					break;
 				}
 			}
