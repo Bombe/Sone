@@ -65,6 +65,9 @@ public class IdentityManager extends AbstractService {
 	/* synchronize access on syncObject. */
 	private final Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
+	/** The last time all identities were loaded. */
+	private volatile long identitiesLastLoaded;
+
 	/**
 	 * Creates a new identity manager.
 	 *
@@ -107,6 +110,16 @@ public class IdentityManager extends AbstractService {
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the last time all identities were loaded.
+	 *
+	 * @return The last time all identities were loaded (in milliseconds since
+	 *         Jan 1, 1970 UTC)
+	 */
+	public long getIdentitiesLastLoaded() {
+		return identitiesLastLoaded;
+	}
 
 	/**
 	 * Returns whether the Web of Trust plugin could be reached during the last
@@ -186,6 +199,7 @@ public class IdentityManager extends AbstractService {
 					}
 				}
 				identitiesLoaded = true;
+				identitiesLastLoaded = System.currentTimeMillis();
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
 			}
