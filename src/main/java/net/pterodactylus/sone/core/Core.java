@@ -77,6 +77,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
 
+	/** The start time. */
+	private final long startupTime = System.currentTimeMillis();
+
 	/** The options. */
 	private final Options options = new Options();
 
@@ -226,6 +229,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the time Sone was started.
+	 *
+	 * @return The startup time (in milliseconds since Jan 1, 1970 UTC)
+	 */
+	public long getStartupTime() {
+		return startupTime;
+	}
 
 	/**
 	 * Sets the configuration to use. This will automatically save the current
