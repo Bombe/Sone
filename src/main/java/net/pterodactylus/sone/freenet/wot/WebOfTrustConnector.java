@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,6 +29,7 @@ import net.pterodactylus.sone.freenet.plugin.ConnectorListener;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.number.Numbers;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -36,7 +38,7 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebOfTrustConnector implements ConnectorListener {
+public class WebOfTrustConnector {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebOfTrustConnector.class);
@@ -44,11 +46,8 @@ public class WebOfTrustConnector implements ConnectorListener {
 	/** The name of the WoT plugin. */
 	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";
 
-	/** A random connection identifier. */
-	private static final String PLUGIN_CONNECTION_IDENTIFIER = "Sone-WoT-Connector-" + Math.abs(Math.random());
-
-	/** The current reply. */
-	private Reply reply;
+	/** Counter for connection identifiers. */
+	private final AtomicLong counter = new AtomicLong();
 
 	/** The plugin connector. */
 	private final PluginConnector pluginConnector;
@@ -62,7 +61,6 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 */
 	public WebOfTrustConnector(PluginConnector pluginConnector) {
 		this.pluginConnector = pluginConnector;
-		pluginConnector.addConnectorListener(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, this);
 	}
 
 	//
@@ -73,10 +71,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * Stops the web of trust connector.
 	 */
 	public void stop() {
-		pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, this);
-		synchronized (reply) {
-			reply.notifyAll();
-		}
+		/* does nothing. */
 	}
 
 	/**
@@ -99,9 +94,9 @@ public class WebOfTrustConnector implements ConnectorListener {
 			String requestUri = fields.get("RequestURI" + ownIdentityCounter);
 			String insertUri = fields.get("InsertURI" + ownIdentityCounter);
 			String nickname = fields.get("Nickname" + ownIdentityCounter);
-			DefaultOwnIdentity ownIdentity = new DefaultOwnIdentity(this, id, nickname, requestUri, insertUri);
-			ownIdentity.setContextsPrivate(parseContexts("Contexts" + ownIdentityCounter + ".", fields));
-			ownIdentity.setPropertiesPrivate(parseProperties("Properties" + ownIdentityCounter + ".", fields));
+			DefaultOwnIdentity ownIdentity = new DefaultOwnIdentity(id, nickname, requestUri, insertUri);
+			ownIdentity.setContexts(parseContexts("Contexts" + ownIdentityCounter + ".", fields));
+			ownIdentity.setProperties(parseProperties("Properties" + ownIdentityCounter + ".", fields));
 			ownIdentities.add(ownIdentity);
 		}
 		return ownIdentities;
@@ -134,7 +129,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).get());
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<Identity>();
 		int identityCounter = -1;
@@ -145,9 +140,13 @@ public class WebOfTrustConnector implements ConnectorListener {
 			}
 			String nickname = fields.get("Nickname" + identityCounter);
 			String requestUri = fields.get("RequestURI" + identityCounter);
-			DefaultIdentity identity = new DefaultIdentity(this, id, nickname, requestUri);
-			identity.setContextsPrivate(parseContexts("Contexts" + identityCounter + ".", fields));
-			identity.setPropertiesPrivate(parseProperties("Properties" + identityCounter + ".", fields));
+			DefaultIdentity identity = new DefaultIdentity(id, nickname, requestUri);
+			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
+			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
+			Integer trust = Numbers.safeParseInteger(fields.get("Trust" + identityCounter), null);
+			int score = Numbers.safeParseInteger(fields.get("Score" + identityCounter));
+			int rank = Numbers.safeParseInteger(fields.get("Rank" + identityCounter));
+			identity.setTrust(ownIdentity, new Trust(trust, score, rank));
 			identities.add(identity);
 		}
 		return identities;
@@ -318,7 +317,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *            The fields to parse the contexts from
 	 * @return The parsed contexts
 	 */
-	private Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
+	private static Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
 		Set<String> contexts = new HashSet<String>();
 		int contextCounter = -1;
 		while (true) {
@@ -340,7 +339,7 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 *            The fields to parse the properties from
 	 * @return The parsed properties
 	 */
-	private Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
+	private static Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
 		Map<String, String> properties = new HashMap<String, String>();
 		int propertiesCounter = -1;
 		while (true) {
@@ -380,15 +379,37 @@ public class WebOfTrustConnector implements ConnectorListener {
 	 * @throws PluginException
 	 *             if the request could not be sent
 	 */
-	private synchronized Reply performRequest(SimpleFieldSet fields, Bucket data) throws PluginException {
-		reply = new Reply();
+	private Reply performRequest(SimpleFieldSet fields, Bucket data) throws PluginException {
+		final String identifier = "FCP-Command-" + System.currentTimeMillis() + "-" + counter.getAndIncrement();
+		final Reply reply = new Reply();
 		logger.log(Level.FINE, String.format("Sending FCP Request: %s", fields.get("Message")));
+		ConnectorListener connectorListener = new ConnectorListener() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
+				String messageName = fields.get("Message");
+				logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", messageName));
+				synchronized (reply) {
+					reply.setFields(fields);
+					reply.setData(data);
+					reply.notify();
+				}
+			}
+		};
+		pluginConnector.addConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 		synchronized (reply) {
-			pluginConnector.sendRequest(WOT_PLUGIN_NAME, PLUGIN_CONNECTION_IDENTIFIER, fields, data);
 			try {
-				reply.wait();
-			} catch (InterruptedException ie1) {
-				logger.log(Level.WARNING, String.format("Got interrupted while waiting for reply on %s.", fields.get("Message")), ie1);
+				pluginConnector.sendRequest(WOT_PLUGIN_NAME, identifier, fields, data);
+				while (reply.getFields() == null) {
+					try {
+						reply.wait();
+					} catch (InterruptedException ie1) {
+						logger.log(Level.WARNING, String.format("Got interrupted while waiting for reply on %s.", fields.get("Message")), ie1);
+					}
+				}
+			} finally {
+				pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
 			}
 		}
 		logger.log(Level.FINEST, String.format("Received FCP Response for %s: %s", fields.get("Message"), (reply.getFields() != null) ? reply.getFields().get("Message") : null));
@@ -396,24 +417,6 @@ public class WebOfTrustConnector implements ConnectorListener {
 			throw new PluginException("Could not perform request for " + fields.get("Message"));
 		}
 		return reply;
-	}
-
-	//
-	// INTERFACE ConnectorListener
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
-		String messageName = fields.get("Message");
-		logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", messageName));
-		synchronized (reply) {
-			reply.setFields(fields);
-			reply.setData(data);
-			reply.notify();
-		}
 	}
 
 	/**

@@ -53,8 +53,6 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.freenet.wot.Trust;
-import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -78,6 +76,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
+
+	/** The start time. */
+	private final long startupTime = System.currentTimeMillis();
 
 	/** The options. */
 	private final Options options = new Options();
@@ -111,6 +112,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
+
+	/** The trust updater. */
+	private final WebOfTrustUpdater webOfTrustUpdater;
 
 	/** The FCP interface. */
 	private volatile FcpInterface fcpInterface;
@@ -184,8 +188,10 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The freenet interface
 	 * @param identityManager
 	 *            The identity manager
+	 * @param webOfTrustUpdater
+	 *            The WebOfTrust updater
 	 */
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -193,6 +199,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
 		this.imageInserter = new ImageInserter(this, freenetInterface);
 		this.updateChecker = new UpdateChecker(freenetInterface);
+		this.webOfTrustUpdater = webOfTrustUpdater;
 	}
 
 	//
@@ -222,6 +229,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	//
 	// ACCESSORS
 	//
+
+	/**
+	 * Returns the time Sone was started.
+	 *
+	 * @return The startup time (in milliseconds since Jan 1, 1970 UTC)
+	 */
+	public long getStartupTime() {
+		return startupTime;
+	}
 
 	/**
 	 * Sets the configuration to use. This will automatically save the current
@@ -885,10 +901,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The created Sone
 	 */
 	public Sone createSone(OwnIdentity ownIdentity) {
-		try {
-			ownIdentity.addContext("Sone");
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.SEVERE, String.format("Could not add “Sone” context to own identity: %s", ownIdentity), wote1);
+		if (!webOfTrustUpdater.addContextWait(ownIdentity, "Sone")) {
+			logger.log(Level.SEVERE, String.format("Could not add “Sone” context to own identity: %s", ownIdentity));
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
@@ -1039,25 +1053,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	}
 
 	/**
-	 * Retrieves the trust relationship from the origin to the target. If the
-	 * trust relationship can not be retrieved, {@code null} is returned.
-	 *
-	 * @see Identity#getTrust(OwnIdentity)
-	 * @param origin
-	 *            The origin of the trust tree
-	 * @param target
-	 *            The target of the trust
-	 * @return The trust relationship
-	 */
-	public Trust getTrust(Sone origin, Sone target) {
-		if (!isLocalSone(origin)) {
-			logger.log(Level.WARNING, String.format("Tried to get trust from remote Sone: %s", origin));
-			return null;
-		}
-		return target.getIdentity().getTrust((OwnIdentity) origin.getIdentity());
-	}
-
-	/**
 	 * Sets the trust value of the given origin Sone for the target Sone.
 	 *
 	 * @param origin
@@ -1069,11 +1064,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void setTrust(Sone origin, Sone target, int trustValue) {
 		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
-		try {
-			((OwnIdentity) origin.getIdentity()).setTrust(target.getIdentity(), trustValue, preferences.getTrustComment());
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not set trust for Sone: %s", target), wote1);
-		}
+		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), trustValue, preferences.getTrustComment());
 	}
 
 	/**
@@ -1086,11 +1077,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void removeTrust(Sone origin, Sone target) {
 		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
-		try {
-			((OwnIdentity) origin.getIdentity()).removeTrust(target.getIdentity());
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not remove trust for Sone: %s", target), wote1);
-		}
+		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), null, null);
 	}
 
 	/**
@@ -1280,12 +1267,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			soneInserter.removeSoneInsertListener(this);
 			soneInserter.stop();
 		}
-		try {
-			((OwnIdentity) sone.getIdentity()).removeContext("Sone");
-			((OwnIdentity) sone.getIdentity()).removeProperty("Sone.LatestEdition");
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not remove context and properties from Sone: %s", sone), wote1);
-		}
+		webOfTrustUpdater.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
+		webOfTrustUpdater.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
 		try {
 			configuration.getLongValue("Sone/" + sone.getId() + "/Time").setValue(null);
 		} catch (ConfigurationException ce1) {
@@ -1857,7 +1840,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (albums) {
 			albums.remove(album.getId());
 		}
-		saveSone(album.getSone());
+		touchConfiguration();
 	}
 
 	/**
@@ -1897,7 +1880,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (images) {
 			images.remove(image.getId());
 		}
-		saveSone(image.getSone());
+		touchConfiguration();
 	}
 
 	/**
@@ -1967,6 +1950,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		loadConfiguration();
 		updateChecker.addUpdateListener(this);
 		updateChecker.start();
+		webOfTrustUpdater.start();
 	}
 
 	/**
@@ -1994,11 +1978,14 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void serviceStop() {
 		synchronized (localSones) {
-			for (SoneInserter soneInserter : soneInserters.values()) {
-				soneInserter.removeSoneInsertListener(this);
-				soneInserter.stop();
+			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
+				soneInserter.getValue().removeSoneInsertListener(this);
+				soneInserter.getValue().stop();
+				saveSone(soneInserter.getKey());
 			}
 		}
+		saveConfiguration();
+		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
 		soneDownloader.stop();
@@ -2138,13 +2125,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 			configuration.save();
 
-			((OwnIdentity) sone.getIdentity()).setProperty("Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
+			webOfTrustUpdater.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 
 			logger.log(Level.INFO, String.format("Sone %s saved.", sone));
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.WARNING, String.format("Could not save Sone: %s", sone), ce1);
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, String.format("Could not set WoT property for Sone: %s", sone), wote1);
 		}
 	}
 
@@ -2174,9 +2159,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
 			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
 			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
-			configuration.getBooleanValue("Option/SoneRescueMode").setValue(options.getBooleanOption("SoneRescueMode").getReal());
-			configuration.getBooleanValue("Option/ClearOnNextRestart").setValue(options.getBooleanOption("ClearOnNextRestart").getReal());
-			configuration.getBooleanValue("Option/ReallyClearOnNextRestart").setValue(options.getBooleanOption("ReallyClearOnNextRestart").getReal());
 
 			/* save known Sones. */
 			int soneCounter = 0;
@@ -2276,20 +2258,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 
 		}));
-		options.addBooleanOption("SoneRescueMode", new DefaultOption<Boolean>(false));
-		options.addBooleanOption("ClearOnNextRestart", new DefaultOption<Boolean>(false));
-		options.addBooleanOption("ReallyClearOnNextRestart", new DefaultOption<Boolean>(false));
-
-		/* read options from configuration. */
-		options.getBooleanOption("ClearOnNextRestart").set(configuration.getBooleanValue("Option/ClearOnNextRestart").getValue(null));
-		options.getBooleanOption("ReallyClearOnNextRestart").set(configuration.getBooleanValue("Option/ReallyClearOnNextRestart").getValue(null));
-		boolean clearConfiguration = options.getBooleanOption("ClearOnNextRestart").get() && options.getBooleanOption("ReallyClearOnNextRestart").get();
-		options.getBooleanOption("ClearOnNextRestart").set(null);
-		options.getBooleanOption("ReallyClearOnNextRestart").set(null);
-		if (clearConfiguration) {
-			/* stop loading the configuration. */
-			return;
-		}
 
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");
@@ -2302,7 +2270,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
 		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
 		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
-		options.getBooleanOption("SoneRescueMode").set(configuration.getBooleanValue("Option/SoneRescueMode").getValue(null));
 
 		/* load known Sones. */
 		int soneCounter = 0;
@@ -2395,12 +2362,12 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The URI to derive the Sone URI from
 	 * @return The derived URI
 	 */
-	private FreenetURI getSoneUri(String uriString) {
+	private static FreenetURI getSoneUri(String uriString) {
 		try {
 			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
 			return uri;
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString, mue1));
+			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString), mue1);
 			return null;
 		}
 	}
@@ -2575,7 +2542,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", image, key));
 		image.setKey(key.toString());
 		deleteTemporaryImage(image.getId());
-		saveSone(image.getSone());
+		touchConfiguration();
 		coreListenerManager.fireImageInsertFinished(image);
 	}
 
@@ -2937,58 +2904,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		 */
 		public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
 			options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
-			return this;
-		}
-
-		/**
-		 * Returns whether Sone should clear its settings on the next restart.
-		 * In order to be effective, {@link #isReallyClearOnNextRestart()} needs
-		 * to return {@code true} as well!
-		 *
-		 * @return {@code true} if Sone should clear its settings on the next
-		 *         restart, {@code false} otherwise
-		 */
-		public boolean isClearOnNextRestart() {
-			return options.getBooleanOption("ClearOnNextRestart").get();
-		}
-
-		/**
-		 * Sets whether Sone will clear its settings on the next restart.
-		 *
-		 * @param clearOnNextRestart
-		 *            {@code true} if Sone should clear its settings on the next
-		 *            restart, {@code false} otherwise
-		 * @return This preferences
-		 */
-		public Preferences setClearOnNextRestart(Boolean clearOnNextRestart) {
-			options.getBooleanOption("ClearOnNextRestart").set(clearOnNextRestart);
-			return this;
-		}
-
-		/**
-		 * Returns whether Sone should really clear its settings on next
-		 * restart. This is a confirmation option that needs to be set in
-		 * addition to {@link #isClearOnNextRestart()} in order to clear Sone’s
-		 * settings on the next restart.
-		 *
-		 * @return {@code true} if Sone should really clear its settings on the
-		 *         next restart, {@code false} otherwise
-		 */
-		public boolean isReallyClearOnNextRestart() {
-			return options.getBooleanOption("ReallyClearOnNextRestart").get();
-		}
-
-		/**
-		 * Sets whether Sone should really clear its settings on the next
-		 * restart.
-		 *
-		 * @param reallyClearOnNextRestart
-		 *            {@code true} if Sone should really clear its settings on
-		 *            the next restart, {@code false} otherwise
-		 * @return This preferences
-		 */
-		public Preferences setReallyClearOnNextRestart(Boolean reallyClearOnNextRestart) {
-			options.getBooleanOption("ReallyClearOnNextRestart").set(reallyClearOnNextRestart);
 			return this;
 		}
 

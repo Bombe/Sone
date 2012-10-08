@@ -41,6 +41,7 @@ public class SoneTextParserTest extends TestCase {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
+	@SuppressWarnings("static-method")
 	public void testPlainText() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts;
@@ -67,6 +68,7 @@ public class SoneTextParserTest extends TestCase {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
+	@SuppressWarnings("static-method")
 	public void testKSKLinks() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts;
@@ -93,7 +95,7 @@ public class SoneTextParserTest extends TestCase {
 	 * @throws IOException
 	 *             if an I/O error occurs
 	 */
-	@SuppressWarnings("synthetic-access")
+	@SuppressWarnings({ "synthetic-access", "static-method" })
 	public void testEmptyLinesAndSoneLinks() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(new TestSoneProvider(), null);
 		Iterable<Part> parts;
@@ -119,7 +121,7 @@ public class SoneTextParserTest extends TestCase {
 	 *            valid
 	 * @return The converted text
 	 */
-	private String convertText(Iterable<Part> parts, Class<?>... validClasses) {
+	private static String convertText(Iterable<Part> parts, Class<?>... validClasses) {
 		StringBuilder text = new StringBuilder();
 		for (Part part : parts) {
 			assertNotNull("Part", part);

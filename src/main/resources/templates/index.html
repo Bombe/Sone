@@ -11,7 +11,8 @@
 		<%foreach pagination.items post>
 			<%include include/viewPost.html>
 		<%foreachelse>
-			<div><%= Page.Index.PostList.Text.NoPostYet|l10n|html></div>
+			<p><%= Page.Index.PostList.Text.NoPostYet|l10n|html></p>
+			<p><%= Page.Index.PostList.Text.FollowSomeSones|l10n|html|replace needle=='{link}' replacement=='<a href="knownSones.html">'|replace needle=='{/link}' replacement=='</a>'></p>
 		<%/foreach>
 		<%include include/pagination.html pageParameter==page>
 	</div>

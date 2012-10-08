@@ -94,7 +94,7 @@ public class GetLikesAjaxPage extends JsonPage {
 	 *            The Sones to convert to an array
 	 * @return The Sones, sorted by name
 	 */
-	private JsonArray getSones(Set<Sone> sones) {
+	private static JsonArray getSones(Set<Sone> sones) {
 		JsonArray soneArray = new JsonArray();
 		List<Sone> sortedSones = new ArrayList<Sone>(sones);
 		Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);

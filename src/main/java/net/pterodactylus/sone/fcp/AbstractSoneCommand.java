@@ -110,7 +110,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            The text to encode
 	 * @return The encoded text
 	 */
-	protected String encodeString(String text) {
+	protected static String encodeString(String text) {
 		return text.replaceAll("\\\\", "\\\\").replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r");
 	}
 
@@ -233,7 +233,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            such as if the Sone is followed by the local Sone
 	 * @return The simple field set containing the given Sone
 	 */
-	protected SimpleFieldSet encodeSone(Sone sone, String prefix, Sone localSone) {
+	protected static SimpleFieldSet encodeSone(Sone sone, String prefix, Sone localSone) {
 		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
 
 		soneBuilder.put(prefix + "Name", sone.getName());
@@ -264,7 +264,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the given Sones
 	 */
-	protected SimpleFieldSet encodeSones(Collection<? extends Sone> sones, String prefix) {
+	protected static SimpleFieldSet encodeSones(Collection<? extends Sone> sones, String prefix) {
 		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
 
 		int soneIndex = 0;
@@ -352,7 +352,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the replies
 	 */
-	protected SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
+	protected static SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
 		SimpleFieldSetBuilder replyBuilder = new SimpleFieldSetBuilder();
 
 		int replyIndex = 0;
@@ -379,7 +379,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the likes
 	 */
-	protected SimpleFieldSet encodeLikes(Collection<? extends Sone> likes, String prefix) {
+	protected static SimpleFieldSet encodeLikes(Collection<? extends Sone> likes, String prefix) {
 		SimpleFieldSetBuilder likesBuilder = new SimpleFieldSetBuilder();
 
 		int likeIndex = 0;

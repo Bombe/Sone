@@ -44,7 +44,7 @@ public abstract class AbstractCommand implements Command {
 	 *             if there is no value for the given key in the simple field
 	 *             set, or the value can not be converted to a String
 	 */
-	protected String getString(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
+	protected static String getString(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
 		try {
 			return simpleFieldSet.getString(key);
 		} catch (FSParseException fspe1) {
@@ -64,7 +64,7 @@ public abstract class AbstractCommand implements Command {
 	 *             if there is no value for the given key in the simple field
 	 *             set, or the value can not be converted to an int
 	 */
-	protected int getInt(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
+	protected static int getInt(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
 		try {
 			return simpleFieldSet.getInt(key);
 		} catch (FSParseException fspe1) {
@@ -84,7 +84,7 @@ public abstract class AbstractCommand implements Command {
 	 *            The default value
 	 * @return The int value
 	 */
-	protected int getInt(SimpleFieldSet simpleFieldSet, String key, int defaultValue) {
+	protected static int getInt(SimpleFieldSet simpleFieldSet, String key, int defaultValue) {
 		return simpleFieldSet.getInt(key, defaultValue);
 	}
 
@@ -100,7 +100,7 @@ public abstract class AbstractCommand implements Command {
 	 *             if there is no value for the given key in the simple field
 	 *             set, or the value can not be converted to a boolean
 	 */
-	protected boolean getBoolean(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
+	protected static boolean getBoolean(SimpleFieldSet simpleFieldSet, String key) throws FcpException {
 		try {
 			return simpleFieldSet.getBoolean(key);
 		} catch (FSParseException fspe1) {
@@ -120,7 +120,7 @@ public abstract class AbstractCommand implements Command {
 	 *            The default value
 	 * @return The boolean value
 	 */
-	protected boolean getBoolean(SimpleFieldSet simpleFieldSet, String key, boolean defaultValue) {
+	protected static boolean getBoolean(SimpleFieldSet simpleFieldSet, String key, boolean defaultValue) {
 		return simpleFieldSet.getBoolean(key, defaultValue);
 	}
 

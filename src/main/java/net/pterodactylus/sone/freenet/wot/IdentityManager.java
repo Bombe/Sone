@@ -19,6 +19,7 @@ package net.pterodactylus.sone.freenet.wot;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,8 +27,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.util.collection.mapper.Mapper;
-import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
@@ -60,21 +59,28 @@ public class IdentityManager extends AbstractService {
 	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The context to filter for. */
-	private volatile String context;
+	private final String context;
 
 	/** The currently known own identities. */
 	/* synchronize access on syncObject. */
-	private Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
+	private final Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
+
+	/** The last time all identities were loaded. */
+	private volatile long identitiesLastLoaded;
 
 	/**
 	 * Creates a new identity manager.
 	 *
 	 * @param webOfTrustConnector
 	 *            The Web of Trust connector
+	 * @param context
+	 *            The context to focus on (may be {@code null} to ignore
+	 *            contexts)
 	 */
-	public IdentityManager(WebOfTrustConnector webOfTrustConnector) {
+	public IdentityManager(WebOfTrustConnector webOfTrustConnector, String context) {
 		super("Sone Identity Manager", false);
 		this.webOfTrustConnector = webOfTrustConnector;
+		this.context = context;
 	}
 
 	//
@@ -106,13 +112,13 @@ public class IdentityManager extends AbstractService {
 	//
 
 	/**
-	 * Sets the context to filter own identities and trusted identities for.
+	 * Returns the last time all identities were loaded.
 	 *
-	 * @param context
-	 *            The context to filter for, or {@code null} to not filter
+	 * @return The last time all identities were loaded (in milliseconds since
+	 *         Jan 1, 1970 UTC)
 	 */
-	public void setContext(String context) {
-		this.context = context;
+	public long getIdentitiesLastLoaded() {
+		return identitiesLastLoaded;
 	}
 
 	/**
@@ -143,7 +149,7 @@ public class IdentityManager extends AbstractService {
 		Set<OwnIdentity> allOwnIdentities = getAllOwnIdentities();
 		for (OwnIdentity ownIdentity : allOwnIdentities) {
 			if (ownIdentity.getId().equals(id)) {
-				return new DefaultOwnIdentity(webOfTrustConnector, ownIdentity);
+				return new DefaultOwnIdentity(ownIdentity);
 			}
 		}
 		return null;
@@ -155,28 +161,7 @@ public class IdentityManager extends AbstractService {
 	 * @return All own identities
 	 */
 	public Set<OwnIdentity> getAllOwnIdentities() {
-		try {
-			Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
-			Map<String, OwnIdentity> newOwnIdentities = new HashMap<String, OwnIdentity>();
-			for (OwnIdentity ownIdentity : ownIdentities) {
-				newOwnIdentities.put(ownIdentity.getId(), ownIdentity);
-			}
-			checkOwnIdentities(newOwnIdentities);
-			return Mappers.mappedSet(ownIdentities, new Mapper<OwnIdentity, OwnIdentity>() {
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public OwnIdentity map(OwnIdentity input) {
-					return new DefaultOwnIdentity(webOfTrustConnector, input);
-				}
-			});
-		} catch (WebOfTrustException wote1) {
-			logger.log(Level.WARNING, "Could not load all own identities!", wote1);
-			return Collections.emptySet();
-		}
+		return new HashSet<OwnIdentity>(currentOwnIdentities.values());
 	}
 
 	//
@@ -214,6 +199,7 @@ public class IdentityManager extends AbstractService {
 					}
 				}
 				identitiesLoaded = true;
+				identitiesLastLoaded = System.currentTimeMillis();
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
 			}
@@ -310,7 +296,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
 				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
 				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
-					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(webOfTrustConnector, oldOwnIdentity));
+					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(oldOwnIdentity));
 				}
 			}
 
@@ -318,7 +304,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
 				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
 				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
-					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(webOfTrustConnector, currentOwnIdentity));
+					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(currentOwnIdentity));
 				}
 			}
 

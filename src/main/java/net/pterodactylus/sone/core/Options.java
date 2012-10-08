@@ -329,6 +329,8 @@ public class Options {
 	/**
 	 * Adds an {@link Enum} {@link Option}.
 	 *
+	 * @param <T>
+	 *            The enum type
 	 * @param name
 	 *            The name of the option
 	 * @param enumOption
@@ -350,6 +352,8 @@ public class Options {
 	 * options.&lt;SomeEnum&gt; getEnumOption(&quot;SomeEnumOption&quot;).get();
 	 * </pre>
 	 *
+	 * @param <T>
+	 *            The enum type
 	 * @param name
 	 *            The name of the option
 	 * @return The enum option, or {@code null} if there is no enum option with

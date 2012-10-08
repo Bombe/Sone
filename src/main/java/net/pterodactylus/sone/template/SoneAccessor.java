@@ -24,6 +24,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
@@ -106,7 +107,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			if (currentSone == null) {
 				return null;
 			}
-			Trust trust = core.getTrust(currentSone, sone);
+			Trust trust = sone.getIdentity().getTrust((OwnIdentity) currentSone.getIdentity());
 			logger.log(Level.FINEST, String.format("Trust for %s by %s: %s", sone, currentSone, trust));
 			if (trust == null) {
 				return new Trust(null, null, null);

@@ -197,7 +197,7 @@ public class FcpInterface {
 	 * @throws PluginNotFoundException
 	 *             if the plugin can not be found
 	 */
-	private void sendReply(PluginReplySender pluginReplySender, String identifier, Response response) throws PluginNotFoundException {
+	private static void sendReply(PluginReplySender pluginReplySender, String identifier, Response response) throws PluginNotFoundException {
 		SimpleFieldSet replyParameters = response.getReplyParameters();
 		if (identifier != null) {
 			replyParameters.putOverwrite("Identifier", identifier);

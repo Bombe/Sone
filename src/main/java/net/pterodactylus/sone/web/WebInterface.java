@@ -103,18 +103,13 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
-import net.pterodactylus.util.cache.Cache;
-import net.pterodactylus.util.cache.CacheException;
-import net.pterodactylus.util.cache.CacheItem;
-import net.pterodactylus.util.cache.DefaultCacheItem;
-import net.pterodactylus.util.cache.MemoryCache;
-import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.collection.SetBuilder;
 import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
+import net.pterodactylus.util.template.ClassPathTemplateProvider;
 import net.pterodactylus.util.template.CollectionSortFilter;
 import net.pterodactylus.util.template.ContainsFilter;
 import net.pterodactylus.util.template.DateFilter;
@@ -123,15 +118,13 @@ import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.MatchFilter;
 import net.pterodactylus.util.template.ModFilter;
 import net.pterodactylus.util.template.PaginationFilter;
-import net.pterodactylus.util.template.Provider;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.ReplaceFilter;
 import net.pterodactylus.util.template.StoreFilter;
 import net.pterodactylus.util.template.Template;
-import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
-import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
+import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.version.Version;
@@ -222,7 +215,6 @@ public class WebInterface implements CoreListener {
 	 * @param sonePlugin
 	 *            The Sone plugin
 	 */
-	@SuppressWarnings("synthetic-access")
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
@@ -261,8 +253,8 @@ public class WebInterface implements CoreListener {
 		templateContextFactory.addFilter("unique", new UniqueElementFilter());
 		templateContextFactory.addFilter("mod", new ModFilter());
 		templateContextFactory.addFilter("paginate", new PaginationFilter());
-		templateContextFactory.addProvider(Provider.TEMPLATE_CONTEXT_PROVIDER);
-		templateContextFactory.addProvider(new ClassPathTemplateProvider());
+		templateContextFactory.addProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
+		templateContextFactory.addProvider(new ClassPathTemplateProvider(WebInterface.class, "/templates/"));
 		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
@@ -1011,68 +1003,6 @@ public class WebInterface implements CoreListener {
 		insertingImagesNotification.remove(image);
 		imageInsertFailedNotification.add(image);
 		notificationManager.addNotification(imageInsertFailedNotification);
-	}
-
-	/**
-	 * Template provider implementation that uses
-	 * {@link WebInterface#createReader(String)} to load templates for
-	 * inclusion.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class ClassPathTemplateProvider implements Provider {
-
-		/** Cache for templates. */
-		private final Cache<String, Template> templateCache = new MemoryCache<String, Template>(new ValueRetriever<String, Template>() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public CacheItem<Template> retrieve(String key) throws CacheException {
-				Template template = findTemplate(key);
-				if (template != null) {
-					return new DefaultCacheItem<Template>(template);
-				}
-				return null;
-			}
-		});
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public Template getTemplate(TemplateContext templateContext, String templateName) {
-			try {
-				return templateCache.get(templateName);
-			} catch (CacheException ce1) {
-				logger.log(Level.WARNING, String.format("Could not get template for %s!", templateName), ce1);
-				return null;
-			}
-		}
-
-		/**
-		 * Locates a template in the class path.
-		 *
-		 * @param templateName
-		 *            The name of the template to load
-		 * @return The loaded template, or {@code null} if no template could be
-		 *         found
-		 */
-		@SuppressWarnings("synthetic-access")
-		private Template findTemplate(String templateName) {
-			Reader templateReader = createReader("/templates/" + templateName);
-			if (templateReader == null) {
-				return null;
-			}
-			Template template = null;
-			try {
-				template = TemplateParser.parse(templateReader);
-			} catch (TemplateException te1) {
-				logger.log(Level.WARNING, String.format("Could not parse template “%s” for inclusion!", templateName), te1);
-			}
-			return template;
-		}
-
 	}
 
 }

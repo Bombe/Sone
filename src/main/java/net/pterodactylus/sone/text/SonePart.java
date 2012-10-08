@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.text;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.template.SoneAccessor;
 
 /**
  * {@link Part} implementation that stores a reference to a {@link Sone}.
@@ -50,6 +51,18 @@ public class SonePart implements Part {
 	 */
 	public Sone getSone() {
 		return sone;
+	}
+
+	//
+	// PART METHODS
+	//
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String getText() {
+		return SoneAccessor.getNiceName(sone);
 	}
 
 }

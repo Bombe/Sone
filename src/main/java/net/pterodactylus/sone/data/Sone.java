@@ -791,7 +791,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public void addAlbum(Album album) {
 		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
-		albums.add(album);
+		if (!albums.contains(album)) {
+			albums.add(album);
+		}
 	}
 
 	/**

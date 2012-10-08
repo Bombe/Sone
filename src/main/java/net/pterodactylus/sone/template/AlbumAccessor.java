@@ -68,7 +68,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 	 *            The name of the link
 	 * @return The created map containing the mappings
 	 */
-	private Map<String, String> createLink(String target, String name) {
+	private static Map<String, String> createLink(String target, String name) {
 		Map<String, String> link = new HashMap<String, String>();
 		link.put("target", target);
 		link.put("name", name);

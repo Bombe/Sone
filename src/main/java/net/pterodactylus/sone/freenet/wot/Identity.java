@@ -17,13 +17,14 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 /**
  * Interface for web of trust identities, defining all functions that can be
- * performed on an identity. The identity is the main entry point for identity
- * management.
+ * performed on an identity. An identity is only a container for identity data
+ * and will not perform any updating in the WebOfTrust plugin itself.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -68,6 +69,30 @@ public interface Identity {
 	public boolean hasContext(String context);
 
 	/**
+	 * Adds the given context to this identity.
+	 *
+	 * @param context
+	 *            The context to add
+	 */
+	public void addContext(String context);
+
+	/**
+	 * Sets all contexts of this identity.
+	 *
+	 * @param contexts
+	 *            All contexts of the identity
+	 */
+	public void setContexts(Collection<String> contexts);
+
+	/**
+	 * Removes the given context from this identity.
+	 *
+	 * @param context
+	 *            The context to remove
+	 */
+	public void removeContext(String context);
+
+	/**
 	 * Returns all properties of this identity.
 	 *
 	 * @return All properties of this identity
@@ -84,6 +109,32 @@ public interface Identity {
 	public String getProperty(String name);
 
 	/**
+	 * Sets the property with the given name to the given value.
+	 *
+	 * @param name
+	 *            The name of the property
+	 * @param value
+	 *            The value of the property
+	 */
+	public void setProperty(String name, String value);
+
+	/**
+	 * Sets all properties of this identity.
+	 *
+	 * @param properties
+	 *            The new properties of this identity
+	 */
+	public void setProperties(Map<String, String> properties);
+
+	/**
+	 * Removes the property with the given name.
+	 *
+	 * @param name
+	 *            The name of the property to remove
+	 */
+	public void removeProperty(String name);
+
+	/**
 	 * Retrieves the trust that this identity receives from the given own
 	 * identity. If this identity is not in the own identity’s trust tree, a
 	 * {@link Trust} is returned that has all its elements set to {@code null}.
@@ -95,5 +146,24 @@ public interface Identity {
 	 *         could not be retrieved
 	 */
 	public Trust getTrust(OwnIdentity ownIdentity);
+
+	/**
+	 * Sets the trust given by an own identity to this identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity that gave trust to this identity
+	 * @param trust
+	 *            The trust given by the given own identity
+	 */
+	public void setTrust(OwnIdentity ownIdentity, Trust trust);
+
+	/**
+	 * Removes trust assignment from the given own identity for this identity.
+	 *
+	 * @param ownIdentity
+	 *            The own identity that removed the trust assignment for this
+	 *            identity
+	 */
+	public void removeTrust(OwnIdentity ownIdentity);
 
 }

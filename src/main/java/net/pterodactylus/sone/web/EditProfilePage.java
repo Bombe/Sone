@@ -158,7 +158,7 @@ public class EditProfilePage extends SoneTemplatePage {
 	 * @return The parsed ID, or {@code null} if there was no part matching the
 	 *         given string
 	 */
-	private String getFieldId(FreenetRequest request, String partNameStart) {
+	private static String getFieldId(FreenetRequest request, String partNameStart) {
 		for (String partName : request.getHttpRequest().getParts()) {
 			if (partName.startsWith(partNameStart)) {
 				return partName.substring(partNameStart.length());

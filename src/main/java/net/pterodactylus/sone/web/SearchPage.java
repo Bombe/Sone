@@ -111,6 +111,26 @@ public class SearchPage extends SoneTemplatePage {
 			throw new RedirectException("index.html");
 		}
 
+		/* check for a couple of shortcuts. */
+		if (phrases.size() == 1) {
+			String phrase = phrases.get(0).getPhrase();
+
+			/* is it a Sone ID? */
+			redirectIfNotNull(getSoneId(phrase), "viewSone.html?sone=");
+
+			/* is it a post ID? */
+			redirectIfNotNull(getPostId(phrase), "viewPost.html?post=");
+
+			/* is it a reply ID? show the post. */
+			redirectIfNotNull(getReplyPostId(phrase), "viewPost.html?post=");
+
+			/* is it an album ID? */
+			redirectIfNotNull(getAlbumId(phrase), "imageBrowser.html?album=");
+
+			/* is it an image ID? */
+			redirectIfNotNull(getImageId(phrase), "imageBrowser.html?image=");
+		}
+
 		Set<Sone> sones = webInterface.getCore().getSones();
 		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
@@ -168,7 +188,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The string generator for the objects
 	 * @return The hits for the given phrases
 	 */
-	private <T> Set<Hit<T>> getHits(Collection<T> objects, List<Phrase> phrases, StringGenerator<T> stringGenerator) {
+	private static <T> Set<Hit<T>> getHits(Collection<T> objects, List<Phrase> phrases, StringGenerator<T> stringGenerator) {
 		Set<Hit<T>> hits = new HashSet<Hit<T>>();
 		for (T object : objects) {
 			String objectString = stringGenerator.generateString(object);
@@ -189,7 +209,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The query to parse
 	 * @return The parsed phrases
 	 */
-	private List<Phrase> parseSearchPhrases(String query) {
+	private static List<Phrase> parseSearchPhrases(String query) {
 		List<String> parsedPhrases = null;
 		try {
 			parsedPhrases = StringEscaper.parseLine(query);
@@ -229,7 +249,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The expression to search
 	 * @return The score of the expression
 	 */
-	private double calculateScore(List<Phrase> phrases, String expression) {
+	private static double calculateScore(List<Phrase> phrases, String expression) {
 		logger.log(Level.FINEST, String.format("Calculating Score for “%s”…", expression));
 		double optionalHits = 0;
 		double requiredHits = 0;
@@ -268,6 +288,91 @@ public class SearchPage extends SoneTemplatePage {
 			}
 		}
 		return requiredHits * 3 + optionalHits + (requiredHits - requiredPhrases) * 5 - (forbiddenHits * 2);
+	}
+
+	/**
+	 * Throws a
+	 * {@link net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException}
+	 * if the given object is not {@code null}, appending the object to the
+	 * given target URL.
+	 *
+	 * @param object
+	 *            The object on which to redirect
+	 * @param target
+	 *            The target of the redirect
+	 * @throws RedirectException
+	 *             if {@code object} is not {@code null}
+	 */
+	private static void redirectIfNotNull(String object, String target) throws RedirectException {
+		if (object != null) {
+			throw new RedirectException(target + object);
+		}
+	}
+
+	/**
+	 * If the given phrase contains a Sone ID (optionally prefixed by
+	 * “sone://”), returns said Sone ID, otherwise return {@code null}.
+	 *
+	 * @param phrase
+	 *            The phrase that maybe is a Sone ID
+	 * @return The Sone ID, or {@code null}
+	 */
+	private String getSoneId(String phrase) {
+		String soneId = phrase.startsWith("sone://") ? phrase.substring(7) : phrase;
+		return (webInterface.getCore().getSone(soneId, false) != null) ? soneId : null;
+	}
+
+	/**
+	 * If the given phrase contains a post ID (optionally prefixed by
+	 * “post://”), returns said post ID, otherwise return {@code null}.
+	 *
+	 * @param phrase
+	 *            The phrase that maybe is a post ID
+	 * @return The post ID, or {@code null}
+	 */
+	private String getPostId(String phrase) {
+		String postId = phrase.startsWith("post://") ? phrase.substring(7) : phrase;
+		return (webInterface.getCore().getPost(postId, false) != null) ? postId : null;
+	}
+
+	/**
+	 * If the given phrase contains a reply ID (optionally prefixed by
+	 * “reply://”), returns the ID of the post the reply belongs to, otherwise
+	 * return {@code null}.
+	 *
+	 * @param phrase
+	 *            The phrase that maybe is a reply ID
+	 * @return The reply’s post ID, or {@code null}
+	 */
+	private String getReplyPostId(String phrase) {
+		String replyId = phrase.startsWith("reply://") ? phrase.substring(8) : phrase;
+		return (webInterface.getCore().getReply(replyId, false) != null) ? webInterface.getCore().getReply(replyId, false).getPost().getId() : null;
+	}
+
+	/**
+	 * If the given phrase contains an album ID (optionally prefixed by
+	 * “album://”), returns said album ID, otherwise return {@code null}.
+	 *
+	 * @param phrase
+	 *            The phrase that maybe is an album ID
+	 * @return The album ID, or {@code null}
+	 */
+	private String getAlbumId(String phrase) {
+		String albumId = phrase.startsWith("album://") ? phrase.substring(8) : phrase;
+		return (webInterface.getCore().getAlbum(albumId, false) != null) ? albumId : null;
+	}
+
+	/**
+	 * If the given phrase contains an image ID (optionally prefixed by
+	 * “image://”), returns said image ID, otherwise return {@code null}.
+	 *
+	 * @param phrase
+	 *            The phrase that maybe is an image ID
+	 * @return The image ID, or {@code null}
+	 */
+	private String getImageId(String phrase) {
+		String imageId = phrase.startsWith("image://") ? phrase.substring(8) : phrase;
+		return (webInterface.getCore().getImage(imageId, false) != null) ? imageId : null;
 	}
 
 	/**
