@@ -144,8 +144,8 @@ public class WebOfTrustConnector {
 			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
 			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
 			Integer trust = Numbers.safeParseInteger(fields.get("Trust" + identityCounter), null);
-			int score = Numbers.safeParseInteger(fields.get("Score" + identityCounter));
-			int rank = Numbers.safeParseInteger(fields.get("Rank" + identityCounter));
+			int score = Numbers.safeParseInteger(fields.get("Score" + identityCounter), 0);
+			int rank = Numbers.safeParseInteger(fields.get("Rank" + identityCounter), 0);
 			identity.setTrust(ownIdentity, new Trust(trust, score, rank));
 			identities.add(identity);
 		}
