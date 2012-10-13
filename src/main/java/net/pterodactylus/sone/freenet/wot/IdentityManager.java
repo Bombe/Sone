@@ -186,14 +186,17 @@ public class IdentityManager extends AbstractService {
 
 				/* load trusted identities. */
 				for (OwnIdentity ownIdentity : ownIdentities) {
+					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
+					Map<String, Identity> identities = new HashMap<String, Identity>();
+					currentIdentities.put(ownIdentity, identities);
+
+					/* if the context doesn’t match, skip getting trusted identities. */
 					if ((context != null) && !ownIdentity.hasContext(context)) {
 						continue;
 					}
-					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
 
+					/* load trusted identities. */
 					Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context);
-					Map<String, Identity> identities = new HashMap<String, Identity>();
-					currentIdentities.put(ownIdentity, identities);
 					for (Identity identity : trustedIdentities) {
 						identities.put(identity.getId(), identity);
 					}
