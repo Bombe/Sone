@@ -1160,8 +1160,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 						if (!storedPosts.contains(post)) {
 							if (post.getTime() < getSoneFollowingTime(sone)) {
 								knownPosts.add(post.getId());
+								post.setKnown(true);
 							} else if (!knownPosts.contains(post.getId())) {
-								sone.setKnown(false);
 								coreListenerManager.fireNewPostFound(post);
 							}
 						}
@@ -1185,8 +1185,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 						if (!storedReplies.contains(reply)) {
 							if (reply.getTime() < getSoneFollowingTime(sone)) {
 								knownReplies.add(reply.getId());
+								reply.setKnown(true);
 							} else if (!knownReplies.contains(reply.getId())) {
-								reply.setKnown(false);
 								coreListenerManager.fireNewReplyFound(reply);
 							}
 						}
