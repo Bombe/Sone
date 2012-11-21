@@ -27,7 +27,6 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
-import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.validation.Validation;
 import freenet.pluginmanager.FredPluginFCP;
@@ -172,9 +171,9 @@ public class FcpInterface {
 			try {
 				Response response = command.execute(parameters, data, AccessType.values()[accessType]);
 				sendReply(pluginReplySender, identifier, response);
-			} catch (FcpException fe1) {
+			} catch (Exception e1) {
 				logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);
-				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + fe1.getMessage()));
+				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + e1.getMessage()));
 			}
 		} catch (PluginNotFoundException pnfe1) {
 			logger.log(Level.WARNING, "Could not find destination plugin: " + pluginReplySender);
