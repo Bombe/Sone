@@ -1579,6 +1579,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The created post
 	 */
 	public Post createPost(Sone sone, Sone recipient, long time, String text) {
+		Validation.begin().isNotNull("Text", text).check().isGreater("Text Length", text.length(), 0).check();
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
@@ -1719,6 +1720,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The created reply
 	 */
 	public PostReply createReply(Sone sone, Post post, long time, String text) {
+		Validation.begin().isNotNull("Text", text).check().isGreater("Text Length", text.trim().length(), 0).check();
 		if (!isLocalSone(sone)) {
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
