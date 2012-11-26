@@ -2413,7 +2413,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void identityUpdated(OwnIdentity ownIdentity, final Identity identity) {
-		new Thread(new Runnable() {
+		soneDownloaders.execute(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -2424,7 +2424,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
-		}).start();
+		});
 	}
 
 	/**
