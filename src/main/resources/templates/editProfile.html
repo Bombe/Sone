@@ -186,12 +186,12 @@
 
 		<ul id="avatar-selection">
 			<li id="no-avatar">
-				<input type="radio" name="avatar-id" value="none"<%ifnull avatar-id> checked="checked"<%/if>/>
+				<input type="radio" name="avatarId" value="none"<%ifnull avatarId> checked="checked"<%/if>/>
 				<%= Page.EditProfile.Avatar.Delete|l10n|html>
 			</li>
 			<%foreach currentSone.allImages image>
 				<li>
-					<input type="radio" name="avatar-id" value="<%image.id|html>"<%if avatar-id|match key=image.id> checked="checked"<%/if>/>
+					<input type="radio" name="avatarId" value="<%image.id|html>"<%if avatarId|match key=image.id> checked="checked"<%/if>/>
 					<div class="post-avatar"><% image|image-link max-width==48 max-height==48 mode==enlarge title=image.title></div>
 				</li>
 			<%/foreach>
