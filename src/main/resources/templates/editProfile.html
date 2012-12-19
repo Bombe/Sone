@@ -191,7 +191,7 @@
 			</li>
 			<%foreach currentSone.allImages image>
 				<li>
-					<input type="radio" name="avatarId" value="<%image.id|html>"<%if avatarId|match key=image.id> checked="checked"<%/if>/>
+					<input type="radio" name="avatarId" value="<%image.id|html>"<%if avatarId|match value=image.id> checked="checked"<%/if>/>
 					<div class="post-avatar"><% image|image-link max-width==48 max-height==48 mode==enlarge title=image.title></div>
 				</li>
 			<%/foreach>
