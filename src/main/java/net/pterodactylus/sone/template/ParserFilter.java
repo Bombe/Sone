@@ -20,7 +20,9 @@ package net.pterodactylus.sone.template;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -213,7 +215,12 @@ public class ParserFilter implements Filter {
 	 *            The part to render
 	 */
 	private void render(Writer writer, LinkPart linkPart) {
-		renderLink(writer, "/external-link/?_CHECKED_HTTP_=" + linkPart.getLink(), linkPart.getText(), linkPart.getTitle(), "internet");
+		try {
+			renderLink(writer, "/external-link/?_CHECKED_HTTP_=" + URLEncoder.encode(linkPart.getLink(), "UTF-8"), linkPart.getText(), linkPart.getTitle(), "internet");
+		} catch (UnsupportedEncodingException uee1) {
+			/* not possible for UTF-8. */
+			throw new RuntimeException("The JVM does not support UTF-8 encoding!", uee1);
+		}
 	}
 
 	/**
