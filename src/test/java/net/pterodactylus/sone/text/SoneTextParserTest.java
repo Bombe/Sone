@@ -19,6 +19,7 @@ package net.pterodactylus.sone.text;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
 
 import junit.framework.TestCase;
 import net.pterodactylus.sone.core.SoneProvider;
@@ -104,6 +105,24 @@ public class SoneTextParserTest extends TestCase {
 		parts = soneTextParser.parse(null, new StringReader("Some text.\n\nLink to sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU and stuff."));
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", convertText(parts, PlainTextPart.class, SonePart.class));
+	}
+
+	/**
+	 * Test for a bug discovered in Sone 0.8.4 where a plain “http://” would be
+	 * parsed into a link.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	@SuppressWarnings({ "synthetic-access", "static-method" })
+	public void testEmpyHttpLinks() throws IOException {
+		SoneTextParser soneTextParser = new SoneTextParser(new TestSoneProvider(), null);
+		Iterable<Part> parts;
+
+		/* check empty http links. */
+		parts = soneTextParser.parse(null, new StringReader("Some text. Empty link: http:// – nice!"));
+		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "Some text. Empty link: http:// – nice!", convertText(parts, PlainTextPart.class));
 	}
 
 	//
