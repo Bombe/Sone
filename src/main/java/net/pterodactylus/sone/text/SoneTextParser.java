@@ -55,28 +55,50 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	private enum LinkType {
 
 		/** Link is a KSK. */
-		KSK,
+		KSK("KSK@"),
 
 		/** Link is a CHK. */
-		CHK,
+		CHK("CHK@"),
 
 		/** Link is an SSK. */
-		SSK,
+		SSK("SSK@"),
 
 		/** Link is a USK. */
-		USK,
+		USK("USK@"),
 
 		/** Link is HTTP. */
-		HTTP,
+		HTTP("http://"),
 
 		/** Link is HTTPS. */
-		HTTPS,
+		HTTPS("https://"),
 
 		/** Link is a Sone. */
-		SONE,
+		SONE("sone://"),
 
 		/** Link is a post. */
-		POST,
+		POST("post://");
+
+		/** The scheme identifying this link type. */
+		private final String scheme;
+
+		/**
+		 * Creates a new link type identified by the given scheme.
+		 *
+		 * @param scheme
+		 *            The scheme of the link type
+		 */
+		private LinkType(String scheme) {
+			this.scheme = scheme;
+		}
+
+		/**
+		 * Returns the scheme of this link type.
+		 *
+		 * @return The scheme of this link type
+		 */
+		public String getScheme() {
+			return scheme;
+		}
 
 	}
 
