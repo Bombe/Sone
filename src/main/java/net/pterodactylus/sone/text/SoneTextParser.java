@@ -222,6 +222,20 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 					lineComplete = false;
 
+					Matcher matcher = whitespacePattern.matcher(line);
+					int nextSpace = matcher.find(0) ? matcher.start() : line.length();
+					String link = line.substring(0, nextSpace);
+					String name = link;
+					logger.log(Level.FINER, String.format("Found link: %s", link));
+					logger.log(Level.FINEST, String.format("CHK: %d, SSK: %d, USK: %d", nextChk, nextSsk, nextUsk));
+
+					/* if there is no text after the scheme, it’s not a link! */
+					if (link.equals(linkType.getScheme())) {
+						parts.add(new PlainTextPart(linkType.getScheme()));
+						line = line.substring(linkType.getScheme().length());
+						continue;
+					}
+
 					if (linkType == LinkType.SONE) {
 						if (line.length() >= (7 + 43)) {
 							String soneId = line.substring(7, 50);
@@ -257,12 +271,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						}
 						continue;
 					}
-					Matcher matcher = whitespacePattern.matcher(line);
-					int nextSpace = matcher.find(0) ? matcher.start() : line.length();
-					String link = line.substring(0, nextSpace);
-					String name = link;
-					logger.log(Level.FINER, String.format("Found link: %s", link));
-					logger.log(Level.FINEST, String.format("CHK: %d, SSK: %d, USK: %d", nextChk, nextSsk, nextUsk));
 
 					if ((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
 						FreenetURI uri;
