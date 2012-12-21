@@ -133,7 +133,7 @@ public class SoneTextParserTest extends TestCase {
 				}
 			}
 			if (!classValid) {
-				assertEquals("Part’s Class", null, part.getClass());
+				fail("Part’s Class (" + part.getClass() + ") is not one of " + Arrays.toString(validClasses));
 			}
 			if (part instanceof PlainTextPart) {
 				text.append(((PlainTextPart) part).getText());
