@@ -59,6 +59,7 @@ import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
+import net.pterodactylus.util.thread.NamedThreadFactory;
 import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.validation.EqualityValidator;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
@@ -108,7 +109,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	private final ImageInserter imageInserter;
 
 	/** Sone downloader thread-pool. */
-	private final ExecutorService soneDownloaders = Executors.newFixedThreadPool(10);
+	private final ExecutorService soneDownloaders = Executors.newFixedThreadPool(10, new NamedThreadFactory("Sone Downloader %2$d"));
 
 	/** The update checker. */
 	private final UpdateChecker updateChecker;
@@ -2414,7 +2415,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void identityUpdated(OwnIdentity ownIdentity, final Identity identity) {
-		new Thread(new Runnable() {
+		soneDownloaders.execute(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -2425,7 +2426,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}
-		}).start();
+		});
 	}
 
 	/**
