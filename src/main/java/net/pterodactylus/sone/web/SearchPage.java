@@ -346,7 +346,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getReplyPostId(String phrase) {
 		String replyId = phrase.startsWith("reply://") ? phrase.substring(8) : phrase;
-		return (webInterface.getCore().getReply(replyId, false) != null) ? webInterface.getCore().getReply(replyId, false).getPost().getId() : null;
+		return (webInterface.getCore().getPostReply(replyId, false) != null) ? webInterface.getCore().getPostReply(replyId, false).getPost().getId() : null;
 	}
 
 	/**

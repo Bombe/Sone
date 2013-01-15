@@ -609,18 +609,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/**
 	 * Returns the reply with the given ID. If there is no reply with the given
-	 * ID yet, a new one is created.
-	 *
-	 * @param replyId
-	 *            The ID of the reply to get
-	 * @return The reply
-	 */
-	public PostReply getReply(String replyId) {
-		return getReply(replyId, true);
-	}
-
-	/**
-	 * Returns the reply with the given ID. If there is no reply with the given
 	 * ID yet, a new one is created, unless {@code create} is false in which
 	 * case {@code null} is returned.
 	 *
@@ -631,7 +619,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            to return {@code null} if no reply can be found
 	 * @return The reply, or {@code null} if there is no such reply
 	 */
-	public PostReply getReply(String replyId, boolean create) {
+	public PostReply getPostReply(String replyId, boolean create) {
 		synchronized (replies) {
 			PostReply reply = replies.get(replyId);
 			if (create && (reply == null)) {
@@ -1382,7 +1370,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
 				return;
 			}
-			replies.add(getReply(replyId).setSone(sone).setPost(getPost(postId)).setTime(replyTime).setText(replyText));
+			replies.add(getPostReply(replyId, true).setSone(sone).setPost(getPost(postId)).setTime(replyTime).setText(replyText));
 		}
 
 		/* load post likes. */

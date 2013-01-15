@@ -67,7 +67,7 @@ public class GetLikesAjaxPage extends JsonPage {
 			Set<Sone> sones = webInterface.getCore().getLikes(post);
 			return createSuccessJsonObject().put("likes", sones.size()).put("sones", getSones(sones));
 		} else if ("reply".equals(type)) {
-			PostReply reply = webInterface.getCore().getReply(id);
+			PostReply reply = webInterface.getCore().getPostReply(id, false);
 			Set<Sone> sones = webInterface.getCore().getLikes(reply);
 			return createSuccessJsonObject().put("likes", sones.size()).put("sones", getSones(sones));
 		}
