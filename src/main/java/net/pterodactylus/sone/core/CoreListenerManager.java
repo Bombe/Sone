@@ -44,19 +44,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that the insert of the given Sone has started.
-	 *
-	 * @see SoneInsertListener#insertStarted(Sone)
-	 * @param sone
-	 *            The Sone being inserted
-	 */
-	void fireSoneInserting(Sone sone) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.soneInserting(sone);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that the insert of the given Sone has finished
 	 * successfully.
 	 *

@@ -32,15 +32,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that the insert of the given Sone has started.
-	 *
-	 * @see SoneInsertListener#insertStarted(Sone)
-	 * @param sone
-	 *            The Sone that is being inserted
-	 */
-	public void soneInserting(Sone sone);
-
-	/**
 	 * Notifies a listener that the insert of the given Sone has finished
 	 * successfully.
 	 *
