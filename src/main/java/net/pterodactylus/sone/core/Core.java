@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
@@ -2505,7 +2506,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void imageInsertAborted(Image image) {
 		logger.log(Level.WARNING, String.format("Image insert aborted for %s.", image));
-		coreListenerManager.fireImageInsertAborted(image);
+		eventBus.post(new ImageInsertAbortedEvent(image));
 	}
 
 	/**

@@ -42,19 +42,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that an image insert was aborted by the user.
-	 *
-	 * @see CoreListener#imageInsertAborted(Image)
-	 * @param image
-	 *            The image that is not inserted anymore
-	 */
-	void fireImageInsertAborted(Image image) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.imageInsertAborted(image);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that an image was successfully inserted.
 	 *
 	 * @see CoreListener#imageInsertFinished(Image)
