@@ -41,6 +41,7 @@ import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
+import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
@@ -1107,7 +1108,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					for (Post post : storedSone.getPosts()) {
 						posts.remove(post.getId());
 						if (!sone.getPosts().contains(post)) {
-							coreListenerManager.firePostRemoved(post);
+							eventBus.post(new PostRemovedEvent(post));
 						}
 					}
 				}
@@ -1580,7 +1581,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (posts) {
 			posts.remove(post.getId());
 		}
-		coreListenerManager.firePostRemoved(post);
+		eventBus.post(new PostRemovedEvent(post));
 		markPostKnown(post);
 		touchConfiguration();
 	}
@@ -2419,7 +2420,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			synchronized (knownPosts) {
 				for (Post post : sone.getPosts()) {
 					posts.remove(post.getId());
-					coreListenerManager.firePostRemoved(post);
+					eventBus.post(new PostRemovedEvent(post));
 				}
 			}
 		}

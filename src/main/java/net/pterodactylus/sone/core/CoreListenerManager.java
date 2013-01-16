@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.core;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.event.AbstractListenerManager;
@@ -44,19 +43,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 	// ACTIONS
 	//
-
-	/**
-	 * Notifies all listener that the given post was removed.
-	 *
-	 * @see CoreListener#postRemoved(Post)
-	 * @param post
-	 *            The removed post
-	 */
-	void firePostRemoved(Post post) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.postRemoved(post);
-		}
-	}
 
 	/**
 	 * Notifies all listener that the given reply was removed.

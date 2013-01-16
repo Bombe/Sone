@@ -43,6 +43,7 @@ import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
+import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -899,19 +900,22 @@ public class WebInterface implements CoreListener {
 		newSoneNotification.remove(soneRemovedEvent.sone());
 	}
 
+	/**
+	 * Notifies the web interface that a {@link Post} was removed.
+	 *
+	 * @param postRemovedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void postRemoved(PostRemovedEvent postRemovedEvent) {
+		newPostNotification.remove(postRemovedEvent.post());
+		localPostNotification.remove(postRemovedEvent.post());
+		mentionNotification.remove(postRemovedEvent.post());
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void postRemoved(Post post) {
-		newPostNotification.remove(post);
-		localPostNotification.remove(post);
-		mentionNotification.remove(post);
-	}
 
 	/**
 	 * {@inheritDoc}
