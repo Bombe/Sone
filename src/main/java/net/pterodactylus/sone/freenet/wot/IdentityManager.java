@@ -194,7 +194,10 @@ public class IdentityManager extends AbstractService {
 					Map<String, Identity> identities = new HashMap<String, Identity>();
 					currentIdentities.put(ownIdentity, identities);
 
-					/* if the context doesn’t match, skip getting trusted identities. */
+					/*
+					 * if the context doesn’t match, skip getting trusted
+					 * identities.
+					 */
 					if ((context != null) && !ownIdentity.hasContext(context)) {
 						continue;
 					}
