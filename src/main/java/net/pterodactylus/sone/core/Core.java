@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
@@ -1243,7 +1244,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			synchronized (knownSones) {
 				knownSones.add(sone.getId());
 			}
-			coreListenerManager.fireMarkSoneKnown(sone);
+			eventBus.post(new MarkSoneKnownEvent(sone));
 			touchConfiguration();
 		}
 	}
