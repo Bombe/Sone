@@ -38,6 +38,7 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -184,6 +185,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		}
 
 		final Configuration startConfiguration = oldConfiguration;
+		final EventBus eventBus = new EventBus();
 
 		/* Freenet injector configuration. */
 		AbstractModule freenetModule = new AbstractModule() {
@@ -200,6 +202,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			@Override
 			protected void configure() {
+				bind(EventBus.class).toInstance(eventBus);
 				bind(Configuration.class).toInstance(startConfiguration);
 				bind(FreenetInterface.class).in(Singleton.class);
 				bind(PluginConnector.class).in(Singleton.class);

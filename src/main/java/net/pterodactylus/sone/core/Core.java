@@ -70,6 +70,7 @@ import net.pterodactylus.util.version.Version;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
 import freenet.keys.FreenetURI;
@@ -95,6 +96,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/** The core listener manager. */
 	private final CoreListenerManager coreListenerManager = new CoreListenerManager(this);
+
+	/** The event bus. */
+	private final EventBus eventBus;
 
 	/** The configuration. */
 	private Configuration configuration;
@@ -193,9 +197,11 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The identity manager
 	 * @param webOfTrustUpdater
 	 *            The WebOfTrust updater
+	 * @param eventBus
+	 *            The event bus
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -204,6 +210,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.imageInserter = new ImageInserter(this, freenetInterface);
 		this.updateChecker = new UpdateChecker(freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
+		this.eventBus = eventBus;
 	}
 
 	//
