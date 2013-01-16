@@ -36,8 +36,6 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.collection.mapper.Mapper;
-import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -45,11 +43,13 @@ import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 
 /**
  * This page lets the user search for posts and replies that contain certain
@@ -144,8 +144,8 @@ public class SearchPage extends SoneTemplatePage {
 		Collections.sort(sortedPostHits, Hit.DESCENDING_COMPARATOR);
 
 		/* extract Sones and posts. */
-		List<Sone> resultSones = Mappers.mappedList(sortedSoneHits, new HitMapper<Sone>());
-		List<Post> resultPosts = Mappers.mappedList(sortedPostHits, new HitMapper<Post>());
+		List<Sone> resultSones = FluentIterable.from(sortedSoneHits).transform(new HitMapper<Sone>()).toList();
+		List<Post> resultPosts = FluentIterable.from(sortedPostHits).transform(new HitMapper<Post>()).toList();
 
 		/* pagination. */
 		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
@@ -637,13 +637,13 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The type of the object to extract
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class HitMapper<T> implements Mapper<Hit<T>, T> {
+	public static class HitMapper<T> implements Function<Hit<T>, T> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public T map(Hit<T> input) {
+		public T apply(Hit<T> input) {
 			return input.getObject();
 		}
 
