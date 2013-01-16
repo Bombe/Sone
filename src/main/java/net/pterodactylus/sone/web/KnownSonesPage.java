@@ -25,7 +25,6 @@ import java.util.List;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.collection.ReverseComparator;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -33,6 +32,7 @@ import net.pterodactylus.util.template.TemplateContext;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.Ordering;
 
 /**
  * This page shows all known Sones.
@@ -117,25 +117,25 @@ public class KnownSonesPage extends SoneTemplatePage {
 		List<Sone> sortedSones = new ArrayList<Sone>(knownSones);
 		if ("activity".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
-				Collections.sort(sortedSones, new ReverseComparator<Sone>(Sone.LAST_ACTIVITY_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.LAST_ACTIVITY_COMPARATOR).reverse());
 			} else {
 				Collections.sort(sortedSones, Sone.LAST_ACTIVITY_COMPARATOR);
 			}
 		} else if ("posts".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
-				Collections.sort(sortedSones, new ReverseComparator<Sone>(Sone.POST_COUNT_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.POST_COUNT_COMPARATOR).reverse());
 			} else {
 				Collections.sort(sortedSones, Sone.POST_COUNT_COMPARATOR);
 			}
 		} else if ("images".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
-				Collections.sort(sortedSones, new ReverseComparator<Sone>(Sone.IMAGE_COUNT_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.IMAGE_COUNT_COMPARATOR).reverse());
 			} else {
 				Collections.sort(sortedSones, Sone.IMAGE_COUNT_COMPARATOR);
 			}
 		} else {
 			if ("desc".equals(sortOrder)) {
-				Collections.sort(sortedSones, new ReverseComparator<Sone>(Sone.NICE_NAME_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.NICE_NAME_COMPARATOR).reverse());
 			} else {
 				Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);
 			}
