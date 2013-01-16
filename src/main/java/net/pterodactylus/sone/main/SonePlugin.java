@@ -43,7 +43,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
+import com.google.inject.spi.InjectionListener;
+import com.google.inject.spi.TypeEncounter;
+import com.google.inject.spi.TypeListener;
 
 import freenet.client.async.DatabaseDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
@@ -212,7 +217,21 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(String.class).annotatedWith(Names.named("WebOfTrustContext")).toInstance("Sone");
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
 				bind(FcpInterface.class).in(Singleton.class);
+				bindListener(Matchers.any(), new TypeListener() {
+
+					@Override
+					public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {
+						typeEncounter.register(new InjectionListener<I>() {
+
+							@Override
+							public void afterInjection(I injectee) {
+								eventBus.register(injectee);
+							}
+						});
+					}
+				});
 			}
+
 		};
 		Injector injector = Guice.createInjector(freenetModule, soneModule);
 		core = injector.getInstance(Core.class);
@@ -226,7 +245,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 		/* create the web interface. */
 		webInterface = injector.getInstance(WebInterface.class);
-		eventBus.register(webInterface);
 
 		boolean startupFailed = true;
 		try {
