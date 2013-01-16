@@ -36,6 +36,7 @@ import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
+import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
@@ -1140,7 +1141,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 								knownReplies.add(reply.getId());
 								reply.setKnown(true);
 							} else if (!knownReplies.contains(reply.getId())) {
-								coreListenerManager.fireNewReplyFound(reply);
+								eventBus.post(new NewPostReplyFoundEvent(reply));
 							}
 						}
 						replies.put(reply.getId(), reply);
@@ -1683,7 +1684,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			replies.put(reply.getId(), reply);
 		}
 		synchronized (knownReplies) {
-			coreListenerManager.fireNewReplyFound(reply);
+			eventBus.post(new NewPostReplyFoundEvent(reply));
 		}
 		sone.addReply(reply);
 		touchConfiguration();

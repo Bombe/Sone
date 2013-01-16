@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
+import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -814,15 +815,12 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
-	//
-	// CORELISTENER METHODS
-	//
-
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void newReplyFound(PostReply reply) {
+	@Subscribe
+	public void newReplyFound(NewPostReplyFoundEvent newPostReplyFoundEvent) {
+		PostReply reply = newPostReplyFoundEvent.postReply();
 		boolean isLocal = reply.getSone().isLocal();
 		if (isLocal) {
 			localReplyNotification.add(reply);
@@ -839,6 +837,10 @@ public class WebInterface implements CoreListener {
 			getCore().markReplyKnown(reply);
 		}
 	}
+
+	//
+	// CORELISTENER METHODS
+	//
 
 	/**
 	 * {@inheritDoc}

@@ -46,19 +46,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that a new reply has been found.
-	 *
-	 * @see CoreListener#newReplyFound(PostReply)
-	 * @param reply
-	 *            The new reply
-	 */
-	void fireNewReplyFound(PostReply reply) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.newReplyFound(reply);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that the given Sone is now marked as known.
 	 *
 	 * @see CoreListener#markSoneKnown(Sone)
