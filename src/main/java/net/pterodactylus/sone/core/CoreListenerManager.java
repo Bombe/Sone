@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.core;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.event.AbstractListenerManager;
 import net.pterodactylus.util.version.Version;
@@ -43,19 +42,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 	// ACTIONS
 	//
-
-	/**
-	 * Notifies all listener that the given reply was removed.
-	 *
-	 * @see CoreListener#replyRemoved(PostReply)
-	 * @param reply
-	 *            The removed reply
-	 */
-	void fireReplyRemoved(PostReply reply) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.replyRemoved(reply);
-		}
-	}
 
 	/**
 	 * Notifies all listeners that the given Sone was locked.

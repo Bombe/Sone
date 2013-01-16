@@ -20,7 +20,6 @@ package net.pterodactylus.sone.core;
 import java.util.EventListener;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.version.Version;
 
@@ -31,14 +30,6 @@ import net.pterodactylus.util.version.Version;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface CoreListener extends EventListener {
-
-	/**
-	 * Notifies a listener that the given reply was removed.
-	 *
-	 * @param reply
-	 *            The removed reply
-	 */
-	public void replyRemoved(PostReply reply);
 
 	/**
 	 * Notifies a listener when a Sone was locked.

@@ -42,6 +42,7 @@ import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.core.event.PostRemovedEvent;
+import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
@@ -1133,7 +1134,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 					for (PostReply reply : storedSone.getReplies()) {
 						replies.remove(reply.getId());
 						if (!sone.getReplies().contains(reply)) {
-							coreListenerManager.fireReplyRemoved(reply);
+							eventBus.post(new PostReplyRemovedEvent(reply));
 						}
 					}
 				}
@@ -2428,7 +2429,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			synchronized (knownReplies) {
 				for (PostReply reply : sone.getReplies()) {
 					replies.remove(reply.getId());
-					coreListenerManager.fireReplyRemoved(reply);
+					eventBus.post(new PostReplyRemovedEvent(reply));
 				}
 			}
 		}
