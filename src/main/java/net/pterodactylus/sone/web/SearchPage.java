@@ -50,6 +50,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
 
 /**
  * This page lets the user search for posts and replies that contain certain
@@ -138,10 +139,8 @@ public class SearchPage extends SoneTemplatePage {
 		postHits = Collections2.filter(postHits, Hit.POSITIVE_FILTER);
 
 		/* now sort. */
-		List<Hit<Sone>> sortedSoneHits = new ArrayList<Hit<Sone>>(soneHits);
-		Collections.sort(sortedSoneHits, Hit.DESCENDING_COMPARATOR);
-		List<Hit<Post>> sortedPostHits = new ArrayList<Hit<Post>>(postHits);
-		Collections.sort(sortedPostHits, Hit.DESCENDING_COMPARATOR);
+		List<Hit<Sone>> sortedSoneHits = Ordering.from(Hit.DESCENDING_COMPARATOR).sortedCopy(soneHits);
+		List<Hit<Post>> sortedPostHits = Ordering.from(Hit.DESCENDING_COMPARATOR).sortedCopy(postHits);
 
 		/* extract Sones and posts. */
 		List<Sone> resultSones = FluentIterable.from(sortedSoneHits).transform(new HitMapper<Sone>()).toList();
