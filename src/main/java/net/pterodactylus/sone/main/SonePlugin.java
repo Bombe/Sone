@@ -227,7 +227,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		/* create the web interface. */
 		webInterface = injector.getInstance(WebInterface.class);
 		eventBus.register(webInterface);
-		core.addCoreListener(webInterface);
 
 		boolean startupFailed = true;
 		try {

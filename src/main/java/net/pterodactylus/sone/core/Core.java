@@ -113,9 +113,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	/** The preferences. */
 	private final Preferences preferences = new Preferences(options);
 
-	/** The core listener manager. */
-	private final CoreListenerManager coreListenerManager = new CoreListenerManager(this);
-
 	/** The event bus. */
 	private final EventBus eventBus;
 
@@ -230,30 +227,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.updateChecker = new UpdateChecker(freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
-	}
-
-	//
-	// LISTENER MANAGEMENT
-	//
-
-	/**
-	 * Adds a new core listener.
-	 *
-	 * @param coreListener
-	 *            The listener to add
-	 */
-	public void addCoreListener(CoreListener coreListener) {
-		coreListenerManager.addListener(coreListener);
-	}
-
-	/**
-	 * Removes a core listener.
-	 *
-	 * @param coreListener
-	 *            The listener to remove
-	 */
-	public void removeCoreListener(CoreListener coreListener) {
-		coreListenerManager.removeListener(coreListener);
 	}
 
 	//
