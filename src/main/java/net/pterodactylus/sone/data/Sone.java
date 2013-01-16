@@ -28,7 +28,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
@@ -150,7 +149,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		}
 	};
 
-	/** Filter that matches all {@link Core#isLocalSone(Sone) local Sones}. */
+	/** Filter that matches all {@link Sone#isLocal() local Sones}. */
 	public static final Filter<Sone> LOCAL_SONE_FILTER = new Filter<Sone>() {
 
 		@Override

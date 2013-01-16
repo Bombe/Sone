@@ -729,8 +729,8 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * Returns all {@link Core#isLocalSone(Sone) local Sone}s that are
-	 * referenced by {@link SonePart}s in the given text (after parsing it using
+	 * Returns all {@link Sone#isLocal() local Sone}s that are referenced by
+	 * {@link SonePart}s in the given text (after parsing it using
 	 * {@link SoneTextParser}).
 	 *
 	 * @param text
