@@ -245,7 +245,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 								 * don’t use create=true above, we don’t want
 								 * the empty shell.
 								 */
-								sone = new Sone(soneId);
+								sone = new Sone(soneId, false);
 							}
 							parts.add(new SonePart(sone));
 							line = line.substring(50);

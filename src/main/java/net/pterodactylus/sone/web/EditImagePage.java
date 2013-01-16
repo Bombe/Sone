@@ -60,7 +60,7 @@ public class EditImagePage extends SoneTemplatePage {
 			if (image == null) {
 				throw new RedirectException("invalid.html");
 			}
-			if (!webInterface.getCore().isLocalSone(image.getSone())) {
+			if (!image.getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {

@@ -48,7 +48,7 @@ public class DeletePostCommand extends AbstractSoneCommand {
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		Post post = getPost(parameters, "Post");
-		if (!getCore().isLocalSone(post.getSone())) {
+		if (!post.getSone().isLocal()) {
 			return new ErrorResponse(401, "Not allowed.");
 		}
 		return new Response("PostDeleted", new SimpleFieldSetBuilder().get());

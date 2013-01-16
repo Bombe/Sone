@@ -54,7 +54,7 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 			if (album == null) {
 				throw new RedirectException("invalid.html");
 			}
-			if (!webInterface.getCore().isLocalSone(album.getSone())) {
+			if (!album.getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("abortDelete")) {

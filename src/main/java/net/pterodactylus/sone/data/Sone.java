@@ -175,6 +175,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	/** The ID of this Sone. */
 	private final String id;
 
+	/** Whether the Sone is local. */
+	private final boolean local;
+
 	/** The identity of this Sone. */
 	private Identity identity;
 
@@ -229,9 +232,13 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *
 	 * @param id
 	 *            The ID of the Sone
+	 * @param local
+	 *            {@code true} if the Sone is a local Sone, {@code false}
+	 *            otherwise
 	 */
-	public Sone(String id) {
+	public Sone(String id, boolean local) {
 		this.id = id;
+		this.local = local;
 	}
 
 	//
@@ -281,6 +288,16 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public String getName() {
 		return (identity != null) ? identity.getNickname() : null;
+	}
+
+	/**
+	 * Returns whether this Sone is a local Sone.
+	 *
+	 * @return {@code true} if this Sone is a local Sone, {@code false}
+	 *         otherwise
+	 */
+	public boolean isLocal() {
+		return local;
 	}
 
 	/**

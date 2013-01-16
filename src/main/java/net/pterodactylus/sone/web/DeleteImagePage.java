@@ -57,7 +57,7 @@ public class DeleteImagePage extends SoneTemplatePage {
 		if (image == null) {
 			throw new RedirectException("invalid.html");
 		}
-		if (!webInterface.getCore().isLocalSone(image.getSone())) {
+		if (!image.getSone().isLocal()) {
 			throw new RedirectException("noPermission.html");
 		}
 		if (request.getMethod() == Method.POST) {

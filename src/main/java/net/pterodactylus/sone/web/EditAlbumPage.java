@@ -57,7 +57,7 @@ public class EditAlbumPage extends SoneTemplatePage {
 			if (album == null) {
 				throw new RedirectException("invalid.html");
 			}
-			if (!webInterface.getCore().isLocalSone(album.getSone())) {
+			if (!album.getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {

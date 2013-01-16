@@ -63,7 +63,7 @@ public class EditImageAjaxPage extends JsonPage {
 		if (image == null) {
 			return createErrorJsonObject("invalid-image-id");
 		}
-		if (!webInterface.getCore().isLocalSone(image.getSone())) {
+		if (!image.getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveLeft"))) {

@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -66,6 +67,9 @@ import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.OrValidator;
 import net.pterodactylus.util.validation.Validation;
 import net.pterodactylus.util.version.Version;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 import freenet.keys.FreenetURI;
 
 /**
@@ -128,20 +132,16 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	private final Set<Sone> lockedSones = new HashSet<Sone>();
 
 	/** Sone inserters. */
-	/* synchronize access on this on localSones. */
+	/* synchronize access on this on sones. */
 	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
 
 	/** Sone rescuers. */
-	/* synchronize access on this on localSones. */
+	/* synchronize access on this on sones. */
 	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<Sone, SoneRescuer>();
 
-	/** All local Sones. */
+	/** All Sones. */
 	/* synchronize access on this on itself. */
-	private final Map<String, Sone> localSones = new HashMap<String, Sone>();
-
-	/** All remote Sones. */
-	/* synchronize access on this on itself. */
-	private final Map<String, Sone> remoteSones = new HashMap<String, Sone>();
+	private final Map<String, Sone> sones = new HashMap<String, Sone>();
 
 	/** All known Sones. */
 	private final Set<String> knownSones = new HashSet<String>();
@@ -297,8 +297,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The Sone rescuer for the given Sone
 	 */
 	public SoneRescuer getSoneRescuer(Sone sone) {
-		Validation.begin().isNotNull("Sone", sone).check().is("Local Sone", isLocalSone(sone)).check();
-		synchronized (localSones) {
+		Validation.begin().isNotNull("Sone", sone).check().is("Local Sone", sone.isLocal()).check();
+		synchronized (sones) {
 			SoneRescuer soneRescuer = soneRescuers.get(sone);
 			if (soneRescuer == null) {
 				soneRescuer = new SoneRescuer(this, soneDownloader, sone);
@@ -328,10 +328,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return All Sones
 	 */
 	public Set<Sone> getSones() {
-		Set<Sone> allSones = new HashSet<Sone>();
-		allSones.addAll(getLocalSones());
-		allSones.addAll(getRemoteSones());
-		return allSones;
+		return new HashSet<Sone>(sones.values());
 	}
 
 	/**
@@ -362,10 +359,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public Sone getSone(String id, boolean create) {
-		if (isLocalSone(id)) {
-			return getLocalSone(id);
+		synchronized (sones) {
+			if (!sones.containsKey(id)) {
+				Sone sone = new Sone(id, false);
+				sones.put(id, sone);
+			}
+			return sones.get(id);
 		}
-		return getRemoteSone(id, create);
 	}
 
 	/**
@@ -377,33 +377,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *         otherwise
 	 */
 	public boolean hasSone(String id) {
-		return isLocalSone(id) || isRemoteSone(id);
-	}
-
-	/**
-	 * Returns whether the given Sone is a local Sone.
-	 *
-	 * @param sone
-	 *            The Sone to check for its locality
-	 * @return {@code true} if the given Sone is local, {@code false} otherwise
-	 */
-	public boolean isLocalSone(Sone sone) {
-		synchronized (localSones) {
-			return localSones.containsKey(sone.getId());
-		}
-	}
-
-	/**
-	 * Returns whether the given ID is the ID of a local Sone.
-	 *
-	 * @param id
-	 *            The Sone ID to check for its locality
-	 * @return {@code true} if the given ID is a local Sone, {@code false}
-	 *         otherwise
-	 */
-	public boolean isLocalSone(String id) {
-		synchronized (localSones) {
-			return localSones.containsKey(id);
+		synchronized (sones) {
+			return sones.containsKey(id);
 		}
 	}
 
@@ -412,21 +387,16 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *
 	 * @return All local Sones
 	 */
-	public Set<Sone> getLocalSones() {
-		synchronized (localSones) {
-			return new HashSet<Sone>(localSones.values());
-		}
-	}
+	public Collection<Sone> getLocalSones() {
+		synchronized (sones) {
+			return Collections2.filter(sones.values(), new Predicate<Sone>() {
 
-	/**
-	 * Returns the local Sone with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the Sone to get
-	 * @return The Sone with the given ID
-	 */
-	public Sone getLocalSone(String id) {
-		return getLocalSone(id, true);
+				@Override
+				public boolean apply(Sone sone) {
+					return sone.isLocal();
+				}
+			});
+		}
 	}
 
 	/**
@@ -440,11 +410,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The Sone with the given ID, or {@code null}
 	 */
 	public Sone getLocalSone(String id, boolean create) {
-		synchronized (localSones) {
-			Sone sone = localSones.get(id);
+		synchronized (sones) {
+			Sone sone = sones.get(id);
 			if ((sone == null) && create) {
-				sone = new Sone(id);
-				localSones.put(id, sone);
+				sone = new Sone(id, true);
+				sones.put(id, sone);
+			}
+			if (!sone.isLocal()) {
+				sone = new Sone(id, true);
+				sones.put(id, sone);
 			}
 			return sone;
 		}
@@ -455,9 +429,15 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *
 	 * @return All remote Sones
 	 */
-	public Set<Sone> getRemoteSones() {
-		synchronized (remoteSones) {
-			return new HashSet<Sone>(remoteSones.values());
+	public Collection<Sone> getRemoteSones() {
+		synchronized (sones) {
+			return Collections2.filter(sones.values(), new Predicate<Sone>() {
+
+				@Override
+				public boolean apply(Sone sone) {
+					return !sone.isLocal();
+				}
+			});
 		}
 	}
 
@@ -472,41 +452,13 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The Sone with the given ID
 	 */
 	public Sone getRemoteSone(String id, boolean create) {
-		synchronized (remoteSones) {
-			Sone sone = remoteSones.get(id);
+		synchronized (sones) {
+			Sone sone = sones.get(id);
 			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
-				sone = new Sone(id);
-				remoteSones.put(id, sone);
+				sone = new Sone(id, false);
+				sones.put(id, sone);
 			}
 			return sone;
-		}
-	}
-
-	/**
-	 * Returns whether the given Sone is a remote Sone.
-	 *
-	 * @param sone
-	 *            The Sone to check
-	 * @return {@code true} if the given Sone is a remote Sone, {@code false}
-	 *         otherwise
-	 */
-	public boolean isRemoteSone(Sone sone) {
-		synchronized (remoteSones) {
-			return remoteSones.containsKey(sone.getId());
-		}
-	}
-
-	/**
-	 * Returns whether the Sone with the given ID is a remote Sone.
-	 *
-	 * @param id
-	 *            The ID of the Sone to check
-	 * @return {@code true} if the Sone with the given ID is a remote Sone,
-	 *         {@code false} otherwise
-	 */
-	public boolean isRemoteSone(String id) {
-		synchronized (remoteSones) {
-			return remoteSones.containsKey(id);
 		}
 	}
 
@@ -859,10 +811,10 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.WARNING, "Given OwnIdentity is null!");
 			return null;
 		}
-		synchronized (localSones) {
+		synchronized (sones) {
 			final Sone sone;
 			try {
-				sone = getLocalSone(ownIdentity.getId()).setIdentity(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
+				sone = getLocalSone(ownIdentity.getId(), true).setIdentity(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
 			} catch (MalformedURLException mue1) {
 				logger.log(Level.SEVERE, String.format("Could not convert the Identity’s URIs to Freenet URIs: %s, %s", ownIdentity.getInsertUri(), ownIdentity.getRequestUri()), mue1);
 				return null;
@@ -871,7 +823,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
-			localSones.put(ownIdentity.getId(), sone);
+			sones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
 			soneInserter.addSoneInsertListener(this);
 			soneInserters.put(sone, soneInserter);
@@ -919,7 +871,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.WARNING, "Given Identity is null!");
 			return null;
 		}
-		synchronized (remoteSones) {
+		synchronized (sones) {
 			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
@@ -1235,8 +1187,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/**
 	 * Deletes the given Sone. This will remove the Sone from the
-	 * {@link #getLocalSone(String) local Sones}, stops its {@link SoneInserter}
-	 * and remove the context from its identity.
+	 * {@link #getLocalSones() local Sones}, stop its {@link SoneInserter} and
+	 * remove the context from its identity.
 	 *
 	 * @param sone
 	 *            The Sone to delete
@@ -1246,12 +1198,12 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			logger.log(Level.WARNING, String.format("Tried to delete Sone of non-own identity: %s", sone));
 			return;
 		}
-		synchronized (localSones) {
-			if (!localSones.containsKey(sone.getId())) {
+		synchronized (sones) {
+			if (!getLocalSones().contains(sone)) {
 				logger.log(Level.WARNING, String.format("Tried to delete non-local Sone: %s", sone));
 				return;
 			}
-			localSones.remove(sone.getId());
+			sones.remove(sone.getId());
 			SoneInserter soneInserter = soneInserters.remove(sone);
 			soneInserter.removeSoneInsertListener(this);
 			soneInserter.stop();
@@ -1291,7 +1243,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The Sone to load and update
 	 */
 	public void loadSone(Sone sone) {
-		if (!isLocalSone(sone)) {
+		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to load non-local Sone: %s", sone));
 			return;
 		}
@@ -1569,7 +1521,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public Post createPost(Sone sone, Sone recipient, long time, String text) {
 		Validation.begin().isNotNull("Text", text).check().isGreater("Text Length", text.length(), 0).check();
-		if (!isLocalSone(sone)) {
+		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
@@ -1603,7 +1555,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The post to delete
 	 */
 	public void deletePost(Post post) {
-		if (!isLocalSone(post.getSone())) {
+		if (!post.getSone().isLocal()) {
 			logger.log(Level.WARNING, String.format("Tried to delete post of non-local Sone: %s", post.getSone()));
 			return;
 		}
@@ -1710,7 +1662,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public PostReply createReply(Sone sone, Post post, long time, String text) {
 		Validation.begin().isNotNull("Text", text).check().isGreater("Text Length", text.trim().length(), 0).check();
-		if (!isLocalSone(sone)) {
+		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
@@ -1744,7 +1696,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	public void deleteReply(PostReply reply) {
 		Sone sone = reply.getSone();
-		if (!isLocalSone(sone)) {
+		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to delete non-local reply: %s", reply));
 			return;
 		}
@@ -1819,7 +1771,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The album to remove
 	 */
 	public void deleteAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().is("Local Sone", isLocalSone(album.getSone())).check();
+		Validation.begin().isNotNull("Album", album).check().is("Local Sone", album.getSone().isLocal()).check();
 		if (!album.isEmpty()) {
 			return;
 		}
@@ -1846,7 +1798,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @return The newly created image
 	 */
 	public Image createImage(Sone sone, Album album, TemporaryImage temporaryImage) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Album", album).isNotNull("Temporary Image", temporaryImage).check().is("Local Sone", isLocalSone(sone)).check().isEqual("Owner and Album Owner", sone, album.getSone()).check();
+		Validation.begin().isNotNull("Sone", sone).isNotNull("Album", album).isNotNull("Temporary Image", temporaryImage).check().is("Local Sone", sone.isLocal()).check().isEqual("Owner and Album Owner", sone, album.getSone()).check();
 		Image image = new Image(temporaryImage.getId()).setSone(sone).setCreationTime(System.currentTimeMillis());
 		album.addImage(image);
 		synchronized (images) {
@@ -1865,7 +1817,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The image to delete
 	 */
 	public void deleteImage(Image image) {
-		Validation.begin().isNotNull("Image", image).check().is("Local Sone", isLocalSone(image.getSone())).check();
+		Validation.begin().isNotNull("Image", image).check().is("Local Sone", image.getSone().isLocal()).check();
 		deleteTemporaryImage(image.getId());
 		image.getAlbum().removeImage(image);
 		synchronized (images) {
@@ -1968,7 +1920,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void serviceStop() {
-		synchronized (localSones) {
+		synchronized (sones) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
 				soneInserter.getValue().removeSoneInsertListener(this);
 				soneInserter.getValue().stop();
@@ -1994,7 +1946,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 *            The Sone to save
 	 */
 	private synchronized void saveSone(Sone sone) {
-		if (!isLocalSone(sone)) {
+		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to save non-local Sone: %s", sone));
 			return;
 		}
@@ -2457,8 +2409,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				}
 			}
 		}
-		synchronized (remoteSones) {
-			remoteSones.remove(identity.getId());
+		synchronized (sones) {
+			sones.remove(identity.getId());
 		}
 		coreListenerManager.fireSoneRemoved(sone);
 	}

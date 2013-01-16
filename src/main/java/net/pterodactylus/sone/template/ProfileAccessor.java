@@ -70,7 +70,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 				return null;
 			}
 			Sone remoteSone = profile.getSone();
-			if (core.isLocalSone(remoteSone)) {
+			if (remoteSone.isLocal()) {
 				/* always show your own avatars. */
 				return avatarId;
 			}

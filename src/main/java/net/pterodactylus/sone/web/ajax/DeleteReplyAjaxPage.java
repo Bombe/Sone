@@ -53,7 +53,7 @@ public class DeleteReplyAjaxPage extends JsonPage {
 		if (reply == null) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		if (!webInterface.getCore().isLocalSone(reply.getSone())) {
+		if (!reply.getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
 		webInterface.getCore().deleteReply(reply);

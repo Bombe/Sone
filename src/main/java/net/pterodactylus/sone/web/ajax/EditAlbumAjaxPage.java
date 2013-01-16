@@ -54,7 +54,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 		if (album == null) {
 			return createErrorJsonObject("invalid-album-id");
 		}
-		if (!webInterface.getCore().isLocalSone(album.getSone())) {
+		if (!album.getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveLeft"))) {

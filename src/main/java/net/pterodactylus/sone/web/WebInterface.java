@@ -372,7 +372,7 @@ public class WebInterface implements CoreListener {
 	 *         currently logged in
 	 */
 	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
-		Set<Sone> localSones = getCore().getLocalSones();
+		Collection<Sone> localSones = getCore().getLocalSones();
 		if (localSones.size() == 1) {
 			return localSones.iterator().next();
 		}
@@ -789,7 +789,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newPostFound(Post post) {
-		boolean isLocal = getCore().isLocalSone(post.getSone());
+		boolean isLocal = post.getSone().isLocal();
 		if (isLocal) {
 			localPostNotification.add(post);
 		} else {
@@ -811,7 +811,7 @@ public class WebInterface implements CoreListener {
 	 */
 	@Override
 	public void newReplyFound(PostReply reply) {
-		boolean isLocal = getCore().isLocalSone(reply.getSone());
+		boolean isLocal = reply.getSone().isLocal();
 		if (isLocal) {
 			localReplyNotification.add(reply);
 		} else {

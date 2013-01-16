@@ -63,7 +63,7 @@ public class DeletePostPage extends SoneTemplatePage {
 			String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			Post post = webInterface.getCore().getPost(postId);
-			if (!webInterface.getCore().isLocalSone(post.getSone())) {
+			if (!post.getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {

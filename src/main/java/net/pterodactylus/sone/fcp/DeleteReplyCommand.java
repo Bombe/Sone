@@ -48,7 +48,7 @@ public class DeleteReplyCommand extends AbstractSoneCommand {
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		PostReply reply = getReply(parameters, "Reply");
-		if (!getCore().isLocalSone(reply.getSone())) {
+		if (!reply.getSone().isLocal()) {
 			return new ErrorResponse(401, "Not allowed.");
 		}
 		return new Response("ReplyDeleted", new SimpleFieldSetBuilder().get());
