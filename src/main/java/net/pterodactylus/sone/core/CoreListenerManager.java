@@ -46,19 +46,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that a new post has been found.
-	 *
-	 * @see CoreListener#newPostFound(Post)
-	 * @param post
-	 *            The new post
-	 */
-	void fireNewPostFound(Post post) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.newPostFound(post);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that a new reply has been found.
 	 *
 	 * @see CoreListener#newReplyFound(PostReply)

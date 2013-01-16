@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
@@ -1114,7 +1115,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 								knownPosts.add(post.getId());
 								post.setKnown(true);
 							} else if (!knownPosts.contains(post.getId())) {
-								coreListenerManager.fireNewPostFound(post);
+								eventBus.post(new NewPostFoundEvent(post));
 							}
 						}
 						posts.put(post.getId(), post);
@@ -1543,7 +1544,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}
-		coreListenerManager.fireNewPostFound(post);
+		eventBus.post(new NewPostFoundEvent(post));
 		sone.addPost(post);
 		touchConfiguration();
 		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
