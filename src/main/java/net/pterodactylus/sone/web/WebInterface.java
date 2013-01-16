@@ -45,6 +45,7 @@ import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
@@ -988,22 +989,25 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
-	//
-	// CORELISTENER METHODS
-	//
-
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} was inserted.
+	 *
+	 * @param soneInsertedEvent
+	 *            The event
 	 */
-	@Override
-	public void soneInserted(Sone sone, long insertDuration) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+	@Subscribe
+	public void soneInserted(SoneInsertedEvent soneInsertedEvent) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.sone());
 		soneInsertNotification.set("soneStatus", "inserted");
-		soneInsertNotification.set("insertDuration", insertDuration / 1000);
-		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		soneInsertNotification.set("insertDuration", soneInsertedEvent.insertDuration() / 1000);
+		if (soneInsertedEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
+
+	//
+	// CORELISTENER METHODS
+	//
 
 	/**
 	 * {@inheritDoc}

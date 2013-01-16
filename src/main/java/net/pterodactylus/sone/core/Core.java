@@ -43,6 +43,7 @@ import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
@@ -2471,7 +2472,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void insertFinished(Sone sone, long insertDuration) {
-		coreListenerManager.fireSoneInserted(sone, insertDuration);
+		eventBus.post(new SoneInsertedEvent(sone, insertDuration));
 	}
 
 	/**
