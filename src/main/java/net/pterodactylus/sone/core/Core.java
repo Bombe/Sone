@@ -1235,7 +1235,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 
 	/**
 	 * Marks the given Sone as known. If the Sone was not {@link Post#isKnown()
-	 * known} before, a {@link CoreListener#markSoneKnown(Sone)} event is fired.
+	 * known} before, a {@link MarkSoneKnownEvent} is fired.
 	 *
 	 * @param sone
 	 *            The Sone to mark as known
