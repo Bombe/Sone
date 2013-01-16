@@ -103,7 +103,6 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
-import net.pterodactylus.util.collection.SetBuilder;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -132,6 +131,7 @@ import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
 
 import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Inject;
 
 import freenet.clients.http.SessionManager;
@@ -462,7 +462,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new posts
 	 */
 	public Set<Post> getNewPosts() {
-		return new SetBuilder<Post>().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).get();
+		return ImmutableSet.<Post> builder().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).build();
 	}
 
 	/**
@@ -472,7 +472,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new replies
 	 */
 	public Set<PostReply> getNewReplies() {
-		return new SetBuilder<PostReply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
+		return ImmutableSet.<PostReply> builder().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).build();
 	}
 
 	/**
