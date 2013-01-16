@@ -34,14 +34,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that the given reply is now marked as known.
-	 *
-	 * @param reply
-	 *            The known reply
-	 */
-	public void markReplyKnown(PostReply reply);
-
-	/**
 	 * Notifies a listener that the given Sone was removed.
 	 *
 	 * @param sone

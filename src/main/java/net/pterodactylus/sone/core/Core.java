@@ -36,6 +36,7 @@ import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
+import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
@@ -1736,7 +1737,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public void markReplyKnown(PostReply reply) {
 		reply.setKnown(true);
 		synchronized (knownReplies) {
-			coreListenerManager.fireMarkReplyKnown(reply);
+			eventBus.post(new MarkPostReplyKnownEvent(reply));
 			if (knownReplies.add(reply.getId())) {
 				touchConfiguration();
 			}

@@ -46,18 +46,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that the given reply is now marked as known.
-	 *
-	 * @param reply
-	 *            The known reply
-	 */
-	void fireMarkReplyKnown(PostReply reply) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.markReplyKnown(reply);
-		}
-	}
-
-	/**
 	 * Notifies all listener that the given Sone was removed.
 	 *
 	 * @see CoreListener#soneRemoved(Sone)

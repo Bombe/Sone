@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
+import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
@@ -858,19 +859,19 @@ public class WebInterface implements CoreListener {
 		mentionNotification.remove(markPostKnownEvent.post());
 	}
 
-	//
-	// CORELISTENER METHODS
-	//
-
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void markReplyKnown(PostReply reply) {
-		newReplyNotification.remove(reply);
-		localReplyNotification.remove(reply);
-		mentionNotification.remove(reply.getPost());
+	@Subscribe
+	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
+		newReplyNotification.remove(markPostReplyKnownEvent.postReply());
+		localReplyNotification.remove(markPostReplyKnownEvent.postReply());
+		mentionNotification.remove(markPostReplyKnownEvent.postReply().getPost());
 	}
+
+	//
+	// CORELISTENER METHODS
+	//
 
 	/**
 	 * {@inheritDoc}
