@@ -45,6 +45,7 @@ import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
@@ -1005,22 +1006,25 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
-	//
-	// CORELISTENER METHODS
-	//
-
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} insert was aborted.
+	 *
+	 * @param soneInsertAbortedEvent
+	 *            The event
 	 */
-	@Override
-	public void soneInsertAborted(Sone sone, Throwable cause) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+	@Subscribe
+	public void soneInsertAborted(SoneInsertAbortedEvent soneInsertAbortedEvent) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.sone());
 		soneInsertNotification.set("soneStatus", "insert-aborted");
-		soneInsertNotification.set("insert-error", cause);
-		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.cause());
+		if (soneInsertAbortedEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
+
+	//
+	// CORELISTENER METHODS
+	//
 
 	/**
 	 * {@inheritDoc}

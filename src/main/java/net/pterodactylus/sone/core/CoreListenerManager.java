@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.core;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.event.AbstractListenerManager;
 import net.pterodactylus.util.version.Version;
 
@@ -42,21 +41,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 	// ACTIONS
 	//
-
-	/**
-	 * Notifies all listeners that the insert of the given Sone was aborted.
-	 *
-	 * @see SoneInsertListener#insertStarted(Sone)
-	 * @param sone
-	 *            The Sone being inserted
-	 * @param cause
-	 *            The cause for the abortion (may be {@code null}
-	 */
-	void fireSoneInsertAborted(Sone sone, Throwable cause) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.soneInsertAborted(sone, cause);
-		}
-	}
 
 	/**
 	 * Notifies all listeners that a new version was found.

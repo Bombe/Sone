@@ -20,7 +20,6 @@ package net.pterodactylus.sone.core;
 import java.util.EventListener;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.version.Version;
 
 /**
@@ -30,17 +29,6 @@ import net.pterodactylus.util.version.Version;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface CoreListener extends EventListener {
-
-	/**
-	 * Notifies a listener that the insert of the given Sone was aborted.
-	 *
-	 * @see SoneInsertListener#insertAborted(Sone, Throwable)
-	 * @param sone
-	 *            The Sone that was inserted
-	 * @param cause
-	 *            The cause for the abortion (may be {@code null})
-	 */
-	public void soneInsertAborted(Sone sone, Throwable cause);
 
 	/**
 	 * Notifies a listener that a new version has been found.
