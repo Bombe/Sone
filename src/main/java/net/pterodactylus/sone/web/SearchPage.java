@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,14 +35,7 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.cache.Cache;
-import net.pterodactylus.util.cache.CacheException;
-import net.pterodactylus.util.cache.CacheItem;
-import net.pterodactylus.util.cache.DefaultCacheItem;
-import net.pterodactylus.util.cache.MemoryCache;
-import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.collection.TimedMap;
 import net.pterodactylus.util.collection.mapper.Mapper;
 import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
@@ -52,6 +46,9 @@ import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
 
 import com.google.common.base.Predicate;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Collections2;
 
 /**
@@ -66,19 +63,18 @@ public class SearchPage extends SoneTemplatePage {
 	private static final Logger logger = Logging.getLogger(SearchPage.class);
 
 	/** Short-term cache. */
-	private final Cache<List<Phrase>, Set<Hit<Post>>> hitCache = new MemoryCache<List<Phrase>, Set<Hit<Post>>>(new ValueRetriever<List<Phrase>, Set<Hit<Post>>>() {
+	private final LoadingCache<List<Phrase>, Set<Hit<Post>>> hitCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<List<Phrase>, Set<Hit<Post>>>() {
 
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public CacheItem<Set<Hit<Post>>> retrieve(List<Phrase> phrases) throws CacheException {
+		public Set<Hit<Post>> load(List<Phrase> phrases) {
 			Set<Post> posts = new HashSet<Post>();
 			for (Sone sone : webInterface.getCore().getSones()) {
 				posts.addAll(sone.getPosts());
 			}
-			return new DefaultCacheItem<Set<Hit<Post>>>(getHits(Collections2.filter(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator()));
+			return getHits(Collections2.filter(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator());
 		}
-
-	}, new TimedMap<List<Phrase>, CacheItem<Set<Hit<Post>>>>(300000));
+	});
 
 	/**
 	 * Creates a new search page.
@@ -135,14 +131,7 @@ public class SearchPage extends SoneTemplatePage {
 		Set<Sone> sones = webInterface.getCore().getSones();
 		Collection<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
-		Collection<Hit<Post>> postHits;
-		try {
-			postHits = hitCache.get(phrases);
-		} catch (CacheException ce1) {
-			/* should never happen. */
-			logger.log(Level.SEVERE, "Could not get search results from cache!", ce1);
-			postHits = Collections.emptySet();
-		}
+		Collection<Hit<Post>> postHits = hitCache.getUnchecked(phrases);
 
 		/* now filter. */
 		soneHits = Collections2.filter(soneHits, Hit.POSITIVE_FILTER);
