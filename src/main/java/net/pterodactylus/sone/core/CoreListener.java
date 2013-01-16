@@ -32,14 +32,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that a Sone was unlocked.
-	 *
-	 * @param sone
-	 *            The Sone that was unlocked
-	 */
-	public void soneUnlocked(Sone sone);
-
-	/**
 	 * Notifies a listener that the insert of the given Sone has started.
 	 *
 	 * @see SoneInsertListener#insertStarted(Sone)

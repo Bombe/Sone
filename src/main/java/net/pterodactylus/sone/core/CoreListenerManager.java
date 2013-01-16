@@ -44,19 +44,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that the given Sone was unlocked.
-	 *
-	 * @see CoreListener#soneUnlocked(Sone)
-	 * @param sone
-	 *            The Sone that was unlocked
-	 */
-	void fireSoneUnlocked(Sone sone) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.soneUnlocked(sone);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that the insert of the given Sone has started.
 	 *
 	 * @see SoneInsertListener#insertStarted(Sone)

@@ -47,6 +47,7 @@ import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
+import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -959,18 +960,21 @@ public class WebInterface implements CoreListener {
 		lockedSonesTickerObjects.put(sone, tickerObject);
 	}
 
+	/**
+	 * Notifies the web interface that a Sone was unlocked.
+	 *
+	 * @param soneUnlockedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void soneUnlocked(SoneUnlockedEvent soneUnlockedEvent) {
+		lockedSonesNotification.remove(soneUnlockedEvent.sone());
+		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(soneUnlockedEvent.sone()));
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void soneUnlocked(Sone sone) {
-		lockedSonesNotification.remove(sone);
-		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
-	}
 
 	/**
 	 * {@inheritDoc}
