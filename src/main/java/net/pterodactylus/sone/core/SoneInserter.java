@@ -20,7 +20,6 @@ package net.pterodactylus.sone.core;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,14 +27,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.util.collection.ListBuilder;
-import net.pterodactylus.util.collection.ReverseComparator;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -47,6 +43,9 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
+
+import com.google.common.collect.Ordering;
+
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
 
@@ -302,8 +301,8 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
-			soneProperties.put("posts", new ListBuilder<Post>(new ArrayList<Post>(sone.getPosts())).sort(Post.TIME_COMPARATOR).get());
-			soneProperties.put("replies", new ListBuilder<PostReply>(new ArrayList<PostReply>(sone.getReplies())).sort(new ReverseComparator<Reply<?>>(Reply.TIME_COMPARATOR)).get());
+			soneProperties.put("posts", Ordering.from(Post.TIME_COMPARATOR).sortedCopy(sone.getPosts()));
+			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", sone.getAllAlbums());

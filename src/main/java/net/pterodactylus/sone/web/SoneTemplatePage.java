@@ -30,12 +30,14 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
-import net.pterodactylus.util.collection.ListBuilder;
-import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.object.HashCode;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
@@ -217,7 +219,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 */
 	@Override
 	protected List<Map<String, String>> getAdditionalLinkNodes(FreenetRequest request) {
-		return new ListBuilder<Map<String, String>>().add(new MapBuilder<String, String>().put("rel", "search").put("type", "application/opensearchdescription+xml").put("title", "Sone").put("href", "http://" + request.getHttpRequest().getHeader("host") + "/Sone/OpenSearch.xml").get()).get();
+		return ImmutableList.<Map<String, String>> builder().add(ImmutableMap.<String, String> builder().put("rel", "search").put("type", "application/opensearchdescription+xml").put("title", "Sone").put("href", "http://" + request.getHttpRequest().getHeader("host") + "/Sone/OpenSearch.xml").build()).build();
 	}
 
 	/**
