@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +65,7 @@ public class NewPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 
 		/* collect new elements from notifications. */
-		Set<Post> posts = webInterface.getNewPosts();
+		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts());
 		for (PostReply reply : webInterface.getNewReplies()) {
 			posts.add(reply.getPost());
 		}
