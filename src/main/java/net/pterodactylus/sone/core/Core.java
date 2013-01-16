@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
@@ -1592,7 +1593,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public void markPostKnown(Post post) {
 		post.setKnown(true);
 		synchronized (knownPosts) {
-			coreListenerManager.fireMarkPostKnown(post);
+			eventBus.post(new MarkPostKnownEvent(post));
 			if (knownPosts.add(post.getId())) {
 				touchConfiguration();
 			}

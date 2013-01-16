@@ -46,18 +46,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that the given post is now marked as known.
-	 *
-	 * @param post
-	 *            The known post
-	 */
-	void fireMarkPostKnown(Post post) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.markPostKnown(post);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that the given reply is now marked as known.
 	 *
 	 * @param reply

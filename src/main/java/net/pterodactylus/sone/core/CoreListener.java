@@ -34,14 +34,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that the given post is now marked as known.
-	 *
-	 * @param post
-	 *            The known post
-	 */
-	public void markPostKnown(Post post);
-
-	/**
 	 * Notifies a listener that the given reply is now marked as known.
 	 *
 	 * @param reply
