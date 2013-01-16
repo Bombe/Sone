@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -892,7 +893,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				}
 				sone.setKnown(!newSone);
 				if (newSone) {
-					coreListenerManager.fireNewSoneFound(sone);
+					eventBus.post(new NewSoneFoundEvent(sone));
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
 							followSone(localSone, sone);

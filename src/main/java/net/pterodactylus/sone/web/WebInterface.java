@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
+import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -132,6 +133,7 @@ import net.pterodactylus.util.web.TemplatePage;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 
 import freenet.clients.http.SessionManager;
@@ -774,19 +776,23 @@ public class WebInterface implements CoreListener {
 	}
 
 	//
-	// CORELISTENER METHODS
+	// EVENT HANDLERS
 	//
 
 	/**
 	 * {@inheritDoc}
 	 */
-	@Override
-	public void newSoneFound(Sone sone) {
-		newSoneNotification.add(sone);
+	@Subscribe
+	public void newSoneFound(NewSoneFoundEvent newSoneFoundEvent) {
+		newSoneNotification.add(newSoneFoundEvent.sone());
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newSoneNotification);
 		}
 	}
+
+	//
+	// CORELISTENER METHODS
+	//
 
 	/**
 	 * {@inheritDoc}

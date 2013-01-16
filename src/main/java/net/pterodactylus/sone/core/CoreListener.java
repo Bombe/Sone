@@ -34,14 +34,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that a new Sone has been discovered.
-	 *
-	 * @param sone
-	 *            The new Sone
-	 */
-	public void newSoneFound(Sone sone);
-
-	/**
 	 * Notifies a listener that a new post has been found.
 	 *
 	 * @param post
