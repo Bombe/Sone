@@ -36,8 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
@@ -165,7 +165,7 @@ import freenet.support.api.HTTPRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebInterface implements CoreListener {
+public class WebInterface {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebInterface.class);
@@ -1075,17 +1075,16 @@ public class WebInterface implements CoreListener {
 		notificationManager.addNotification(insertedImagesNotification);
 	}
 
-	//
-	// CORELISTENER METHODS
-	//
-
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that an {@link Image} insert has failed.
+	 *
+	 * @param imageInsertFailedEvent
+	 *            The event
 	 */
-	@Override
-	public void imageInsertFailed(Image image, Throwable cause) {
-		insertingImagesNotification.remove(image);
-		imageInsertFailedNotification.add(image);
+	@Subscribe
+	public void imageInsertFailed(ImageInsertFailedEvent imageInsertFailedEvent) {
+		insertingImagesNotification.remove(imageInsertFailedEvent.image());
+		imageInsertFailedNotification.add(imageInsertFailedEvent.image());
 		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 
