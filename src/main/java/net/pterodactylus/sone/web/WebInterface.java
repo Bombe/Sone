@@ -785,7 +785,10 @@ public class WebInterface implements CoreListener {
 	//
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new {@link Sone} was found.
+	 *
+	 * @param newSoneFoundEvent
+	 *            The event
 	 */
 	@Subscribe
 	public void newSoneFound(NewSoneFoundEvent newSoneFoundEvent) {
@@ -796,7 +799,10 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new {@link Post} was found.
+	 *
+	 * @param newPostFoundEvent
+	 *            The event
 	 */
 	@Subscribe
 	public void newPostFound(NewPostFoundEvent newPostFoundEvent) {
@@ -819,7 +825,10 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new {@link PostReply} was found.
+	 *
+	 * @param newPostReplyFoundEvent
+	 *            The event
 	 */
 	@Subscribe
 	public void newReplyFound(NewPostReplyFoundEvent newPostReplyFoundEvent) {
@@ -842,7 +851,10 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} was marked as known.
+	 *
+	 * @param markSoneKnownEvent
+	 *            The event
 	 */
 	@Subscribe
 	public void markSoneKnown(MarkSoneKnownEvent markSoneKnownEvent) {
@@ -850,7 +862,10 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Post} was marked as known.
+	 *
+	 * @param markPostKnownEvent
+	 *            The event
 	 */
 	@Subscribe
 	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
@@ -860,7 +875,10 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link PostReply} was marked as known.
+	 *
+	 * @param markPostReplyKnownEvent
+	 *            The event
 	 */
 	@Subscribe
 	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
