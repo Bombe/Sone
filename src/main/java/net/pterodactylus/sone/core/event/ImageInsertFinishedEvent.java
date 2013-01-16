@@ -1,5 +1,5 @@
 /*
- * Sone - CoreListener.java - Copyright © 2010–2012 David Roden
+ * Sone - ImageInsertFinishedEvent.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,28 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
-
-import java.util.EventListener;
+package net.pterodactylus.sone.core.event;
 
 import net.pterodactylus.sone.data.Image;
 
 /**
- * Listener interface for objects that want to be notified on certain
- * {@link Core} events, such es discovery of new data.
+ * Event that signals that an {@link Image} insert is finished.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface CoreListener extends EventListener {
+public class ImageInsertFinishedEvent extends ImageEvent {
 
 	/**
-	 * Notifies a listener that an image failed to be inserted.
+	 * Creates a new “image insert finished” event.
 	 *
 	 * @param image
-	 *            The image that could not be inserted
-	 * @param cause
-	 *            The reason for the failed insert
+	 *            The image whose insert finished
 	 */
-	public void imageInsertFailed(Image image, Throwable cause);
+	public ImageInsertFinishedEvent(Image image) {
+		super(image);
+	}
 
 }

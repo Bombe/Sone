@@ -38,6 +38,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
@@ -1061,19 +1062,22 @@ public class WebInterface implements CoreListener {
 		insertingImagesNotification.remove(imageInsertAbortedEvent.image());
 	}
 
+	/**
+	 * Notifies the web interface that an {@link Image} insert is finished.
+	 *
+	 * @param imageInsertFinishedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
+		insertingImagesNotification.remove(imageInsertFinishedEvent.image());
+		insertedImagesNotification.add(imageInsertFinishedEvent.image());
+		notificationManager.addNotification(insertedImagesNotification);
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void imageInsertFinished(Image image) {
-		insertingImagesNotification.remove(image);
-		insertedImagesNotification.add(image);
-		notificationManager.addNotification(insertedImagesNotification);
-	}
 
 	/**
 	 * {@inheritDoc}

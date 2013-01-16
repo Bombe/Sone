@@ -42,19 +42,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that an image was successfully inserted.
-	 *
-	 * @see CoreListener#imageInsertFinished(Image)
-	 * @param image
-	 *            The image that was inserted
-	 */
-	void fireImageInsertFinished(Image image) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.imageInsertFinished(image);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that an image failed to be inserted.
 	 *
 	 * @see CoreListener#imageInsertFailed(Image, Throwable)

@@ -36,6 +36,7 @@ import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
@@ -2518,7 +2519,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		image.setKey(key.toString());
 		deleteTemporaryImage(image.getId());
 		touchConfiguration();
-		coreListenerManager.fireImageInsertFinished(image);
+		eventBus.post(new ImageInsertFinishedEvent(image));
 	}
 
 	/**
