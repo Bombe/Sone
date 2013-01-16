@@ -33,6 +33,8 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.validation.Validation;
 
+import com.google.inject.Inject;
+
 /**
  * Updates WebOfTrust identity data in a background thread because communicating
  * with the WebOfTrust plugin can potentially last quite long.
@@ -60,6 +62,7 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * @param webOfTrustConnector
 	 *            The web of trust connector
 	 */
+	@Inject
 	public WebOfTrustUpdater(WebOfTrustConnector webOfTrustConnector) {
 		super("Trust Updater");
 		this.webOfTrustConnector = webOfTrustConnector;

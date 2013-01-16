@@ -131,6 +131,9 @@ import net.pterodactylus.util.version.Version;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
+
+import com.google.inject.Inject;
+
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
@@ -215,6 +218,7 @@ public class WebInterface implements CoreListener {
 	 * @param sonePlugin
 	 *            The Sone plugin
 	 */
+	@Inject
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();

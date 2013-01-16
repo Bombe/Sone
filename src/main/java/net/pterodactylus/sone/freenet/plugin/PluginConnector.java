@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.pterodactylus.util.collection.Pair;
+
+import com.google.inject.Inject;
+
 import freenet.pluginmanager.FredPluginTalker;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginRespirator;
@@ -49,6 +52,7 @@ public class PluginConnector implements FredPluginTalker {
 	 * @param pluginRespirator
 	 *            The plugin respirator
 	 */
+	@Inject
 	public PluginConnector(PluginRespirator pluginRespirator) {
 		this.pluginRespirator = pluginRespirator;
 	}

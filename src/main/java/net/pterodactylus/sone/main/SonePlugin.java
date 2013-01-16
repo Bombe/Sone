@@ -37,9 +37,17 @@ import net.pterodactylus.util.config.MapConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
+
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.google.inject.name.Names;
+
 import freenet.client.async.DatabaseDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
+import freenet.node.Node;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.FredPluginBaseL10n;
 import freenet.pluginmanager.FredPluginFCP;
@@ -106,9 +114,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 	/** The web of trust connector. */
 	private WebOfTrustConnector webOfTrustConnector;
-
-	/** The identity manager. */
-	private IdentityManager identityManager;
 
 	//
 	// ACCESSORS
@@ -178,33 +183,50 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			}
 		}
 
+		final Configuration startConfiguration = oldConfiguration;
+
+		/* Freenet injector configuration. */
+		AbstractModule freenetModule = new AbstractModule() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			protected void configure() {
+				bind(PluginRespirator.class).toInstance(SonePlugin.this.pluginRespirator);
+				bind(Node.class).toInstance(SonePlugin.this.pluginRespirator.getNode());
+			}
+		};
+		/* Sone injector configuration. */
+		AbstractModule soneModule = new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(Configuration.class).toInstance(startConfiguration);
+				bind(FreenetInterface.class).in(Singleton.class);
+				bind(PluginConnector.class).in(Singleton.class);
+				bind(WebOfTrustConnector.class).in(Singleton.class);
+				bind(WebOfTrustUpdater.class).in(Singleton.class);
+				bind(IdentityManager.class).in(Singleton.class);
+				bind(String.class).annotatedWith(Names.named("WebOfTrustContext")).toInstance("Sone");
+				bind(SonePlugin.class).toInstance(SonePlugin.this);
+				bind(FcpInterface.class).in(Singleton.class);
+			}
+		};
+		Injector injector = Guice.createInjector(freenetModule, soneModule);
+		core = injector.getInstance(Core.class);
+
+		/* create web of trust connector. */
+		webOfTrustConnector = injector.getInstance(WebOfTrustConnector.class);
+
+		/* create FCP interface. */
+		fcpInterface = injector.getInstance(FcpInterface.class);
+		core.setFcpInterface(fcpInterface);
+
+		/* create the web interface. */
+		webInterface = injector.getInstance(WebInterface.class);
+		core.addCoreListener(webInterface);
+
 		boolean startupFailed = true;
 		try {
-			/* create freenet interface. */
-			FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
-
-			/* create web of trust connector. */
-			PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
-			webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
-			identityManager = new IdentityManager(webOfTrustConnector, "Sone");
-
-			/* create trust updater. */
-			WebOfTrustUpdater trustUpdater = new WebOfTrustUpdater(webOfTrustConnector);
-			trustUpdater.init();
-
-			/* create core. */
-			core = new Core(oldConfiguration, freenetInterface, identityManager, trustUpdater);
-
-			/* create the web interface. */
-			webInterface = new WebInterface(this);
-			core.addCoreListener(webInterface);
-
-			/* create FCP interface. */
-			fcpInterface = new FcpInterface(core);
-			core.setFcpInterface(fcpInterface);
-
-			/* create the identity manager. */
-			identityManager.addIdentityListener(core);
 
 			/* start core! */
 			core.start();
@@ -215,7 +237,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webInterface.start();
 			webInterface.setFirstStart(firstStart);
 			webInterface.setNewConfig(newConfig);
-			identityManager.start();
 			startupFailed = false;
 		} finally {
 			if (startupFailed) {
@@ -240,9 +261,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			/* stop the core. */
 			core.stop();
-
-			/* stop the identity manager. */
-			identityManager.stop();
 
 			/* stop the web of trust connector. */
 			webOfTrustConnector.stop();

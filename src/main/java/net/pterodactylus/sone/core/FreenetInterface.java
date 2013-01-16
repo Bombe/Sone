@@ -33,6 +33,7 @@ import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
+import com.google.inject.Inject;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchException;
@@ -83,6 +84,7 @@ public class FreenetInterface {
 	 * @param node
 	 *            The node to interact with
 	 */
+	@Inject
 	public FreenetInterface(Node node) {
 		this.node = node;
 		this.client = node.clientCore.makeClient(RequestStarter.INTERACTIVE_PRIORITY_CLASS, false, true);

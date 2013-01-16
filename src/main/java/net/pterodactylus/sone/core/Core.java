@@ -70,6 +70,8 @@ import net.pterodactylus.util.version.Version;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.inject.Inject;
+
 import freenet.keys.FreenetURI;
 
 /**
@@ -192,6 +194,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 * @param webOfTrustUpdater
 	 *            The WebOfTrust updater
 	 */
+	@Inject
 	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater) {
 		super("Sone Core");
 		this.configuration = configuration;
@@ -1893,6 +1896,9 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		loadConfiguration();
 		updateChecker.addUpdateListener(this);
 		updateChecker.start();
+		identityManager.addIdentityListener(this);
+		identityManager.start();
+		webOfTrustUpdater.init();
 		webOfTrustUpdater.start();
 	}
 
@@ -1932,6 +1938,8 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		updateChecker.stop();
 		updateChecker.removeUpdateListener(this);
 		soneDownloader.stop();
+		identityManager.removeIdentityListener(this);
+		identityManager.stop();
 	}
 
 	//

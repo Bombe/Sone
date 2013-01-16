@@ -30,6 +30,9 @@ import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
+import com.google.inject.Inject;
+import com.google.inject.name.Named;
+
 /**
  * The identity manager takes care of loading and storing identities, their
  * contexts, and properties. It does so in a way that does not expose errors via
@@ -77,7 +80,8 @@ public class IdentityManager extends AbstractService {
 	 *            The context to focus on (may be {@code null} to ignore
 	 *            contexts)
 	 */
-	public IdentityManager(WebOfTrustConnector webOfTrustConnector, String context) {
+	@Inject
+	public IdentityManager(WebOfTrustConnector webOfTrustConnector, @Named("WebOfTrustContext") String context) {
 		super("Sone Identity Manager", false);
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.context = context;

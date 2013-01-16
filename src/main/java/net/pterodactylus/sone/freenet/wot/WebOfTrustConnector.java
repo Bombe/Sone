@@ -30,6 +30,9 @@ import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+
+import com.google.inject.Inject;
+
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -59,6 +62,7 @@ public class WebOfTrustConnector {
 	 * @param pluginConnector
 	 *            The plugin connector
 	 */
+	@Inject
 	public WebOfTrustConnector(PluginConnector pluginConnector) {
 		this.pluginConnector = pluginConnector;
 	}

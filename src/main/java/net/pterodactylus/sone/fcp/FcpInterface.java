@@ -29,6 +29,9 @@ import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.validation.Validation;
+
+import com.google.inject.Inject;
+
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
@@ -79,6 +82,7 @@ public class FcpInterface {
 	 * @param core
 	 *            The core
 	 */
+	@Inject
 	public FcpInterface(Core core) {
 		commands.put("Version", new VersionCommand(core));
 		commands.put("GetLocalSones", new GetLocalSonesCommand(core));
