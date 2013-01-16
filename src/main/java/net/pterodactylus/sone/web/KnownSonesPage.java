@@ -104,6 +104,10 @@ public class KnownSonesPage extends SoneTemplatePage {
 					return sone.isKnown();
 				}
 			});
+		} else if ("own".equals(filter)) {
+			knownSones = Filters.filteredList(knownSones, Sone.LOCAL_SONE_FILTER);
+		} else if ("not-own".equals(filter)) {
+			knownSones = Filters.filteredList(knownSones, Filters.reverseFilter(Sone.LOCAL_SONE_FILTER));
 		}
 		if ("activity".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
