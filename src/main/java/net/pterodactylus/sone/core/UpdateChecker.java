@@ -26,12 +26,11 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.version.Version;
-import freenet.client.FetchResult;
 import freenet.keys.FreenetURI;
 import freenet.support.api.Bucket;
 
@@ -168,12 +167,12 @@ public class UpdateChecker {
 			public void editionFound(FreenetURI uri, long edition, boolean newKnownGood, boolean newSlot) {
 				logger.log(Level.FINEST, String.format("Found update for %s: %d, %s, %s", uri, edition, newKnownGood, newSlot));
 				if (newKnownGood || newSlot) {
-					Pair<FreenetURI, FetchResult> uriResult = freenetInterface.fetchUri(uri.setMetaString(new String[] { "sone.properties" }));
+					Fetched uriResult = freenetInterface.fetchUri(uri.setMetaString(new String[] { "sone.properties" }));
 					if (uriResult == null) {
 						logger.log(Level.WARNING, String.format("Could not fetch properties of latest homepage: %s", uri));
 						return;
 					}
-					Bucket resultBucket = uriResult.getRight().asBucket();
+					Bucket resultBucket = uriResult.getFetchResult().asBucket();
 					try {
 						parseProperties(resultBucket.getInputStream(), edition);
 						latestEdition = edition;

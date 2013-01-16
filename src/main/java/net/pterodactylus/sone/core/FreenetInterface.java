@@ -29,7 +29,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
@@ -101,13 +100,13 @@ public class FreenetInterface {
 	 *            The URI to fetch
 	 * @return The result of the fetch, or {@code null} if an error occured
 	 */
-	public Pair<FreenetURI, FetchResult> fetchUri(FreenetURI uri) {
+	public Fetched fetchUri(FreenetURI uri) {
 		FetchResult fetchResult = null;
 		FreenetURI currentUri = new FreenetURI(uri);
 		while (true) {
 			try {
 				fetchResult = client.fetch(currentUri);
-				return new Pair<FreenetURI, FetchResult>(currentUri, fetchResult);
+				return new Fetched(currentUri, fetchResult);
 			} catch (FetchException fe1) {
 				if (fe1.getMode() == FetchException.PERMANENT_REDIRECT) {
 					currentUri = fe1.newURI;
@@ -299,6 +298,56 @@ public class FreenetInterface {
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.INFO, String.format("Could not unregister invalid USK: %s", uri), mue1);
 		}
+	}
+
+	/**
+	 * Container for a fetched URI and the {@link FetchResult}.
+	 *
+	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
+	 */
+	public static class Fetched {
+
+		/** The fetched URI. */
+		private final FreenetURI freenetUri;
+
+		/** The fetch result. */
+		private final FetchResult fetchResult;
+
+		/**
+		 * Creates a new fetched URI.
+		 *
+		 * @param freenetUri
+		 *            The URI that was fetched
+		 * @param fetchResult
+		 *            The fetch result
+		 */
+		public Fetched(FreenetURI freenetUri, FetchResult fetchResult) {
+			this.freenetUri = freenetUri;
+			this.fetchResult = fetchResult;
+		}
+
+		//
+		// ACCESSORS
+		//
+
+		/**
+		 * Returns the fetched URI.
+		 *
+		 * @return The fetched URI
+		 */
+		public FreenetURI getFreenetUri() {
+			return freenetUri;
+		}
+
+		/**
+		 * Returns the fetch result.
+		 *
+		 * @return The fetch result
+		 */
+		public FetchResult getFetchResult() {
+			return fetchResult;
+		}
+
 	}
 
 	/**

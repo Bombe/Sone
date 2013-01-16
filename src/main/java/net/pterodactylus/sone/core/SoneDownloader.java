@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -34,7 +35,6 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.util.collection.Pair;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
@@ -155,13 +155,13 @@ public class SoneDownloader extends AbstractService {
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		sone.setStatus(SoneStatus.downloading);
 		try {
-			Pair<FreenetURI, FetchResult> fetchResults = freenetInterface.fetchUri(requestUri);
+			Fetched fetchResults = freenetInterface.fetchUri(requestUri);
 			if (fetchResults == null) {
 				/* TODO - mark Sone as bad. */
 				return null;
 			}
-			logger.log(Level.FINEST, String.format("Got %d bytes back.", fetchResults.getRight().size()));
-			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
+			logger.log(Level.FINEST, String.format("Got %d bytes back.", fetchResults.getFetchResult().size()));
+			Sone parsedSone = parseSone(sone, fetchResults.getFetchResult(), fetchResults.getFreenetUri());
 			if (parsedSone != null) {
 				if (!fetchOnly) {
 					core.updateSone(parsedSone);

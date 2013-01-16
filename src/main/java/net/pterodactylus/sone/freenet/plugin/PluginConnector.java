@@ -21,8 +21,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.pterodactylus.util.collection.Pair;
-
 import com.google.inject.Inject;
 
 import freenet.pluginmanager.FredPluginTalker;
@@ -44,7 +42,7 @@ public class PluginConnector implements FredPluginTalker {
 	private final PluginRespirator pluginRespirator;
 
 	/** Connector listener managers for all plugin connections. */
-	private final Map<Pair<String, String>, ConnectorListenerManager> connectorListenerManagers = Collections.synchronizedMap(new HashMap<Pair<String, String>, ConnectorListenerManager>());
+	private final Map<PluginIdentifier, ConnectorListenerManager> connectorListenerManagers = Collections.synchronizedMap(new HashMap<PluginIdentifier, ConnectorListenerManager>());
 
 	/**
 	 * Creates a new plugin connector.
@@ -160,10 +158,10 @@ public class PluginConnector implements FredPluginTalker {
 	 *         and {@code create} is {@code false}
 	 */
 	private ConnectorListenerManager getConnectorListenerManager(String pluginName, String identifier, boolean create) {
-		ConnectorListenerManager connectorListenerManager = connectorListenerManagers.get(new Pair<String, String>(pluginName, identifier));
+		ConnectorListenerManager connectorListenerManager = connectorListenerManagers.get(new PluginIdentifier(pluginName, identifier));
 		if (create && (connectorListenerManager == null)) {
 			connectorListenerManager = new ConnectorListenerManager(this);
-			connectorListenerManagers.put(new Pair<String, String>(pluginName, identifier), connectorListenerManager);
+			connectorListenerManagers.put(new PluginIdentifier(pluginName, identifier), connectorListenerManager);
 		}
 		return connectorListenerManager;
 	}
@@ -202,6 +200,59 @@ public class PluginConnector implements FredPluginTalker {
 			return;
 		}
 		connectorListenerManager.fireReceivedReply(params, data);
+	}
+
+	/**
+	 * Container for identifying plugins. Plugins are identified by their plugin
+	 * name and their unique identifier.
+	 *
+	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
+	 */
+	private static class PluginIdentifier {
+
+		/** The plugin name. */
+		private final String pluginName;
+
+		/** The plugin identifier. */
+		private final String identifier;
+
+		/**
+		 * Creates a new plugin identifier.
+		 *
+		 * @param pluginName
+		 *            The name of the plugin
+		 * @param identifier
+		 *            The identifier of the plugin
+		 */
+		public PluginIdentifier(String pluginName, String identifier) {
+			this.pluginName = pluginName;
+			this.identifier = identifier;
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return pluginName.hashCode() ^ identifier.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof PluginIdentifier)) {
+				return false;
+			}
+			PluginIdentifier pluginIdentifier = (PluginIdentifier) object;
+			return pluginName.equals(pluginIdentifier.pluginName) && identifier.equals(pluginIdentifier.identifier);
+		}
+
 	}
 
 }
