@@ -41,6 +41,7 @@ import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
 import net.pterodactylus.sone.core.event.NewPostFoundEvent;
 import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
+import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -2433,7 +2434,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		synchronized (sones) {
 			sones.remove(identity.getId());
 		}
-		coreListenerManager.fireSoneRemoved(sone);
+		eventBus.post(new SoneRemovedEvent(sone));
 	}
 
 	//

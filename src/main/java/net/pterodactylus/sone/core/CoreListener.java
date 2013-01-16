@@ -34,14 +34,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that the given Sone was removed.
-	 *
-	 * @param sone
-	 *            The removed Sone
-	 */
-	public void soneRemoved(Sone sone);
-
-	/**
 	 * Notifies a listener that the given post was removed.
 	 *
 	 * @param post

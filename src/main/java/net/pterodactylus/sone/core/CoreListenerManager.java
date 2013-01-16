@@ -46,19 +46,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listener that the given Sone was removed.
-	 *
-	 * @see CoreListener#soneRemoved(Sone)
-	 * @param sone
-	 *            The removed Sone
-	 */
-	void fireSoneRemoved(Sone sone) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.soneRemoved(sone);
-		}
-	}
-
-	/**
 	 * Notifies all listener that the given post was removed.
 	 *
 	 * @see CoreListener#postRemoved(Post)
