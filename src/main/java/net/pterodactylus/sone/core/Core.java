@@ -419,7 +419,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 				sone = new Sone(id, true);
 				sones.put(id, sone);
 			}
-			if (!sone.isLocal()) {
+			if ((sone != null) && !sone.isLocal()) {
 				sone = new Sone(id, true);
 				sones.put(id, sone);
 			}
