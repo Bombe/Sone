@@ -24,11 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.pterodactylus.util.collection.IterableWrapper;
-import net.pterodactylus.util.collection.filter.NotNullFilter;
-import net.pterodactylus.util.collection.mapper.Mapper;
 import net.pterodactylus.util.object.Default;
 import net.pterodactylus.util.validation.Validation;
+
+import com.google.common.base.Function;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
@@ -208,15 +209,14 @@ public class Album implements Fingerprintable {
 	 * @return The images in this album
 	 */
 	public List<Image> getImages() {
-		return IterableWrapper.wrap(imageIds).map(new Mapper<String, Image>() {
+		return new ArrayList<Image>(Collections2.filter(Collections2.transform(imageIds, new Function<String, Image>() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
-			public Image map(String imageId) {
+			public Image apply(String imageId) {
 				return images.get(imageId);
 			}
-
-		}).filter(new NotNullFilter()).list();
+		}), Predicates.notNull()));
 	}
 
 	/**
