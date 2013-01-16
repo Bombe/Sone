@@ -20,7 +20,6 @@ package net.pterodactylus.sone.core;
 import java.util.EventListener;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.util.version.Version;
 
 /**
  * Listener interface for objects that want to be notified on certain
@@ -29,18 +28,6 @@ import net.pterodactylus.util.version.Version;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface CoreListener extends EventListener {
-
-	/**
-	 * Notifies a listener that a new version has been found.
-	 *
-	 * @param version
-	 *            The version that was found
-	 * @param releaseTime
-	 *            The release time of the new version
-	 * @param latestEdition
-	 *            The latest edition of the Sone homepage
-	 */
-	public void updateFound(Version version, long releaseTime, long latestEdition);
 
 	/**
 	 * Notifies a listener that an image has started being inserted.

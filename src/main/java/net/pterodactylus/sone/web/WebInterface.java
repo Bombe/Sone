@@ -51,6 +51,7 @@ import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
+import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -139,7 +140,6 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.thread.Ticker;
-import net.pterodactylus.util.version.Version;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
@@ -1022,20 +1022,23 @@ public class WebInterface implements CoreListener {
 		}
 	}
 
+	/**
+	 * Notifies the web interface that a new Sone version was found.
+	 *
+	 * @param updateFoundEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void updateFound(UpdateFoundEvent updateFoundEvent) {
+		newVersionNotification.getTemplateContext().set("latestVersion", updateFoundEvent.version());
+		newVersionNotification.getTemplateContext().set("latestEdition", updateFoundEvent.latestEdition());
+		newVersionNotification.getTemplateContext().set("releaseTime", updateFoundEvent.releaseTime());
+		notificationManager.addNotification(newVersionNotification);
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateFound(Version version, long releaseTime, long latestEdition) {
-		newVersionNotification.getTemplateContext().set("latestVersion", version);
-		newVersionNotification.getTemplateContext().set("latestEdition", latestEdition);
-		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
-		notificationManager.addNotification(newVersionNotification);
-	}
 
 	/**
 	 * {@inheritDoc}

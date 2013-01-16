@@ -19,7 +19,6 @@ package net.pterodactylus.sone.core;
 
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.event.AbstractListenerManager;
-import net.pterodactylus.util.version.Version;
 
 /**
  * Manager for {@link CoreListener}s.
@@ -41,23 +40,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 	// ACTIONS
 	//
-
-	/**
-	 * Notifies all listeners that a new version was found.
-	 *
-	 * @see CoreListener#updateFound(Version, long, long)
-	 * @param version
-	 *            The new version
-	 * @param releaseTime
-	 *            The release time of the new version
-	 * @param latestEdition
-	 *            The latest edition of the Sone homepage
-	 */
-	void fireUpdateFound(Version version, long releaseTime, long latestEdition) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.updateFound(version, releaseTime, latestEdition);
-		}
-	}
 
 	/**
 	 * Notifies all listeners that an image has started being inserted.

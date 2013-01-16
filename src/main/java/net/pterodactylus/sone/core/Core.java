@@ -49,6 +49,7 @@ import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
+import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -2453,7 +2454,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	 */
 	@Override
 	public void updateFound(Version version, long releaseTime, long latestEdition) {
-		coreListenerManager.fireUpdateFound(version, releaseTime, latestEdition);
+		eventBus.post(new UpdateFoundEvent(version, releaseTime, latestEdition));
 	}
 
 	//
