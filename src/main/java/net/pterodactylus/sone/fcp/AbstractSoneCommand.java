@@ -32,7 +32,9 @@ import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
 import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.util.collection.filter.Filters;
+
+import com.google.common.collect.Collections2;
+
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
 
@@ -335,7 +337,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			String postPrefix = prefix + postIndex++;
 			postBuilder.put(encodePost(post, postPrefix + ".", includeReplies));
 			if (includeReplies) {
-				postBuilder.put(encodeReplies(Filters.filteredList(core.getReplies(post), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
+				postBuilder.put(encodeReplies(Collections2.filter(core.getReplies(post), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
 			}
 		}
 

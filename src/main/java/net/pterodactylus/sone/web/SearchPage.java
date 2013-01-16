@@ -42,8 +42,6 @@ import net.pterodactylus.util.cache.MemoryCache;
 import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.collection.TimedMap;
-import net.pterodactylus.util.collection.filter.Filter;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.collection.mapper.Mapper;
 import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
@@ -52,6 +50,9 @@ import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * This page lets the user search for posts and replies that contain certain
@@ -74,7 +75,7 @@ public class SearchPage extends SoneTemplatePage {
 			for (Sone sone : webInterface.getCore().getSones()) {
 				posts.addAll(sone.getPosts());
 			}
-			return new DefaultCacheItem<Set<Hit<Post>>>(getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator()));
+			return new DefaultCacheItem<Set<Hit<Post>>>(getHits(Collections2.filter(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator()));
 		}
 
 	}, new TimedMap<List<Phrase>, CacheItem<Set<Hit<Post>>>>(300000));
@@ -132,9 +133,9 @@ public class SearchPage extends SoneTemplatePage {
 		}
 
 		Set<Sone> sones = webInterface.getCore().getSones();
-		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
+		Collection<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
-		Set<Hit<Post>> postHits;
+		Collection<Hit<Post>> postHits;
 		try {
 			postHits = hitCache.get(phrases);
 		} catch (CacheException ce1) {
@@ -144,8 +145,8 @@ public class SearchPage extends SoneTemplatePage {
 		}
 
 		/* now filter. */
-		soneHits = Filters.filteredSet(soneHits, Hit.POSITIVE_FILTER);
-		postHits = Filters.filteredSet(postHits, Hit.POSITIVE_FILTER);
+		soneHits = Collections2.filter(soneHits, Hit.POSITIVE_FILTER);
+		postHits = Collections2.filter(postHits, Hit.POSITIVE_FILTER);
 
 		/* now sort. */
 		List<Hit<Sone>> sortedSoneHits = new ArrayList<Hit<Sone>>(soneHits);
@@ -472,7 +473,7 @@ public class SearchPage extends SoneTemplatePage {
 			if (post.getRecipient() != null) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient()));
 			}
-			for (PostReply reply : Filters.filteredList(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLY_FILTER)) {
+			for (PostReply reply : Collections2.filter(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLY_FILTER)) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(reply.getSone()));
 				postString.append(' ').append(reply.getText());
 			}
@@ -582,10 +583,10 @@ public class SearchPage extends SoneTemplatePage {
 	private static class Hit<T> {
 
 		/** Filter for {@link Hit}s with a score of more than 0. */
-		public static final Filter<Hit<?>> POSITIVE_FILTER = new Filter<Hit<?>>() {
+		public static final Predicate<Hit<?>> POSITIVE_FILTER = new Predicate<Hit<?>>() {
 
 			@Override
-			public boolean filterObject(Hit<?> hit) {
+			public boolean apply(Hit<?> hit) {
 				return hit.getScore() > 0;
 			}
 

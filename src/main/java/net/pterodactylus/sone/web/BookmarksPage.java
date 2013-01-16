@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -25,11 +26,12 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.collection.filter.Filter;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * Page that lets the user browse all his bookmarked posts.
@@ -61,10 +63,10 @@ public class BookmarksPage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Set<Post> allPosts = webInterface.getCore().getBookmarkedPosts();
-		Set<Post> loadedPosts = Filters.filteredSet(allPosts, new Filter<Post>() {
+		Collection<Post> loadedPosts = Collections2.filter(allPosts, new Predicate<Post>() {
 
 			@Override
-			public boolean filterObject(Post post) {
+			public boolean apply(Post post) {
 				return post.getSone() != null;
 			}
 		});

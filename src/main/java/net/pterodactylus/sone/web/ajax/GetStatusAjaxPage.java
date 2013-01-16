@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,12 +33,13 @@ import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.collection.filter.Filter;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.object.HashCode;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -89,12 +91,12 @@ public class GetStatusAjaxPage extends JsonPage {
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		int notificationHash = HashCode.hashCode(notifications);
 		/* load new posts. */
-		Set<Post> newPosts = webInterface.getNewPosts();
+		Collection<Post> newPosts = webInterface.getNewPosts();
 		if (currentSone != null) {
-			newPosts = Filters.filteredSet(newPosts, new Filter<Post>() {
+			newPosts = Collections2.filter(newPosts, new Predicate<Post>() {
 
 				@Override
-				public boolean filterObject(Post post) {
+				public boolean apply(Post post) {
 					return ListNotificationFilters.isPostVisible(currentSone, post);
 				}
 
@@ -110,22 +112,22 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
-		Set<PostReply> newReplies = webInterface.getNewReplies();
+		Collection<PostReply> newReplies = webInterface.getNewReplies();
 		if (currentSone != null) {
-			newReplies = Filters.filteredSet(newReplies, new Filter<PostReply>() {
+			newReplies = Collections2.filter(newReplies, new Predicate<PostReply>() {
 
 				@Override
-				public boolean filterObject(PostReply reply) {
+				public boolean apply(PostReply reply) {
 					return ListNotificationFilters.isReplyVisible(currentSone, reply);
 				}
 
 			});
 		}
 		/* remove replies to unknown posts. */
-		newReplies = Filters.filteredSet(newReplies, new Filter<PostReply>() {
+		newReplies = Collections2.filter(newReplies, new Predicate<PostReply>() {
 
 			@Override
-			public boolean filterObject(PostReply reply) {
+			public boolean apply(PostReply reply) {
 				return (reply.getPost() != null) && (reply.getPost().getSone() != null);
 			}
 		});

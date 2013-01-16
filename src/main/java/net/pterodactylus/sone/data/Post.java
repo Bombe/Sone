@@ -19,7 +19,7 @@ package net.pterodactylus.sone.data;
 
 import java.util.Comparator;
 
-import net.pterodactylus.util.collection.filter.Filter;
+import com.google.common.base.Predicate;
 
 /**
  * A post is a short message that a user writes in his Sone to let other users
@@ -40,10 +40,10 @@ public interface Post {
 	};
 
 	/** Filter for posts with timestamps from the future. */
-	public static final Filter<Post> FUTURE_POSTS_FILTER = new Filter<Post>() {
+	public static final Predicate<Post> FUTURE_POSTS_FILTER = new Predicate<Post>() {
 
 		@Override
-		public boolean filterObject(Post post) {
+		public boolean apply(Post post) {
 			return post.getTime() <= System.currentTimeMillis();
 		}
 

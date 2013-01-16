@@ -20,7 +20,7 @@ package net.pterodactylus.sone.data;
 import java.util.Comparator;
 import java.util.UUID;
 
-import net.pterodactylus.util.collection.filter.Filter;
+import com.google.common.base.Predicate;
 
 /**
  * Abstract base class for all replies.
@@ -45,13 +45,13 @@ public abstract class Reply<T extends Reply<T>> {
 	};
 
 	/** Filter for replies with timestamps from the future. */
-	public static final Filter<Reply<?>> FUTURE_REPLY_FILTER = new Filter<Reply<?>>() {
+	public static final Predicate<Reply<?>> FUTURE_REPLY_FILTER = new Predicate<Reply<?>>() {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean filterObject(Reply<?> reply) {
+		public boolean apply(Reply<?> reply) {
 			return reply.getTime() <= System.currentTimeMillis();
 		}
 

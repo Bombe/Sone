@@ -104,7 +104,6 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.util.collection.SetBuilder;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -132,6 +131,7 @@ import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
 
+import com.google.common.collect.Collections2;
 import com.google.inject.Inject;
 
 import freenet.clients.http.SessionManager;
@@ -737,7 +737,7 @@ public class WebInterface implements CoreListener {
 	 *            The text to parse
 	 * @return All mentioned local Sones
 	 */
-	private Set<Sone> getMentionedSones(String text) {
+	private Collection<Sone> getMentionedSones(String text) {
 		/* we need no context to find mentioned Sones. */
 		Set<Sone> mentionedSones = new HashSet<Sone>();
 		try {
@@ -749,7 +749,7 @@ public class WebInterface implements CoreListener {
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, String.format("Could not parse post text: %s", text), ioe1);
 		}
-		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
+		return Collections2.filter(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}
 
 	/**

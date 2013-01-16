@@ -32,9 +32,11 @@ import net.pterodactylus.sone.core.Options;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.util.collection.filter.Filter;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.validation.Validation;
+
+import com.google.common.base.Predicate;
+
 import freenet.keys.FreenetURI;
 
 /**
@@ -141,29 +143,29 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	};
 
 	/** Filter to remove Sones that have not been downloaded. */
-	public static final Filter<Sone> EMPTY_SONE_FILTER = new Filter<Sone>() {
+	public static final Predicate<Sone> EMPTY_SONE_FILTER = new Predicate<Sone>() {
 
 		@Override
-		public boolean filterObject(Sone sone) {
+		public boolean apply(Sone sone) {
 			return sone.getTime() != 0;
 		}
 	};
 
 	/** Filter that matches all {@link Sone#isLocal() local Sones}. */
-	public static final Filter<Sone> LOCAL_SONE_FILTER = new Filter<Sone>() {
+	public static final Predicate<Sone> LOCAL_SONE_FILTER = new Predicate<Sone>() {
 
 		@Override
-		public boolean filterObject(Sone sone) {
+		public boolean apply(Sone sone) {
 			return sone.getIdentity() instanceof OwnIdentity;
 		}
 
 	};
 
 	/** Filter that matches Sones that have at least one album. */
-	public static final Filter<Sone> HAS_ALBUM_FILTER = new Filter<Sone>() {
+	public static final Predicate<Sone> HAS_ALBUM_FILTER = new Predicate<Sone>() {
 
 		@Override
-		public boolean filterObject(Sone sone) {
+		public boolean apply(Sone sone) {
 			return !sone.getAlbums().isEmpty();
 		}
 	};
