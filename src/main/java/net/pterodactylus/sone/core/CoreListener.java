@@ -32,14 +32,6 @@ import net.pterodactylus.util.version.Version;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener when a Sone was locked.
-	 *
-	 * @param sone
-	 *            The Sone that was locked
-	 */
-	public void soneLocked(Sone sone);
-
-	/**
 	 * Notifies a listener that a Sone was unlocked.
 	 *
 	 * @param sone

@@ -44,19 +44,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that the given Sone was locked.
-	 *
-	 * @see CoreListener#soneLocked(Sone)
-	 * @param sone
-	 *            The Sone that was locked
-	 */
-	void fireSoneLocked(Sone sone) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.soneLocked(sone);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that the given Sone was unlocked.
 	 *
 	 * @see CoreListener#soneUnlocked(Sone)
