@@ -30,14 +30,6 @@ import net.pterodactylus.sone.data.Image;
 public interface CoreListener extends EventListener {
 
 	/**
-	 * Notifies a listener that an image has started being inserted.
-	 *
-	 * @param image
-	 *            The image that is now inserted
-	 */
-	public void imageInsertStarted(Image image);
-
-	/**
 	 * Notifies a listener that an image insert was aborted by the user.
 	 *
 	 * @param image

@@ -37,6 +37,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.CoreListener;
+import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
@@ -1036,18 +1037,21 @@ public class WebInterface implements CoreListener {
 		notificationManager.addNotification(newVersionNotification);
 	}
 
+	/**
+	 * Notifies the web interface that an image insert was started
+	 *
+	 * @param imageInsertStartedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void imageInsertStarted(ImageInsertStartedEvent imageInsertStartedEvent) {
+		insertingImagesNotification.add(imageInsertStartedEvent.image());
+		notificationManager.addNotification(insertingImagesNotification);
+	}
+
 	//
 	// CORELISTENER METHODS
 	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void imageInsertStarted(Image image) {
-		insertingImagesNotification.add(image);
-		notificationManager.addNotification(insertingImagesNotification);
-	}
 
 	/**
 	 * {@inheritDoc}

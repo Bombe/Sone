@@ -42,19 +42,6 @@ public class CoreListenerManager extends AbstractListenerManager<Core, CoreListe
 	//
 
 	/**
-	 * Notifies all listeners that an image has started being inserted.
-	 *
-	 * @see CoreListener#imageInsertStarted(Image)
-	 * @param image
-	 *            The image that is now inserted
-	 */
-	void fireImageInsertStarted(Image image) {
-		for (CoreListener coreListener : getListeners()) {
-			coreListener.imageInsertStarted(image);
-		}
-	}
-
-	/**
 	 * Notifies all listeners that an image insert was aborted by the user.
 	 *
 	 * @see CoreListener#imageInsertAborted(Image)
