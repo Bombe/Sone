@@ -69,8 +69,8 @@ public class Options {
 		 * @param value
 		 *            The value to validate
 		 * @return {@code true} if this option does not have a {@link Validator}
-		 *         , or the {@link Validator} validates this object, {@code
-		 *         false} otherwise
+		 *         , or the {@link Validator} validates this object,
+		 *         {@code false} otherwise
 		 */
 		public boolean validate(T value);
 

@@ -294,7 +294,6 @@ public class WebOfTrustUpdater extends AbstractService {
 		 *
 		 * @return {@code true} if this job finished successfully, {@code false}
 		 *         otherwise
-		 *
 		 * @see WebOfTrustUpdater#stop()
 		 */
 		@SuppressWarnings("synthetic-access")
