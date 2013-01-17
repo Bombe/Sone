@@ -24,12 +24,13 @@ import java.util.Map;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.number.Numbers;
-import net.pterodactylus.util.object.Default;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
+
+import com.google.common.base.Optional;
 
 /**
  * Template filter that turns an {@link Image} into an HTML &lt;img&gt; tag,
@@ -105,8 +106,8 @@ public class ImageLinkFilter implements Filter {
 			linkTemplateContext.set("width", (int) (imageWidth * scale + 0.5));
 			linkTemplateContext.set("height", (int) (imageHeight * scale + 0.5));
 		}
-		linkTemplateContext.set("alt", Default.forNull(title, image.getDescription()));
-		linkTemplateContext.set("title", Default.forNull(title, image.getTitle()));
+		linkTemplateContext.set("alt", Optional.fromNullable(title).or(image.getDescription()));
+		linkTemplateContext.set("title", Optional.fromNullable(title).or(image.getTitle()));
 
 		StringWriter stringWriter = new StringWriter();
 		linkTemplate.render(linkTemplateContext, stringWriter);

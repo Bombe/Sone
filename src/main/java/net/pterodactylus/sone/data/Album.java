@@ -28,9 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.pterodactylus.util.object.Default;
-
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 
@@ -330,7 +329,7 @@ public class Album implements Fingerprintable {
 		if (albumImage == null) {
 			return null;
 		}
-		return Default.forNull(images.get(albumImage), images.values().iterator().next());
+		return Optional.fromNullable(images.get(albumImage)).or(images.values().iterator().next());
 	}
 
 	/**
