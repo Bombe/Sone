@@ -63,9 +63,13 @@ import net.pterodactylus.sone.data.impl.PostImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.freenet.wot.IdentityListener;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.event.IdentityAddedEvent;
+import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent;
+import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
+import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
+import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -92,7 +96,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements IdentityListener, SoneProvider, PostProvider {
+public class Core extends AbstractService implements SoneProvider, PostProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -1885,7 +1889,6 @@ public class Core extends AbstractService implements IdentityListener, SoneProvi
 	public void serviceStart() {
 		loadConfiguration();
 		updateChecker.start();
-		identityManager.addIdentityListener(this);
 		identityManager.start();
 		webOfTrustUpdater.init();
 		webOfTrustUpdater.start();
@@ -1925,7 +1928,6 @@ public class Core extends AbstractService implements IdentityListener, SoneProvi
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		soneDownloader.stop();
-		identityManager.removeIdentityListener(this);
 		identityManager.stop();
 	}
 
@@ -2310,15 +2312,15 @@ public class Core extends AbstractService implements IdentityListener, SoneProvi
 		}
 	}
 
-	//
-	// INTERFACE IdentityListener
-	//
-
 	/**
-	 * {@inheritDoc}
+	 * Notifies the core that a new {@link OwnIdentity} was added.
+	 *
+	 * @param ownIdentityAddedEvent
+	 *            The event
 	 */
-	@Override
-	public void ownIdentityAdded(OwnIdentity ownIdentity) {
+	@Subscribe
+	public void ownIdentityAdded(OwnIdentityAddedEvent ownIdentityAddedEvent) {
+		OwnIdentity ownIdentity = ownIdentityAddedEvent.ownIdentity();
 		logger.log(Level.FINEST, String.format("Adding OwnIdentity: %s", ownIdentity));
 		if (ownIdentity.hasContext("Sone")) {
 			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
@@ -2327,29 +2329,41 @@ public class Core extends AbstractService implements IdentityListener, SoneProvi
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the core that an {@link OwnIdentity} was removed.
+	 *
+	 * @param ownIdentityRemovedEvent
+	 *            The event
 	 */
-	@Override
-	public void ownIdentityRemoved(OwnIdentity ownIdentity) {
+	@Subscribe
+	public void ownIdentityRemoved(OwnIdentityRemovedEvent ownIdentityRemovedEvent) {
+		OwnIdentity ownIdentity = ownIdentityRemovedEvent.ownIdentity();
 		logger.log(Level.FINEST, String.format("Removing OwnIdentity: %s", ownIdentity));
 		trustedIdentities.remove(ownIdentity);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the core that a new {@link Identity} was added.
+	 *
+	 * @param identityAddedEvent
+	 *            The event
 	 */
-	@Override
-	public void identityAdded(OwnIdentity ownIdentity, Identity identity) {
+	@Subscribe
+	public void identityAdded(IdentityAddedEvent identityAddedEvent) {
+		Identity identity = identityAddedEvent.identity();
 		logger.log(Level.FINEST, String.format("Adding Identity: %s", identity));
-		trustedIdentities.get(ownIdentity).add(identity);
+		trustedIdentities.get(identityAddedEvent.ownIdentity()).add(identity);
 		addRemoteSone(identity);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the core that an {@link Identity} was updated.
+	 *
+	 * @param identityUpdatedEvent
+	 *            The event
 	 */
-	@Override
-	public void identityUpdated(OwnIdentity ownIdentity, final Identity identity) {
+	@Subscribe
+	public void identityUpdated(IdentityUpdatedEvent identityUpdatedEvent) {
+		final Identity identity = identityUpdatedEvent.identity();
 		soneDownloaders.execute(new Runnable() {
 
 			@Override
@@ -2365,10 +2379,15 @@ public class Core extends AbstractService implements IdentityListener, SoneProvi
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the core that an {@link Identity} was removed.
+	 *
+	 * @param identityRemovedEvent
+	 *            The event
 	 */
-	@Override
-	public void identityRemoved(OwnIdentity ownIdentity, Identity identity) {
+	@Subscribe
+	public void identityRemoved(IdentityRemovedEvent identityRemovedEvent) {
+		OwnIdentity ownIdentity = identityRemovedEvent.ownIdentity();
+		Identity identity = identityRemovedEvent.identity();
 		trustedIdentities.get(ownIdentity).remove(identity);
 		boolean foundIdentity = false;
 		for (Entry<OwnIdentity, Set<Identity>> trustedIdentity : trustedIdentities.entrySet()) {

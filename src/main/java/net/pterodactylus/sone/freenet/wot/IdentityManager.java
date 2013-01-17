@@ -27,9 +27,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
+import net.pterodactylus.sone.freenet.wot.event.IdentityAddedEvent;
+import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent;
+import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
+import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
+import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
 
@@ -39,7 +45,7 @@ import com.google.inject.name.Named;
  * exceptions but it only logs them and tries to return sensible defaults.
  * <p>
  * It is also responsible for polling identities from the Web of Trust plugin
- * and notifying registered {@link IdentityListener}s when {@link Identity}s and
+ * and sending events to the {@link EventBus} when {@link Identity}s and
  * {@link OwnIdentity}s are discovered or disappearing.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -55,8 +61,8 @@ public class IdentityManager extends AbstractService {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(IdentityManager.class);
 
-	/** The event manager. */
-	private final IdentityListenerManager identityListenerManager = new IdentityListenerManager();
+	/** The event bus. */
+	private final EventBus eventBus;
 
 	/** The Web of Trust connector. */
 	private final WebOfTrustConnector webOfTrustConnector;
@@ -74,6 +80,8 @@ public class IdentityManager extends AbstractService {
 	/**
 	 * Creates a new identity manager.
 	 *
+	 * @param eventBus
+	 *            The event bus
 	 * @param webOfTrustConnector
 	 *            The Web of Trust connector
 	 * @param context
@@ -81,34 +89,11 @@ public class IdentityManager extends AbstractService {
 	 *            contexts)
 	 */
 	@Inject
-	public IdentityManager(WebOfTrustConnector webOfTrustConnector, @Named("WebOfTrustContext") String context) {
+	public IdentityManager(EventBus eventBus, WebOfTrustConnector webOfTrustConnector, @Named("WebOfTrustContext") String context) {
 		super("Sone Identity Manager", false);
+		this.eventBus = eventBus;
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.context = context;
-	}
-
-	//
-	// LISTENER MANAGEMENT
-	//
-
-	/**
-	 * Adds a listener for identity events.
-	 *
-	 * @param identityListener
-	 *            The listener to add
-	 */
-	public void addIdentityListener(IdentityListener identityListener) {
-		identityListenerManager.addListener(identityListener);
-	}
-
-	/**
-	 * Removes a listener for identity events.
-	 *
-	 * @param identityListener
-	 *            The listener to remove
-	 */
-	public void removeIdentityListener(IdentityListener identityListener) {
-		identityListenerManager.removeListener(identityListener);
 	}
 
 	//
@@ -225,7 +210,7 @@ public class IdentityManager extends AbstractService {
 					/* find new identities. */
 					for (Identity currentIdentity : currentIdentities.get(ownIdentity).values()) {
 						if (!oldIdentities.containsKey(ownIdentity) || !oldIdentities.get(ownIdentity).containsKey(currentIdentity.getId())) {
-							identityListenerManager.fireIdentityAdded(ownIdentity, currentIdentity);
+							eventBus.post(new IdentityAddedEvent(ownIdentity, currentIdentity));
 						}
 					}
 
@@ -233,7 +218,7 @@ public class IdentityManager extends AbstractService {
 					if (oldIdentities.containsKey(ownIdentity)) {
 						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
 							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
-								identityListenerManager.fireIdentityRemoved(ownIdentity, oldIdentity);
+								eventBus.post(new IdentityRemovedEvent(ownIdentity, oldIdentity));
 							}
 						}
 
@@ -246,12 +231,12 @@ public class IdentityManager extends AbstractService {
 							Set<String> oldContexts = oldIdentity.getContexts();
 							Set<String> newContexts = newIdentity.getContexts();
 							if (oldContexts.size() != newContexts.size()) {
-								identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+								eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 								continue;
 							}
 							for (String oldContext : oldContexts) {
 								if (!newContexts.contains(oldContext)) {
-									identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+									eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 									break;
 								}
 							}
@@ -266,12 +251,12 @@ public class IdentityManager extends AbstractService {
 							Map<String, String> oldProperties = oldIdentity.getProperties();
 							Map<String, String> newProperties = newIdentity.getProperties();
 							if (oldProperties.size() != newProperties.size()) {
-								identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+								eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 								continue;
 							}
 							for (Entry<String, String> oldProperty : oldProperties.entrySet()) {
 								if (!newProperties.containsKey(oldProperty.getKey()) || !newProperties.get(oldProperty.getKey()).equals(oldProperty.getValue())) {
-									identityListenerManager.fireIdentityUpdated(ownIdentity, newIdentity);
+									eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 									break;
 								}
 							}
@@ -306,7 +291,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
 				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
 				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
-					identityListenerManager.fireOwnIdentityRemoved(new DefaultOwnIdentity(oldOwnIdentity));
+					eventBus.post(new OwnIdentityRemovedEvent(new DefaultOwnIdentity(oldOwnIdentity)));
 				}
 			}
 
@@ -314,7 +299,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
 				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
 				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
-					identityListenerManager.fireOwnIdentityAdded(new DefaultOwnIdentity(currentOwnIdentity));
+					eventBus.post(new OwnIdentityAddedEvent(new DefaultOwnIdentity(currentOwnIdentity)));
 				}
 			}
 
