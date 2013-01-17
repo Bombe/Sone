@@ -636,7 +636,7 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The type of the object to extract
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class HitMapper<T> implements Function<Hit<T>, T> {
+	private static class HitMapper<T> implements Function<Hit<T>, T> {
 
 		/**
 		 * {@inheritDoc}
