@@ -362,7 +362,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public Sone getSone(String id, boolean create) {
 		synchronized (sones) {
-			if (!sones.containsKey(id)) {
+			if (!sones.containsKey(id) && create) {
 				Sone sone = new Sone(id, false);
 				sones.put(id, sone);
 			}
