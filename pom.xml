@@ -102,22 +102,16 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
-	<reporting>
-		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.7</version>
 				<configuration>
-					<links>
-						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://java.pterodactylus.net/utils/apidocs/</link>
-						<link>http://java.pterodactylus.net/utils.json/apidocs/</link>
-					</links>
+					<detectLinks>true</detectLinks>
+					<detectJavaApiLink>true</detectJavaApiLink>
+					<footer>© 2010–2013 David ‘Bombe’ Roden</footer>
 				</configuration>
 			</plugin>
 		</plugins>
-	</reporting>
+	</build>
 </project>
