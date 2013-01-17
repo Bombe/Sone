@@ -58,7 +58,7 @@ public class NewPage extends SoneTemplatePage {
 	//
 
 	/**
-	 * {@inherit}
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {

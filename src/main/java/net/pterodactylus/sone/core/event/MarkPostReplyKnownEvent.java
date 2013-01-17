@@ -20,7 +20,7 @@ package net.pterodactylus.sone.core.event;
 import net.pterodactylus.sone.data.PostReply;
 
 /**
- * Event that signals that a {@line PostReply} has been marked as
+ * Event that signals that a {@link PostReply} has been marked as
  * {@link PostReply#isKnown() known}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>

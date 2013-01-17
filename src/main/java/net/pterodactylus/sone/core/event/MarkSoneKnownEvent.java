@@ -20,7 +20,7 @@ package net.pterodactylus.sone.core.event;
 import net.pterodactylus.sone.data.Sone;
 
 /**
- * Event that signals that a {@line Sone} has been marked as
+ * Event that signals that a {@link Sone} has been marked as
  * {@link Sone#isKnown() known}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
