@@ -19,9 +19,10 @@ package net.pterodactylus.sone.template;
 
 import java.util.Map;
 
-import net.pterodactylus.util.number.Hex;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.io.BaseEncoding;
 
 /**
  * Escapes double quotes, backslashes, carriage returns and line feeds, and
@@ -56,7 +57,7 @@ public class JavascriptFilter implements Filter {
 				javascriptString.append('\\');
 				javascriptString.append(c);
 			} else if (c < 32) {
-				javascriptString.append("\\x").append(Hex.toHex((byte) c));
+				javascriptString.append("\\x").append(BaseEncoding.base16().lowerCase().encode(new byte[] { (byte) c }));
 			} else {
 				javascriptString.append(c);
 			}
