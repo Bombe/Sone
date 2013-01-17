@@ -173,89 +173,91 @@ public class SoneInserter extends AbstractService {
 		long lastModificationTime = 0;
 		String lastInsertedFingerprint = lastInsertFingerprint;
 		String lastFingerprint = "";
-		while (!shouldStop()) { try {
-			/* check every seconds. */
-			sleep(1000);
+		while (!shouldStop()) {
+			try {
+				/* check every seconds. */
+				sleep(1000);
 
-			/* don’t insert locked Sones. */
-			if (core.isLocked(sone)) {
-				/* trigger redetection when the Sone is unlocked. */
-				synchronized (sone) {
-					modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
-				}
-				lastFingerprint = "";
-				lastModificationTime = 0;
-				continue;
-			}
-
-			InsertInformation insertInformation = null;
-			synchronized (sone) {
-				String fingerprint = sone.getFingerprint();
-				if (!fingerprint.equals(lastFingerprint)) {
-					if (fingerprint.equals(lastInsertedFingerprint)) {
-						modified = false;
-						lastModificationTime = 0;
-						logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
-					} else {
-						lastModificationTime = System.currentTimeMillis();
-						modified = true;
-						logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
-					}
-					lastFingerprint = fingerprint;
-				}
-				if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
-					lastInsertedFingerprint = fingerprint;
-					insertInformation = new InsertInformation(sone);
-				}
-			}
-
-			if (insertInformation != null) {
-				logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
-
-				boolean success = false;
-				try {
-					sone.setStatus(SoneStatus.inserting);
-					long insertTime = System.currentTimeMillis();
-					insertInformation.setTime(insertTime);
-					soneInsertListenerManager.fireInsertStarted();
-					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
-					soneInsertListenerManager.fireInsertFinished(System.currentTimeMillis() - insertTime);
-					/* at this point we might already be stopped. */
-					if (shouldStop()) {
-						/* if so, bail out, don’t change anything. */
-						break;
-					}
-					sone.setTime(insertTime);
-					sone.setLatestEdition(finalUri.getEdition());
-					core.touchConfiguration();
-					success = true;
-					logger.log(Level.INFO, String.format("Inserted Sone “%s” at %s.", sone.getName(), finalUri));
-				} catch (SoneException se1) {
-					soneInsertListenerManager.fireInsertAborted(se1);
-					logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
-				} finally {
-					sone.setStatus(SoneStatus.idle);
-				}
-
-				/*
-				 * reset modification counter if Sone has not been modified
-				 * while it was inserted.
-				 */
-				if (success) {
+				/* don’t insert locked Sones. */
+				if (core.isLocked(sone)) {
+					/* trigger redetection when the Sone is unlocked. */
 					synchronized (sone) {
-						if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
-							logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
-							lastModificationTime = 0;
-							lastInsertFingerprint = lastInsertedFingerprint;
-							core.touchConfiguration();
+						modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
+					}
+					lastFingerprint = "";
+					lastModificationTime = 0;
+					continue;
+				}
+
+				InsertInformation insertInformation = null;
+				synchronized (sone) {
+					String fingerprint = sone.getFingerprint();
+					if (!fingerprint.equals(lastFingerprint)) {
+						if (fingerprint.equals(lastInsertedFingerprint)) {
 							modified = false;
+							lastModificationTime = 0;
+							logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
+						} else {
+							lastModificationTime = System.currentTimeMillis();
+							modified = true;
+							logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
+						}
+						lastFingerprint = fingerprint;
+					}
+					if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
+						lastInsertedFingerprint = fingerprint;
+						insertInformation = new InsertInformation(sone);
+					}
+				}
+
+				if (insertInformation != null) {
+					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
+
+					boolean success = false;
+					try {
+						sone.setStatus(SoneStatus.inserting);
+						long insertTime = System.currentTimeMillis();
+						insertInformation.setTime(insertTime);
+						eventBus.post(new SoneInsertingEvent(sone));
+						FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+						eventBus.post(new SoneInsertedEvent(sone, System.currentTimeMillis() - insertTime));
+						/* at this point we might already be stopped. */
+						if (shouldStop()) {
+							/* if so, bail out, don’t change anything. */
+							break;
+						}
+						sone.setTime(insertTime);
+						sone.setLatestEdition(finalUri.getEdition());
+						core.touchConfiguration();
+						success = true;
+						logger.log(Level.INFO, String.format("Inserted Sone “%s” at %s.", sone.getName(), finalUri));
+					} catch (SoneException se1) {
+						eventBus.post(new SoneInsertAbortedEvent(sone, se1));
+						logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
+					} finally {
+						sone.setStatus(SoneStatus.idle);
+					}
+
+					/*
+					 * reset modification counter if Sone has not been modified
+					 * while it was inserted.
+					 */
+					if (success) {
+						synchronized (sone) {
+							if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
+								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
+								lastModificationTime = 0;
+								lastInsertFingerprint = lastInsertedFingerprint;
+								core.touchConfiguration();
+								modified = false;
+							}
 						}
 					}
 				}
+			} catch (Throwable t1) {
+				logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
 			}
-		} catch (Throwable t1) {
-			logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
-		}}
+		}
 	}
 
 	/**
