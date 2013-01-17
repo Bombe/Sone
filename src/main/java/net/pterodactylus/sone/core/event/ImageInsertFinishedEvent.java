@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core.event;
 
 import net.pterodactylus.sone.data.Image;
+import freenet.keys.FreenetURI;
 
 /**
  * Event that signals that an {@link Image} insert is finished.
@@ -26,14 +27,33 @@ import net.pterodactylus.sone.data.Image;
  */
 public class ImageInsertFinishedEvent extends ImageEvent {
 
+	/** The URI of the image. */
+	private final FreenetURI resultingUri;
+
 	/**
 	 * Creates a new “image insert finished” event.
 	 *
 	 * @param image
 	 *            The image whose insert finished
+	 * @param resultingUri
+	 *            The resulting URI of the image
 	 */
-	public ImageInsertFinishedEvent(Image image) {
+	public ImageInsertFinishedEvent(Image image, FreenetURI resultingUri) {
 		super(image);
+		this.resultingUri = resultingUri;
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the URI of the image.
+	 *
+	 * @return The URI of the image
+	 */
+	public FreenetURI resultingUri() {
+		return resultingUri;
 	}
 
 }

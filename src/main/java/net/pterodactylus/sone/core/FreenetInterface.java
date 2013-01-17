@@ -18,20 +18,23 @@
 package net.pterodactylus.sone.core;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
 import freenet.client.ClientMetadata;
@@ -65,6 +68,9 @@ public class FreenetInterface {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(FreenetInterface.class);
 
+	/** The event bus. */
+	private final EventBus eventBus;
+
 	/** The node to interact with. */
 	private final Node node;
 
@@ -80,11 +86,14 @@ public class FreenetInterface {
 	/**
 	 * Creates a new Freenet interface.
 	 *
+	 * @param eventBus
+	 *            The event bus
 	 * @param node
 	 *            The node to interact with
 	 */
 	@Inject
-	public FreenetInterface(Node node) {
+	public FreenetInterface(EventBus eventBus, Node node) {
+		this.eventBus = eventBus;
 		this.node = node;
 		this.client = node.clientCore.makeClient(RequestStarter.INTERACTIVE_PRIORITY_CLASS, false, true);
 	}
@@ -375,18 +384,18 @@ public class FreenetInterface {
 	}
 
 	/**
-	 * Insert token that can be used to add {@link ImageInsertListener}s and
-	 * cancel a running insert.
+	 * Insert token that can cancel a running insert and sends events.
 	 *
+	 * @see ImageInsertAbortedEvent
+	 * @see ImageInsertStartedEvent
+	 * @see ImageInsertFailedEvent
+	 * @see ImageInsertFinishedEvent
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class InsertToken implements ClientPutCallback {
 
 		/** The image being inserted. */
 		private final Image image;
-
-		/** The list of registered image insert listeners. */
-		private final List<ImageInsertListener> imageInsertListeners = Collections.synchronizedList(new ArrayList<ImageInsertListener>());
 
 		/** The client putter. */
 		private ClientPutter clientPutter;
@@ -405,30 +414,6 @@ public class FreenetInterface {
 		}
 
 		//
-		// LISTENER MANAGEMENT
-		//
-
-		/**
-		 * Adds the given listener to the list of registered listener.
-		 *
-		 * @param imageInsertListener
-		 *            The listener to add
-		 */
-		public void addImageInsertListener(ImageInsertListener imageInsertListener) {
-			imageInsertListeners.add(imageInsertListener);
-		}
-
-		/**
-		 * Removes the given listener from the list of registered listener.
-		 *
-		 * @param imageInsertListener
-		 *            The listener to remove
-		 */
-		public void removeImageInsertListener(ImageInsertListener imageInsertListener) {
-			imageInsertListeners.remove(imageInsertListener);
-		}
-
-		//
 		// ACCESSORS
 		//
 
@@ -436,15 +421,13 @@ public class FreenetInterface {
 		 * Sets the client putter that is inserting the image. This will also
 		 * signal all registered listeners that the image has started.
 		 *
-		 * @see ImageInsertListener#imageInsertStarted(Image)
 		 * @param clientPutter
 		 *            The client putter
 		 */
+		@SuppressWarnings("synthetic-access")
 		public void setClientPutter(ClientPutter clientPutter) {
 			this.clientPutter = clientPutter;
-			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
-				imageInsertListener.imageInsertStarted(image);
-			}
+			eventBus.post(new ImageInsertStartedEvent(image));
 		}
 
 		//
@@ -453,15 +436,11 @@ public class FreenetInterface {
 
 		/**
 		 * Cancels the running insert.
-		 *
-		 * @see ImageInsertListener#imageInsertAborted(Image)
 		 */
 		@SuppressWarnings("synthetic-access")
 		public void cancel() {
 			clientPutter.cancel(null, node.clientCore.clientContext);
-			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
-				imageInsertListener.imageInsertAborted(image);
-			}
+			eventBus.post(new ImageInsertAbortedEvent(image));
 		}
 
 		//
@@ -480,13 +459,12 @@ public class FreenetInterface {
 		 * {@inheritDoc}
 		 */
 		@Override
+		@SuppressWarnings("synthetic-access")
 		public void onFailure(InsertException insertException, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
-			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
-				if ((insertException != null) && ("Cancelled by user".equals(insertException.getMessage()))) {
-					imageInsertListener.imageInsertAborted(image);
-				} else {
-					imageInsertListener.imageInsertFailed(image, insertException);
-				}
+			if ((insertException != null) && ("Cancelled by user".equals(insertException.getMessage()))) {
+				eventBus.post(new ImageInsertAbortedEvent(image));
+			} else {
+				eventBus.post(new ImageInsertFailedEvent(image, insertException));
 			}
 		}
 
@@ -518,10 +496,9 @@ public class FreenetInterface {
 		 * {@inheritDoc}
 		 */
 		@Override
+		@SuppressWarnings("synthetic-access")
 		public void onSuccess(BaseClientPutter clientPutter, ObjectContainer objectContainer) {
-			for (ImageInsertListener imageInsertListener : imageInsertListeners) {
-				imageInsertListener.imageInsertFinished(image, resultingUri);
-			}
+			eventBus.post(new ImageInsertFinishedEvent(image, resultingUri));
 		}
 
 	}

@@ -42,9 +42,6 @@ public class ImageInserter {
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(ImageInserter.class);
 
-	/** The core. */
-	private final Core core;
-
 	/** The freenet interface. */
 	private final FreenetInterface freenetInterface;
 
@@ -54,19 +51,15 @@ public class ImageInserter {
 	/**
 	 * Creates a new image inserter.
 	 *
-	 * @param core
-	 *            The Sone core
 	 * @param freenetInterface
 	 *            The freenet interface
 	 */
-	public ImageInserter(Core core, FreenetInterface freenetInterface) {
-		this.core = core;
+	public ImageInserter(FreenetInterface freenetInterface) {
 		this.freenetInterface = freenetInterface;
 	}
 
 	/**
-	 * Inserts the given image. The {@link #core} will automatically added as
-	 * {@link ImageInsertListener} to the created {@link InsertToken}.
+	 * Inserts the given image.
 	 *
 	 * @param temporaryImage
 	 *            The temporary image data
@@ -78,7 +71,6 @@ public class ImageInserter {
 		try {
 			InsertToken insertToken = freenetInterface.new InsertToken(image);
 			insertTokens.put(image.getId(), insertToken);
-			insertToken.addImageInsertListener(core);
 			freenetInterface.insertImage(temporaryImage, image, insertToken);
 		} catch (SoneException se1) {
 			logger.log(Level.WARNING, "Could not insert image!", se1);
@@ -98,7 +90,6 @@ public class ImageInserter {
 			return;
 		}
 		insertToken.cancel();
-		insertToken.removeImageInsertListener(core);
 	}
 
 }

@@ -35,10 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
-import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
-import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
-import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
@@ -90,6 +87,7 @@ import net.pterodactylus.util.version.Version;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 
 import freenet.keys.FreenetURI;
@@ -99,7 +97,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener, ImageInsertListener {
+public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -223,7 +221,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
-		this.imageInserter = new ImageInserter(this, freenetInterface);
+		this.imageInserter = new ImageInserter(freenetInterface);
 		this.updateChecker = new UpdateChecker(freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
@@ -2462,47 +2460,18 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		eventBus.post(new SoneInsertAbortedEvent(sone, cause));
 	}
 
-	//
-	// SONEINSERTLISTENER METHODS
-	//
-
 	/**
-	 * {@inheritDoc}
+	 * Deletes the temporary image.
+	 *
+	 * @param imageInsertFinishedEvent
+	 *            The event
 	 */
-	@Override
-	public void imageInsertStarted(Image image) {
-		logger.log(Level.WARNING, String.format("Image insert started for %s...", image));
-		eventBus.post(new ImageInsertStartedEvent(image));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void imageInsertAborted(Image image) {
-		logger.log(Level.WARNING, String.format("Image insert aborted for %s.", image));
-		eventBus.post(new ImageInsertAbortedEvent(image));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void imageInsertFinished(Image image, FreenetURI key) {
-		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", image, key));
-		image.setKey(key.toString());
-		deleteTemporaryImage(image.getId());
+	@Subscribe
+	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
+		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", imageInsertFinishedEvent.image(), imageInsertFinishedEvent.resultingUri()));
+		imageInsertFinishedEvent.image().setKey(imageInsertFinishedEvent.resultingUri().toString());
+		deleteTemporaryImage(imageInsertFinishedEvent.image().getId());
 		touchConfiguration();
-		eventBus.post(new ImageInsertFinishedEvent(image));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void imageInsertFailed(Image image, Throwable cause) {
-		logger.log(Level.WARNING, String.format("Image insert failed for %s." + image), cause);
-		eventBus.post(new ImageInsertFailedEvent(image, cause));
 	}
 
 	/**
