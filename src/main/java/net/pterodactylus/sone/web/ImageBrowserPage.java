@@ -27,9 +27,11 @@ import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
 
 /**
  * The image browser page is the entry page for the image management.
@@ -90,7 +92,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 				albums.addAll(sone.getAllAlbums());
 			}
 			Collections.sort(albums, Album.TITLE_COMPARATOR);
-			Pagination<Album> albumPagination = new Pagination<Album>(albums, 12).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+			Pagination<Album> albumPagination = new Pagination<Album>(albums, 12).setPage(Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getParam("page"))).or(0));
 			templateContext.set("albumPagination", albumPagination);
 			templateContext.set("albums", albumPagination.getItems());
 			return;

@@ -26,12 +26,13 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.primitives.Ints;
 
 /**
  * Page that lets the user browse all his bookmarked posts.
@@ -72,7 +73,7 @@ public class BookmarksPage extends SoneTemplatePage {
 		});
 		List<Post> sortedPosts = new ArrayList<Post>(loadedPosts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
-		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getParam("page"))).or(0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 		templateContext.set("postsNotLoaded", allPosts.size() != loadedPosts.size());

@@ -25,10 +25,12 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+
+import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
 
 /**
  * This page lets the user edit the options of the Sone plugin.
@@ -78,31 +80,31 @@ public class OptionsPage extends SoneTemplatePage {
 				currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").set(ShowCustomAvatars.valueOf(showCustomAvatars));
 				webInterface.getCore().touchConfiguration();
 			}
-			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
+			Integer insertionDelay = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
 			if (!preferences.validateInsertionDelay(insertionDelay)) {
 				fieldErrors.add("insertion-delay");
 			} else {
 				preferences.setInsertionDelay(insertionDelay);
 			}
-			Integer postsPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
+			Integer postsPerPage = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4));
 			if (!preferences.validatePostsPerPage(postsPerPage)) {
 				fieldErrors.add("posts-per-page");
 			} else {
 				preferences.setPostsPerPage(postsPerPage);
 			}
-			Integer imagesPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4), null);
+			Integer imagesPerPage = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4));
 			if (!preferences.validateImagesPerPage(imagesPerPage)) {
 				fieldErrors.add("images-per-page");
 			} else {
 				preferences.setImagesPerPage(imagesPerPage);
 			}
-			Integer charactersPerPost = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
+			Integer charactersPerPost = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10));
 			if (!preferences.validateCharactersPerPost(charactersPerPost)) {
 				fieldErrors.add("characters-per-post");
 			} else {
 				preferences.setCharactersPerPost(charactersPerPost);
 			}
-			Integer postCutOffLength = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("post-cut-off-length", 10), null);
+			Integer postCutOffLength = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("post-cut-off-length", 10));
 			if (!preferences.validatePostCutOffLength(postCutOffLength)) {
 				fieldErrors.add("post-cut-off-length");
 			} else {
@@ -110,13 +112,13 @@ public class OptionsPage extends SoneTemplatePage {
 			}
 			boolean requireFullAccess = request.getHttpRequest().isPartSet("require-full-access");
 			preferences.setRequireFullAccess(requireFullAccess);
-			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
+			Integer positiveTrust = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
 			if (!preferences.validatePositiveTrust(positiveTrust)) {
 				fieldErrors.add("positive-trust");
 			} else {
 				preferences.setPositiveTrust(positiveTrust);
 			}
-			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
+			Integer negativeTrust = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
 			if (!preferences.validateNegativeTrust(negativeTrust)) {
 				fieldErrors.add("negative-trust");
 			} else {
@@ -129,7 +131,7 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setTrustComment(trustComment);
 			boolean fcpInterfaceActive = request.getHttpRequest().isPartSet("fcp-interface-active");
 			preferences.setFcpInterfaceActive(fcpInterfaceActive);
-			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
+			Integer fcpFullAccessRequiredInteger = Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1))).or(preferences.getFcpFullAccessRequired().ordinal());
 			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
 			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
 			webInterface.getCore().touchConfiguration();

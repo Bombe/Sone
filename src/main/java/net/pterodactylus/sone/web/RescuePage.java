@@ -20,10 +20,12 @@ package net.pterodactylus.sone.web;
 import net.pterodactylus.sone.core.SoneRescuer;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+
+import com.google.common.base.Optional;
+import com.google.common.primitives.Longs;
 
 /**
  * Page that lets the user control the rescue mode for a Sone.
@@ -59,7 +61,7 @@ public class RescuePage extends SoneTemplatePage {
 		SoneRescuer soneRescuer = webInterface.getCore().getSoneRescuer(currentSone);
 		if (request.getMethod() == Method.POST) {
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("fetch", 4))) {
-				long edition = Numbers.safeParseLong(request.getHttpRequest().getPartAsStringFailsafe("edition", 8), -1L);
+				long edition = Optional.fromNullable(Longs.tryParse(request.getHttpRequest().getPartAsStringFailsafe("edition", 8))).or(-1L);
 				if (edition > -1) {
 					soneRescuer.setEdition(edition);
 				}

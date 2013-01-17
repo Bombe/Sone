@@ -23,7 +23,6 @@ import java.util.Map;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -31,6 +30,7 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
 
 import com.google.common.base.Optional;
+import com.google.common.primitives.Ints;
 
 /**
  * Template filter that turns an {@link Image} into an HTML &lt;img&gt; tag,
@@ -77,8 +77,8 @@ public class ImageLinkFilter implements Filter {
 			return null;
 		}
 		String imageClass = String.valueOf(parameters.get("class"));
-		int maxWidth = Numbers.safeParseInteger(parameters.get("max-width"), Integer.MAX_VALUE);
-		int maxHeight = Numbers.safeParseInteger(parameters.get("max-height"), Integer.MAX_VALUE);
+		int maxWidth = Optional.fromNullable(Ints.tryParse(String.valueOf(parameters.get("max-width")))).or(Integer.MAX_VALUE);
+		int maxHeight = Optional.fromNullable(Ints.tryParse(String.valueOf(parameters.get("max-height")))).or(Integer.MAX_VALUE);
 		String mode = String.valueOf(parameters.get("mode"));
 		String title = String.valueOf(parameters.get("title"));
 

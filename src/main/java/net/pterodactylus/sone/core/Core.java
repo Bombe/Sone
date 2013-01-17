@@ -79,16 +79,17 @@ import net.pterodactylus.sone.utils.IntegerRangePredicate;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 import net.pterodactylus.util.thread.Ticker;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.common.primitives.Longs;
 import com.google.inject.Inject;
 
 import freenet.keys.FreenetURI;
@@ -823,7 +824,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.SEVERE, String.format("Could not convert the Identity’s URIs to Freenet URIs: %s, %s", ownIdentity.getInsertUri(), ownIdentity.getRequestUri()), mue1);
 				return null;
 			}
-			sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
+			sone.setLatestEdition(Optional.fromNullable(Longs.tryParse(ownIdentity.getProperty("Sone.LatestEdition"))).or(0L));
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
@@ -878,7 +879,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
 			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
-			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
+			sone.setLatestEdition(Optional.fromNullable(Longs.tryParse(identity.getProperty("Sone.LatestEdition"))).or(0L));
 			if (newSone) {
 				synchronized (knownSones) {
 					newSone = !knownSones.contains(sone.getId());
@@ -2393,7 +2394,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId(), false);
 				sone.setIdentity(identity);
-				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
+				sone.setLatestEdition(Optional.fromNullable(Longs.tryParse(identity.getProperty("Sone.LatestEdition"))).or(sone.getLatestEdition()));
 				soneDownloader.addSone(sone);
 				soneDownloader.fetchSone(sone);
 			}

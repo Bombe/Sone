@@ -23,10 +23,12 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+
+import com.google.common.primitives.Ints;
+
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -74,9 +76,9 @@ public class EditProfilePage extends SoneTemplatePage {
 				firstName = request.getHttpRequest().getPartAsStringFailsafe("first-name", 256).trim();
 				middleName = request.getHttpRequest().getPartAsStringFailsafe("middle-name", 256).trim();
 				lastName = request.getHttpRequest().getPartAsStringFailsafe("last-name", 256).trim();
-				birthDay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
-				birthMonth = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
-				birthYear = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
+				birthDay = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
+				birthMonth = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
+				birthYear = Ints.tryParse(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
 				avatarId = request.getHttpRequest().getPartAsStringFailsafe("avatarId", 36);
 				profile.setFirstName(firstName.length() > 0 ? firstName : null);
 				profile.setMiddleName(middleName.length() > 0 ? middleName : null);

@@ -27,12 +27,13 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
+import com.google.common.primitives.Ints;
 
 /**
  * The index page shows the main page of Sone. This page will contain the posts
@@ -88,7 +89,7 @@ public class IndexPage extends SoneTemplatePage {
 		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
 		List<Post> sortedPosts = new ArrayList<Post>(allPosts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
-		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getParam("page"))).or(0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}
