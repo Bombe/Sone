@@ -63,6 +63,7 @@ import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.data.impl.PostImpl;
+import net.pterodactylus.sone.data.impl.PostReplyImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -579,7 +580,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		synchronized (replies) {
 			PostReply reply = replies.get(replyId);
 			if (create && (reply == null)) {
-				reply = new PostReply(replyId);
+				reply = new PostReplyImpl(replyId);
 				replies.put(replyId, reply);
 			}
 			return reply;
@@ -1679,7 +1680,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
-		final PostReply reply = new PostReply(sone, post, System.currentTimeMillis(), text.trim());
+		final PostReply reply = new PostReplyImpl(sone, post, System.currentTimeMillis(), text.trim());
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
