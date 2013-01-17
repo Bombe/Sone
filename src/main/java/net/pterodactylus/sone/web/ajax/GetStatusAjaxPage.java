@@ -36,7 +36,6 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.object.HashCode;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -89,7 +88,6 @@ public class GetStatusAjaxPage extends JsonPage {
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
-		int notificationHash = HashCode.hashCode(notifications);
 		/* load new posts. */
 		Collection<Post> newPosts = webInterface.getNewPosts();
 		if (currentSone != null) {
@@ -140,7 +138,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notificationHash).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notifications.hashCode()).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**

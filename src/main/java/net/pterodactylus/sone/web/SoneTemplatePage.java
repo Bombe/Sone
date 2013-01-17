@@ -31,7 +31,6 @@ import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
 import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.object.HashCode;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -267,7 +266,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		templateContext.set("notifications", notifications);
-		templateContext.set("notificationHash", HashCode.hashCode(notifications));
+		templateContext.set("notificationHash", notifications.hashCode());
 	}
 
 	/**

@@ -32,7 +32,6 @@ import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.TemplateNotification;
-import net.pterodactylus.util.object.HashCode;
 import net.pterodactylus.util.template.TemplateContext;
 
 /**
@@ -81,12 +80,11 @@ public class GetNotificationsAjaxPage extends JsonPage {
 		Collection<Notification> notifications = webInterface.getNotifications().getNotifications();
 		List<Notification> filteredNotifications = ListNotificationFilters.filterNotifications(notifications, currentSone);
 		Collections.sort(filteredNotifications, Notification.CREATED_TIME_SORTER);
-		int notificationHash = HashCode.hashCode(filteredNotifications);
 		JsonArray jsonNotifications = new JsonArray();
 		for (Notification notification : filteredNotifications) {
 			jsonNotifications.add(createJsonNotification(request, notification));
 		}
-		return createSuccessJsonObject().put("notificationHash", notificationHash).put("notifications", jsonNotifications).put("options", createJsonOptions(currentSone));
+		return createSuccessJsonObject().put("notificationHash", filteredNotifications.hashCode()).put("notifications", jsonNotifications).put("options", createJsonOptions(currentSone));
 	}
 
 	//
