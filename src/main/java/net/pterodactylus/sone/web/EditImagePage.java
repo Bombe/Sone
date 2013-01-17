@@ -65,7 +65,7 @@ public class EditImagePage extends SoneTemplatePage {
 			}
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {
 				image.getAlbum().moveImageUp(image);
-			} else  if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
+			} else if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
 				image.getAlbum().moveImageDown(image);
 			} else {
 				String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
