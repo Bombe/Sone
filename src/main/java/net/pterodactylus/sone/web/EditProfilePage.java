@@ -1,5 +1,5 @@
 /*
- * Sone - EditProfilePage.java - Copyright © 2010–2012 David Roden
+ * Sone - EditProfilePage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
