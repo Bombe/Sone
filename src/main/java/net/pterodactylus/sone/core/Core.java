@@ -75,6 +75,7 @@ import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.utils.IntegerRangePredicate;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -82,11 +83,9 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 import net.pterodactylus.util.thread.Ticker;
-import net.pterodactylus.util.validation.EqualityValidator;
-import net.pterodactylus.util.validation.IntegerRangeValidator;
-import net.pterodactylus.util.validation.OrValidator;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -2188,7 +2187,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	@SuppressWarnings("unchecked")
 	private void loadConfiguration() {
 		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangeValidator(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
 
 			@Override
 			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
@@ -2196,13 +2195,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			}
 
 		}));
-		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
-		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangeValidator(1, Integer.MAX_VALUE)));
-		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
-		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, new OrValidator<Integer>(new IntegerRangeValidator(50, Integer.MAX_VALUE), new EqualityValidator<Integer>(-1))));
+		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
+		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
+		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, Predicates.or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
+		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, Predicates.or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
-		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangeValidator(0, 100)));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangeValidator(-100, 100)));
+		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangePredicate(0, 100)));
+		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangePredicate(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, new OptionWatcher<Boolean>() {
 

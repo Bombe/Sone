@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.pterodactylus.util.validation.Validator;
+import com.google.common.base.Predicate;
 
 /**
  * Stores various options that influence Sone’s behaviour.
@@ -68,9 +68,8 @@ public class Options {
 		 *
 		 * @param value
 		 *            The value to validate
-		 * @return {@code true} if this option does not have a {@link Validator}
-		 *         , or the {@link Validator} validates this object,
-		 *         {@code false} otherwise
+		 * @return {@code true} if this option does not have a validator, or the
+		 *         validator validates this object, {@code false} otherwise
 		 */
 		public boolean validate(T value);
 
@@ -127,7 +126,7 @@ public class Options {
 		private volatile T value;
 
 		/** The validator. */
-		private Validator<T> validator;
+		private Predicate<T> validator;
 
 		/** The option watcher. */
 		private final OptionWatcher<T> optionWatcher;
@@ -150,7 +149,7 @@ public class Options {
 		 * @param validator
 		 *            The validator for value validation (may be {@code null})
 		 */
-		public DefaultOption(T defaultValue, Validator<T> validator) {
+		public DefaultOption(T defaultValue, Predicate<T> validator) {
 			this(defaultValue, validator, null);
 		}
 
@@ -176,7 +175,7 @@ public class Options {
 		 * @param optionWatcher
 		 *            The option watcher (may be {@code null})
 		 */
-		public DefaultOption(T defaultValue, Validator<T> validator, OptionWatcher<T> optionWatcher) {
+		public DefaultOption(T defaultValue, Predicate<T> validator, OptionWatcher<T> optionWatcher) {
 			this.defaultValue = defaultValue;
 			this.validator = validator;
 			this.optionWatcher = optionWatcher;
@@ -214,7 +213,7 @@ public class Options {
 		 */
 		@Override
 		public boolean validate(T value) {
-			return (validator == null) || (value == null) || validator.validate(value);
+			return (validator == null) || (value == null) || validator.apply(value);
 		}
 
 		/**
@@ -222,7 +221,7 @@ public class Options {
 		 */
 		@Override
 		public void set(T value) {
-			if ((value != null) && (validator != null) && (!validator.validate(value))) {
+			if ((value != null) && (validator != null) && (!validator.apply(value))) {
 				throw new IllegalArgumentException("New Value (" + value + ") could not be validated.");
 			}
 			T oldValue = this.value;
