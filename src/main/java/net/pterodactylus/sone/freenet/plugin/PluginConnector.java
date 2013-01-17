@@ -17,10 +17,9 @@
 
 package net.pterodactylus.sone.freenet.plugin;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
 
+import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
 import freenet.pluginmanager.FredPluginTalker;
@@ -38,53 +37,24 @@ import freenet.support.api.Bucket;
  */
 public class PluginConnector implements FredPluginTalker {
 
+	/** The event bus. */
+	private final EventBus eventBus;
+
 	/** The plugin respirator. */
 	private final PluginRespirator pluginRespirator;
-
-	/** Connector listener managers for all plugin connections. */
-	private final Map<PluginIdentifier, ConnectorListenerManager> connectorListenerManagers = Collections.synchronizedMap(new HashMap<PluginIdentifier, ConnectorListenerManager>());
 
 	/**
 	 * Creates a new plugin connector.
 	 *
+	 * @param eventBus
+	 *            The event bus
 	 * @param pluginRespirator
 	 *            The plugin respirator
 	 */
 	@Inject
-	public PluginConnector(PluginRespirator pluginRespirator) {
+	public PluginConnector(EventBus eventBus, PluginRespirator pluginRespirator) {
+		this.eventBus = eventBus;
 		this.pluginRespirator = pluginRespirator;
-	}
-
-	//
-	// LISTENER MANAGEMENT
-	//
-
-	/**
-	 * Adds a connection listener for the given plugin connection.
-	 *
-	 * @param pluginName
-	 *            The name of the plugin
-	 * @param identifier
-	 *            The identifier of the connection
-	 * @param connectorListener
-	 *            The listener to add
-	 */
-	public void addConnectorListener(String pluginName, String identifier, ConnectorListener connectorListener) {
-		getConnectorListenerManager(pluginName, identifier).addListener(connectorListener);
-	}
-
-	/**
-	 * Removes a connection listener for the given plugin connection.
-	 *
-	 * @param pluginName
-	 *            The name of the plugin
-	 * @param identifier
-	 *            The identifier of the connection
-	 * @param connectorListener
-	 *            The listener to remove
-	 */
-	public void removeConnectorListener(String pluginName, String identifier, ConnectorListener connectorListener) {
-		getConnectorListenerManager(pluginName, identifier).removeListener(connectorListener);
 	}
 
 	//
@@ -130,43 +100,6 @@ public class PluginConnector implements FredPluginTalker {
 	//
 
 	/**
-	 * Returns the connection listener manager for the given plugin connection,
-	 * creating a new one if none does exist yet.
-	 *
-	 * @param pluginName
-	 *            The name of the plugin
-	 * @param identifier
-	 *            The identifier of the connection
-	 * @return The connection listener manager
-	 */
-	private ConnectorListenerManager getConnectorListenerManager(String pluginName, String identifier) {
-		return getConnectorListenerManager(pluginName, identifier, true);
-	}
-
-	/**
-	 * Returns the connection listener manager for the given plugin connection,
-	 * optionally creating a new one if none does exist yet.
-	 *
-	 * @param pluginName
-	 *            The name of the plugin
-	 * @param identifier
-	 *            The identifier of the connection
-	 * @param create
-	 *            {@code true} to create a new manager if there is none,
-	 *            {@code false} to return {@code null} in that case
-	 * @return The connection listener manager, or {@code null} if none existed
-	 *         and {@code create} is {@code false}
-	 */
-	private ConnectorListenerManager getConnectorListenerManager(String pluginName, String identifier, boolean create) {
-		ConnectorListenerManager connectorListenerManager = connectorListenerManagers.get(new PluginIdentifier(pluginName, identifier));
-		if (create && (connectorListenerManager == null)) {
-			connectorListenerManager = new ConnectorListenerManager(this);
-			connectorListenerManagers.put(new PluginIdentifier(pluginName, identifier), connectorListenerManager);
-		}
-		return connectorListenerManager;
-	}
-
-	/**
 	 * Returns the plugin talker for the given plugin connection.
 	 *
 	 * @param pluginName
@@ -194,65 +127,7 @@ public class PluginConnector implements FredPluginTalker {
 	 */
 	@Override
 	public void onReply(String pluginName, String identifier, SimpleFieldSet params, Bucket data) {
-		ConnectorListenerManager connectorListenerManager = getConnectorListenerManager(pluginName, identifier, false);
-		if (connectorListenerManager == null) {
-			/* we don’t care about events for this plugin. */
-			return;
-		}
-		connectorListenerManager.fireReceivedReply(params, data);
-	}
-
-	/**
-	 * Container for identifying plugins. Plugins are identified by their plugin
-	 * name and their unique identifier.
-	 *
-	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
-	 */
-	private static class PluginIdentifier {
-
-		/** The plugin name. */
-		private final String pluginName;
-
-		/** The plugin identifier. */
-		private final String identifier;
-
-		/**
-		 * Creates a new plugin identifier.
-		 *
-		 * @param pluginName
-		 *            The name of the plugin
-		 * @param identifier
-		 *            The identifier of the plugin
-		 */
-		public PluginIdentifier(String pluginName, String identifier) {
-			this.pluginName = pluginName;
-			this.identifier = identifier;
-		}
-
-		//
-		// OBJECT METHODS
-		//
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return pluginName.hashCode() ^ identifier.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(Object object) {
-			if (!(object instanceof PluginIdentifier)) {
-				return false;
-			}
-			PluginIdentifier pluginIdentifier = (PluginIdentifier) object;
-			return pluginName.equals(pluginIdentifier.pluginName) && identifier.equals(pluginIdentifier.identifier);
-		}
-
+		eventBus.post(new ReceivedReplyEvent(this, pluginName, identifier, params, data));
 	}
 
 }
