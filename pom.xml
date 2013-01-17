@@ -109,6 +109,7 @@
 				<configuration>
 					<detectLinks>true</detectLinks>
 					<detectJavaApiLink>true</detectJavaApiLink>
+					<show>private</show>
 					<footer>© 2010–2013 David ‘Bombe’ Roden</footer>
 				</configuration>
 			</plugin>
