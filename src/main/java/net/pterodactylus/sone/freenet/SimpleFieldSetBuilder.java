@@ -17,7 +17,8 @@
 
 package net.pterodactylus.sone.freenet;
 
-import net.pterodactylus.util.validation.Validation;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import freenet.support.SimpleFieldSet;
 
 /**
@@ -46,8 +47,7 @@ public class SimpleFieldSetBuilder {
 	 *            The simple field set to build
 	 */
 	public SimpleFieldSetBuilder(SimpleFieldSet simpleFieldSet) {
-		Validation.begin().isNotNull("Simple Field Set", simpleFieldSet).check();
-		this.simpleFieldSet = simpleFieldSet;
+		this.simpleFieldSet = checkNotNull(simpleFieldSet, "simpleFieldSet must not be null");
 	}
 
 	/**

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +30,6 @@ import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.validation.Validation;
 
 import com.google.inject.Inject;
 
@@ -122,8 +123,7 @@ public class FcpInterface {
 	 *            The action level for which full FCP access is required
 	 */
 	public void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
-		Validation.begin().isNotNull("FullAccessRequired", fullAccessRequired).check();
-		this.fullAccessRequired = fullAccessRequired;
+		this.fullAccessRequired = checkNotNull(fullAccessRequired, "fullAccessRequired must not be null");
 	}
 
 	//

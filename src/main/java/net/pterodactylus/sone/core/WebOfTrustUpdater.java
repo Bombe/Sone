@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -31,7 +33,6 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
-import net.pterodactylus.util.validation.Validation;
 
 import com.google.inject.Inject;
 
@@ -474,9 +475,8 @@ public class WebOfTrustUpdater extends AbstractService {
 		 */
 		@SuppressWarnings("synthetic-access")
 		public WebOfTrustContextUpdateJob(OwnIdentity ownIdentity, String context) {
-			Validation.begin().isNotNull("OwnIdentity", ownIdentity).isNotNull("Context", context).check();
-			this.ownIdentity = ownIdentity;
-			this.context = context;
+			this.ownIdentity = checkNotNull(ownIdentity, "ownIdentity must not be null");
+			this.context = checkNotNull(context, "context must not be null");
 		}
 
 		//

@@ -17,12 +17,14 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
-import net.pterodactylus.util.validation.Validation;
 
 /**
  * A profile stores personal information about a {@link Sone}. All information
@@ -237,7 +239,7 @@ public class Profile implements Fingerprintable {
 			this.avatar = null;
 			return this;
 		}
-		Validation.begin().isEqual("Image Owner", avatar.getSone(), sone).check();
+		checkArgument(avatar.getSone().equals(sone), "avatar must belong to Sone");
 		this.avatar = avatar.getId();
 		return this;
 	}
@@ -283,7 +285,7 @@ public class Profile implements Fingerprintable {
 	 *         field with the given ID
 	 */
 	public Field getFieldById(String fieldId) {
-		Validation.begin().isNotNull("Field ID", fieldId).check();
+		checkNotNull(fieldId, "fieldId must not be null");
 		for (Field field : fields) {
 			if (field.getId().equals(fieldId)) {
 				return field;
@@ -319,7 +321,9 @@ public class Profile implements Fingerprintable {
 	 *             if the name is not valid
 	 */
 	public Field addField(String fieldName) throws IllegalArgumentException {
-		Validation.begin().isNotNull("Field Name", fieldName).check().isGreater("Field Name Length", fieldName.length(), 0).isNull("Field Name Unique", getFieldByName(fieldName)).check();
+		checkNotNull(fieldName, "fieldName must not be null");
+		checkArgument(fieldName.length() > 0, "fieldName must not be empty");
+		checkState(getFieldByName(fieldName) == null, "fieldName must be unique");
 		@SuppressWarnings("synthetic-access")
 		Field field = new Field().setName(fieldName);
 		fields.add(field);
@@ -335,7 +339,9 @@ public class Profile implements Fingerprintable {
 	 *            The field to move up
 	 */
 	public void moveFieldUp(Field field) {
-		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isGreater("Field Index", getFieldIndex(field), 0).check();
+		checkNotNull(field, "field must not be null");
+		checkArgument(hasField(field), "field must belong to this profile");
+		checkArgument(getFieldIndex(field) > 0, "field index must be > 0");
 		int fieldIndex = getFieldIndex(field);
 		fields.remove(field);
 		fields.add(fieldIndex - 1, field);
@@ -350,7 +356,9 @@ public class Profile implements Fingerprintable {
 	 *            The field to move down
 	 */
 	public void moveFieldDown(Field field) {
-		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isLess("Field Index", getFieldIndex(field), fields.size() - 1).check();
+		checkNotNull(field, "field must not be null");
+		checkArgument(hasField(field), "field must belong to this profile");
+		checkArgument(getFieldIndex(field) < fields.size() - 1, "field index must be < " + (fields.size() - 1));
 		int fieldIndex = getFieldIndex(field);
 		fields.remove(field);
 		fields.add(fieldIndex + 1, field);
@@ -363,7 +371,8 @@ public class Profile implements Fingerprintable {
 	 *            The field to remove
 	 */
 	public void removeField(Field field) {
-		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).check();
+		checkNotNull(field, "field must not be null");
+		checkArgument(hasField(field), "field must belong to this profile");
 		fields.remove(field);
 	}
 
@@ -455,8 +464,7 @@ public class Profile implements Fingerprintable {
 		 *            The ID of the field
 		 */
 		private Field(String id) {
-			Validation.begin().isNotNull("Field ID", id).check();
-			this.id = id;
+			this.id = checkNotNull(id, "id must not be null");
 		}
 
 		/**
@@ -487,7 +495,8 @@ public class Profile implements Fingerprintable {
 		 * @return This field
 		 */
 		public Field setName(String name) {
-			Validation.begin().isNotNull("Field Name", name).check().is("Field Unique", (getFieldByName(name) == null) || equals(getFieldByName(name))).check();
+			checkNotNull(name, "name must not be null");
+			checkArgument(getFieldByName(name) == null, "name must be unique");
 			this.name = name;
 			return this;
 		}

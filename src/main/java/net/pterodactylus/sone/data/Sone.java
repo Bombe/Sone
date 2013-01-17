@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +36,6 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.validation.Validation;
 
 import com.google.common.base.Predicate;
 
@@ -422,8 +424,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *             if {@code status} is {@code null}
 	 */
 	public Sone setStatus(SoneStatus status) {
-		Validation.begin().isNotNull("Sone Status", status).check();
-		this.status = status;
+		this.status = checkNotNull(status, "status must not be null");
 		return this;
 	}
 
@@ -808,7 +809,8 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The album to add
 	 */
 	public void addAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
 		if (!albums.contains(album)) {
 			albums.add(album);
 		}
@@ -821,7 +823,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The albums of this Sone
 	 */
 	public void setAlbums(Collection<? extends Album> albums) {
-		Validation.begin().isNotNull("Albums", albums).check();
+		checkNotNull(albums, "albums must not be null");
 		this.albums.clear();
 		for (Album album : albums) {
 			addAlbum(album);
@@ -835,7 +837,8 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *            The album to remove
 	 */
 	public void removeAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
 		albums.remove(album);
 	}
 
@@ -849,7 +852,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *         <code>null</code> if the album did not change its place
 	 */
 	public Album moveAlbumUp(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).isNull("Album Parent", album.getParent()).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
+		checkArgument(album.getParent() == null, "album must not have a parent");
 		int oldIndex = albums.indexOf(album);
 		if (oldIndex <= 0) {
 			return null;
@@ -869,7 +874,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 *         <code>null</code> if the album did not change its place
 	 */
 	public Album moveAlbumDown(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.getSone(), this).isNull("Album Parent", album.getParent()).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
+		checkArgument(album.getParent() == null, "album must not have a parent");
 		int oldIndex = albums.indexOf(album);
 		if ((oldIndex < 0) || (oldIndex >= (albums.size() - 1))) {
 			return null;

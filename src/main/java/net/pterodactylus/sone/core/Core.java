@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -81,7 +84,6 @@ import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.validation.EqualityValidator;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.OrValidator;
-import net.pterodactylus.util.validation.Validation;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -296,7 +298,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The Sone rescuer for the given Sone
 	 */
 	public SoneRescuer getSoneRescuer(Sone sone) {
-		Validation.begin().isNotNull("Sone", sone).check().is("Local Sone", sone.isLocal()).check();
+		checkNotNull(sone, "sone must not be null");
+		checkArgument(sone.isLocal(), "sone must be local");
 		synchronized (sones) {
 			SoneRescuer soneRescuer = soneRescuers.get(sone);
 			if (soneRescuer == null) {
@@ -500,7 +503,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return {@code true} if the target Sone is trusted by the origin Sone
 	 */
 	public boolean isSoneTrusted(Sone origin, Sone target) {
-		Validation.begin().isNotNull("Origin", origin).isNotNull("Target", target).check().isInstanceOf("Origin’s OwnIdentity", origin.getIdentity(), OwnIdentity.class).check();
+		checkNotNull(origin, "origin must not be null");
+		checkNotNull(target, "target must not be null");
+		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin’s identity must be an OwnIdentity");
 		return trustedIdentities.containsKey(origin.getIdentity()) && trustedIdentities.get(origin.getIdentity()).contains(target.getIdentity());
 	}
 
@@ -546,7 +551,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return All posts that have the given Sone as recipient
 	 */
 	public Set<Post> getDirectedPosts(Sone recipient) {
-		Validation.begin().isNotNull("Recipient", recipient).check();
+		checkNotNull(recipient, "recipient must not be null");
 		Set<Post> directedPosts = new HashSet<Post>();
 		synchronized (posts) {
 			for (Post post : posts.values()) {
@@ -911,7 +916,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The ID of the Sone to follow
 	 */
 	public void followSone(Sone sone, String soneId) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		checkNotNull(sone, "sone must not be null");
+		checkNotNull(soneId, "soneId must not be null");
 		Sone followedSone = getSone(soneId, true);
 		if (followedSone == null) {
 			logger.log(Level.INFO, String.format("Ignored Sone with invalid ID: %s", soneId));
@@ -932,7 +938,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The Sone that should be followed
 	 */
 	public void followSone(Sone sone, Sone followedSone) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Followed Sone", followedSone).check();
+		checkNotNull(sone, "sone must not be null");
+		checkNotNull(followedSone, "followedSone must not be null");
 		sone.addFriend(followedSone.getId());
 		synchronized (soneFollowingTimes) {
 			if (!soneFollowingTimes.containsKey(followedSone)) {
@@ -962,7 +969,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The ID of the Sone being unfollowed
 	 */
 	public void unfollowSone(Sone sone, String soneId) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Sone ID", soneId).check();
+		checkNotNull(sone, "sone must not be null");
+		checkNotNull(soneId, "soneId must not be null");
 		unfollowSone(sone, getSone(soneId, false));
 	}
 
@@ -977,7 +985,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The Sone being unfollowed
 	 */
 	public void unfollowSone(Sone sone, Sone unfollowedSone) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Unfollowed Sone", unfollowedSone).check();
+		checkNotNull(sone, "sone must not be null");
+		checkNotNull(unfollowedSone, "unfollowedSone must not be null");
 		sone.removeFriend(unfollowedSone.getId());
 		boolean unfollowedSoneStillFollowed = false;
 		for (Sone localSone : getLocalSones()) {
@@ -1002,7 +1011,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The trust value (from {@code -100} to {@code 100})
 	 */
 	public void setTrust(Sone origin, Sone target, int trustValue) {
-		Validation.begin().isNotNull("Trust Origin", origin).check().isInstanceOf("Trust Origin", origin.getIdentity(), OwnIdentity.class).isNotNull("Trust Target", target).isLessOrEqual("Trust Value", trustValue, 100).isGreaterOrEqual("Trust Value", trustValue, -100).check();
+		checkNotNull(origin, "origin must not be null");
+		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin must be a local Sone");
+		checkNotNull(target, "target must not be null");
+		checkArgument((trustValue >= -100) && (trustValue <= 100), "trustValue must be within [-100, 100]");
 		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), trustValue, preferences.getTrustComment());
 	}
 
@@ -1015,7 +1027,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The trust target
 	 */
 	public void removeTrust(Sone origin, Sone target) {
-		Validation.begin().isNotNull("Trust Origin", origin).isNotNull("Trust Target", target).check().isInstanceOf("Trust Origin Identity", origin.getIdentity(), OwnIdentity.class).check();
+		checkNotNull(origin, "origin must not be null");
+		checkNotNull(target, "target must not be null");
+		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin must be a local Sone");
 		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), null, null);
 	}
 
@@ -1517,7 +1531,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The created post
 	 */
 	public Post createPost(Sone sone, Sone recipient, long time, String text) {
-		Validation.begin().isNotNull("Text", text).check().isGreater("Text Length", text.length(), 0).check();
+		checkNotNull(text, "text must not be null");
+		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
@@ -1658,7 +1673,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The created reply
 	 */
 	public PostReply createReply(Sone sone, Post post, long time, String text) {
-		Validation.begin().isNotNull("Text", text).check().isGreater("Text Length", text.trim().length(), 0).check();
+		checkNotNull(text, "text must not be null");
+		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
@@ -1768,7 +1784,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The album to remove
 	 */
 	public void deleteAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().is("Local Sone", album.getSone().isLocal()).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.getSone().isLocal(), "album’s Sone must be a local Sone");
 		if (!album.isEmpty()) {
 			return;
 		}
@@ -1795,7 +1812,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The newly created image
 	 */
 	public Image createImage(Sone sone, Album album, TemporaryImage temporaryImage) {
-		Validation.begin().isNotNull("Sone", sone).isNotNull("Album", album).isNotNull("Temporary Image", temporaryImage).check().is("Local Sone", sone.isLocal()).check().isEqual("Owner and Album Owner", sone, album.getSone()).check();
+		checkNotNull(sone, "sone must not be null");
+		checkNotNull(album, "album must not be null");
+		checkNotNull(temporaryImage, "temporaryImage must not be null");
+		checkArgument(sone.isLocal(), "sone must be a local Sone");
+		checkArgument(sone.equals(album.getSone()), "album must belong to the given Sone");
 		Image image = new Image(temporaryImage.getId()).setSone(sone).setCreationTime(System.currentTimeMillis());
 		album.addImage(image);
 		synchronized (images) {
@@ -1814,7 +1835,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The image to delete
 	 */
 	public void deleteImage(Image image) {
-		Validation.begin().isNotNull("Image", image).check().is("Local Sone", image.getSone().isLocal()).check();
+		checkNotNull(image, "image must not be null");
+		checkArgument(image.getSone().isLocal(), "image must belong to a local Sone");
 		deleteTemporaryImage(image.getId());
 		image.getAlbum().removeImage(image);
 		synchronized (images) {
@@ -1848,7 +1870,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The temporary image to delete
 	 */
 	public void deleteTemporaryImage(TemporaryImage temporaryImage) {
-		Validation.begin().isNotNull("Temporary Image", temporaryImage).check();
+		checkNotNull(temporaryImage, "temporaryImage must not be null");
 		deleteTemporaryImage(temporaryImage.getId());
 	}
 
@@ -1859,7 +1881,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The ID of the temporary image to delete
 	 */
 	public void deleteTemporaryImage(String imageId) {
-		Validation.begin().isNotNull("Temporary Image ID", imageId).check();
+		checkNotNull(imageId, "imageId must not be null");
 		synchronized (temporaryImages) {
 			temporaryImages.remove(imageId);
 		}

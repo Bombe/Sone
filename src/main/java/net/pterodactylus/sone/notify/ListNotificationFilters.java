@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.notify;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +30,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.validation.Validation;
 
 /**
  * Filter for {@link ListNotification}s.
@@ -218,7 +219,7 @@ public class ListNotificationFilters {
 	 *         otherwise
 	 */
 	public static boolean isPostVisible(Sone sone, Post post) {
-		Validation.begin().isNotNull("Post", post).check();
+		checkNotNull(post, "post must not be null");
 		Sone postSone = post.getSone();
 		if (postSone == null) {
 			return false;
@@ -280,7 +281,7 @@ public class ListNotificationFilters {
 	 *         otherwise
 	 */
 	public static boolean isReplyVisible(Sone sone, PostReply reply) {
-		Validation.begin().isNotNull("Reply", reply).check();
+		checkNotNull(reply, "reply must not be null");
 		Post post = reply.getPost();
 		if (post == null) {
 			return false;

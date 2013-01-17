@@ -17,9 +17,10 @@
 
 package net.pterodactylus.sone.data;
 
-import java.util.UUID;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import net.pterodactylus.util.validation.Validation;
+import java.util.UUID;
 
 /**
  * A temporary image stores an uploaded image in memory until it has been
@@ -82,7 +83,8 @@ public class TemporaryImage {
 	 * @return This temporary image
 	 */
 	public TemporaryImage setMimeType(String mimeType) {
-		Validation.begin().isNotNull("MIME Type", mimeType).isNull("Previous MIME Type", this.mimeType).check();
+		checkNotNull(mimeType, "mimeType must not be null");
+		checkState(this.mimeType == null, "mime type must not already be set");
 		this.mimeType = mimeType;
 		return this;
 	}
@@ -105,7 +107,8 @@ public class TemporaryImage {
 	 * @return This temporary image
 	 */
 	public TemporaryImage setImageData(byte[] imageData) {
-		Validation.begin().isNotNull("Image Data", imageData).isNull("Previous Image Data", this.imageData).check();
+		checkNotNull(imageData, "imageData must not be null");
+		checkState(this.imageData == null, "image data must not already be set");
 		this.imageData = imageData;
 		return this;
 	}

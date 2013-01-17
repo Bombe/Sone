@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,7 +30,6 @@ import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.validation.Validation;
 
 /**
  * The image inserter is responsible for inserting images using
@@ -67,7 +69,9 @@ public class ImageInserter {
 	 *            The image
 	 */
 	public void insertImage(TemporaryImage temporaryImage, Image image) {
-		Validation.begin().isNotNull("Temporary Image", temporaryImage).isNotNull("Image", image).check().isEqual("Image IDs", image.getId(), temporaryImage.getId()).check();
+		checkNotNull(temporaryImage, "temporaryImage must not be null");
+		checkNotNull(image, "image must not be null");
+		checkArgument(image.getId().equals(temporaryImage.getId()), "image IDs must match");
 		try {
 			InsertToken insertToken = freenetInterface.new InsertToken(image);
 			insertTokens.put(image.getId(), insertToken);
