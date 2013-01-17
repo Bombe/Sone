@@ -20,13 +20,13 @@ package net.pterodactylus.sone.web.ajax;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
-import net.pterodactylus.util.number.Digits;
 
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
@@ -65,7 +65,7 @@ public class GetTimesAjaxPage extends JsonPage {
 				JsonObject postTime = new JsonObject();
 				Time time = getTime(post.getTime());
 				postTime.put("timeText", time.getText());
-				postTime.put("refreshTime", time.getRefresh() / Time.SECOND);
+				postTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
 				synchronized (dateFormat) {
 					postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
 				}
@@ -84,7 +84,7 @@ public class GetTimesAjaxPage extends JsonPage {
 				JsonObject replyTime = new JsonObject();
 				Time time = getTime(reply.getTime());
 				replyTime.put("timeText", time.getText());
-				replyTime.put("refreshTime", time.getRefresh() / Time.SECOND);
+				replyTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
 				synchronized (dateFormat) {
 					replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
 				}
@@ -140,59 +140,59 @@ public class GetTimesAjaxPage extends JsonPage {
 	 */
 	public static Time getTime(WebInterface webInterface, long time) {
 		if (time == 0) {
-			return new Time(webInterface.getL10n().getString("View.Sone.Text.UnknownDate"), 12 * Time.HOUR);
+			return new Time(webInterface.getL10n().getString("View.Sone.Text.UnknownDate"), TimeUnit.HOURS.toMillis(12));
 		}
 		long age = System.currentTimeMillis() - time;
 		String text;
 		long refresh;
 		if (age < 0) {
 			text = webInterface.getL10n().getDefaultString("View.Time.InTheFuture");
-			refresh = 5 * Time.MINUTE;
-		} else if (age < 20 * Time.SECOND) {
+			refresh = TimeUnit.MINUTES.toMillis(5);
+		} else if (age < TimeUnit.SECONDS.toMillis(20)) {
 			text = webInterface.getL10n().getDefaultString("View.Time.AFewSecondsAgo");
-			refresh = 10 * Time.SECOND;
-		} else if (age < 45 * Time.SECOND) {
+			refresh = TimeUnit.SECONDS.toMillis(10);
+		} else if (age < TimeUnit.SECONDS.toMillis(45)) {
 			text = webInterface.getL10n().getString("View.Time.HalfAMinuteAgo");
-			refresh = 20 * Time.SECOND;
-		} else if (age < 90 * Time.SECOND) {
+			refresh = TimeUnit.SECONDS.toMillis(20);
+		} else if (age < TimeUnit.SECONDS.toMillis(90)) {
 			text = webInterface.getL10n().getString("View.Time.AMinuteAgo");
-			refresh = Time.MINUTE;
-		} else if (age < 30 * Time.MINUTE) {
-			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf((int) (Digits.round(age, Time.MINUTE) / Time.MINUTE)));
-			refresh = 1 * Time.MINUTE;
-		} else if (age < 45 * Time.MINUTE) {
+			refresh = TimeUnit.MINUTES.toMillis(1);
+		} else if (age < TimeUnit.MINUTES.toMillis(30)) {
+			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf(TimeUnit.MILLISECONDS.toMinutes(age + TimeUnit.SECONDS.toMillis(30))));
+			refresh = TimeUnit.MINUTES.toMillis(1);
+		} else if (age < TimeUnit.MINUTES.toMillis(45)) {
 			text = webInterface.getL10n().getString("View.Time.HalfAnHourAgo");
-			refresh = 10 * Time.MINUTE;
-		} else if (age < 90 * Time.MINUTE) {
+			refresh = TimeUnit.MINUTES.toMillis(10);
+		} else if (age < TimeUnit.MINUTES.toMillis(90)) {
 			text = webInterface.getL10n().getString("View.Time.AnHourAgo");
-			refresh = Time.HOUR;
-		} else if (age < 21 * Time.HOUR) {
-			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf((int) (Digits.round(age, Time.HOUR) / Time.HOUR)));
-			refresh = Time.HOUR;
-		} else if (age < 42 * Time.HOUR) {
+			refresh = TimeUnit.HOURS.toMillis(1);
+		} else if (age < TimeUnit.HOURS.toMillis(21)) {
+			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf(TimeUnit.MILLISECONDS.toHours(age + TimeUnit.MINUTES.toMillis(30))));
+			refresh = TimeUnit.HOURS.toMillis(1);
+		} else if (age < TimeUnit.HOURS.toMillis(42)) {
 			text = webInterface.getL10n().getString("View.Time.ADayAgo");
-			refresh = Time.DAY;
-		} else if (age < 6 * Time.DAY) {
-			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf((int) (Digits.round(age, Time.DAY) / Time.DAY)));
-			refresh = Time.DAY;
-		} else if (age < 11 * Time.DAY) {
+			refresh = TimeUnit.DAYS.toMillis(1);
+		} else if (age < TimeUnit.DAYS.toMillis(6)) {
+			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf(TimeUnit.MILLISECONDS.toDays(age + TimeUnit.HOURS.toMillis(12))));
+			refresh = TimeUnit.DAYS.toMillis(1);
+		} else if (age < TimeUnit.DAYS.toMillis(11)) {
 			text = webInterface.getL10n().getString("View.Time.AWeekAgo");
-			refresh = Time.DAY;
-		} else if (age < 4 * Time.WEEK) {
-			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((int) (Digits.round(age, Time.WEEK) / Time.WEEK)));
-			refresh = Time.DAY;
-		} else if (age < 6 * Time.WEEK) {
+			refresh = TimeUnit.DAYS.toMillis(1);
+		} else if (age < TimeUnit.DAYS.toMillis(28)) {
+			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((TimeUnit.MILLISECONDS.toHours(age) + 84) / 24));
+			refresh = TimeUnit.DAYS.toMillis(1);
+		} else if (age < TimeUnit.DAYS.toMillis(42)) {
 			text = webInterface.getL10n().getString("View.Time.AMonthAgo");
-			refresh = Time.DAY;
-		} else if (age < 11 * Time.MONTH) {
-			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((int) (Digits.round(age, Time.MONTH) / Time.MONTH)));
-			refresh = Time.DAY;
-		} else if (age < 18 * Time.MONTH) {
+			refresh = TimeUnit.DAYS.toMillis(1);
+		} else if (age < TimeUnit.DAYS.toMillis(330)) {
+			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((TimeUnit.MILLISECONDS.toDays(age) + 15) / 30));
+			refresh = TimeUnit.DAYS.toMillis(1);
+		} else if (age < TimeUnit.DAYS.toMillis(540)) {
 			text = webInterface.getL10n().getString("View.Time.AYearAgo");
-			refresh = Time.WEEK;
+			refresh = TimeUnit.DAYS.toMillis(7);
 		} else {
-			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((int) (Digits.round(age, Time.YEAR) / Time.YEAR)));
-			refresh = Time.WEEK;
+			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((long) ((TimeUnit.MILLISECONDS.toDays(age) + 182.64) / 365.28)));
+			refresh = TimeUnit.DAYS.toMillis(7);
 		}
 		return new Time(text, refresh);
 	}
@@ -203,27 +203,6 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class Time {
-
-		/** Number of milliseconds in a second. */
-		private static final long SECOND = 1000;
-
-		/** Number of milliseconds in a minute. */
-		private static final long MINUTE = 60 * SECOND;
-
-		/** Number of milliseconds in an hour. */
-		private static final long HOUR = 60 * MINUTE;
-
-		/** Number of milliseconds in a day. */
-		private static final long DAY = 24 * HOUR;
-
-		/** Number of milliseconds in a week. */
-		private static final long WEEK = 7 * DAY;
-
-		/** Number of milliseconds in a 30-day month. */
-		private static final long MONTH = 30 * DAY;
-
-		/** Number of milliseconds in a year. */
-		private static final long YEAR = 365 * DAY;
 
 		/** The formatted time. */
 		private final String text;
