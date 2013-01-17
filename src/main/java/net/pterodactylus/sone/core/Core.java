@@ -44,9 +44,6 @@ import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
 import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
 import net.pterodactylus.sone.core.event.PostRemovedEvent;
 import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
-import net.pterodactylus.sone.core.event.SoneInsertedEvent;
-import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
@@ -97,7 +94,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider, SoneInsertListener {
+public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -824,8 +821,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
 			sones.put(ownIdentity.getId(), sone);
-			final SoneInserter soneInserter = new SoneInserter(this, freenetInterface, sone);
-			soneInserter.addSoneInsertListener(this);
+			final SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, sone);
 			soneInserters.put(sone, soneInserter);
 			sone.setStatus(SoneStatus.idle);
 			loadSone(sone);
@@ -1205,7 +1201,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			}
 			sones.remove(sone.getId());
 			SoneInserter soneInserter = soneInserters.remove(sone);
-			soneInserter.removeSoneInsertListener(this);
 			soneInserter.stop();
 		}
 		webOfTrustUpdater.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
@@ -1925,7 +1920,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	public void serviceStop() {
 		synchronized (sones) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
-				soneInserter.getValue().removeSoneInsertListener(this);
 				soneInserter.getValue().stop();
 				saveSone(soneInserter.getKey());
 			}
@@ -2430,34 +2424,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void updateFound(Version version, long releaseTime, long latestEdition) {
 		eventBus.post(new UpdateFoundEvent(version, releaseTime, latestEdition));
-	}
-
-	//
-	// INTERFACE ImageInsertListener
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void insertStarted(Sone sone) {
-		eventBus.post(new SoneInsertingEvent(sone));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void insertFinished(Sone sone, long insertDuration) {
-		eventBus.post(new SoneInsertedEvent(sone, insertDuration));
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void insertAborted(Sone sone, Throwable cause) {
-		eventBus.post(new SoneInsertAbortedEvent(sone, cause));
 	}
 
 	/**

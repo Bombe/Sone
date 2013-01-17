@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -45,6 +48,7 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
 import com.google.common.collect.Ordering;
+import com.google.common.eventbus.EventBus;
 
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
@@ -77,14 +81,14 @@ public class SoneInserter extends AbstractService {
 	/** The core. */
 	private final Core core;
 
+	/** The event bus. */
+	private final EventBus eventBus;
+
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
 	/** The Sone to insert. */
 	private final Sone sone;
-
-	/** The insert listener manager. */
-	private SoneInsertListenerManager soneInsertListenerManager;
 
 	/** Whether a modification has been detected. */
 	private volatile boolean modified = false;
@@ -97,41 +101,19 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @param core
 	 *            The core
+	 * @param eventBus
+	 *            The event bus
 	 * @param freenetInterface
 	 *            The freenet interface
 	 * @param sone
 	 *            The Sone to insert
 	 */
-	public SoneInserter(Core core, FreenetInterface freenetInterface, Sone sone) {
+	public SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone) {
 		super("Sone Inserter for “" + sone.getName() + "”", false);
 		this.core = core;
+		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
-		this.soneInsertListenerManager = new SoneInsertListenerManager(sone);
-	}
-
-	//
-	// LISTENER MANAGEMENT
-	//
-
-	/**
-	 * Adds a listener for Sone insert events.
-	 *
-	 * @param soneInsertListener
-	 *            The Sone insert listener
-	 */
-	public void addSoneInsertListener(SoneInsertListener soneInsertListener) {
-		soneInsertListenerManager.addListener(soneInsertListener);
-	}
-
-	/**
-	 * Removes a listener for Sone insert events.
-	 *
-	 * @param soneInsertListener
-	 *            The Sone insert listener
-	 */
-	public void removeSoneInsertListener(SoneInsertListener soneInsertListener) {
-		soneInsertListenerManager.removeListener(soneInsertListener);
 	}
 
 	//
