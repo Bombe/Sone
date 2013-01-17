@@ -47,7 +47,6 @@ import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
-import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -79,7 +78,6 @@ import net.pterodactylus.util.validation.EqualityValidator;
 import net.pterodactylus.util.validation.IntegerRangeValidator;
 import net.pterodactylus.util.validation.OrValidator;
 import net.pterodactylus.util.validation.Validation;
-import net.pterodactylus.util.version.Version;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
@@ -94,7 +92,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements IdentityListener, UpdateListener, SoneProvider, PostProvider {
+public class Core extends AbstractService implements IdentityListener, SoneProvider, PostProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -219,7 +217,7 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
 		this.imageInserter = new ImageInserter(freenetInterface);
-		this.updateChecker = new UpdateChecker(freenetInterface);
+		this.updateChecker = new UpdateChecker(eventBus, freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 	}
@@ -1886,7 +1884,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 	@Override
 	public void serviceStart() {
 		loadConfiguration();
-		updateChecker.addUpdateListener(this);
 		updateChecker.start();
 		identityManager.addIdentityListener(this);
 		identityManager.start();
@@ -1927,7 +1924,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 		saveConfiguration();
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
-		updateChecker.removeUpdateListener(this);
 		soneDownloader.stop();
 		identityManager.removeIdentityListener(this);
 		identityManager.stop();
@@ -2412,18 +2408,6 @@ public class Core extends AbstractService implements IdentityListener, UpdateLis
 			sones.remove(identity.getId());
 		}
 		eventBus.post(new SoneRemovedEvent(sone));
-	}
-
-	//
-	// INTERFACE UpdateListener
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void updateFound(Version version, long releaseTime, long latestEdition) {
-		eventBus.post(new UpdateFoundEvent(version, releaseTime, latestEdition));
 	}
 
 	/**

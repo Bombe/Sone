@@ -27,10 +27,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
+import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.version.Version;
+
+import com.google.common.eventbus.EventBus;
+import com.google.inject.Inject;
+
 import freenet.keys.FreenetURI;
 import freenet.support.api.Bucket;
 
@@ -50,11 +55,11 @@ public class UpdateChecker {
 	/** The current latest known edition. */
 	private static final int LATEST_EDITION = 55;
 
+	/** The event bus. */
+	private final EventBus eventBus;
+
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
-
-	/** The update listener manager. */
-	private final UpdateListenerManager updateListenerManager = new UpdateListenerManager();
 
 	/** The current URI of the homepage. */
 	private FreenetURI currentUri;
@@ -71,35 +76,15 @@ public class UpdateChecker {
 	/**
 	 * Creates a new update checker.
 	 *
+	 * @param eventBus
+	 *            The event bus
 	 * @param freenetInterface
 	 *            The freenet interface to use
 	 */
-	public UpdateChecker(FreenetInterface freenetInterface) {
+	@Inject
+	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface) {
+		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
-	}
-
-	//
-	// EVENT LISTENER MANAGEMENT
-	//
-
-	/**
-	 * Adds the given listener to the list of registered listeners.
-	 *
-	 * @param updateListener
-	 *            The listener to add
-	 */
-	public void addUpdateListener(UpdateListener updateListener) {
-		updateListenerManager.addListener(updateListener);
-	}
-
-	/**
-	 * Removes the given listener from the list of registered listeners.
-	 *
-	 * @param updateListener
-	 *            The listener to remove
-	 */
-	public void removeUpdateListener(UpdateListener updateListener) {
-		updateListenerManager.removeListener(updateListener);
 	}
 
 	//
@@ -201,8 +186,7 @@ public class UpdateChecker {
 	 * Parses the properties of the latest version and fires events, if
 	 * necessary.
 	 *
-	 * @see UpdateListener#updateFound(Version, long, long)
-	 * @see UpdateListenerManager#fireUpdateFound(Version, long, long)
+	 * @see UpdateFoundEvent
 	 * @param propertiesInputStream
 	 *            The input stream to parse
 	 * @param edition
@@ -240,7 +224,7 @@ public class UpdateChecker {
 			currentLatestVersion = version;
 			latestVersionDate = releaseTime;
 			logger.log(Level.INFO, String.format("Found new version: %s (%tc)", version, new Date(releaseTime)));
-			updateListenerManager.fireUpdateFound(version, releaseTime, edition);
+			eventBus.post(new UpdateFoundEvent(version, releaseTime, edition));
 		}
 	}
 
