@@ -1537,7 +1537,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
-		final Post post = new PostImpl(sone, time, text);
+		final Post post = new PostImpl(sone, time, text.trim());
 		if (recipient != null) {
 			post.setRecipient(recipient);
 		}
@@ -1679,7 +1679,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
-		final PostReply reply = new PostReply(sone, post, System.currentTimeMillis(), text);
+		final PostReply reply = new PostReply(sone, post, System.currentTimeMillis(), text.trim());
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
