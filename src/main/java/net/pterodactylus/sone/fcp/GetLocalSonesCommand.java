@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.fcp;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -44,7 +43,7 @@ public class GetLocalSonesCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
 		return new Response("ListLocalSones", encodeSones(getCore().getLocalSones(), "LocalSones."));
 	}
 

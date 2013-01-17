@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.freenet;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
@@ -84,7 +83,7 @@ public class StringBucket implements Bucket {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public InputStream getInputStream() throws IOException {
+	public InputStream getInputStream() {
 		return new ByteArrayInputStream(string.getBytes(encoding));
 	}
 
@@ -100,7 +99,7 @@ public class StringBucket implements Bucket {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public OutputStream getOutputStream() throws IOException {
+	public OutputStream getOutputStream() {
 		return null;
 	}
 
