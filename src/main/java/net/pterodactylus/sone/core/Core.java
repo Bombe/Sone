@@ -101,7 +101,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements SoneProvider, PostProvider {
+public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -574,12 +574,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the reply with the given ID.
-	 *
-	 * @param replyId
-	 *            The ID of the reply to get
-	 * @return The reply, or {@code null} if there is no such reply
+	 * {@inheritDoc}
 	 */
+	@Override
 	public PostReply getPostReply(String replyId) {
 		synchronized (replies) {
 			return replies.get(replyId);
@@ -587,12 +584,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns all replies for the given post, order ascending by time.
-	 *
-	 * @param post
-	 *            The post to get all replies for
-	 * @return All replies for the given post
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<PostReply> getReplies(Post post) {
 		Set<Sone> sones = getSones();
 		List<PostReply> replies = new ArrayList<PostReply>();
