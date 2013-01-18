@@ -33,7 +33,7 @@ import org.apache.commons.lang.StringUtils;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilderImpl, PostReplyBuilder> implements PostReplyBuilder {
+public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder> implements PostReplyBuilder {
 
 	/** The post the created reply refers to. */
 	private Post post;

@@ -23,13 +23,11 @@ import net.pterodactylus.sone.data.Sone;
 /**
  * Abstract implementation of a {@link ReplyBuilder}.
  *
- * @param <C>
- *            The concrete implementation of the builder
  * @param <B>
  *            The interface implemented and exposed by the builder
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class AbstractReplyBuilder<C extends AbstractReplyBuilder<C, B>, B extends ReplyBuilder<B>> implements ReplyBuilder<B> {
+public class AbstractReplyBuilder<B extends ReplyBuilder<B>> implements ReplyBuilder<B> {
 
 	/** Whether to use a random ID for the reply. */
 	protected boolean randomId;
