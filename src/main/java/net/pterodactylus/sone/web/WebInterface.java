@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -142,7 +146,6 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
-import net.pterodactylus.util.thread.Ticker;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
@@ -213,7 +216,7 @@ public class WebInterface {
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
 
 	/** Sone locked notification ticker objects. */
-	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
+	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
 
 	/** The “Sone locked” notification. */
 	private final ListNotification<Sone> lockedSonesNotification;
@@ -229,6 +232,9 @@ public class WebInterface {
 
 	/** The “image insert failed” notification. */
 	private final ListNotification<Image> imageInsertFailedNotification;
+
+	/** Scheduled executor for time-based notifications. */
+	private final ScheduledExecutorService ticker = Executors.newScheduledThreadPool(1);
 
 	/**
 	 * Creates a new web interface.
@@ -554,17 +560,17 @@ public class WebInterface {
 		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
 		notificationManager.addNotification(startupNotification);
 
-		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (120 * 1000), new Runnable() {
+		ticker.schedule(new Runnable() {
 
 			@Override
 			public void run() {
 				startupNotification.dismiss();
 			}
-		}, "Sone Startup Notification Remover");
+		}, 2, TimeUnit.MINUTES);
 
 		Template wotMissingNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/wotMissingNotification.html"));
 		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
-		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), new Runnable() {
+		ticker.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -574,10 +580,9 @@ public class WebInterface {
 				} else {
 					notificationManager.addNotification(wotMissingNotification);
 				}
-				Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), this, "Sone WoT Connector Checker");
 			}
 
-		}, "Sone WoT Connector Checker");
+		}, 15, 15, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -585,7 +590,7 @@ public class WebInterface {
 	 */
 	public void stop() {
 		unregisterToadlets();
-		Ticker.getInstance().stop();
+		ticker.shutdownNow();
 	}
 
 	//
@@ -953,7 +958,7 @@ public class WebInterface {
 	@Subscribe
 	public void soneLocked(SoneLockedEvent soneLockedEvent) {
 		final Sone sone = soneLockedEvent.sone();
-		Object tickerObject = Ticker.getInstance().registerEvent(System.currentTimeMillis() + (5 * 60) * 1000, new Runnable() {
+		ScheduledFuture<?> tickerObject = ticker.schedule(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -962,7 +967,7 @@ public class WebInterface {
 				lockedSonesTickerObjects.remove(sone);
 				notificationManager.addNotification(lockedSonesNotification);
 			}
-		}, "Sone Locked Notification");
+		}, 5, TimeUnit.MINUTES);
 		lockedSonesTickerObjects.put(sone, tickerObject);
 	}
 
@@ -975,7 +980,7 @@ public class WebInterface {
 	@Subscribe
 	public void soneUnlocked(SoneUnlockedEvent soneUnlockedEvent) {
 		lockedSonesNotification.remove(soneUnlockedEvent.sone());
-		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(soneUnlockedEvent.sone()));
+		lockedSonesTickerObjects.remove(soneUnlockedEvent.sone()).cancel(false);
 	}
 
 	/**

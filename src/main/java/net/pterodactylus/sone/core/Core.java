@@ -32,6 +32,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,7 +84,6 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
-import net.pterodactylus.util.thread.Ticker;
 
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
@@ -196,7 +197,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	private final Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
 
 	/** Ticker for threads that mark own elements as known. */
-	private final Ticker localElementTicker = new Ticker();
+	private final ScheduledExecutorService localElementTicker = Executors.newScheduledThreadPool(1);
 
 	/** The time the configuration was last touched. */
 	private volatile long lastConfigurationUpdate;
@@ -1547,7 +1548,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		eventBus.post(new NewPostFoundEvent(post));
 		sone.addPost(post);
 		touchConfiguration();
-		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+		localElementTicker.schedule(new Runnable() {
 
 			/**
 			 * {@inheritDoc}
@@ -1556,7 +1557,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			public void run() {
 				markPostKnown(post);
 			}
-		}, "Mark " + post + " read.");
+		}, 10, TimeUnit.SECONDS);
 		return post;
 	}
 
@@ -1688,7 +1689,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		}
 		sone.addReply(reply);
 		touchConfiguration();
-		localElementTicker.registerEvent(System.currentTimeMillis() + 10 * 1000, new Runnable() {
+		localElementTicker.schedule(new Runnable() {
 
 			/**
 			 * {@inheritDoc}
@@ -1697,7 +1698,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			public void run() {
 				markReplyKnown(reply);
 			}
-		}, "Mark " + reply + " read.");
+		}, 10, TimeUnit.SECONDS);
 		return reply;
 	}
 
@@ -1940,6 +1941,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 */
 	@Override
 	public void serviceStop() {
+		localElementTicker.shutdownNow();
 		synchronized (sones) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
 				soneInserter.getValue().stop();
