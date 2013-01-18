@@ -31,6 +31,7 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostBuilder;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
@@ -372,11 +373,13 @@ public class SoneDownloader extends AbstractService {
 					return null;
 				}
 				try {
-					Post post = core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText);
+					PostBuilder postBuilder = core.postBuilder();
+					/* TODO - parse time correctly. */
+					postBuilder.withId(postId).from(sone).withTime(Long.parseLong(postTime)).withText(postText);
 					if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-						post.setRecipient(core.getSone(postRecipientId));
+						postBuilder.to(core.getSone(postRecipientId));
 					}
-					posts.add(post);
+					posts.add(postBuilder.build());
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, String.format("Downloaded post for Sone %s with invalid time: %s", sone, postTime));
