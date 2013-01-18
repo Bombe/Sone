@@ -522,24 +522,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the post with the given ID, optionally creating a new post.
-	 *
-	 * @param postId
-	 *            The ID of the post to get
-	 * @param create
-	 *            {@code true} it create a new post if no post with the given ID
-	 *            exists, {@code false} to return {@code null}
-	 * @return The post, or {@code null} if there is no such post
+	 * {@inheritDoc}
 	 */
 	@Override
-	public Post getPost(String postId, boolean create) {
+	public Post getPost(String postId) {
 		synchronized (posts) {
-			Post post = posts.get(postId);
-			if ((post == null) && create) {
-				post = new PostImpl(postId);
-				posts.put(postId, post);
-			}
-			return post;
+			return posts.get(postId);
 		}
 	}
 
@@ -677,7 +665,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
-				Post post = getPost(bookmarkedPostId, false);
+				Post post = getPost(bookmarkedPostId);
 				if (post != null) {
 					posts.add(post);
 				}

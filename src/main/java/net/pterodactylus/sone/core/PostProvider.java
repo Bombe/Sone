@@ -27,17 +27,12 @@ import net.pterodactylus.sone.data.Post;
 public interface PostProvider {
 
 	/**
-	 * Returns the post with the given ID, if it exists. If it does not exist
-	 * and {@code create} is {@code false}, {@code null} is returned; otherwise,
-	 * a new post with the given ID is created and returned.
+	 * Returns the post with the given ID.
 	 *
 	 * @param postId
 	 *            The ID of the post to return
-	 * @param create
-	 *            {@code true} to create a new post if no post with the given ID
-	 *            exists, {@code false} to return {@code null} instead
 	 * @return The post with the given ID, or {@code null}
 	 */
-	public Post getPost(String postId, boolean create);
+	public Post getPost(String postId);
 
 }

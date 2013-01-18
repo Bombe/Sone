@@ -54,7 +54,7 @@ public class ViewPostPage extends SoneTemplatePage {
 	@Override
 	protected String getPageTitle(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId, false);
+		Post post = webInterface.getCore().getPost(postId);
 		String title = "";
 		if ((post != null) && (post.getSone() != null)) {
 			title = post.getText().substring(0, Math.min(20, post.getText().length())) + "…";

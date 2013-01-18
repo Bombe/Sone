@@ -185,7 +185,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected Post getPost(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
 		try {
 			String postId = simpleFieldSet.getString(parameterName);
-			Post post = core.getPost(postId, false);
+			Post post = core.getPost(postId);
 			if (post == null) {
 				throw new FcpException("Could not load post from “" + postId + "”.");
 			}

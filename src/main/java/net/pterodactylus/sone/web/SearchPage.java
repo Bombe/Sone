@@ -322,7 +322,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getPostId(String phrase) {
 		String postId = phrase.startsWith("post://") ? phrase.substring(7) : phrase;
-		return (webInterface.getCore().getPost(postId, false) != null) ? postId : null;
+		return (webInterface.getCore().getPost(postId) != null) ? postId : null;
 	}
 
 	/**
