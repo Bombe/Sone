@@ -63,7 +63,7 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 				}
 				core.markPostKnown(post);
 			} else if (type.equals("reply")) {
-				PostReply reply = core.getPostReply(id, false);
+				PostReply reply = core.getPostReply(id);
 				if (reply == null) {
 					continue;
 				}

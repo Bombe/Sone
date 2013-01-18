@@ -558,25 +558,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the reply with the given ID. If there is no reply with the given
-	 * ID yet, a new one is created, unless {@code create} is false in which
-	 * case {@code null} is returned.
+	 * Returns the reply with the given ID.
 	 *
 	 * @param replyId
 	 *            The ID of the reply to get
-	 * @param create
-	 *            {@code true} to always return a {@link Reply}, {@code false}
-	 *            to return {@code null} if no reply can be found
 	 * @return The reply, or {@code null} if there is no such reply
 	 */
-	public PostReply getPostReply(String replyId, boolean create) {
+	public PostReply getPostReply(String replyId) {
 		synchronized (replies) {
-			PostReply reply = replies.get(replyId);
-			if (create && (reply == null)) {
-				reply = new PostReplyImpl(replyId);
-				replies.put(replyId, reply);
-			}
-			return reply;
+			return replies.get(replyId);
 		}
 	}
 
