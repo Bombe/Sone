@@ -2198,8 +2198,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		}));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
-		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, Predicates.or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
-		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, Predicates.or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
+		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, Predicates.<Integer> or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
+		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, Predicates.<Integer> or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
 		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangePredicate(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangePredicate(-100, 100)));
