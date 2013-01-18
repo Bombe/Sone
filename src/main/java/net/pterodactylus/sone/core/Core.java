@@ -871,7 +871,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (sones) {
 			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
-			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
+			sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
 				synchronized (knownSones) {
