@@ -25,15 +25,14 @@ import java.util.List;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Ordering;
-import com.google.common.primitives.Ints;
 
 /**
  * This page shows all known Sones.
@@ -141,7 +140,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 				Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);
 			}
 		}
-		Pagination<Sone> sonePagination = new Pagination<Sone>(sortedSones, 25).setPage(Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getParam("page"))).or(0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(sortedSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", sonePagination);
 		templateContext.set("knownSones", sonePagination.getItems());
 	}

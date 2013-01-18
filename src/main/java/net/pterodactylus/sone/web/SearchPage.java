@@ -37,13 +37,13 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
 
 import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -51,7 +51,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
-import com.google.common.primitives.Ints;
 
 /**
  * This page lets the user search for posts and replies that contain certain
@@ -149,8 +148,8 @@ public class SearchPage extends SoneTemplatePage {
 		List<Post> resultPosts = FluentIterable.from(sortedPostHits).transform(new HitMapper<Post>()).toList();
 
 		/* pagination. */
-		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getParam("sonePage"))).or(0));
-		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Optional.fromNullable(Ints.tryParse(request.getHttpRequest().getParam("postPage"))).or(0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
+		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 
 		templateContext.set("sonePagination", sonePagination);
 		templateContext.set("soneHits", sonePagination.getItems());
