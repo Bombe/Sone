@@ -59,6 +59,8 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostBuilder;
 import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.PostReplyBuilder;
+import net.pterodactylus.sone.data.PostReplyBuilderFactory;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
@@ -66,7 +68,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.data.impl.PostReplyImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -178,6 +179,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	/** All known posts. */
 	private final Set<String> knownPosts = new HashSet<String>();
 
+	/** The post reply builder factory. */
+	private final PostReplyBuilderFactory postReplyBuilderFactory;
+
 	/** All replies. */
 	private final Map<String, PostReply> replies = new HashMap<String, PostReply>();
 
@@ -221,9 +225,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The event bus
 	 * @param postBuilderFactory
 	 *            The post builder
+	 * @param postReplyBuilderFactory
+	 *            The post reply builder factory
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostBuilderFactory postBuilderFactory) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostBuilderFactory postBuilderFactory, PostReplyBuilderFactory postReplyBuilderFactory) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -234,6 +240,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.postBuilderFactory = postBuilderFactory;
+		this.postReplyBuilderFactory = postReplyBuilderFactory;
 	}
 
 	//
@@ -555,6 +562,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			}
 		}
 		return directedPosts;
+	}
+
+	/**
+	 * Returns a post reply builder.
+	 *
+	 * @return A new post reply builder
+	 */
+	public PostReplyBuilder postReplyBuilder() {
+		return postReplyBuilderFactory.newPostReplyBuilder();
 	}
 
 	/**
@@ -1319,7 +1335,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
 				return;
 			}
-			replies.add(getPostReply(replyId, true).setSone(sone).setPost(getPost(postId)).setTime(replyTime).setText(replyText));
+			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+			postReplyBuilder.withId(replyId).from(sone).to(getPost(postId)).withTime(replyTime).withText(replyText);
+			replies.add(postReplyBuilder.build());
 		}
 
 		/* load post likes. */
@@ -1644,30 +1662,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The created reply
 	 */
 	public PostReply createReply(Sone sone, Post post, String text) {
-		return createReply(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The Sone that creates the reply
-	 * @param post
-	 *            The post that this reply refers to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 * @return The created reply
-	 */
-	public PostReply createReply(Sone sone, Post post, long time, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
-		final PostReply reply = new PostReplyImpl(sone, post, System.currentTimeMillis(), text.trim());
+		PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+		postReplyBuilder.randomId().from(sone).to(post).currentTime().withText(text.trim());
+		final PostReply reply = postReplyBuilder.build();
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
