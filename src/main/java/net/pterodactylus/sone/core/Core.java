@@ -149,7 +149,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private volatile FcpInterface fcpInterface;
 
 	/** The times Sones were followed. */
-	private final Map<Sone, Long> soneFollowingTimes = new HashMap<Sone, Long>();
+	private final Map<String, Long> soneFollowingTimes = new HashMap<String, Long>();
 
 	/** Locked local Sones. */
 	/* synchronize on itself. */
@@ -851,7 +851,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
 		sone.getOptions().addEnumOption("ShowCustomAvatars", new DefaultOption<ShowCustomAvatars>(ShowCustomAvatars.NEVER));
 
-		followSone(sone, getSone("nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"));
+		followSone(sone, "nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
 		touchConfiguration();
 		return sone;
 	}
@@ -882,7 +882,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 					eventBus.post(new NewSoneFoundEvent(sone));
 					for (Sone localSone : getLocalSones()) {
 						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
-							followSone(localSone, sone);
+							followSone(localSone, sone.getId());
 						}
 					}
 				}
@@ -912,33 +912,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void followSone(Sone sone, String soneId) {
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
-		Sone followedSone = getSone(soneId, true);
-		if (followedSone == null) {
-			logger.log(Level.INFO, String.format("Ignored Sone with invalid ID: %s", soneId));
-			return;
-		}
-		followSone(sone, getSone(soneId));
-	}
-
-	/**
-	 * Lets the given local Sone follow the other given Sone. If the given Sone
-	 * was not followed by any local Sone before, this will mark all elements of
-	 * the followed Sone as read that have been created before the current
-	 * moment.
-	 *
-	 * @param sone
-	 *            The local Sone that should follow the other Sone
-	 * @param followedSone
-	 *            The Sone that should be followed
-	 */
-	public void followSone(Sone sone, Sone followedSone) {
-		checkNotNull(sone, "sone must not be null");
-		checkNotNull(followedSone, "followedSone must not be null");
-		sone.addFriend(followedSone.getId());
+		sone.addFriend(soneId);
 		synchronized (soneFollowingTimes) {
-			if (!soneFollowingTimes.containsKey(followedSone)) {
+			if (!soneFollowingTimes.containsKey(soneId)) {
 				long now = System.currentTimeMillis();
-				soneFollowingTimes.put(followedSone, now);
+				soneFollowingTimes.put(soneId, now);
+				Sone followedSone = getSone(soneId);
+				if (followedSone == null) {
+					return;
+				}
 				for (Post post : followedSone.getPosts()) {
 					if (post.getTime() < now) {
 						markPostKnown(post);
@@ -965,30 +947,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void unfollowSone(Sone sone, String soneId) {
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
-		unfollowSone(sone, getSone(soneId, false));
-	}
-
-	/**
-	 * Lets the given local Sone unfollow the other given Sone. If the given
-	 * local Sone is the last local Sone that followed the given Sone, its
-	 * following time will be removed.
-	 *
-	 * @param sone
-	 *            The local Sone that should unfollow another Sone
-	 * @param unfollowedSone
-	 *            The Sone being unfollowed
-	 */
-	public void unfollowSone(Sone sone, Sone unfollowedSone) {
-		checkNotNull(sone, "sone must not be null");
-		checkNotNull(unfollowedSone, "unfollowedSone must not be null");
-		sone.removeFriend(unfollowedSone.getId());
+		sone.removeFriend(soneId);
 		boolean unfollowedSoneStillFollowed = false;
 		for (Sone localSone : getLocalSones()) {
-			unfollowedSoneStillFollowed |= localSone.hasFriend(unfollowedSone.getId());
+			unfollowedSoneStillFollowed |= localSone.hasFriend(soneId);
 		}
 		if (!unfollowedSoneStillFollowed) {
 			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.remove(unfollowedSone);
+				soneFollowingTimes.remove(soneId);
 			}
 		}
 		touchConfiguration();
@@ -2120,8 +2086,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* save Sone following times. */
 			soneCounter = 0;
 			synchronized (soneFollowingTimes) {
-				for (Entry<Sone, Long> soneFollowingTime : soneFollowingTimes.entrySet()) {
-					configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(soneFollowingTime.getKey().getId());
+				for (Entry<String, Long> soneFollowingTime : soneFollowingTimes.entrySet()) {
+					configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(soneFollowingTime.getKey());
 					configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").setValue(soneFollowingTime.getValue());
 					++soneCounter;
 				}
@@ -2244,7 +2210,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, String.format("Ignoring Sone with invalid ID: %s", soneId));
 			} else {
 				synchronized (soneFollowingTimes) {
-					soneFollowingTimes.put(getSone(soneId), time);
+					soneFollowingTimes.put(soneId, time);
 				}
 			}
 			++soneCounter;
