@@ -72,11 +72,6 @@ public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder>
 		checkState(postId != null, "post must not be null");
 
 		/* create new post reply. */
-		PostReplyImpl postReplyImpl = new PostReplyImpl(postProvider, randomId ? UUID.randomUUID().toString() : id);
-		postReplyImpl.setSone(sender);
-		postReplyImpl.setPost(postId);
-		postReplyImpl.setTime(currentTime ? System.currentTimeMillis() : time);
-		postReplyImpl.setText(text);
-		return postReplyImpl;
+		return new PostReplyImpl(postProvider, randomId ? UUID.randomUUID().toString() : id, sender, currentTime ? System.currentTimeMillis() : time, text, postId);
 	}
 }

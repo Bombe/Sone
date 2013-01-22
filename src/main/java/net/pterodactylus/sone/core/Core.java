@@ -1130,7 +1130,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				Set<PostReply> storedReplies = storedSone.getReplies();
 				synchronized (knownReplies) {
 					for (PostReply reply : sone.getReplies()) {
-						reply.setSone(storedSone).setKnown(knownReplies.contains(reply.getId()));
+						reply.setKnown(knownReplies.contains(reply.getId()));
 						if (!storedReplies.contains(reply)) {
 							if (reply.getTime() < getSoneFollowingTime(sone)) {
 								knownReplies.add(reply.getId());

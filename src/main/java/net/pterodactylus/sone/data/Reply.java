@@ -71,15 +71,6 @@ public interface Reply<T extends Reply<T>> {
 	public Sone getSone();
 
 	/**
-	 * Sets the Sone that posted this reply.
-	 *
-	 * @param sone
-	 *            The Sone that posted this reply
-	 * @return This reply
-	 */
-	public T setSone(Sone sone);
-
-	/**
 	 * Returns the time of the reply.
 	 *
 	 * @return The time of the reply (in milliseconds since Jan 1, 1970 UTC)
@@ -87,29 +78,11 @@ public interface Reply<T extends Reply<T>> {
 	public long getTime();
 
 	/**
-	 * Sets the time of the reply.
-	 *
-	 * @param time
-	 *            The time of the reply (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This reply
-	 */
-	public T setTime(long time);
-
-	/**
 	 * Returns the text of the reply.
 	 *
 	 * @return The text of the reply
 	 */
 	public String getText();
-
-	/**
-	 * Sets the text of the reply.
-	 *
-	 * @param text
-	 *            The text of the reply
-	 * @return This reply
-	 */
-	public T setText(String text);
 
 	/**
 	 * Returns whether this reply is known.

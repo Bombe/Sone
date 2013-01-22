@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import java.util.UUID;
-
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 
@@ -35,40 +33,16 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	private final String id;
 
 	/** The Sone that created this reply. */
-	private volatile Sone sone;
+	private final Sone sone;
 
 	/** The time of the reply. */
-	private volatile long time;
+	private final long time;
 
 	/** The text of the reply. */
-	private volatile String text;
+	private final String text;
 
 	/** Whether the reply is known. */
 	private volatile boolean known;
-
-	/**
-	 * Creates a new reply with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the reply
-	 */
-	protected ReplyImpl(String id) {
-		this(id, null, 0, null);
-	}
-
-	/**
-	 * Creates a new reply with a new random ID.
-	 *
-	 * @param sone
-	 *            The Sone of the reply
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	protected ReplyImpl(Sone sone, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, time, text);
-	}
 
 	/**
 	 * Creates a new reply.
@@ -106,20 +80,6 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	}
 
 	/**
-	 * Sets the Sone that posted this reply.
-	 *
-	 * @param sone
-	 *            The Sone that posted this reply
-	 * @return This reply (for method chaining)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public T setSone(Sone sone) {
-		this.sone = sone;
-		return (T) this;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
@@ -128,39 +88,11 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	}
 
 	/**
-	 * Sets the time of this reply.
-	 *
-	 * @param time
-	 *            The time of this reply (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This reply (for method chaining)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public T setTime(long time) {
-		this.time = time;
-		return (T) this;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String getText() {
 		return text;
-	}
-
-	/**
-	 * Sets the text of this reply.
-	 *
-	 * @param text
-	 *            The text of this reply
-	 * @return This reply (for method chaining)
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public T setText(String text) {
-		this.text = text;
-		return (T) this;
 	}
 
 	/**
