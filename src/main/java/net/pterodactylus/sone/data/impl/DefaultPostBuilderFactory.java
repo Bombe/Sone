@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.data.impl;
 
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.PostBuilder;
 import net.pterodactylus.sone.data.PostBuilderFactory;
 
@@ -28,12 +29,25 @@ import net.pterodactylus.sone.data.PostBuilderFactory;
  */
 public class DefaultPostBuilderFactory implements PostBuilderFactory {
 
+	/** The Sone provider. */
+	private final SoneProvider soneProvider;
+
+	/**
+	 * Creates a new default post builder factory.
+	 *
+	 * @param soneProvider
+	 *            The Sone provider
+	 */
+	public DefaultPostBuilderFactory(SoneProvider soneProvider) {
+		this.soneProvider = soneProvider;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public PostBuilder newPostBuilder() {
-		return new PostBuilderImpl();
+		return new PostBuilderImpl(soneProvider);
 	}
 
 }

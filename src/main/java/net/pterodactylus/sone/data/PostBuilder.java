@@ -53,11 +53,11 @@ public interface PostBuilder {
 	/**
 	 * Configures this builder to use the given Sone as sender of the new post.
 	 *
-	 * @param sender
-	 *            The sender of the post
+	 * @param senderId
+	 *            The ID of the sender of the post
 	 * @return This post builder
 	 */
-	public PostBuilder from(Sone sender);
+	public PostBuilder from(String senderId);
 
 	/**
 	 * Configures this builder to use a random ID for the new post. If this
@@ -108,11 +108,11 @@ public interface PostBuilder {
 	 * Configures the builder to use the given {@link Sone} as recipient for the
 	 * post.
 	 *
-	 * @param recipient
-	 *            The recipient of the post
+	 * @param recipientId
+	 *            The ID of the recipient of the post
 	 * @return This post builder
 	 */
-	public PostBuilder to(Sone recipient);
+	public PostBuilder to(String recipientId);
 
 	/**
 	 * Verifies this builder’s configuration and creates a new post.
@@ -122,14 +122,14 @@ public interface PostBuilder {
 	 * <ul>
 	 * <li>Exactly one of {@link #randomId()} or {@link #withId(String)} must
 	 * have been called.</li>
-	 * <li>The {@link #from(Sone) sender} must not be {@code null}.</li>
+	 * <li>The {@link #from(String) sender} must not be {@code null}.</li>
 	 * <li>Exactly one of {@link #currentTime()} or {@link #withTime(long)} must
 	 * have been called.</li>
 	 * <li>The {@link #withText(String) text} must not be {@code null} and must
 	 * contain something other than whitespace.</li>
-	 * <li>The {@link #to(Sone) recipient} must either not have been set, or it
-	 * must have been set to a {@link Sone} other than {@link #from(Sone) the
-	 * sender}.</li>
+	 * <li>The {@link #to(String) recipient} must either not have been set, or
+	 * it must have been set to a {@link Sone} other than {@link #from(String)
+	 * the sender}.</li>
 	 * </ul>
 	 *
 	 * @return A new post

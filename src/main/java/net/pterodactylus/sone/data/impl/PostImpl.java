@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data.impl;
 
 import java.util.UUID;
 
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 
@@ -30,14 +31,17 @@ import net.pterodactylus.sone.data.Sone;
  */
 public class PostImpl implements Post {
 
+	/** The Sone provider. */
+	private final SoneProvider soneProvider;
+
 	/** The GUID of the post. */
 	private final UUID id;
 
-	/** The Sone this post belongs to. */
-	private final Sone sone;
+	/** The ID of the owning Sone. */
+	private final String soneId;
 
-	/** The Sone of the recipient. */
-	private final Sone recipient;
+	/** The ID of the recipient Sone. */
+	private final String recipientId;
 
 	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
 	private final long time;
@@ -51,21 +55,24 @@ public class PostImpl implements Post {
 	/**
 	 * Creates a new post.
 	 *
+	 * @param soneProvider
+	 *            The Sone provider
 	 * @param id
 	 *            The ID of the post
-	 * @param sone
-	 *            The Sone this post belongs to
-	 * @param recipient
-	 *            The recipient of the post
+	 * @param soneId
+	 *            The ID of the Sone this post belongs to
+	 * @param recipientId
+	 *            The ID of the recipient of the post
 	 * @param time
 	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
 	 * @param text
 	 *            The text of the post
 	 */
-	public PostImpl(String id, Sone sone, Sone recipient, long time, String text) {
+	public PostImpl(SoneProvider soneProvider, String id, String soneId, String recipientId, long time, String text) {
+		this.soneProvider = soneProvider;
 		this.id = UUID.fromString(id);
-		this.sone = sone;
-		this.recipient = recipient;
+		this.soneId = soneId;
+		this.recipientId = recipientId;
 		this.time = time;
 		this.text = text;
 	}
@@ -87,7 +94,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getSone() {
-		return sone;
+		return soneProvider.getSone(soneId, false);
 	}
 
 	/**
@@ -95,7 +102,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getRecipient() {
-		return recipient;
+		return soneProvider.getSone(recipientId, false);
 	}
 
 	/**
@@ -160,7 +167,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
+		return String.format("%s[id=%s,sone=%s,recipient=%s,time=%d,text=%s]", getClass().getName(), id, soneId, recipientId, time, text);
 	}
 
 }

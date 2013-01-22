@@ -1104,7 +1104,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
 						PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
-						postBuilder.copyPost(post).from(storedSone);
+						postBuilder.copyPost(post).from(storedSone.getId());
 						Post newPost = postBuilder.build().setKnown(knownPosts.contains(post.getId()));
 						if (!storedPosts.contains(newPost)) {
 							if (newPost.getTime() < getSoneFollowingTime(sone)) {
@@ -1307,9 +1307,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			PostBuilder postBuilder = postBuilderFactory.newPostBuilder().withId(postId).from(sone).withTime(postTime).withText(postText);
+			PostBuilder postBuilder = postBuilderFactory.newPostBuilder().withId(postId).from(sone.getId()).withTime(postTime).withText(postText);
 			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-				postBuilder.to(getSone(postRecipientId));
+				postBuilder.to(postRecipientId);
 			}
 			posts.add(postBuilder.build());
 		}
@@ -1536,9 +1536,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
-		postBuilder.from(sone).randomId().withTime(time).withText(text.trim());
+		postBuilder.from(sone.getId()).randomId().withTime(time).withText(text.trim());
 		if (recipient != null) {
-			postBuilder.to(recipient);
+			postBuilder.to(recipient.getId());
 		}
 		final Post post = postBuilder.build();
 		synchronized (posts) {
