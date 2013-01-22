@@ -1,5 +1,5 @@
 /*
- * Sone - SoneProvider.java - Copyright © 2011–2013 David Roden
+ * Sone - PostReplyProvider.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.database;
 
-import net.pterodactylus.sone.data.Sone;
+import java.util.List;
+
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 
 /**
- * Interface for objects that can provide {@link Sone}s by their ID.
+ * Interface for objects that can provide {@link PostReply}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface SoneProvider {
+public interface PostReplyProvider {
 
 	/**
-	 * Returns the Sone with the given ID, if it exists.
+	 * Returns the reply with the given ID.
 	 *
-	 * @param soneId
-	 *            The ID of the Sone to return
-	 * @return The Sone with the given ID, or {@code null}
+	 * @param id
+	 *            The ID of the reply to get
+	 * @return The reply, or {@code null} if there is no such reply
 	 */
-	public Sone getSone(String soneId);
+	public PostReply getPostReply(String id);
+
+	/**
+	 * Returns all replies for the given post, order ascending by time.
+	 *
+	 * @param post
+	 *            The post to get all replies for
+	 * @return All replies for the given post
+	 */
+	public List<PostReply> getReplies(Post post);
 
 }

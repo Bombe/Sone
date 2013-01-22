@@ -21,10 +21,10 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
 
-import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.PostReplyBuilder;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 
 import org.apache.commons.lang.StringUtils;
 

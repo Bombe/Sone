@@ -17,10 +17,10 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * Simple {@link PostReply} implementation.

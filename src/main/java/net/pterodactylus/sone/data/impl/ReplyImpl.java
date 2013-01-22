@@ -17,9 +17,9 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * Abstract base class for all replies.

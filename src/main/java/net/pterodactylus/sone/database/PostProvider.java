@@ -1,5 +1,5 @@
 /*
- * Sone - PostReplyProvider.java - Copyright © 2013 David Roden
+ * Sone - PostProvider.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,36 +15,36 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.database;
 
-import java.util.List;
+import java.util.Collection;
 
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
 
 /**
- * Interface for objects that can provide {@link PostReply}s.
+ * Interface for objects that can provide {@link Post}s by their ID.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface PostReplyProvider {
+public interface PostProvider {
 
 	/**
-	 * Returns the reply with the given ID.
+	 * Returns the post with the given ID.
 	 *
-	 * @param id
-	 *            The ID of the reply to get
-	 * @return The reply, or {@code null} if there is no such reply
+	 * @param postId
+	 *            The ID of the post to return
+	 * @return The post with the given ID, or {@code null}
 	 */
-	public PostReply getPostReply(String id);
+	public Post getPost(String postId);
 
 	/**
-	 * Returns all replies for the given post, order ascending by time.
+	 * Returns all posts that have the given Sone as recipient.
 	 *
-	 * @param post
-	 *            The post to get all replies for
-	 * @return All replies for the given post
+	 * @see Post#getRecipient()
+	 * @param recipientId
+	 *            The ID of the recipient of the posts
+	 * @return All posts that have the given Sone as recipient
 	 */
-	public List<PostReply> getReplies(Post post);
+	public Collection<Post> getDirectedPosts(String recipientId);
 
 }

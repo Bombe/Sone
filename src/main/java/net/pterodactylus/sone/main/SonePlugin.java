@@ -24,13 +24,13 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
-import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.core.WebOfTrustUpdater;
 import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReplyBuilderFactory;
 import net.pterodactylus.sone.data.impl.DefaultPostBuilderFactory;
 import net.pterodactylus.sone.data.impl.DefaultPostReplyBuilderFactory;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;

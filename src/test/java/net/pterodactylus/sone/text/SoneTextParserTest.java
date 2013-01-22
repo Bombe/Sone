@@ -22,8 +22,8 @@ import java.io.StringReader;
 import java.util.Arrays;
 
 import junit.framework.TestCase;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * JUnit test case for {@link SoneTextParser}.

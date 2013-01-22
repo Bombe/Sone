@@ -19,9 +19,9 @@ package net.pterodactylus.sone.data.impl;
 
 import java.util.UUID;
 
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * A post is a short message that a user writes in his Sone to let other users

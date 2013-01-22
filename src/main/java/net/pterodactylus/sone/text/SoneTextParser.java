@@ -26,10 +26,10 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
