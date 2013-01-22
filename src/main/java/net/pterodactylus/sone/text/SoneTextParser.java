@@ -239,7 +239,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (linkType == LinkType.SONE) {
 						if (line.length() >= (7 + 43)) {
 							String soneId = line.substring(7, 50);
-							Sone sone = soneProvider.getSone(soneId, false);
+							Sone sone = soneProvider.getSone(soneId);
 							if (sone == null) {
 								/*
 								 * don’t use create=true above, we don’t want

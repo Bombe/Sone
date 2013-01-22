@@ -65,7 +65,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	@Override
 	protected String getPageTitle(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
+		Sone sone = webInterface.getCore().getSone(soneId);
 		if ((sone != null) && (sone.getTime() > 0)) {
 			String soneName = SoneAccessor.getNiceName(sone);
 			return soneName + " - " + webInterface.getL10n().getString("Page.ViewSone.Title");
@@ -80,7 +80,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
+		Sone sone = webInterface.getCore().getSone(soneId);
 		templateContext.set("sone", sone);
 		templateContext.set("soneId", soneId);
 		if (sone == null) {

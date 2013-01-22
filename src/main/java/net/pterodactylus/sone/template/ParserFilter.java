@@ -94,7 +94,7 @@ public class ParserFilter implements Filter {
 		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("cut-off-length"))), length));
 		Object sone = parameters.get("sone");
 		if (sone instanceof String) {
-			sone = core.getSone((String) sone, false);
+			sone = core.getSone((String) sone);
 		}
 		FreenetRequest request = (FreenetRequest) templateContext.get("request");
 		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);

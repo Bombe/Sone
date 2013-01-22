@@ -69,7 +69,7 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 				}
 				core.markReplyKnown(reply);
 			} else if (type.equals("sone")) {
-				Sone sone = core.getSone(id, false);
+				Sone sone = core.getSone(id);
 				if (sone == null) {
 					continue;
 				}

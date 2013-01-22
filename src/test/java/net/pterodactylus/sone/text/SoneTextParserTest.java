@@ -181,7 +181,7 @@ public class SoneTextParserTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Sone getSone(final String soneId, boolean create) {
+		public Sone getSone(final String soneId) {
 			return new Sone(soneId, false) {
 
 				/**

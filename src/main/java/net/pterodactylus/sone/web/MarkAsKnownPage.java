@@ -77,7 +77,7 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 				}
 				webInterface.getCore().markReplyKnown(reply);
 			} else if (type.equals("sone")) {
-				Sone sone = webInterface.getCore().getSone(id, false);
+				Sone sone = webInterface.getCore().getSone(id);
 				if (sone == null) {
 					continue;
 				}

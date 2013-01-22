@@ -51,7 +51,7 @@ public class CreatePostAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		String recipientId = request.getHttpRequest().getParam("recipient");
-		Sone recipient = webInterface.getCore().getSone(recipientId, false);
+		Sone recipient = webInterface.getCore().getSone(recipientId);
 		String senderId = request.getHttpRequest().getParam("sender");
 		Sone sender = webInterface.getCore().getLocalSone(senderId, false);
 		if (sender == null) {

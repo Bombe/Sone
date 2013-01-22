@@ -83,7 +83,7 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId, false);
+		return soneProvider.getSone(soneId);
 	}
 
 	/**

@@ -94,7 +94,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId, false);
+		return soneProvider.getSone(soneId);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getRecipient() {
-		return soneProvider.getSone(recipientId, false);
+		return soneProvider.getSone(recipientId);
 	}
 
 	/**

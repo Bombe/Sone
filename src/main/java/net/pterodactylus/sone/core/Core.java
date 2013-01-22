@@ -357,30 +357,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sone with the given ID, or {@code null} if there is no such
 	 *         Sone
 	 */
-	public Sone getSone(String id) {
-		return getSone(id, true);
-	}
-
-	/**
-	 * Returns the Sone with the given ID, regardless whether it’s local or
-	 * remote.
-	 *
-	 * @param id
-	 *            The ID of the Sone to get
-	 * @param create
-	 *            {@code true} to create a new Sone if none exists,
-	 *            {@code false} to return {@code null} if a Sone with the given
-	 *            ID does not exist
-	 * @return The Sone with the given ID, or {@code null} if there is no such
-	 *         Sone
-	 */
 	@Override
-	public Sone getSone(String id, boolean create) {
+	public Sone getSone(String id) {
 		synchronized (sones) {
-			if (!sones.containsKey(id) && create) {
-				Sone sone = new Sone(id, false);
-				sones.put(id, sone);
-			}
 			return sones.get(id);
 		}
 	}
@@ -2359,7 +2338,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* some local identity still trusts this identity, don’t remove. */
 			return;
 		}
-		Sone sone = getSone(identity.getId(), false);
+		Sone sone = getSone(identity.getId());
 		if (sone == null) {
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;

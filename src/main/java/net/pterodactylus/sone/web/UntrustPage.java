@@ -59,7 +59,7 @@ public class UntrustPage extends SoneTemplatePage {
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			String identity = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			Sone sone = webInterface.getCore().getSone(identity, false);
+			Sone sone = webInterface.getCore().getSone(identity);
 			if (sone != null) {
 				webInterface.getCore().untrustSone(currentSone, sone);
 			}
