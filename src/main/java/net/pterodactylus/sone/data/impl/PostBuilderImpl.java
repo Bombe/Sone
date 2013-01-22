@@ -138,11 +138,9 @@ public class PostBuilderImpl implements PostBuilder {
 	 */
 	@Override
 	public Post build() {
-		checkState(!randomId && (id == null), "neither random ID or custom ID set");
-		checkState(randomId && (id != null), "both random ID and custom ID set");
+		checkState((randomId && (id == null)) || (!randomId && (id != null)), "exactly one of random ID or custom ID must be set");
 		checkState(sender != null, "sender must not be null");
-		checkState(!currentTime && (time == 0), "neither current time or custom time set");
-		checkState(currentTime && (time != 0), "both current time and custom time set");
+		checkState((currentTime && (time == 0)) || (!currentTime && (time > 0)), "one of current time or custom time must be set");
 		checkState(!StringUtils.isBlank(text), "text must not be empty");
 		checkState((recipient == null) || !recipient.equals(sender), "sender and recipient must not be the same");
 		return new PostImpl(randomId ? UUID.randomUUID().toString() : id, sender, currentTime ? System.currentTimeMillis() : time, text).setRecipient(recipient);
