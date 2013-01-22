@@ -523,26 +523,21 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns all posts that have the given Sone as recipient.
-	 *
-	 * @see Post#getRecipient()
-	 * @param recipient
-	 *            The recipient of the posts
-	 * @return All posts that have the given Sone as recipient
+	 * {@inheritDoc}
 	 */
-	public Set<Post> getDirectedPosts(Sone recipient) {
-		checkNotNull(recipient, "recipient must not be null");
-		Set<Post> directedPosts = new HashSet<Post>();
+	@Override
+	public Collection<Post> getDirectedPosts(final String recipientId) {
+		checkNotNull(recipientId, "recipient must not be null");
 		synchronized (posts) {
-			for (Post post : posts.values()) {
-				if (recipient.equals(post.getRecipient())) {
-					directedPosts.add(post);
-				}
-			}
-		}
-		return directedPosts;
-	}
+			return Collections2.filter(posts.values(), new Predicate<Post>() {
 
+				@Override
+				public boolean apply(Post post) {
+					return (post.getRecipient() != null) && (post.getRecipient().getId().equals(recipientId));
+				}
+			});
+		}
+	}
 	/**
 	 * Returns a post reply builder.
 	 *
