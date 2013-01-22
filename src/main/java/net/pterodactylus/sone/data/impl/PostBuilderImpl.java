@@ -143,7 +143,7 @@ public class PostBuilderImpl implements PostBuilder {
 		checkState((currentTime && (time == 0)) || (!currentTime && (time > 0)), "one of current time or custom time must be set");
 		checkState(!StringUtils.isBlank(text), "text must not be empty");
 		checkState((recipient == null) || !recipient.equals(sender), "sender and recipient must not be the same");
-		return new PostImpl(randomId ? UUID.randomUUID().toString() : id, sender, currentTime ? System.currentTimeMillis() : time, text).setRecipient(recipient);
+		return new PostImpl(randomId ? UUID.randomUUID().toString() : id, sender, recipient, currentTime ? System.currentTimeMillis() : time, text);
 	}
 
 }
