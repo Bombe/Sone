@@ -2304,23 +2304,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Generate a Sone URI from the given URI and latest edition.
-	 *
-	 * @param uriString
-	 *            The URI to derive the Sone URI from
-	 * @return The derived URI
-	 */
-	private static FreenetURI getSoneUri(String uriString) {
-		try {
-			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
-			return uri;
-		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString), mue1);
-			return null;
-		}
-	}
-
-	/**
 	 * Notifies the core that a new {@link OwnIdentity} was added.
 	 *
 	 * @param ownIdentityAddedEvent
