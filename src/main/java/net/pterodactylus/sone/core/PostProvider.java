@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.core;
 
+import java.util.Collection;
+
 import net.pterodactylus.sone.data.Post;
 
 /**
@@ -34,5 +36,15 @@ public interface PostProvider {
 	 * @return The post with the given ID, or {@code null}
 	 */
 	public Post getPost(String postId);
+
+	/**
+	 * Returns all posts that have the given Sone as recipient.
+	 *
+	 * @see Post#getRecipient()
+	 * @param recipientId
+	 *            The ID of the recipient of the posts
+	 * @return All posts that have the given Sone as recipient
+	 */
+	public Collection<Post> getDirectedPosts(String recipientId);
 
 }
