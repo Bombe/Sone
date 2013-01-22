@@ -409,7 +409,7 @@ public class SoneDownloader extends AbstractService {
 				try {
 					PostReplyBuilder postReplyBuilder = core.postReplyBuilder();
 					/* TODO - parse time correctly. */
-					postReplyBuilder.withId(replyId).from(sone).to(replyPostId).withTime(Long.parseLong(replyTime)).withText(replyText);
+					postReplyBuilder.withId(replyId).from(sone.getId()).to(replyPostId).withTime(Long.parseLong(replyTime)).withText(replyText);
 					replies.add(postReplyBuilder.build());
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */

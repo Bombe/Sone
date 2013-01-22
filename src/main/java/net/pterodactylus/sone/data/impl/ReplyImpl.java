@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.data.impl;
 
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 
@@ -29,11 +30,14 @@ import net.pterodactylus.sone.data.Sone;
  */
 public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 
+	/** The Sone provider. */
+	private final SoneProvider soneProvider;
+
 	/** The ID of the reply. */
 	private final String id;
 
 	/** The Sone that created this reply. */
-	private final Sone sone;
+	private final String soneId;
 
 	/** The time of the reply. */
 	private final long time;
@@ -47,18 +51,21 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	/**
 	 * Creates a new reply.
 	 *
+	 * @param soneProvider
+	 *            The Sone provider
 	 * @param id
 	 *            The ID of the reply
-	 * @param sone
-	 *            The Sone of the reply
+	 * @param soneId
+	 *            The ID of the Sone of the reply
 	 * @param time
 	 *            The time of the reply
 	 * @param text
 	 *            The text of the reply
 	 */
-	protected ReplyImpl(String id, Sone sone, long time, String text) {
+	protected ReplyImpl(SoneProvider soneProvider, String id, String soneId, long time, String text) {
+		this.soneProvider = soneProvider;
 		this.id = id;
-		this.sone = sone;
+		this.soneId = soneId;
 		this.time = time;
 		this.text = text;
 	}
@@ -76,7 +83,7 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	 */
 	@Override
 	public Sone getSone() {
-		return sone;
+		return soneProvider.getSone(soneId, false);
 	}
 
 	/**
@@ -142,7 +149,7 @@ public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
+		return String.format("%s[id=%s,sone=%s,time=%d,text=%s]", getClass().getName(), id, soneId, time, text);
 	}
 
 }

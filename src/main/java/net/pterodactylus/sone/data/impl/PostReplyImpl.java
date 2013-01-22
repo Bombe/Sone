@@ -18,9 +18,9 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.core.PostProvider;
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Sone;
 
 /**
  * Simple {@link PostReply} implementation.
@@ -38,12 +38,14 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	/**
 	 * Creates a new reply.
 	 *
+	 * @param soneProvider
+	 *            The Sone provider
 	 * @param postProvider
 	 *            The post provider
 	 * @param id
 	 *            The ID of the reply
-	 * @param sone
-	 *            The Sone of the reply
+	 * @param soneId
+	 *            The ID of the Sone of the reply
 	 * @param time
 	 *            The time of the reply
 	 * @param text
@@ -51,8 +53,8 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	 * @param postId
 	 *            The ID of the post this reply refers to
 	 */
-	public PostReplyImpl(PostProvider postProvider, String id, Sone sone, long time, String text, String postId) {
-		super(id, sone, time, text);
+	public PostReplyImpl(SoneProvider soneProvider, PostProvider postProvider, String id, String soneId, long time, String text, String postId) {
+		super(soneProvider, id, soneId, time, text);
 		this.postProvider = postProvider;
 		this.postId = postId;
 	}

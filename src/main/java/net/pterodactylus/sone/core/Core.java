@@ -1330,7 +1330,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				return;
 			}
 			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
-			postReplyBuilder.withId(replyId).from(sone).to(postId).withTime(replyTime).withText(replyText);
+			postReplyBuilder.withId(replyId).from(sone.getId()).to(postId).withTime(replyTime).withText(replyText);
 			replies.add(postReplyBuilder.build());
 		}
 
@@ -1663,7 +1663,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
-		postReplyBuilder.randomId().from(sone).to(post.getId()).currentTime().withText(text.trim());
+		postReplyBuilder.randomId().from(sone.getId()).to(post.getId()).currentTime().withText(text.trim());
 		final PostReply reply = postReplyBuilder.build();
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
