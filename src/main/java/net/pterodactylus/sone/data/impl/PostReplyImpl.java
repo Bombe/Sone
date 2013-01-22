@@ -17,11 +17,9 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import java.util.UUID;
-
+import net.pterodactylus.sone.core.PostProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Sone;
 
 /**
  * Simple {@link PostReply} implementation.
@@ -30,66 +28,24 @@ import net.pterodactylus.sone.data.Sone;
  */
 public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 
+	/** The post provider. */
+	private final PostProvider postProvider;
+
 	/** The Post this reply refers to. */
-	private volatile Post post;
+	private volatile String postId;
 
 	/**
 	 * Creates a new reply.
 	 *
+	 * @param postProvider
+	 *            The post provider
 	 * @param id
 	 *            The ID of the reply
 	 */
-	public PostReplyImpl(String id) {
-		this(id, null, null, 0, null);
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param text
-	 *            The text of the reply
-	 */
-	public PostReplyImpl(Sone sone, Post post, String text) {
-		this(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply-
-	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	public PostReplyImpl(Sone sone, Post post, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, post, time, text);
-	}
-
-	/**
-	 * Creates a new reply-
-	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param id
-	 *            The ID of the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	public PostReplyImpl(String id, Sone sone, Post post, long time, String text) {
-		super(id, sone, time, text);
-		this.post = post;
+	public PostReplyImpl(PostProvider postProvider, String id) {
+		super(id);
+		this.postProvider = postProvider;
+		this.postId = postId;
 	}
 
 	//
@@ -101,19 +57,19 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	 */
 	@Override
 	public Post getPost() {
-		return post;
+		return postProvider.getPost(postId);
 	}
 
 	/**
 	 * Sets the post this reply refers to.
 	 *
-	 * @param post
-	 *            The post this reply refers to
+	 * @param postId
+	 *            The ID of the post to reply to
 	 * @return This reply (for method chaining)
 	 */
 	@Override
-	public PostReply setPost(Post post) {
-		this.post = post;
+	public PostReply setPost(String postId) {
+		this.postId = postId;
 		return this;
 	}
 

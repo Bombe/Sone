@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
 
-import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.core.PostProvider;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.PostReplyBuilder;
 
@@ -35,15 +35,28 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder> implements PostReplyBuilder {
 
-	/** The post the created reply refers to. */
-	private Post post;
+	/** The post builder. */
+	private final PostProvider postProvider;
+
+	/** The ID of the post the created reply refers to. */
+	private String postId;
+
+	/**
+	 * Creates a new post reply builder.
+	 *
+	 * @param postProvider
+	 *            The post provider
+	 */
+	public PostReplyBuilderImpl(PostProvider postProvider) {
+		this.postProvider = postProvider;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PostReplyBuilder to(Post post) {
-		this.post = post;
+	public PostReplyBuilder to(String postId) {
+		this.postId = postId;
 		return this;
 	}
 
@@ -56,12 +69,12 @@ public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder>
 		checkState(sender != null, "sender must not be null");
 		checkState((currentTime && (time == 0)) || (!currentTime && (time >= 0)), "either current time or custom time must be set");
 		checkState(!StringUtils.isBlank(text), "text must not be empty");
-		checkState(post != null, "post must not be null");
+		checkState(postId != null, "post must not be null");
 
 		/* create new post reply. */
-		PostReplyImpl postReplyImpl = new PostReplyImpl(randomId ? UUID.randomUUID().toString() : id);
+		PostReplyImpl postReplyImpl = new PostReplyImpl(postProvider, randomId ? UUID.randomUUID().toString() : id);
 		postReplyImpl.setSone(sender);
-		postReplyImpl.setPost(post);
+		postReplyImpl.setPost(postId);
 		postReplyImpl.setTime(currentTime ? System.currentTimeMillis() : time);
 		postReplyImpl.setText(text);
 		return postReplyImpl;

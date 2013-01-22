@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
+import net.pterodactylus.sone.core.PostProvider;
 import net.pterodactylus.sone.core.WebOfTrustUpdater;
 import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReplyBuilderFactory;
@@ -223,6 +224,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(FcpInterface.class).in(Singleton.class);
 				bind(PostBuilderFactory.class).to(DefaultPostBuilderFactory.class).in(Singleton.class);
 				bind(PostReplyBuilderFactory.class).to(DefaultPostReplyBuilderFactory.class).in(Singleton.class);
+				bind(PostProvider.class).to(Core.class).in(Singleton.class);
 				bindListener(Matchers.any(), new TypeListener() {
 
 					@Override

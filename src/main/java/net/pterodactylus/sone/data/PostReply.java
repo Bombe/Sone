@@ -35,10 +35,10 @@ public interface PostReply extends Reply<PostReply> {
 	/**
 	 * Sets the post this reply refers to.
 	 *
-	 * @param post
-	 *            The post this reply refers to
+	 * @param postId
+	 *            The ID of the post to reply to
 	 * @return This reply
 	 */
-	public PostReply setPost(Post post);
+	public PostReply setPost(String postId);
 
 }

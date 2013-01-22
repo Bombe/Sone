@@ -28,11 +28,11 @@ public interface PostReplyBuilder extends ReplyBuilder<PostReplyBuilder> {
 	 * Configures this builder to set the given post as post the created reply
 	 * refers to.
 	 *
-	 * @param post
-	 *            The post the reply refers to
+	 * @param postId
+	 *            The ID of the post the reply refers to
 	 * @return This builder
 	 */
-	public PostReplyBuilder to(Post post);
+	public PostReplyBuilder to(String postId);
 
 	/**
 	 * Verifies the configuration of this builder and creates a new post reply.
@@ -47,7 +47,7 @@ public interface PostReplyBuilder extends ReplyBuilder<PostReplyBuilder> {
 	 * have been called.</li>
 	 * <li>The {@link #withText(String) text} must not be {@code null} and must
 	 * contain something other than whitespace.</li>
-	 * <li>The {@link #to(Post) post} have been set.</li>
+	 * <li>The {@link #to(String) post} have been set.</li>
 	 * </ul>
 	 *
 	 * @return The created post reply
