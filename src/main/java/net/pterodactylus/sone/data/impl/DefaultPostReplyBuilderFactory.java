@@ -17,9 +17,9 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import net.pterodactylus.sone.data.PostReplyBuilder;
-import net.pterodactylus.sone.data.PostReplyBuilderFactory;
 import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.PostReplyBuilderFactory;
 import net.pterodactylus.sone.database.SoneProvider;
 
 import com.google.inject.Inject;

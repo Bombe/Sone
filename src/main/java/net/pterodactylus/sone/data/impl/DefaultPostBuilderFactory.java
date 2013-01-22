@@ -17,8 +17,8 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import net.pterodactylus.sone.data.PostBuilder;
-import net.pterodactylus.sone.data.PostBuilderFactory;
+import net.pterodactylus.sone.database.PostBuilder;
+import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.SoneProvider;
 
 /**
