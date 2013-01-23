@@ -964,7 +964,6 @@ public class WebInterface {
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				lockedSonesNotification.add(sone);
-				lockedSonesTickerObjects.remove(sone);
 				notificationManager.addNotification(lockedSonesNotification);
 			}
 		}, 5, TimeUnit.MINUTES);
