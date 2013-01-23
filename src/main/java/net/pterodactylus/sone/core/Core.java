@@ -1307,7 +1307,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			PostBuilder postBuilder = postBuilderFactory.newPostBuilder().withId(postId).from(sone).withTime(postTime).withText(postText);
+			PostBuilder postBuilder = postBuilder().withId(postId).from(sone).withTime(postTime).withText(postText);
 			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
 				postBuilder.to(getSone(postRecipientId));
 			}
