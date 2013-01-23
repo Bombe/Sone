@@ -56,6 +56,8 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostBuilder;
+import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
@@ -64,7 +66,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.data.impl.PostImpl;
 import net.pterodactylus.sone.data.impl.PostReplyImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
@@ -168,6 +169,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	/** All known Sones. */
 	private final Set<String> knownSones = new HashSet<String>();
 
+	/** The post builder. */
+	private final PostBuilderFactory postBuilderFactory;
+
 	/** All posts. */
 	private final Map<String, Post> posts = new HashMap<String, Post>();
 
@@ -215,9 +219,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The WebOfTrust updater
 	 * @param eventBus
 	 *            The event bus
+	 * @param postBuilderFactory
+	 *            The post builder
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostBuilderFactory postBuilderFactory) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -227,6 +233,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		this.updateChecker = new UpdateChecker(eventBus, freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
+		this.postBuilderFactory = postBuilderFactory;
 	}
 
 	//
@@ -511,35 +518,21 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the post with the given ID.
+	 * Returns a post builder.
 	 *
-	 * @param postId
-	 *            The ID of the post to get
-	 * @return The post with the given ID, or a new post with the given ID
+	 * @return A new post builder
 	 */
-	public Post getPost(String postId) {
-		return getPost(postId, true);
+	public PostBuilder postBuilder() {
+		return postBuilderFactory.newPostBuilder();
 	}
 
 	/**
-	 * Returns the post with the given ID, optionally creating a new post.
-	 *
-	 * @param postId
-	 *            The ID of the post to get
-	 * @param create
-	 *            {@code true} it create a new post if no post with the given ID
-	 *            exists, {@code false} to return {@code null}
-	 * @return The post, or {@code null} if there is no such post
+	 * {@inheritDoc}
 	 */
 	@Override
-	public Post getPost(String postId, boolean create) {
+	public Post getPost(String postId) {
 		synchronized (posts) {
-			Post post = posts.get(postId);
-			if ((post == null) && create) {
-				post = new PostImpl(postId);
-				posts.put(postId, post);
-			}
-			return post;
+			return posts.get(postId);
 		}
 	}
 
@@ -677,7 +670,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
-				Post post = getPost(bookmarkedPostId, false);
+				Post post = getPost(bookmarkedPostId);
 				if (post != null) {
 					posts.add(post);
 				}
@@ -1110,16 +1103,18 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				List<Post> storedPosts = storedSone.getPosts();
 				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
-						post.setSone(storedSone).setKnown(knownPosts.contains(post.getId()));
-						if (!storedPosts.contains(post)) {
-							if (post.getTime() < getSoneFollowingTime(sone)) {
-								knownPosts.add(post.getId());
-								post.setKnown(true);
-							} else if (!knownPosts.contains(post.getId())) {
-								eventBus.post(new NewPostFoundEvent(post));
+						PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
+						postBuilder.copyPost(post).from(storedSone);
+						Post newPost = postBuilder.build().setKnown(knownPosts.contains(post.getId()));
+						if (!storedPosts.contains(newPost)) {
+							if (newPost.getTime() < getSoneFollowingTime(sone)) {
+								knownPosts.add(newPost.getId());
+								newPost.setKnown(true);
+							} else if (!knownPosts.contains(newPost.getId())) {
+								eventBus.post(new NewPostFoundEvent(newPost));
 							}
 						}
-						posts.put(post.getId(), post);
+						posts.put(newPost.getId(), newPost);
 					}
 				}
 			}
@@ -1312,11 +1307,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			Post post = getPost(postId).setSone(sone).setTime(postTime).setText(postText);
+			PostBuilder postBuilder = postBuilderFactory.newPostBuilder().withId(postId).from(sone).withTime(postTime).withText(postText);
 			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-				post.setRecipient(getSone(postRecipientId));
+				postBuilder.to(getSone(postRecipientId));
 			}
-			posts.add(post);
+			posts.add(postBuilder.build());
 		}
 
 		/* load replies. */
@@ -1538,10 +1533,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
-		final Post post = new PostImpl(sone, time, text.trim());
+		PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
+		postBuilder.from(sone).randomId().withTime(time).withText(text.trim());
 		if (recipient != null) {
-			post.setRecipient(recipient);
+			postBuilder.to(recipient);
 		}
+		final Post post = postBuilder.build();
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}

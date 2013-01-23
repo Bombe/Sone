@@ -68,29 +68,11 @@ public interface Post {
 	public Sone getSone();
 
 	/**
-	 * Sets the Sone of this post.
-	 *
-	 * @param sone
-	 *            The Sone of this post
-	 * @return This post (for method chaining)
-	 */
-	public Post setSone(Sone sone);
-
-	/**
 	 * Returns the recipient of this post, if any.
 	 *
 	 * @return The recipient of this post, or {@code null}
 	 */
 	public Sone getRecipient();
-
-	/**
-	 * Sets the recipient of this post.
-	 *
-	 * @param recipient
-	 *            The recipient of this post, or {@code null}
-	 * @return This post (for method chaining)
-	 */
-	public Post setRecipient(Sone recipient);
 
 	/**
 	 * Returns the time of the post.
@@ -100,29 +82,11 @@ public interface Post {
 	public long getTime();
 
 	/**
-	 * Sets the time of this post.
-	 *
-	 * @param time
-	 *            The time of this post (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This post (for method chaining)
-	 */
-	public Post setTime(long time);
-
-	/**
 	 * Returns the text of the post.
 	 *
 	 * @return The text of the post
 	 */
 	public String getText();
-
-	/**
-	 * Sets the text of this post.
-	 *
-	 * @param text
-	 *            The text of this post
-	 * @return This post (for method chaining)
-	 */
-	public Post setText(String text);
 
 	/**
 	 * Returns whether this post is known.

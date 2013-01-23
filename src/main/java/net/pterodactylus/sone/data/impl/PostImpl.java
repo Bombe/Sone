@@ -124,9 +124,12 @@ public class PostImpl implements Post {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the Sone of this post.
+	 *
+	 * @param sone
+	 *            The Sone of this post
+	 * @return This post (for method chaining)
 	 */
-	@Override
 	public PostImpl setSone(Sone sone) {
 		this.sone = sone;
 		return this;
@@ -141,9 +144,12 @@ public class PostImpl implements Post {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the recipient of this post.
+	 *
+	 * @param recipient
+	 *            The recipient of this post, or {@code null}
+	 * @return This post (for method chaining)
 	 */
-	@Override
 	public PostImpl setRecipient(Sone recipient) {
 		if (!sone.equals(recipient)) {
 			this.recipient = recipient;
@@ -160,9 +166,12 @@ public class PostImpl implements Post {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the time of this post.
+	 *
+	 * @param time
+	 *            The time of this post (in milliseconds since Jan 1, 1970 UTC)
+	 * @return This post (for method chaining)
 	 */
-	@Override
 	public PostImpl setTime(long time) {
 		this.time = time;
 		return this;
@@ -177,9 +186,12 @@ public class PostImpl implements Post {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Sets the text of this post.
+	 *
+	 * @param text
+	 *            The text of this post
+	 * @return This post (for method chaining)
 	 */
-	@Override
 	public PostImpl setText(String text) {
 		this.text = text;
 		return this;

@@ -58,7 +58,7 @@ public class GetTimesAjaxPage extends JsonPage {
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
 			for (String id : ids) {
-				Post post = webInterface.getCore().getPost(id, false);
+				Post post = webInterface.getCore().getPost(id);
 				if (post == null) {
 					continue;
 				}

@@ -258,7 +258,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (linkType == LinkType.POST) {
 						if (line.length() >= (7 + 36)) {
 							String postId = line.substring(7, 43);
-							Post post = postProvider.getPost(postId, false);
+							Post post = postProvider.getPost(postId);
 							if ((post != null) && (post.getSone() != null)) {
 								parts.add(new PostPart(post));
 							} else {
