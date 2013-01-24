@@ -207,6 +207,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			@Override
 			protected void configure() {
+				bind(Core.class).in(Singleton.class);
 				bind(EventBus.class).toInstance(eventBus);
 				bind(Configuration.class).toInstance(startConfiguration);
 				bind(FreenetInterface.class).in(Singleton.class);
