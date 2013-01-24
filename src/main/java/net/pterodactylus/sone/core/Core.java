@@ -59,6 +59,8 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostBuilder;
 import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.PostReplyBuilder;
+import net.pterodactylus.sone.data.PostReplyBuilderFactory;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
@@ -66,7 +68,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.data.impl.PostReplyImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -103,7 +104,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements SoneProvider, PostProvider {
+public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -181,6 +182,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	/** All known posts. */
 	private final Set<String> knownPosts = new HashSet<String>();
 
+	/** The post reply builder factory. */
+	private final PostReplyBuilderFactory postReplyBuilderFactory;
+
 	/** All replies. */
 	private final Map<String, PostReply> replies = new HashMap<String, PostReply>();
 
@@ -224,9 +228,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The event bus
 	 * @param postBuilderFactory
 	 *            The post builder
+	 * @param postReplyBuilderFactory
+	 *            The post reply builder factory
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostBuilderFactory postBuilderFactory) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostBuilderFactory postBuilderFactory, PostReplyBuilderFactory postReplyBuilderFactory) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -237,6 +243,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.postBuilderFactory = postBuilderFactory;
+		this.postReplyBuilderFactory = postReplyBuilderFactory;
 	}
 
 	//
@@ -561,35 +568,28 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the reply with the given ID. If there is no reply with the given
-	 * ID yet, a new one is created, unless {@code create} is false in which
-	 * case {@code null} is returned.
+	 * Returns a post reply builder.
 	 *
-	 * @param replyId
-	 *            The ID of the reply to get
-	 * @param create
-	 *            {@code true} to always return a {@link Reply}, {@code false}
-	 *            to return {@code null} if no reply can be found
-	 * @return The reply, or {@code null} if there is no such reply
+	 * @return A new post reply builder
 	 */
-	public PostReply getPostReply(String replyId, boolean create) {
+	public PostReplyBuilder postReplyBuilder() {
+		return postReplyBuilderFactory.newPostReplyBuilder();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public PostReply getPostReply(String replyId) {
 		synchronized (replies) {
-			PostReply reply = replies.get(replyId);
-			if (create && (reply == null)) {
-				reply = new PostReplyImpl(replyId);
-				replies.put(replyId, reply);
-			}
-			return reply;
+			return replies.get(replyId);
 		}
 	}
 
 	/**
-	 * Returns all replies for the given post, order ascending by time.
-	 *
-	 * @param post
-	 *            The post to get all replies for
-	 * @return All replies for the given post
+	 * {@inheritDoc}
 	 */
+	@Override
 	public List<PostReply> getReplies(final Post post) {
 		return Ordering.from(Reply.TIME_COMPARATOR).sortedCopy(FluentIterable.from(getSones()).transformAndConcat(new Function<Sone, Iterable<PostReply>>() {
 
@@ -876,7 +876,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		synchronized (sones) {
 			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
-			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
+			sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
 				synchronized (knownSones) {
@@ -1334,7 +1334,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
 				return;
 			}
-			replies.add(getPostReply(replyId, true).setSone(sone).setPost(getPost(postId)).setTime(replyTime).setText(replyText));
+			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+			postReplyBuilder.withId(replyId).from(sone).to(postId).withTime(replyTime).withText(replyText);
+			replies.add(postReplyBuilder.build());
 		}
 
 		/* load post likes. */
@@ -1659,30 +1661,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The created reply
 	 */
 	public PostReply createReply(Sone sone, Post post, String text) {
-		return createReply(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The Sone that creates the reply
-	 * @param post
-	 *            The post that this reply refers to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 * @return The created reply
-	 */
-	public PostReply createReply(Sone sone, Post post, long time, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
-		final PostReply reply = new PostReplyImpl(sone, post, System.currentTimeMillis(), text.trim());
+		PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+		postReplyBuilder.randomId().from(sone).to(post.getId()).currentTime().withText(text.trim());
+		final PostReply reply = postReplyBuilder.build();
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
@@ -2318,23 +2305,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
 		} catch (IllegalArgumentException iae1) {
 			logger.log(Level.WARNING, String.format("Invalid value for %s in configuration, using default.", optionName));
-		}
-	}
-
-	/**
-	 * Generate a Sone URI from the given URI and latest edition.
-	 *
-	 * @param uriString
-	 *            The URI to derive the Sone URI from
-	 * @return The derived URI
-	 */
-	private static FreenetURI getSoneUri(String uriString) {
-		try {
-			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
-			return uri;
-		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString), mue1);
-			return null;
 		}
 	}
 

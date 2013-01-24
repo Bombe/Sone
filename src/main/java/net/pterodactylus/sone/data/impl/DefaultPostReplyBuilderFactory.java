@@ -1,5 +1,5 @@
 /*
- * Sone - PostReplyImpl.java - Copyright © 2010–2013 David Roden
+ * Sone - DefaultPostReplyBuilderFactory.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,59 +18,38 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.PostReplyBuilder;
+import net.pterodactylus.sone.data.PostReplyBuilderFactory;
+
+import com.google.inject.Inject;
 
 /**
- * Simple {@link PostReply} implementation.
+ * {@link PostReplyBuilderFactory} that creates {@link PostReplyBuilderImpl}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
+public class DefaultPostReplyBuilderFactory implements PostReplyBuilderFactory {
 
 	/** The post provider. */
 	private final PostProvider postProvider;
 
-	/** The Post this reply refers to. */
-	private volatile String postId;
-
 	/**
-	 * Creates a new reply.
+	 * Creates a new default post reply builder factory.
 	 *
 	 * @param postProvider
 	 *            The post provider
-	 * @param id
-	 *            The ID of the reply
 	 */
-	public PostReplyImpl(PostProvider postProvider, String id) {
-		super(id);
+	@Inject
+	public DefaultPostReplyBuilderFactory(PostProvider postProvider) {
 		this.postProvider = postProvider;
-		this.postId = postId;
 	}
-
-	//
-	// ACCESSORS
-	//
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Post getPost() {
-		return postProvider.getPost(postId);
-	}
-
-	/**
-	 * Sets the post this reply refers to.
-	 *
-	 * @param postId
-	 *            The ID of the post to reply to
-	 * @return This reply (for method chaining)
-	 */
-	@Override
-	public PostReply setPost(String postId) {
-		this.postId = postId;
-		return this;
+	public PostReplyBuilder newPostReplyBuilder() {
+		return new PostReplyBuilderImpl(postProvider);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - PostReply.java - Copyright © 2010–2013 David Roden
+ * Sone - PostReplyBuilderFactory.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,27 +18,17 @@
 package net.pterodactylus.sone.data;
 
 /**
- * A reply is like a {@link Post} but can never be posted on its own, it always
- * refers to another {@link Post}.
+ * Factory for {@link PostReplyBuilder}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface PostReply extends Reply<PostReply> {
+public interface PostReplyBuilderFactory {
 
 	/**
-	 * Returns the post this reply refers to.
+	 * Creates a new post reply builder.
 	 *
-	 * @return The post this reply refers to
+	 * @return A new post reply builder
 	 */
-	public Post getPost();
-
-	/**
-	 * Sets the post this reply refers to.
-	 *
-	 * @param postId
-	 *            The ID of the post to reply to
-	 * @return This reply
-	 */
-	public PostReply setPost(String postId);
+	public PostReplyBuilder newPostReplyBuilder();
 
 }
