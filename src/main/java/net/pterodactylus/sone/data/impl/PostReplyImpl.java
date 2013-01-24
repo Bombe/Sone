@@ -53,6 +53,14 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	//
 
 	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public String getPostId() {
+		return postId;
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override

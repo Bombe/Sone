@@ -2008,7 +2008,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (PostReply reply : sone.getReplies()) {
 				String replyPrefix = sonePrefix + "/Replies/" + replyCounter++;
 				configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
-				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPost().getId());
+				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPostId());
 				configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
 				configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
 			}

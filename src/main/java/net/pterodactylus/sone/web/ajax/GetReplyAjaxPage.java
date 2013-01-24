@@ -97,7 +97,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	private JsonObject createJsonReply(FreenetRequest request, PostReply reply, Sone currentSone) {
 		JsonObject jsonReply = new JsonObject();
 		jsonReply.put("id", reply.getId());
-		jsonReply.put("postId", reply.getPost().getId());
+		jsonReply.put("postId", reply.getPostId());
 		jsonReply.put("soneId", reply.getSone().getId());
 		jsonReply.put("time", reply.getTime());
 		StringWriter stringWriter = new StringWriter();

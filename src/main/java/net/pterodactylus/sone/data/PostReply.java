@@ -26,6 +26,13 @@ package net.pterodactylus.sone.data;
 public interface PostReply extends Reply<PostReply> {
 
 	/**
+	 * Returns the ID of the post this reply refers to.
+	 *
+	 * @return The ID of the post this reply refers to
+	 */
+	public String getPostId();
+
+	/**
 	 * Returns the post this reply refers to.
 	 *
 	 * @return The post this reply refers to

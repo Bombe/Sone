@@ -134,7 +134,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			JsonObject jsonReply = new JsonObject();
 			jsonReply.put("id", reply.getId());
 			jsonReply.put("sone", reply.getSone().getId());
-			jsonReply.put("post", reply.getPost().getId());
+			jsonReply.put("post", reply.getPostId());
 			jsonReply.put("postSone", reply.getPost().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}

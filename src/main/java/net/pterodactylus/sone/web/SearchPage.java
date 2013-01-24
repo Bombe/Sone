@@ -341,7 +341,7 @@ public class SearchPage extends SoneTemplatePage {
 		if (!postReply.isPresent()) {
 			return null;
 		}
-		return postReply.get().getPost().getId();
+		return postReply.get().getPostId();
 	}
 
 	/**
