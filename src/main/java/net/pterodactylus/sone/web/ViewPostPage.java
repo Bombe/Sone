@@ -19,6 +19,8 @@ package net.pterodactylus.sone.web;
 
 import java.net.URI;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -54,11 +56,11 @@ public class ViewPostPage extends SoneTemplatePage {
 	@Override
 	protected String getPageTitle(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId);
+		Optional<Post> post = webInterface.getCore().getPost(postId);
 		String title = "";
-		if ((post != null) && (post.getSone() != null)) {
-			title = post.getText().substring(0, Math.min(20, post.getText().length())) + "…";
-			title += " - " + SoneAccessor.getNiceName(post.getSone()) + " - ";
+		if (post.isPresent()) {
+			title = post.get().getText().substring(0, Math.min(20, post.get().getText().length())) + "…";
+			title += " - " + SoneAccessor.getNiceName(post.get().getSone()) + " - ";
 		}
 		title += webInterface.getL10n().getString("Page.ViewPost.Title");
 		return title;
@@ -72,8 +74,8 @@ public class ViewPostPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		String postId = request.getHttpRequest().getParam("post");
 		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
-		Post post = webInterface.getCore().getPost(postId);
-		templateContext.set("post", post);
+		Optional<Post> post = webInterface.getCore().getPost(postId);
+		templateContext.set("post", post.get());
 		templateContext.set("raw", raw);
 	}
 

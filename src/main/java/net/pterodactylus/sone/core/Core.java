@@ -541,9 +541,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Post getPost(String postId) {
+	public Optional<Post> getPost(String postId) {
 		synchronized (posts) {
-			return posts.get(postId);
+			return Optional.fromNullable(posts.get(postId));
 		}
 	}
 
@@ -676,9 +676,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
-				Post post = getPost(bookmarkedPostId);
-				if (post != null) {
-					posts.add(post);
+				Optional<Post> post = getPost(bookmarkedPostId);
+				if (!post.isPresent()) {
+					posts.add(post.get());
 				}
 			}
 		}

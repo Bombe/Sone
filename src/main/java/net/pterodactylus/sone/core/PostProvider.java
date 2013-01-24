@@ -19,6 +19,8 @@ package net.pterodactylus.sone.core;
 
 import net.pterodactylus.sone.data.Post;
 
+import com.google.common.base.Optional;
+
 /**
  * Interface for objects that can provide {@link Post}s by their ID.
  *
@@ -33,6 +35,6 @@ public interface PostProvider {
 	 *            The ID of the post to return
 	 * @return The post with the given ID, or {@code null}
 	 */
-	public Post getPost(String postId);
+	public Optional<Post> getPost(String postId);
 
 }

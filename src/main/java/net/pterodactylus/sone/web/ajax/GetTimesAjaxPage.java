@@ -60,16 +60,16 @@ public class GetTimesAjaxPage extends JsonPage {
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
 			for (String id : ids) {
-				Post post = webInterface.getCore().getPost(id);
-				if (post == null) {
+				Optional<Post> post = webInterface.getCore().getPost(id);
+				if (!post.isPresent()) {
 					continue;
 				}
 				JsonObject postTime = new JsonObject();
-				Time time = getTime(post.getTime());
+				Time time = getTime(post.get().getTime());
 				postTime.put("timeText", time.getText());
 				postTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
 				synchronized (dateFormat) {
-					postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
+					postTime.put("tooltip", dateFormat.format(new Date(post.get().getTime())));
 				}
 				postTimes.put(id, postTime);
 			}

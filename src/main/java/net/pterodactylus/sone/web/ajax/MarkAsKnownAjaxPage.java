@@ -59,11 +59,11 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 		Core core = webInterface.getCore();
 		for (String id : ids) {
 			if (type.equals("post")) {
-				Post post = core.getPost(id);
-				if (post == null) {
+				Optional<Post> post = core.getPost(id);
+				if (!post.isPresent()) {
 					continue;
 				}
-				core.markPostKnown(post);
+				core.markPostKnown(post.get());
 			} else if (type.equals("reply")) {
 				Optional<PostReply> reply = core.getPostReply(id);
 				if (!reply.isPresent()) {

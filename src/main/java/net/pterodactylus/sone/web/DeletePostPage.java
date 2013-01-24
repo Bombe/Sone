@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
@@ -55,19 +57,22 @@ public class DeletePostPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.GET) {
 			String postId = request.getHttpRequest().getParam("post");
 			String returnPage = request.getHttpRequest().getParam("returnPage");
-			Post post = webInterface.getCore().getPost(postId);
-			templateContext.set("post", post);
+			Optional<Post> post = webInterface.getCore().getPost(postId);
+			if (!post.isPresent()) {
+				throw new RedirectException("noPermission.html");
+			}
+			templateContext.set("post", post.get());
 			templateContext.set("returnPage", returnPage);
 			return;
 		} else if (request.getMethod() == Method.POST) {
 			String postId = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
-			Post post = webInterface.getCore().getPost(postId);
-			if (!post.getSone().isLocal()) {
+			Optional<Post> post = webInterface.getCore().getPost(postId);
+			if (!post.isPresent() || !post.get().getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {
-				webInterface.getCore().deletePost(post);
+				webInterface.getCore().deletePost(post.get());
 				throw new RedirectException(returnPage);
 			} else if (request.getHttpRequest().isPartSet("abortDelete")) {
 				throw new RedirectException(returnPage);

@@ -19,6 +19,8 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.io.StringWriter;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
@@ -59,11 +61,11 @@ public class GetPostAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId);
-		if (post == null) {
+		Optional<Post> post = webInterface.getCore().getPost(postId);
+		if (!post.isPresent()) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		return createSuccessJsonObject().put("post", createJsonPost(request, post, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("post", createJsonPost(request, post.get(), getCurrentSone(request.getToadletContext())));
 	}
 
 	/**

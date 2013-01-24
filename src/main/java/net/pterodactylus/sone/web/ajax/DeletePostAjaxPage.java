@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -49,14 +51,14 @@ public class DeletePostAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId);
-		if ((post == null) || (post.getSone() == null)) {
+		Optional<Post> post = webInterface.getCore().getPost(postId);
+		if (!post.isPresent()) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		if (!post.getSone().isLocal()) {
+		if (!post.get().getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
-		webInterface.getCore().deletePost(post);
+		webInterface.getCore().deletePost(post.get());
 		return createSuccessJsonObject();
 	}
 

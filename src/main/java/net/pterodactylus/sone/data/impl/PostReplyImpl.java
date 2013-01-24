@@ -57,7 +57,7 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	 */
 	@Override
 	public Post getPost() {
-		return postProvider.getPost(postId);
+		return postProvider.getPost(postId).get();
 	}
 
 	/**
