@@ -31,6 +31,8 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.notify.Notification;
 
+import com.google.common.base.Optional;
+
 /**
  * Filter for {@link ListNotification}s.
  *
@@ -282,11 +284,11 @@ public class ListNotificationFilters {
 	 */
 	public static boolean isReplyVisible(Sone sone, PostReply reply) {
 		checkNotNull(reply, "reply must not be null");
-		Post post = reply.getPost();
-		if (post == null) {
+		Optional<Post> post = reply.getPost();
+		if (!post.isPresent()) {
 			return false;
 		}
-		if (!isPostVisible(sone, post)) {
+		if (!isPostVisible(sone, post.get())) {
 			return false;
 		}
 		if (reply.getTime() > System.currentTimeMillis()) {

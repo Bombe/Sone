@@ -857,8 +857,8 @@ public class WebInterface {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && (reply.getPost().getSone() != null) && (reply.getTime() <= System.currentTimeMillis())) {
-				mentionNotification.add(reply.getPost());
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && reply.getPost().isPresent() && (reply.getTime() <= System.currentTimeMillis())) {
+				mentionNotification.add(reply.getPost().get());
 				notificationManager.addNotification(mentionNotification);
 			}
 		} else {
@@ -900,7 +900,7 @@ public class WebInterface {
 	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
 		newReplyNotification.remove(markPostReplyKnownEvent.postReply());
 		localReplyNotification.remove(markPostReplyKnownEvent.postReply());
-		mentionNotification.remove(markPostReplyKnownEvent.postReply().getPost());
+		mentionNotification.remove(markPostReplyKnownEvent.postReply().getPost().get());
 	}
 
 	/**
@@ -940,11 +940,11 @@ public class WebInterface {
 		localReplyNotification.remove(reply);
 		if (!getMentionedSones(reply.getText()).isEmpty()) {
 			boolean isMentioned = false;
-			for (PostReply existingReply : getCore().getReplies(reply.getPost())) {
+			for (PostReply existingReply : getCore().getReplies(reply.getPost().get())) {
 				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
 			}
 			if (!isMentioned) {
-				mentionNotification.remove(reply.getPost());
+				mentionNotification.remove(reply.getPost().get());
 			}
 		}
 	}

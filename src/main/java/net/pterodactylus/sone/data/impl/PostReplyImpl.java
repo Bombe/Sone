@@ -21,6 +21,8 @@ import net.pterodactylus.sone.core.PostProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 
+import com.google.common.base.Optional;
+
 /**
  * Simple {@link PostReply} implementation.
  *
@@ -64,8 +66,8 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Post getPost() {
-		return postProvider.getPost(postId).get();
+	public Optional<Post> getPost() {
+		return postProvider.getPost(postId);
 	}
 
 	/**

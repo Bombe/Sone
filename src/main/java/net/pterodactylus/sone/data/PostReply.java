@@ -37,7 +37,7 @@ public interface PostReply extends Reply<PostReply> {
 	 *
 	 * @return The post this reply refers to
 	 */
-	public Post getPost();
+	public Optional<Post> getPost();
 
 	/**
 	 * Sets the post this reply refers to.

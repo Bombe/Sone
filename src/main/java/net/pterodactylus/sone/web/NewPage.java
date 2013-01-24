@@ -67,7 +67,7 @@ public class NewPage extends SoneTemplatePage {
 		/* collect new elements from notifications. */
 		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts());
 		for (PostReply reply : webInterface.getNewReplies()) {
-			posts.add(reply.getPost());
+			posts.add(reply.getPost().get());
 		}
 
 		/* filter and sort them. */
