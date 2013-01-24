@@ -86,9 +86,12 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -587,18 +590,20 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The post to get all replies for
 	 * @return All replies for the given post
 	 */
-	public List<PostReply> getReplies(Post post) {
-		Set<Sone> sones = getSones();
-		List<PostReply> replies = new ArrayList<PostReply>();
-		for (Sone sone : sones) {
-			for (PostReply reply : sone.getReplies()) {
-				if (reply.getPost().equals(post)) {
-					replies.add(reply);
-				}
+	public List<PostReply> getReplies(final Post post) {
+		return Ordering.from(Reply.TIME_COMPARATOR).sortedCopy(FluentIterable.from(getSones()).transformAndConcat(new Function<Sone, Iterable<PostReply>>() {
+
+			@Override
+			public Iterable<PostReply> apply(Sone sone) {
+				return sone.getReplies();
 			}
-		}
-		Collections.sort(replies, Reply.TIME_COMPARATOR);
-		return replies;
+		}).filter(new Predicate<PostReply>() {
+
+			@Override
+			public boolean apply(PostReply reply) {
+				return post.equals(reply.getPost());
+			}
+		}));
 	}
 
 	/**
