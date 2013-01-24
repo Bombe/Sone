@@ -28,6 +28,8 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
+import com.google.common.base.Optional;
+
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
  *
@@ -77,16 +79,16 @@ public class GetTimesAjaxPage extends JsonPage {
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
 			for (String id : ids) {
-				PostReply reply = webInterface.getCore().getPostReply(id);
-				if (reply == null) {
+				Optional<PostReply> reply = webInterface.getCore().getPostReply(id);
+				if (!reply.isPresent()) {
 					continue;
 				}
 				JsonObject replyTime = new JsonObject();
-				Time time = getTime(reply.getTime());
+				Time time = getTime(reply.get().getTime());
 				replyTime.put("timeText", time.getText());
 				replyTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
 				synchronized (dateFormat) {
-					replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
+					replyTime.put("tooltip", dateFormat.format(new Date(reply.get().getTime())));
 				}
 				replyTimes.put(id, replyTime);
 			}

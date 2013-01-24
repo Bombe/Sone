@@ -27,6 +27,8 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
+import com.google.common.base.Optional;
+
 /**
  * Page that lets the user mark a number of {@link Sone}s, {@link Post}s, or
  * {@link Reply Replie}s as known.
@@ -71,11 +73,11 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 				}
 				webInterface.getCore().markPostKnown(post);
 			} else if (type.equals("reply")) {
-				PostReply reply = webInterface.getCore().getPostReply(id);
-				if (reply == null) {
+				Optional<PostReply> reply = webInterface.getCore().getPostReply(id);
+				if (!reply.isPresent()) {
 					continue;
 				}
-				webInterface.getCore().markReplyKnown(reply);
+				webInterface.getCore().markReplyKnown(reply.get());
 			} else if (type.equals("sone")) {
 				Sone sone = webInterface.getCore().getSone(id, false);
 				if (sone == null) {

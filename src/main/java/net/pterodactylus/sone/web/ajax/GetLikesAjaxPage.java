@@ -31,6 +31,8 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 
+import com.google.common.base.Optional;
+
 /**
  * AJAX page that retrieves the number of “likes” a {@link Post} has.
  *
@@ -67,8 +69,11 @@ public class GetLikesAjaxPage extends JsonPage {
 			Set<Sone> sones = webInterface.getCore().getLikes(post);
 			return createSuccessJsonObject().put("likes", sones.size()).put("sones", getSones(sones));
 		} else if ("reply".equals(type)) {
-			PostReply reply = webInterface.getCore().getPostReply(id);
-			Set<Sone> sones = webInterface.getCore().getLikes(reply);
+			Optional<PostReply> reply = webInterface.getCore().getPostReply(id);
+			if (!reply.isPresent()) {
+				return createErrorJsonObject("invalid-reply-id");
+			}
+			Set<Sone> sones = webInterface.getCore().getLikes(reply.get());
 			return createSuccessJsonObject().put("likes", sones.size()).put("sones", getSones(sones));
 		}
 		return createErrorJsonObject("invalid-type");

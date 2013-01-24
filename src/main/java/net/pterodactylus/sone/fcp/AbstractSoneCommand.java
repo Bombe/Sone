@@ -33,6 +33,7 @@ import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 
 import freenet.node.FSParseException;
@@ -211,11 +212,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected PostReply getReply(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
 		try {
 			String replyId = simpleFieldSet.getString(parameterName);
-			PostReply reply = core.getPostReply(replyId);
-			if (reply == null) {
+			Optional<PostReply> reply = core.getPostReply(replyId);
+			if (!reply.isPresent()) {
 				throw new FcpException("Could not load reply from “" + replyId + "”.");
 			}
-			return reply;
+			return reply.get();
 		} catch (FSParseException fspe1) {
 			throw new FcpException("Could not reply ID from “" + parameterName + "”.", fspe1);
 		}

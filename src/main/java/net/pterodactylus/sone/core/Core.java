@@ -88,6 +88,7 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
@@ -580,9 +581,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PostReply getPostReply(String replyId) {
+	public Optional<PostReply> getPostReply(String replyId) {
 		synchronized (replies) {
-			return replies.get(replyId);
+			return Optional.fromNullable(replies.get(replyId));
 		}
 	}
 

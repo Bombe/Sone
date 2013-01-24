@@ -22,6 +22,8 @@ import java.util.List;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 
+import com.google.common.base.Optional;
+
 /**
  * Interface for objects that can provide {@link PostReply}s.
  *
@@ -36,7 +38,7 @@ public interface PostReplyProvider {
 	 *            The ID of the reply to get
 	 * @return The reply, or {@code null} if there is no such reply
 	 */
-	public PostReply getPostReply(String id);
+	public Optional<PostReply> getPostReply(String id);
 
 	/**
 	 * Returns all replies for the given post, order ascending by time.
