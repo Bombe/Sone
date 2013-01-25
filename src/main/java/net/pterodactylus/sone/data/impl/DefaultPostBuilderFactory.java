@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data.impl;
 
+import com.google.inject.Inject;
+
 import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.PostBuilder;
 import net.pterodactylus.sone.data.PostBuilderFactory;
@@ -38,6 +40,7 @@ public class DefaultPostBuilderFactory implements PostBuilderFactory {
 	 * @param soneProvider
 	 *            The Sone provider
 	 */
+	@Inject
 	public DefaultPostBuilderFactory(SoneProvider soneProvider) {
 		this.soneProvider = soneProvider;
 	}
