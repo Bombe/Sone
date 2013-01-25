@@ -1942,6 +1942,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		soneDownloader.stop();
+		soneDownloaders.shutdown();
 		identityManager.stop();
 	}
 
