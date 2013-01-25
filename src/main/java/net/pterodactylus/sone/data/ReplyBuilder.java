@@ -46,14 +46,14 @@ public interface ReplyBuilder<B extends ReplyBuilder<B>> {
 	public B withId(String id);
 
 	/**
-	 * Configures this builder to use the given {@link Sone} as sender of the
-	 * reply.
+	 * Configures this builder to use the ID of the given {@link Sone} as sender
+	 * of the reply.
 	 *
-	 * @param sender
-	 *            The sender of the reply
+	 * @param senderId
+	 *            The ID of the sender of the reply
 	 * @return This builder
 	 */
-	public B from(Sone sender);
+	public B from(String senderId);
 
 	/**
 	 * Configures this builder to use the current time when creating the reply.

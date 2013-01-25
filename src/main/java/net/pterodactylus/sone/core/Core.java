@@ -1110,7 +1110,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
 						PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
-						postBuilder.copyPost(post).from(storedSone);
+						postBuilder.copyPost(post).from(storedSone.getId());
 						Post newPost = postBuilder.build().setKnown(knownPosts.contains(post.getId()));
 						if (!storedPosts.contains(newPost)) {
 							if (newPost.getTime() < getSoneFollowingTime(sone)) {
@@ -1136,7 +1136,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				Set<PostReply> storedReplies = storedSone.getReplies();
 				synchronized (knownReplies) {
 					for (PostReply reply : sone.getReplies()) {
-						reply.setSone(storedSone).setKnown(knownReplies.contains(reply.getId()));
+						reply.setKnown(knownReplies.contains(reply.getId()));
 						if (!storedReplies.contains(reply)) {
 							if (reply.getTime() < getSoneFollowingTime(sone)) {
 								knownReplies.add(reply.getId());
@@ -1313,9 +1313,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			PostBuilder postBuilder = postBuilder().withId(postId).from(sone).withTime(postTime).withText(postText);
+			PostBuilder postBuilder = postBuilder().withId(postId).from(sone.getId()).withTime(postTime).withText(postText);
 			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-				postBuilder.to(getSone(postRecipientId));
+				postBuilder.to(postRecipientId);
 			}
 			posts.add(postBuilder.build());
 		}
@@ -1336,7 +1336,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				return;
 			}
 			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
-			postReplyBuilder.withId(replyId).from(sone).to(postId).withTime(replyTime).withText(replyText);
+			postReplyBuilder.withId(replyId).from(sone.getId()).to(postId).withTime(replyTime).withText(replyText);
 			replies.add(postReplyBuilder.build());
 		}
 
@@ -1542,9 +1542,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
-		postBuilder.from(sone).randomId().withTime(time).withText(text.trim());
+		postBuilder.from(sone.getId()).randomId().withTime(time).withText(text.trim());
 		if (recipient != null) {
-			postBuilder.to(recipient);
+			postBuilder.to(recipient.getId());
 		}
 		final Post post = postBuilder.build();
 		synchronized (posts) {
@@ -1669,7 +1669,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
-		postReplyBuilder.randomId().from(sone).to(post.getId()).currentTime().withText(text.trim());
+		postReplyBuilder.randomId().from(sone.getId()).to(post.getId()).currentTime().withText(text.trim());
 		final PostReply reply = postReplyBuilder.build();
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);

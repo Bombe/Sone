@@ -42,7 +42,7 @@ public interface PostReplyBuilder extends ReplyBuilder<PostReplyBuilder> {
 	 * <ul>
 	 * <li>Exactly one of {@link #randomId()} or {@link #withId(String)} must
 	 * have been called.</li>
-	 * <li>The {@link #from(Sone) sender} must not be {@code null}.</li>
+	 * <li>The {@link #from(String) sender} must not be {@code null}.</li>
 	 * <li>Exactly one of {@link #currentTime()} or {@link #withTime(long)} must
 	 * have been called.</li>
 	 * <li>The {@link #withText(String) text} must not be {@code null} and must

@@ -376,9 +376,9 @@ public class SoneDownloader extends AbstractService {
 				try {
 					PostBuilder postBuilder = core.postBuilder();
 					/* TODO - parse time correctly. */
-					postBuilder.withId(postId).from(sone).withTime(Long.parseLong(postTime)).withText(postText);
+					postBuilder.withId(postId).from(sone.getId()).withTime(Long.parseLong(postTime)).withText(postText);
 					if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-						postBuilder.to(core.getSone(postRecipientId));
+						postBuilder.to(postRecipientId);
 					}
 					posts.add(postBuilder.build());
 				} catch (NumberFormatException nfe1) {
@@ -409,7 +409,7 @@ public class SoneDownloader extends AbstractService {
 				try {
 					PostReplyBuilder postReplyBuilder = core.postReplyBuilder();
 					/* TODO - parse time correctly. */
-					postReplyBuilder.withId(replyId).from(sone).to(replyPostId).withTime(Long.parseLong(replyTime)).withText(replyText);
+					postReplyBuilder.withId(replyId).from(sone.getId()).to(replyPostId).withTime(Long.parseLong(replyTime)).withText(replyText);
 					replies.add(postReplyBuilder.build());
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */

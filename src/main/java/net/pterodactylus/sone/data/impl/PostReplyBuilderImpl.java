@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.UUID;
 
 import net.pterodactylus.sone.core.PostProvider;
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.PostReplyBuilder;
 
@@ -35,7 +36,10 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder> implements PostReplyBuilder {
 
-	/** The post builder. */
+	/** The Sone provider. */
+	private final SoneProvider soneProvider;
+
+	/** The post provider. */
 	private final PostProvider postProvider;
 
 	/** The ID of the post the created reply refers to. */
@@ -44,10 +48,13 @@ public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder>
 	/**
 	 * Creates a new post reply builder.
 	 *
+	 * @param soneProvider
+	 *            The Sone provider
 	 * @param postProvider
 	 *            The post provider
 	 */
-	public PostReplyBuilderImpl(PostProvider postProvider) {
+	public PostReplyBuilderImpl(SoneProvider soneProvider, PostProvider postProvider) {
+		this.soneProvider = soneProvider;
 		this.postProvider = postProvider;
 	}
 
@@ -66,17 +73,12 @@ public class PostReplyBuilderImpl extends AbstractReplyBuilder<PostReplyBuilder>
 	@Override
 	public PostReply build() {
 		checkState((randomId && (id == null)) || (!randomId && (id != null)), "either random ID nor custom ID must be set");
-		checkState(sender != null, "sender must not be null");
+		checkState(senderId != null, "sender must not be null");
 		checkState((currentTime && (time == 0)) || (!currentTime && (time >= 0)), "either current time or custom time must be set");
 		checkState(!StringUtils.isBlank(text), "text must not be empty");
 		checkState(postId != null, "post must not be null");
 
 		/* create new post reply. */
-		PostReplyImpl postReplyImpl = new PostReplyImpl(postProvider, randomId ? UUID.randomUUID().toString() : id);
-		postReplyImpl.setSone(sender);
-		postReplyImpl.setPost(postId);
-		postReplyImpl.setTime(currentTime ? System.currentTimeMillis() : time);
-		postReplyImpl.setText(text);
-		return postReplyImpl;
+		return new PostReplyImpl(soneProvider, postProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
 	}
 }

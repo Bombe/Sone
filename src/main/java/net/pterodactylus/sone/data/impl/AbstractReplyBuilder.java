@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.data.ReplyBuilder;
-import net.pterodactylus.sone.data.Sone;
 
 /**
  * Abstract implementation of a {@link ReplyBuilder}.
@@ -36,7 +35,7 @@ public class AbstractReplyBuilder<B extends ReplyBuilder<B>> implements ReplyBui
 	protected String id;
 
 	/** The sender of the reply. */
-	protected Sone sender;
+	protected String senderId;
 
 	/** Whether to use the current time when creating the reply. */
 	protected boolean currentTime;
@@ -72,8 +71,8 @@ public class AbstractReplyBuilder<B extends ReplyBuilder<B>> implements ReplyBui
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	public B from(Sone sender) {
-		this.sender = sender;
+	public B from(String senderId) {
+		this.senderId = senderId;
 		return (B) this;
 	}
 

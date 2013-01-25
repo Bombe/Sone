@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data.impl;
 
 import java.util.UUID;
 
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 
@@ -30,20 +31,23 @@ import net.pterodactylus.sone.data.Sone;
  */
 public class PostImpl implements Post {
 
+	/** The Sone provider. */
+	private final SoneProvider soneProvider;
+
 	/** The GUID of the post. */
 	private final UUID id;
 
-	/** The Sone this post belongs to. */
-	private volatile Sone sone;
+	/** The ID of the owning Sone. */
+	private final String soneId;
 
-	/** The Sone of the recipient. */
-	private volatile Sone recipient;
+	/** The ID of the recipient Sone. */
+	private final String recipientId;
 
 	/** The time of the post (in milliseconds since Jan 1, 1970 UTC). */
-	private volatile long time;
+	private final long time;
 
 	/** The text of the post. */
-	private volatile String text;
+	private final String text;
 
 	/** Whether the post is known. */
 	private volatile boolean known;
@@ -51,54 +55,24 @@ public class PostImpl implements Post {
 	/**
 	 * Creates a new post.
 	 *
+	 * @param soneProvider
+	 *            The Sone provider
 	 * @param id
 	 *            The ID of the post
-	 */
-	public PostImpl(String id) {
-		this(id, null, 0, null);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone this post belongs to
-	 * @param text
-	 *            The text of the post
-	 */
-	public PostImpl(Sone sone, String text) {
-		this(sone, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone this post belongs to
+	 * @param soneId
+	 *            The ID of the Sone this post belongs to
+	 * @param recipientId
+	 *            The ID of the recipient of the post
 	 * @param time
 	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
 	 * @param text
 	 *            The text of the post
 	 */
-	public PostImpl(Sone sone, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, time, text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param id
-	 *            The ID of the post
-	 * @param sone
-	 *            The Sone this post belongs to
-	 * @param time
-	 *            The time of the post (in milliseconds since Jan 1, 1970 UTC)
-	 * @param text
-	 *            The text of the post
-	 */
-	public PostImpl(String id, Sone sone, long time, String text) {
+	public PostImpl(SoneProvider soneProvider, String id, String soneId, String recipientId, long time, String text) {
+		this.soneProvider = soneProvider;
 		this.id = UUID.fromString(id);
-		this.sone = sone;
+		this.soneId = soneId;
+		this.recipientId = recipientId;
 		this.time = time;
 		this.text = text;
 	}
@@ -120,19 +94,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getSone() {
-		return sone;
-	}
-
-	/**
-	 * Sets the Sone of this post.
-	 *
-	 * @param sone
-	 *            The Sone of this post
-	 * @return This post (for method chaining)
-	 */
-	public PostImpl setSone(Sone sone) {
-		this.sone = sone;
-		return this;
+		return soneProvider.getSone(soneId, false);
 	}
 
 	/**
@@ -140,21 +102,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getRecipient() {
-		return recipient;
-	}
-
-	/**
-	 * Sets the recipient of this post.
-	 *
-	 * @param recipient
-	 *            The recipient of this post, or {@code null}
-	 * @return This post (for method chaining)
-	 */
-	public PostImpl setRecipient(Sone recipient) {
-		if (!sone.equals(recipient)) {
-			this.recipient = recipient;
-		}
-		return this;
+		return soneProvider.getSone(recipientId, false);
 	}
 
 	/**
@@ -166,35 +114,11 @@ public class PostImpl implements Post {
 	}
 
 	/**
-	 * Sets the time of this post.
-	 *
-	 * @param time
-	 *            The time of this post (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This post (for method chaining)
-	 */
-	public PostImpl setTime(long time) {
-		this.time = time;
-		return this;
-	}
-
-	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public String getText() {
 		return text;
-	}
-
-	/**
-	 * Sets the text of this post.
-	 *
-	 * @param text
-	 *            The text of this post
-	 * @return This post (for method chaining)
-	 */
-	public PostImpl setText(String text) {
-		this.text = text;
-		return this;
 	}
 
 	/**
@@ -243,7 +167,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
+		return String.format("%s[id=%s,sone=%s,recipient=%s,time=%d,text=%s]", getClass().getName(), id, soneId, recipientId, time, text);
 	}
 
 }

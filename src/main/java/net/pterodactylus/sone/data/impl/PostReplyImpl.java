@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.core.PostProvider;
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 
@@ -34,18 +35,28 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	private final PostProvider postProvider;
 
 	/** The Post this reply refers to. */
-	private volatile String postId;
+	private final String postId;
 
 	/**
 	 * Creates a new reply.
 	 *
+	 * @param soneProvider
+	 *            The Sone provider
 	 * @param postProvider
 	 *            The post provider
 	 * @param id
 	 *            The ID of the reply
+	 * @param soneId
+	 *            The ID of the Sone of the reply
+	 * @param time
+	 *            The time of the reply
+	 * @param text
+	 *            The text of the reply
+	 * @param postId
+	 *            The ID of the post this reply refers to
 	 */
-	public PostReplyImpl(PostProvider postProvider, String id) {
-		super(id);
+	public PostReplyImpl(SoneProvider soneProvider, PostProvider postProvider, String id, String soneId, long time, String text, String postId) {
+		super(soneProvider, id, soneId, time, text);
 		this.postProvider = postProvider;
 		this.postId = postId;
 	}
@@ -68,19 +79,6 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	@Override
 	public Optional<Post> getPost() {
 		return postProvider.getPost(postId);
-	}
-
-	/**
-	 * Sets the post this reply refers to.
-	 *
-	 * @param postId
-	 *            The ID of the post to reply to
-	 * @return This reply (for method chaining)
-	 */
-	@Override
-	public PostReply setPost(String postId) {
-		this.postId = postId;
-		return this;
 	}
 
 }

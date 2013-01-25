@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
 
+import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostBuilder;
-import net.pterodactylus.sone.data.Sone;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -34,6 +34,9 @@ import org.apache.commons.lang.StringUtils;
  */
 public class PostBuilderImpl implements PostBuilder {
 
+	/** The Sone provider for the created posts. */
+	private final SoneProvider soneProvider;
+
 	/** Wether to create a post with a random ID. */
 	private boolean randomId;
 
@@ -41,7 +44,7 @@ public class PostBuilderImpl implements PostBuilder {
 	private String id;
 
 	/** The sender of the post. */
-	private Sone sender;
+	private String senderId;
 
 	/** Whether to use the current time when creating the post. */
 	private boolean currentTime;
@@ -53,7 +56,17 @@ public class PostBuilderImpl implements PostBuilder {
 	private String text;
 
 	/** The (optional) recipient of the post. */
-	private Sone recipient;
+	private String recipientId;
+
+	/**
+	 * Creates a new post builder.
+	 *
+	 * @param soneProvider
+	 *            The Sone provider
+	 */
+	public PostBuilderImpl(SoneProvider soneProvider) {
+		this.soneProvider = soneProvider;
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -62,11 +75,11 @@ public class PostBuilderImpl implements PostBuilder {
 	public PostBuilder copyPost(Post post) {
 		this.randomId = false;
 		this.id = post.getId();
-		this.sender = post.getSone();
+		this.senderId = post.getSone().getId();
 		this.currentTime = false;
 		this.time = post.getTime();
 		this.text = post.getText();
-		this.recipient = post.getRecipient();
+		this.recipientId = (post.getRecipient() != null) ? post.getRecipient().getId() : null;
 		return this;
 	}
 
@@ -92,8 +105,8 @@ public class PostBuilderImpl implements PostBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PostBuilder from(Sone sender) {
-		this.sender = sender;
+	public PostBuilder from(String senderId) {
+		this.senderId = senderId;
 		return this;
 	}
 
@@ -128,8 +141,8 @@ public class PostBuilderImpl implements PostBuilder {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public PostBuilder to(Sone recipient) {
-		this.recipient = recipient;
+	public PostBuilder to(String recipientId) {
+		this.recipientId = recipientId;
 		return this;
 	}
 
@@ -139,11 +152,11 @@ public class PostBuilderImpl implements PostBuilder {
 	@Override
 	public Post build() {
 		checkState((randomId && (id == null)) || (!randomId && (id != null)), "exactly one of random ID or custom ID must be set");
-		checkState(sender != null, "sender must not be null");
+		checkState(senderId != null, "sender must not be null");
 		checkState((currentTime && (time == 0)) || (!currentTime && (time > 0)), "one of current time or custom time must be set");
 		checkState(!StringUtils.isBlank(text), "text must not be empty");
-		checkState((recipient == null) || !recipient.equals(sender), "sender and recipient must not be the same");
-		return new PostImpl(randomId ? UUID.randomUUID().toString() : id, sender, currentTime ? System.currentTimeMillis() : time, text).setRecipient(recipient);
+		checkState((recipientId == null) || !recipientId.equals(senderId), "sender and recipient must not be the same");
+		return new PostImpl(soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
 	}
 
 }
