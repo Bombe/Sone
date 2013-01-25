@@ -1529,7 +1529,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
  *            request
  */
 function markSoneAsKnown(soneElement, skipRequest) {
-	if ($(soneElement).is(".new")) {
+	if ($(soneElement).hasClass("new")) {
 		$(soneElement).removeClass("new");
 		if ((typeof skipRequest == "undefined") || !skipRequest) {
 			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": "sone", "id": getSoneId(soneElement)});
