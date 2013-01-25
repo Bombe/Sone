@@ -1109,18 +1109,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				List<Post> storedPosts = storedSone.getPosts();
 				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
-						PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
-						postBuilder.copyPost(post).from(storedSone.getId());
-						Post newPost = postBuilder.build().setKnown(knownPosts.contains(post.getId()));
-						if (!storedPosts.contains(newPost)) {
-							if (newPost.getTime() < getSoneFollowingTime(sone)) {
-								knownPosts.add(newPost.getId());
-								newPost.setKnown(true);
-							} else if (!knownPosts.contains(newPost.getId())) {
-								eventBus.post(new NewPostFoundEvent(newPost));
+						post.setKnown(knownPosts.contains(post.getId()));
+						if (!storedPosts.contains(post)) {
+							if (post.getTime() < getSoneFollowingTime(sone)) {
+								knownPosts.add(post.getId());
+								post.setKnown(true);
+							} else if (!knownPosts.contains(post.getId())) {
+								eventBus.post(new NewPostFoundEvent(post));
 							}
 						}
-						posts.put(newPost.getId(), newPost);
+						posts.put(post.getId(), post);
 					}
 				}
 			}
@@ -1165,36 +1163,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 					}
 				}
 			}
-			synchronized (storedSone) {
-				if (!soneRescueMode || (sone.getTime() > storedSone.getTime())) {
-					storedSone.setTime(sone.getTime());
-				}
-				storedSone.setClient(sone.getClient());
-				storedSone.setProfile(sone.getProfile());
-				if (soneRescueMode) {
-					for (Post post : sone.getPosts()) {
-						storedSone.addPost(post);
-					}
-					for (PostReply reply : sone.getReplies()) {
-						storedSone.addReply(reply);
-					}
-					for (String likedPostId : sone.getLikedPostIds()) {
-						storedSone.addLikedPostId(likedPostId);
-					}
-					for (String likedReplyId : sone.getLikedReplyIds()) {
-						storedSone.addLikedReplyId(likedReplyId);
-					}
-					for (Album album : sone.getAlbums()) {
-						storedSone.addAlbum(album);
-					}
-				} else {
-					storedSone.setPosts(sone.getPosts());
-					storedSone.setReplies(sone.getReplies());
-					storedSone.setLikePostIds(sone.getLikedPostIds());
-					storedSone.setLikeReplyIds(sone.getLikedReplyIds());
-					storedSone.setAlbums(sone.getAlbums());
-				}
-				storedSone.setLatestEdition(sone.getLatestEdition());
+			synchronized (sones) {
+				sones.put(sone.getId(), sone);
 			}
 		}
 	}
