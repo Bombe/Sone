@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.collect.Collections2;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
@@ -66,7 +68,7 @@ public class NewPage extends SoneTemplatePage {
 
 		/* collect new elements from notifications. */
 		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts());
-		for (PostReply reply : webInterface.getNewReplies()) {
+		for (PostReply reply : Collections2.filter(webInterface.getNewReplies(), PostReply.HAS_POST_FILTER)) {
 			posts.add(reply.getPost().get());
 		}
 
