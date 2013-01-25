@@ -602,7 +602,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 			@Override
 			public boolean apply(PostReply reply) {
-				return post.equals(reply.getPost());
+				return post.getId().equals(reply.getPostId());
 			}
 		}));
 	}
