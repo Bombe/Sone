@@ -26,6 +26,8 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
+import com.google.common.base.Optional;
+
 /**
  * AJAX page that lets the user mark a number of {@link Sone}s, {@link Post}s,
  * or {@link Reply}s as known.
@@ -57,17 +59,17 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 		Core core = webInterface.getCore();
 		for (String id : ids) {
 			if (type.equals("post")) {
-				Post post = core.getPost(id, false);
-				if (post == null) {
+				Optional<Post> post = core.getPost(id);
+				if (!post.isPresent()) {
 					continue;
 				}
-				core.markPostKnown(post);
+				core.markPostKnown(post.get());
 			} else if (type.equals("reply")) {
-				PostReply reply = core.getPostReply(id, false);
-				if (reply == null) {
+				Optional<PostReply> reply = core.getPostReply(id);
+				if (!reply.isPresent()) {
 					continue;
 				}
-				core.markReplyKnown(reply);
+				core.markReplyKnown(reply.get());
 			} else if (type.equals("sone")) {
 				Sone sone = core.getSone(id, false);
 				if (sone == null) {

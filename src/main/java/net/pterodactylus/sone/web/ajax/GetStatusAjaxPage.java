@@ -122,20 +122,14 @@ public class GetStatusAjaxPage extends JsonPage {
 			});
 		}
 		/* remove replies to unknown posts. */
-		newReplies = Collections2.filter(newReplies, new Predicate<PostReply>() {
-
-			@Override
-			public boolean apply(PostReply reply) {
-				return (reply.getPost() != null) && (reply.getPost().getSone() != null);
-			}
-		});
+		newReplies = Collections2.filter(newReplies, PostReply.HAS_POST_FILTER);
 		JsonArray jsonReplies = new JsonArray();
 		for (PostReply reply : newReplies) {
 			JsonObject jsonReply = new JsonObject();
 			jsonReply.put("id", reply.getId());
 			jsonReply.put("sone", reply.getSone().getId());
-			jsonReply.put("post", reply.getPost().getId());
-			jsonReply.put("postSone", reply.getPost().getSone().getId());
+			jsonReply.put("post", reply.getPostId());
+			jsonReply.put("postSone", reply.getPost().get().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
 		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notifications.hashCode()).put("newPosts", jsonPosts).put("newReplies", jsonReplies);

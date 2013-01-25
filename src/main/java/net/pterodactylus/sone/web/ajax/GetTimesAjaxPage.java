@@ -28,6 +28,8 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
 
+import com.google.common.base.Optional;
+
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
  *
@@ -58,16 +60,16 @@ public class GetTimesAjaxPage extends JsonPage {
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
 			for (String id : ids) {
-				Post post = webInterface.getCore().getPost(id, false);
-				if (post == null) {
+				Optional<Post> post = webInterface.getCore().getPost(id);
+				if (!post.isPresent()) {
 					continue;
 				}
 				JsonObject postTime = new JsonObject();
-				Time time = getTime(post.getTime());
+				Time time = getTime(post.get().getTime());
 				postTime.put("timeText", time.getText());
 				postTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
 				synchronized (dateFormat) {
-					postTime.put("tooltip", dateFormat.format(new Date(post.getTime())));
+					postTime.put("tooltip", dateFormat.format(new Date(post.get().getTime())));
 				}
 				postTimes.put(id, postTime);
 			}
@@ -77,16 +79,16 @@ public class GetTimesAjaxPage extends JsonPage {
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
 			for (String id : ids) {
-				PostReply reply = webInterface.getCore().getPostReply(id, false);
-				if (reply == null) {
+				Optional<PostReply> reply = webInterface.getCore().getPostReply(id);
+				if (!reply.isPresent()) {
 					continue;
 				}
 				JsonObject replyTime = new JsonObject();
-				Time time = getTime(reply.getTime());
+				Time time = getTime(reply.get().getTime());
 				replyTime.put("timeText", time.getText());
 				replyTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
 				synchronized (dateFormat) {
-					replyTime.put("tooltip", dateFormat.format(new Date(reply.getTime())));
+					replyTime.put("tooltip", dateFormat.format(new Date(reply.get().getTime())));
 				}
 				replyTimes.put(id, replyTime);
 			}

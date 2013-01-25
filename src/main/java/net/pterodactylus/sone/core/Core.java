@@ -56,7 +56,11 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostBuilder;
+import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.PostReplyBuilder;
+import net.pterodactylus.sone.data.PostReplyBuilderFactory;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
@@ -64,8 +68,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.sone.data.impl.PostImpl;
-import net.pterodactylus.sone.data.impl.PostReplyImpl;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -85,9 +87,13 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -99,7 +105,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Core extends AbstractService implements SoneProvider, PostProvider {
+public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(Core.class);
@@ -168,11 +174,17 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	/** All known Sones. */
 	private final Set<String> knownSones = new HashSet<String>();
 
+	/** The post builder. */
+	private final PostBuilderFactory postBuilderFactory;
+
 	/** All posts. */
 	private final Map<String, Post> posts = new HashMap<String, Post>();
 
 	/** All known posts. */
 	private final Set<String> knownPosts = new HashSet<String>();
+
+	/** The post reply builder factory. */
+	private final PostReplyBuilderFactory postReplyBuilderFactory;
 
 	/** All replies. */
 	private final Map<String, PostReply> replies = new HashMap<String, PostReply>();
@@ -215,9 +227,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 *            The WebOfTrust updater
 	 * @param eventBus
 	 *            The event bus
+	 * @param postBuilderFactory
+	 *            The post builder
+	 * @param postReplyBuilderFactory
+	 *            The post reply builder factory
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostBuilderFactory postBuilderFactory, PostReplyBuilderFactory postReplyBuilderFactory) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -227,6 +243,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		this.updateChecker = new UpdateChecker(eventBus, freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
+		this.postBuilderFactory = postBuilderFactory;
+		this.postReplyBuilderFactory = postReplyBuilderFactory;
 	}
 
 	//
@@ -511,35 +529,21 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the post with the given ID.
+	 * Returns a post builder.
 	 *
-	 * @param postId
-	 *            The ID of the post to get
-	 * @return The post with the given ID, or a new post with the given ID
+	 * @return A new post builder
 	 */
-	public Post getPost(String postId) {
-		return getPost(postId, true);
+	public PostBuilder postBuilder() {
+		return postBuilderFactory.newPostBuilder();
 	}
 
 	/**
-	 * Returns the post with the given ID, optionally creating a new post.
-	 *
-	 * @param postId
-	 *            The ID of the post to get
-	 * @param create
-	 *            {@code true} it create a new post if no post with the given ID
-	 *            exists, {@code false} to return {@code null}
-	 * @return The post, or {@code null} if there is no such post
+	 * {@inheritDoc}
 	 */
 	@Override
-	public Post getPost(String postId, boolean create) {
+	public Optional<Post> getPost(String postId) {
 		synchronized (posts) {
-			Post post = posts.get(postId);
-			if ((post == null) && create) {
-				post = new PostImpl(postId);
-				posts.put(postId, post);
-			}
-			return post;
+			return Optional.fromNullable(posts.get(postId));
 		}
 	}
 
@@ -565,47 +569,42 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	}
 
 	/**
-	 * Returns the reply with the given ID. If there is no reply with the given
-	 * ID yet, a new one is created, unless {@code create} is false in which
-	 * case {@code null} is returned.
+	 * Returns a post reply builder.
 	 *
-	 * @param replyId
-	 *            The ID of the reply to get
-	 * @param create
-	 *            {@code true} to always return a {@link Reply}, {@code false}
-	 *            to return {@code null} if no reply can be found
-	 * @return The reply, or {@code null} if there is no such reply
+	 * @return A new post reply builder
 	 */
-	public PostReply getPostReply(String replyId, boolean create) {
+	public PostReplyBuilder postReplyBuilder() {
+		return postReplyBuilderFactory.newPostReplyBuilder();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Optional<PostReply> getPostReply(String replyId) {
 		synchronized (replies) {
-			PostReply reply = replies.get(replyId);
-			if (create && (reply == null)) {
-				reply = new PostReplyImpl(replyId);
-				replies.put(replyId, reply);
-			}
-			return reply;
+			return Optional.fromNullable(replies.get(replyId));
 		}
 	}
 
 	/**
-	 * Returns all replies for the given post, order ascending by time.
-	 *
-	 * @param post
-	 *            The post to get all replies for
-	 * @return All replies for the given post
+	 * {@inheritDoc}
 	 */
-	public List<PostReply> getReplies(Post post) {
-		Set<Sone> sones = getSones();
-		List<PostReply> replies = new ArrayList<PostReply>();
-		for (Sone sone : sones) {
-			for (PostReply reply : sone.getReplies()) {
-				if (reply.getPost().equals(post)) {
-					replies.add(reply);
-				}
+	@Override
+	public List<PostReply> getReplies(final Post post) {
+		return Ordering.from(Reply.TIME_COMPARATOR).sortedCopy(FluentIterable.from(getSones()).transformAndConcat(new Function<Sone, Iterable<PostReply>>() {
+
+			@Override
+			public Iterable<PostReply> apply(Sone sone) {
+				return sone.getReplies();
 			}
-		}
-		Collections.sort(replies, Reply.TIME_COMPARATOR);
-		return replies;
+		}).filter(new Predicate<PostReply>() {
+
+			@Override
+			public boolean apply(PostReply reply) {
+				return post.equals(reply.getPost());
+			}
+		}));
 	}
 
 	/**
@@ -677,9 +676,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		Set<Post> posts = new HashSet<Post>();
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
-				Post post = getPost(bookmarkedPostId, false);
-				if (post != null) {
-					posts.add(post);
+				Optional<Post> post = getPost(bookmarkedPostId);
+				if (!post.isPresent()) {
+					posts.add(post.get());
 				}
 			}
 		}
@@ -878,7 +877,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 		synchronized (sones) {
 			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
-			sone.setRequestUri(getSoneUri(identity.getRequestUri()));
+			sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
 			if (newSone) {
 				synchronized (knownSones) {
@@ -1110,16 +1109,18 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				List<Post> storedPosts = storedSone.getPosts();
 				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
-						post.setSone(storedSone).setKnown(knownPosts.contains(post.getId()));
-						if (!storedPosts.contains(post)) {
-							if (post.getTime() < getSoneFollowingTime(sone)) {
-								knownPosts.add(post.getId());
-								post.setKnown(true);
-							} else if (!knownPosts.contains(post.getId())) {
-								eventBus.post(new NewPostFoundEvent(post));
+						PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
+						postBuilder.copyPost(post).from(storedSone);
+						Post newPost = postBuilder.build().setKnown(knownPosts.contains(post.getId()));
+						if (!storedPosts.contains(newPost)) {
+							if (newPost.getTime() < getSoneFollowingTime(sone)) {
+								knownPosts.add(newPost.getId());
+								newPost.setKnown(true);
+							} else if (!knownPosts.contains(newPost.getId())) {
+								eventBus.post(new NewPostFoundEvent(newPost));
 							}
 						}
-						posts.put(post.getId(), post);
+						posts.put(newPost.getId(), newPost);
 					}
 				}
 			}
@@ -1312,11 +1313,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.WARNING, "Invalid post found, aborting load!");
 				return;
 			}
-			Post post = getPost(postId).setSone(sone).setTime(postTime).setText(postText);
+			PostBuilder postBuilder = postBuilder().withId(postId).from(sone).withTime(postTime).withText(postText);
 			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-				post.setRecipient(getSone(postRecipientId));
+				postBuilder.to(getSone(postRecipientId));
 			}
-			posts.add(post);
+			posts.add(postBuilder.build());
 		}
 
 		/* load replies. */
@@ -1334,7 +1335,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
 				return;
 			}
-			replies.add(getPostReply(replyId, true).setSone(sone).setPost(getPost(postId)).setTime(replyTime).setText(replyText));
+			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+			postReplyBuilder.withId(replyId).from(sone).to(postId).withTime(replyTime).withText(replyText);
+			replies.add(postReplyBuilder.build());
 		}
 
 		/* load post likes. */
@@ -1538,10 +1541,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
-		final Post post = new PostImpl(sone, time, text.trim());
+		PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
+		postBuilder.from(sone).randomId().withTime(time).withText(text.trim());
 		if (recipient != null) {
-			post.setRecipient(recipient);
+			postBuilder.to(recipient);
 		}
+		final Post post = postBuilder.build();
 		synchronized (posts) {
 			posts.put(post.getId(), post);
 		}
@@ -1657,30 +1662,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 	 * @return The created reply
 	 */
 	public PostReply createReply(Sone sone, Post post, String text) {
-		return createReply(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param sone
-	 *            The Sone that creates the reply
-	 * @param post
-	 *            The post that this reply refers to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 * @return The created reply
-	 */
-	public PostReply createReply(Sone sone, Post post, long time, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
-		final PostReply reply = new PostReplyImpl(sone, post, System.currentTimeMillis(), text.trim());
+		PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+		postReplyBuilder.randomId().from(sone).to(post.getId()).currentTime().withText(text.trim());
+		final PostReply reply = postReplyBuilder.build();
 		synchronized (replies) {
 			replies.put(reply.getId(), reply);
 		}
@@ -2018,7 +2008,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			for (PostReply reply : sone.getReplies()) {
 				String replyPrefix = sonePrefix + "/Replies/" + replyCounter++;
 				configuration.getStringValue(replyPrefix + "/ID").setValue(reply.getId());
-				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPost().getId());
+				configuration.getStringValue(replyPrefix + "/Post/ID").setValue(reply.getPostId());
 				configuration.getLongValue(replyPrefix + "/Time").setValue(reply.getTime());
 				configuration.getStringValue(replyPrefix + "/Text").setValue(reply.getText());
 			}
@@ -2316,23 +2306,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider 
 			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
 		} catch (IllegalArgumentException iae1) {
 			logger.log(Level.WARNING, String.format("Invalid value for %s in configuration, using default.", optionName));
-		}
-	}
-
-	/**
-	 * Generate a Sone URI from the given URI and latest edition.
-	 *
-	 * @param uriString
-	 *            The URI to derive the Sone URI from
-	 * @return The derived URI
-	 */
-	private static FreenetURI getSoneUri(String uriString) {
-		try {
-			FreenetURI uri = new FreenetURI(uriString).setDocName("Sone").setMetaString(new String[0]);
-			return uri;
-		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not create Sone URI from URI: %s", uriString), mue1);
-			return null;
 		}
 	}
 

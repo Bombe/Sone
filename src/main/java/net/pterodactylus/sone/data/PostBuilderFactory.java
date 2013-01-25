@@ -1,5 +1,5 @@
 /*
- * Sone - PostProvider.java - Copyright © 2011–2013 David Roden
+ * Sone - PostBuilderFactory.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,26 +15,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
-
-import net.pterodactylus.sone.data.Post;
-
-import com.google.common.base.Optional;
+package net.pterodactylus.sone.data;
 
 /**
- * Interface for objects that can provide {@link Post}s by their ID.
+ * Factory for {@link PostBuilder}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface PostProvider {
+public interface PostBuilderFactory {
 
 	/**
-	 * Returns the post with the given ID.
+	 * Creates a new post builder.
 	 *
-	 * @param postId
-	 *            The ID of the post to return
-	 * @return The post with the given ID, or {@code null}
+	 * @return A new post builder
 	 */
-	public Optional<Post> getPost(String postId);
+	public PostBuilder newPostBuilder();
 
 }

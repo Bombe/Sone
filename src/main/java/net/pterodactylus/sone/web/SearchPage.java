@@ -44,6 +44,7 @@ import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
 
 import com.google.common.base.Function;
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -322,7 +323,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getPostId(String phrase) {
 		String postId = phrase.startsWith("post://") ? phrase.substring(7) : phrase;
-		return (webInterface.getCore().getPost(postId, false) != null) ? postId : null;
+		return (webInterface.getCore().getPost(postId) != null) ? postId : null;
 	}
 
 	/**
@@ -336,7 +337,11 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getReplyPostId(String phrase) {
 		String replyId = phrase.startsWith("reply://") ? phrase.substring(8) : phrase;
-		return (webInterface.getCore().getPostReply(replyId, false) != null) ? webInterface.getCore().getPostReply(replyId, false).getPost().getId() : null;
+		Optional<PostReply> postReply = webInterface.getCore().getPostReply(replyId);
+		if (!postReply.isPresent()) {
+			return null;
+		}
+		return postReply.get().getPostId();
 	}
 
 	/**

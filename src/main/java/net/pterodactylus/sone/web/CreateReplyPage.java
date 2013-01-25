@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.TextFilter;
@@ -58,7 +60,10 @@ public class CreateReplyPage extends SoneTemplatePage {
 		String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
-			Post post = webInterface.getCore().getPost(postId);
+			Optional<Post> post = webInterface.getCore().getPost(postId);
+			if (!post.isPresent()) {
+				throw new RedirectException("noPermission.html");
+			}
 			if (text.length() > 0) {
 				String senderId = request.getHttpRequest().getPartAsStringFailsafe("sender", 43);
 				Sone sender = webInterface.getCore().getLocalSone(senderId, false);
@@ -66,7 +71,7 @@ public class CreateReplyPage extends SoneTemplatePage {
 					sender = getCurrentSone(request.getToadletContext());
 				}
 				text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
-				webInterface.getCore().createReply(sender, post, text);
+				webInterface.getCore().createReply(sender, post.get(), text);
 				throw new RedirectException(returnPage);
 			}
 			templateContext.set("errorTextEmpty", true);

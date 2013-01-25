@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.data;
 
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+
 /**
  * A reply is like a {@link Post} but can never be posted on its own, it always
  * refers to another {@link Post}.
@@ -26,19 +29,38 @@ package net.pterodactylus.sone.data;
 public interface PostReply extends Reply<PostReply> {
 
 	/**
+	 * Filter that selects {@link PostReply}s that have a
+	 * {@link Optional#isPresent() present} {@link #getPost() post}.
+	 */
+	public static final Predicate<PostReply> HAS_POST_FILTER = new Predicate<PostReply>() {
+
+		@Override
+		public boolean apply(PostReply postReply) {
+			return postReply.getPost().isPresent();
+		}
+	};
+
+	/**
+	 * Returns the ID of the post this reply refers to.
+	 *
+	 * @return The ID of the post this reply refers to
+	 */
+	public String getPostId();
+
+	/**
 	 * Returns the post this reply refers to.
 	 *
 	 * @return The post this reply refers to
 	 */
-	public Post getPost();
+	public Optional<Post> getPost();
 
 	/**
 	 * Sets the post this reply refers to.
 	 *
-	 * @param post
-	 *            The post this reply refers to
+	 * @param postId
+	 *            The ID of the post to reply to
 	 * @return This reply
 	 */
-	public PostReply setPost(Post post);
+	public PostReply setPost(String postId);
 
 }

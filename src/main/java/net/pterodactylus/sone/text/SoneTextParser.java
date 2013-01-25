@@ -26,6 +26,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.core.PostProvider;
 import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
@@ -258,9 +260,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (linkType == LinkType.POST) {
 						if (line.length() >= (7 + 36)) {
 							String postId = line.substring(7, 43);
-							Post post = postProvider.getPost(postId, false);
-							if ((post != null) && (post.getSone() != null)) {
-								parts.add(new PostPart(post));
+							Optional<Post> post = postProvider.getPost(postId);
+							if (post.isPresent()) {
+								parts.add(new PostPart(post.get()));
 							} else {
 								parts.add(new PlainTextPart(line.substring(0, 43)));
 							}

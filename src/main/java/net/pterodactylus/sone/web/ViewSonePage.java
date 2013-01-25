@@ -36,6 +36,8 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
+import com.google.common.base.Optional;
+
 /**
  * Lets the user browser another Sone.
  *
@@ -95,11 +97,11 @@ public class ViewSonePage extends SoneTemplatePage {
 		Set<PostReply> replies = sone.getReplies();
 		final Map<Post, List<PostReply>> repliedPosts = new HashMap<Post, List<PostReply>>();
 		for (PostReply reply : replies) {
-			Post post = reply.getPost();
-			if (repliedPosts.containsKey(post) || sone.equals(post.getSone()) || (sone.equals(post.getRecipient()))) {
+			Optional<Post> post = reply.getPost();
+			if (!post.isPresent() || repliedPosts.containsKey(post.get()) || sone.equals(post.get().getSone()) || (sone.equals(post.get().getRecipient()))) {
 				continue;
 			}
-			repliedPosts.put(post, webInterface.getCore().getReplies(post));
+			repliedPosts.put(post.get(), webInterface.getCore().getReplies(post.get()));
 		}
 		List<Post> posts = new ArrayList<Post>(repliedPosts.keySet());
 		Collections.sort(posts, new Comparator<Post>() {
