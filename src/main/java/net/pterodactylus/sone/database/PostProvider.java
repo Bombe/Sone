@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.database;
+
+import java.util.Collection;
 
 import net.pterodactylus.sone.data.Post;
 
@@ -36,5 +38,15 @@ public interface PostProvider {
 	 * @return The post with the given ID, or {@code null}
 	 */
 	public Optional<Post> getPost(String postId);
+
+	/**
+	 * Returns all posts that have the given Sone as recipient.
+	 *
+	 * @see Post#getRecipient()
+	 * @param recipientId
+	 *            The ID of the recipient of the posts
+	 * @return All posts that have the given Sone as recipient
+	 */
+	public Collection<Post> getDirectedPosts(String recipientId);
 
 }

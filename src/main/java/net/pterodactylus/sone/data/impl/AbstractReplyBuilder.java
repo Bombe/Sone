@@ -17,7 +17,7 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import net.pterodactylus.sone.data.ReplyBuilder;
+import net.pterodactylus.sone.database.ReplyBuilder;
 
 /**
  * Abstract implementation of a {@link ReplyBuilder}.

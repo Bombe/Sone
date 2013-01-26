@@ -15,7 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.database;
+
+import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.Sone;
 
 /**
  * Methods that all reply builders need to implement in order to be able to

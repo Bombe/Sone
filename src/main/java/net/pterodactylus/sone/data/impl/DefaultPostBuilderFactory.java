@@ -17,11 +17,11 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import com.google.inject.Inject;
+import net.pterodactylus.sone.database.PostBuilder;
+import net.pterodactylus.sone.database.PostBuilderFactory;
+import net.pterodactylus.sone.database.SoneProvider;
 
-import net.pterodactylus.sone.core.SoneProvider;
-import net.pterodactylus.sone.data.PostBuilder;
-import net.pterodactylus.sone.data.PostBuilderFactory;
+import com.google.inject.Inject;
 
 /**
  * {@link PostBuilderFactory} implementation that creates

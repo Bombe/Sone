@@ -66,9 +66,9 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 			if (!getCore().hasSone(friendSoneId)) {
 				continue;
 			}
-			allPosts.addAll(getCore().getSone(friendSoneId, false).getPosts());
+			allPosts.addAll(getCore().getSone(friendSoneId).getPosts());
 		}
-		allPosts.addAll(getCore().getDirectedPosts(sone));
+		allPosts.addAll(getCore().getDirectedPosts(sone.getId()));
 		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
 
 		List<Post> sortedPosts = new ArrayList<Post>(allPosts);

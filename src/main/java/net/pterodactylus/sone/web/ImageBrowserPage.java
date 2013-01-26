@@ -77,7 +77,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 		}
 		String soneId = request.getHttpRequest().getParam("sone", null);
 		if (soneId != null) {
-			Sone sone = webInterface.getCore().getSone(soneId, false);
+			Sone sone = webInterface.getCore().getSone(soneId);
 			templateContext.set("soneRequested", true);
 			templateContext.set("sone", sone);
 			return;

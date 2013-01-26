@@ -51,7 +51,7 @@ public class DistrustAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
+		Sone sone = webInterface.getCore().getSone(soneId);
 		if (sone == null) {
 			return createErrorJsonObject("invalid-sone-id");
 		}

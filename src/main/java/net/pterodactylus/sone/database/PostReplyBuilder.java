@@ -15,7 +15,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.database;
+
+import net.pterodactylus.sone.data.PostReply;
 
 /**
  * Builder for a {@link PostReply} object.

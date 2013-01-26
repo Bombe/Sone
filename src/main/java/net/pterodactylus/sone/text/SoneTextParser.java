@@ -26,14 +26,15 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.google.common.base.Optional;
-
-import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
+
+import com.google.common.base.Optional;
+
 import freenet.keys.FreenetURI;
 
 /**
@@ -241,7 +242,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (linkType == LinkType.SONE) {
 						if (line.length() >= (7 + 43)) {
 							String soneId = line.substring(7, 50);
-							Sone sone = soneProvider.getSone(soneId, false);
+							Sone sone = soneProvider.getSone(soneId);
 							if (sone == null) {
 								/*
 								 * don’t use create=true above, we don’t want

@@ -56,17 +56,20 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostBuilder;
-import net.pterodactylus.sone.data.PostBuilderFactory;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.PostReplyBuilder;
-import net.pterodactylus.sone.data.PostReplyBuilderFactory;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.database.PostBuilder;
+import net.pterodactylus.sone.database.PostBuilderFactory;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.PostReplyBuilderFactory;
+import net.pterodactylus.sone.database.PostReplyProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
@@ -361,30 +364,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sone with the given ID, or {@code null} if there is no such
 	 *         Sone
 	 */
-	public Sone getSone(String id) {
-		return getSone(id, true);
-	}
-
-	/**
-	 * Returns the Sone with the given ID, regardless whether it’s local or
-	 * remote.
-	 *
-	 * @param id
-	 *            The ID of the Sone to get
-	 * @param create
-	 *            {@code true} to create a new Sone if none exists,
-	 *            {@code false} to return {@code null} if a Sone with the given
-	 *            ID does not exist
-	 * @return The Sone with the given ID, or {@code null} if there is no such
-	 *         Sone
-	 */
 	@Override
-	public Sone getSone(String id, boolean create) {
+	public Sone getSone(String id) {
 		synchronized (sones) {
-			if (!sones.containsKey(id) && create) {
-				Sone sone = new Sone(id, false);
-				sones.put(id, sone);
-			}
 			return sones.get(id);
 		}
 	}
@@ -545,26 +527,21 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns all posts that have the given Sone as recipient.
-	 *
-	 * @see Post#getRecipient()
-	 * @param recipient
-	 *            The recipient of the posts
-	 * @return All posts that have the given Sone as recipient
+	 * {@inheritDoc}
 	 */
-	public Set<Post> getDirectedPosts(Sone recipient) {
-		checkNotNull(recipient, "recipient must not be null");
-		Set<Post> directedPosts = new HashSet<Post>();
+	@Override
+	public Collection<Post> getDirectedPosts(final String recipientId) {
+		checkNotNull(recipientId, "recipient must not be null");
 		synchronized (posts) {
-			for (Post post : posts.values()) {
-				if (recipient.equals(post.getRecipient())) {
-					directedPosts.add(post);
-				}
-			}
-		}
-		return directedPosts;
-	}
+			return Collections2.filter(posts.values(), new Predicate<Post>() {
 
+				@Override
+				public boolean apply(Post post) {
+					return (post.getRecipient() != null) && (post.getRecipient().getId().equals(recipientId));
+				}
+			});
+		}
+	}
 	/**
 	 * Returns a post reply builder.
 	 *
@@ -2333,7 +2310,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* some local identity still trusts this identity, don’t remove. */
 			return;
 		}
-		Sone sone = getSone(identity.getId(), false);
+		Sone sone = getSone(identity.getId());
 		if (sone == null) {
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;

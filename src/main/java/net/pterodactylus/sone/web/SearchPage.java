@@ -310,7 +310,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getSoneId(String phrase) {
 		String soneId = phrase.startsWith("sone://") ? phrase.substring(7) : phrase;
-		return (webInterface.getCore().getSone(soneId, false) != null) ? soneId : null;
+		return (webInterface.getCore().getSone(soneId) != null) ? soneId : null;
 	}
 
 	/**

@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.database;
 
 import java.util.List;
 

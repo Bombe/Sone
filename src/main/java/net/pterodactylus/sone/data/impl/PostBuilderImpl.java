@@ -21,9 +21,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
 
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostBuilder;
+import net.pterodactylus.sone.database.PostBuilder;
+import net.pterodactylus.sone.database.SoneProvider;
 
 import org.apache.commons.lang.StringUtils;
 

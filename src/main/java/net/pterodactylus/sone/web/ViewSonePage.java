@@ -67,7 +67,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	@Override
 	protected String getPageTitle(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
+		Sone sone = webInterface.getCore().getSone(soneId);
 		if ((sone != null) && (sone.getTime() > 0)) {
 			String soneName = SoneAccessor.getNiceName(sone);
 			return soneName + " - " + webInterface.getL10n().getString("Page.ViewSone.Title");
@@ -82,14 +82,14 @@ public class ViewSonePage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
+		Sone sone = webInterface.getCore().getSone(soneId);
 		templateContext.set("sone", sone);
 		templateContext.set("soneId", soneId);
 		if (sone == null) {
 			return;
 		}
 		List<Post> sonePosts = sone.getPosts();
-		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone));
+		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone.getId()));
 		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
 		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);

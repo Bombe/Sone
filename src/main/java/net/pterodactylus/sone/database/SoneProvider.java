@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.database;
 
 import net.pterodactylus.sone.data.Sone;
 
@@ -27,17 +27,12 @@ import net.pterodactylus.sone.data.Sone;
 public interface SoneProvider {
 
 	/**
-	 * Returns the Sone with the given ID, if it exists. If it does not exist
-	 * and {@code create} is {@code false}, {@code null} is returned; otherwise,
-	 * a new Sone with the given ID is created and returned.
+	 * Returns the Sone with the given ID, if it exists.
 	 *
 	 * @param soneId
 	 *            The ID of the Sone to return
-	 * @param create
-	 *            {@code true} to create a new Sone if no Sone with the given ID
-	 *            exists, {@code false} to return {@code null} instead
 	 * @return The Sone with the given ID, or {@code null}
 	 */
-	public Sone getSone(String soneId, boolean create);
+	public Sone getSone(String soneId);
 
 }
