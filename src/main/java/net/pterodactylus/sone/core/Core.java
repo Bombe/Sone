@@ -542,6 +542,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			});
 		}
 	}
+
 	/**
 	 * Returns a post reply builder.
 	 *
