@@ -1375,9 +1375,19 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				knownSones.add(friend);
 			}
 		}
+		synchronized (this.posts) {
+			for (Post post : posts) {
+				this.posts.put(post.getId(), post);
+			}
+		}
 		synchronized (knownPosts) {
 			for (Post post : posts) {
 				knownPosts.add(post.getId());
+			}
+		}
+		synchronized (this.replies) {
+			for (PostReply postReply : replies) {
+				this.replies.put(postReply.getId(), postReply);
 			}
 		}
 		synchronized (knownReplies) {
