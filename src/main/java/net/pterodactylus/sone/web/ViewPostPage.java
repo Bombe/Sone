@@ -75,7 +75,7 @@ public class ViewPostPage extends SoneTemplatePage {
 		String postId = request.getHttpRequest().getParam("post");
 		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
 		Optional<Post> post = webInterface.getCore().getPost(postId);
-		templateContext.set("post", post.get());
+		templateContext.set("post", post.orNull());
 		templateContext.set("raw", raw);
 	}
 
