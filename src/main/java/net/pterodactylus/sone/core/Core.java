@@ -505,10 +505,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public long getSoneFollowingTime(Sone sone) {
 		synchronized (soneFollowingTimes) {
-			if (soneFollowingTimes.containsKey(sone)) {
-				return soneFollowingTimes.get(sone);
-			}
-			return Long.MAX_VALUE;
+			return Optional.fromNullable(soneFollowingTimes.get(sone.getId())).or(Long.MAX_VALUE);
 		}
 	}
 
