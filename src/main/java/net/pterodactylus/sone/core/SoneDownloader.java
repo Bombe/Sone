@@ -166,6 +166,7 @@ public class SoneDownloader extends AbstractService {
 			Sone parsedSone = parseSone(sone, fetchResults.getFetchResult(), fetchResults.getFreenetUri());
 			if (parsedSone != null) {
 				if (!fetchOnly) {
+					parsedSone.setStatus((parsedSone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 					core.updateSone(parsedSone);
 					addSone(parsedSone);
 				}
