@@ -2098,7 +2098,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/**
 	 * Loads the configuration.
 	 */
-	@SuppressWarnings("unchecked")
 	private void loadConfiguration() {
 		/* create options. */
 		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
