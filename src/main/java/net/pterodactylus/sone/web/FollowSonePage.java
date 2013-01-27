@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
@@ -55,9 +57,10 @@ public class FollowSonePage extends SoneTemplatePage {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String soneIds = request.getHttpRequest().getPartAsStringFailsafe("sone", 1200);
 			for (String soneId : soneIds.split("[ ,]+")) {
-				if (webInterface.getCore().hasSone(soneId)) {
+				Optional<Sone> sone = webInterface.getCore().getSone(soneId);
+				if (sone.isPresent()) {
 					webInterface.getCore().followSone(currentSone, soneId);
-					webInterface.getCore().markSoneKnown(webInterface.getCore().getSone(soneId));
+					webInterface.getCore().markSoneKnown(sone.get());
 				}
 			}
 			throw new RedirectException(returnPage);

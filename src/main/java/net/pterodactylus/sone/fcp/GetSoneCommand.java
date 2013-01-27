@@ -21,6 +21,9 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
+
+import com.google.common.base.Optional;
+
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -48,7 +51,7 @@ public class GetSoneCommand extends AbstractSoneCommand {
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		Sone sone = getSone(parameters, "Sone", false);
-		Sone localSone = getSone(parameters, "LocalSone", false, false);
+		Optional<Sone> localSone = getSone(parameters, "LocalSone", false, false);
 		return new Response("Sone", encodeSone(sone, "", localSone));
 	}
 

@@ -96,7 +96,7 @@ public class GetPostAjaxPage extends JsonPage {
 		JsonObject jsonPost = new JsonObject();
 		jsonPost.put("id", post.getId());
 		jsonPost.put("sone", post.getSone().getId());
-		jsonPost.put("recipient", (post.getRecipient() == null) ? null : post.getRecipient().getId());
+		jsonPost.put("recipient", post.getRecipientId().orNull());
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();

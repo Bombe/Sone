@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data;
 
 import java.util.Comparator;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 
 /**
@@ -68,11 +69,31 @@ public interface Post {
 	public Sone getSone();
 
 	/**
-	 * Returns the recipient of this post, if any.
+	 * Returns whether this post has a recipient.
 	 *
-	 * @return The recipient of this post, or {@code null}
+	 * @return {@code true} if this post has a recipient, {@code false}
+	 *         otherwise
 	 */
-	public Sone getRecipient();
+	public boolean hasRecipient();
+
+	/**
+	 * Returns the ID of the recipient {@link Sone}, or
+	 * {@link Optional#absent()} if this post does not have a recipient.
+	 *
+	 * @return The ID of the recipient, or {@link Optional#absent()}
+	 */
+	public Optional<String> getRecipientId();
+
+	/**
+	 * Returns the recipient of this post, if any. As this method can return
+	 * {@link Optional#absent()} if the post has a recipient which has not yet
+	 * been loaded, it is recommended to use {@link #hasRecipient()} to check
+	 * for the presence of a recipient.
+	 *
+	 * @return The recipient of this post, or {@link Optional#absent()} if there
+	 *         is no recipient
+	 */
+	public Optional<Sone> getRecipient();
 
 	/**
 	 * Returns the time of the post.

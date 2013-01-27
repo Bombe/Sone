@@ -67,9 +67,9 @@ public class ViewSonePage extends SoneTemplatePage {
 	@Override
 	protected String getPageTitle(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId);
-		if ((sone != null) && (sone.getTime() > 0)) {
-			String soneName = SoneAccessor.getNiceName(sone);
+		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
+		if (sone.isPresent()) {
+			String soneName = SoneAccessor.getNiceName(sone.get());
 			return soneName + " - " + webInterface.getL10n().getString("Page.ViewSone.Title");
 		}
 		return webInterface.getL10n().getString("Page.ViewSone.Page.TitleWithoutSone");
@@ -82,23 +82,23 @@ public class ViewSonePage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId);
-		templateContext.set("sone", sone);
+		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
+		templateContext.set("sone", sone.orNull());
 		templateContext.set("soneId", soneId);
-		if (sone == null) {
+		if (!sone.isPresent()) {
 			return;
 		}
-		List<Post> sonePosts = sone.getPosts();
-		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone.getId()));
+		List<Post> sonePosts = sone.get().getPosts();
+		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone.get().getId()));
 		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
 		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());
-		Set<PostReply> replies = sone.getReplies();
+		Set<PostReply> replies = sone.get().getReplies();
 		final Map<Post, List<PostReply>> repliedPosts = new HashMap<Post, List<PostReply>>();
 		for (PostReply reply : replies) {
 			Optional<Post> post = reply.getPost();
-			if (!post.isPresent() || repliedPosts.containsKey(post.get()) || sone.equals(post.get().getSone()) || (sone.equals(post.get().getRecipient()))) {
+			if (!post.isPresent() || repliedPosts.containsKey(post.get()) || sone.get().equals(post.get().getSone()) || (sone.get().getId().equals(post.get().getRecipientId().orNull()))) {
 				continue;
 			}
 			repliedPosts.put(post.get(), webInterface.getCore().getReplies(post.get()));

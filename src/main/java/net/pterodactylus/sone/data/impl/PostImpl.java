@@ -23,6 +23,8 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.SoneProvider;
 
+import com.google.common.base.Optional;
+
 /**
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
@@ -94,14 +96,30 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId);
+		return soneProvider.getSone(soneId).get();
+	}
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public boolean hasRecipient() {
+		return recipientId != null;
+	}
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public Optional<String> getRecipientId() {
+		return Optional.fromNullable(recipientId);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Sone getRecipient() {
+	public Optional<Sone> getRecipient() {
 		return soneProvider.getSone(recipientId);
 	}
 

@@ -19,6 +19,8 @@ package net.pterodactylus.sone.database;
 
 import net.pterodactylus.sone.data.Sone;
 
+import com.google.common.base.Optional;
+
 /**
  * Interface for objects that can provide {@link Sone}s by their ID.
  *
@@ -27,12 +29,13 @@ import net.pterodactylus.sone.data.Sone;
 public interface SoneProvider {
 
 	/**
-	 * Returns the Sone with the given ID, if it exists.
+	 * Returns the Sone with the given ID, or {@link Optional#absent()} if it
+	 * does not exist.
 	 *
 	 * @param soneId
 	 *            The ID of the Sone to return
-	 * @return The Sone with the given ID, or {@code null}
+	 * @return The Sone with the given ID, or {@link Optional#absent()}
 	 */
-	public Sone getSone(String soneId);
+	public Optional<Sone> getSone(String soneId);
 
 }

@@ -74,7 +74,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			String[] soneIds = loadSoneIds.split(",");
 			for (String soneId : soneIds) {
 				/* just add it, we skip null further down. */
-				sones.add(webInterface.getCore().getSone(soneId));
+				sones.add(webInterface.getCore().getSone(soneId).orNull());
 			}
 		}
 		JsonArray jsonSones = new JsonArray();
@@ -105,7 +105,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			JsonObject jsonPost = new JsonObject();
 			jsonPost.put("id", post.getId());
 			jsonPost.put("sone", post.getSone().getId());
-			jsonPost.put("recipient", (post.getRecipient() != null) ? post.getRecipient().getId() : null);
+			jsonPost.put("recipient", post.getRecipientId().orNull());
 			jsonPost.put("time", post.getTime());
 			jsonPosts.add(jsonPost);
 		}

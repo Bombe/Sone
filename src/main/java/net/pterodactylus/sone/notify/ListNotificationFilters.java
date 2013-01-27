@@ -245,7 +245,7 @@ public class ListNotificationFilters {
 				 */
 				return true;
 			}
-			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
+			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.getId().equals(post.getRecipientId().orNull())) {
 				return false;
 			}
 		}

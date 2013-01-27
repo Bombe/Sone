@@ -82,7 +82,7 @@ public abstract class AbstractPostBuilder implements PostBuilder {
 		this.currentTime = false;
 		this.time = post.getTime();
 		this.text = post.getText();
-		this.recipientId = (post.getRecipient() != null) ? post.getRecipient().getId() : null;
+		this.recipientId = post.getRecipientId().orNull();
 		return this;
 	}
 

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
@@ -51,11 +53,11 @@ public class UntrustAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId);
-		if (sone == null) {
+		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
+		if (!sone.isPresent()) {
 			return createErrorJsonObject("invalid-sone-id");
 		}
-		webInterface.getCore().untrustSone(currentSone, sone);
+		webInterface.getCore().untrustSone(currentSone, sone.get());
 		return createSuccessJsonObject().put("trustValue", (String) null);
 	}
 

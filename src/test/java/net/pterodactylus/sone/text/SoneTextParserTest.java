@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 
+import com.google.common.base.Optional;
+
 import junit.framework.TestCase;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.SoneProvider;
@@ -181,8 +183,8 @@ public class SoneTextParserTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Sone getSone(final String soneId) {
-			return new Sone(soneId, false) {
+		public Optional<Sone> getSone(final String soneId) {
+			return Optional.<Sone> fromNullable(new Sone(soneId, false) {
 
 				/**
 				 * {@inheritDoc}
@@ -191,7 +193,7 @@ public class SoneTextParserTest extends TestCase {
 				public String getName() {
 					return soneId;
 				}
-			};
+			});
 		}
 
 	}

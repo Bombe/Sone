@@ -365,9 +365,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *         Sone
 	 */
 	@Override
-	public Sone getSone(String id) {
+	public Optional<Sone> getSone(String id) {
 		synchronized (sones) {
-			return sones.get(id);
+			return Optional.fromNullable(sones.get(id));
 		}
 	}
 
@@ -537,7 +537,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 				@Override
 				public boolean apply(Post post) {
-					return (post.getRecipient() != null) && (post.getRecipient().getId().equals(recipientId));
+					return recipientId.equals(post.getRecipientId().orNull());
 				}
 			});
 		}
@@ -898,16 +898,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			if (!soneFollowingTimes.containsKey(soneId)) {
 				long now = System.currentTimeMillis();
 				soneFollowingTimes.put(soneId, now);
-				Sone followedSone = getSone(soneId);
-				if (followedSone == null) {
+				Optional<Sone> followedSone = getSone(soneId);
+				if (!followedSone.isPresent()) {
 					return;
 				}
-				for (Post post : followedSone.getPosts()) {
+				for (Post post : followedSone.get().getPosts()) {
 					if (post.getTime() < now) {
 						markPostKnown(post);
 					}
 				}
-				for (PostReply reply : followedSone.getReplies()) {
+				for (PostReply reply : followedSone.get().getReplies()) {
 					if (reply.getTime() < now) {
 						markReplyKnown(reply);
 					}
@@ -1032,22 +1032,22 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            of the age of the given Sone
 	 */
 	public void updateSone(Sone sone, boolean soneRescueMode) {
-		if (hasSone(sone.getId())) {
-			Sone storedSone = getSone(sone.getId());
-			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
+		Optional<Sone> storedSone = getSone(sone.getId());
+		if (storedSone.isPresent()) {
+			if (!soneRescueMode && !(sone.getTime() > storedSone.get().getTime())) {
 				logger.log(Level.FINE, String.format("Downloaded Sone %s is not newer than stored Sone %s.", sone, storedSone));
 				return;
 			}
 			synchronized (posts) {
 				if (!soneRescueMode) {
-					for (Post post : storedSone.getPosts()) {
+					for (Post post : storedSone.get().getPosts()) {
 						posts.remove(post.getId());
 						if (!sone.getPosts().contains(post)) {
 							eventBus.post(new PostRemovedEvent(post));
 						}
 					}
 				}
-				List<Post> storedPosts = storedSone.getPosts();
+				List<Post> storedPosts = storedSone.get().getPosts();
 				synchronized (knownPosts) {
 					for (Post post : sone.getPosts()) {
 						post.setKnown(knownPosts.contains(post.getId()));
@@ -1065,14 +1065,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 			synchronized (replies) {
 				if (!soneRescueMode) {
-					for (PostReply reply : storedSone.getReplies()) {
+					for (PostReply reply : storedSone.get().getReplies()) {
 						replies.remove(reply.getId());
 						if (!sone.getReplies().contains(reply)) {
 							eventBus.post(new PostReplyRemovedEvent(reply));
 						}
 					}
 				}
-				Set<PostReply> storedReplies = storedSone.getReplies();
+				Set<PostReply> storedReplies = storedSone.get().getReplies();
 				synchronized (knownReplies) {
 					for (PostReply reply : sone.getReplies()) {
 						reply.setKnown(knownReplies.contains(reply.getId()));
@@ -1090,7 +1090,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 			synchronized (albums) {
 				synchronized (images) {
-					for (Album album : storedSone.getAlbums()) {
+					for (Album album : storedSone.get().getAlbums()) {
 						albums.remove(album.getId());
 						for (Image image : album.getImages()) {
 							images.remove(image.getId());
@@ -1437,7 +1437,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The text of the post
 	 * @return The created post
 	 */
-	public Post createPost(Sone sone, Sone recipient, String text) {
+	public Post createPost(Sone sone, Optional<Sone> recipient, String text) {
 		return createPost(sone, recipient, System.currentTimeMillis(), text);
 	}
 
@@ -1455,7 +1455,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The text of the post
 	 * @return The created post
 	 */
-	public Post createPost(Sone sone, Sone recipient, long time, String text) {
+	public Post createPost(Sone sone, Optional<Sone> recipient, long time, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
@@ -1464,8 +1464,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		PostBuilder postBuilder = postBuilderFactory.newPostBuilder();
 		postBuilder.from(sone.getId()).randomId().withTime(time).withText(text.trim());
-		if (recipient != null) {
-			postBuilder.to(recipient.getId());
+		if (recipient.isPresent()) {
+			postBuilder.to(recipient.get().getId());
 		}
 		final Post post = postBuilder.build();
 		synchronized (posts) {
@@ -1919,7 +1919,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (Post post : sone.getPosts()) {
 				String postPrefix = sonePrefix + "/Posts/" + postCounter++;
 				configuration.getStringValue(postPrefix + "/ID").setValue(post.getId());
-				configuration.getStringValue(postPrefix + "/Recipient").setValue((post.getRecipient() != null) ? post.getRecipient().getId() : null);
+				configuration.getStringValue(postPrefix + "/Recipient").setValue(post.getRecipientId().orNull());
 				configuration.getLongValue(postPrefix + "/Time").setValue(post.getTime());
 				configuration.getStringValue(postPrefix + "/Text").setValue(post.getText());
 			}
@@ -2166,13 +2166,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				break;
 			}
 			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
-			Sone followedSone = getSone(soneId);
-			if (followedSone == null) {
-				logger.log(Level.WARNING, String.format("Ignoring Sone with invalid ID: %s", soneId));
-			} else {
-				synchronized (soneFollowingTimes) {
-					soneFollowingTimes.put(soneId, time);
-				}
+			synchronized (soneFollowingTimes) {
+				soneFollowingTimes.put(soneId, time);
 			}
 			++soneCounter;
 		}
@@ -2320,14 +2315,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* some local identity still trusts this identity, don’t remove. */
 			return;
 		}
-		Sone sone = getSone(identity.getId());
-		if (sone == null) {
+		Optional<Sone> sone = getSone(identity.getId());
+		if (!sone.isPresent()) {
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;
 		}
 		synchronized (posts) {
 			synchronized (knownPosts) {
-				for (Post post : sone.getPosts()) {
+				for (Post post : sone.get().getPosts()) {
 					posts.remove(post.getId());
 					eventBus.post(new PostRemovedEvent(post));
 				}
@@ -2335,7 +2330,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		synchronized (replies) {
 			synchronized (knownReplies) {
-				for (PostReply reply : sone.getReplies()) {
+				for (PostReply reply : sone.get().getReplies()) {
 					replies.remove(reply.getId());
 					eventBus.post(new PostReplyRemovedEvent(reply));
 				}
@@ -2344,7 +2339,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (sones) {
 			sones.remove(identity.getId());
 		}
-		eventBus.post(new SoneRemovedEvent(sone));
+		eventBus.post(new SoneRemovedEvent(sone.get()));
 	}
 
 	/**

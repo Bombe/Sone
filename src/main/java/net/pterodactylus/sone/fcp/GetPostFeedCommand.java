@@ -28,6 +28,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 
 import freenet.support.SimpleFieldSet;
@@ -63,10 +64,11 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		Collection<Post> allPosts = new HashSet<Post>();
 		allPosts.addAll(sone.getPosts());
 		for (String friendSoneId : sone.getFriends()) {
-			if (!getCore().hasSone(friendSoneId)) {
+			Optional<Sone> friendSone = getCore().getSone(friendSoneId);
+			if (!friendSone.isPresent()) {
 				continue;
 			}
-			allPosts.addAll(getCore().getSone(friendSoneId).getPosts());
+			allPosts.addAll(friendSone.get().getPosts());
 		}
 		allPosts.addAll(getCore().getDirectedPosts(sone.getId()));
 		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);

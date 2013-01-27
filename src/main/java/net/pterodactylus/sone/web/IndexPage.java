@@ -31,6 +31,7 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
@@ -66,14 +67,15 @@ public class IndexPage extends SoneTemplatePage {
 		Collection<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(currentSone.getPosts());
 		for (String friendSoneId : currentSone.getFriends()) {
-			if (!webInterface.getCore().hasSone(friendSoneId)) {
+			Optional<Sone> friendSone = webInterface.getCore().getSone(friendSoneId);
+			if (!friendSone.isPresent()) {
 				continue;
 			}
-			allPosts.addAll(webInterface.getCore().getSone(friendSoneId).getPosts());
+			allPosts.addAll(friendSone.get().getPosts());
 		}
 		for (Sone sone : webInterface.getCore().getSones()) {
 			for (Post post : sone.getPosts()) {
-				if (currentSone.equals(post.getRecipient()) && !allPosts.contains(post)) {
+				if (currentSone.equals(post.getRecipient().orNull()) && !allPosts.contains(post)) {
 					allPosts.add(post);
 				}
 			}

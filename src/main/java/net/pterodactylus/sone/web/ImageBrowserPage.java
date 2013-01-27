@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
@@ -77,9 +79,9 @@ public class ImageBrowserPage extends SoneTemplatePage {
 		}
 		String soneId = request.getHttpRequest().getParam("sone", null);
 		if (soneId != null) {
-			Sone sone = webInterface.getCore().getSone(soneId);
+			Optional<Sone> sone = webInterface.getCore().getSone(soneId);
 			templateContext.set("soneRequested", true);
-			templateContext.set("sone", sone);
+			templateContext.set("sone", sone.orNull());
 			return;
 		}
 		String mode = request.getHttpRequest().getParam("mode", null);

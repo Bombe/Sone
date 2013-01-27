@@ -134,7 +134,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *             or if the Sone ID is invalid
 	 */
 	protected Sone getSone(SimpleFieldSet simpleFieldSet, String parameterName, boolean localOnly) throws FcpException {
-		return getSone(simpleFieldSet, parameterName, localOnly, true);
+		return getSone(simpleFieldSet, parameterName, localOnly, true).get();
 	}
 
 	/**
@@ -158,13 +158,13 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *             or if {@code mandatory} is {@code true} and the Sone ID is
 	 *             invalid
 	 */
-	protected Sone getSone(SimpleFieldSet simpleFieldSet, String parameterName, boolean localOnly, boolean mandatory) throws FcpException {
+	protected Optional<Sone> getSone(SimpleFieldSet simpleFieldSet, String parameterName, boolean localOnly, boolean mandatory) throws FcpException {
 		String soneId = simpleFieldSet.get(parameterName);
 		if (mandatory && (soneId == null)) {
 			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.");
 		}
-		Sone sone = localOnly ? core.getLocalSone(soneId, false) : core.getSone(soneId);
-		if (mandatory && (sone == null)) {
+		Optional<Sone> sone = core.getSone(soneId);
+		if ((mandatory && !sone.isPresent()) || (mandatory && sone.isPresent() && (localOnly && !sone.get().isLocal()))) {
 			throw new FcpException("Could not load Sone from “" + soneId + "”.");
 		}
 		return sone;
@@ -236,14 +236,14 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            such as if the Sone is followed by the local Sone
 	 * @return The simple field set containing the given Sone
 	 */
-	protected static SimpleFieldSet encodeSone(Sone sone, String prefix, Sone localSone) {
+	protected static SimpleFieldSet encodeSone(Sone sone, String prefix, Optional<Sone> localSone) {
 		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
 
 		soneBuilder.put(prefix + "Name", sone.getName());
 		soneBuilder.put(prefix + "NiceName", SoneAccessor.getNiceName(sone));
 		soneBuilder.put(prefix + "LastUpdated", sone.getTime());
-		if (localSone != null) {
-			soneBuilder.put(prefix + "Followed", String.valueOf(localSone.hasFriend(sone.getId())));
+		if (localSone.isPresent()) {
+			soneBuilder.put(prefix + "Followed", String.valueOf(localSone.get().hasFriend(sone.getId())));
 		}
 		Profile profile = sone.getProfile();
 		soneBuilder.put(prefix + "Field.Count", profile.getFields().size());
@@ -301,8 +301,8 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 
 		postBuilder.put(prefix + "ID", post.getId());
 		postBuilder.put(prefix + "Sone", post.getSone().getId());
-		if (post.getRecipient() != null) {
-			postBuilder.put(prefix + "Recipient", post.getRecipient().getId());
+		if (post.hasRecipient()) {
+			postBuilder.put(prefix + "Recipient", post.getRecipientId().get());
 		}
 		postBuilder.put(prefix + "Time", post.getTime());
 		postBuilder.put(prefix + "Text", encodeString(post.getText()));

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import com.google.common.base.Optional;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -59,9 +61,9 @@ public class TrustPage extends SoneTemplatePage {
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			String identity = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			Sone sone = webInterface.getCore().getSone(identity);
-			if (sone != null) {
-				webInterface.getCore().trustSone(currentSone, sone);
+			Optional<Sone> sone = webInterface.getCore().getSone(identity);
+			if (sone.isPresent()) {
+				webInterface.getCore().trustSone(currentSone, sone.get());
 			}
 			throw new RedirectException(returnPage);
 		}

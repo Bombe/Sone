@@ -79,11 +79,11 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 				}
 				webInterface.getCore().markReplyKnown(reply.get());
 			} else if (type.equals("sone")) {
-				Sone sone = webInterface.getCore().getSone(id);
-				if (sone == null) {
+				Optional<Sone> sone = webInterface.getCore().getSone(id);
+				if (!sone.isPresent()) {
 					continue;
 				}
-				webInterface.getCore().markSoneKnown(sone);
+				webInterface.getCore().markSoneKnown(sone.get());
 			}
 		}
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);

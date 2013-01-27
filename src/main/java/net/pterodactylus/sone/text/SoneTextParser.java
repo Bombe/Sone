@@ -242,15 +242,15 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (linkType == LinkType.SONE) {
 						if (line.length() >= (7 + 43)) {
 							String soneId = line.substring(7, 50);
-							Sone sone = soneProvider.getSone(soneId);
-							if (sone == null) {
+							Optional<Sone> sone = soneProvider.getSone(soneId);
+							if (!sone.isPresent()) {
 								/*
 								 * don’t use create=true above, we don’t want
 								 * the empty shell.
 								 */
-								sone = new Sone(soneId, false);
+								sone = Optional.fromNullable(new Sone(soneId, false));
 							}
-							parts.add(new SonePart(sone));
+							parts.add(new SonePart(sone.get()));
 							line = line.substring(50);
 						} else {
 							parts.add(new PlainTextPart(line));
