@@ -18,12 +18,12 @@
 	<div class="inner-part">
 		<div<%if !post.loaded> class="hidden"<%/if>>
 			<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a></div>
-			<%ifnull !post.recipient>
+			<%if post.hasRecipient>
 				<span class="recipient-to">→</span>
-				<%ifnull post.recipient.identity>
-					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><%= View.Post.UnknownAuthor|l10n|html></a></div>
+				<%ifnull post.recipient.orNull>
+					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipientId.get|html>"><%= View.Post.UnknownAuthor|l10n|html></a></div>
 				<%else>
-					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipient.id|html>"><% post.recipient.niceName|html></a></div>
+					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipientId.get|html>"><% post.recipient.get.niceName|html></a></div>
 				<%/if>
 			<%/if>
 			<% post.text|html|store key==originalText text==true>
