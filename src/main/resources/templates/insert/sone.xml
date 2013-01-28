@@ -42,7 +42,7 @@
 		<%foreach currentSone.replies reply>
 		<reply>
 			<id><% reply.id></id>
-			<post-id><% reply.post.id|xml></post-id>
+			<post-id><% reply.postId.get|xml></post-id>
 			<time><% reply.time></time>
 			<text><% reply.text|xml></text>
 		</reply>
