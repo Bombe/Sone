@@ -802,6 +802,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
+			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			sones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, sone);
 			soneInserters.put(sone, soneInserter);
@@ -2236,7 +2237,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		OwnIdentity ownIdentity = ownIdentityAddedEvent.ownIdentity();
 		logger.log(Level.FINEST, String.format("Adding OwnIdentity: %s", ownIdentity));
 		if (ownIdentity.hasContext("Sone")) {
-			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			addLocalSone(ownIdentity);
 		}
 	}
