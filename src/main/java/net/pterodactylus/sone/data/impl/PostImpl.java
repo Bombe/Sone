@@ -103,14 +103,6 @@ public class PostImpl implements Post {
 	 * {@inheritDocs}
 	 */
 	@Override
-	public boolean hasRecipient() {
-		return recipientId != null;
-	}
-
-	/**
-	 * {@inheritDocs}
-	 */
-	@Override
 	public Optional<String> getRecipientId() {
 		return Optional.fromNullable(recipientId);
 	}

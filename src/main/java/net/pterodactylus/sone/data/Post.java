@@ -69,14 +69,6 @@ public interface Post {
 	public Sone getSone();
 
 	/**
-	 * Returns whether this post has a recipient.
-	 *
-	 * @return {@code true} if this post has a recipient, {@code false}
-	 *         otherwise
-	 */
-	public boolean hasRecipient();
-
-	/**
 	 * Returns the ID of the recipient {@link Sone}, or
 	 * {@link Optional#absent()} if this post does not have a recipient.
 	 *

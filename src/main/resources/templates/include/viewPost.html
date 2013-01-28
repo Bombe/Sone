@@ -18,9 +18,9 @@
 	<div class="inner-part">
 		<div<%if !post.loaded> class="hidden"<%/if>>
 			<div class="author profile-link"><a href="viewSone.html?sone=<% post.sone.id|html>"><% post.sone.niceName|html></a></div>
-			<%if post.hasRecipient>
+			<%if post.recipientId.present>
 				<span class="recipient-to">→</span>
-				<%ifnull post.recipient.orNull>
+				<%if !post.recipient.present>
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipientId.get|html>"><%= View.Post.UnknownAuthor|l10n|html></a></div>
 				<%else>
 					<div class="recipient profile-link"><a href="viewSone.html?sone=<% post.recipientId.get|html>"><% post.recipient.get.niceName|html></a></div>

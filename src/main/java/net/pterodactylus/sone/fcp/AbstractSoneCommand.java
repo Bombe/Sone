@@ -301,7 +301,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 
 		postBuilder.put(prefix + "ID", post.getId());
 		postBuilder.put(prefix + "Sone", post.getSone().getId());
-		if (post.hasRecipient()) {
+		if (post.getRecipientId().isPresent()) {
 			postBuilder.put(prefix + "Recipient", post.getRecipientId().get());
 		}
 		postBuilder.put(prefix + "Time", post.getTime());
