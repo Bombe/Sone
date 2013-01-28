@@ -243,7 +243,6 @@ public class ListNotificationFilters {
 				 * received trust values. to prevent this we simply assume that
 				 * posts are visible if there is no trust.
 				 */
-				return true;
 			}
 			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.getId().equals(post.getRecipientId().orNull())) {
 				return false;
