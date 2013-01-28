@@ -208,7 +208,7 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return getId().hashCode();
 	}
 
 	/**
@@ -216,11 +216,11 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public boolean equals(Object object) {
-		if (!(object instanceof DefaultIdentity)) {
+		if (!(object instanceof Identity)) {
 			return false;
 		}
-		DefaultIdentity identity = (DefaultIdentity) object;
-		return identity.id.equals(id);
+		Identity identity = (Identity) object;
+		return identity.getId().equals(getId());
 	}
 
 	/**
