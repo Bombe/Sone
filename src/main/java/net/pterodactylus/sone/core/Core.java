@@ -373,10 +373,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns all local Sones.
-	 *
-	 * @return All local Sones
+	 * {@inheritDocs}
 	 */
+	@Override
 	public Collection<Sone> getLocalSones() {
 		synchronized (sones) {
 			return Collections2.filter(sones.values(), new Predicate<Sone>() {
@@ -415,10 +414,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns all remote Sones.
-	 *
-	 * @return All remote Sones
+	 * {@inheritDocs}
 	 */
+	@Override
 	public Collection<Sone> getRemoteSones() {
 		synchronized (sones) {
 			return Collections2.filter(sones.values(), new Predicate<Sone>() {

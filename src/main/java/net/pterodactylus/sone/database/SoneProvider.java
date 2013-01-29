@@ -47,4 +47,18 @@ public interface SoneProvider {
 	 */
 	public Collection<Sone> getSones();
 
+	/**
+	 * Returns all local Sones.
+	 *
+	 * @return All local Sones
+	 */
+	public Collection<Sone> getLocalSones();
+
+	/**
+	 * Returns all remote Sones.
+	 *
+	 * @return All remote Sones
+	 */
+	public Collection<Sone> getRemoteSones();
+
 }
