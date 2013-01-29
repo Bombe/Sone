@@ -131,7 +131,7 @@ public class SearchPage extends SoneTemplatePage {
 			redirectIfNotNull(getImageId(phrase), "imageBrowser.html?image=");
 		}
 
-		Set<Sone> sones = webInterface.getCore().getSones();
+		Collection<Sone> sones = webInterface.getCore().getSones();
 		Collection<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
 		Collection<Hit<Post>> postHits = hitCache.getUnchecked(phrases);

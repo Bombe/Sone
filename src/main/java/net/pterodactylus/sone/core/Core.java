@@ -347,11 +347,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns all Sones, remote and local.
-	 *
-	 * @return All Sones
+	 * {@inheritDocs}
 	 */
-	public Set<Sone> getSones() {
+	@Override
+	public Collection<Sone> getSones() {
 		synchronized (sones) {
 			return Collections.unmodifiableCollection(sones.values());
 		}

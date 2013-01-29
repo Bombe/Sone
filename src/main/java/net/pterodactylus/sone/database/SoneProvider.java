@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.database;
 
+import java.util.Collection;
+
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
@@ -37,5 +39,12 @@ public interface SoneProvider {
 	 * @return The Sone with the given ID, or {@link Optional#absent()}
 	 */
 	public Optional<Sone> getSone(String soneId);
+
+	/**
+	 * Returns all Sones.
+	 *
+	 * @return All Sones
+	 */
+	public Collection<Sone> getSones();
 
 }
