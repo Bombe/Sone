@@ -372,20 +372,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Checks whether the core knows a Sone with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the Sone
-	 * @return {@code true} if there is a Sone with the given ID, {@code false}
-	 *         otherwise
-	 */
-	public boolean hasSone(String id) {
-		synchronized (sones) {
-			return sones.containsKey(id);
-		}
-	}
-
-	/**
 	 * Returns all local Sones.
 	 *
 	 * @return All local Sones
