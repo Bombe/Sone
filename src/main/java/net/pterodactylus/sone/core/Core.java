@@ -352,7 +352,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return All Sones
 	 */
 	public Set<Sone> getSones() {
-		return new HashSet<Sone>(sones.values());
+		synchronized (sones) {
+			return Collections.unmodifiableCollection(sones.values());
+		}
 	}
 
 	/**
