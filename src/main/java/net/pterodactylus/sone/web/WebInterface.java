@@ -938,7 +938,7 @@ public class WebInterface {
 		PostReply reply = postReplyRemovedEvent.postReply();
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
-		if (!getMentionedSones(reply.getText()).isEmpty()) {
+		if (!getMentionedSones(reply.getText()).isEmpty() && reply.getPost().isPresent()) {
 			boolean isMentioned = false;
 			for (PostReply existingReply : getCore().getReplies(reply.getPost().get())) {
 				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
