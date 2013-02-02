@@ -40,6 +40,15 @@ public interface PostProvider {
 	public Optional<Post> getPost(String postId);
 
 	/**
+	 * Returns all posts from the given Sone.
+	 *
+	 * @param soneId
+	 *            The ID of the Sone
+	 * @return All posts from the given Sone
+	 */
+	public Collection<Post> getPosts(String soneId);
+
+	/**
 	 * Returns all posts that have the given Sone as recipient.
 	 *
 	 * @see Post#getRecipient()

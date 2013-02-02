@@ -512,6 +512,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public Collection<Post> getPosts(String soneId) {
+		return postDatabase.getPosts(soneId);
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	@Override
