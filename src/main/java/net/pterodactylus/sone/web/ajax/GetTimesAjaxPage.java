@@ -181,7 +181,7 @@ public class GetTimesAjaxPage extends JsonPage {
 			text = webInterface.getL10n().getString("View.Time.AWeekAgo");
 			refresh = TimeUnit.DAYS.toMillis(1);
 		} else if (age < TimeUnit.DAYS.toMillis(28)) {
-			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((TimeUnit.MILLISECONDS.toHours(age) + 84) / 24));
+			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((TimeUnit.MILLISECONDS.toHours(age) + 84) / (7 * 24)));
 			refresh = TimeUnit.DAYS.toMillis(1);
 		} else if (age < TimeUnit.DAYS.toMillis(42)) {
 			text = webInterface.getL10n().getString("View.Time.AMonthAgo");
