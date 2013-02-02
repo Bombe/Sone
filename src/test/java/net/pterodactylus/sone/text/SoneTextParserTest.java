@@ -20,6 +20,7 @@ package net.pterodactylus.sone.text;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collection;
 
 import com.google.common.base.Optional;
 
@@ -194,6 +195,30 @@ public class SoneTextParserTest extends TestCase {
 					return soneId;
 				}
 			});
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getSones() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getLocalSones() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getRemoteSones() {
+			return null;
 		}
 
 	}
