@@ -228,7 +228,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	private final List<Album> albums = new CopyOnWriteArrayList<Album>();
 
 	/** Sone-specific options. */
-	private final Options options = new Options();
+	private Options options = new Options();
 
 	/**
 	 * Creates a new Sone.
@@ -893,6 +893,17 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public Options getOptions() {
 		return options;
+	}
+
+	/**
+	 * Sets the options of this Sone.
+	 *
+	 * @param options
+	 *            The options of this Sone
+	 */
+	/* TODO - remove this method again, maybe add an option provider */
+	public void setOptions(Options options) {
+		this.options = options;
 	}
 
 	//
