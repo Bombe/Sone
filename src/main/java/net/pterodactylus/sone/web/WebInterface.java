@@ -940,7 +940,7 @@ public class WebInterface {
 		localReplyNotification.remove(reply);
 		if (!getMentionedSones(reply.getText()).isEmpty() && reply.getPost().isPresent()) {
 			boolean isMentioned = false;
-			for (PostReply existingReply : getCore().getReplies(reply.getPost().get())) {
+			for (PostReply existingReply : getCore().getReplies(reply.getPostId())) {
 				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
 			}
 			if (!isMentioned) {

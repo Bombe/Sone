@@ -43,10 +43,10 @@ public interface PostReplyProvider {
 	/**
 	 * Returns all replies for the given post, order ascending by time.
 	 *
-	 * @param post
-	 *            The post to get all replies for
+	 * @param postId
+	 *            The ID of the post to get all replies for
 	 * @return All replies for the given post
 	 */
-	public List<PostReply> getReplies(Post post);
+	public List<PostReply> getReplies(String postId);
 
 }

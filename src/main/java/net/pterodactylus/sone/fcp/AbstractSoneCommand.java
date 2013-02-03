@@ -309,7 +309,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		postBuilder.put(encodeLikes(core.getLikes(post), prefix + "Likes."));
 
 		if (includeReplies) {
-			List<PostReply> replies = core.getReplies(post);
+			List<PostReply> replies = core.getReplies(post.getId());
 			postBuilder.put(encodeReplies(replies, prefix));
 		}
 
@@ -338,7 +338,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			String postPrefix = prefix + postIndex++;
 			postBuilder.put(encodePost(post, postPrefix + ".", includeReplies));
 			if (includeReplies) {
-				postBuilder.put(encodeReplies(Collections2.filter(core.getReplies(post), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
+				postBuilder.put(encodeReplies(Collections2.filter(core.getReplies(post.getId()), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
 			}
 		}
 

@@ -543,7 +543,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * {@inheritDoc}
 	 */
 	@Override
-	public List<PostReply> getReplies(final Post post) {
+	public List<PostReply> getReplies(final String postId) {
 		return Ordering.from(Reply.TIME_COMPARATOR).sortedCopy(FluentIterable.from(getSones()).transformAndConcat(new Function<Sone, Iterable<PostReply>>() {
 
 			@Override
@@ -554,7 +554,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 			@Override
 			public boolean apply(PostReply reply) {
-				return post.getId().equals(reply.getPostId());
+				return postId.equals(reply.getPostId());
 			}
 		}));
 	}
@@ -1481,7 +1481,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		post.setKnown(true);
 		eventBus.post(new MarkPostKnownEvent(post));
 		touchConfiguration();
-		for (PostReply reply : getReplies(post)) {
+		for (PostReply reply : getReplies(post.getId())) {
 			markReplyKnown(reply);
 		}
 	}

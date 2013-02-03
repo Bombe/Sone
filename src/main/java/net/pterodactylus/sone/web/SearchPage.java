@@ -467,7 +467,7 @@ public class SearchPage extends SoneTemplatePage {
 			if (post.getRecipient().isPresent()) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient().get()));
 			}
-			for (PostReply reply : Collections2.filter(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLY_FILTER)) {
+			for (PostReply reply : Collections2.filter(webInterface.getCore().getReplies(post.getId()), Reply.FUTURE_REPLY_FILTER)) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(reply.getSone()));
 				postString.append(' ').append(reply.getText());
 			}
