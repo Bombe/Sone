@@ -26,6 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
+
 /**
  * A profile stores personal information about a {@link Sone}. All information
  * is optional and can be {@code null}.
@@ -401,37 +404,37 @@ public class Profile implements Fingerprintable {
 	 */
 	@Override
 	public String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Profile(");
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString("Profile(");
 		if (firstName != null) {
-			fingerprint.append("FirstName(").append(firstName).append(')');
+			hash.putString("FirstName(").putString(firstName).putString(")");
 		}
 		if (middleName != null) {
-			fingerprint.append("MiddleName(").append(middleName).append(')');
+			hash.putString("MiddleName(").putString(middleName).putString(")");
 		}
 		if (lastName != null) {
-			fingerprint.append("LastName(").append(lastName).append(')');
+			hash.putString("LastName(").putString(lastName).putString(")");
 		}
 		if (birthDay != null) {
-			fingerprint.append("BirthDay(").append(birthDay).append(')');
+			hash.putString("BirthDay(").putInt(birthDay).putString(")");
 		}
 		if (birthMonth != null) {
-			fingerprint.append("BirthMonth(").append(birthMonth).append(')');
+			hash.putString("BirthMonth(").putInt(birthMonth).putString(")");
 		}
 		if (birthYear != null) {
-			fingerprint.append("BirthYear(").append(birthYear).append(')');
+			hash.putString("BirthYear(").putInt(birthYear).putString(")");
 		}
 		if (avatar != null) {
-			fingerprint.append("Avatar(").append(avatar).append(')');
+			hash.putString("Avatar(").putString(avatar).putString(")");
 		}
-		fingerprint.append("ContactInformation(");
+		hash.putString("ContactInformation(");
 		for (Field field : fields) {
-			fingerprint.append(field.getName()).append('(').append(field.getValue()).append(')');
+			hash.putString(field.getName()).putString("(").putString(field.getValue()).putString(")");
 		}
-		fingerprint.append(")");
-		fingerprint.append(")");
+		hash.putString(")");
+		hash.putString(")");
 
-		return fingerprint.toString();
+		return hash.hash().toString();
 	}
 
 	/**

@@ -32,6 +32,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
@@ -436,33 +438,33 @@ public class Album implements Fingerprintable {
 	 */
 	@Override
 	public String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Album(");
-		fingerprint.append("ID(").append(id).append(')');
-		fingerprint.append("Title(").append(title).append(')');
-		fingerprint.append("Description(").append(description).append(')');
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString("Album(");
+		hash.putString("ID(").putString(id).putString(")");
+		hash.putString("Title(").putString(title).putString(")");
+		hash.putString("Description(").putString(description).putString(")");
 		if (albumImage != null) {
-			fingerprint.append("AlbumImage(").append(albumImage).append(')');
+			hash.putString("AlbumImage(").putString(albumImage).putString(")");
 		}
 
 		/* add nested albums. */
-		fingerprint.append("Albums(");
+		hash.putString("Albums(");
 		for (Album album : albums) {
-			fingerprint.append(album.getFingerprint());
+			hash.putString(album.getFingerprint());
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
 		/* add images. */
-		fingerprint.append("Images(");
+		hash.putString("Images(");
 		for (Image image : getImages()) {
 			if (image.isInserted()) {
-				fingerprint.append(image.getFingerprint());
+				hash.putString(image.getFingerprint());
 			}
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
-		fingerprint.append(')');
-		return fingerprint.toString();
+		hash.putString(")");
+		return hash.hash().toString();
 	}
 
 	//

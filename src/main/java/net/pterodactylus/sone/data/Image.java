@@ -23,6 +23,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
 
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
+
 /**
  * Container for image metadata.
  *
@@ -296,13 +299,13 @@ public class Image implements Fingerprintable {
 	 */
 	@Override
 	public String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Image(");
-		fingerprint.append("ID(").append(id).append(')');
-		fingerprint.append("Title(").append(title).append(')');
-		fingerprint.append("Description(").append(description).append(')');
-		fingerprint.append(')');
-		return fingerprint.toString();
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString("Image(");
+		hash.putString("ID(").putString(id).putString(")");
+		hash.putString("Title(").putString(title).putString(")");
+		hash.putString("Description(").putString(description).putString(")");
+		hash.putString(")");
+		return hash.hash().toString();
 	}
 
 	//

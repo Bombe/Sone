@@ -38,6 +38,8 @@ import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
 
 import com.google.common.base.Predicate;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 import freenet.keys.FreenetURI;
 
@@ -915,46 +917,46 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	@Override
 	public synchronized String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append(profile.getFingerprint());
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString(profile.getFingerprint());
 
-		fingerprint.append("Posts(");
+		hash.putString("Posts(");
 		for (Post post : getPosts()) {
-			fingerprint.append("Post(").append(post.getId()).append(')');
+			hash.putString("Post(").putString(post.getId()).putString(")");
 		}
-		fingerprint.append(")");
+		hash.putString(")");
 
 		List<PostReply> replies = new ArrayList<PostReply>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
-		fingerprint.append("Replies(");
+		hash.putString("Replies(");
 		for (PostReply reply : replies) {
-			fingerprint.append("Reply(").append(reply.getId()).append(')');
+			hash.putString("Reply(").putString(reply.getId()).putString(")");
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
 		List<String> likedPostIds = new ArrayList<String>(getLikedPostIds());
 		Collections.sort(likedPostIds);
-		fingerprint.append("LikedPosts(");
+		hash.putString("LikedPosts(");
 		for (String likedPostId : likedPostIds) {
-			fingerprint.append("Post(").append(likedPostId).append(')');
+			hash.putString("Post(").putString(likedPostId).putString(")");
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
 		List<String> likedReplyIds = new ArrayList<String>(getLikedReplyIds());
 		Collections.sort(likedReplyIds);
-		fingerprint.append("LikedReplies(");
+		hash.putString("LikedReplies(");
 		for (String likedReplyId : likedReplyIds) {
-			fingerprint.append("Reply(").append(likedReplyId).append(')');
+			hash.putString("Reply(").putString(likedReplyId).putString(")");
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
-		fingerprint.append("Albums(");
+		hash.putString("Albums(");
 		for (Album album : albums) {
-			fingerprint.append(album.getFingerprint());
+			hash.putString(album.getFingerprint());
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
-		return fingerprint.toString();
+		return hash.hash().toString();
 	}
 
 	//
