@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
@@ -30,6 +32,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.json.JsonUtils;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 import freenet.clients.http.SessionManager.Session;
@@ -42,6 +45,9 @@ import freenet.clients.http.ToadletContext;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class JsonPage implements FreenetPage {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(JsonPage.class);
 
 	/** The path of the page. */
 	private final String path;
@@ -226,6 +232,7 @@ public abstract class JsonPage implements FreenetPage {
 			JsonObject jsonObject = createJsonObject(request);
 			return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(JsonUtils.format(jsonObject));
 		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Error executing JSON page!", e1);
 			return response.setStatusCode(500).setStatusText(e1.getMessage()).setContentType("text/plain").write(dumpStackTrace(e1));
 		}
 	}
