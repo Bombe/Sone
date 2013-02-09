@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -229,7 +230,8 @@ public class FreenetInterface {
 				}
 			};
 			soneUskCallbacks.put(sone.getId(), uskCallback);
-			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, (System.currentTimeMillis() - sone.getTime()) < 7 * 24 * 60 * 60 * 1000, (HighLevelSimpleClientImpl) client);
+			boolean runBackgroundFetch = (System.currentTimeMillis() - sone.getTime()) < TimeUnit.DAYS.toMillis(7);
+			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, runBackgroundFetch, (HighLevelSimpleClientImpl) client);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe USK “%s”!", sone.getRequestUri()), mue1);
 		}
