@@ -25,14 +25,12 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.core.WebOfTrustUpdater;
-import net.pterodactylus.sone.data.impl.DefaultPostBuilderFactory;
-import net.pterodactylus.sone.data.impl.DefaultPostReplyBuilderFactory;
+import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.PostBuilderFactory;
-import net.pterodactylus.sone.database.PostDatabase;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.PostReplyBuilderFactory;
 import net.pterodactylus.sone.database.SoneProvider;
-import net.pterodactylus.sone.database.memory.MemoryPostDatabase;
+import net.pterodactylus.sone.database.memory.MemoryDatabase;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
@@ -216,7 +214,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			@Override
 			protected void configure() {
 				bind(Core.class).in(Singleton.class);
-				bind(MemoryPostDatabase.class).in(Singleton.class);
+				bind(MemoryDatabase.class).in(Singleton.class);
 				bind(EventBus.class).toInstance(eventBus);
 				bind(Configuration.class).toInstance(startConfiguration);
 				bind(FreenetInterface.class).in(Singleton.class);
@@ -227,11 +225,11 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(String.class).annotatedWith(Names.named("WebOfTrustContext")).toInstance("Sone");
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
 				bind(FcpInterface.class).in(Singleton.class);
-				bind(PostDatabase.class).to(MemoryPostDatabase.class);
-				bind(PostBuilderFactory.class).to(MemoryPostDatabase.class);
-				bind(PostReplyBuilderFactory.class).to(DefaultPostReplyBuilderFactory.class).in(Singleton.class);
+				bind(Database.class).to(MemoryDatabase.class);
+				bind(PostBuilderFactory.class).to(MemoryDatabase.class);
+				bind(PostReplyBuilderFactory.class).to(MemoryDatabase.class);
 				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
-				bind(PostProvider.class).to(MemoryPostDatabase.class);
+				bind(PostProvider.class).to(MemoryDatabase.class);
 				bindListener(Matchers.any(), new TypeListener() {
 
 					@Override

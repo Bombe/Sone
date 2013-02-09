@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryPostDatabase.java - Copyright © 2013 David Roden
+ * Sone - MemoryDatabase.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,26 +19,37 @@ package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.AbstractPostBuilder;
+import net.pterodactylus.sone.data.impl.AbstractPostReplyBuilder;
+import net.pterodactylus.sone.database.Database;
+import net.pterodactylus.sone.database.DatabaseException;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostDatabase;
+import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
 import com.google.common.base.Optional;
+import com.google.common.util.concurrent.AbstractService;
 import com.google.inject.Inject;
 
 /**
@@ -46,13 +57,16 @@ import com.google.inject.Inject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class MemoryPostDatabase implements PostDatabase {
+public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The lock. */
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
 	/** The Sone provider. */
 	private final SoneProvider soneProvider;
+
+	/** The configuration. */
+	private final Configuration configuration;
 
 	/** All posts by their ID. */
 	private final Map<String, Post> allPosts = new HashMap<String, Post>();
@@ -66,15 +80,70 @@ public class MemoryPostDatabase implements PostDatabase {
 	/** Whether posts are known. */
 	private final Set<String> knownPosts = new HashSet<String>();
 
+	/** All post replies by their ID. */
+	private final Map<String, PostReply> allPostReplies = new HashMap<String, PostReply>();
+
+	/** Replies by post. */
+	private final Map<String, SortedSet<PostReply>> postReplies = new HashMap<String, SortedSet<PostReply>>();
+
+	/** Whether post replies are known. */
+	private final Set<String> knownPostReplies = new HashSet<String>();
+
 	/**
 	 * Creates a new memory database.
 	 *
 	 * @param soneProvider
 	 *            The Sone provider
+	 * @param configuration
+	 *            The configuration for loading and saving elements
 	 */
 	@Inject
-	public MemoryPostDatabase(SoneProvider soneProvider) {
+	public MemoryDatabase(SoneProvider soneProvider, Configuration configuration) {
 		this.soneProvider = soneProvider;
+		this.configuration = configuration;
+	}
+
+	//
+	// DATABASE METHODS
+	//
+
+	/**
+	 * Saves the database.
+	 *
+	 * @throws DatabaseException
+	 *             if an error occurs while saving
+	 */
+	@Override
+	public void save() throws DatabaseException {
+		saveKnownPosts();
+		saveKnownPostReplies();
+	}
+
+	//
+	// SERVICE METHODS
+	//
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	protected void doStart() {
+		loadKnownPosts();
+		loadKnownPostReplies();
+		notifyStarted();
+	}
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	protected void doStop() {
+		try {
+			save();
+			notifyStopped();
+		} catch (DatabaseException de1) {
+			notifyFailed(de1);
+		}
 	}
 
 	//
@@ -228,23 +297,68 @@ public class MemoryPostDatabase implements PostDatabase {
 	}
 
 	//
-	// POSTDATABASE METHODS
+	// POSTREPLYPROVIDER METHODS
 	//
 
 	/**
 	 * {@inheritDocs}
 	 */
 	@Override
-	public void loadKnownPosts(Configuration configuration, String prefix) {
+	public Optional<PostReply> getPostReply(String id) {
+		lock.readLock().lock();
+		try {
+			return Optional.fromNullable(allPostReplies.get(id));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public List<PostReply> getReplies(String postId) {
+		lock.readLock().lock();
+		try {
+			if (!postReplies.containsKey(postId)) {
+				return Collections.emptyList();
+			}
+			return new ArrayList<PostReply>(postReplies.get(postId));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	//
+	// POSTREPLYBUILDERFACTORY METHODS
+	//
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public PostReplyBuilder newPostReplyBuilder() {
+		return new MemoryPostReplyBuilder();
+	}
+
+	//
+	// POSTREPLYSTORE METHODS
+	//
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public void storePostReply(PostReply postReply) {
 		lock.writeLock().lock();
 		try {
-			int postCounter = 0;
-			while (true) {
-				String knownPostId = configuration.getStringValue(prefix + postCounter++ + "/ID").getValue(null);
-				if (knownPostId == null) {
-					break;
-				}
-				knownPosts.add(knownPostId);
+			allPostReplies.put(postReply.getId(), postReply);
+			if (postReplies.containsKey(postReply.getPostId())) {
+				postReplies.get(postReply.getPostId()).add(postReply);
+			} else {
+				TreeSet<PostReply> replies = new TreeSet<PostReply>(Reply.TIME_COMPARATOR);
+				replies.add(postReply);
+				postReplies.put(postReply.getPostId(), replies);
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -255,16 +369,65 @@ public class MemoryPostDatabase implements PostDatabase {
 	 * {@inheritDocs}
 	 */
 	@Override
-	public void saveKnownPosts(Configuration configuration, String prefix) throws ConfigurationException {
-		lock.readLock().lock();
-		try {
-			int postCounter = 0;
-			for (String knownPostId : knownPosts) {
-				configuration.getStringValue(prefix + postCounter++ + "/ID").setValue(knownPostId);
+	public void storePostReplies(Sone sone, Collection<PostReply> postReplies) {
+		checkNotNull(sone, "sone must not be null");
+		/* verify that all posts are from the same Sone. */
+		for (PostReply postReply : postReplies) {
+			if (!sone.equals(postReply.getSone())) {
+				throw new IllegalArgumentException(String.format("PostReply from different Sone found: %s", postReply));
 			}
-			configuration.getStringValue(prefix + postCounter + "/ID").setValue(null);
+		}
+
+		lock.writeLock().lock();
+		try {
+			for (PostReply postReply : postReplies) {
+				allPostReplies.put(postReply.getId(), postReply);
+				if (this.postReplies.containsKey(postReply.getPostId())) {
+					this.postReplies.get(postReply.getPostId()).add(postReply);
+				} else {
+					TreeSet<PostReply> replies = new TreeSet<PostReply>(Reply.TIME_COMPARATOR);
+					replies.add(postReply);
+					this.postReplies.put(postReply.getPostId(), replies);
+				}
+			}
 		} finally {
-			lock.readLock().unlock();
+			lock.writeLock().unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public void removePostReply(PostReply postReply) {
+		lock.writeLock().lock();
+		try {
+			allPostReplies.remove(postReply.getId());
+			if (postReplies.containsKey(postReply.getPostId())) {
+				postReplies.get(postReply.getPostId()).remove(postReply);
+				if (postReplies.get(postReply.getPostId()).isEmpty()) {
+					postReplies.remove(postReply.getPostId());
+				}
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	/**
+	 * {@inheritDocs}
+	 */
+	@Override
+	public void removePostReplies(Sone sone) {
+		checkNotNull(sone, "sone must not be null");
+
+		lock.writeLock().lock();
+		try {
+			for (PostReply postReply : sone.getReplies()) {
+				removePostReply(postReply);
+			}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 
@@ -303,6 +466,45 @@ public class MemoryPostDatabase implements PostDatabase {
 				knownPosts.add(post.getId());
 			} else {
 				knownPosts.remove(post.getId());
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	/**
+	 * Returns whether the given post reply is known.
+	 *
+	 * @param postReply
+	 *            The post reply
+	 * @return {@code true} if the given post reply is known, {@code false}
+	 *         otherwise
+	 */
+	boolean isPostReplyKnown(PostReply postReply) {
+		lock.readLock().lock();
+		try {
+			return knownPostReplies.contains(postReply.getId());
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**
+	 * Sets whether the given post reply is known.
+	 *
+	 * @param postReply
+	 *            The post reply
+	 * @param known
+	 *            {@code true} if the post reply is known, {@code false}
+	 *            otherwise
+	 */
+	void setPostReplyKnown(PostReply postReply, boolean known) {
+		lock.writeLock().lock();
+		try {
+			if (known) {
+				knownPostReplies.add(postReply.getId());
+			} else {
+				knownPostReplies.remove(postReply.getId());
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -376,6 +578,86 @@ public class MemoryPostDatabase implements PostDatabase {
 	}
 
 	/**
+	 * Loads the known posts.
+	 */
+	private void loadKnownPosts() {
+		lock.writeLock().lock();
+		try {
+			int postCounter = 0;
+			while (true) {
+				String knownPostId = configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").getValue(null);
+				if (knownPostId == null) {
+					break;
+				}
+				knownPosts.add(knownPostId);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	/**
+	 * Saves the known posts to the configuration.
+	 *
+	 * @throws DatabaseException
+	 *             if a configuration error occurs
+	 */
+	private void saveKnownPosts() throws DatabaseException {
+		lock.readLock().lock();
+		try {
+			int postCounter = 0;
+			for (String knownPostId : knownPosts) {
+				configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").setValue(knownPostId);
+			}
+			configuration.getStringValue("KnownPosts/" + postCounter + "/ID").setValue(null);
+		} catch (ConfigurationException ce1) {
+			throw new DatabaseException("Could not save database.", ce1);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**
+	 * Loads the known post replies.
+	 */
+	private void loadKnownPostReplies() {
+		lock.writeLock().lock();
+		try {
+			int replyCounter = 0;
+			while (true) {
+				String knownReplyId = configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").getValue(null);
+				if (knownReplyId == null) {
+					break;
+				}
+				knownPostReplies.add(knownReplyId);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	/**
+	 * Saves the known post replies to the configuration.
+	 *
+	 * @throws DatabaseException
+	 *             if a configuration error occurs
+	 */
+	private void saveKnownPostReplies() throws DatabaseException {
+		lock.readLock().lock();
+		try {
+			int replyCounter = 0;
+			for (String knownReplyId : knownPostReplies) {
+				configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
+			}
+			configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
+		} catch (ConfigurationException ce1) {
+			throw new DatabaseException("Could not save database.", ce1);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/**
 	 * {@link PostBuilder} implementation that creates a {@link MemoryPost}.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -398,9 +680,31 @@ public class MemoryPostDatabase implements PostDatabase {
 		@Override
 		public Post build() throws IllegalStateException {
 			validate();
-			Post post = new MemoryPost(MemoryPostDatabase.this, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
+			Post post = new MemoryPost(MemoryDatabase.this, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
 			post.setKnown(isPostKnown(post));
 			return post;
+		}
+
+	}
+
+	/**
+	 * {@link PostReplyBuilder} implementation that creates
+	 * {@link MemoryPostReply} objects.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	private class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public PostReply build() throws IllegalStateException {
+			validate();
+
+			PostReply postReply = new MemoryPostReply(MemoryDatabase.this, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
+			postReply.setKnown(isPostReplyKnown(postReply));
+			return postReply;
 		}
 
 	}

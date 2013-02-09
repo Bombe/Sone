@@ -19,7 +19,6 @@ package net.pterodactylus.sone.database;
 
 import java.util.List;
 
-import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 
 import com.google.common.base.Optional;

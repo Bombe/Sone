@@ -1,5 +1,5 @@
 /*
- * Sone - PostDatabase.java - Copyright © 2013 David Roden
+ * Sone - PostReplyDatabase.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,12 +18,12 @@
 package net.pterodactylus.sone.database;
 
 /**
- * Combines a {@link PostProvider}, a {@link PostBuilderFactory}, and a
- * {@link PostStore} into a complete post database.
+ * Combines a {@link PostReplyProvider}, a {@link PostReplyBuilderFactory}, and
+ * a {@link PostReplyStore} into a complete post reply database.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface PostDatabase extends PostProvider, PostBuilderFactory, PostStore {
+public interface PostReplyDatabase extends PostReplyProvider, PostReplyBuilderFactory, PostReplyStore {
 
 	/* nothing here. */
 

@@ -34,7 +34,7 @@ import com.google.common.base.Optional;
 class MemoryPost implements Post {
 
 	/** The post database. */
-	private final MemoryPostDatabase postDatabase;
+	private final MemoryDatabase postDatabase;
 
 	/** The Sone provider. */
 	private final SoneProvider soneProvider;
@@ -72,7 +72,7 @@ class MemoryPost implements Post {
 	 * @param text
 	 *            The text of the post
 	 */
-	public MemoryPost(MemoryPostDatabase postDatabase, SoneProvider soneProvider, String id, String soneId, String recipientId, long time, String text) {
+	public MemoryPost(MemoryDatabase postDatabase, SoneProvider soneProvider, String id, String soneId, String recipientId, long time, String text) {
 		this.postDatabase = postDatabase;
 		this.soneProvider = soneProvider;
 		this.id = UUID.fromString(id);

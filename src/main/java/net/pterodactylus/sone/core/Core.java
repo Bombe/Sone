@@ -64,11 +64,11 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.database.Database;
+import net.pterodactylus.sone.database.DatabaseException;
 import net.pterodactylus.sone.database.PostBuilder;
-import net.pterodactylus.sone.database.PostDatabase;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.PostReplyBuilder;
-import net.pterodactylus.sone.database.PostReplyBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.fcp.FcpInterface;
@@ -90,13 +90,10 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -178,16 +175,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final Set<String> knownSones = new HashSet<String>();
 
 	/** The post database. */
-	private final PostDatabase postDatabase;
-
-	/** The post reply builder factory. */
-	private final PostReplyBuilderFactory postReplyBuilderFactory;
-
-	/** All replies. */
-	private final Map<String, PostReply> replies = new HashMap<String, PostReply>();
-
-	/** All known replies. */
-	private final Set<String> knownReplies = new HashSet<String>();
+	private final Database database;
 
 	/** All bookmarked posts. */
 	/* synchronize access on itself. */
@@ -224,13 +212,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The WebOfTrust updater
 	 * @param eventBus
 	 *            The event bus
-	 * @param postDatabase
-	 *            The post database
-	 * @param postReplyBuilderFactory
-	 *            The post reply builder factory
+	 * @param database
+	 *            The database
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, PostDatabase postDatabase, PostReplyBuilderFactory postReplyBuilderFactory) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -240,8 +226,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.updateChecker = new UpdateChecker(eventBus, freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
-		this.postDatabase = postDatabase;
-		this.postReplyBuilderFactory = postReplyBuilderFactory;
+		this.database = database;
 	}
 
 	//
@@ -492,7 +477,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return A new post builder
 	 */
 	public PostBuilder postBuilder() {
-		return postDatabase.newPostBuilder();
+		return database.newPostBuilder();
 	}
 
 	/**
@@ -500,7 +485,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Optional<Post> getPost(String postId) {
-		return postDatabase.getPost(postId);
+		return database.getPost(postId);
 	}
 
 	/**
@@ -508,7 +493,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Collection<Post> getPosts(String soneId) {
-		return postDatabase.getPosts(soneId);
+		return database.getPosts(soneId);
 	}
 
 	/**
@@ -517,7 +502,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Post> getDirectedPosts(final String recipientId) {
 		checkNotNull(recipientId, "recipient must not be null");
-		return postDatabase.getDirectedPosts(recipientId);
+		return database.getDirectedPosts(recipientId);
 	}
 
 	/**
@@ -526,7 +511,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return A new post reply builder
 	 */
 	public PostReplyBuilder postReplyBuilder() {
-		return postReplyBuilderFactory.newPostReplyBuilder();
+		return database.newPostReplyBuilder();
 	}
 
 	/**
@@ -534,9 +519,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Optional<PostReply> getPostReply(String replyId) {
-		synchronized (replies) {
-			return Optional.fromNullable(replies.get(replyId));
-		}
+		return database.getPostReply(replyId);
 	}
 
 	/**
@@ -544,19 +527,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public List<PostReply> getReplies(final String postId) {
-		return Ordering.from(Reply.TIME_COMPARATOR).sortedCopy(FluentIterable.from(getSones()).transformAndConcat(new Function<Sone, Iterable<PostReply>>() {
-
-			@Override
-			public Iterable<PostReply> apply(Sone sone) {
-				return sone.getReplies();
-			}
-		}).filter(new Predicate<PostReply>() {
-
-			@Override
-			public boolean apply(PostReply reply) {
-				return postId.equals(reply.getPostId());
-			}
-		}));
+		return database.getReplies(postId);
 	}
 
 	/**
@@ -1017,7 +988,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				return;
 			}
 			/* find removed posts. */
-			Collection<Post> existingPosts = postDatabase.getPosts(sone.getId());
+			Collection<Post> existingPosts = database.getPosts(sone.getId());
 			for (Post oldPost : existingPosts) {
 				if (!sone.getPosts().contains(oldPost)) {
 					eventBus.post(new PostRemovedEvent(oldPost));
@@ -1035,32 +1006,26 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			}
 			/* store posts. */
-			postDatabase.storePosts(sone, sone.getPosts());
-			synchronized (replies) {
-				if (!soneRescueMode) {
-					for (PostReply reply : storedSone.get().getReplies()) {
-						replies.remove(reply.getId());
-						if (!sone.getReplies().contains(reply)) {
-							eventBus.post(new PostReplyRemovedEvent(reply));
-						}
-					}
-				}
-				Set<PostReply> storedReplies = storedSone.get().getReplies();
-				synchronized (knownReplies) {
-					for (PostReply reply : sone.getReplies()) {
-						reply.setKnown(knownReplies.contains(reply.getId()));
-						if (!storedReplies.contains(reply)) {
-							if (reply.getTime() < getSoneFollowingTime(sone)) {
-								knownReplies.add(reply.getId());
-								reply.setKnown(true);
-							} else if (!knownReplies.contains(reply.getId())) {
-								eventBus.post(new NewPostReplyFoundEvent(reply));
-							}
-						}
-						replies.put(reply.getId(), reply);
+			database.storePosts(sone, sone.getPosts());
+			if (!soneRescueMode) {
+				for (PostReply reply : storedSone.get().getReplies()) {
+					if (!sone.getReplies().contains(reply)) {
+						eventBus.post(new PostReplyRemovedEvent(reply));
 					}
 				}
 			}
+			Set<PostReply> storedReplies = storedSone.get().getReplies();
+			for (PostReply reply : sone.getReplies()) {
+				if (storedReplies.contains(reply)) {
+					continue;
+				}
+				if (reply.getTime() < getSoneFollowingTime(sone)) {
+					reply.setKnown(true);
+				} else if (!reply.isKnown()) {
+					eventBus.post(new NewPostReplyFoundEvent(reply));
+				}
+			}
+			database.storePostReplies(sone, sone.getReplies());
 			synchronized (albums) {
 				synchronized (images) {
 					for (Album album : storedSone.get().getAlbums()) {
@@ -1220,8 +1185,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
 				return;
 			}
-			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
-			postReplyBuilder.withId(replyId).from(sone.getId()).to(postId).withTime(replyTime).withText(replyText);
+			PostReplyBuilder postReplyBuilder = postReplyBuilder().withId(replyId).from(sone.getId()).to(postId).withTime(replyTime).withText(replyText);
 			replies.add(postReplyBuilder.build());
 		}
 
@@ -1349,19 +1313,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				knownSones.add(friend);
 			}
 		}
-		postDatabase.storePosts(sone, posts);
+		database.storePosts(sone, posts);
 		for (Post post : posts) {
 			post.setKnown(true);
 		}
-		synchronized (this.replies) {
-			for (PostReply postReply : replies) {
-				this.replies.put(postReply.getId(), postReply);
-			}
-		}
-		synchronized (knownReplies) {
-			for (PostReply reply : replies) {
-				knownReplies.add(reply.getId());
-			}
+		database.storePostReplies(sone, replies);
+		for (PostReply reply : replies) {
+			reply.setKnown(true);
 		}
 	}
 
@@ -1430,13 +1388,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.FINE, String.format("Tried to create post for non-local Sone: %s", sone));
 			return null;
 		}
-		PostBuilder postBuilder = postDatabase.newPostBuilder();
+		PostBuilder postBuilder = database.newPostBuilder();
 		postBuilder.from(sone.getId()).randomId().withTime(time).withText(text.trim());
 		if (recipient.isPresent()) {
 			postBuilder.to(recipient.get().getId());
 		}
 		final Post post = postBuilder.build();
-		postDatabase.storePost(post);
+		database.storePost(post);
 		eventBus.post(new NewPostFoundEvent(post));
 		sone.addPost(post);
 		touchConfiguration();
@@ -1464,7 +1422,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, String.format("Tried to delete post of non-local Sone: %s", post.getSone()));
 			return;
 		}
-		postDatabase.removePost(post);
+		database.removePost(post);
 		eventBus.post(new PostRemovedEvent(post));
 		markPostKnown(post);
 		touchConfiguration();
@@ -1548,15 +1506,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.FINE, String.format("Tried to create reply for non-local Sone: %s", sone));
 			return null;
 		}
-		PostReplyBuilder postReplyBuilder = postReplyBuilderFactory.newPostReplyBuilder();
+		PostReplyBuilder postReplyBuilder = postReplyBuilder();
 		postReplyBuilder.randomId().from(sone.getId()).to(post.getId()).currentTime().withText(text.trim());
 		final PostReply reply = postReplyBuilder.build();
-		synchronized (replies) {
-			replies.put(reply.getId(), reply);
-		}
-		synchronized (knownReplies) {
-			eventBus.post(new NewPostReplyFoundEvent(reply));
-		}
+		database.storePostReply(reply);
+		eventBus.post(new NewPostReplyFoundEvent(reply));
 		sone.addReply(reply);
 		touchConfiguration();
 		localElementTicker.schedule(new Runnable() {
@@ -1584,13 +1538,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.FINE, String.format("Tried to delete non-local reply: %s", reply));
 			return;
 		}
-		synchronized (replies) {
-			replies.remove(reply.getId());
-		}
-		synchronized (knownReplies) {
-			markReplyKnown(reply);
-			knownReplies.remove(reply.getId());
-		}
+		database.removePostReply(reply);
+		markReplyKnown(reply);
 		sone.removeReply(reply);
 		touchConfiguration();
 	}
@@ -1603,12 +1552,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The reply to mark as known
 	 */
 	public void markReplyKnown(PostReply reply) {
+		boolean previouslyKnown = reply.isKnown();
 		reply.setKnown(true);
-		synchronized (knownReplies) {
-			eventBus.post(new MarkPostReplyKnownEvent(reply));
-			if (knownReplies.add(reply.getId())) {
-				touchConfiguration();
-			}
+		eventBus.post(new MarkPostReplyKnownEvent(reply));
+		if (!previouslyKnown) {
+			touchConfiguration();
 		}
 	}
 
@@ -1785,6 +1733,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		identityManager.start();
 		webOfTrustUpdater.init();
 		webOfTrustUpdater.start();
+		database.start();
 	}
 
 	/**
@@ -1819,6 +1768,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 		}
 		saveConfiguration();
+		database.stop();
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		soneDownloader.stop();
@@ -2016,16 +1966,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 
 			/* save known posts. */
-			postDatabase.saveKnownPosts(configuration, "KnownPosts/");
-
-			/* save known replies. */
-			int replyCounter = 0;
-			synchronized (knownReplies) {
-				for (String knownReplyId : knownReplies) {
-					configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").setValue(knownReplyId);
-				}
-				configuration.getStringValue("KnownReplies/" + replyCounter + "/ID").setValue(null);
-			}
+			database.save();
 
 			/* save bookmarked posts. */
 			int bookmarkedPostCounter = 0;
@@ -2041,6 +1982,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
+		} catch (DatabaseException de1) {
+			logger.log(Level.SEVERE, "Could not save database!", de1);
 		} finally {
 			synchronized (configuration) {
 				storingConfiguration = false;
@@ -2123,21 +2066,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				soneFollowingTimes.put(soneId, time);
 			}
 			++soneCounter;
-		}
-
-		/* load known posts. */
-		postDatabase.loadKnownPosts(configuration, "KnownPosts/");
-
-		/* load known replies. */
-		int replyCounter = 0;
-		while (true) {
-			String knownReplyId = configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").getValue(null);
-			if (knownReplyId == null) {
-				break;
-			}
-			synchronized (knownReplies) {
-				knownReplies.add(knownReplyId);
-			}
 		}
 
 		/* load bookmarked posts. */
@@ -2263,17 +2191,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;
 		}
-		postDatabase.removePosts(sone.get());
+		database.removePosts(sone.get());
 		for (Post post : sone.get().getPosts()) {
 			eventBus.post(new PostRemovedEvent(post));
 		}
-		synchronized (replies) {
-			synchronized (knownReplies) {
-				for (PostReply reply : sone.get().getReplies()) {
-					replies.remove(reply.getId());
-					eventBus.post(new PostReplyRemovedEvent(reply));
-				}
-			}
+		database.removePostReplies(sone.get());
+		for (PostReply reply : sone.get().getReplies()) {
+			eventBus.post(new PostReplyRemovedEvent(reply));
 		}
 		synchronized (sones) {
 			sones.remove(identity.getId());
