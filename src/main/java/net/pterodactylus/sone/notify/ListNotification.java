@@ -141,7 +141,9 @@ public class ListNotification<T> extends TemplateNotification {
 	 *            The element to remove
 	 */
 	public void remove(T element) {
-		elements.remove(element);
+		while (elements.remove(element)) {
+			/* do nothing, just remove all instances of the element. */
+		}
 		if (elements.isEmpty()) {
 			dismiss();
 		}
