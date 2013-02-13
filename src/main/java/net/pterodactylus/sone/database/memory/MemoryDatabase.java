@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -37,7 +36,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.impl.AbstractPostReplyBuilder;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
 import net.pterodactylus.sone.database.PostBuilder;
@@ -337,7 +335,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 */
 	@Override
 	public PostReplyBuilder newPostReplyBuilder() {
-		return new MemoryPostReplyBuilder();
+		return new MemoryPostReplyBuilder(this, soneProvider);
 	}
 
 	//
@@ -654,28 +652,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} finally {
 			lock.readLock().unlock();
 		}
-	}
-
-	/**
-	 * {@link PostReplyBuilder} implementation that creates
-	 * {@link MemoryPostReply} objects.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
-
-		/**
-		 * {@inheritDocs}
-		 */
-		@Override
-		public PostReply build() throws IllegalStateException {
-			validate();
-
-			PostReply postReply = new MemoryPostReply(MemoryDatabase.this, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
-			postReply.setKnown(isPostReplyKnown(postReply));
-			return postReply;
-		}
-
 	}
 
 }
