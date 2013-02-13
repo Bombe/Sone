@@ -37,7 +37,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.impl.AbstractPostBuilder;
 import net.pterodactylus.sone.data.impl.AbstractPostReplyBuilder;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
@@ -194,7 +193,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 */
 	@Override
 	public PostBuilder newPostBuilder() {
-		return new MemoryPostBuilder(soneProvider);
+		return new MemoryPostBuilder(this, soneProvider);
 	}
 
 	//
@@ -655,36 +654,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} finally {
 			lock.readLock().unlock();
 		}
-	}
-
-	/**
-	 * {@link PostBuilder} implementation that creates a {@link MemoryPost}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class MemoryPostBuilder extends AbstractPostBuilder {
-
-		/**
-		 * Creates a new memory post builder.
-		 *
-		 * @param soneProvider
-		 *            The Sone provider
-		 */
-		public MemoryPostBuilder(SoneProvider soneProvider) {
-			super(soneProvider);
-		}
-
-		/**
-		 * {@inheritDocs}
-		 */
-		@Override
-		public Post build() throws IllegalStateException {
-			validate();
-			Post post = new MemoryPost(MemoryDatabase.this, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
-			post.setKnown(isPostKnown(post));
-			return post;
-		}
-
 	}
 
 	/**
