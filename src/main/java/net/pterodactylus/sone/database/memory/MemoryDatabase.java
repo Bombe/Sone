@@ -377,6 +377,10 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 		lock.writeLock().lock();
 		try {
+			/* remove all post replies of the Sone. */
+			for (PostReply postReply : getRepliesFrom(sone.getId())) {
+				removePostReply(postReply);
+			}
 			for (PostReply postReply : postReplies) {
 				allPostReplies.put(postReply.getId(), postReply);
 				if (this.postReplies.containsKey(postReply.getPostId())) {
