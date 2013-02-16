@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -89,7 +90,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			templateContext.set("galleryRequested", true);
 			List<Album> albums = new ArrayList<Album>();
 			for (Sone sone : webInterface.getCore().getSones()) {
-				albums.addAll(sone.getAllAlbums());
+				albums.addAll(FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList());
 			}
 			Collections.sort(albums, Album.TITLE_COMPARATOR);
 			Pagination<Album> albumPagination = new Pagination<Album>(albums, 12).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));

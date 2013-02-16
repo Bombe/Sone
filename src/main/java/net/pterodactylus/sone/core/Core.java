@@ -94,6 +94,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -1867,7 +1868,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = sone.getAllAlbums();
+			List<Album> albums = FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList();
 
 			int albumCounter = 0;
 			for (Album album : albums) {

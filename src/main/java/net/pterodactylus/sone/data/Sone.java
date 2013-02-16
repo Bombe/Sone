@@ -38,6 +38,7 @@ import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
 
 import com.google.common.base.Predicate;
+import com.google.common.collect.FluentIterable;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 
@@ -770,27 +771,6 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Returns a flattened list of all albums of this Sone. The resulting list
-	 * contains parent albums before child albums so that the resulting list can
-	 * be parsed in a single pass.
-	 *
-	 * @return The flattened albums
-	 */
-	public List<Album> getAllAlbums() {
-		List<Album> flatAlbums = new ArrayList<Album>();
-		flatAlbums.addAll(albums);
-		int lastAlbumIndex = 0;
-		while (lastAlbumIndex < flatAlbums.size()) {
-			int previousAlbumCount = flatAlbums.size();
-			for (Album album : new ArrayList<Album>(flatAlbums.subList(lastAlbumIndex, flatAlbums.size()))) {
-				flatAlbums.addAll(album.getAlbums());
-			}
-			lastAlbumIndex = previousAlbumCount;
-		}
-		return flatAlbums;
-	}
-
-	/**
 	 * Returns all images of a Sone. Images of a album are inserted into this
 	 * list before images of all child albums.
 	 *
@@ -798,7 +778,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 */
 	public List<Image> getAllImages() {
 		List<Image> allImages = new ArrayList<Image>();
-		for (Album album : getAllAlbums()) {
+		for (Album album : FluentIterable.from(getAlbums()).transformAndConcat(Album.FLATTENER).toList()) {
 			allImages.addAll(album.getImages());
 		}
 		return allImages;
