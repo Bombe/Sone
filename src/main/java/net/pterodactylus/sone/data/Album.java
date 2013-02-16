@@ -32,6 +32,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 
@@ -48,6 +50,20 @@ public class Album implements Fingerprintable {
 		@Override
 		public int compare(Album leftAlbum, Album rightAlbum) {
 			return leftAlbum.getTitle().compareToIgnoreCase(rightAlbum.getTitle());
+		}
+	};
+
+	/** Function that flattens the given album and all albums beneath it. */
+	public static final Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
+
+		@Override
+		public List<Album> apply(Album album) {
+			List<Album> albums = new ArrayList<Album>();
+			albums.add(album);
+			for (Album subAlbum : album.getAlbums()) {
+				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
+			}
+			return albums;
 		}
 	};
 
