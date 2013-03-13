@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,12 +36,12 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.util.logging.Logging;
 
+import freenet.keys.FreenetURI;
+
 import com.google.common.base.Predicate;
 import com.google.common.collect.FluentIterable;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
-
-import freenet.keys.FreenetURI;
 
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
