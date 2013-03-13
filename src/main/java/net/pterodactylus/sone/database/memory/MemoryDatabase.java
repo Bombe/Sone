@@ -17,7 +17,7 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
