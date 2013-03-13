@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,8 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.SortedSetMultimap;
+import com.google.common.collect.TreeMultimap;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.inject.Inject;
 
@@ -79,6 +82,15 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** All post replies by their ID. */
 	private final Map<String, PostReply> allPostReplies = new HashMap<String, PostReply>();
+
+	/** Replies sorted by Sone. */
+	private final SortedSetMultimap<String, PostReply> sonePostReplies = TreeMultimap.create(new Comparator<String>() {
+
+		@Override
+		public int compare(String leftString, String rightString) {
+			return leftString.compareTo(rightString);
+		}
+	}, PostReply.TIME_COMPARATOR);
 
 	/** Replies by post. */
 	private final Map<String, SortedSet<PostReply>> postReplies = new HashMap<String, SortedSet<PostReply>>();
@@ -383,6 +395,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 			}
 			for (PostReply postReply : postReplies) {
 				allPostReplies.put(postReply.getId(), postReply);
+				sonePostReplies.put(postReply.getSone().getId(), postReply);
 				if (this.postReplies.containsKey(postReply.getPostId())) {
 					this.postReplies.get(postReply.getPostId()).add(postReply);
 				} else {
@@ -619,8 +632,25 @@ public class MemoryDatabase extends AbstractService implements Database {
 	}
 
 	/**
-	 * Loads the known post replies.
+	 * Returns all replies by the given Sone.
+	 *
+	 * @param id
+	 * 		The ID of the Sone
+	 * @return The post replies of the Sone, sorted by time (newest first)
 	 */
+	private Collection<PostReply> getRepliesFrom(String id) {
+		lock.readLock().lock();
+		try {
+			if (sonePostReplies.containsKey(id)) {
+				return Collections.unmodifiableCollection(sonePostReplies.get(id));
+			}
+			return Collections.emptySet();
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	/** Loads the known post replies. */
 	private void loadKnownPostReplies() {
 		lock.writeLock().lock();
 		try {
