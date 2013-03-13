@@ -102,9 +102,9 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Creates a new memory database.
 	 *
 	 * @param soneProvider
-	 *            The Sone provider
+	 * 		The Sone provider
 	 * @param configuration
-	 *            The configuration for loading and saving elements
+	 * 		The configuration for loading and saving elements
 	 */
 	@Inject
 	public MemoryDatabase(SoneProvider soneProvider, Configuration configuration) {
@@ -120,7 +120,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Saves the database.
 	 *
 	 * @throws DatabaseException
-	 *             if an error occurs while saving
+	 * 		if an error occurs while saving
 	 */
 	@Override
 	public void save() throws DatabaseException {
@@ -132,9 +132,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// SERVICE METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	protected void doStart() {
 		loadKnownPosts();
@@ -142,9 +140,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		notifyStarted();
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	protected void doStop() {
 		try {
@@ -159,9 +155,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTPROVIDER METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public Optional<Post> getPost(String postId) {
 		lock.readLock().lock();
@@ -172,23 +166,19 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public Collection<Post> getPosts(String soneId) {
 		return new HashSet<Post>(getPostsFrom(soneId));
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public Collection<Post> getDirectedPosts(String recipientId) {
 		lock.readLock().lock();
 		try {
 			Collection<Post> posts = recipientPosts.get(recipientId);
-			return (posts == null) ? Collections.<Post> emptySet() : new HashSet<Post>(posts);
+			return (posts == null) ? Collections.<Post>emptySet() : new HashSet<Post>(posts);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -198,9 +188,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTBUILDERFACTORY METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public PostBuilder newPostBuilder() {
 		return new MemoryPostBuilder(this, soneProvider);
@@ -210,9 +198,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTSTORE METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void storePost(Post post) {
 		checkNotNull(post, "post must not be null");
@@ -228,9 +214,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void removePost(Post post) {
 		checkNotNull(post, "post must not be null");
@@ -247,9 +231,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void storePosts(Sone sone, Collection<Post> posts) throws IllegalArgumentException {
 		checkNotNull(sone, "sone must not be null");
@@ -284,9 +266,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void removePosts(Sone sone) {
 		checkNotNull(sone, "sone must not be null");
@@ -309,9 +289,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTREPLYPROVIDER METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public Optional<PostReply> getPostReply(String id) {
 		lock.readLock().lock();
@@ -322,9 +300,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public List<PostReply> getReplies(String postId) {
 		lock.readLock().lock();
@@ -342,9 +318,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTREPLYBUILDERFACTORY METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public PostReplyBuilder newPostReplyBuilder() {
 		return new MemoryPostReplyBuilder(this, soneProvider);
@@ -354,9 +328,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTREPLYSTORE METHODS
 	//
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void storePostReply(PostReply postReply) {
 		lock.writeLock().lock();
@@ -374,9 +346,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void storePostReplies(Sone sone, Collection<PostReply> postReplies) {
 		checkNotNull(sone, "sone must not be null");
@@ -409,9 +379,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void removePostReply(PostReply postReply) {
 		lock.writeLock().lock();
@@ -428,9 +396,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	/** {@inheritDocs} */
 	@Override
 	public void removePostReplies(Sone sone) {
 		checkNotNull(sone, "sone must not be null");
@@ -453,7 +419,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Returns whether the given post is known.
 	 *
 	 * @param post
-	 *            The post
+	 * 		The post
 	 * @return {@code true} if the post is known, {@code false} otherwise
 	 */
 	boolean isPostKnown(Post post) {
@@ -469,9 +435,9 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Sets whether the given post is known.
 	 *
 	 * @param post
-	 *            The post
+	 * 		The post
 	 * @param known
-	 *            {@code true} if the post is known, {@code false} otherwise
+	 * 		{@code true} if the post is known, {@code false} otherwise
 	 */
 	void setPostKnown(Post post, boolean known) {
 		lock.writeLock().lock();
@@ -490,7 +456,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Returns whether the given post reply is known.
 	 *
 	 * @param postReply
-	 *            The post reply
+	 * 		The post reply
 	 * @return {@code true} if the given post reply is known, {@code false}
 	 *         otherwise
 	 */
@@ -507,10 +473,9 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Sets whether the given post reply is known.
 	 *
 	 * @param postReply
-	 *            The post reply
+	 * 		The post reply
 	 * @param known
-	 *            {@code true} if the post reply is known, {@code false}
-	 *            otherwise
+	 * 		{@code true} if the post reply is known, {@code false} otherwise
 	 */
 	void setPostReplyKnown(PostReply postReply, boolean known) {
 		lock.writeLock().lock();
@@ -534,7 +499,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * none yet.
 	 *
 	 * @param soneId
-	 *            The ID of the Sone to get the posts for
+	 * 		The ID of the Sone to get the posts for
 	 * @return All posts
 	 */
 	private Collection<Post> getPostsFrom(String soneId) {
@@ -561,11 +526,11 @@ public class MemoryDatabase extends AbstractService implements Database {
 	}
 
 	/**
-	 * Gets all posts that are directed the given Sone, creating a new
-	 * collection if there is none yet.
+	 * Gets all posts that are directed the given Sone, creating a new collection
+	 * if there is none yet.
 	 *
 	 * @param recipientId
-	 *            The ID of the Sone to get the posts for
+	 * 		The ID of the Sone to get the posts for
 	 * @return All posts
 	 */
 	private Collection<Post> getPostsTo(String recipientId) {
@@ -591,9 +556,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		return posts;
 	}
 
-	/**
-	 * Loads the known posts.
-	 */
+	/** Loads the known posts. */
 	private void loadKnownPosts() {
 		lock.writeLock().lock();
 		try {
@@ -614,7 +577,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Saves the known posts to the configuration.
 	 *
 	 * @throws DatabaseException
-	 *             if a configuration error occurs
+	 * 		if a configuration error occurs
 	 */
 	private void saveKnownPosts() throws DatabaseException {
 		lock.readLock().lock();
@@ -671,7 +634,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * Saves the known post replies to the configuration.
 	 *
 	 * @throws DatabaseException
-	 *             if a configuration error occurs
+	 * 		if a configuration error occurs
 	 */
 	private void saveKnownPostReplies() throws DatabaseException {
 		lock.readLock().lock();
