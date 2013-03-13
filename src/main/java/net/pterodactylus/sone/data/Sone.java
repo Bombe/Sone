@@ -46,7 +46,7 @@ import com.google.common.hash.Hashing;
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
  * replies, her likes and dislikes, etc.
- * <p>
+ * <p/>
  * Operations that modify the Sone need to synchronize on the Sone in question.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
@@ -111,9 +111,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	};
 
-	/**
-	 * Comparator that sorts Sones by last activity (least recent active first).
-	 */
+	/** Comparator that sorts Sones by last activity (least recent active first). */
 	public static final Comparator<Sone> LAST_ACTIVITY_COMPARATOR = new Comparator<Sone>() {
 
 		@Override
@@ -236,10 +234,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Creates a new Sone.
 	 *
 	 * @param id
-	 *            The ID of the Sone
+	 * 		The ID of the Sone
 	 * @param local
-	 *            {@code true} if the Sone is a local Sone, {@code false}
-	 *            otherwise
+	 * 		{@code true} if the Sone is a local Sone, {@code false} otherwise
 	 */
 	public Sone(String id, boolean local) {
 		this.id = id;
@@ -273,10 +270,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * identity has to match this Sone’s {@link #getId()}.
 	 *
 	 * @param identity
-	 *            The identity of this Sone
+	 * 		The identity of this Sone
 	 * @return This Sone (for method chaining)
 	 * @throws IllegalArgumentException
-	 *             if the ID of the identity does not match this Sone’s ID
+	 * 		if the ID of the identity does not match this Sone’s ID
 	 */
 	public Sone setIdentity(Identity identity) throws IllegalArgumentException {
 		if (!identity.getId().equals(id)) {
@@ -298,8 +295,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	/**
 	 * Returns whether this Sone is a local Sone.
 	 *
-	 * @return {@code true} if this Sone is a local Sone, {@code false}
-	 *         otherwise
+	 * @return {@code true} if this Sone is a local Sone, {@code false} otherwise
 	 */
 	public boolean isLocal() {
 		return local;
@@ -318,7 +314,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the request URI of this Sone.
 	 *
 	 * @param requestUri
-	 *            The request URI of this Sone
+	 * 		The request URI of this Sone
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setRequestUri(FreenetURI requestUri) {
@@ -346,7 +342,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the insert URI of this Sone.
 	 *
 	 * @param insertUri
-	 *            The insert URI of this Sone
+	 * 		The insert URI of this Sone
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setInsertUri(FreenetURI insertUri) {
@@ -372,11 +368,11 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 	/**
 	 * Sets the latest edition of this Sone. If the given latest edition is not
-	 * greater than the current latest edition, the latest edition of this Sone
-	 * is not changed.
+	 * greater than the current latest edition, the latest edition of this Sone is
+	 * not changed.
 	 *
 	 * @param latestEdition
-	 *            The latest edition of this Sone
+	 * 		The latest edition of this Sone
 	 */
 	public void setLatestEdition(long latestEdition) {
 		if (!(latestEdition > this.latestEdition)) {
@@ -399,7 +395,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the time of the last inserted update of this Sone.
 	 *
 	 * @param time
-	 *            The time of the update (in milliseconds since Jan 1, 1970 UTC)
+	 * 		The time of the update (in milliseconds since Jan 1, 1970 UTC)
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setTime(long time) {
@@ -420,10 +416,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the new status of this Sone.
 	 *
 	 * @param status
-	 *            The new status of this Sone
+	 * 		The new status of this Sone
 	 * @return This Sone
 	 * @throws IllegalArgumentException
-	 *             if {@code status} is {@code null}
+	 * 		if {@code status} is {@code null}
 	 */
 	public Sone setStatus(SoneStatus status) {
 		this.status = checkNotNull(status, "status must not be null");
@@ -431,9 +427,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Returns a copy of the profile. If you want to update values in the
-	 * profile of this Sone, update the values in the returned {@link Profile}
-	 * and use {@link #setProfile(Profile)} to change the profile in this Sone.
+	 * Returns a copy of the profile. If you want to update values in the profile
+	 * of this Sone, update the values in the returned {@link Profile} and use
+	 * {@link #setProfile(Profile)} to change the profile in this Sone.
 	 *
 	 * @return A copy of the profile
 	 */
@@ -442,12 +438,12 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Sets the profile of this Sone. A copy of the given profile is stored so
-	 * that subsequent modifications of the given profile are not reflected in
-	 * this Sone!
+	 * Sets the profile of this Sone. A copy of the given profile is stored so that
+	 * subsequent modifications of the given profile are not reflected in this
+	 * Sone!
 	 *
 	 * @param profile
-	 *            The profile to set
+	 * 		The profile to set
 	 */
 	public void setProfile(Profile profile) {
 		this.profile = new Profile(profile);
@@ -466,7 +462,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the client used by this Sone.
 	 *
 	 * @param client
-	 *            The client used by this Sone, or {@code null}
+	 * 		The client used by this Sone, or {@code null}
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setClient(Client client) {
@@ -487,7 +483,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets whether this Sone is known.
 	 *
 	 * @param known
-	 *            {@code true} if this Sone is known, {@code false} otherwise
+	 * 		{@code true} if this Sone is known, {@code false} otherwise
 	 * @return This Sone
 	 */
 	public Sone setKnown(boolean known) {
@@ -509,9 +505,9 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Returns whether this Sone has the given Sone as a friend Sone.
 	 *
 	 * @param friendSoneId
-	 *            The ID of the Sone to check for
-	 * @return {@code true} if this Sone has the given Sone as a friend,
-	 *         {@code false} otherwise
+	 * 		The ID of the Sone to check for
+	 * @return {@code true} if this Sone has the given Sone as a friend, {@code
+	 *         false} otherwise
 	 */
 	public boolean hasFriend(String friendSoneId) {
 		return friendSones.contains(friendSoneId);
@@ -521,7 +517,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Adds the given Sone as a friend Sone.
 	 *
 	 * @param friendSone
-	 *            The friend Sone to add
+	 * 		The friend Sone to add
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone addFriend(String friendSone) {
@@ -535,7 +531,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Removes the given Sone as a friend Sone.
 	 *
 	 * @param friendSoneId
-	 *            The ID of the friend Sone to remove
+	 * 		The ID of the friend Sone to remove
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone removeFriend(String friendSoneId) {
@@ -561,7 +557,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets all posts of this Sone at once.
 	 *
 	 * @param posts
-	 *            The new (and only) posts of this Sone
+	 * 		The new (and only) posts of this Sone
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setPosts(Collection<Post> posts) {
@@ -573,11 +569,11 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Adds the given post to this Sone. The post will not be added if its
-	 * {@link Post#getSone() Sone} is not this Sone.
+	 * Adds the given post to this Sone. The post will not be added if its {@link
+	 * Post#getSone() Sone} is not this Sone.
 	 *
 	 * @param post
-	 *            The post to add
+	 * 		The post to add
 	 */
 	public void addPost(Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
@@ -589,7 +585,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Removes the given post from this Sone.
 	 *
 	 * @param post
-	 *            The post to remove
+	 * 		The post to remove
 	 */
 	public void removePost(Post post) {
 		if (post.getSone().equals(this)) {
@@ -610,7 +606,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets all replies of this Sone at once.
 	 *
 	 * @param replies
-	 *            The new (and only) replies of this Sone
+	 * 		The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setReplies(Collection<PostReply> replies) {
@@ -624,7 +620,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * nothing is added to this Sone.
 	 *
 	 * @param reply
-	 *            The reply to add
+	 * 		The reply to add
 	 */
 	public void addReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
@@ -636,7 +632,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Removes a reply from this Sone.
 	 *
 	 * @param reply
-	 *            The reply to remove
+	 * 		The reply to remove
 	 */
 	public void removeReply(PostReply reply) {
 		if (reply.getSone().equals(this)) {
@@ -657,7 +653,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the IDs of all liked posts.
 	 *
 	 * @param likedPostIds
-	 *            All liked posts’ IDs
+	 * 		All liked posts’ IDs
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setLikePostIds(Set<String> likedPostIds) {
@@ -670,7 +666,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Checks whether the given post ID is liked by this Sone.
 	 *
 	 * @param postId
-	 *            The ID of the post
+	 * 		The ID of the post
 	 * @return {@code true} if this Sone likes the given post, {@code false}
 	 *         otherwise
 	 */
@@ -682,7 +678,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Adds the given post ID to the list of posts this Sone likes.
 	 *
 	 * @param postId
-	 *            The ID of the post
+	 * 		The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone addLikedPostId(String postId) {
@@ -694,7 +690,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Removes the given post ID from the list of posts this Sone likes.
 	 *
 	 * @param postId
-	 *            The ID of the post
+	 * 		The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone removeLikedPostId(String postId) {
@@ -715,7 +711,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the IDs of all liked replies.
 	 *
 	 * @param likedReplyIds
-	 *            All liked replies’ IDs
+	 * 		All liked replies’ IDs
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone setLikeReplyIds(Set<String> likedReplyIds) {
@@ -728,7 +724,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Checks whether the given reply ID is liked by this Sone.
 	 *
 	 * @param replyId
-	 *            The ID of the reply
+	 * 		The ID of the reply
 	 * @return {@code true} if this Sone likes the given reply, {@code false}
 	 *         otherwise
 	 */
@@ -740,7 +736,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Adds the given reply ID to the list of replies this Sone likes.
 	 *
 	 * @param replyId
-	 *            The ID of the reply
+	 * 		The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone addLikedReplyId(String replyId) {
@@ -752,7 +748,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Removes the given post ID from the list of replies this Sone likes.
 	 *
 	 * @param replyId
-	 *            The ID of the reply
+	 * 		The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
 	public Sone removeLikedReplyId(String replyId) {
@@ -770,8 +766,8 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Returns all images of a Sone. Images of a album are inserted into this
-	 * list before images of all child albums.
+	 * Returns all images of a Sone. Images of a album are inserted into this list
+	 * before images of all child albums.
 	 *
 	 * @return The list of all images
 	 */
@@ -787,7 +783,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Adds an album to this Sone.
 	 *
 	 * @param album
-	 *            The album to add
+	 * 		The album to add
 	 */
 	public void addAlbum(Album album) {
 		checkNotNull(album, "album must not be null");
@@ -801,7 +797,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the albums of this Sone.
 	 *
 	 * @param albums
-	 *            The albums of this Sone
+	 * 		The albums of this Sone
 	 */
 	public void setAlbums(Collection<? extends Album> albums) {
 		checkNotNull(albums, "albums must not be null");
@@ -815,7 +811,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Removes an album from this Sone.
 	 *
 	 * @param album
-	 *            The album to remove
+	 * 		The album to remove
 	 */
 	public void removeAlbum(Album album) {
 		checkNotNull(album, "album must not be null");
@@ -824,11 +820,11 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Moves the given album up in this album’s albums. If the album is already
-	 * the first album, nothing happens.
+	 * Moves the given album up in this album’s albums. If the album is already the
+	 * first album, nothing happens.
 	 *
 	 * @param album
-	 *            The album to move up
+	 * 		The album to move up
 	 * @return The album that the given album swapped the place with, or
 	 *         <code>null</code> if the album did not change its place
 	 */
@@ -846,11 +842,11 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Moves the given album down in this album’s albums. If the album is
-	 * already the last album, nothing happens.
+	 * Moves the given album down in this album’s albums. If the album is already
+	 * the last album, nothing happens.
 	 *
 	 * @param album
-	 *            The album to move down
+	 * 		The album to move down
 	 * @return The album that the given album swapped the place with, or
 	 *         <code>null</code> if the album did not change its place
 	 */
@@ -880,7 +876,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	 * Sets the options of this Sone.
 	 *
 	 * @param options
-	 *            The options of this Sone
+	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
 	public void setOptions(Options options) {
@@ -891,9 +887,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	// FINGERPRINTABLE METHODS
 	//
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public synchronized String getFingerprint() {
 		Hasher hash = Hashing.sha256().newHasher();
@@ -942,9 +936,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	// INTERFACE Comparable<Sone>
 	//
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int compareTo(Sone sone) {
 		return NICE_NAME_COMPARATOR.compare(this, sone);
@@ -954,17 +946,13 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	// OBJECT METHODS
 	//
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public int hashCode() {
 		return id.hashCode();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public boolean equals(Object object) {
 		if (!(object instanceof Sone)) {
@@ -973,9 +961,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		return ((Sone) object).id.equals(id);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	public String toString() {
 		return getClass().getName() + "[identity=" + identity + ",requestUri=" + requestUri + ",insertUri(" + String.valueOf(insertUri).length() + "),friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + ")]";
