@@ -1,5 +1,5 @@
 /*
- * Sone - SoneInsertListener.java - Copyright © 2011–2012 David Roden
+ * Sone - SoneInsertedEvent.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,45 +15,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
-
-import java.util.EventListener;
+package net.pterodactylus.sone.core.event;
 
 import net.pterodactylus.sone.data.Sone;
 
 /**
- * Listener for Sone insert events.
+ * Event that signals that a {@link Sone} was inserted.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface SoneInsertListener extends EventListener {
+public class SoneInsertedEvent extends SoneEvent {
+
+	/** The duration of the insert. */
+	private final long insertDuration;
 
 	/**
-	 * Notifies a listener that a Sone is now being inserted.
-	 *
-	 * @param sone
-	 *            The Sone being inserted
-	 */
-	public void insertStarted(Sone sone);
-
-	/**
-	 * Notifies a listener that a Sone has been successfully inserted.
+	 * Creates a new “Sone was inserted” event.
 	 *
 	 * @param sone
 	 *            The Sone that was inserted
 	 * @param insertDuration
 	 *            The duration of the insert (in milliseconds)
 	 */
-	public void insertFinished(Sone sone, long insertDuration);
+	public SoneInsertedEvent(Sone sone, long insertDuration) {
+		super(sone);
+		this.insertDuration = insertDuration;
+	}
+
+	//
+	// ACCESSORS
+	//
 
 	/**
-	 * Notifies a listener that the insert of the given Sone was aborted.
+	 * Returns the duration of the insert.
 	 *
-	 * @param sone
-	 *            The Sone that was being inserted
-	 * @param cause
-	 *            The cause of the abortion (may be {@code null})
+	 * @return The duration of the insert (in milliseconds)
 	 */
-	public void insertAborted(Sone sone, Throwable cause);
+	public long insertDuration() {
+		return insertDuration;
+	}
 
 }

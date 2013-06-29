@@ -1,5 +1,5 @@
 /*
- * Sone - DeletePostAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - DeletePostAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.web.ajax;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
@@ -49,14 +51,14 @@ public class DeletePostAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId, false);
-		if ((post == null) || (post.getSone() == null)) {
+		Optional<Post> post = webInterface.getCore().getPost(postId);
+		if (!post.isPresent()) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		if (!webInterface.getCore().isLocalSone(post.getSone())) {
+		if (!post.get().getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
-		webInterface.getCore().deletePost(post);
+		webInterface.getCore().deletePost(post.get());
 		return createSuccessJsonObject();
 	}
 

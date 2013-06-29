@@ -1,5 +1,5 @@
 /*
- * Sone - DeleteReplyAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - DeleteReplyAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.web.ajax;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.web.WebInterface;
@@ -49,14 +51,14 @@ public class DeleteReplyAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
-		PostReply reply = webInterface.getCore().getReply(replyId);
-		if (reply == null) {
+		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
+		if (!reply.isPresent()) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		if (!webInterface.getCore().isLocalSone(reply.getSone())) {
+		if (!reply.get().getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
-		webInterface.getCore().deleteReply(reply);
+		webInterface.getCore().deleteReply(reply.get());
 		return createSuccessJsonObject();
 	}
 

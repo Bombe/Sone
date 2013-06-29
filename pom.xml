@@ -2,17 +2,23 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>sone</artifactId>
-	<version>0.8.4</version>
+	<version>0.8.5</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils</artifactId>
-			<version>0.12.2</version>
+			<version>0.12.3</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>3.8.2</version>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -32,6 +38,21 @@
 			<artifactId>utils.json</artifactId>
 			<version>0.1</version>
 		</dependency>
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>14.0-rc1</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -47,6 +68,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -55,6 +77,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
 				<configuration>
 					<archive>
 						<manifestEntries>
@@ -90,21 +113,17 @@
 					</execution>
 				</executions>
 			</plugin>
-		</plugins>
-	</build>
-	<reporting>
-		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
 				<configuration>
-					<links>
-						<link>http://download.oracle.com/javase/6/docs/api/</link>
-						<link>http://java.pterodactylus.net/utils/apidocs/</link>
-						<link>http://java.pterodactylus.net/utils.json/apidocs/</link>
-					</links>
+					<detectLinks>true</detectLinks>
+					<detectJavaApiLink>true</detectJavaApiLink>
+					<show>private</show>
+					<footer>© 2010–2013 David ‘Bombe’ Roden</footer>
 				</configuration>
 			</plugin>
 		</plugins>
-	</reporting>
+	</build>
 </project>

@@ -1,5 +1,5 @@
 /*
- * Sone - PostReply.java - Copyright © 2010–2012 David Roden
+ * Sone - PostReply.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
 
 package net.pterodactylus.sone.data;
 
-import java.util.UUID;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 /**
  * A reply is like a {@link Post} but can never be posted on its own, it always
@@ -25,93 +26,32 @@ import java.util.UUID;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class PostReply extends Reply<PostReply> {
-
-	/** The Post this reply refers to. */
-	private volatile Post post;
+public interface PostReply extends Reply<PostReply> {
 
 	/**
-	 * Creates a new reply.
-	 *
-	 * @param id
-	 *            The ID of the reply
+	 * Filter that selects {@link PostReply}s that have a
+	 * {@link Optional#isPresent() present} {@link #getPost() post}.
 	 */
-	public PostReply(String id) {
-		this(id, null, null, 0, null);
-	}
+	public static final Predicate<PostReply> HAS_POST_FILTER = new Predicate<PostReply>() {
+
+		@Override
+		public boolean apply(PostReply postReply) {
+			return postReply.getPost().isPresent();
+		}
+	};
 
 	/**
-	 * Creates a new reply.
+	 * Returns the ID of the post this reply refers to.
 	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param text
-	 *            The text of the reply
+	 * @return The ID of the post this reply refers to
 	 */
-	public PostReply(Sone sone, Post post, String text) {
-		this(sone, post, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new reply-
-	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	public PostReply(Sone sone, Post post, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, post, time, text);
-	}
-
-	/**
-	 * Creates a new reply-
-	 *
-	 * @param sone
-	 *            The sone that posted the reply
-	 * @param id
-	 *            The ID of the reply
-	 * @param post
-	 *            The post to reply to
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	public PostReply(String id, Sone sone, Post post, long time, String text) {
-		super(id, sone, time, text);
-		this.post = post;
-	}
-
-	//
-	// ACCESSORS
-	//
+	public String getPostId();
 
 	/**
 	 * Returns the post this reply refers to.
 	 *
 	 * @return The post this reply refers to
 	 */
-	public Post getPost() {
-		return post;
-	}
-
-	/**
-	 * Sets the post this reply refers to.
-	 *
-	 * @param post
-	 *            The post this reply refers to
-	 * @return This reply (for method chaining)
-	 */
-	public PostReply setPost(Post post) {
-		this.post = post;
-		return this;
-	}
+	public Optional<Post> getPost();
 
 }

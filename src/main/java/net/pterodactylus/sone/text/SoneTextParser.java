@@ -1,5 +1,5 @@
 /*
- * Sone - FreenetLinkParser.java - Copyright © 2010–2012 David Roden
+ * Sone - SoneTextParser.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,12 +26,15 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.pterodactylus.sone.core.PostProvider;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
+
+import com.google.common.base.Optional;
+
 import freenet.keys.FreenetURI;
 
 /**
@@ -55,28 +58,50 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	private enum LinkType {
 
 		/** Link is a KSK. */
-		KSK,
+		KSK("KSK@"),
 
 		/** Link is a CHK. */
-		CHK,
+		CHK("CHK@"),
 
 		/** Link is an SSK. */
-		SSK,
+		SSK("SSK@"),
 
 		/** Link is a USK. */
-		USK,
+		USK("USK@"),
 
 		/** Link is HTTP. */
-		HTTP,
+		HTTP("http://"),
 
 		/** Link is HTTPS. */
-		HTTPS,
+		HTTPS("https://"),
 
 		/** Link is a Sone. */
-		SONE,
+		SONE("sone://"),
 
 		/** Link is a post. */
-		POST,
+		POST("post://");
+
+		/** The scheme identifying this link type. */
+		private final String scheme;
+
+		/**
+		 * Creates a new link type identified by the given scheme.
+		 *
+		 * @param scheme
+		 *            The scheme of the link type
+		 */
+		private LinkType(String scheme) {
+			this.scheme = scheme;
+		}
+
+		/**
+		 * Returns the scheme of this link type.
+		 *
+		 * @return The scheme of this link type
+		 */
+		public String getScheme() {
+			return scheme;
+		}
 
 	}
 
@@ -200,18 +225,32 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 					lineComplete = false;
 
+					Matcher matcher = whitespacePattern.matcher(line);
+					int nextSpace = matcher.find(0) ? matcher.start() : line.length();
+					String link = line.substring(0, nextSpace);
+					String name = link;
+					logger.log(Level.FINER, String.format("Found link: %s", link));
+					logger.log(Level.FINEST, String.format("CHK: %d, SSK: %d, USK: %d", nextChk, nextSsk, nextUsk));
+
+					/* if there is no text after the scheme, it’s not a link! */
+					if (link.equals(linkType.getScheme())) {
+						parts.add(new PlainTextPart(linkType.getScheme()));
+						line = line.substring(linkType.getScheme().length());
+						continue;
+					}
+
 					if (linkType == LinkType.SONE) {
 						if (line.length() >= (7 + 43)) {
 							String soneId = line.substring(7, 50);
-							Sone sone = soneProvider.getSone(soneId, false);
-							if (sone == null) {
+							Optional<Sone> sone = soneProvider.getSone(soneId);
+							if (!sone.isPresent()) {
 								/*
 								 * don’t use create=true above, we don’t want
 								 * the empty shell.
 								 */
-								sone = new Sone(soneId);
+								sone = Optional.fromNullable(new Sone(soneId, false));
 							}
-							parts.add(new SonePart(sone));
+							parts.add(new SonePart(sone.get()));
 							line = line.substring(50);
 						} else {
 							parts.add(new PlainTextPart(line));
@@ -222,9 +261,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (linkType == LinkType.POST) {
 						if (line.length() >= (7 + 36)) {
 							String postId = line.substring(7, 43);
-							Post post = postProvider.getPost(postId, false);
-							if ((post != null) && (post.getSone() != null)) {
-								parts.add(new PostPart(post));
+							Optional<Post> post = postProvider.getPost(postId);
+							if (post.isPresent()) {
+								parts.add(new PostPart(post.get()));
 							} else {
 								parts.add(new PlainTextPart(line.substring(0, 43)));
 							}
@@ -235,12 +274,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						}
 						continue;
 					}
-					Matcher matcher = whitespacePattern.matcher(line);
-					int nextSpace = matcher.find(0) ? matcher.start() : line.length();
-					String link = line.substring(0, nextSpace);
-					String name = link;
-					logger.log(Level.FINER, String.format("Found link: %s", link));
-					logger.log(Level.FINEST, String.format("CHK: %d, SSK: %d, USK: %d", nextChk, nextSsk, nextUsk));
 
 					if ((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
 						FreenetURI uri;

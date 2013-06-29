@@ -1,5 +1,5 @@
 /*
- * Sone - ImageBrowserPage.java - Copyright © 2011–2012 David Roden
+ * Sone - ImageBrowserPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -77,9 +80,9 @@ public class ImageBrowserPage extends SoneTemplatePage {
 		}
 		String soneId = request.getHttpRequest().getParam("sone", null);
 		if (soneId != null) {
-			Sone sone = webInterface.getCore().getSone(soneId, false);
+			Optional<Sone> sone = webInterface.getCore().getSone(soneId);
 			templateContext.set("soneRequested", true);
-			templateContext.set("sone", sone);
+			templateContext.set("sone", sone.orNull());
 			return;
 		}
 		String mode = request.getHttpRequest().getParam("mode", null);
@@ -87,7 +90,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			templateContext.set("galleryRequested", true);
 			List<Album> albums = new ArrayList<Album>();
 			for (Sone sone : webInterface.getCore().getSones()) {
-				albums.addAll(sone.getAllAlbums());
+				albums.addAll(FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList());
 			}
 			Collections.sort(albums, Album.TITLE_COMPARATOR);
 			Pagination<Album> albumPagination = new Pagination<Album>(albums, 12).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));

@@ -1,5 +1,5 @@
 /*
- * Sone - CreateReplyAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - CreateReplyAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.web.ajax;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
@@ -58,12 +60,12 @@ public class CreateReplyAjaxPage extends JsonPage {
 		if (sender == null) {
 			sender = getCurrentSone(request.getToadletContext());
 		}
-		Post post = webInterface.getCore().getPost(postId);
-		if ((post == null) || (post.getSone() == null)) {
+		Optional<Post> post = webInterface.getCore().getPost(postId);
+		if (!post.isPresent()) {
 			return createErrorJsonObject("invalid-post-id");
 		}
 		text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
-		PostReply reply = webInterface.getCore().createReply(sender, post, text);
+		PostReply reply = webInterface.getCore().createReply(sender, post.get(), text);
 		return createSuccessJsonObject().put("reply", reply.getId()).put("sone", sender.getId());
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Sone - SoneAccessor.java - Copyright © 2010–2012 David Roden
+ * Sone - SoneAccessor.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,8 +76,6 @@ public class SoneAccessor extends ReflectionAccessor {
 		Sone sone = (Sone) object;
 		if (member.equals("niceName")) {
 			return getNiceName(sone);
-		} else if (member.equals("local")) {
-			return core.isLocalSone(sone);
 		} else if (member.equals("friend")) {
 			Sone currentSone = (Sone) templateContext.get("currentSone");
 			return (currentSone != null) && currentSone.hasFriend(sone.getId());

@@ -1,5 +1,5 @@
 /*
- * Sone - DefaultIdentity.java - Copyright © 2010–2012 David Roden
+ * Sone - DefaultIdentity.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -208,7 +208,7 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public int hashCode() {
-		return id.hashCode();
+		return getId().hashCode();
 	}
 
 	/**
@@ -216,11 +216,11 @@ public class DefaultIdentity implements Identity {
 	 */
 	@Override
 	public boolean equals(Object object) {
-		if (!(object instanceof DefaultIdentity)) {
+		if (!(object instanceof Identity)) {
 			return false;
 		}
-		DefaultIdentity identity = (DefaultIdentity) object;
-		return identity.id.equals(id);
+		Identity identity = (Identity) object;
+		return identity.getId().equals(getId());
 	}
 
 	/**

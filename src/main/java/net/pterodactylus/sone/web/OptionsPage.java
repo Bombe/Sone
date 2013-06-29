@@ -1,5 +1,5 @@
 /*
- * Sone - OptionsPage.java - Copyright © 2010–2012 David Roden
+ * Sone - OptionsPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ package net.pterodactylus.sone.web;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.pterodactylus.sone.core.Core.Preferences;
+import net.pterodactylus.sone.core.Preferences;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;

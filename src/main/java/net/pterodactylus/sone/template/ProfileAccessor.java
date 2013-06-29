@@ -1,5 +1,5 @@
 /*
- * Sone - ProfileAccessor.java - Copyright © 2011–2012 David Roden
+ * Sone - ProfileAccessor.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 				return null;
 			}
 			Sone remoteSone = profile.getSone();
-			if (core.isLocalSone(remoteSone)) {
+			if (remoteSone.isLocal()) {
 				/* always show your own avatars. */
 				return avatarId;
 			}

@@ -1,5 +1,5 @@
 /*
- * Sone - DeleteAlbumPage.java - Copyright © 2011–2012 David Roden
+ * Sone - DeleteAlbumPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 			if (album == null) {
 				throw new RedirectException("invalid.html");
 			}
-			if (!webInterface.getCore().isLocalSone(album.getSone())) {
+			if (!album.getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("abortDelete")) {

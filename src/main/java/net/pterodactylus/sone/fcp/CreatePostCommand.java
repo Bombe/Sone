@@ -1,5 +1,5 @@
 /*
- * Sone - CreatePostCommand.java - Copyright © 2011–2012 David Roden
+ * Sone - CreatePostCommand.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.fcp;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
@@ -57,7 +59,7 @@ public class CreatePostCommand extends AbstractSoneCommand {
 		if (sone.equals(recipient)) {
 			return new ErrorResponse("Sone and Recipient must not be the same.");
 		}
-		Post post = getCore().createPost(sone, recipient, text);
+		Post post = getCore().createPost(sone, Optional.fromNullable(recipient), text);
 		return new Response("PostCreated", new SimpleFieldSetBuilder().put("Post", post.getId()).get());
 	}
 

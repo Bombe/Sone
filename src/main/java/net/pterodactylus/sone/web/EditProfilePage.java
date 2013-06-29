@@ -1,5 +1,5 @@
 /*
- * Sone - EditProfilePage.java - Copyright © 2010–2012 David Roden
+ * Sone - EditProfilePage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -77,7 +77,7 @@ public class EditProfilePage extends SoneTemplatePage {
 				birthDay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
 				birthMonth = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
 				birthYear = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
-				avatarId = request.getHttpRequest().getPartAsStringFailsafe("avatar-id", 36);
+				avatarId = request.getHttpRequest().getPartAsStringFailsafe("avatarId", 36);
 				profile.setFirstName(firstName.length() > 0 ? firstName : null);
 				profile.setMiddleName(middleName.length() > 0 ? middleName : null);
 				profile.setLastName(lastName.length() > 0 ? lastName : null);
@@ -139,7 +139,7 @@ public class EditProfilePage extends SoneTemplatePage {
 		templateContext.set("birthDay", birthDay);
 		templateContext.set("birthMonth", birthMonth);
 		templateContext.set("birthYear", birthYear);
-		templateContext.set("avatar-id", avatarId);
+		templateContext.set("avatarId", avatarId);
 		templateContext.set("fields", fields);
 	}
 

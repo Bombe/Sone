@@ -1,5 +1,5 @@
 /*
- * Sone - UnfollowSoneAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - UnfollowSoneAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ public class UnfollowSoneAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		if (!webInterface.getCore().hasSone(soneId)) {
+		if (!webInterface.getCore().getSone(soneId).isPresent()) {
 			return createErrorJsonObject("invalid-sone-id");
 		}
 		Sone currentSone = getCurrentSone(request.getToadletContext());

@@ -1,5 +1,5 @@
 /*
- * Sone - DeleteReplyPage.java - Copyright © 2010–2012 David Roden
+ * Sone - DeleteReplyPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+
+import com.google.common.base.Optional;
 
 /**
  * This page lets the user delete a reply.
@@ -53,14 +55,14 @@ public class DeleteReplyPage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String replyId = request.getHttpRequest().getPartAsStringFailsafe("reply", 36);
-		PostReply reply = webInterface.getCore().getReply(replyId);
+		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
-			if (!webInterface.getCore().isLocalSone(reply.getSone())) {
+			if (!reply.get().getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {
-				webInterface.getCore().deleteReply(reply);
+				webInterface.getCore().deleteReply(reply.get());
 				throw new RedirectException(returnPage);
 			} else if (request.getHttpRequest().isPartSet("abortDelete")) {
 				throw new RedirectException(returnPage);

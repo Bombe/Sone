@@ -1,5 +1,5 @@
 /*
- * Sone - ParserFilter.java - Copyright © 2011–2012 David Roden
+ * Sone - ParserFilter.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@ package net.pterodactylus.sone.template;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +94,7 @@ public class ParserFilter implements Filter {
 		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("cut-off-length"))), length));
 		Object sone = parameters.get("sone");
 		if (sone instanceof String) {
-			sone = core.getSone((String) sone, false);
+			sone = core.getSone((String) sone);
 		}
 		FreenetRequest request = (FreenetRequest) templateContext.get("request");
 		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);
@@ -213,7 +215,12 @@ public class ParserFilter implements Filter {
 	 *            The part to render
 	 */
 	private void render(Writer writer, LinkPart linkPart) {
-		renderLink(writer, "/?_CHECKED_HTTP_=" + linkPart.getLink(), linkPart.getText(), linkPart.getTitle(), "internet");
+		try {
+			renderLink(writer, "/external-link/?_CHECKED_HTTP_=" + URLEncoder.encode(linkPart.getLink(), "UTF-8"), linkPart.getText(), linkPart.getTitle(), "internet");
+		} catch (UnsupportedEncodingException uee1) {
+			/* not possible for UTF-8. */
+			throw new RuntimeException("The JVM does not support UTF-8 encoding!", uee1);
+		}
 	}
 
 	/**

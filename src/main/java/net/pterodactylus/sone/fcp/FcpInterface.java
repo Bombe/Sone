@@ -1,5 +1,5 @@
 /*
- * Sone - FcpInterface.java - Copyright © 2011–2012 David Roden
+ * Sone - FcpInterface.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +29,10 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
-import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.validation.Validation;
+
+import com.google.inject.Inject;
+
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
@@ -80,6 +83,7 @@ public class FcpInterface {
 	 * @param core
 	 *            The core
 	 */
+	@Inject
 	public FcpInterface(Core core) {
 		commands.put("Version", new VersionCommand(core));
 		commands.put("GetLocalSones", new GetLocalSonesCommand(core));
@@ -88,6 +92,8 @@ public class FcpInterface {
 		commands.put("GetPost", new GetPostCommand(core));
 		commands.put("GetPosts", new GetPostsCommand(core));
 		commands.put("GetPostFeed", new GetPostFeedCommand(core));
+		commands.put("LockSone", new LockSoneCommand(core));
+		commands.put("UnlockSone", new UnlockSoneCommand(core));
 		commands.put("LikePost", new LikePostCommand(core));
 		commands.put("LikeReply", new LikeReplyCommand(core));
 		commands.put("CreatePost", new CreatePostCommand(core));
@@ -119,8 +125,7 @@ public class FcpInterface {
 	 *            The action level for which full FCP access is required
 	 */
 	public void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
-		Validation.begin().isNotNull("FullAccessRequired", fullAccessRequired).check();
-		this.fullAccessRequired = fullAccessRequired;
+		this.fullAccessRequired = checkNotNull(fullAccessRequired, "fullAccessRequired must not be null");
 	}
 
 	//
@@ -172,9 +177,9 @@ public class FcpInterface {
 			try {
 				Response response = command.execute(parameters, data, AccessType.values()[accessType]);
 				sendReply(pluginReplySender, identifier, response);
-			} catch (FcpException fe1) {
+			} catch (Exception e1) {
 				logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);
-				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + fe1.getMessage()));
+				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + e1.getMessage()));
 			}
 		} catch (PluginNotFoundException pnfe1) {
 			logger.log(Level.WARNING, "Could not find destination plugin: " + pluginReplySender);

@@ -1,5 +1,5 @@
 /*
- * Sone - ReplyGroupFilter.java - Copyright © 2010–2012 David Roden
+ * Sone - ReplyGroupFilter.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
 
+import com.google.common.base.Optional;
+
 /**
  * {@link Filter} implementation that groups replies by the post the are in
  * reply to, returning a map with the post as key and the list of replies as
@@ -48,17 +50,21 @@ public class ReplyGroupFilter implements Filter {
 		Map<Post, Set<Sone>> postSones = new HashMap<Post, Set<Sone>>();
 		Map<Post, Set<PostReply>> postReplies = new HashMap<Post, Set<PostReply>>();
 		for (PostReply reply : allReplies) {
-			Post post = reply.getPost();
-			Set<Sone> sones = postSones.get(post);
+			/*
+			 * All replies from a new-reply notification have posts,
+			 * ListNotificationFilters takes care of that.
+			 */
+			Optional<Post> post = reply.getPost();
+			Set<Sone> sones = postSones.get(post.get());
 			if (sones == null) {
 				sones = new HashSet<Sone>();
-				postSones.put(post, sones);
+				postSones.put(post.get(), sones);
 			}
 			sones.add(reply.getSone());
-			Set<PostReply> replies = postReplies.get(post);
+			Set<PostReply> replies = postReplies.get(post.get());
 			if (replies == null) {
 				replies = new HashSet<PostReply>();
-				postReplies.put(post, replies);
+				postReplies.put(post.get(), replies);
 			}
 			replies.add(reply);
 		}

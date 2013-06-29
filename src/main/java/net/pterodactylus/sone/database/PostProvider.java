@@ -1,5 +1,5 @@
 /*
- * Sone - PostProvider.java - Copyright © 2011–2012 David Roden
+ * Sone - PostProvider.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,9 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.database;
+
+import java.util.Collection;
 
 import net.pterodactylus.sone.data.Post;
+
+import com.google.common.base.Optional;
 
 /**
  * Interface for objects that can provide {@link Post}s by their ID.
@@ -27,17 +31,31 @@ import net.pterodactylus.sone.data.Post;
 public interface PostProvider {
 
 	/**
-	 * Returns the post with the given ID, if it exists. If it does not exist
-	 * and {@code create} is {@code false}, {@code null} is returned; otherwise,
-	 * a new post with the given ID is created and returned.
+	 * Returns the post with the given ID.
 	 *
 	 * @param postId
 	 *            The ID of the post to return
-	 * @param create
-	 *            {@code true} to create a new post if no post with the given ID
-	 *            exists, {@code false} to return {@code null} instead
 	 * @return The post with the given ID, or {@code null}
 	 */
-	public Post getPost(String postId, boolean create);
+	public Optional<Post> getPost(String postId);
+
+	/**
+	 * Returns all posts from the given Sone.
+	 *
+	 * @param soneId
+	 *            The ID of the Sone
+	 * @return All posts from the given Sone
+	 */
+	public Collection<Post> getPosts(String soneId);
+
+	/**
+	 * Returns all posts that have the given Sone as recipient.
+	 *
+	 * @see Post#getRecipient()
+	 * @param recipientId
+	 *            The ID of the recipient of the posts
+	 * @return All posts that have the given Sone as recipient
+	 */
+	public Collection<Post> getDirectedPosts(String recipientId);
 
 }

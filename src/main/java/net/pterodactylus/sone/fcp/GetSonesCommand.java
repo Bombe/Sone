@@ -1,5 +1,5 @@
 /*
- * Sone - GetSonesCommand.java - Copyright © 2011–2012 David Roden
+ * Sone - GetSonesCommand.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ import java.util.List;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -48,7 +47,7 @@ public class GetSonesCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
 		int startSone = getInt(parameters, "StartSone", 0);
 		int maxSones = getInt(parameters, "MaxSones", -1);
 		List<Sone> sones = new ArrayList<Sone>(getCore().getSones());

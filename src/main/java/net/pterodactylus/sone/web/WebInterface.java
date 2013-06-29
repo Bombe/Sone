@@ -1,5 +1,5 @@
 /*
- * Sone - WebInterface.java - Copyright © 2010–2012 David Roden
+ * Sone - WebInterface.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +32,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.core.CoreListener;
+import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
+import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
+import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
+import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
+import net.pterodactylus.sone.core.event.NewPostFoundEvent;
+import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
+import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
+import net.pterodactylus.sone.core.event.PostRemovedEvent;
+import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertingEvent;
+import net.pterodactylus.sone.core.event.SoneLockedEvent;
+import net.pterodactylus.sone.core.event.SoneRemovedEvent;
+import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
+import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -103,8 +125,6 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
-import net.pterodactylus.util.collection.SetBuilder;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -126,11 +146,15 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
-import net.pterodactylus.util.thread.Ticker;
-import net.pterodactylus.util.version.Version;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
+
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
@@ -144,7 +168,7 @@ import freenet.support.api.HTTPRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebInterface implements CoreListener {
+public class WebInterface {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(WebInterface.class);
@@ -192,7 +216,7 @@ public class WebInterface implements CoreListener {
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
 
 	/** Sone locked notification ticker objects. */
-	private final Map<Sone, Object> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, Object>());
+	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
 
 	/** The “Sone locked” notification. */
 	private final ListNotification<Sone> lockedSonesNotification;
@@ -209,12 +233,16 @@ public class WebInterface implements CoreListener {
 	/** The “image insert failed” notification. */
 	private final ListNotification<Image> imageInsertFailedNotification;
 
+	/** Scheduled executor for time-based notifications. */
+	private final ScheduledExecutorService ticker = Executors.newScheduledThreadPool(1);
+
 	/**
 	 * Creates a new web interface.
 	 *
 	 * @param sonePlugin
 	 *            The Sone plugin
 	 */
+	@Inject
 	public WebInterface(SonePlugin sonePlugin) {
 		this.sonePlugin = sonePlugin;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
@@ -372,7 +400,7 @@ public class WebInterface implements CoreListener {
 	 *         currently logged in
 	 */
 	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
-		Set<Sone> localSones = getCore().getLocalSones();
+		Collection<Sone> localSones = getCore().getLocalSones();
 		if (localSones.size() == 1) {
 			return localSones.iterator().next();
 		}
@@ -458,7 +486,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new posts
 	 */
 	public Set<Post> getNewPosts() {
-		return new SetBuilder<Post>().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).get();
+		return ImmutableSet.<Post> builder().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).build();
 	}
 
 	/**
@@ -468,7 +496,7 @@ public class WebInterface implements CoreListener {
 	 * @return The new replies
 	 */
 	public Set<PostReply> getNewReplies() {
-		return new SetBuilder<PostReply>().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).get();
+		return ImmutableSet.<PostReply> builder().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).build();
 	}
 
 	/**
@@ -532,17 +560,17 @@ public class WebInterface implements CoreListener {
 		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
 		notificationManager.addNotification(startupNotification);
 
-		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (120 * 1000), new Runnable() {
+		ticker.schedule(new Runnable() {
 
 			@Override
 			public void run() {
 				startupNotification.dismiss();
 			}
-		}, "Sone Startup Notification Remover");
+		}, 2, TimeUnit.MINUTES);
 
 		Template wotMissingNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/wotMissingNotification.html"));
 		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
-		Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), new Runnable() {
+		ticker.scheduleAtFixedRate(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -552,10 +580,9 @@ public class WebInterface implements CoreListener {
 				} else {
 					notificationManager.addNotification(wotMissingNotification);
 				}
-				Ticker.getInstance().registerEvent(System.currentTimeMillis() + (15 * 1000), this, "Sone WoT Connector Checker");
 			}
 
-		}, "Sone WoT Connector Checker");
+		}, 15, 15, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -563,7 +590,7 @@ public class WebInterface implements CoreListener {
 	 */
 	public void stop() {
 		unregisterToadlets();
-		Ticker.getInstance().stop();
+		ticker.shutdownNow();
 	}
 
 	//
@@ -725,15 +752,15 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * Returns all {@link Core#isLocalSone(Sone) local Sone}s that are
-	 * referenced by {@link SonePart}s in the given text (after parsing it using
+	 * Returns all {@link Sone#isLocal() local Sone}s that are referenced by
+	 * {@link SonePart}s in the given text (after parsing it using
 	 * {@link SoneTextParser}).
 	 *
 	 * @param text
 	 *            The text to parse
 	 * @return All mentioned local Sones
 	 */
-	private Set<Sone> getMentionedSones(String text) {
+	private Collection<Sone> getMentionedSones(String text) {
 		/* we need no context to find mentioned Sones. */
 		Set<Sone> mentionedSones = new HashSet<Sone>();
 		try {
@@ -745,7 +772,7 @@ public class WebInterface implements CoreListener {
 		} catch (IOException ioe1) {
 			logger.log(Level.WARNING, String.format("Could not parse post text: %s", text), ioe1);
 		}
-		return Filters.filteredSet(mentionedSones, Sone.LOCAL_SONE_FILTER);
+		return Collections2.filter(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}
 
 	/**
@@ -770,26 +797,33 @@ public class WebInterface implements CoreListener {
 	}
 
 	//
-	// CORELISTENER METHODS
+	// EVENT HANDLERS
 	//
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new {@link Sone} was found.
+	 *
+	 * @param newSoneFoundEvent
+	 *            The event
 	 */
-	@Override
-	public void newSoneFound(Sone sone) {
-		newSoneNotification.add(sone);
+	@Subscribe
+	public void newSoneFound(NewSoneFoundEvent newSoneFoundEvent) {
+		newSoneNotification.add(newSoneFoundEvent.sone());
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newSoneNotification);
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new {@link Post} was found.
+	 *
+	 * @param newPostFoundEvent
+	 *            The event
 	 */
-	@Override
-	public void newPostFound(Post post) {
-		boolean isLocal = getCore().isLocalSone(post.getSone());
+	@Subscribe
+	public void newPostFound(NewPostFoundEvent newPostFoundEvent) {
+		Post post = newPostFoundEvent.post();
+		boolean isLocal = post.getSone().isLocal();
 		if (isLocal) {
 			localPostNotification.add(post);
 		} else {
@@ -807,11 +841,15 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new {@link PostReply} was found.
+	 *
+	 * @param newPostReplyFoundEvent
+	 *            The event
 	 */
-	@Override
-	public void newReplyFound(PostReply reply) {
-		boolean isLocal = getCore().isLocalSone(reply.getSone());
+	@Subscribe
+	public void newReplyFound(NewPostReplyFoundEvent newPostReplyFoundEvent) {
+		PostReply reply = newPostReplyFoundEvent.postReply();
+		boolean isLocal = reply.getSone().isLocal();
 		if (isLocal) {
 			localReplyNotification.add(reply);
 		} else {
@@ -819,8 +857,8 @@ public class WebInterface implements CoreListener {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && (reply.getPost().getSone() != null) && (reply.getTime() <= System.currentTimeMillis())) {
-				mentionNotification.add(reply.getPost());
+			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && reply.getPost().isPresent() && (reply.getTime() <= System.currentTimeMillis())) {
+				mentionNotification.add(reply.getPost().get());
 				notificationManager.addNotification(mentionNotification);
 			}
 		} else {
@@ -829,179 +867,228 @@ public class WebInterface implements CoreListener {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} was marked as known.
+	 *
+	 * @param markSoneKnownEvent
+	 *            The event
 	 */
-	@Override
-	public void markSoneKnown(Sone sone) {
-		newSoneNotification.remove(sone);
+	@Subscribe
+	public void markSoneKnown(MarkSoneKnownEvent markSoneKnownEvent) {
+		newSoneNotification.remove(markSoneKnownEvent.sone());
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Post} was marked as known.
+	 *
+	 * @param markPostKnownEvent
+	 *            The event
 	 */
-	@Override
-	public void markPostKnown(Post post) {
-		newPostNotification.remove(post);
-		localPostNotification.remove(post);
-		mentionNotification.remove(post);
+	@Subscribe
+	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
+		newPostNotification.remove(markPostKnownEvent.post());
+		localPostNotification.remove(markPostKnownEvent.post());
+		mentionNotification.remove(markPostKnownEvent.post());
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link PostReply} was marked as known.
+	 *
+	 * @param markPostReplyKnownEvent
+	 *            The event
 	 */
-	@Override
-	public void markReplyKnown(PostReply reply) {
+	@Subscribe
+	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
+		newReplyNotification.remove(markPostReplyKnownEvent.postReply());
+		localReplyNotification.remove(markPostReplyKnownEvent.postReply());
+		mentionNotification.remove(markPostReplyKnownEvent.postReply().getPost().get());
+	}
+
+	/**
+	 * Notifies the web interface that a {@link Sone} was removed.
+	 *
+	 * @param soneRemovedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void soneRemoved(SoneRemovedEvent soneRemovedEvent) {
+		newSoneNotification.remove(soneRemovedEvent.sone());
+	}
+
+	/**
+	 * Notifies the web interface that a {@link Post} was removed.
+	 *
+	 * @param postRemovedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void postRemoved(PostRemovedEvent postRemovedEvent) {
+		newPostNotification.remove(postRemovedEvent.post());
+		localPostNotification.remove(postRemovedEvent.post());
+		mentionNotification.remove(postRemovedEvent.post());
+	}
+
+	/**
+	 * Notifies the web interface that a {@link PostReply} was removed.
+	 *
+	 * @param postReplyRemovedEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void replyRemoved(PostReplyRemovedEvent postReplyRemovedEvent) {
+		PostReply reply = postReplyRemovedEvent.postReply();
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
-		mentionNotification.remove(reply.getPost());
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void soneRemoved(Sone sone) {
-		newSoneNotification.remove(sone);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void postRemoved(Post post) {
-		newPostNotification.remove(post);
-		localPostNotification.remove(post);
-		mentionNotification.remove(post);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public void replyRemoved(PostReply reply) {
-		newReplyNotification.remove(reply);
-		localReplyNotification.remove(reply);
-		if (!getMentionedSones(reply.getText()).isEmpty()) {
+		if (!getMentionedSones(reply.getText()).isEmpty() && reply.getPost().isPresent()) {
 			boolean isMentioned = false;
-			for (PostReply existingReply : getCore().getReplies(reply.getPost())) {
+			for (PostReply existingReply : getCore().getReplies(reply.getPostId())) {
 				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
 			}
 			if (!isMentioned) {
-				mentionNotification.remove(reply.getPost());
+				mentionNotification.remove(reply.getPost().get());
 			}
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a Sone was locked.
+	 *
+	 * @param soneLockedEvent
+	 *            The event
 	 */
-	@Override
-	public void soneLocked(final Sone sone) {
-		Object tickerObject = Ticker.getInstance().registerEvent(System.currentTimeMillis() + (5 * 60) * 1000, new Runnable() {
+	@Subscribe
+	public void soneLocked(SoneLockedEvent soneLockedEvent) {
+		final Sone sone = soneLockedEvent.sone();
+		ScheduledFuture<?> tickerObject = ticker.schedule(new Runnable() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				lockedSonesNotification.add(sone);
-				lockedSonesTickerObjects.remove(sone);
 				notificationManager.addNotification(lockedSonesNotification);
 			}
-		}, "Sone Locked Notification");
+		}, 5, TimeUnit.MINUTES);
 		lockedSonesTickerObjects.put(sone, tickerObject);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a Sone was unlocked.
+	 *
+	 * @param soneUnlockedEvent
+	 *            The event
 	 */
-	@Override
-	public void soneUnlocked(Sone sone) {
-		lockedSonesNotification.remove(sone);
-		Ticker.getInstance().deregisterEvent(lockedSonesTickerObjects.remove(sone));
+	@Subscribe
+	public void soneUnlocked(SoneUnlockedEvent soneUnlockedEvent) {
+		lockedSonesNotification.remove(soneUnlockedEvent.sone());
+		lockedSonesTickerObjects.remove(soneUnlockedEvent.sone()).cancel(false);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} is being inserted.
+	 *
+	 * @param soneInsertingEvent
+	 *            The event
 	 */
-	@Override
-	public void soneInserting(Sone sone) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+	@Subscribe
+	public void soneInserting(SoneInsertingEvent soneInsertingEvent) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertingEvent.sone());
 		soneInsertNotification.set("soneStatus", "inserting");
-		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		if (soneInsertingEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} was inserted.
+	 *
+	 * @param soneInsertedEvent
+	 *            The event
 	 */
-	@Override
-	public void soneInserted(Sone sone, long insertDuration) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+	@Subscribe
+	public void soneInserted(SoneInsertedEvent soneInsertedEvent) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.sone());
 		soneInsertNotification.set("soneStatus", "inserted");
-		soneInsertNotification.set("insertDuration", insertDuration / 1000);
-		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		soneInsertNotification.set("insertDuration", soneInsertedEvent.insertDuration() / 1000);
+		if (soneInsertedEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a {@link Sone} insert was aborted.
+	 *
+	 * @param soneInsertAbortedEvent
+	 *            The event
 	 */
-	@Override
-	public void soneInsertAborted(Sone sone, Throwable cause) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(sone);
+	@Subscribe
+	public void soneInsertAborted(SoneInsertAbortedEvent soneInsertAbortedEvent) {
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.sone());
 		soneInsertNotification.set("soneStatus", "insert-aborted");
-		soneInsertNotification.set("insert-error", cause);
-		if (sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.cause());
+		if (soneInsertAbortedEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that a new Sone version was found.
+	 *
+	 * @param updateFoundEvent
+	 *            The event
 	 */
-	@Override
-	public void updateFound(Version version, long releaseTime, long latestEdition) {
-		newVersionNotification.getTemplateContext().set("latestVersion", version);
-		newVersionNotification.getTemplateContext().set("latestEdition", latestEdition);
-		newVersionNotification.getTemplateContext().set("releaseTime", releaseTime);
+	@Subscribe
+	public void updateFound(UpdateFoundEvent updateFoundEvent) {
+		newVersionNotification.getTemplateContext().set("latestVersion", updateFoundEvent.version());
+		newVersionNotification.getTemplateContext().set("latestEdition", updateFoundEvent.latestEdition());
+		newVersionNotification.getTemplateContext().set("releaseTime", updateFoundEvent.releaseTime());
 		notificationManager.addNotification(newVersionNotification);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that an image insert was started
+	 *
+	 * @param imageInsertStartedEvent
+	 *            The event
 	 */
-	@Override
-	public void imageInsertStarted(Image image) {
-		insertingImagesNotification.add(image);
+	@Subscribe
+	public void imageInsertStarted(ImageInsertStartedEvent imageInsertStartedEvent) {
+		insertingImagesNotification.add(imageInsertStartedEvent.image());
 		notificationManager.addNotification(insertingImagesNotification);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that an {@link Image} insert was aborted.
+	 *
+	 * @param imageInsertAbortedEvent
+	 *            The event
 	 */
-	@Override
-	public void imageInsertAborted(Image image) {
-		insertingImagesNotification.remove(image);
+	@Subscribe
+	public void imageInsertAborted(ImageInsertAbortedEvent imageInsertAbortedEvent) {
+		insertingImagesNotification.remove(imageInsertAbortedEvent.image());
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that an {@link Image} insert is finished.
+	 *
+	 * @param imageInsertFinishedEvent
+	 *            The event
 	 */
-	@Override
-	public void imageInsertFinished(Image image) {
-		insertingImagesNotification.remove(image);
-		insertedImagesNotification.add(image);
+	@Subscribe
+	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
+		insertingImagesNotification.remove(imageInsertFinishedEvent.image());
+		insertedImagesNotification.add(imageInsertFinishedEvent.image());
 		notificationManager.addNotification(insertedImagesNotification);
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * Notifies the web interface that an {@link Image} insert has failed.
+	 *
+	 * @param imageInsertFailedEvent
+	 *            The event
 	 */
-	@Override
-	public void imageInsertFailed(Image image, Throwable cause) {
-		insertingImagesNotification.remove(image);
-		imageInsertFailedNotification.add(image);
+	@Subscribe
+	public void imageInsertFailed(ImageInsertFailedEvent imageInsertFailedEvent) {
+		insertingImagesNotification.remove(imageInsertFailedEvent.image());
+		imageInsertFailedNotification.add(imageInsertFailedEvent.image());
 		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 

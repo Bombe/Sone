@@ -1,5 +1,5 @@
 /*
- * Sone - SoneTextParserTest.java - Copyright © 2011–2012 David Roden
+ * Sone - SoneTextParserTest.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,10 +19,14 @@ package net.pterodactylus.sone.text;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.Arrays;
+import java.util.Collection;
+
+import com.google.common.base.Optional;
 
 import junit.framework.TestCase;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * JUnit test case for {@link SoneTextParser}.
@@ -106,6 +110,24 @@ public class SoneTextParserTest extends TestCase {
 		assertEquals("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", convertText(parts, PlainTextPart.class, SonePart.class));
 	}
 
+	/**
+	 * Test for a bug discovered in Sone 0.8.4 where a plain “http://” would be
+	 * parsed into a link.
+	 *
+	 * @throws IOException
+	 *             if an I/O error occurs
+	 */
+	@SuppressWarnings({ "synthetic-access", "static-method" })
+	public void testEmpyHttpLinks() throws IOException {
+		SoneTextParser soneTextParser = new SoneTextParser(new TestSoneProvider(), null);
+		Iterable<Part> parts;
+
+		/* check empty http links. */
+		parts = soneTextParser.parse(null, new StringReader("Some text. Empty link: http:// – nice!"));
+		assertNotNull("Parts", parts);
+		assertEquals("Part Text", "Some text. Empty link: http:// – nice!", convertText(parts, PlainTextPart.class));
+	}
+
 	//
 	// PRIVATE METHODS
 	//
@@ -133,7 +155,7 @@ public class SoneTextParserTest extends TestCase {
 				}
 			}
 			if (!classValid) {
-				assertEquals("Part’s Class", null, part.getClass());
+				fail("Part’s Class (" + part.getClass() + ") is not one of " + Arrays.toString(validClasses));
 			}
 			if (part instanceof PlainTextPart) {
 				text.append(((PlainTextPart) part).getText());
@@ -162,8 +184,8 @@ public class SoneTextParserTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Sone getSone(final String soneId, boolean create) {
-			return new Sone(soneId) {
+		public Optional<Sone> getSone(final String soneId) {
+			return Optional.<Sone> fromNullable(new Sone(soneId, false) {
 
 				/**
 				 * {@inheritDoc}
@@ -172,7 +194,31 @@ public class SoneTextParserTest extends TestCase {
 				public String getName() {
 					return soneId;
 				}
-			};
+			});
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getSones() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getLocalSones() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getRemoteSones() {
+			return null;
 		}
 
 	}

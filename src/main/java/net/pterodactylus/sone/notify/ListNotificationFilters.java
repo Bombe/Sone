@@ -1,5 +1,5 @@
 /*
- * Sone - ListNotificationFilters.java - Copyright © 2010–2012 David Roden
+ * Sone - ListNotificationFilters.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.notify;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -28,7 +30,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.validation.Validation;
+
+import com.google.common.base.Optional;
 
 /**
  * Filter for {@link ListNotification}s.
@@ -218,7 +221,7 @@ public class ListNotificationFilters {
 	 *         otherwise
 	 */
 	public static boolean isPostVisible(Sone sone, Post post) {
-		Validation.begin().isNotNull("Post", post).check();
+		checkNotNull(post, "post must not be null");
 		Sone postSone = post.getSone();
 		if (postSone == null) {
 			return false;
@@ -240,9 +243,8 @@ public class ListNotificationFilters {
 				 * received trust values. to prevent this we simply assume that
 				 * posts are visible if there is no trust.
 				 */
-				return true;
 			}
-			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.equals(post.getRecipient())) {
+			if ((!postSone.equals(sone)) && !sone.hasFriend(postSone.getId()) && !sone.getId().equals(post.getRecipientId().orNull())) {
 				return false;
 			}
 		}
@@ -280,12 +282,12 @@ public class ListNotificationFilters {
 	 *         otherwise
 	 */
 	public static boolean isReplyVisible(Sone sone, PostReply reply) {
-		Validation.begin().isNotNull("Reply", reply).check();
-		Post post = reply.getPost();
-		if (post == null) {
+		checkNotNull(reply, "reply must not be null");
+		Optional<Post> post = reply.getPost();
+		if (!post.isPresent()) {
 			return false;
 		}
-		if (!isPostVisible(sone, post)) {
+		if (!isPostVisible(sone, post.get())) {
 			return false;
 		}
 		if (reply.getTime() > System.currentTimeMillis()) {

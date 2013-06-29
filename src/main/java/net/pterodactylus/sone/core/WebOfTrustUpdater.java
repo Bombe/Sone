@@ -1,5 +1,5 @@
 /*
- * Sone - WebOfTrustUpdater.java - Copyright © 2012 David Roden
+ * Sone - WebOfTrustUpdater.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
@@ -31,7 +33,8 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
-import net.pterodactylus.util.validation.Validation;
+
+import com.google.inject.Inject;
 
 /**
  * Updates WebOfTrust identity data in a background thread because communicating
@@ -60,6 +63,7 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * @param webOfTrustConnector
 	 *            The web of trust connector
 	 */
+	@Inject
 	public WebOfTrustUpdater(WebOfTrustConnector webOfTrustConnector) {
 		super("Trust Updater");
 		this.webOfTrustConnector = webOfTrustConnector;
@@ -290,7 +294,6 @@ public class WebOfTrustUpdater extends AbstractService {
 		 *
 		 * @return {@code true} if this job finished successfully, {@code false}
 		 *         otherwise
-		 *
 		 * @see WebOfTrustUpdater#stop()
 		 */
 		@SuppressWarnings("synthetic-access")
@@ -471,9 +474,8 @@ public class WebOfTrustUpdater extends AbstractService {
 		 */
 		@SuppressWarnings("synthetic-access")
 		public WebOfTrustContextUpdateJob(OwnIdentity ownIdentity, String context) {
-			Validation.begin().isNotNull("OwnIdentity", ownIdentity).isNotNull("Context", context).check();
-			this.ownIdentity = ownIdentity;
-			this.context = context;
+			this.ownIdentity = checkNotNull(ownIdentity, "ownIdentity must not be null");
+			this.context = checkNotNull(context, "context must not be null");
 		}
 
 		//

@@ -1,5 +1,5 @@
 /*
- * Sone - TrustPage.java - Copyright © 2011–2012 David Roden
+ * Sone - TrustPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.web;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
@@ -59,9 +61,9 @@ public class TrustPage extends SoneTemplatePage {
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 			String identity = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 			Sone currentSone = getCurrentSone(request.getToadletContext());
-			Sone sone = webInterface.getCore().getSone(identity, false);
-			if (sone != null) {
-				webInterface.getCore().trustSone(currentSone, sone);
+			Optional<Sone> sone = webInterface.getCore().getSone(identity);
+			if (sone.isPresent()) {
+				webInterface.getCore().trustSone(currentSone, sone.get());
 			}
 			throw new RedirectException(returnPage);
 		}

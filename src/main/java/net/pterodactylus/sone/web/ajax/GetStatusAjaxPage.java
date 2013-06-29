@@ -1,5 +1,5 @@
 /*
- * Sone - GetStatusAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - GetStatusAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,12 +33,12 @@ import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.collection.filter.Filter;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.json.JsonArray;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.object.HashCode;
+
+import com.google.common.base.Predicate;
+import com.google.common.collect.Collections2;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -73,7 +74,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			String[] soneIds = loadSoneIds.split(",");
 			for (String soneId : soneIds) {
 				/* just add it, we skip null further down. */
-				sones.add(webInterface.getCore().getSone(soneId, false));
+				sones.add(webInterface.getCore().getSone(soneId).orNull());
 			}
 		}
 		JsonArray jsonSones = new JsonArray();
@@ -87,14 +88,13 @@ public class GetStatusAjaxPage extends JsonPage {
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
-		int notificationHash = HashCode.hashCode(notifications);
 		/* load new posts. */
-		Set<Post> newPosts = webInterface.getNewPosts();
+		Collection<Post> newPosts = webInterface.getNewPosts();
 		if (currentSone != null) {
-			newPosts = Filters.filteredSet(newPosts, new Filter<Post>() {
+			newPosts = Collections2.filter(newPosts, new Predicate<Post>() {
 
 				@Override
-				public boolean filterObject(Post post) {
+				public boolean apply(Post post) {
 					return ListNotificationFilters.isPostVisible(currentSone, post);
 				}
 
@@ -105,40 +105,34 @@ public class GetStatusAjaxPage extends JsonPage {
 			JsonObject jsonPost = new JsonObject();
 			jsonPost.put("id", post.getId());
 			jsonPost.put("sone", post.getSone().getId());
-			jsonPost.put("recipient", (post.getRecipient() != null) ? post.getRecipient().getId() : null);
+			jsonPost.put("recipient", post.getRecipientId().orNull());
 			jsonPost.put("time", post.getTime());
 			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
-		Set<PostReply> newReplies = webInterface.getNewReplies();
+		Collection<PostReply> newReplies = webInterface.getNewReplies();
 		if (currentSone != null) {
-			newReplies = Filters.filteredSet(newReplies, new Filter<PostReply>() {
+			newReplies = Collections2.filter(newReplies, new Predicate<PostReply>() {
 
 				@Override
-				public boolean filterObject(PostReply reply) {
+				public boolean apply(PostReply reply) {
 					return ListNotificationFilters.isReplyVisible(currentSone, reply);
 				}
 
 			});
 		}
 		/* remove replies to unknown posts. */
-		newReplies = Filters.filteredSet(newReplies, new Filter<PostReply>() {
-
-			@Override
-			public boolean filterObject(PostReply reply) {
-				return (reply.getPost() != null) && (reply.getPost().getSone() != null);
-			}
-		});
+		newReplies = Collections2.filter(newReplies, PostReply.HAS_POST_FILTER);
 		JsonArray jsonReplies = new JsonArray();
 		for (PostReply reply : newReplies) {
 			JsonObject jsonReply = new JsonObject();
 			jsonReply.put("id", reply.getId());
 			jsonReply.put("sone", reply.getSone().getId());
-			jsonReply.put("post", reply.getPost().getId());
-			jsonReply.put("postSone", reply.getPost().getSone().getId());
+			jsonReply.put("post", reply.getPostId());
+			jsonReply.put("postSone", reply.getPost().get().getSone().getId());
 			jsonReplies.add(jsonReply);
 		}
-		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notificationHash).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
+		return createSuccessJsonObject().put("loggedIn", currentSone != null).put("options", createJsonOptions(currentSone)).put("sones", jsonSones).put("notificationHash", notifications.hashCode()).put("newPosts", jsonPosts).put("newReplies", jsonReplies);
 	}
 
 	/**

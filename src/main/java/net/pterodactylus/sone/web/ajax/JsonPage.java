@@ -1,5 +1,5 @@
 /*
- * Sone - JsonPage.java - Copyright © 2010–2012 David Roden
+ * Sone - JsonPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,15 +17,22 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.URI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.json.JsonUtils;
+import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 import freenet.clients.http.SessionManager.Session;
@@ -38,6 +45,9 @@ import freenet.clients.http.ToadletContext;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class JsonPage implements FreenetPage {
+
+	/** The logger. */
+	private static final Logger logger = Logging.getLogger(JsonPage.class);
 
 	/** The path of the page. */
 	private final String path;
@@ -218,8 +228,13 @@ public abstract class JsonPage implements FreenetPage {
 				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
 			}
 		}
-		JsonObject jsonObject = createJsonObject(request);
-		return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(JsonUtils.format(jsonObject));
+		try {
+			JsonObject jsonObject = createJsonObject(request);
+			return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(JsonUtils.format(jsonObject));
+		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Error executing JSON page!", e1);
+			return response.setStatusCode(500).setStatusText(e1.getMessage()).setContentType("text/plain").write(dumpStackTrace(e1));
+		}
 	}
 
 	/**
@@ -228,6 +243,38 @@ public abstract class JsonPage implements FreenetPage {
 	@Override
 	public boolean isLinkExcepted(URI link) {
 		return false;
+	}
+
+	//
+	// PRIVATE METHODS
+	//
+
+	/**
+	 * Returns a byte array containing the stack trace of the given throwable.
+	 *
+	 * @param t
+	 *            The throwable whose stack trace to dump into an array
+	 * @return The array with the stack trace, or an empty array if the stack
+	 *         trace could not be dumped
+	 */
+	private static byte[] dumpStackTrace(Throwable t) {
+		ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+		OutputStreamWriter writer = null;
+		PrintWriter printWriter = null;
+		try {
+			writer = new OutputStreamWriter(byteArrayOutputStream, "uTF-8");
+			printWriter = new PrintWriter(writer);
+			t.printStackTrace(printWriter);
+			byteArrayOutputStream.flush();
+			return byteArrayOutputStream.toByteArray();
+		} catch (IOException ioe1) {
+			/* quite not possible. */
+			return new byte[0];
+		} finally {
+			Closer.close(printWriter);
+			Closer.close(writer);
+			Closer.close(byteArrayOutputStream);
+		}
 	}
 
 }

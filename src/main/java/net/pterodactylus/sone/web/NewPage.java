@@ -1,5 +1,5 @@
 /*
- * Sone - NewPage.java - Copyright © 2012 David Roden
+ * Sone - NewPage.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,11 @@ package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.google.common.collect.Collections2;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
@@ -57,16 +60,16 @@ public class NewPage extends SoneTemplatePage {
 	//
 
 	/**
-	 * {@inherit}
+	 * {@inheritDoc}
 	 */
 	@Override
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 
 		/* collect new elements from notifications. */
-		Set<Post> posts = webInterface.getNewPosts();
-		for (PostReply reply : webInterface.getNewReplies()) {
-			posts.add(reply.getPost());
+		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts());
+		for (PostReply reply : Collections2.filter(webInterface.getNewReplies(), PostReply.HAS_POST_FILTER)) {
+			posts.add(reply.getPost().get());
 		}
 
 		/* filter and sort them. */

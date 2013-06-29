@@ -1,5 +1,5 @@
 /*
- * Sone - Post.java - Copyright © 2010–2012 David Roden
+ * Sone - Post.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,8 @@ package net.pterodactylus.sone.data;
 
 import java.util.Comparator;
 
-import net.pterodactylus.util.collection.filter.Filter;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 
 /**
  * A post is a short message that a user writes in his Sone to let other users
@@ -40,10 +41,10 @@ public interface Post {
 	};
 
 	/** Filter for posts with timestamps from the future. */
-	public static final Filter<Post> FUTURE_POSTS_FILTER = new Filter<Post>() {
+	public static final Predicate<Post> FUTURE_POSTS_FILTER = new Predicate<Post>() {
 
 		@Override
-		public boolean filterObject(Post post) {
+		public boolean apply(Post post) {
 			return post.getTime() <= System.currentTimeMillis();
 		}
 
@@ -68,29 +69,23 @@ public interface Post {
 	public Sone getSone();
 
 	/**
-	 * Sets the Sone of this post.
+	 * Returns the ID of the recipient {@link Sone}, or
+	 * {@link Optional#absent()} if this post does not have a recipient.
 	 *
-	 * @param sone
-	 *            The Sone of this post
-	 * @return This post (for method chaining)
+	 * @return The ID of the recipient, or {@link Optional#absent()}
 	 */
-	public Post setSone(Sone sone);
+	public Optional<String> getRecipientId();
 
 	/**
-	 * Returns the recipient of this post, if any.
+	 * Returns the recipient of this post, if any. As this method can return
+	 * {@link Optional#absent()} if the post has a recipient which has not yet
+	 * been loaded, it is recommended to use {@link #hasRecipient()} to check
+	 * for the presence of a recipient.
 	 *
-	 * @return The recipient of this post, or {@code null}
+	 * @return The recipient of this post, or {@link Optional#absent()} if there
+	 *         is no recipient
 	 */
-	public Sone getRecipient();
-
-	/**
-	 * Sets the recipient of this post.
-	 *
-	 * @param recipient
-	 *            The recipient of this post, or {@code null}
-	 * @return This post (for method chaining)
-	 */
-	public Post setRecipient(Sone recipient);
+	public Optional<Sone> getRecipient();
 
 	/**
 	 * Returns the time of the post.
@@ -100,29 +95,11 @@ public interface Post {
 	public long getTime();
 
 	/**
-	 * Sets the time of this post.
-	 *
-	 * @param time
-	 *            The time of this post (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This post (for method chaining)
-	 */
-	public Post setTime(long time);
-
-	/**
 	 * Returns the text of the post.
 	 *
 	 * @return The text of the post
 	 */
 	public String getText();
-
-	/**
-	 * Sets the text of this post.
-	 *
-	 * @param text
-	 *            The text of this post
-	 * @return This post (for method chaining)
-	 */
-	public Post setText(String text);
 
 	/**
 	 * Returns whether this post is known.

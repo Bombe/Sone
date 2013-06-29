@@ -1,5 +1,5 @@
 /*
- * Sone - MarkAsKnownPage.java - Copyright © 2011–2012 David Roden
+ * Sone - MarkAsKnownPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.base.Optional;
 
 /**
  * Page that lets the user mark a number of {@link Sone}s, {@link Post}s, or
@@ -65,23 +67,23 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 		for (StringTokenizer idTokenizer = new StringTokenizer(ids); idTokenizer.hasMoreTokens();) {
 			String id = idTokenizer.nextToken();
 			if (type.equals("post")) {
-				Post post = webInterface.getCore().getPost(id, false);
-				if (post == null) {
+				Optional<Post> post = webInterface.getCore().getPost(id);
+				if (!post.isPresent()) {
 					continue;
 				}
-				webInterface.getCore().markPostKnown(post);
+				webInterface.getCore().markPostKnown(post.get());
 			} else if (type.equals("reply")) {
-				PostReply reply = webInterface.getCore().getReply(id, false);
-				if (reply == null) {
+				Optional<PostReply> reply = webInterface.getCore().getPostReply(id);
+				if (!reply.isPresent()) {
 					continue;
 				}
-				webInterface.getCore().markReplyKnown(reply);
+				webInterface.getCore().markReplyKnown(reply.get());
 			} else if (type.equals("sone")) {
-				Sone sone = webInterface.getCore().getSone(id, false);
-				if (sone == null) {
+				Optional<Sone> sone = webInterface.getCore().getSone(id);
+				if (!sone.isPresent()) {
 					continue;
 				}
-				webInterface.getCore().markSoneKnown(sone);
+				webInterface.getCore().markSoneKnown(sone.get());
 			}
 		}
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);

@@ -1,5 +1,5 @@
 /*
- * Sone - DistrustAjaxPage.java - Copyright © 2011–2012 David Roden
+ * Sone - DistrustAjaxPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.web.ajax;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
@@ -51,11 +53,11 @@ public class DistrustAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getSone(soneId, false);
-		if (sone == null) {
+		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
+		if (!sone.isPresent()) {
 			return createErrorJsonObject("invalid-sone-id");
 		}
-		webInterface.getCore().distrustSone(currentSone, sone);
+		webInterface.getCore().distrustSone(currentSone, sone.get());
 		return createSuccessJsonObject().put("trustValue", webInterface.getCore().getPreferences().getNegativeTrust());
 	}
 

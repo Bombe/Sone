@@ -1,5 +1,5 @@
 /*
- * Sone - SonePlugin.java - Copyright © 2010–2012 David Roden
+ * Sone - SonePlugin.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,12 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.core.WebOfTrustUpdater;
+import net.pterodactylus.sone.database.Database;
+import net.pterodactylus.sone.database.PostBuilderFactory;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.PostReplyBuilderFactory;
+import net.pterodactylus.sone.database.SoneProvider;
+import net.pterodactylus.sone.database.memory.MemoryDatabase;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
@@ -37,9 +43,23 @@ import net.pterodactylus.util.config.MapConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
+
+import com.google.common.eventbus.EventBus;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Singleton;
+import com.google.inject.TypeLiteral;
+import com.google.inject.matcher.Matchers;
+import com.google.inject.name.Names;
+import com.google.inject.spi.InjectionListener;
+import com.google.inject.spi.TypeEncounter;
+import com.google.inject.spi.TypeListener;
+
 import freenet.client.async.DatabaseDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
+import freenet.node.Node;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.FredPluginBaseL10n;
 import freenet.pluginmanager.FredPluginFCP;
@@ -84,7 +104,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 8, 4);
+	public static final Version VERSION = new Version(0, 8, 5);
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(SonePlugin.class);
@@ -106,9 +126,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 	/** The web of trust connector. */
 	private WebOfTrustConnector webOfTrustConnector;
-
-	/** The identity manager. */
-	private IdentityManager identityManager;
 
 	//
 	// ACCESSORS
@@ -178,33 +195,72 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			}
 		}
 
+		final Configuration startConfiguration = oldConfiguration;
+		final EventBus eventBus = new EventBus();
+
+		/* Freenet injector configuration. */
+		AbstractModule freenetModule = new AbstractModule() {
+
+			@Override
+			@SuppressWarnings("synthetic-access")
+			protected void configure() {
+				bind(PluginRespirator.class).toInstance(SonePlugin.this.pluginRespirator);
+				bind(Node.class).toInstance(SonePlugin.this.pluginRespirator.getNode());
+			}
+		};
+		/* Sone injector configuration. */
+		AbstractModule soneModule = new AbstractModule() {
+
+			@Override
+			protected void configure() {
+				bind(Core.class).in(Singleton.class);
+				bind(MemoryDatabase.class).in(Singleton.class);
+				bind(EventBus.class).toInstance(eventBus);
+				bind(Configuration.class).toInstance(startConfiguration);
+				bind(FreenetInterface.class).in(Singleton.class);
+				bind(PluginConnector.class).in(Singleton.class);
+				bind(WebOfTrustConnector.class).in(Singleton.class);
+				bind(WebOfTrustUpdater.class).in(Singleton.class);
+				bind(IdentityManager.class).in(Singleton.class);
+				bind(String.class).annotatedWith(Names.named("WebOfTrustContext")).toInstance("Sone");
+				bind(SonePlugin.class).toInstance(SonePlugin.this);
+				bind(FcpInterface.class).in(Singleton.class);
+				bind(Database.class).to(MemoryDatabase.class);
+				bind(PostBuilderFactory.class).to(MemoryDatabase.class);
+				bind(PostReplyBuilderFactory.class).to(MemoryDatabase.class);
+				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
+				bind(PostProvider.class).to(MemoryDatabase.class);
+				bindListener(Matchers.any(), new TypeListener() {
+
+					@Override
+					public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {
+						typeEncounter.register(new InjectionListener<I>() {
+
+							@Override
+							public void afterInjection(I injectee) {
+								eventBus.register(injectee);
+							}
+						});
+					}
+				});
+			}
+
+		};
+		Injector injector = Guice.createInjector(freenetModule, soneModule);
+		core = injector.getInstance(Core.class);
+
+		/* create web of trust connector. */
+		webOfTrustConnector = injector.getInstance(WebOfTrustConnector.class);
+
+		/* create FCP interface. */
+		fcpInterface = injector.getInstance(FcpInterface.class);
+		core.setFcpInterface(fcpInterface);
+
+		/* create the web interface. */
+		webInterface = injector.getInstance(WebInterface.class);
+
 		boolean startupFailed = true;
 		try {
-			/* create freenet interface. */
-			FreenetInterface freenetInterface = new FreenetInterface(pluginRespirator.getNode());
-
-			/* create web of trust connector. */
-			PluginConnector pluginConnector = new PluginConnector(pluginRespirator);
-			webOfTrustConnector = new WebOfTrustConnector(pluginConnector);
-			identityManager = new IdentityManager(webOfTrustConnector, "Sone");
-
-			/* create trust updater. */
-			WebOfTrustUpdater trustUpdater = new WebOfTrustUpdater(webOfTrustConnector);
-			trustUpdater.init();
-
-			/* create core. */
-			core = new Core(oldConfiguration, freenetInterface, identityManager, trustUpdater);
-
-			/* create the web interface. */
-			webInterface = new WebInterface(this);
-			core.addCoreListener(webInterface);
-
-			/* create FCP interface. */
-			fcpInterface = new FcpInterface(core);
-			core.setFcpInterface(fcpInterface);
-
-			/* create the identity manager. */
-			identityManager.addIdentityListener(core);
 
 			/* start core! */
 			core.start();
@@ -215,7 +271,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webInterface.start();
 			webInterface.setFirstStart(firstStart);
 			webInterface.setNewConfig(newConfig);
-			identityManager.start();
 			startupFailed = false;
 		} finally {
 			if (startupFailed) {
@@ -240,9 +295,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			/* stop the core. */
 			core.stop();
-
-			/* stop the identity manager. */
-			identityManager.stop();
 
 			/* stop the web of trust connector. */
 			webOfTrustConnector.stop();

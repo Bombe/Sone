@@ -31,7 +31,7 @@
 		<%foreach currentSone.posts post>
 		<post>
 			<id><% post.id|xml></id>
-			<recipient><%ifnull !post.recipient><% post.recipient.id|xml><%/if></recipient>
+			<recipient><%if post.recipientId.present><% post.recipientId.get|xml><%/if></recipient>
 			<time><% post.time></time>
 			<text><% post.text|xml></text>
 		</post>
@@ -42,7 +42,7 @@
 		<%foreach currentSone.replies reply>
 		<reply>
 			<id><% reply.id></id>
-			<post-id><% reply.post.id|xml></post-id>
+			<post-id><% reply.postId|xml></post-id>
 			<time><% reply.time></time>
 			<text><% reply.text|xml></text>
 		</reply>

@@ -1,5 +1,5 @@
 /*
- * Sone - EditAlbumAjaxPage.java - Copyright © 2011–2012 David Roden
+ * Sone - EditAlbumAjaxPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +54,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 		if (album == null) {
 			return createErrorJsonObject("invalid-album-id");
 		}
-		if (!webInterface.getCore().isLocalSone(album.getSone())) {
+		if (!album.getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveLeft"))) {
