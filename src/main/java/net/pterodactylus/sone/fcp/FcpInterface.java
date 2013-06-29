@@ -87,6 +87,8 @@ public class FcpInterface {
 		commands.put("GetPost", new GetPostCommand(core));
 		commands.put("GetPosts", new GetPostsCommand(core));
 		commands.put("GetPostFeed", new GetPostFeedCommand(core));
+		commands.put("LockSone", new LockSoneCommand(core));
+		commands.put("UnlockSone", new UnlockSoneCommand(core));
 		commands.put("LikePost", new LikePostCommand(core));
 		commands.put("LikeReply", new LikeReplyCommand(core));
 		commands.put("CreatePost", new CreatePostCommand(core));
