@@ -1,5 +1,5 @@
 /*
- * Sone - MarkAsKnownAjaxPage.java - Copyright © 2011–2012 David Roden
+ * Sone - MarkAsKnownAjaxPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
+
+import com.google.common.base.Optional;
 
 /**
  * AJAX page that lets the user mark a number of {@link Sone}s, {@link Post}s,
@@ -57,23 +59,23 @@ public class MarkAsKnownAjaxPage extends JsonPage {
 		Core core = webInterface.getCore();
 		for (String id : ids) {
 			if (type.equals("post")) {
-				Post post = core.getPost(id, false);
-				if (post == null) {
+				Optional<Post> post = core.getPost(id);
+				if (!post.isPresent()) {
 					continue;
 				}
-				core.markPostKnown(post);
+				core.markPostKnown(post.get());
 			} else if (type.equals("reply")) {
-				PostReply reply = core.getReply(id, false);
-				if (reply == null) {
+				Optional<PostReply> reply = core.getPostReply(id);
+				if (!reply.isPresent()) {
 					continue;
 				}
-				core.markReplyKnown(reply);
+				core.markReplyKnown(reply.get());
 			} else if (type.equals("sone")) {
-				Sone sone = core.getSone(id, false);
-				if (sone == null) {
+				Optional<Sone> sone = core.getSone(id);
+				if (!sone.isPresent()) {
 					continue;
 				}
-				core.markSoneKnown(sone);
+				core.markSoneKnown(sone.get());
 			}
 		}
 		return createSuccessJsonObject();

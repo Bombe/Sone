@@ -1,5 +1,5 @@
 /*
- * Sone - ListNotification.java - Copyright © 2010–2012 David Roden
+ * Sone - ListNotification.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,7 +141,9 @@ public class ListNotification<T> extends TemplateNotification {
 	 *            The element to remove
 	 */
 	public void remove(T element) {
-		elements.remove(element);
+		while (elements.remove(element)) {
+			/* do nothing, just remove all instances of the element. */
+		}
 		if (elements.isEmpty()) {
 			dismiss();
 		}

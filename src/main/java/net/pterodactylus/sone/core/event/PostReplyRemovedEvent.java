@@ -1,5 +1,5 @@
 /*
- * Sone - UpdateListener.java - Copyright © 2011–2012 David Roden
+ * Sone - PostReplyRemovedEvent.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.core.event;
 
-import java.util.EventListener;
-
-import net.pterodactylus.util.version.Version;
+import net.pterodactylus.sone.data.PostReply;
 
 /**
- * Listener interface for {@link UpdateChecker} events.
+ * Event that signals that a {@link PostReply} was removed.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface UpdateListener extends EventListener {
+public class PostReplyRemovedEvent extends PostReplyEvent {
 
 	/**
-	 * Notifies a listener that a newer version than the current version was
-	 * found.
+	 * Creates a new “post reply removed” event.
 	 *
-	 * @param version
-	 *            The version that was found
-	 * @param releaseTime
-	 *            The release time of the version
-	 * @param latestEdition
-	 *            The latest edition of the Sone homepage
+	 * @param postReply
+	 *            The post reply that was removed
 	 */
-	public void updateFound(Version version, long releaseTime, long latestEdition);
+	public PostReplyRemovedEvent(PostReply postReply) {
+		super(postReply);
+	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - EditImageAjaxPage.java - Copyright © 2011–2012 David Roden
+ * Sone - EditImageAjaxPage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,10 @@ import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.collection.MapBuilder;
 import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Page that stores a user’s image modifications.
@@ -63,7 +64,7 @@ public class EditImageAjaxPage extends JsonPage {
 		if (image == null) {
 			return createErrorJsonObject("invalid-image-id");
 		}
-		if (!webInterface.getCore().isLocalSone(image.getSone())) {
+		if (!image.getSone().isLocal()) {
 			return createErrorJsonObject("not-authorized");
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveLeft"))) {
@@ -80,7 +81,7 @@ public class EditImageAjaxPage extends JsonPage {
 		String description = request.getHttpRequest().getParam("description").trim();
 		image.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
 		webInterface.getCore().touchConfiguration();
-		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", (String) parserFilter.format(new TemplateContext(), image.getDescription(), new MapBuilder<String, Object>().put("sone", image.getSone()).get()));
+		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", (String) parserFilter.format(new TemplateContext(), image.getDescription(), ImmutableMap.<String, Object> builder().put("sone", image.getSone()).build()));
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - DeleteReplyCommand.java - Copyright © 2011–2012 David Roden
+ * Sone - DeleteReplyCommand.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class DeleteReplyCommand extends AbstractSoneCommand {
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		PostReply reply = getReply(parameters, "Reply");
-		if (!getCore().isLocalSone(reply.getSone())) {
+		if (!reply.getSone().isLocal()) {
 			return new ErrorResponse(401, "Not allowed.");
 		}
 		return new Response("ReplyDeleted", new SimpleFieldSetBuilder().get());

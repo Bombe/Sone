@@ -1,5 +1,5 @@
 /*
- * Sone - Image.java - Copyright © 2011–2012 David Roden
+ * Sone - Image.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,9 +17,14 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.UUID;
 
-import net.pterodactylus.util.validation.Validation;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 /**
  * Container for image metadata.
@@ -70,8 +75,7 @@ public class Image implements Fingerprintable {
 	 *            The ID of the image
 	 */
 	public Image(String id) {
-		Validation.begin().isNotNull("Image ID", id).check();
-		this.id = id;
+		this.id = checkNotNull(id, "id must not be null");
 	}
 
 	//
@@ -105,7 +109,8 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setSone(Sone sone) {
-		Validation.begin().isNotNull("New Image Owner", sone).isEither("Old Image Owner", this.sone, null, sone).check();
+		checkNotNull(sone, "sone must not be null");
+		checkArgument((this.sone == null) || this.sone.equals(sone), "sone must not already be set to another sone");
 		this.sone = sone;
 		return this;
 	}
@@ -128,7 +133,8 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setAlbum(Album album) {
-		Validation.begin().isNotNull("New Album", album).check().isEqual("Album Owner and Image Owner", album.getSone(), getSone()).check();
+		checkNotNull(album, "album must not be null");
+		checkNotNull(album.getSone().equals(getSone()), "album must belong to the same Sone as this image");
 		this.album = album;
 		return this;
 	}
@@ -151,7 +157,8 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setKey(String key) {
-		Validation.begin().isNotNull("New Image Key", key).isEither("Old Image Key", this.key, null, key).check();
+		checkNotNull(key, "key must not be null");
+		checkState((this.key == null) || this.key.equals(key), "key must not be already set to another key");
 		this.key = key;
 		return this;
 	}
@@ -187,7 +194,8 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setCreationTime(long creationTime) {
-		Validation.begin().isGreater("New Image Creation Time", creationTime, 0).isEither("Old Image Creation Time", this.creationTime, 0L, creationTime).check();
+		checkArgument(creationTime > 0, "creationTime must be > 0");
+		checkState((this.creationTime == 0) || (this.creationTime == creationTime), "creationTime must not already be set");
 		this.creationTime = creationTime;
 		return this;
 	}
@@ -210,7 +218,8 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setWidth(int width) {
-		Validation.begin().isGreater("New Image Width", width, 0).isEither("Old Image Width", this.width, 0, width).check();
+		checkArgument(width > 0, "width must be > 0");
+		checkState((this.width == 0) || (this.width == width), "width must not already be set to another width");
 		this.width = width;
 		return this;
 	}
@@ -233,7 +242,8 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setHeight(int height) {
-		Validation.begin().isGreater("New Image Height", height, 0).isEither("Old Image Height", this.height, 0, height).check();
+		checkArgument(height > 0, "height must be > 0");
+		checkState((this.height == 0) || (this.height == height), "height must not already be set to another height");
 		this.height = height;
 		return this;
 	}
@@ -255,8 +265,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setTitle(String title) {
-		Validation.begin().isNotNull("Image Title", title).check();
-		this.title = title;
+		this.title = checkNotNull(title, "title must not be null");
 		return this;
 	}
 
@@ -277,8 +286,7 @@ public class Image implements Fingerprintable {
 	 * @return This image
 	 */
 	public Image setDescription(String description) {
-		Validation.begin().isNotNull("Image Description", description).check();
-		this.description = description;
+		this.description = checkNotNull(description, "description must not be null");
 		return this;
 	}
 
@@ -291,13 +299,13 @@ public class Image implements Fingerprintable {
 	 */
 	@Override
 	public String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Image(");
-		fingerprint.append("ID(").append(id).append(')');
-		fingerprint.append("Title(").append(title).append(')');
-		fingerprint.append("Description(").append(description).append(')');
-		fingerprint.append(')');
-		return fingerprint.toString();
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString("Image(");
+		hash.putString("ID(").putString(id).putString(")");
+		hash.putString("Title(").putString(title).putString(")");
+		hash.putString("Description(").putString(description).putString(")");
+		hash.putString(")");
+		return hash.hash().toString();
 	}
 
 	//

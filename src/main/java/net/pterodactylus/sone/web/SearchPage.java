@@ -1,5 +1,5 @@
 /*
- * Sone - SearchPage.java - Copyright © 2010–2012 David Roden
+ * Sone - SearchPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,24 +35,23 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.cache.Cache;
-import net.pterodactylus.util.cache.CacheException;
-import net.pterodactylus.util.cache.CacheItem;
-import net.pterodactylus.util.cache.DefaultCacheItem;
-import net.pterodactylus.util.cache.MemoryCache;
-import net.pterodactylus.util.cache.ValueRetriever;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.collection.TimedMap;
-import net.pterodactylus.util.collection.filter.Filter;
-import net.pterodactylus.util.collection.filter.Filters;
-import net.pterodactylus.util.collection.mapper.Mapper;
-import net.pterodactylus.util.collection.mapper.Mappers;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
 import net.pterodactylus.util.text.TextException;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
 
 /**
  * This page lets the user search for posts and replies that contain certain
@@ -65,19 +65,18 @@ public class SearchPage extends SoneTemplatePage {
 	private static final Logger logger = Logging.getLogger(SearchPage.class);
 
 	/** Short-term cache. */
-	private final Cache<List<Phrase>, Set<Hit<Post>>> hitCache = new MemoryCache<List<Phrase>, Set<Hit<Post>>>(new ValueRetriever<List<Phrase>, Set<Hit<Post>>>() {
+	private final LoadingCache<List<Phrase>, Set<Hit<Post>>> hitCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<List<Phrase>, Set<Hit<Post>>>() {
 
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public CacheItem<Set<Hit<Post>>> retrieve(List<Phrase> phrases) throws CacheException {
+		public Set<Hit<Post>> load(List<Phrase> phrases) {
 			Set<Post> posts = new HashSet<Post>();
 			for (Sone sone : webInterface.getCore().getSones()) {
 				posts.addAll(sone.getPosts());
 			}
-			return new DefaultCacheItem<Set<Hit<Post>>>(getHits(Filters.filteredSet(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator()));
+			return getHits(Collections2.filter(posts, Post.FUTURE_POSTS_FILTER), phrases, new PostStringGenerator());
 		}
-
-	}, new TimedMap<List<Phrase>, CacheItem<Set<Hit<Post>>>>(300000));
+	});
 
 	/**
 	 * Creates a new search page.
@@ -99,6 +98,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
+	@SuppressWarnings("synthetic-access")
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String query = request.getHttpRequest().getParam("query").trim();
@@ -131,31 +131,22 @@ public class SearchPage extends SoneTemplatePage {
 			redirectIfNotNull(getImageId(phrase), "imageBrowser.html?image=");
 		}
 
-		Set<Sone> sones = webInterface.getCore().getSones();
-		Set<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
+		Collection<Sone> sones = webInterface.getCore().getSones();
+		Collection<Hit<Sone>> soneHits = getHits(sones, phrases, SoneStringGenerator.COMPLETE_GENERATOR);
 
-		Set<Hit<Post>> postHits;
-		try {
-			postHits = hitCache.get(phrases);
-		} catch (CacheException ce1) {
-			/* should never happen. */
-			logger.log(Level.SEVERE, "Could not get search results from cache!", ce1);
-			postHits = Collections.emptySet();
-		}
+		Collection<Hit<Post>> postHits = hitCache.getUnchecked(phrases);
 
 		/* now filter. */
-		soneHits = Filters.filteredSet(soneHits, Hit.POSITIVE_FILTER);
-		postHits = Filters.filteredSet(postHits, Hit.POSITIVE_FILTER);
+		soneHits = Collections2.filter(soneHits, Hit.POSITIVE_FILTER);
+		postHits = Collections2.filter(postHits, Hit.POSITIVE_FILTER);
 
 		/* now sort. */
-		List<Hit<Sone>> sortedSoneHits = new ArrayList<Hit<Sone>>(soneHits);
-		Collections.sort(sortedSoneHits, Hit.DESCENDING_COMPARATOR);
-		List<Hit<Post>> sortedPostHits = new ArrayList<Hit<Post>>(postHits);
-		Collections.sort(sortedPostHits, Hit.DESCENDING_COMPARATOR);
+		List<Hit<Sone>> sortedSoneHits = Ordering.from(Hit.DESCENDING_COMPARATOR).sortedCopy(soneHits);
+		List<Hit<Post>> sortedPostHits = Ordering.from(Hit.DESCENDING_COMPARATOR).sortedCopy(postHits);
 
 		/* extract Sones and posts. */
-		List<Sone> resultSones = Mappers.mappedList(sortedSoneHits, new HitMapper<Sone>());
-		List<Post> resultPosts = Mappers.mappedList(sortedPostHits, new HitMapper<Post>());
+		List<Sone> resultSones = FluentIterable.from(sortedSoneHits).transform(new HitMapper<Sone>()).toList();
+		List<Post> resultPosts = FluentIterable.from(sortedPostHits).transform(new HitMapper<Post>()).toList();
 
 		/* pagination. */
 		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
@@ -319,7 +310,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getSoneId(String phrase) {
 		String soneId = phrase.startsWith("sone://") ? phrase.substring(7) : phrase;
-		return (webInterface.getCore().getSone(soneId, false) != null) ? soneId : null;
+		return (webInterface.getCore().getSone(soneId).isPresent()) ? soneId : null;
 	}
 
 	/**
@@ -332,7 +323,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getPostId(String phrase) {
 		String postId = phrase.startsWith("post://") ? phrase.substring(7) : phrase;
-		return (webInterface.getCore().getPost(postId, false) != null) ? postId : null;
+		return (webInterface.getCore().getPost(postId).isPresent()) ? postId : null;
 	}
 
 	/**
@@ -346,7 +337,11 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getReplyPostId(String phrase) {
 		String replyId = phrase.startsWith("reply://") ? phrase.substring(8) : phrase;
-		return (webInterface.getCore().getReply(replyId, false) != null) ? webInterface.getCore().getReply(replyId, false).getPost().getId() : null;
+		Optional<PostReply> postReply = webInterface.getCore().getPostReply(replyId);
+		if (!postReply.isPresent()) {
+			return null;
+		}
+		return postReply.get().getPostId();
 	}
 
 	/**
@@ -469,10 +464,10 @@ public class SearchPage extends SoneTemplatePage {
 		public String generateString(Post post) {
 			StringBuilder postString = new StringBuilder();
 			postString.append(post.getText());
-			if (post.getRecipient() != null) {
-				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient()));
+			if (post.getRecipient().isPresent()) {
+				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(post.getRecipient().get()));
 			}
-			for (PostReply reply : Filters.filteredList(webInterface.getCore().getReplies(post), Reply.FUTURE_REPLY_FILTER)) {
+			for (PostReply reply : Collections2.filter(webInterface.getCore().getReplies(post.getId()), Reply.FUTURE_REPLY_FILTER)) {
 				postString.append(' ').append(SoneStringGenerator.NAME_GENERATOR.generateString(reply.getSone()));
 				postString.append(' ').append(reply.getText());
 			}
@@ -582,10 +577,10 @@ public class SearchPage extends SoneTemplatePage {
 	private static class Hit<T> {
 
 		/** Filter for {@link Hit}s with a score of more than 0. */
-		public static final Filter<Hit<?>> POSITIVE_FILTER = new Filter<Hit<?>>() {
+		public static final Predicate<Hit<?>> POSITIVE_FILTER = new Predicate<Hit<?>>() {
 
 			@Override
-			public boolean filterObject(Hit<?> hit) {
+			public boolean apply(Hit<?> hit) {
 				return hit.getScore() > 0;
 			}
 
@@ -647,13 +642,13 @@ public class SearchPage extends SoneTemplatePage {
 	 *            The type of the object to extract
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	public static class HitMapper<T> implements Mapper<Hit<T>, T> {
+	private static class HitMapper<T> implements Function<Hit<T>, T> {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public T map(Hit<T> input) {
+		public T apply(Hit<T> input) {
 			return input.getObject();
 		}
 

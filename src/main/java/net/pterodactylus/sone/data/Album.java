@@ -1,5 +1,5 @@
 /*
- * Sone - Album.java - Copyright © 2011–2012 David Roden
+ * Sone - Album.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -24,11 +28,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.pterodactylus.util.collection.IterableWrapper;
-import net.pterodactylus.util.collection.filter.NotNullFilter;
-import net.pterodactylus.util.collection.mapper.Mapper;
-import net.pterodactylus.util.object.Default;
-import net.pterodactylus.util.validation.Validation;
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableList;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
@@ -43,6 +50,20 @@ public class Album implements Fingerprintable {
 		@Override
 		public int compare(Album leftAlbum, Album rightAlbum) {
 			return leftAlbum.getTitle().compareToIgnoreCase(rightAlbum.getTitle());
+		}
+	};
+
+	/** Function that flattens the given album and all albums beneath it. */
+	public static final Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
+
+		@Override
+		public List<Album> apply(Album album) {
+			List<Album> albums = new ArrayList<Album>();
+			albums.add(album);
+			for (Album subAlbum : album.getAlbums()) {
+				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
+			}
+			return albums;
 		}
 	};
 
@@ -87,8 +108,7 @@ public class Album implements Fingerprintable {
 	 *            The ID of the album
 	 */
 	public Album(String id) {
-		Validation.begin().isNotNull("Album ID", id).check();
-		this.id = id;
+		this.id = checkNotNull(id, "id must not be null");
 	}
 
 	//
@@ -122,7 +142,8 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	public Album setSone(Sone sone) {
-		Validation.begin().isNotNull("New Album Owner", sone).isEither("Old Album Owner", this.sone, null, sone).check();
+		checkNotNull(sone, "sone must not be null");
+		checkState((this.sone == null) || (this.sone.equals(sone)), "album owner must not already be set to some other Sone");
 		this.sone = sone;
 		return this;
 	}
@@ -143,7 +164,9 @@ public class Album implements Fingerprintable {
 	 *            The album to add
 	 */
 	public void addAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEither("Old Album Parent", this.parent, null, album.parent).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.getSone().equals(sone), "album must belong to the same Sone as this album");
+		checkState((this.parent == null) || (this.parent.equals(album.parent)), "album must not already be set to some other Sone");
 		album.setParent(this);
 		if (!albums.contains(album)) {
 			albums.add(album);
@@ -157,7 +180,9 @@ public class Album implements Fingerprintable {
 	 *            The album to remove
 	 */
 	public void removeAlbum(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEqual("Album Parent", album.parent, this).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.sone.equals(sone), "album must belong this album’s Sone");
+		checkArgument(equals(album.parent), "album must belong to this album");
 		albums.remove(album);
 		album.removeParent();
 	}
@@ -172,7 +197,9 @@ public class Album implements Fingerprintable {
 	 *         <code>null</code> if the album did not change its place
 	 */
 	public Album moveAlbumUp(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEqual("Album Parent", album.parent, this).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.sone.equals(sone), "album must belong to the same Sone as this album");
+		checkArgument(equals(album.parent), "album must belong to this album");
 		int oldIndex = albums.indexOf(album);
 		if (oldIndex <= 0) {
 			return null;
@@ -192,7 +219,9 @@ public class Album implements Fingerprintable {
 	 *         <code>null</code> if the album did not change its place
 	 */
 	public Album moveAlbumDown(Album album) {
-		Validation.begin().isNotNull("Album", album).check().isEqual("Album Owner", album.sone, sone).isEqual("Album Parent", album.parent, this).check();
+		checkNotNull(album, "album must not be null");
+		checkArgument(album.sone.equals(sone), "album must belong to the same Sone as this album");
+		checkArgument(equals(album.parent), "album must belong to this album");
 		int oldIndex = albums.indexOf(album);
 		if ((oldIndex < 0) || (oldIndex >= (albums.size() - 1))) {
 			return null;
@@ -208,15 +237,14 @@ public class Album implements Fingerprintable {
 	 * @return The images in this album
 	 */
 	public List<Image> getImages() {
-		return IterableWrapper.wrap(imageIds).map(new Mapper<String, Image>() {
+		return new ArrayList<Image>(Collections2.filter(Collections2.transform(imageIds, new Function<String, Image>() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
-			public Image map(String imageId) {
+			public Image apply(String imageId) {
 				return images.get(imageId);
 			}
-
-		}).filter(new NotNullFilter()).list();
+		}), Predicates.notNull()));
 	}
 
 	/**
@@ -226,7 +254,9 @@ public class Album implements Fingerprintable {
 	 *            The image to add
 	 */
 	public void addImage(Image image) {
-		Validation.begin().isNotNull("Image", image).check().isNotNull("Image Owner", image.getSone()).check().isEqual("Image Owner", image.getSone(), sone).check();
+		checkNotNull(image, "image must not be null");
+		checkNotNull(image.getSone(), "image must have an owner");
+		checkArgument(image.getSone().equals(sone), "image must belong to the same Sone as this album");
 		if (image.getAlbum() != null) {
 			image.getAlbum().removeImage(image);
 		}
@@ -247,7 +277,9 @@ public class Album implements Fingerprintable {
 	 *            The image to remove
 	 */
 	public void removeImage(Image image) {
-		Validation.begin().isNotNull("Image", image).check().isEqual("Image Owner", image.getSone(), sone).check();
+		checkNotNull(image, "image must not be null");
+		checkNotNull(image.getSone(), "image must have an owner");
+		checkArgument(image.getSone().equals(sone), "image must belong to the same Sone as this album");
 		imageIds.remove(image.getId());
 		images.remove(image.getId());
 		if (image.getId().equals(albumImage)) {
@@ -269,7 +301,10 @@ public class Album implements Fingerprintable {
 	 *         <code>null</code> if the image did not change its place
 	 */
 	public Image moveImageUp(Image image) {
-		Validation.begin().isNotNull("Image", image).check().isEqual("Image Album", image.getAlbum(), this).isEqual("Album Owner", image.getAlbum().getSone(), sone).check();
+		checkNotNull(image, "image must not be null");
+		checkNotNull(image.getSone(), "image must have an owner");
+		checkArgument(image.getSone().equals(sone), "image must belong to the same Sone as this album");
+		checkArgument(image.getAlbum().equals(this), "image must belong to this album");
 		int oldIndex = imageIds.indexOf(image.getId());
 		if (oldIndex <= 0) {
 			return null;
@@ -289,7 +324,10 @@ public class Album implements Fingerprintable {
 	 *         <code>null</code> if the image did not change its place
 	 */
 	public Image moveImageDown(Image image) {
-		Validation.begin().isNotNull("Image", image).check().isEqual("Image Album", image.getAlbum(), this).isEqual("Album Owner", image.getAlbum().getSone(), sone).check();
+		checkNotNull(image, "image must not be null");
+		checkNotNull(image.getSone(), "image must have an owner");
+		checkArgument(image.getSone().equals(sone), "image must belong to the same Sone as this album");
+		checkArgument(image.getAlbum().equals(this), "image must belong to this album");
 		int oldIndex = imageIds.indexOf(image.getId());
 		if ((oldIndex == -1) || (oldIndex >= (imageIds.size() - 1))) {
 			return null;
@@ -309,7 +347,7 @@ public class Album implements Fingerprintable {
 		if (albumImage == null) {
 			return null;
 		}
-		return Default.forNull(images.get(albumImage), images.values().iterator().next());
+		return Optional.fromNullable(images.get(albumImage)).or(images.values().iterator().next());
 	}
 
 	/**
@@ -351,8 +389,7 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	protected Album setParent(Album parent) {
-		Validation.begin().isNotNull("Album Parent", parent).check();
-		this.parent = parent;
+		this.parent = checkNotNull(parent, "parent must not be null");
 		return this;
 	}
 
@@ -383,8 +420,7 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	public Album setTitle(String title) {
-		Validation.begin().isNotNull("Album Title", title).check();
-		this.title = title;
+		this.title = checkNotNull(title, "title must not be null");
 		return this;
 	}
 
@@ -405,8 +441,7 @@ public class Album implements Fingerprintable {
 	 * @return This album
 	 */
 	public Album setDescription(String description) {
-		Validation.begin().isNotNull("Album Description", description).check();
-		this.description = description;
+		this.description = checkNotNull(description, "description must not be null");
 		return this;
 	}
 
@@ -419,33 +454,33 @@ public class Album implements Fingerprintable {
 	 */
 	@Override
 	public String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Album(");
-		fingerprint.append("ID(").append(id).append(')');
-		fingerprint.append("Title(").append(title).append(')');
-		fingerprint.append("Description(").append(description).append(')');
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString("Album(");
+		hash.putString("ID(").putString(id).putString(")");
+		hash.putString("Title(").putString(title).putString(")");
+		hash.putString("Description(").putString(description).putString(")");
 		if (albumImage != null) {
-			fingerprint.append("AlbumImage(").append(albumImage).append(')');
+			hash.putString("AlbumImage(").putString(albumImage).putString(")");
 		}
 
 		/* add nested albums. */
-		fingerprint.append("Albums(");
+		hash.putString("Albums(");
 		for (Album album : albums) {
-			fingerprint.append(album.getFingerprint());
+			hash.putString(album.getFingerprint());
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
 		/* add images. */
-		fingerprint.append("Images(");
+		hash.putString("Images(");
 		for (Image image : getImages()) {
 			if (image.isInserted()) {
-				fingerprint.append(image.getFingerprint());
+				hash.putString(image.getFingerprint());
 			}
 		}
-		fingerprint.append(')');
+		hash.putString(")");
 
-		fingerprint.append(')');
-		return fingerprint.toString();
+		hash.putString(")");
+		return hash.hash().toString();
 	}
 
 	//

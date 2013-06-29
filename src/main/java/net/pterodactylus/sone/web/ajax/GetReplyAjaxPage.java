@@ -1,5 +1,5 @@
 /*
- * Sone - GetReplyAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - GetReplyAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 package net.pterodactylus.sone.web.ajax;
 
 import java.io.StringWriter;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
@@ -62,11 +64,11 @@ public class GetReplyAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
-		PostReply reply = webInterface.getCore().getReply(replyId);
-		if ((reply == null) || (reply.getSone() == null)) {
+		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
+		if (!reply.isPresent()) {
 			return createErrorJsonObject("invalid-reply-id");
 		}
-		return createSuccessJsonObject().put("reply", createJsonReply(request, reply, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("reply", createJsonReply(request, reply.get(), getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -95,7 +97,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	private JsonObject createJsonReply(FreenetRequest request, PostReply reply, Sone currentSone) {
 		JsonObject jsonReply = new JsonObject();
 		jsonReply.put("id", reply.getId());
-		jsonReply.put("postId", reply.getPost().getId());
+		jsonReply.put("postId", reply.getPostId());
 		jsonReply.put("soneId", reply.getSone().getId());
 		jsonReply.put("time", reply.getTime());
 		StringWriter stringWriter = new StringWriter();

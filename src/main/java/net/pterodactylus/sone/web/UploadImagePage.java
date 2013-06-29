@@ -1,5 +1,5 @@
 /*
- * Sone - UploadImagePage.java - Copyright © 2011–2012 David Roden
+ * Sone - UploadImagePage.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,11 +36,13 @@ import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.io.StreamCopier;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+
+import com.google.common.io.ByteStreams;
+
 import freenet.support.api.Bucket;
 import freenet.support.api.HTTPUploadedFile;
 
@@ -99,7 +101,7 @@ public class UploadImagePage extends SoneTemplatePage {
 				imageInputStream = fileBucket.getInputStream();
 				/* TODO - check length */
 				imageDataOutputStream = new ByteArrayOutputStream((int) fileBucket.size());
-				StreamCopier.copy(imageInputStream, imageDataOutputStream);
+				ByteStreams.copy(imageInputStream, imageDataOutputStream);
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
 				return;

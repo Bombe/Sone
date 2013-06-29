@@ -1,5 +1,5 @@
 /*
- * Sone - SoneDownloader.java - Copyright © 2010–2012 David Roden
+ * Sone - SoneDownloader.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -34,7 +35,8 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.util.collection.Pair;
+import net.pterodactylus.sone.database.PostBuilder;
+import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
@@ -95,10 +97,9 @@ public class SoneDownloader extends AbstractService {
 	 *            The Sone to add
 	 */
 	public void addSone(Sone sone) {
-		if (!sones.add(sone)) {
-			freenetInterface.unregisterUsk(sone);
+		if (sones.add(sone)) {
+			freenetInterface.registerUsk(sone, this);
 		}
-		freenetInterface.registerUsk(sone, this);
 	}
 
 	/**
@@ -155,15 +156,16 @@ public class SoneDownloader extends AbstractService {
 		FreenetURI requestUri = soneUri.setMetaString(new String[] { "sone.xml" });
 		sone.setStatus(SoneStatus.downloading);
 		try {
-			Pair<FreenetURI, FetchResult> fetchResults = freenetInterface.fetchUri(requestUri);
+			Fetched fetchResults = freenetInterface.fetchUri(requestUri);
 			if (fetchResults == null) {
 				/* TODO - mark Sone as bad. */
 				return null;
 			}
-			logger.log(Level.FINEST, String.format("Got %d bytes back.", fetchResults.getRight().size()));
-			Sone parsedSone = parseSone(sone, fetchResults.getRight(), fetchResults.getLeft());
+			logger.log(Level.FINEST, String.format("Got %d bytes back.", fetchResults.getFetchResult().size()));
+			Sone parsedSone = parseSone(sone, fetchResults.getFetchResult(), fetchResults.getFreenetUri());
 			if (parsedSone != null) {
 				if (!fetchOnly) {
+					parsedSone.setStatus((parsedSone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 					core.updateSone(parsedSone);
 					addSone(parsedSone);
 				}
@@ -236,7 +238,7 @@ public class SoneDownloader extends AbstractService {
 			return null;
 		}
 
-		Sone sone = new Sone(originalSone.getId()).setIdentity(originalSone.getIdentity());
+		Sone sone = new Sone(originalSone.getId(), false).setIdentity(originalSone.getIdentity());
 
 		SimpleXML soneXml;
 		try {
@@ -372,11 +374,13 @@ public class SoneDownloader extends AbstractService {
 					return null;
 				}
 				try {
-					Post post = core.getPost(postId).setSone(sone).setTime(Long.parseLong(postTime)).setText(postText);
+					PostBuilder postBuilder = core.postBuilder();
+					/* TODO - parse time correctly. */
+					postBuilder.withId(postId).from(sone.getId()).withTime(Long.parseLong(postTime)).withText(postText);
 					if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-						post.setRecipient(core.getSone(postRecipientId));
+						postBuilder.to(postRecipientId);
 					}
-					posts.add(post);
+					posts.add(postBuilder.build());
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, String.format("Downloaded post for Sone %s with invalid time: %s", sone, postTime));
@@ -403,7 +407,10 @@ public class SoneDownloader extends AbstractService {
 					return null;
 				}
 				try {
-					replies.add(core.getReply(replyId).setSone(sone).setPost(core.getPost(replyPostId)).setTime(Long.parseLong(replyTime)).setText(replyText));
+					PostReplyBuilder postReplyBuilder = core.postReplyBuilder();
+					/* TODO - parse time correctly. */
+					postReplyBuilder.withId(replyId).from(sone.getId()).to(replyPostId).withTime(Long.parseLong(replyTime)).withText(replyText);
+					replies.add(postReplyBuilder.build());
 				} catch (NumberFormatException nfe1) {
 					/* TODO - mark Sone as bad. */
 					logger.log(Level.WARNING, String.format("Downloaded reply for Sone %s with invalid time: %s", sone, replyTime));

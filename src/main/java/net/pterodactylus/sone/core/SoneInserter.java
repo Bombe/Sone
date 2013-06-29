@@ -1,5 +1,5 @@
 /*
- * Sone - SoneInserter.java - Copyright © 2010–2012 David Roden
+ * Sone - SoneInserter.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,22 +20,22 @@ package net.pterodactylus.sone.core;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertedEvent;
+import net.pterodactylus.sone.core.event.SoneInsertingEvent;
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.util.collection.ListBuilder;
-import net.pterodactylus.util.collection.ReverseComparator;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
@@ -47,6 +47,11 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
+
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.Ordering;
+import com.google.common.eventbus.EventBus;
+
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
 
@@ -78,14 +83,14 @@ public class SoneInserter extends AbstractService {
 	/** The core. */
 	private final Core core;
 
+	/** The event bus. */
+	private final EventBus eventBus;
+
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
 	/** The Sone to insert. */
 	private final Sone sone;
-
-	/** The insert listener manager. */
-	private SoneInsertListenerManager soneInsertListenerManager;
 
 	/** Whether a modification has been detected. */
 	private volatile boolean modified = false;
@@ -98,41 +103,19 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @param core
 	 *            The core
+	 * @param eventBus
+	 *            The event bus
 	 * @param freenetInterface
 	 *            The freenet interface
 	 * @param sone
 	 *            The Sone to insert
 	 */
-	public SoneInserter(Core core, FreenetInterface freenetInterface, Sone sone) {
+	public SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone) {
 		super("Sone Inserter for “" + sone.getName() + "”", false);
 		this.core = core;
+		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
-		this.soneInsertListenerManager = new SoneInsertListenerManager(sone);
-	}
-
-	//
-	// LISTENER MANAGEMENT
-	//
-
-	/**
-	 * Adds a listener for Sone insert events.
-	 *
-	 * @param soneInsertListener
-	 *            The Sone insert listener
-	 */
-	public void addSoneInsertListener(SoneInsertListener soneInsertListener) {
-		soneInsertListenerManager.addListener(soneInsertListener);
-	}
-
-	/**
-	 * Removes a listener for Sone insert events.
-	 *
-	 * @param soneInsertListener
-	 *            The Sone insert listener
-	 */
-	public void removeSoneInsertListener(SoneInsertListener soneInsertListener) {
-		soneInsertListenerManager.removeListener(soneInsertListener);
 	}
 
 	//
@@ -192,89 +175,91 @@ public class SoneInserter extends AbstractService {
 		long lastModificationTime = 0;
 		String lastInsertedFingerprint = lastInsertFingerprint;
 		String lastFingerprint = "";
-		while (!shouldStop()) { try {
-			/* check every seconds. */
-			sleep(1000);
+		while (!shouldStop()) {
+			try {
+				/* check every seconds. */
+				sleep(1000);
 
-			/* don’t insert locked Sones. */
-			if (core.isLocked(sone)) {
-				/* trigger redetection when the Sone is unlocked. */
-				synchronized (sone) {
-					modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
-				}
-				lastFingerprint = "";
-				lastModificationTime = 0;
-				continue;
-			}
-
-			InsertInformation insertInformation = null;
-			synchronized (sone) {
-				String fingerprint = sone.getFingerprint();
-				if (!fingerprint.equals(lastFingerprint)) {
-					if (fingerprint.equals(lastInsertedFingerprint)) {
-						modified = false;
-						lastModificationTime = 0;
-						logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
-					} else {
-						lastModificationTime = System.currentTimeMillis();
-						modified = true;
-						logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
-					}
-					lastFingerprint = fingerprint;
-				}
-				if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
-					lastInsertedFingerprint = fingerprint;
-					insertInformation = new InsertInformation(sone);
-				}
-			}
-
-			if (insertInformation != null) {
-				logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
-
-				boolean success = false;
-				try {
-					sone.setStatus(SoneStatus.inserting);
-					long insertTime = System.currentTimeMillis();
-					insertInformation.setTime(insertTime);
-					soneInsertListenerManager.fireInsertStarted();
-					FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
-					soneInsertListenerManager.fireInsertFinished(System.currentTimeMillis() - insertTime);
-					/* at this point we might already be stopped. */
-					if (shouldStop()) {
-						/* if so, bail out, don’t change anything. */
-						break;
-					}
-					sone.setTime(insertTime);
-					sone.setLatestEdition(finalUri.getEdition());
-					core.touchConfiguration();
-					success = true;
-					logger.log(Level.INFO, String.format("Inserted Sone “%s” at %s.", sone.getName(), finalUri));
-				} catch (SoneException se1) {
-					soneInsertListenerManager.fireInsertAborted(se1);
-					logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
-				} finally {
-					sone.setStatus(SoneStatus.idle);
-				}
-
-				/*
-				 * reset modification counter if Sone has not been modified
-				 * while it was inserted.
-				 */
-				if (success) {
+				/* don’t insert locked Sones. */
+				if (core.isLocked(sone)) {
+					/* trigger redetection when the Sone is unlocked. */
 					synchronized (sone) {
-						if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
-							logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
-							lastModificationTime = 0;
-							lastInsertFingerprint = lastInsertedFingerprint;
-							core.touchConfiguration();
+						modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
+					}
+					lastFingerprint = "";
+					lastModificationTime = 0;
+					continue;
+				}
+
+				InsertInformation insertInformation = null;
+				synchronized (sone) {
+					String fingerprint = sone.getFingerprint();
+					if (!fingerprint.equals(lastFingerprint)) {
+						if (fingerprint.equals(lastInsertedFingerprint)) {
 							modified = false;
+							lastModificationTime = 0;
+							logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
+						} else {
+							lastModificationTime = System.currentTimeMillis();
+							modified = true;
+							logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
+						}
+						lastFingerprint = fingerprint;
+					}
+					if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
+						lastInsertedFingerprint = fingerprint;
+						insertInformation = new InsertInformation(sone);
+					}
+				}
+
+				if (insertInformation != null) {
+					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
+
+					boolean success = false;
+					try {
+						sone.setStatus(SoneStatus.inserting);
+						long insertTime = System.currentTimeMillis();
+						insertInformation.setTime(insertTime);
+						eventBus.post(new SoneInsertingEvent(sone));
+						FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+						eventBus.post(new SoneInsertedEvent(sone, System.currentTimeMillis() - insertTime));
+						/* at this point we might already be stopped. */
+						if (shouldStop()) {
+							/* if so, bail out, don’t change anything. */
+							break;
+						}
+						sone.setTime(insertTime);
+						sone.setLatestEdition(finalUri.getEdition());
+						core.touchConfiguration();
+						success = true;
+						logger.log(Level.INFO, String.format("Inserted Sone “%s” at %s.", sone.getName(), finalUri));
+					} catch (SoneException se1) {
+						eventBus.post(new SoneInsertAbortedEvent(sone, se1));
+						logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
+					} finally {
+						sone.setStatus(SoneStatus.idle);
+					}
+
+					/*
+					 * reset modification counter if Sone has not been modified
+					 * while it was inserted.
+					 */
+					if (success) {
+						synchronized (sone) {
+							if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
+								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
+								lastModificationTime = 0;
+								lastInsertFingerprint = lastInsertedFingerprint;
+								core.touchConfiguration();
+								modified = false;
+							}
 						}
 					}
 				}
+			} catch (Throwable t1) {
+				logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
 			}
-		} catch (Throwable t1) {
-			logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
-		}}
+		}
 	}
 
 	/**
@@ -302,11 +287,11 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
-			soneProperties.put("posts", new ListBuilder<Post>(new ArrayList<Post>(sone.getPosts())).sort(Post.TIME_COMPARATOR).get());
-			soneProperties.put("replies", new ListBuilder<PostReply>(new ArrayList<PostReply>(sone.getReplies())).sort(new ReverseComparator<Reply<?>>(Reply.TIME_COMPARATOR)).get());
+			soneProperties.put("posts", Ordering.from(Post.TIME_COMPARATOR).sortedCopy(sone.getPosts()));
+			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", sone.getAllAlbums());
+			soneProperties.put("albums", FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList());
 		}
 
 		//

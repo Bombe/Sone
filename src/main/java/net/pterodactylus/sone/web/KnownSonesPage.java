@@ -1,5 +1,5 @@
 /*
- * Sone - KnownSonesPage.java - Copyright © 2010–2012 David Roden
+ * Sone - KnownSonesPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,18 +18,21 @@
 package net.pterodactylus.sone.web;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.collection.ReverseComparator;
-import net.pterodactylus.util.collection.filter.Filter;
-import net.pterodactylus.util.collection.filter.Filters;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Ordering;
 
 /**
  * This page shows all known Sones.
@@ -67,70 +70,77 @@ public class KnownSonesPage extends SoneTemplatePage {
 		templateContext.set("order", (sortOrder != null) ? sortOrder : "asc");
 		templateContext.set("filter", filter);
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
-		List<Sone> knownSones = Filters.filteredList(new ArrayList<Sone>(webInterface.getCore().getSones()), Sone.EMPTY_SONE_FILTER);
+		Collection<Sone> knownSones = Collections2.filter(webInterface.getCore().getSones(), Sone.EMPTY_SONE_FILTER);
 		if ((currentSone != null) && "followed".equals(filter)) {
-			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
+			knownSones = Collections2.filter(knownSones, new Predicate<Sone>() {
 
 				@Override
-				public boolean filterObject(Sone sone) {
+				public boolean apply(Sone sone) {
 					return currentSone.hasFriend(sone.getId());
 				}
 			});
 		} else if ((currentSone != null) && "not-followed".equals(filter)) {
-			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
+			knownSones = Collections2.filter(knownSones, new Predicate<Sone>() {
 
 				@Override
-				public boolean filterObject(Sone sone) {
+				public boolean apply(Sone sone) {
 					return !currentSone.hasFriend(sone.getId());
 				}
 			});
 		} else if ("new".equals(filter)) {
-			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
+			knownSones = Collections2.filter(knownSones, new Predicate<Sone>() {
+
 				/**
 				 * {@inheritDoc}
 				 */
 				@Override
-				public boolean filterObject(Sone sone) {
+				public boolean apply(Sone sone) {
 					return !sone.isKnown();
 				}
 			});
 		} else if ("not-new".equals(filter)) {
-			knownSones = Filters.filteredList(knownSones, new Filter<Sone>() {
+			knownSones = Collections2.filter(knownSones, new Predicate<Sone>() {
+
 				/**
 				 * {@inheritDoc}
 				 */
 				@Override
-				public boolean filterObject(Sone sone) {
+				public boolean apply(Sone sone) {
 					return sone.isKnown();
 				}
 			});
+		} else if ("own".equals(filter)) {
+			knownSones = Collections2.filter(knownSones, Sone.LOCAL_SONE_FILTER);
+		} else if ("not-own".equals(filter)) {
+			knownSones = Collections2.filter(knownSones, Predicates.not(Sone.LOCAL_SONE_FILTER));
 		}
+		List<Sone> sortedSones = new ArrayList<Sone>(knownSones);
 		if ("activity".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
-				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.LAST_ACTIVITY_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.LAST_ACTIVITY_COMPARATOR).reverse());
 			} else {
-				Collections.sort(knownSones, Sone.LAST_ACTIVITY_COMPARATOR);
+				Collections.sort(sortedSones, Sone.LAST_ACTIVITY_COMPARATOR);
 			}
 		} else if ("posts".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
-				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.POST_COUNT_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.POST_COUNT_COMPARATOR).reverse());
 			} else {
-				Collections.sort(knownSones, Sone.POST_COUNT_COMPARATOR);
+				Collections.sort(sortedSones, Sone.POST_COUNT_COMPARATOR);
 			}
 		} else if ("images".equals(sortField)) {
 			if ("asc".equals(sortOrder)) {
-				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.IMAGE_COUNT_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.IMAGE_COUNT_COMPARATOR).reverse());
 			} else {
-				Collections.sort(knownSones, Sone.IMAGE_COUNT_COMPARATOR);
+				Collections.sort(sortedSones, Sone.IMAGE_COUNT_COMPARATOR);
 			}
 		} else {
 			if ("desc".equals(sortOrder)) {
-				Collections.sort(knownSones, new ReverseComparator<Sone>(Sone.NICE_NAME_COMPARATOR));
+				Collections.sort(sortedSones, Ordering.from(Sone.NICE_NAME_COMPARATOR).reverse());
 			} else {
-				Collections.sort(knownSones, Sone.NICE_NAME_COMPARATOR);
+				Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);
 			}
 		}
-		Pagination<Sone> sonePagination = new Pagination<Sone>(knownSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(sortedSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", sonePagination);
 		templateContext.set("knownSones", sonePagination.getItems());
 	}

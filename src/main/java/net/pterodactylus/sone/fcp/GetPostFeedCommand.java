@@ -1,5 +1,5 @@
 /*
- * Sone - GetPostFeedCommand.java - Copyright © 2011–2012 David Roden
+ * Sone - GetPostFeedCommand.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,16 +18,19 @@
 package net.pterodactylus.sone.fcp;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
-import net.pterodactylus.util.collection.filter.Filters;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
+
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -58,16 +61,17 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		int startPost = getInt(parameters, "StartPost", 0);
 		int maxPosts = getInt(parameters, "MaxPosts", -1);
 
-		Set<Post> allPosts = new HashSet<Post>();
+		Collection<Post> allPosts = new HashSet<Post>();
 		allPosts.addAll(sone.getPosts());
 		for (String friendSoneId : sone.getFriends()) {
-			if (!getCore().hasSone(friendSoneId)) {
+			Optional<Sone> friendSone = getCore().getSone(friendSoneId);
+			if (!friendSone.isPresent()) {
 				continue;
 			}
-			allPosts.addAll(getCore().getSone(friendSoneId, false).getPosts());
+			allPosts.addAll(friendSone.get().getPosts());
 		}
-		allPosts.addAll(getCore().getDirectedPosts(sone));
-		allPosts = Filters.filteredSet(allPosts, Post.FUTURE_POSTS_FILTER);
+		allPosts.addAll(getCore().getDirectedPosts(sone.getId()));
+		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
 
 		List<Post> sortedPosts = new ArrayList<Post>(allPosts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);

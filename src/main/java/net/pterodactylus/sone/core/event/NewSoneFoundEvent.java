@@ -1,5 +1,5 @@
 /*
- * Sone - SoneProvider.java - Copyright © 2011–2012 David Roden
+ * Sone - NewSoneFoundEvent.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,29 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.core.event;
 
 import net.pterodactylus.sone.data.Sone;
 
 /**
- * Interface for objects that can provide {@link Sone}s by their ID.
+ * Event that signals that a new remote Sone was found.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface SoneProvider {
+public class NewSoneFoundEvent extends SoneEvent {
 
 	/**
-	 * Returns the Sone with the given ID, if it exists. If it does not exist
-	 * and {@code create} is {@code false}, {@code null} is returned; otherwise,
-	 * a new Sone with the given ID is created and returned.
+	 * Creates a new “new Sone found” event.
 	 *
-	 * @param soneId
-	 *            The ID of the Sone to return
-	 * @param create
-	 *            {@code true} to create a new Sone if no Sone with the given ID
-	 *            exists, {@code false} to return {@code null} instead
-	 * @return The Sone with the given ID, or {@code null}
+	 * @param sone
+	 *            The Sone that was found
 	 */
-	public Sone getSone(String soneId, boolean create);
+	public NewSoneFoundEvent(Sone sone) {
+		super(sone);
+	}
 
 }

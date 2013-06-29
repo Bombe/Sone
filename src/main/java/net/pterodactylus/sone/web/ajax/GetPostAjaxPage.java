@@ -1,5 +1,5 @@
 /*
- * Sone - GetPostAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - GetPostAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 package net.pterodactylus.sone.web.ajax;
 
 import java.io.StringWriter;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
@@ -59,11 +61,11 @@ public class GetPostAjaxPage extends JsonPage {
 	@Override
 	protected JsonObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
-		Post post = webInterface.getCore().getPost(postId, false);
-		if (post == null) {
+		Optional<Post> post = webInterface.getCore().getPost(postId);
+		if (!post.isPresent()) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		return createSuccessJsonObject().put("post", createJsonPost(request, post, getCurrentSone(request.getToadletContext())));
+		return createSuccessJsonObject().put("post", createJsonPost(request, post.get(), getCurrentSone(request.getToadletContext())));
 	}
 
 	/**
@@ -94,7 +96,7 @@ public class GetPostAjaxPage extends JsonPage {
 		JsonObject jsonPost = new JsonObject();
 		jsonPost.put("id", post.getId());
 		jsonPost.put("sone", post.getSone().getId());
-		jsonPost.put("recipient", (post.getRecipient() == null) ? null : post.getRecipient().getId());
+		jsonPost.put("recipient", post.getRecipientId().orNull());
 		jsonPost.put("time", post.getTime());
 		StringWriter stringWriter = new StringWriter();
 		TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext();

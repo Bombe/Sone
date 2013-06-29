@@ -1,5 +1,5 @@
 /*
- * Sone - CreatePostPage.java - Copyright © 2010–2012 David Roden
+ * Sone - CreatePostPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,8 @@
  */
 
 package net.pterodactylus.sone.web;
+
+import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
@@ -65,7 +67,7 @@ public class CreatePostPage extends SoneTemplatePage {
 				if (sender == null) {
 					sender = currentSone;
 				}
-				Sone recipient = webInterface.getCore().getSone(recipientId, false);
+				Optional<Sone> recipient = webInterface.getCore().getSone(recipientId);
 				text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
 				webInterface.getCore().createPost(sender, recipient, System.currentTimeMillis(), text);
 				throw new RedirectException(returnPage);

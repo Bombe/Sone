@@ -1,5 +1,5 @@
 /*
- * Sone - SoneTextParserTest.java - Copyright © 2011–2012 David Roden
+ * Sone - SoneTextParserTest.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,10 +20,13 @@ package net.pterodactylus.sone.text;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
+import java.util.Collection;
+
+import com.google.common.base.Optional;
 
 import junit.framework.TestCase;
-import net.pterodactylus.sone.core.SoneProvider;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * JUnit test case for {@link SoneTextParser}.
@@ -181,8 +184,8 @@ public class SoneTextParserTest extends TestCase {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public Sone getSone(final String soneId, boolean create) {
-			return new Sone(soneId) {
+		public Optional<Sone> getSone(final String soneId) {
+			return Optional.<Sone> fromNullable(new Sone(soneId, false) {
 
 				/**
 				 * {@inheritDoc}
@@ -191,7 +194,31 @@ public class SoneTextParserTest extends TestCase {
 				public String getName() {
 					return soneId;
 				}
-			};
+			});
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getSones() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getLocalSones() {
+			return null;
+		}
+
+		/**
+		 * {@inheritDocs}
+		 */
+		@Override
+		public Collection<Sone> getRemoteSones() {
+			return null;
 		}
 
 	}

@@ -48,6 +48,8 @@
 						<%/if>
 						<option value="new"<%if filter|match value=="new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.New|l10n|html></option>
 						<option value="not-new"<%if filter|match value=="not-new"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotNew|l10n|html></option>
+						<option value="own"<%if filter|match value=="own"> selected="selected"<%/if>><%= Page.KnownSones.Filter.Own|l10n|html></option>
+						<option value="not-own"<%if filter|match value=="not-own"> selected="selected"<%/if>><%= Page.KnownSones.Filter.NotOwn|l10n|html></option>
 					</select>
 				</div>
 			<%/if>

@@ -1,5 +1,5 @@
 /*
- * Sone - Profile.java - Copyright © 2010–2012 David Roden
+ * Sone - Profile.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,17 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import net.pterodactylus.util.validation.Validation;
+import com.google.common.hash.Hasher;
+import com.google.common.hash.Hashing;
 
 /**
  * A profile stores personal information about a {@link Sone}. All information
@@ -237,7 +242,7 @@ public class Profile implements Fingerprintable {
 			this.avatar = null;
 			return this;
 		}
-		Validation.begin().isEqual("Image Owner", avatar.getSone(), sone).check();
+		checkArgument(avatar.getSone().equals(sone), "avatar must belong to Sone");
 		this.avatar = avatar.getId();
 		return this;
 	}
@@ -283,7 +288,7 @@ public class Profile implements Fingerprintable {
 	 *         field with the given ID
 	 */
 	public Field getFieldById(String fieldId) {
-		Validation.begin().isNotNull("Field ID", fieldId).check();
+		checkNotNull(fieldId, "fieldId must not be null");
 		for (Field field : fields) {
 			if (field.getId().equals(fieldId)) {
 				return field;
@@ -319,7 +324,9 @@ public class Profile implements Fingerprintable {
 	 *             if the name is not valid
 	 */
 	public Field addField(String fieldName) throws IllegalArgumentException {
-		Validation.begin().isNotNull("Field Name", fieldName).check().isGreater("Field Name Length", fieldName.length(), 0).isNull("Field Name Unique", getFieldByName(fieldName)).check();
+		checkNotNull(fieldName, "fieldName must not be null");
+		checkArgument(fieldName.length() > 0, "fieldName must not be empty");
+		checkState(getFieldByName(fieldName) == null, "fieldName must be unique");
 		@SuppressWarnings("synthetic-access")
 		Field field = new Field().setName(fieldName);
 		fields.add(field);
@@ -335,7 +342,9 @@ public class Profile implements Fingerprintable {
 	 *            The field to move up
 	 */
 	public void moveFieldUp(Field field) {
-		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isGreater("Field Index", getFieldIndex(field), 0).check();
+		checkNotNull(field, "field must not be null");
+		checkArgument(hasField(field), "field must belong to this profile");
+		checkArgument(getFieldIndex(field) > 0, "field index must be > 0");
 		int fieldIndex = getFieldIndex(field);
 		fields.remove(field);
 		fields.add(fieldIndex - 1, field);
@@ -350,7 +359,9 @@ public class Profile implements Fingerprintable {
 	 *            The field to move down
 	 */
 	public void moveFieldDown(Field field) {
-		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).isLess("Field Index", getFieldIndex(field), fields.size() - 1).check();
+		checkNotNull(field, "field must not be null");
+		checkArgument(hasField(field), "field must belong to this profile");
+		checkArgument(getFieldIndex(field) < fields.size() - 1, "field index must be < " + (fields.size() - 1));
 		int fieldIndex = getFieldIndex(field);
 		fields.remove(field);
 		fields.add(fieldIndex + 1, field);
@@ -363,7 +374,8 @@ public class Profile implements Fingerprintable {
 	 *            The field to remove
 	 */
 	public void removeField(Field field) {
-		Validation.begin().isNotNull("Field", field).check().is("Field Existing", hasField(field)).check();
+		checkNotNull(field, "field must not be null");
+		checkArgument(hasField(field), "field must belong to this profile");
 		fields.remove(field);
 	}
 
@@ -392,37 +404,37 @@ public class Profile implements Fingerprintable {
 	 */
 	@Override
 	public String getFingerprint() {
-		StringBuilder fingerprint = new StringBuilder();
-		fingerprint.append("Profile(");
+		Hasher hash = Hashing.sha256().newHasher();
+		hash.putString("Profile(");
 		if (firstName != null) {
-			fingerprint.append("FirstName(").append(firstName).append(')');
+			hash.putString("FirstName(").putString(firstName).putString(")");
 		}
 		if (middleName != null) {
-			fingerprint.append("MiddleName(").append(middleName).append(')');
+			hash.putString("MiddleName(").putString(middleName).putString(")");
 		}
 		if (lastName != null) {
-			fingerprint.append("LastName(").append(lastName).append(')');
+			hash.putString("LastName(").putString(lastName).putString(")");
 		}
 		if (birthDay != null) {
-			fingerprint.append("BirthDay(").append(birthDay).append(')');
+			hash.putString("BirthDay(").putInt(birthDay).putString(")");
 		}
 		if (birthMonth != null) {
-			fingerprint.append("BirthMonth(").append(birthMonth).append(')');
+			hash.putString("BirthMonth(").putInt(birthMonth).putString(")");
 		}
 		if (birthYear != null) {
-			fingerprint.append("BirthYear(").append(birthYear).append(')');
+			hash.putString("BirthYear(").putInt(birthYear).putString(")");
 		}
 		if (avatar != null) {
-			fingerprint.append("Avatar(").append(avatar).append(')');
+			hash.putString("Avatar(").putString(avatar).putString(")");
 		}
-		fingerprint.append("ContactInformation(");
+		hash.putString("ContactInformation(");
 		for (Field field : fields) {
-			fingerprint.append(field.getName()).append('(').append(field.getValue()).append(')');
+			hash.putString(field.getName()).putString("(").putString(field.getValue()).putString(")");
 		}
-		fingerprint.append(")");
-		fingerprint.append(")");
+		hash.putString(")");
+		hash.putString(")");
 
-		return fingerprint.toString();
+		return hash.hash().toString();
 	}
 
 	/**
@@ -455,8 +467,7 @@ public class Profile implements Fingerprintable {
 		 *            The ID of the field
 		 */
 		private Field(String id) {
-			Validation.begin().isNotNull("Field ID", id).check();
-			this.id = id;
+			this.id = checkNotNull(id, "id must not be null");
 		}
 
 		/**
@@ -487,7 +498,8 @@ public class Profile implements Fingerprintable {
 		 * @return This field
 		 */
 		public Field setName(String name) {
-			Validation.begin().isNotNull("Field Name", name).check().is("Field Unique", (getFieldByName(name) == null) || equals(getFieldByName(name))).check();
+			checkNotNull(name, "name must not be null");
+			checkArgument(getFieldByName(name) == null, "name must be unique");
 			this.name = name;
 			return this;
 		}

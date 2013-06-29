@@ -1,5 +1,5 @@
 /*
- * Sone - WebOfTrustConnector.java - Copyright © 2010–2012 David Roden
+ * Sone - WebOfTrustConnector.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.freenet.plugin.ConnectorListener;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
+import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
+
+import com.google.common.collect.MapMaker;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -52,6 +57,9 @@ public class WebOfTrustConnector {
 	/** The plugin connector. */
 	private final PluginConnector pluginConnector;
 
+	/** Map for replies. */
+	private final Map<PluginIdentifier, Reply> replies = new MapMaker().makeMap();
+
 	/**
 	 * Creates a new Web of Trust connector that uses the given plugin
 	 * connector.
@@ -59,6 +67,7 @@ public class WebOfTrustConnector {
 	 * @param pluginConnector
 	 *            The plugin connector
 	 */
+	@Inject
 	public WebOfTrustConnector(PluginConnector pluginConnector) {
 		this.pluginConnector = pluginConnector;
 	}
@@ -380,24 +389,12 @@ public class WebOfTrustConnector {
 	 *             if the request could not be sent
 	 */
 	private Reply performRequest(SimpleFieldSet fields, Bucket data) throws PluginException {
-		final String identifier = "FCP-Command-" + System.currentTimeMillis() + "-" + counter.getAndIncrement();
-		final Reply reply = new Reply();
-		logger.log(Level.FINE, String.format("Sending FCP Request: %s", fields.get("Message")));
-		ConnectorListener connectorListener = new ConnectorListener() {
+		String identifier = "FCP-Command-" + System.currentTimeMillis() + "-" + counter.getAndIncrement();
+		Reply reply = new Reply();
+		PluginIdentifier pluginIdentifier = new PluginIdentifier(WOT_PLUGIN_NAME, identifier);
+		replies.put(pluginIdentifier, reply);
 
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void receivedReply(PluginConnector pluginConnector, SimpleFieldSet fields, Bucket data) {
-				String messageName = fields.get("Message");
-				logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", messageName));
-				synchronized (reply) {
-					reply.setFields(fields);
-					reply.setData(data);
-					reply.notify();
-				}
-			}
-		};
-		pluginConnector.addConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
+		logger.log(Level.FINE, String.format("Sending FCP Request: %s", fields.get("Message")));
 		synchronized (reply) {
 			try {
 				pluginConnector.sendRequest(WOT_PLUGIN_NAME, identifier, fields, data);
@@ -409,7 +406,7 @@ public class WebOfTrustConnector {
 					}
 				}
 			} finally {
-				pluginConnector.removeConnectorListener(WOT_PLUGIN_NAME, identifier, connectorListener);
+				replies.remove(pluginIdentifier);
 			}
 		}
 		logger.log(Level.FINEST, String.format("Received FCP Response for %s: %s", fields.get("Message"), (reply.getFields() != null) ? reply.getFields().get("Message") : null));
@@ -417,6 +414,27 @@ public class WebOfTrustConnector {
 			throw new PluginException("Could not perform request for " + fields.get("Message"));
 		}
 		return reply;
+	}
+
+	/**
+	 * Notifies the connector that a plugin reply was received.
+	 *
+	 * @param receivedReplyEvent
+	 *            The event
+	 */
+	@Subscribe
+	public void receivedReply(ReceivedReplyEvent receivedReplyEvent) {
+		PluginIdentifier pluginIdentifier = new PluginIdentifier(receivedReplyEvent.pluginName(), receivedReplyEvent.identifier());
+		Reply reply = replies.remove(pluginIdentifier);
+		if (reply == null) {
+			return;
+		}
+		logger.log(Level.FINEST, String.format("Received Reply from Plugin: %s", receivedReplyEvent.fieldSet().get("Message")));
+		synchronized (reply) {
+			reply.setFields(receivedReplyEvent.fieldSet());
+			reply.setData(receivedReplyEvent.data());
+			reply.notify();
+		}
 	}
 
 	/**
@@ -550,6 +568,59 @@ public class WebOfTrustConnector {
 		public static SimpleFieldSetConstructor create(boolean shortLived) {
 			SimpleFieldSetConstructor simpleFieldSetConstructor = new SimpleFieldSetConstructor(shortLived);
 			return simpleFieldSetConstructor;
+		}
+
+	}
+
+	/**
+	 * Container for identifying plugins. Plugins are identified by their plugin
+	 * name and their unique identifier.
+	 *
+	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
+	 */
+	private static class PluginIdentifier {
+
+		/** The plugin name. */
+		private final String pluginName;
+
+		/** The plugin identifier. */
+		private final String identifier;
+
+		/**
+		 * Creates a new plugin identifier.
+		 *
+		 * @param pluginName
+		 *            The name of the plugin
+		 * @param identifier
+		 *            The identifier of the plugin
+		 */
+		public PluginIdentifier(String pluginName, String identifier) {
+			this.pluginName = pluginName;
+			this.identifier = identifier;
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public int hashCode() {
+			return pluginName.hashCode() ^ identifier.hashCode();
+		}
+
+		/**
+		 * {@inheritDoc}
+		 */
+		@Override
+		public boolean equals(Object object) {
+			if (!(object instanceof PluginIdentifier)) {
+				return false;
+			}
+			PluginIdentifier pluginIdentifier = (PluginIdentifier) object;
+			return pluginName.equals(pluginIdentifier.pluginName) && identifier.equals(pluginIdentifier.identifier);
 		}
 
 	}

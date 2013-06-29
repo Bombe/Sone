@@ -1,5 +1,5 @@
 /*
- * Sone - DeletePostCommand.java - Copyright © 2011–2012 David Roden
+ * Sone - DeletePostCommand.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ public class DeletePostCommand extends AbstractSoneCommand {
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
 		Post post = getPost(parameters, "Post");
-		if (!getCore().isLocalSone(post.getSone())) {
+		if (!post.getSone().isLocal()) {
 			return new ErrorResponse(401, "Not allowed.");
 		}
 		return new Response("PostDeleted", new SimpleFieldSetBuilder().get());

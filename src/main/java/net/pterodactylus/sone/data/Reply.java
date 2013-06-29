@@ -1,5 +1,5 @@
 /*
- * Sone - Reply.java - Copyright © 2011–2012 David Roden
+ * Sone - Reply.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,21 +18,20 @@
 package net.pterodactylus.sone.data;
 
 import java.util.Comparator;
-import java.util.UUID;
 
-import net.pterodactylus.util.collection.filter.Filter;
+import com.google.common.base.Predicate;
 
 /**
- * Abstract base class for all replies.
+ * Defines methods common for all replies.
  *
  * @param <T>
  *            The type of the reply
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class Reply<T extends Reply<T>> {
+public interface Reply<T extends Reply<T>> {
 
 	/** Comparator that sorts replies ascending by time. */
-	public static final Comparator<Reply<?>> TIME_COMPARATOR = new Comparator<Reply<?>>() {
+	public static final Comparator<? super Reply<?>> TIME_COMPARATOR = new Comparator<Reply<?>>() {
 
 		/**
 		 * {@inheritDoc}
@@ -45,159 +44,52 @@ public abstract class Reply<T extends Reply<T>> {
 	};
 
 	/** Filter for replies with timestamps from the future. */
-	public static final Filter<Reply<?>> FUTURE_REPLY_FILTER = new Filter<Reply<?>>() {
+	public static final Predicate<Reply<?>> FUTURE_REPLY_FILTER = new Predicate<Reply<?>>() {
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public boolean filterObject(Reply<?> reply) {
+		public boolean apply(Reply<?> reply) {
 			return reply.getTime() <= System.currentTimeMillis();
 		}
 
 	};
-
-	/** The ID of the reply. */
-	private final String id;
-
-	/** The Sone that created this reply. */
-	private volatile Sone sone;
-
-	/** The time of the reply. */
-	private volatile long time;
-
-	/** The text of the reply. */
-	private volatile String text;
-
-	/** Whether the reply is known. */
-	private volatile boolean known;
-
-	/**
-	 * Creates a new reply with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the reply
-	 */
-	protected Reply(String id) {
-		this(id, null, 0, null);
-	}
-
-	/**
-	 * Creates a new reply with a new random ID.
-	 *
-	 * @param sone
-	 *            The Sone of the reply
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	protected Reply(Sone sone, long time, String text) {
-		this(UUID.randomUUID().toString(), sone, time, text);
-	}
-
-	/**
-	 * Creates a new reply.
-	 *
-	 * @param id
-	 *            The ID of the reply
-	 * @param sone
-	 *            The Sone of the reply
-	 * @param time
-	 *            The time of the reply
-	 * @param text
-	 *            The text of the reply
-	 */
-	protected Reply(String id, Sone sone, long time, String text) {
-		this.id = id;
-		this.sone = sone;
-		this.time = time;
-		this.text = text;
-	}
 
 	/**
 	 * Returns the ID of the reply.
 	 *
 	 * @return The ID of the reply
 	 */
-	public String getId() {
-		return id;
-	}
+	public String getId();
 
 	/**
 	 * Returns the Sone that posted this reply.
 	 *
 	 * @return The Sone that posted this reply
 	 */
-	public Sone getSone() {
-		return sone;
-	}
-
-	/**
-	 * Sets the Sone that posted this reply.
-	 *
-	 * @param sone
-	 *            The Sone that posted this reply
-	 * @return This reply (for method chaining)
-	 */
-	@SuppressWarnings("unchecked")
-	public T setSone(Sone sone) {
-		this.sone = sone;
-		return (T) this;
-	}
+	public Sone getSone();
 
 	/**
 	 * Returns the time of the reply.
 	 *
 	 * @return The time of the reply (in milliseconds since Jan 1, 1970 UTC)
 	 */
-	public long getTime() {
-		return time;
-	}
-
-	/**
-	 * Sets the time of this reply.
-	 *
-	 * @param time
-	 *            The time of this reply (in milliseconds since Jan 1, 1970 UTC)
-	 * @return This reply (for method chaining)
-	 */
-	@SuppressWarnings("unchecked")
-	public T setTime(long time) {
-		this.time = time;
-		return (T) this;
-	}
+	public long getTime();
 
 	/**
 	 * Returns the text of the reply.
 	 *
 	 * @return The text of the reply
 	 */
-	public String getText() {
-		return text;
-	}
-
-	/**
-	 * Sets the text of this reply.
-	 *
-	 * @param text
-	 *            The text of this reply
-	 * @return This reply (for method chaining)
-	 */
-	@SuppressWarnings("unchecked")
-	public T setText(String text) {
-		this.text = text;
-		return (T) this;
-	}
+	public String getText();
 
 	/**
 	 * Returns whether this reply is known.
 	 *
 	 * @return {@code true} if this reply is known, {@code false} otherwise
 	 */
-	public boolean isKnown() {
-		return known;
-	}
+	public boolean isKnown();
 
 	/**
 	 * Sets whether this reply is known.
@@ -206,42 +98,6 @@ public abstract class Reply<T extends Reply<T>> {
 	 *            {@code true} if this reply is known, {@code false} otherwise
 	 * @return This reply
 	 */
-	@SuppressWarnings("unchecked")
-	public T setKnown(boolean known) {
-		this.known = known;
-		return (T) this;
-	}
-
-	//
-	// OBJECT METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public int hashCode() {
-		return id.hashCode();
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean equals(Object object) {
-		if (!(object instanceof Reply<?>)) {
-			return false;
-		}
-		Reply<?> reply = (Reply<?>) object;
-		return reply.id.equals(id);
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public String toString() {
-		return getClass().getName() + "[id=" + id + ",sone=" + sone + ",time=" + time + ",text=" + text + "]";
-	}
+	public T setKnown(boolean known);
 
 }

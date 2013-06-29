@@ -1,5 +1,5 @@
 /*
- * FreenetSone - WebInterface.java - Copyright © 2010–2012 David Roden
+ * Sone - EditImagePage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,12 +60,12 @@ public class EditImagePage extends SoneTemplatePage {
 			if (image == null) {
 				throw new RedirectException("invalid.html");
 			}
-			if (!webInterface.getCore().isLocalSone(image.getSone())) {
+			if (!image.getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {
 				image.getAlbum().moveImageUp(image);
-			} else  if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
+			} else if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
 				image.getAlbum().moveImageDown(image);
 			} else {
 				String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();

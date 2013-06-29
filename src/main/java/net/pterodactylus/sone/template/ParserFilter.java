@@ -1,5 +1,5 @@
 /*
- * Sone - ParserFilter.java - Copyright © 2011–2012 David Roden
+ * Sone - ParserFilter.java - Copyright © 2011–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -94,7 +94,7 @@ public class ParserFilter implements Filter {
 		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("cut-off-length"))), length));
 		Object sone = parameters.get("sone");
 		if (sone instanceof String) {
-			sone = core.getSone((String) sone, false);
+			sone = core.getSone((String) sone);
 		}
 		FreenetRequest request = (FreenetRequest) templateContext.get("request");
 		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);

@@ -34,6 +34,7 @@ import net.pterodactylus.sone.freenet.fcp.FcpException;
 
 import freenet.support.SimpleFieldSet;
 
+import com.google.common.base.Optional;
 import org.junit.Test;
 
 /**
@@ -47,8 +48,9 @@ public class LockSoneCommandTest {
 	public void testLockingALocalSone() throws FcpException {
 		Sone localSone = mock(Sone.class);
 		when(localSone.getId()).thenReturn("LocalSone");
+		when(localSone.isLocal()).thenReturn(true);
 		Core core = mock(Core.class);
-		when(core.getSone(eq("LocalSone"), anyBoolean())).thenReturn(localSone);
+		when(core.getSone(eq("LocalSone"))).thenReturn(Optional.of(localSone));
 		when(core.getLocalSone(eq("LocalSone"), anyBoolean())).thenReturn(localSone);
 		SimpleFieldSet fields = new SimpleFieldSetBuilder().put("Sone", "LocalSone").get();
 
@@ -66,7 +68,7 @@ public class LockSoneCommandTest {
 	public void testLockingARemoteSone() throws FcpException {
 		Sone removeSone = mock(Sone.class);
 		Core core = mock(Core.class);
-		when(core.getSone(eq("RemoteSone"), anyBoolean())).thenReturn(removeSone);
+		when(core.getSone(eq("RemoteSone"))).thenReturn(Optional.of(removeSone));
 		SimpleFieldSet fields = new SimpleFieldSetBuilder().put("Sone", "RemoteSone").get();
 
 		LockSoneCommand lockSoneCommand = new LockSoneCommand(core);

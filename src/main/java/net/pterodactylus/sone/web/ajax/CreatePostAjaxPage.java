@@ -1,5 +1,5 @@
 /*
- * Sone - CreatePostAjaxPage.java - Copyright © 2010–2012 David Roden
+ * Sone - CreatePostAjaxPage.java - Copyright © 2010–2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@ import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.json.JsonObject;
+
+import com.google.common.base.Optional;
 
 /**
  * AJAX handler that creates a new post.
@@ -51,7 +53,7 @@ public class CreatePostAjaxPage extends JsonPage {
 			return createErrorJsonObject("auth-required");
 		}
 		String recipientId = request.getHttpRequest().getParam("recipient");
-		Sone recipient = webInterface.getCore().getSone(recipientId, false);
+		Optional<Sone> recipient = webInterface.getCore().getSone(recipientId);
 		String senderId = request.getHttpRequest().getParam("sender");
 		Sone sender = webInterface.getCore().getLocalSone(senderId, false);
 		if (sender == null) {
@@ -63,7 +65,7 @@ public class CreatePostAjaxPage extends JsonPage {
 		}
 		text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
 		Post newPost = webInterface.getCore().createPost(sender, recipient, text);
-		return createSuccessJsonObject().put("postId", newPost.getId()).put("sone", sender.getId()).put("recipient", (newPost.getRecipient() != null) ? newPost.getRecipient().getId() : null);
+		return createSuccessJsonObject().put("postId", newPost.getId()).put("sone", sender.getId()).put("recipient", newPost.getRecipientId().orNull());
 	}
 
 }
