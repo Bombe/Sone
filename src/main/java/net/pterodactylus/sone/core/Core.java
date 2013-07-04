@@ -92,7 +92,6 @@ import net.pterodactylus.util.thread.NamedThreadFactory;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
@@ -361,13 +360,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Sone> getLocalSones() {
 		synchronized (sones) {
-			return Collections2.filter(sones.values(), new Predicate<Sone>() {
+			return FluentIterable.from(sones.values()).filter(new Predicate<Sone>() {
 
 				@Override
 				public boolean apply(Sone sone) {
 					return sone.isLocal();
 				}
-			});
+			}).toSet();
 		}
 	}
 
@@ -402,13 +401,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Sone> getRemoteSones() {
 		synchronized (sones) {
-			return Collections2.filter(sones.values(), new Predicate<Sone>() {
+			return FluentIterable.from(sones.values()).filter(new Predicate<Sone>() {
 
 				@Override
 				public boolean apply(Sone sone) {
 					return !sone.isLocal();
 				}
-			});
+			}).toSet();
 		}
 	}
 
