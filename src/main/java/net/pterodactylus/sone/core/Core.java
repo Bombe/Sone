@@ -1051,6 +1051,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 			synchronized (sones) {
 				sone.setOptions(storedSone.get().getOptions());
+				sone.setKnown(storedSone.get().isKnown());
 				sones.put(sone.getId(), sone);
 			}
 		}
