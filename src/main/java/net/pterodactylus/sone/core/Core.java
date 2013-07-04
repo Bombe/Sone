@@ -334,7 +334,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Sone> getSones() {
 		synchronized (sones) {
-			return Collections.unmodifiableCollection(sones.values());
+			return ImmutableSet.copyOf(sones.values());
 		}
 	}
 
