@@ -171,7 +171,9 @@ public class IdentityManager extends AbstractService {
 			boolean identitiesLoaded = false;
 			try {
 				/* get all identities with the wanted context from WoT. */
+				logger.finer("Getting all Own Identities from WoT...");
 				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
+				logger.finest(String.format("Loaded %d Own Identities.", ownIdentities.size()));
 
 				/* load trusted identities. */
 				for (OwnIdentity ownIdentity : ownIdentities) {
@@ -188,7 +190,9 @@ public class IdentityManager extends AbstractService {
 					}
 
 					/* load trusted identities. */
+					logger.finer(String.format("Getting trusted identities for %s...", ownIdentity.getId()));
 					Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context);
+					logger.finest(String.format("Got %d trusted identities.", trustedIdentities.size()));
 					for (Identity identity : trustedIdentities) {
 						identities.put(identity.getId(), identity);
 					}
@@ -210,6 +214,7 @@ public class IdentityManager extends AbstractService {
 					/* find new identities. */
 					for (Identity currentIdentity : currentIdentities.get(ownIdentity).values()) {
 						if (!oldIdentities.containsKey(ownIdentity) || !oldIdentities.get(ownIdentity).containsKey(currentIdentity.getId())) {
+							logger.finest(String.format("Identity added for %s: %s", ownIdentity.getId(), currentIdentity));
 							eventBus.post(new IdentityAddedEvent(ownIdentity, currentIdentity));
 						}
 					}
@@ -218,6 +223,7 @@ public class IdentityManager extends AbstractService {
 					if (oldIdentities.containsKey(ownIdentity)) {
 						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
 							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
+								logger.finest(String.format("Identity removed for %s: %s", ownIdentity.getId(), oldIdentity));
 								eventBus.post(new IdentityRemovedEvent(ownIdentity, oldIdentity));
 							}
 						}
@@ -231,11 +237,13 @@ public class IdentityManager extends AbstractService {
 							Set<String> oldContexts = oldIdentity.getContexts();
 							Set<String> newContexts = newIdentity.getContexts();
 							if (oldContexts.size() != newContexts.size()) {
+								logger.finest(String.format("Contexts changed for %s: was: %s, is now: %s", ownIdentity.getId(), oldContexts, newContexts));
 								eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 								continue;
 							}
 							for (String oldContext : oldContexts) {
 								if (!newContexts.contains(oldContext)) {
+									logger.finest(String.format("Context was removed for %s: %s", ownIdentity.getId(), oldContext));
 									eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 									break;
 								}
@@ -251,11 +259,13 @@ public class IdentityManager extends AbstractService {
 							Map<String, String> oldProperties = oldIdentity.getProperties();
 							Map<String, String> newProperties = newIdentity.getProperties();
 							if (oldProperties.size() != newProperties.size()) {
+								logger.finest(String.format("Properties changed for %s: was: %s, is now: %s", ownIdentity.getId(), oldProperties, newProperties));
 								eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 								continue;
 							}
 							for (Entry<String, String> oldProperty : oldProperties.entrySet()) {
 								if (!newProperties.containsKey(oldProperty.getKey()) || !newProperties.get(oldProperty.getKey()).equals(oldProperty.getValue())) {
+									logger.finest(String.format("Property was removed for %s: %s", ownIdentity.getId(), oldProperty));
 									eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
 									break;
 								}
@@ -291,6 +301,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
 				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
 				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
+					logger.finest(String.format("Own Identity removed: %s", oldOwnIdentity));
 					eventBus.post(new OwnIdentityRemovedEvent(new DefaultOwnIdentity(oldOwnIdentity)));
 				}
 			}
@@ -299,6 +310,7 @@ public class IdentityManager extends AbstractService {
 			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
 				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
 				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
+					logger.finest(String.format("Own Identity added: %s", currentOwnIdentity));
 					eventBus.post(new OwnIdentityAddedEvent(new DefaultOwnIdentity(currentOwnIdentity)));
 				}
 			}
