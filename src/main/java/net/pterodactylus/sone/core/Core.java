@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -95,6 +94,10 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -183,7 +186,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final Set<String> bookmarkedPosts = new HashSet<String>();
 
 	/** Trusted identities, sorted by own identities. */
-	private final Map<OwnIdentity, Set<Identity>> trustedIdentities = Collections.synchronizedMap(new HashMap<OwnIdentity, Set<Identity>>());
+	private final Multimap<OwnIdentity, Identity> trustedIdentities = Multimaps.synchronizedSetMultimap(HashMultimap.<OwnIdentity, Identity>create());
 
 	/** All known albums. */
 	private final Map<String, Album> albums = new HashMap<String, Album>();
@@ -469,7 +472,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(origin, "origin must not be null");
 		checkNotNull(target, "target must not be null");
 		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin’s identity must be an OwnIdentity");
-		return trustedIdentities.containsKey(origin.getIdentity()) && trustedIdentities.get(origin.getIdentity()).contains(target.getIdentity());
+		return trustedIdentities.containsEntry(origin.getIdentity(), target.getIdentity());
 	}
 
 	/**
@@ -751,7 +754,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
-			trustedIdentities.put(ownIdentity, Collections.synchronizedSet(new HashSet<Identity>()));
 			sones.put(ownIdentity.getId(), sone);
 			final SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, sone);
 			soneInserters.put(sone, soneInserter);
@@ -2123,7 +2125,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void ownIdentityRemoved(OwnIdentityRemovedEvent ownIdentityRemovedEvent) {
 		OwnIdentity ownIdentity = ownIdentityRemovedEvent.ownIdentity();
 		logger.log(Level.FINEST, String.format("Removing OwnIdentity: %s", ownIdentity));
-		trustedIdentities.remove(ownIdentity);
+		trustedIdentities.removeAll(ownIdentity);
 	}
 
 	/**
@@ -2136,7 +2138,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void identityAdded(IdentityAddedEvent identityAddedEvent) {
 		Identity identity = identityAddedEvent.identity();
 		logger.log(Level.FINEST, String.format("Adding Identity: %s", identity));
-		trustedIdentities.get(identityAddedEvent.ownIdentity()).add(identity);
+		trustedIdentities.put(identityAddedEvent.ownIdentity(), identity);
 		addRemoteSone(identity);
 	}
 
@@ -2173,9 +2175,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void identityRemoved(IdentityRemovedEvent identityRemovedEvent) {
 		OwnIdentity ownIdentity = identityRemovedEvent.ownIdentity();
 		Identity identity = identityRemovedEvent.identity();
-		trustedIdentities.get(ownIdentity).remove(identity);
+		trustedIdentities.remove(ownIdentity, identity);
 		boolean foundIdentity = false;
-		for (Entry<OwnIdentity, Set<Identity>> trustedIdentity : trustedIdentities.entrySet()) {
+		for (Entry<OwnIdentity, Collection<Identity>> trustedIdentity : trustedIdentities.asMap().entrySet()) {
 			if (trustedIdentity.getKey().equals(ownIdentity)) {
 				continue;
 			}
