@@ -802,7 +802,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		synchronized (sones) {
-			final Sone sone = getRemoteSone(identity.getId(), true).setIdentity(identity);
+			final Sone sone = getRemoteSone(identity.getId(), true);
+			if (sone.isLocal()) {
+				return sone;
+			}
+			sone.setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
 			sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
 			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
