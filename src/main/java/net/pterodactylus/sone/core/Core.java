@@ -741,6 +741,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, "Given OwnIdentity is null!");
 			return null;
 		}
+		logger.info(String.format("Adding Sone from OwnIdentity: %s", ownIdentity));
 		synchronized (sones) {
 			final Sone sone;
 			try {
@@ -1116,6 +1117,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.FINE, String.format("Tried to load non-local Sone: %s", sone));
 			return;
 		}
+		logger.info(String.format("Loading local Sone: %s", sone));
 
 		/* initialize options. */
 		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
@@ -1327,6 +1329,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		for (PostReply reply : replies) {
 			reply.setKnown(true);
 		}
+
+		logger.info(String.format("Sone loaded successfully: %s", sone));
 	}
 
 	/**
