@@ -420,8 +420,8 @@
 				<%last><%= true|store key==endRow><%/last>
 				<%if endRow>
 					</div>
-					<%include include/pagination.html pageParameter=="page">
 				<%/if>
+                <%last><%include include/pagination.html pageParameter=="page"><%/last>
 			<%/foreach>
 
 			<%if album.sone.local>
