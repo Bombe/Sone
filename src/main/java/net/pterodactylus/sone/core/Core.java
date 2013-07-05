@@ -2165,6 +2165,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			@SuppressWarnings("synthetic-access")
 			public void run() {
 				Sone sone = getRemoteSone(identity.getId(), false);
+				if (sone.isLocal()) {
+					return;
+				}
 				sone.setIdentity(identity);
 				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 				soneDownloader.addSone(sone);
