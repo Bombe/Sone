@@ -20,6 +20,7 @@ package net.pterodactylus.sone.data;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,6 +31,7 @@ import java.util.UUID;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.FluentIterable;
@@ -64,6 +66,24 @@ public class Album implements Fingerprintable {
 				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
 			}
 			return albums;
+		}
+	};
+
+	/**
+	 * Filter that removes all albums that do not have any images in any album
+	 * below it.
+	 */
+	public static final Predicate<Album> NOT_EMPTY = new Predicate<Album>() {
+
+		@Override
+		public boolean apply(Album album) {
+			return FluentIterable.from(asList(album)).transformAndConcat(FLATTENER).anyMatch(new Predicate<Album>() {
+
+				@Override
+				public boolean apply(Album album) {
+					return !album.getImages().isEmpty();
+				}
+			});
 		}
 	};
 
