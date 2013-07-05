@@ -19,6 +19,8 @@ package net.pterodactylus.sone.web;
 
 import static net.pterodactylus.sone.data.Album.FLATTENER;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
+import static net.pterodactylus.sone.data.Album.TITLE_COMPARATOR;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -94,7 +96,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			for (Sone sone : webInterface.getCore().getSones()) {
 				albums.addAll(FluentIterable.from(sone.getAlbums()).transformAndConcat(FLATTENER).filter(NOT_EMPTY).toList());
 			}
-			Collections.sort(albums, Album.TITLE_COMPARATOR);
+			Collections.sort(albums, TITLE_COMPARATOR);
 			Pagination<Album> albumPagination = new Pagination<Album>(albums, 12).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
 			templateContext.set("albumPagination", albumPagination);
 			templateContext.set("albums", albumPagination.getItems());
