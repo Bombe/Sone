@@ -1,3 +1,4 @@
+<%ifnull !currentSone>
 <form id="update-status" action="createPost.html" method="post">
 	<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 	<input type="hidden" name="returnPage" value="<% request.uri|html>" />
@@ -13,3 +14,4 @@
 	<textarea class="rip-out status-input" name="text"></textarea>
 	<button type="submit"><%= Page.Index.Button.Post|l10n|html></button>
 </form>
+<%/if>
