@@ -603,7 +603,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (bookmarkedPosts) {
 			for (String bookmarkedPostId : bookmarkedPosts) {
 				Optional<Post> post = getPost(bookmarkedPostId);
-				if (!post.isPresent()) {
+				if (post.isPresent()) {
 					posts.add(post.get());
 				}
 			}
