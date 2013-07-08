@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Maps;
 
 /**
@@ -37,6 +38,33 @@ public class JsonReturnObject {
 	 */
 	public JsonReturnObject(boolean success) {
 		this.success = success;
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns whether the request was successful.
+	 *
+	 * @return {@code true} if the request was successful, {@code false} otherwise
+	 */
+	@VisibleForTesting
+	public boolean isSuccess() {
+		return success;
+	}
+
+	/**
+	 * Returns the value stored under the given key.
+	 *
+	 * @param key
+	 * 		The key of the value to retrieve
+	 * @return The value of the key, or {@code null} if there is no value for the
+	 *         given key
+	 */
+	@VisibleForTesting
+	public JsonNode get(String key) {
+		return content.get(key);
 	}
 
 	//

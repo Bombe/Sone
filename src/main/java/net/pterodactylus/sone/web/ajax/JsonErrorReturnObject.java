@@ -5,6 +5,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
 
 /**
  * {@link JsonReturnObject} that signals an error has occured.
@@ -26,6 +27,20 @@ public class JsonErrorReturnObject extends JsonReturnObject {
 	public JsonErrorReturnObject(String error) {
 		super(false);
 		this.error = error;
+	}
+
+	//
+	// ACCESSORS
+	//
+
+	/**
+	 * Returns the error that occured.
+	 *
+	 * @return The error that occured
+	 */
+	@VisibleForTesting
+	public String getError() {
+		return error;
 	}
 
 }
