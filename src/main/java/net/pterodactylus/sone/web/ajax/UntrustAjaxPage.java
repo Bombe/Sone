@@ -23,7 +23,6 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * AJAX page that lets the user untrust a Sone.
@@ -47,7 +46,7 @@ public class UntrustAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		if (currentSone == null) {
 			return createErrorJsonObject("auth-required");

@@ -25,7 +25,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * This AJAX page create a reply.
@@ -52,7 +51,7 @@ public class CreateReplyAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
 		String text = request.getHttpRequest().getParam("text").trim();
 		String senderId = request.getHttpRequest().getParam("sender");

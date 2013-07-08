@@ -22,7 +22,6 @@ import com.google.common.base.Optional;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * AJAX page that lets a Sone follow another Sone.
@@ -45,7 +44,7 @@ public class FollowSoneAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
 		if (!sone.isPresent()) {

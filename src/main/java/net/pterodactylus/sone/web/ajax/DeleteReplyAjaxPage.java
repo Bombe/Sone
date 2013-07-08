@@ -22,7 +22,6 @@ import com.google.common.base.Optional;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * This AJAX page deletes a reply.
@@ -49,7 +48,7 @@ public class DeleteReplyAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
 		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
 		if (!reply.isPresent()) {

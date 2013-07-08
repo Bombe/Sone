@@ -30,11 +30,11 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.json.JsonObject;
-import net.pterodactylus.util.json.JsonUtils;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 
@@ -48,6 +48,9 @@ public abstract class JsonPage implements FreenetPage {
 
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(JsonPage.class);
+
+	/** The JSON serializer. */
+	private static final ObjectMapper objectMapper = new ObjectMapper();
 
 	/** The path of the page. */
 	private final String path;
@@ -140,7 +143,7 @@ public abstract class JsonPage implements FreenetPage {
 	 *            The request to handle
 	 * @return The created JSON object
 	 */
-	protected abstract JsonObject createJsonObject(FreenetRequest request);
+	protected abstract JsonReturnObject createJsonObject(FreenetRequest request);
 
 	/**
 	 * Returns whether this command needs the form password for authentication
@@ -174,8 +177,8 @@ public abstract class JsonPage implements FreenetPage {
 	 *
 	 * @return A reply signaling success
 	 */
-	protected static JsonObject createSuccessJsonObject() {
-		return new JsonObject().put("success", true);
+	protected static JsonReturnObject createSuccessJsonObject() {
+		return new JsonReturnObject(true);
 	}
 
 	/**
@@ -185,8 +188,8 @@ public abstract class JsonPage implements FreenetPage {
 	 *            The error that has occured
 	 * @return The JSON object, signalling failure and the error code
 	 */
-	protected static JsonObject createErrorJsonObject(String error) {
-		return new JsonObject().put("success", false).put("error", error);
+	protected static JsonReturnObject createErrorJsonObject(String error) {
+		return new JsonErrorReturnObject(error);
 	}
 
 	//
@@ -215,22 +218,22 @@ public abstract class JsonPage implements FreenetPage {
 	@Override
 	public Response handleRequest(FreenetRequest request, Response response) throws IOException {
 		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !request.getToadletContext().isAllowedFullAccess()) {
-			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(objectMapper.writeValueAsString(new JsonErrorReturnObject("auth-required")));
 		}
 		if (needsFormPassword()) {
 			String formPassword = request.getHttpRequest().getParam("formPassword");
 			if (!webInterface.getFormPassword().equals(formPassword)) {
-				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(objectMapper.writeValueAsString(new JsonErrorReturnObject("auth-required")));
 			}
 		}
 		if (requiresLogin()) {
 			if (getCurrentSone(request.getToadletContext(), false) == null) {
-				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(JsonUtils.format(new JsonObject().put("success", false).put("error", "auth-required")));
+				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(objectMapper.writeValueAsString(new JsonErrorReturnObject("auth-required")));
 			}
 		}
 		try {
-			JsonObject jsonObject = createJsonObject(request);
-			return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(JsonUtils.format(jsonObject));
+			JsonReturnObject jsonObject = createJsonObject(request);
+			return response.setStatusCode(200).setStatusText("OK").setContentType("application/json").write(objectMapper.writeValueAsString(jsonObject));
 		} catch (Exception e1) {
 			logger.log(Level.WARNING, "Error executing JSON page!", e1);
 			return response.setStatusCode(500).setStatusText(e1.getMessage()).setContentType("text/plain").write(dumpStackTrace(e1));

@@ -21,7 +21,6 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * Page that stores a user’s album modifications.
@@ -48,7 +47,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String albumId = request.getHttpRequest().getParam("album");
 		Album album = webInterface.getCore().getAlbum(albumId, false);
 		if (album == null) {
