@@ -21,7 +21,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * AJAX page that lets the user unlike a {@link Post}.
@@ -44,7 +43,7 @@ public class UnlikeAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String type = request.getHttpRequest().getParam("type", null);
 		String id = request.getHttpRequest().getParam(type, null);
 		if ((id == null) || (id.length() == 0)) {

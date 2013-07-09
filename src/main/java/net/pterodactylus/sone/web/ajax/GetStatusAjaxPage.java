@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
@@ -33,10 +35,11 @@ import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonArray;
-import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
@@ -65,7 +68,7 @@ public class GetStatusAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		/* load Sones. always return the status of the current Sone. */
 		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSone(request.getToadletContext(), false)));
@@ -77,13 +80,12 @@ public class GetStatusAjaxPage extends JsonPage {
 				sones.add(webInterface.getCore().getSone(soneId).orNull());
 			}
 		}
-		JsonArray jsonSones = new JsonArray();
+		ArrayNode jsonSones = new ArrayNode(instance);
 		for (Sone sone : sones) {
 			if (sone == null) {
 				continue;
 			}
-			JsonObject jsonSone = createJsonSone(sone);
-			jsonSones.add(jsonSone);
+			jsonSones.add(createJsonSone(sone));
 		}
 		/* load notifications. */
 		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
@@ -100,9 +102,9 @@ public class GetStatusAjaxPage extends JsonPage {
 
 			});
 		}
-		JsonArray jsonPosts = new JsonArray();
+		ArrayNode jsonPosts = new ArrayNode(instance);
 		for (Post post : newPosts) {
-			JsonObject jsonPost = new JsonObject();
+			ObjectNode jsonPost = new ObjectNode(instance);
 			jsonPost.put("id", post.getId());
 			jsonPost.put("sone", post.getSone().getId());
 			jsonPost.put("recipient", post.getRecipientId().orNull());
@@ -123,9 +125,9 @@ public class GetStatusAjaxPage extends JsonPage {
 		}
 		/* remove replies to unknown posts. */
 		newReplies = Collections2.filter(newReplies, PostReply.HAS_POST_FILTER);
-		JsonArray jsonReplies = new JsonArray();
+		ArrayNode jsonReplies = new ArrayNode(instance);
 		for (PostReply reply : newReplies) {
-			JsonObject jsonReply = new JsonObject();
+			ObjectNode jsonReply = new ObjectNode(instance);
 			jsonReply.put("id", reply.getId());
 			jsonReply.put("sone", reply.getSone().getId());
 			jsonReply.put("post", reply.getPostId());
@@ -162,8 +164,8 @@ public class GetStatusAjaxPage extends JsonPage {
 	 *            The Sone to convert to a JSON object
 	 * @return The JSON representation of the given Sone
 	 */
-	private JsonObject createJsonSone(Sone sone) {
-		JsonObject jsonSone = new JsonObject();
+	private JsonNode createJsonSone(Sone sone) {
+		ObjectNode jsonSone = new ObjectNode(instance);
 		jsonSone.put("id", sone.getId());
 		jsonSone.put("name", SoneAccessor.getNiceName(sone));
 		jsonSone.put("local", sone.getInsertUri() != null);
@@ -187,8 +189,8 @@ public class GetStatusAjaxPage extends JsonPage {
 	 *            The current Sone (may be {@code null})
 	 * @return The current options
 	 */
-	private static JsonObject createJsonOptions(Sone currentSone) {
-		JsonObject options = new JsonObject();
+	private static JsonNode createJsonOptions(Sone currentSone) {
+		ObjectNode options = new ObjectNode(instance);
 		if (currentSone != null) {
 			options.put("ShowNotification/NewSones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
 			options.put("ShowNotification/NewPosts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());

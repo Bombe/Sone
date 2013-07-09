@@ -17,12 +17,16 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 
 /**
  * AJAX page that lets the user delete a profile field.
@@ -45,7 +49,7 @@ public class DeleteProfileFieldAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String fieldId = request.getHttpRequest().getParam("field");
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Profile profile = currentSone.getProfile();
@@ -56,7 +60,7 @@ public class DeleteProfileFieldAjaxPage extends JsonPage {
 		profile.removeField(field);
 		currentSone.setProfile(profile);
 		webInterface.getCore().touchConfiguration();
-		return createSuccessJsonObject().put("field", new JsonObject().put("id", field.getId()));
+		return createSuccessJsonObject().put("field", new ObjectNode(instance).put("id", new TextNode(field.getId())));
 	}
 
 }

@@ -239,7 +239,7 @@ public class SoneDownloader extends AbstractService {
 			return null;
 		}
 
-		Sone sone = new Sone(originalSone.getId(), false).setIdentity(originalSone.getIdentity());
+		Sone sone = new Sone(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
 
 		SimpleXML soneXml;
 		try {

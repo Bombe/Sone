@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,8 +28,8 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
 
 /**
@@ -54,9 +56,9 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String allIds = request.getHttpRequest().getParam("posts");
-		JsonObject postTimes = new JsonObject();
+		ObjectNode postTimes = new ObjectNode(instance);
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
 			for (String id : ids) {
@@ -64,7 +66,7 @@ public class GetTimesAjaxPage extends JsonPage {
 				if (!post.isPresent()) {
 					continue;
 				}
-				JsonObject postTime = new JsonObject();
+				ObjectNode postTime = new ObjectNode(instance);
 				Time time = getTime(post.get().getTime());
 				postTime.put("timeText", time.getText());
 				postTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));
@@ -74,7 +76,7 @@ public class GetTimesAjaxPage extends JsonPage {
 				postTimes.put(id, postTime);
 			}
 		}
-		JsonObject replyTimes = new JsonObject();
+		ObjectNode replyTimes = new ObjectNode(instance);
 		allIds = request.getHttpRequest().getParam("replies");
 		if (allIds.length() > 0) {
 			String[] ids = allIds.split(",");
@@ -83,7 +85,7 @@ public class GetTimesAjaxPage extends JsonPage {
 				if (!reply.isPresent()) {
 					continue;
 				}
-				JsonObject replyTime = new JsonObject();
+				ObjectNode replyTime = new ObjectNode(instance);
 				Time time = getTime(reply.get().getTime());
 				replyTime.put("timeText", time.getText());
 				replyTime.put("refreshTime", TimeUnit.MILLISECONDS.toSeconds(time.getRefresh()));

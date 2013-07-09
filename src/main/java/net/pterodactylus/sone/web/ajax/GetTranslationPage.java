@@ -19,7 +19,6 @@ package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * Returns the translation for a given key as JSON object.
@@ -46,7 +45,7 @@ public class GetTranslationPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String key = request.getHttpRequest().getParam("key");
 		String translation = webInterface.getL10n().getString(key);
 		return createSuccessJsonObject().put("value", translation);
