@@ -6,8 +6,8 @@ package net.pterodactylus.sone.web.ajax;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.IntNode;
@@ -27,7 +27,6 @@ public class JsonReturnObject {
 	private final boolean success;
 
 	/** The returned values. */
-	@JsonUnwrapped
 	private final Map<String, JsonNode> content = Maps.newHashMap();
 
 	/**
@@ -65,6 +64,16 @@ public class JsonReturnObject {
 	@VisibleForTesting
 	public JsonNode get(String key) {
 		return content.get(key);
+	}
+
+	/**
+	 * Returns the content of this object for serialization.
+	 *
+	 * @return The content of this object
+	 */
+	@JsonAnyGetter
+	public Map<String, JsonNode> getContent() {
+		return content;
 	}
 
 	//
