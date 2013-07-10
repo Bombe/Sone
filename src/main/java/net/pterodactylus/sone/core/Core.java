@@ -1054,10 +1054,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				sone.setKnown(storedSone.get().isKnown());
 				sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 				if (sone.isLocal()) {
-					soneInserters.remove(storedSone.get()).stop();
-					SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, sone);
-					soneInserters.put(sone, soneInserter);
-					soneInserter.start();
+					soneInserters.get(storedSone.get()).setSone(sone);
 					touchConfiguration();
 				}
 				sones.put(sone.getId(), sone);
