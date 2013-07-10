@@ -1052,6 +1052,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			synchronized (sones) {
 				sone.setOptions(storedSone.get().getOptions());
 				sone.setKnown(storedSone.get().isKnown());
+				sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
+				if (sone.isLocal()) {
+					soneInserters.remove(storedSone.get()).stop();
+					SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, sone);
+					soneInserters.put(sone, soneInserter);
+					soneInserter.start();
+					touchConfiguration();
+				}
 				sones.put(sone.getId(), sone);
 			}
 		}
