@@ -518,7 +518,9 @@ public class SoneDownloader extends AbstractService {
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
-			sone.setAlbums(topLevelAlbums);
+			for (Album album : topLevelAlbums) {
+				sone.getRootAlbum().addAlbum(album);
+			}
 		}
 
 		return sone;

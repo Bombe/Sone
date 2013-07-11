@@ -69,6 +69,15 @@ public class Album implements Fingerprintable {
 		}
 	};
 
+	/** Function that transforms an album into the images it contains. */
+	public static final Function<Album, List<Image>> IMAGES = new Function<Album, List<Image>>() {
+
+		@Override
+		public List<Image> apply(Album album) {
+			return album.getImages();
+		}
+	};
+
 	/**
 	 * Filter that removes all albums that do not have any images in any album
 	 * below it.
@@ -186,7 +195,6 @@ public class Album implements Fingerprintable {
 	public void addAlbum(Album album) {
 		checkNotNull(album, "album must not be null");
 		checkArgument(album.getSone().equals(sone), "album must belong to the same Sone as this album");
-		checkState((this.parent == null) || (this.parent.equals(album.parent)), "album must not already be set to some other Sone");
 		album.setParent(this);
 		if (!albums.contains(album)) {
 			albums.add(album);

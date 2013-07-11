@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
 import java.io.InputStreamReader;
 import java.io.StringWriter;
@@ -308,7 +309,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList());
+			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
 		}
 
 		//

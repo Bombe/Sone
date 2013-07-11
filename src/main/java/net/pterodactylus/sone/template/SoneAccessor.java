@@ -17,6 +17,11 @@
 
 package net.pterodactylus.sone.template;
 
+import static com.google.common.collect.FluentIterable.from;
+import static java.util.Arrays.asList;
+import static net.pterodactylus.sone.data.Album.FLATTENER;
+import static net.pterodactylus.sone.data.Album.IMAGES;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -111,6 +116,8 @@ public class SoneAccessor extends ReflectionAccessor {
 				return new Trust(null, null, null);
 			}
 			return trust;
+		} else if (member.equals("allImages")) {
+			return from(asList(sone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES);
 		}
 		return super.get(templateContext, object, member);
 	}

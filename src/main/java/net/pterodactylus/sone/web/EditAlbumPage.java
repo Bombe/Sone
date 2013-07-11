@@ -61,20 +61,10 @@ public class EditAlbumPage extends SoneTemplatePage {
 				throw new RedirectException("noPermission.html");
 			}
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveLeft", 4))) {
-				if (album.getParent() == null) {
-					currentSone.moveAlbumUp(album);
-					webInterface.getCore().touchConfiguration();
-					throw new RedirectException("imageBrowser.html?sone=" + currentSone.getId());
-				}
 				album.getParent().moveAlbumUp(album);
 				webInterface.getCore().touchConfiguration();
 				throw new RedirectException("imageBrowser.html?album=" + album.getParent().getId());
 			} else if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("moveRight", 4))) {
-				if (album.getParent() == null) {
-					currentSone.moveAlbumDown(album);
-					webInterface.getCore().touchConfiguration();
-					throw new RedirectException("imageBrowser.html?sone=" + currentSone.getId());
-				}
 				album.getParent().moveAlbumDown(album);
 				webInterface.getCore().touchConfiguration();
 				throw new RedirectException("imageBrowser.html?album=" + album.getParent().getId());
