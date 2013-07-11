@@ -832,7 +832,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		hash.putString(")");
 
 		hash.putString("Albums(");
-		for (Album album : albums) {
+		for (Album album : rootAlbum.getAlbums()) {
+			if (!Album.NOT_EMPTY.apply(album)) {
+				continue;
+			}
 			hash.putString(album.getFingerprint());
 		}
 		hash.putString(")");

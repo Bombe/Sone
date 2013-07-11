@@ -86,11 +86,19 @@ public class Album implements Fingerprintable {
 
 		@Override
 		public boolean apply(Album album) {
+			/* so, we flatten all albums below the given one and check whether at least one album… */
 			return FluentIterable.from(asList(album)).transformAndConcat(FLATTENER).anyMatch(new Predicate<Album>() {
 
 				@Override
 				public boolean apply(Album album) {
-					return !album.getImages().isEmpty();
+					/* …contains any inserted images. */
+					return !album.getImages().isEmpty() && FluentIterable.from(album.getImages()).allMatch(new Predicate<Image>() {
+
+						@Override
+						public boolean apply(Image input) {
+							return input.isInserted();
+						}
+					});
 				}
 			});
 		}
