@@ -44,7 +44,7 @@ import com.google.common.hash.Hashing;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Album implements Fingerprintable {
+public class Album implements Identified, Fingerprintable {
 
 	/** Compares two {@link Album}s by {@link #getTitle()}. */
 	public static final Comparator<Album> TITLE_COMPARATOR = new Comparator<Album>() {

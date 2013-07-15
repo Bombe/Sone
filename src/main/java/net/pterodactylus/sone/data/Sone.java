@@ -54,7 +54,7 @@ import com.google.common.primitives.Ints;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Sone implements Fingerprintable, Comparable<Sone> {
+public class Sone implements Identified, Fingerprintable, Comparable<Sone> {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.

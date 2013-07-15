@@ -28,7 +28,7 @@ import com.google.common.base.Predicate;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Post {
+public interface Post extends Identified {
 
 	/** Comparator for posts, sorts descending by time. */
 	public static final Comparator<Post> TIME_COMPARATOR = new Comparator<Post>() {

@@ -28,7 +28,7 @@ import com.google.common.base.Predicate;
  *            The type of the reply
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Reply<T extends Reply<T>> {
+public interface Reply<T extends Reply<T>> extends Identified {
 
 	/** Comparator that sorts replies ascending by time. */
 	public static final Comparator<? super Reply<?>> TIME_COMPARATOR = new Comparator<Reply<?>>() {

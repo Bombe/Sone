@@ -31,7 +31,7 @@ import com.google.common.hash.Hashing;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Image implements Fingerprintable {
+public class Image implements Identified, Fingerprintable {
 
 	/** The ID of the image. */
 	private final String id;
