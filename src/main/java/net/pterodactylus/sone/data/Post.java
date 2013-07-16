@@ -77,10 +77,7 @@ public interface Post extends Identified {
 	public Optional<String> getRecipientId();
 
 	/**
-	 * Returns the recipient of this post, if any. As this method can return
-	 * {@link Optional#absent()} if the post has a recipient which has not yet
-	 * been loaded, it is recommended to use {@link #hasRecipient()} to check
-	 * for the presence of a recipient.
+	 * Returns the recipient of this post, if any.
 	 *
 	 * @return The recipient of this post, or {@link Optional#absent()} if there
 	 *         is no recipient
