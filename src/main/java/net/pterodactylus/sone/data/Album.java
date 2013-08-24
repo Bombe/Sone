@@ -408,6 +408,16 @@ public class Album implements Identified, Fingerprintable {
 	}
 
 	/**
+	 * Returns whether this album is an identitiy’s root album.
+	 *
+	 * @return {@code true} if this album is an identity’s root album, {@code
+	 *         false} otherwise
+	 */
+	public boolean isRoot() {
+		return parent == null;
+	}
+
+	/**
 	 * Returns the parent album of this album.
 	 *
 	 * @return The parent album of this album, or {@code null} if this album

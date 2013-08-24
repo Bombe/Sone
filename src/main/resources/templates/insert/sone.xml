@@ -67,7 +67,7 @@
 		<%/first>
 		<album>
 			<id><%album.id|xml></id>
-			<%ifnull !album.parent>
+			<%if !album.parent.root>
 			<parent><%album.parent.id|xml></parent>
 			<%/if>
 			<title><%album.title|xml></title>
