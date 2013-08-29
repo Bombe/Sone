@@ -872,7 +872,7 @@ function ajaxifyPost(postElement) {
 			}).fadeIn();
 		}, 1000);
 	}).mouseleave(function() {
-		if (currentSoneMenuId = getPostId(this)) {
+		if (currentSoneMenuId == getPostId(this)) {
 			clearTimeout(currentSoneMenuTimeoutHandler);
 		}
 	});
@@ -1011,7 +1011,7 @@ function ajaxifyReply(replyElement) {
 			}).fadeIn();
 		}, 1000);
 	}).mouseleave(function() {
-		if (currentSoneMenuId = getPostId(this) + "-" + getReplyId(this)) {
+		if (currentSoneMenuId == getPostId(this) + "-" + getReplyId(this)) {
 			clearTimeout(currentSoneMenuTimeoutHandler);
 		}
 	});
