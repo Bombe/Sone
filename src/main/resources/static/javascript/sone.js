@@ -2,7 +2,7 @@
 
 function ajaxGet(url, data, successCallback, errorCallback) {
 	(function(url, data, successCallback, errorCallback) {
-		$.ajax({"type": "GET", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus, xmlHttpRequest) {
+		$.ajax({"cache": false, "type": "GET", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus, xmlHttpRequest) {
 			ajaxSuccess();
 			if (typeof successCallback != "undefined") {
 				successCallback(data, textStatus);
