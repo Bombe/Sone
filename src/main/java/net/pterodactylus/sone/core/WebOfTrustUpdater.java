@@ -332,72 +332,17 @@ public class WebOfTrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Base class for WebOfTrust trust update jobs.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class WebOfTrustTrustUpdateJob extends WebOfTrustUpdateJob {
-
-		/** The identity giving the trust. */
-		protected final OwnIdentity truster;
-
-		/** The identity receiving the trust. */
-		protected final Identity trustee;
-
-		/**
-		 * Creates a new trust update job.
-		 *
-		 * @param truster
-		 *            The identity giving the trust
-		 * @param trustee
-		 *            The identity receiving the trust
-		 */
-		@SuppressWarnings("synthetic-access")
-		public WebOfTrustTrustUpdateJob(OwnIdentity truster, Identity trustee) {
-			this.truster = truster;
-			this.trustee = trustee;
-		}
-
-		//
-		// OBJECT METHODS
-		//
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(Object object) {
-			if ((object == null) || !object.getClass().equals(getClass())) {
-				return false;
-			}
-			WebOfTrustTrustUpdateJob updateJob = (WebOfTrustTrustUpdateJob) object;
-			return ((truster == null) ? (updateJob.truster == null) : updateJob.truster.equals(truster)) && ((trustee == null) ? (updateJob.trustee == null) : updateJob.trustee.equals(trustee));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return getClass().hashCode() ^ ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), (truster == null) ? null : truster.getId(), (trustee == null) ? null : trustee.getId());
-		}
-
-	}
-
-	/**
 	 * Update job that sets the trust relation between two identities.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetTrustJob extends WebOfTrustTrustUpdateJob {
+	private class SetTrustJob extends WebOfTrustUpdateJob {
+
+		/** The identity giving the trust. */
+		private final OwnIdentity truster;
+
+		/** The identity receiving the trust. */
+		private final Identity trustee;
 
 		/** The score of the relation. */
 		private final Integer score;
@@ -419,7 +364,8 @@ public class WebOfTrustUpdater extends AbstractService {
 		 *            The comment of the trust relation
 		 */
 		public SetTrustJob(OwnIdentity truster, Identity trustee, Integer score, String comment) {
-			super(truster, trustee);
+			this.truster = truster;
+			this.trustee = trustee;
 			this.score = score;
 			this.comment = comment;
 		}
@@ -447,6 +393,32 @@ public class WebOfTrustUpdater extends AbstractService {
 				logger.log(Level.WARNING, "Could not set Trust value for " + truster + " -> " + trustee + " to " + score + " (" + comment + ")!", wote1);
 				finish(false);
 			}
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean equals(Object object) {
+			if ((object == null) || !object.getClass().equals(getClass())) {
+				return false;
+			}
+			SetTrustJob updateJob = (SetTrustJob) object;
+			return ((truster == null) ? (updateJob.truster == null) : updateJob.truster.equals(truster)) && ((trustee == null) ? (updateJob.trustee == null) : updateJob.trustee.equals(trustee));
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int hashCode() {
+			return getClass().hashCode() ^ ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), (truster == null) ? null : truster.getId(), (trustee == null) ? null : trustee.getId());
 		}
 
 	}
