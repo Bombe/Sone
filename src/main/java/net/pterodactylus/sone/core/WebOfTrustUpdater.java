@@ -559,72 +559,17 @@ public class WebOfTrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Base class for update jobs that deal with properties.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class WebOfTrustPropertyUpdateJob extends WebOfTrustUpdateJob {
-
-		/** The own identity to update properties on. */
-		protected final OwnIdentity ownIdentity;
-
-		/** The name of the property to update. */
-		protected final String propertyName;
-
-		/**
-		 * Creates a new property update job.
-		 *
-		 * @param ownIdentity
-		 *            The own identity to update the property on
-		 * @param propertyName
-		 *            The name of the property to update
-		 */
-		@SuppressWarnings("synthetic-access")
-		public WebOfTrustPropertyUpdateJob(OwnIdentity ownIdentity, String propertyName) {
-			this.ownIdentity = ownIdentity;
-			this.propertyName = propertyName;
-		}
-
-		//
-		// OBJECT METHODS
-		//
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(Object object) {
-			if ((object == null) || !object.getClass().equals(getClass())) {
-				return false;
-			}
-			WebOfTrustPropertyUpdateJob updateJob = (WebOfTrustPropertyUpdateJob) object;
-			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.propertyName.equals(propertyName);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return getClass().hashCode() ^ ownIdentity.hashCode() ^ propertyName.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return String.format("%s[ownIdentity=%s,propertyName=%s]", getClass().getSimpleName(), ownIdentity, propertyName);
-		}
-
-	}
-
-	/**
 	 * WebOfTrust update job that sets a property on an {@link OwnIdentity}.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetPropertyJob extends WebOfTrustPropertyUpdateJob {
+	private class SetPropertyJob extends WebOfTrustUpdateJob {
+
+		/** The own identity to update properties on. */
+		private final OwnIdentity ownIdentity;
+
+		/** The name of the property to update. */
+		private final String propertyName;
 
 		/** The value of the property to set. */
 		private final String propertyValue;
@@ -663,6 +608,32 @@ public class WebOfTrustUpdater extends AbstractService {
 				logger.log(Level.WARNING, String.format("Could not set Property “%2$s” to “%3$s” on Own Identity %1$s!", ownIdentity, propertyName, propertyValue), pe1);
 				finish(false);
 			}
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean equals(Object object) {
+			if ((object == null) || !object.getClass().equals(getClass())) {
+				return false;
+			}
+			SetPropertyJob updateJob = (SetPropertyJob) object;
+			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.propertyName.equals(propertyName);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int hashCode() {
+			return getClass().hashCode() ^ ownIdentity.hashCode() ^ propertyName.hashCode();
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return String.format("%s[ownIdentity=%s,propertyName=%s]", getClass().getSimpleName(), ownIdentity, propertyName);
 		}
 
 	}
