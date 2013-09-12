@@ -48,12 +48,6 @@ public class SubstringFilter implements Filter {
 		}
 		String dataString = String.valueOf(data);
 		int dataLength = dataString.length();
-		if (lengthString == null) {
-			if (start < 0) {
-				return dataString.substring(dataLength + start);
-			}
-			return dataString.substring(start);
-		}
 		int length = Integer.MAX_VALUE;
 		try {
 			length = Integer.parseInt(lengthString);
