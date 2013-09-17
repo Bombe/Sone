@@ -45,7 +45,7 @@ public interface Post extends Identified {
 
 		@Override
 		public boolean apply(Post post) {
-			return post.getTime() <= System.currentTimeMillis();
+			return (post == null) ? false : post.getTime() <= System.currentTimeMillis();
 		}
 
 	};

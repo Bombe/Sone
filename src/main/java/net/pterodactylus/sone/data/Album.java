@@ -21,13 +21,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -59,7 +62,11 @@ public class Album implements Identified, Fingerprintable {
 	public static final Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
 
 		@Override
+		@Nonnull
 		public List<Album> apply(Album album) {
+			if (album == null) {
+				return emptyList();
+			}
 			List<Album> albums = new ArrayList<Album>();
 			albums.add(album);
 			for (Album subAlbum : album.getAlbums()) {
@@ -73,8 +80,9 @@ public class Album implements Identified, Fingerprintable {
 	public static final Function<Album, List<Image>> IMAGES = new Function<Album, List<Image>>() {
 
 		@Override
+		@Nonnull
 		public List<Image> apply(Album album) {
-			return album.getImages();
+			return (album != null) ? album.getImages() : Collections.<Image>emptyList();
 		}
 	};
 

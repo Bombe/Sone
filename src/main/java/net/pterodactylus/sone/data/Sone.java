@@ -155,7 +155,7 @@ public class Sone implements Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return sone.getTime() != 0;
+			return (sone == null) ? false : sone.getTime() != 0;
 		}
 	};
 
@@ -164,7 +164,7 @@ public class Sone implements Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return sone.getIdentity() instanceof OwnIdentity;
+			return (sone == null) ? false : sone.getIdentity() instanceof OwnIdentity;
 		}
 
 	};
@@ -174,7 +174,7 @@ public class Sone implements Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return !sone.getRootAlbum().getAlbums().isEmpty();
+			return (sone == null) ? false : !sone.getRootAlbum().getAlbums().isEmpty();
 		}
 	};
 

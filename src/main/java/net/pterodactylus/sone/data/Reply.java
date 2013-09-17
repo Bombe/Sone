@@ -51,7 +51,7 @@ public interface Reply<T extends Reply<T>> extends Identified {
 		 */
 		@Override
 		public boolean apply(Reply<?> reply) {
-			return reply.getTime() <= System.currentTimeMillis();
+			return (reply == null) ? false : reply.getTime() <= System.currentTimeMillis();
 		}
 
 	};
