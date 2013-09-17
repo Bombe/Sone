@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
@@ -69,14 +70,14 @@ public class ReplyGroupFilter implements Filter {
 			replies.add(reply);
 		}
 		Map<Post, Map<String, Set<?>>> result = new HashMap<Post, Map<String, Set<?>>>();
-		for (Post post : postSones.keySet()) {
-			if (result.containsKey(post)) {
+		for (Entry<Post, Set<Sone>> postEntry : postSones.entrySet()) {
+			if (result.containsKey(postEntry.getKey())) {
 				continue;
 			}
 			Map<String, Set<?>> postResult = new HashMap<String, Set<?>>();
-			postResult.put("sones", postSones.get(post));
-			postResult.put("replies", postReplies.get(post));
-			result.put(post, postResult);
+			postResult.put("sones", postEntry.getValue());
+			postResult.put("replies", postReplies.get(postEntry.getKey()));
+			result.put(postEntry.getKey(), postResult);
 		}
 		return result;
 	}
