@@ -1365,7 +1365,7 @@ function getShownSoneId() {
  * @returns The ID of the currently shown Sones
  */
 function getShownSoneIds() {
-	var soneIds = new Array();
+	var soneIds = [];
 	sone.find("#known-sones .sone .id").each(function() {
 		soneIds.push($(this).text());
 	});
