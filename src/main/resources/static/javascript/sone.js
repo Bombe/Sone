@@ -71,7 +71,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 		separator = $("<span> · </span>").addClass("separator");
 		getTranslation("WebInterface.Button.Comment", function(text) {
 			commentElement = $("<div><span>" + text + "</span></div>").addClass("show-reply-form").click(function() {
-				replyElement = $("#sone .post#post-" + postId + " .create-reply");
+				replyElement = sone.find(".post#post-" + postId + " .create-reply");
 				replyElement.removeClass("hidden");
 				replyElement.removeClass("light");
 				(function(replyElement) {
@@ -145,22 +145,22 @@ function filterSoneId(soneId) {
  *            The date and time of the last update (formatted for display)
  */
 function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, lastUpdatedText) {
-	$("#sone .sone." + filterSoneId(soneId)).
+	sone.find(".sone." + filterSoneId(soneId)).
 		toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
 		toggleClass("inserting", status == "inserting").
 		toggleClass("downloading", status == "downloading").
 		toggleClass("modified", modified);
-	$("#sone .sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
-	$("#sone .sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
+	sone.find(".sone." + filterSoneId(soneId) + " .lock").toggleClass("hidden", locked);
+	sone.find(".sone." + filterSoneId(soneId) + " .unlock").toggleClass("hidden", !locked);
 	if (lastUpdated != null) {
-		$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").attr("title", lastUpdated).text(lastUpdatedText);
+		sone.find(".sone." + filterSoneId(soneId) + " .last-update span.time").attr("title", lastUpdated).text(lastUpdatedText);
 	} else {
 		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
-			$("#sone .sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
+			sone.find(".sone." + filterSoneId(soneId) + " .last-update span.time").text(unknown);
 		});
 	}
-	$("#sone .sone." + filterSoneId(soneId) + " .profile-link a").text(name);
+	sone.find(".sone." + filterSoneId(soneId) + " .profile-link a").text(name);
 }
 
 /**
@@ -215,7 +215,7 @@ function enhanceDeletePostButton(button, postId, text) {
 				return;
 			}
 			if (data.success) {
-				$("#sone .post#post-" + postId).slideUp();
+				sone.find(".post#post-" + postId).slideUp();
 			} else if (data.error == "invalid-post-id") {
 				/* pretend the post is already gone. */
 				getPost(postId).slideUp();
@@ -242,12 +242,12 @@ function enhanceDeletePostButton(button, postId, text) {
  */
 function enhanceDeleteReplyButton(button, replyId, text) {
 	enhanceDeleteButton(button, text, function() {
-		ajaxGet("deleteReply.ajax", { "reply": replyId, "formPassword": $("#sone #formPassword").text() }, function(data, textStatus) {
+		ajaxGet("deleteReply.ajax", { "reply": replyId, "formPassword": sone.find("#formPassword").text() }, function(data, textStatus) {
 			if (data == null) {
 				return;
 			}
 			if (data.success) {
-				$("#sone .reply#reply-" + replyId).slideUp();
+				sone.find(".reply#reply-" + replyId).slideUp();
 			} else if (data.error == "invalid-reply-id") {
 				/* pretend the reply is already gone. */
 				getReply(replyId).slideUp();
@@ -263,7 +263,7 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 }
 
 function getFormPassword() {
-	return $("#sone #formPassword").text();
+	return sone.find("#formPassword").text();
 }
 
 /**
@@ -274,7 +274,7 @@ function getFormPassword() {
  * @returns All Sone elements with the given ID
  */
 function getSone(soneId) {
-	return $("#sone .sone").filter(function(index) {
+	return sone.find(".sone").filter(function(index) {
 		return $(".id", this).text() == soneId;
 	});
 }
@@ -333,7 +333,7 @@ function getSoneId(element) {
  * @returns The element of the post
  */
 function getPost(postId) {
-	return $("#sone .post#post-" + postId);
+	return sone.find(".post#post-" + postId);
 }
 
 function getPostElement(element) {
@@ -367,7 +367,7 @@ function getPostAuthor(element) {
  * @returns The element of the reply
  */
 function getReply(replyId) {
-	return $("#sone .reply#reply-" + replyId);
+	return sone.find(".reply#reply-" + replyId);
 }
 
 function getReplyElement(element) {
@@ -401,7 +401,7 @@ function getReplyAuthor(element) {
  * @returns The notification element
  */
 function getNotification(notificationId) {
-	return $("#sone #notification-area .notification#" + notificationId);
+	return sone.find("#notification-area .notification#" + notificationId);
 }
 
 /**
@@ -442,8 +442,8 @@ function likePost(postId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .post#post-" + postId + " > .inner-part > .status-line .like").addClass("hidden");
-		$("#sone .post#post-" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
+		sone.find(".post#post-" + postId + " > .inner-part > .status-line .like").addClass("hidden");
+		sone.find(".post#post-" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -455,8 +455,8 @@ function unlikePost(postId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .post#post-" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
-		$("#sone .post#post-" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
+		sone.find(".post#post-" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
+		sone.find(".post#post-" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -466,9 +466,9 @@ function unlikePost(postId) {
 function updatePostLikes(postId) {
 	ajaxGet("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			$("#sone .post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
-			$("#sone .post#post-" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
-			$("#sone .post#post-" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
+			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
+			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -480,8 +480,8 @@ function likeReply(replyId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .reply#reply-" + replyId + " .status-line .like").addClass("hidden");
-		$("#sone .reply#reply-" + replyId + " .status-line .unlike").removeClass("hidden");
+		sone.find(".reply#reply-" + replyId + " .status-line .like").addClass("hidden");
+		sone.find(".reply#reply-" + replyId + " .status-line .unlike").removeClass("hidden");
 		updateReplyLikes(replyId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -493,8 +493,8 @@ function unlikeReply(replyId) {
 		if ((data == null) || !data.success) {
 			return;
 		}
-		$("#sone .reply#reply-" + replyId + " .status-line .unlike").addClass("hidden");
-		$("#sone .reply#reply-" + replyId + " .status-line .like").removeClass("hidden");
+		sone.find(".reply#reply-" + replyId + " .status-line .unlike").addClass("hidden");
+		sone.find(".reply#reply-" + replyId + " .status-line .like").removeClass("hidden");
 		updateReplyLikes(replyId);
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -553,14 +553,14 @@ function untrustSone(soneId) {
  *            The trust value for the Sone
  */
 function updateTrustControls(soneId, trustValue) {
-	$("#sone .post").each(function() {
+	sone.find(".post").each(function() {
 		if (getPostAuthor(this) == soneId) {
 			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
 			getPostElement(this).find(".post-distrust").toggleClass("hidden", trustValue != null);
 			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
 		}
 	});
-	$("#sone .reply").each(function() {
+	sone.find(".reply").each(function() {
 		if (getReplyAuthor(this) == soneId) {
 			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
 			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", trustValue != null);
@@ -604,9 +604,9 @@ function unbookmarkPost(postId) {
 function updateReplyLikes(replyId) {
 	ajaxGet("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			$("#sone .reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
-			$("#sone .reply#reply-" + replyId + " .status-line .likes span.like-count").text(data.likes);
-			$("#sone .reply#reply-" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			sone.find(".reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
+			sone.find(".reply#reply-" + replyId + " .status-line .likes span.like-count").text(data.likes);
+			sone.find(".reply#reply-" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -714,10 +714,10 @@ function ajaxifyPost(postElement) {
 				if (success) {
 					$(inputField).val("");
 					loadNewReply(replyId, soneId, postId);
-					$("#sone .post#post-" + postId + " .create-reply").addClass("hidden");
-					$("#sone .post#post-" + postId + " .create-reply .sender").hide();
-					$("#sone .post#post-" + postId + " .create-reply .select-sender").show();
-					$("#sone .post#post-" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
+					sone.find(".post#post-" + postId + " .create-reply").addClass("hidden");
+					sone.find(".post#post-" + postId + " .create-reply .sender").hide();
+					sone.find(".post#post-" + postId + " .create-reply .select-sender").show();
+					sone.find(".post#post-" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
 				} else {
 					alert(error);
 				}
@@ -883,7 +883,7 @@ function ajaxifyPost(postElement) {
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
-				$("#sone .sone-menu").each(function() {
+				sone.find(".sone-menu").each(function() {
 					if (getMenuSone(this) == soneId) {
 						$(".follow", this).toggleClass("hidden", true);
 						$(".unfollow", this).toggleClass("hidden", false);
@@ -897,7 +897,7 @@ function ajaxifyPost(postElement) {
 			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
-				$("#sone .sone-menu").each(function() {
+				sone.find(".sone-menu").each(function() {
 					if (getMenuSone(this) == soneId) {
 						$(".follow", this).toggleClass("hidden", false);
 						$(".unfollow", this).toggleClass("hidden", true);
@@ -1022,7 +1022,7 @@ function ajaxifyReply(replyElement) {
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
-				$("#sone .sone-menu").each(function() {
+				sone.find(".sone-menu").each(function() {
 					if (getMenuSone(this) == soneId) {
 						$(".follow", this).toggleClass("hidden", true);
 						$(".unfollow", this).toggleClass("hidden", false);
@@ -1036,7 +1036,7 @@ function ajaxifyReply(replyElement) {
 			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
-				$("#sone .sone-menu").each(function() {
+				sone.find(".sone-menu").each(function() {
 					if (getMenuSone(this) == soneId) {
 						$(".follow", this).toggleClass("hidden", false);
 						$(".unfollow", this).toggleClass("hidden", true);
@@ -1095,7 +1095,7 @@ function ajaxifyNotification(notification) {
  * determine whether the notifications changed and need to be reloaded.
  */
 function getNotificationHash() {
-	return $("#sone #notification-area #notification-hash").text();
+	return sone.find("#notification-area #notification-hash").text();
 }
 
 /**
@@ -1105,7 +1105,7 @@ function getNotificationHash() {
  *            The new notification hash
  */
 function setNotificationHash(notificationHash) {
-	$("#sone #notification-area #notification-hash").text(notificationHash);
+	sone.find("#notification-area #notification-hash").text(notificationHash);
 }
 
 /**
@@ -1231,7 +1231,7 @@ function requestNotifications() {
 	ajaxGet("getNotifications.ajax", {}, function(data, textStatus) {
 		if (data && data.success) {
 			/* search for removed notifications. */
-			$("#sone #notification-area .notification").each(function() {
+			sone.find("#notification-area .notification").each(function() {
 				notificationId = $(this).attr("id");
 				foundNotification = false;
 				$.each(data.notifications, function(index, value) {
@@ -1260,7 +1260,7 @@ function requestNotifications() {
 					$(this).slideUp("normal", function() {
 						$(this).remove();
 						/* remove activity when no notifications are visible. */
-						if ($("#sone #notification-area .notification").length == 0) {
+						if (sone.find("#notification-area .notification").length == 0) {
 							resetActivity();
 						}
 					});
@@ -1281,7 +1281,7 @@ function requestNotifications() {
 					checkForRemovedReplies(oldNotification, notification);
 					oldNotification.replaceWith(notification.show());
 				} else {
-					$("#sone #notification-area").append(notification);
+					sone.find("#notification-area").append(notification);
 					if (value.id.substring(0, 5) != "local") {
 						notification.slideDown();
 						setActivity();
@@ -1309,7 +1309,7 @@ function getCurrentSoneId() {
  * @returns The page ID
  */
 function getPageId() {
-	return $("#sone .page-id").text();
+	return sone.find(".page-id").text();
 }
 
 /**
@@ -1355,7 +1355,7 @@ function isViewSonePage() {
  * @returns The ID of the currently shown Sone
  */
 function getShownSoneId() {
-	return $("#sone .sone-id").first().text();
+	return sone.find(".sone-id").first().text();
 }
 
 /**
@@ -1366,7 +1366,7 @@ function getShownSoneId() {
  */
 function getShownSoneIds() {
 	var soneIds = new Array();
-	$("#sone #known-sones .sone .id").each(function() {
+	sone.find("#known-sones .sone .id").each(function() {
 		soneIds.push($(this).text());
 	});
 	return soneIds.join(",");
@@ -1389,7 +1389,7 @@ function isViewPostPage() {
  * @returns The ID of the currently shown post
  */
 function getShownPostId() {
-	return $("#sone .post-id").text();
+	return sone.find(".post-id").text();
 }
 
 /**
@@ -1423,7 +1423,7 @@ function hasPost(postId) {
  *          exists on the page, <code>false</code> otherwise
  */
 function hasReply(replyId) {
-	return $("#sone .reply#reply-" + replyId).length > 0;
+	return sone.find(".reply#reply-" + replyId).length > 0;
 }
 
 function loadNewPost(postId, soneId, recipientId, time) {
@@ -1437,7 +1437,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			}
 		}
 	}
-	if (getPostTime($("#sone .post").last()) > time) {
+	if (getPostTime(sone.find(".post").last()) > time) {
 		return;
 	}
 	ajaxGet("getPost.ajax", { "post" : postId }, function(data, textStatus) {
@@ -1449,7 +1449,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				return;
 			}
 			var firstOlderPost = null;
-			$("#sone .post").each(function() {
+			sone.find(".post").each(function() {
 				if (getPostTime(this) < data.post.time) {
 					firstOlderPost = $(this);
 					return false;
@@ -1483,7 +1483,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 			if (hasReply(data.reply.id)) {
 				return;
 			}
-			$("#sone .post#post-" + data.reply.postId).each(function() {
+			sone.find(".post#post-" + data.reply.postId).each(function() {
 				var firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
 					if (getReplyTime(this) > data.reply.time) {
@@ -1730,7 +1730,7 @@ function changeIcon(iconUrl) {
 function createNotification(id, lastUpdatedTime, text, dismissable) {
 	notification = $("<div></div>").addClass("notification").attr("id", id).attr("lastUpdatedTime", lastUpdatedTime);
 	if (dismissable) {
-		dismissForm = $("#sone #notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id");
+		dismissForm = sone.find("#notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id");
 		dismissForm.find("input[name=notification]").val(id);
 		notification.append(dismissForm);
 	}
@@ -1745,8 +1745,8 @@ function createNotification(id, lastUpdatedTime, text, dismissable) {
  *            The ID of the notification
  */
 function showNotificationDetails(notificationId) {
-	$("#sone .notification#" + notificationId + " .text").removeClass("hidden");
-	$("#sone .notification#" + notificationId + " .short-text").addClass("hidden");
+	sone.find(".notification#" + notificationId + " .text").removeClass("hidden");
+	sone.find(".notification#" + notificationId + " .short-text").addClass("hidden");
 }
 
 /**
@@ -1758,7 +1758,7 @@ function showNotificationDetails(notificationId) {
 function deleteProfileField(fieldId) {
 	ajaxGet("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
 		if (data && data.success) {
-			$("#sone .profile-field#" + data.field.id).slideUp();
+			sone.find(".profile-field#" + data.field.id).slideUp();
 		}
 	});
 }
@@ -1854,11 +1854,11 @@ function ajaxSuccess() {
  */
 function showOfflineMarker(visible) {
 	/* jQuery documentation says toggle() works the other way around?! */
-	$("#sone #offline-marker").toggle(visible);
+	sone.find("#offline-marker").toggle(visible);
 	if (visible) {
-		$("#sone #main").addClass("offline");
+		sone.find("#main").addClass("offline");
 	} else {
-		$("#sone #main").removeClass("offline");
+		sone.find("#main").removeClass("offline");
 	}
 }
 
@@ -1866,9 +1866,10 @@ function showOfflineMarker(visible) {
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
 
+var sone = $("#sone");
 var focus = true;
 var online = true;
-var initiallyLoggedIn = $("#sone #loggedIn").text() == "true";
+var initiallyLoggedIn = sone.find("#loggedIn").text() == "true";
 var notLoggedIn = !initiallyLoggedIn;
 
 /** ID of the next-to-show Sone context menu. */
@@ -1880,7 +1881,7 @@ var currentSoneMenuTimeoutHandler;
 $(document).ready(function() {
 
 	/* rip out the status update textarea. */
-	$("#sone .rip-out").each(function() {
+	sone.find(".rip-out").each(function() {
 		var oldElement = $(this);
 		newElement = $("<input type='text'/>");
 		newElement.attr("class", oldElement.attr("class")).attr("name", oldElement.attr("name"));
@@ -1890,14 +1891,14 @@ $(document).ready(function() {
 	/* this initializes the status update input field. */
 	getTranslation("WebInterface.DefaultText.StatusUpdate", function(defaultText) {
 		registerInputTextareaSwap("#sone #update-status .status-input", defaultText, "text", false, false);
-		$("#sone #update-status .select-sender").css("display", "inline");
-		$("#sone #update-status .sender").hide();
-		$("#sone #update-status .select-sender button").click(function() {
-			$("#sone #update-status .sender").show();
-			$("#sone #update-status .select-sender").hide();
+		sone.find("#update-status .select-sender").css("display", "inline");
+		sone.find("#update-status .sender").hide();
+		sone.find("#update-status .select-sender button").click(function() {
+			sone.find("#update-status .sender").show();
+			sone.find("#update-status .select-sender").hide();
 			return false;
 		});
-		$("#sone #update-status").submit(function() {
+		sone.find("#update-status").submit(function() {
 			button = $("button:submit", this);
 			button.attr("disabled", "disabled");
 			if ($(this).find(":input.default:enabled").length > 0) {
@@ -1924,14 +1925,14 @@ $(document).ready(function() {
 	/* ajaxify input field on “view Sone” page. */
 	getTranslation("WebInterface.DefaultText.Message", function(defaultText) {
 		registerInputTextareaSwap("#sone #post-message input[name=text]", defaultText, "text", false, false);
-		$("#sone #post-message .select-sender").css("display", "inline");
-		$("#sone #post-message .sender").hide();
-		$("#sone #post-message .select-sender button").click(function() {
-			$("#sone #post-message .sender").show();
-			$("#sone #post-message .select-sender").hide();
+		sone.find("#post-message .select-sender").css("display", "inline");
+		sone.find("#post-message .sender").hide();
+		sone.find("#post-message .select-sender button").click(function() {
+			sone.find("#post-message .sender").show();
+			sone.find("#post-message .select-sender").hide();
 			return false;
 		});
-		$("#sone #post-message").submit(function() {
+		sone.find("#post-message").submit(function() {
 			sender = $(this).find(":input[name=sender]").val();
 			text = $(this).find(":input[name=text]:enabled").val();
 			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text });
@@ -1949,7 +1950,7 @@ $(document).ready(function() {
 		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
 			getTranslation("WebInterface.DefaultText.Reply", function(text) {
 				getTranslation("WebInterface.Button.Comment", function(text) {
-					$("#sone .post").each(function() {
+					sone.find(".post").each(function() {
 						ajaxifyPost(this);
 					});
 				});
@@ -1959,7 +1960,7 @@ $(document).ready(function() {
 
 	/* update post times. */
 	postIds = [];
-	$("#sone .post").each(function() {
+	sone.find(".post").each(function() {
 		postIds.push(getPostId(this));
 	});
 	updatePostTimes(postIds.join(","));
@@ -1967,7 +1968,7 @@ $(document).ready(function() {
 	/* hides all replies but the latest two. */
 	if (!isViewPostPage()) {
 		getTranslation("WebInterface.ClickToShow.Replies", function(text) {
-			$("#sone .post .replies").each(function() {
+			sone.find(".post .replies").each(function() {
 				allReplies = $(this).find(".reply");
 				if (allReplies.length > 2) {
 					newHidden = false;
@@ -1992,12 +1993,12 @@ $(document).ready(function() {
 		});
 	}
 
-	$("#sone .sone").each(function() {
+	sone.find(".sone").each(function() {
 		ajaxifySone($(this));
 	});
 
 	/* process all existing notifications, ajaxify dismiss buttons. */
-	$("#sone #notification-area .notification").each(function() {
+	sone.find("#notification-area .notification").each(function() {
 		ajaxifyNotification($(this));
 	});
 
