@@ -1946,10 +1946,10 @@ $(document).ready(function() {
 
 	/* Ajaxifies all posts. */
 	/* calling getTranslation here will cache the necessary values. */
-	getTranslation("WebInterface.Confirmation.DeletePostButton", function(text) {
-		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function(text) {
-			getTranslation("WebInterface.DefaultText.Reply", function(text) {
-				getTranslation("WebInterface.Button.Comment", function(text) {
+	getTranslation("WebInterface.Confirmation.DeletePostButton", function() {
+		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function() {
+			getTranslation("WebInterface.DefaultText.Reply", function() {
+				getTranslation("WebInterface.Button.Comment", function () {
 					sone.find(".post").each(function() {
 						ajaxifyPost(this);
 					});
