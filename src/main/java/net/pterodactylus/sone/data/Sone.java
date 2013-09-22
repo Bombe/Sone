@@ -17,7 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.FluentIterable.from;
 import static java.util.Arrays.asList;
 import static net.pterodactylus.sone.data.Album.FLATTENER;
