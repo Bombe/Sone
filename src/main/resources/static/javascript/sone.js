@@ -145,7 +145,7 @@ function filterSoneId(soneId) {
  *            The date and time of the last update (formatted for display)
  */
 function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, lastUpdatedText) {
-	var updateSone = sone.find(".sone." + filterSoneId(soneId));
+    var updateSone = sone.find(".sone." + filterSoneId(soneId));
 	updateSone.toggleClass("unknown", status == "unknown").
 		toggleClass("idle", status == "idle").
 		toggleClass("inserting", status == "inserting").
@@ -1949,8 +1949,8 @@ $(document).ready(function() {
 	getTranslation("WebInterface.Confirmation.DeletePostButton", function() {
 		getTranslation("WebInterface.Confirmation.DeleteReplyButton", function() {
 			getTranslation("WebInterface.DefaultText.Reply", function() {
-				getTranslation("WebInterface.Button.Comment", function () {
-					sone.find(".post").each(function() {
+                getTranslation("WebInterface.Button.Comment", function () {
+                    sone.find(".post").each(function() {
 						ajaxifyPost(this);
 					});
 				});
