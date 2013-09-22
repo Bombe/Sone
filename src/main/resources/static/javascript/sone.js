@@ -75,7 +75,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 				replyElement.removeClass("hidden");
 				replyElement.removeClass("light");
 				(function(replyElement) {
-					replyElement.find("input.reply-input").blur(function() {
+					replyElement.find(":input.reply-input").blur(function() {
 						if ($(this).hasClass("default")) {
 							replyElement.addClass("light");
 						}
@@ -83,7 +83,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 						replyElement.removeClass("light");
 					});
 				})(replyElement);
-				textArea = replyElement.find("input.reply-input").focus().data("textarea");
+				textArea = replyElement.find(":input.reply-input").focus().data("textarea");
 				if (author != getCurrentSoneId()) {
 					textArea.val(textArea.val() + "@sone://" + author + " ");
 				}
@@ -813,7 +813,7 @@ function ajaxifyPost(postElement) {
 	/* ajaxify author/post links */
 	$(".post-status-line .permalink a", postElement).click(function() {
 		if (!$(".create-reply", postElement).hasClass("hidden")) {
-			textArea = $("input.reply-input", postElement).focus().data("textarea");
+			textArea = $(":input.reply-input", postElement).focus().data("textarea");
 			$(textArea).replaceSelection($(this).attr("href"));
 		}
 		return false;
@@ -832,7 +832,7 @@ function ajaxifyPost(postElement) {
 
 	/* process reply input fields. */
 	getTranslation("WebInterface.DefaultText.Reply", function(text) {
-		$(postElement).find("input.reply-input").each(function() {
+		$(postElement).find(":input.reply-input").each(function() {
 			registerInputTextareaSwap(this, text, "text", false, false);
 		});
 	});
@@ -935,7 +935,7 @@ function ajaxifyReply(replyElement) {
 	/* ajaxify author links */
 	$(".reply-status-line .permalink a", replyElement).click(function() {
 		if (!$(".create-reply", getPostElement(replyElement)).hasClass("hidden")) {
-			textArea = $("input.reply-input", getPostElement(replyElement)).focus().data("textarea");
+			textArea = $(":input.reply-input", getPostElement(replyElement)).focus().data("textarea");
 			$(textArea).replaceSelection($(this).attr("href"));
 		}
 		return false;
