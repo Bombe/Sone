@@ -62,7 +62,7 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 			}
 			Album parentAlbum = album.getParent();
 			webInterface.getCore().deleteAlbum(album);
-			if (parentAlbum == null) {
+			if (parentAlbum.equals(album.getSone().getRootAlbum())) {
 				throw new RedirectException("imageBrowser.html?sone=" + album.getSone().getId());
 			}
 			throw new RedirectException("imageBrowser.html?album=" + parentAlbum.getId());

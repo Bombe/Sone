@@ -18,9 +18,7 @@
 package net.pterodactylus.sone.template;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.util.template.Accessor;
@@ -43,36 +41,66 @@ public class AlbumAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Album album = (Album) object;
 		if ("backlinks".equals(member)) {
-			List<Map<String, String>> backlinks = new ArrayList<Map<String, String>>();
+			List<Link> backlinks = new ArrayList<Link>();
 			Album currentAlbum = album;
-			while (currentAlbum != null) {
-				backlinks.add(0, createLink("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getTitle()));
+			while (!currentAlbum.equals(album.getSone().getRootAlbum())) {
+				backlinks.add(0, new Link("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getTitle()));
 				currentAlbum = currentAlbum.getParent();
 			}
-			backlinks.add(0, createLink("imageBrowser.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
+			backlinks.add(0, new Link("imageBrowser.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
 			return backlinks;
 		}
 		return super.get(templateContext, object, member);
 	}
 
-	//
-	// PRIVATE METHODS
-	//
-
 	/**
-	 * Creates a map containing mappings for “target” and “link.”
+	 * Container for links.
 	 *
-	 * @param target
-	 *            The target to link to
-	 * @param name
-	 *            The name of the link
-	 * @return The created map containing the mappings
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private static Map<String, String> createLink(String target, String name) {
-		Map<String, String> link = new HashMap<String, String>();
-		link.put("target", target);
-		link.put("name", name);
-		return link;
+	private static class Link {
+
+		/** The target of the link. */
+		private final String target;
+
+		/** The name of the link. */
+		private final String name;
+
+		/**
+		 * Creates a new link.
+		 *
+		 * @param target
+		 * 		The target of the link
+		 * @param name
+		 * 		The name of the link
+		 */
+		private Link(String target, String name) {
+			this.target = target;
+			this.name = name;
+		}
+
+		//
+		// ACCESSORS
+		//
+
+		/**
+		 * Returns the target of the link.
+		 *
+		 * @return The target of the link
+		 */
+		public String getTarget() {
+			return target;
+		}
+
+		/**
+		 * Returns the name of the link.
+		 *
+		 * @return The name of the link
+		 */
+		public String getName() {
+			return name;
+		}
+
 	}
 
 }

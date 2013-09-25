@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import java.io.StringWriter;
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 
 import com.google.common.base.Optional;
 
@@ -26,10 +27,12 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * This AJAX page returns the details of a reply.
@@ -62,7 +65,7 @@ public class GetReplyAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String replyId = request.getHttpRequest().getParam("reply");
 		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
 		if (!reply.isPresent()) {
@@ -94,8 +97,8 @@ public class GetReplyAjaxPage extends JsonPage {
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the reply
 	 */
-	private JsonObject createJsonReply(FreenetRequest request, PostReply reply, Sone currentSone) {
-		JsonObject jsonReply = new JsonObject();
+	private JsonNode createJsonReply(FreenetRequest request, PostReply reply, Sone currentSone) {
+		ObjectNode jsonReply = new ObjectNode(instance);
 		jsonReply.put("id", reply.getId());
 		jsonReply.put("postId", reply.getPostId());
 		jsonReply.put("soneId", reply.getSone().getId());

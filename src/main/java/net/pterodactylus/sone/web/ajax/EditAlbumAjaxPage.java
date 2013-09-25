@@ -21,7 +21,6 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * Page that stores a user’s album modifications.
@@ -48,7 +47,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String albumId = request.getHttpRequest().getParam("album");
 		Album album = webInterface.getCore().getAlbum(albumId, false);
 		if (album == null) {
@@ -58,12 +57,12 @@ public class EditAlbumAjaxPage extends JsonPage {
 			return createErrorJsonObject("not-authorized");
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveLeft"))) {
-			Album swappedAlbum = (album.getParent() != null) ? album.getParent().moveAlbumUp(album) : album.getSone().moveAlbumUp(album);
+			Album swappedAlbum = album.getParent().moveAlbumUp(album);
 			webInterface.getCore().touchConfiguration();
 			return createSuccessJsonObject().put("sourceAlbumId", album.getId()).put("destinationAlbumId", swappedAlbum.getId());
 		}
 		if ("true".equals(request.getHttpRequest().getParam("moveRight"))) {
-			Album swappedAlbum = (album.getParent() != null) ? album.getParent().moveAlbumDown(album) : album.getSone().moveAlbumDown(album);
+			Album swappedAlbum = album.getParent().moveAlbumDown(album);
 			webInterface.getCore().touchConfiguration();
 			return createSuccessJsonObject().put("sourceAlbumId", album.getId()).put("destinationAlbumId", swappedAlbum.getId());
 		}

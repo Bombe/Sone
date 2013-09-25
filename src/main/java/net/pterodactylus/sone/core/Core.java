@@ -1035,13 +1035,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			database.storePostReplies(sone, sone.getReplies());
 			synchronized (albums) {
 				synchronized (images) {
-					for (Album album : storedSone.get().getAlbums()) {
+					for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
 						albums.remove(album.getId());
 						for (Image image : album.getImages()) {
 							images.remove(image.getId());
 						}
 					}
-					for (Album album : sone.getAlbums()) {
+					for (Album album : sone.getRootAlbum().getAlbums()) {
 						albums.put(album.getId(), album);
 						for (Image image : album.getImages()) {
 							images.put(image.getId(), image);
@@ -1052,6 +1052,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			synchronized (sones) {
 				sone.setOptions(storedSone.get().getOptions());
 				sone.setKnown(storedSone.get().isKnown());
+				sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
+				if (sone.isLocal()) {
+					soneInserters.get(storedSone.get()).setSone(sone);
+					touchConfiguration();
+				}
 				sones.put(sone.getId(), sone);
 			}
 		}
@@ -1314,7 +1319,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (String friendId : friends) {
 				followSone(sone, friendId);
 			}
-			sone.setAlbums(topLevelAlbums);
+			for (Album album : sone.getRootAlbum().getAlbums()) {
+				sone.getRootAlbum().removeAlbum(album);
+			}
+			for (Album album : topLevelAlbums) {
+				sone.getRootAlbum().addAlbum(album);
+			}
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 		}
 		synchronized (knownSones) {
@@ -1579,7 +1589,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The new album
 	 */
 	public Album createAlbum(Sone sone) {
-		return createAlbum(sone, null);
+		return createAlbum(sone, sone.getRootAlbum());
 	}
 
 	/**
@@ -1598,11 +1608,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			albums.put(album.getId(), album);
 		}
 		album.setSone(sone);
-		if (parent != null) {
-			parent.addAlbum(album);
-		} else {
-			sone.addAlbum(album);
-		}
+		parent.addAlbum(album);
 		return album;
 	}
 
@@ -1619,11 +1625,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		if (!album.isEmpty()) {
 			return;
 		}
-		if (album.getParent() == null) {
-			album.getSone().removeAlbum(album);
-		} else {
-			album.getParent().removeAlbum(album);
-		}
+		album.getParent().removeAlbum(album);
 		synchronized (albums) {
 			albums.remove(album.getId());
 		}
@@ -1878,7 +1880,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList();
+			List<Album> albums = FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).toList();
 
 			int albumCounter = 0;
 			for (Album album : albums) {
@@ -1886,7 +1888,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				configuration.getStringValue(albumPrefix + "/ID").setValue(album.getId());
 				configuration.getStringValue(albumPrefix + "/Title").setValue(album.getTitle());
 				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
-				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent() == null ? null : album.getParent().getId());
+				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent().equals(sone.getRootAlbum()) ? null : album.getParent().getId());
 				configuration.getStringValue(albumPrefix + "/AlbumImage").setValue(album.getAlbumImage() == null ? null : album.getAlbumImage().getId());
 			}
 			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);

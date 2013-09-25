@@ -239,7 +239,7 @@ public class SoneDownloader extends AbstractService {
 			return null;
 		}
 
-		Sone sone = new Sone(originalSone.getId(), false).setIdentity(originalSone.getIdentity());
+		Sone sone = new Sone(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
 
 		SimpleXML soneXml;
 		try {
@@ -518,7 +518,9 @@ public class SoneDownloader extends AbstractService {
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
-			sone.setAlbums(topLevelAlbums);
+			for (Album album : topLevelAlbums) {
+				sone.getRootAlbum().addAlbum(album);
+			}
 		}
 
 		return sone;

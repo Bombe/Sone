@@ -22,7 +22,6 @@ import com.google.common.base.Optional;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * This AJAX page deletes a post.
@@ -49,7 +48,7 @@ public class DeletePostAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
 		Optional<Post> post = webInterface.getCore().getPost(postId);
 		if (!post.isPresent()) {

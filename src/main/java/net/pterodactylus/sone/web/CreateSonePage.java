@@ -97,6 +97,9 @@ public class CreateSonePage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
+		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
+		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);
+		templateContext.set("sones", localSones);
 		List<OwnIdentity> ownIdentitiesWithoutSone = getOwnIdentitiesWithoutSone(webInterface.getCore());
 		templateContext.set("identitiesWithoutSone", ownIdentitiesWithoutSone);
 		if (request.getMethod() == Method.POST) {

@@ -18,12 +18,14 @@
 package net.pterodactylus.sone.web.page;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URI;
 
 import net.pterodactylus.util.web.Header;
 import net.pterodactylus.util.web.Method;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
+
 import freenet.client.HighLevelSimpleClient;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.LinkFilterExceptedToadlet;
@@ -144,21 +146,28 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 */
 	private void handleRequest(FreenetRequest pageRequest) throws IOException, ToadletContextClosedException {
 		Bucket pageBucket = null;
+		OutputStream pageBucketOutputStream = null;
+		Response pageResponse;
 		try {
 			pageBucket = pageRequest.getToadletContext().getBucketFactory().makeBucket(-1);
-			Response pageResponse = new Response(pageBucket.getOutputStream());
-			pageResponse = page.handleRequest(pageRequest, pageResponse);
-			MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
-			if (pageResponse.getHeaders() != null) {
-				for (Header header : pageResponse.getHeaders()) {
-					for (String value : header) {
-						headers.put(header.getName(), value);
-					}
+			pageBucketOutputStream = pageBucket.getOutputStream();
+			pageResponse = page.handleRequest(pageRequest, new Response(pageBucketOutputStream));
+		} catch (IOException ioe1) {
+			Closer.close(pageBucket);
+			throw ioe1;
+		} finally {
+			Closer.close(pageBucketOutputStream);
+		}
+		MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
+		if (pageResponse.getHeaders() != null) {
+			for (Header header : pageResponse.getHeaders()) {
+				for (String value : header) {
+					headers.put(header.getName(), value);
 				}
 			}
+		}
+		try {
 			writeReply(pageRequest.getToadletContext(), pageResponse.getStatusCode(), pageResponse.getContentType(), pageResponse.getStatusText(), headers, pageBucket);
-		} catch (Throwable t1) {
-			writeInternalError(t1, pageRequest.getToadletContext());
 		} finally {
 			Closer.close(pageBucket);
 		}

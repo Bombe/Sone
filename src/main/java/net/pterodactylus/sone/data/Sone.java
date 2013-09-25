@@ -17,7 +17,11 @@
 
 package net.pterodactylus.sone.data;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.FluentIterable.from;
+import static java.util.Arrays.asList;
+import static net.pterodactylus.sone.data.Album.FLATTENER;
+import static net.pterodactylus.sone.data.Album.IMAGES;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +29,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,9 +42,9 @@ import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
 
 import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
+import com.google.common.primitives.Ints;
 
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
@@ -51,7 +54,7 @@ import com.google.common.hash.Hashing;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Sone implements Fingerprintable, Comparable<Sone> {
+public class Sone implements Identified, Fingerprintable, Comparable<Sone> {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
@@ -140,7 +143,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		 */
 		@Override
 		public int compare(Sone leftSone, Sone rightSone) {
-			return rightSone.getAllImages().size() - leftSone.getAllImages().size();
+			int rightSoneImageCount = from(asList(rightSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
+			int leftSoneImageCount = from(asList(leftSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
+			/* sort descending. */
+			return Ints.compare(rightSoneImageCount, leftSoneImageCount);
 		}
 	};
 
@@ -149,7 +155,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return sone.getTime() != 0;
+			return (sone == null) ? false : sone.getTime() != 0;
 		}
 	};
 
@@ -158,7 +164,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return sone.getIdentity() instanceof OwnIdentity;
+			return (sone == null) ? false : sone.getIdentity() instanceof OwnIdentity;
 		}
 
 	};
@@ -168,7 +174,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return !sone.getAlbums().isEmpty();
+			return (sone == null) ? false : !sone.getRootAlbum().getAlbums().isEmpty();
 		}
 	};
 
@@ -224,8 +230,8 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	/** The IDs of all liked replies. */
 	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
 
-	/** The albums of this Sone. */
-	private final List<Album> albums = new CopyOnWriteArrayList<Album>();
+	/** The root album containing all albums. */
+	private final Album rootAlbum = new Album().setSone(this);
 
 	/** Sone-specific options. */
 	private Options options = new Options();
@@ -757,110 +763,12 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	}
 
 	/**
-	 * Returns the albums of this Sone.
+	 * Returns the root album that contains all visible albums of this Sone.
 	 *
-	 * @return The albums of this Sone
+	 * @return The root album of this Sone
 	 */
-	public List<Album> getAlbums() {
-		return Collections.unmodifiableList(albums);
-	}
-
-	/**
-	 * Returns all images of a Sone. Images of a album are inserted into this list
-	 * before images of all child albums.
-	 *
-	 * @return The list of all images
-	 */
-	public List<Image> getAllImages() {
-		List<Image> allImages = new ArrayList<Image>();
-		for (Album album : FluentIterable.from(getAlbums()).transformAndConcat(Album.FLATTENER).toList()) {
-			allImages.addAll(album.getImages());
-		}
-		return allImages;
-	}
-
-	/**
-	 * Adds an album to this Sone.
-	 *
-	 * @param album
-	 * 		The album to add
-	 */
-	public void addAlbum(Album album) {
-		checkNotNull(album, "album must not be null");
-		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
-		if (!albums.contains(album)) {
-			albums.add(album);
-		}
-	}
-
-	/**
-	 * Sets the albums of this Sone.
-	 *
-	 * @param albums
-	 * 		The albums of this Sone
-	 */
-	public void setAlbums(Collection<? extends Album> albums) {
-		checkNotNull(albums, "albums must not be null");
-		this.albums.clear();
-		for (Album album : albums) {
-			addAlbum(album);
-		}
-	}
-
-	/**
-	 * Removes an album from this Sone.
-	 *
-	 * @param album
-	 * 		The album to remove
-	 */
-	public void removeAlbum(Album album) {
-		checkNotNull(album, "album must not be null");
-		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
-		albums.remove(album);
-	}
-
-	/**
-	 * Moves the given album up in this album’s albums. If the album is already the
-	 * first album, nothing happens.
-	 *
-	 * @param album
-	 * 		The album to move up
-	 * @return The album that the given album swapped the place with, or
-	 *         <code>null</code> if the album did not change its place
-	 */
-	public Album moveAlbumUp(Album album) {
-		checkNotNull(album, "album must not be null");
-		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
-		checkArgument(album.getParent() == null, "album must not have a parent");
-		int oldIndex = albums.indexOf(album);
-		if (oldIndex <= 0) {
-			return null;
-		}
-		albums.remove(oldIndex);
-		albums.add(oldIndex - 1, album);
-		return albums.get(oldIndex);
-	}
-
-	/**
-	 * Moves the given album down in this album’s albums. If the album is already
-	 * the last album, nothing happens.
-	 *
-	 * @param album
-	 * 		The album to move down
-	 * @return The album that the given album swapped the place with, or
-	 *         <code>null</code> if the album did not change its place
-	 */
-	public Album moveAlbumDown(Album album) {
-		checkNotNull(album, "album must not be null");
-		checkArgument(album.getSone().equals(this), "album must belong to this Sone");
-		checkArgument(album.getParent() == null, "album must not have a parent");
-		int oldIndex = albums.indexOf(album);
-		if ((oldIndex < 0) || (oldIndex >= (albums.size() - 1))) {
-			return null;
-		}
-		albums.remove(oldIndex);
-		albums.add(oldIndex + 1, album);
-		return albums.get(oldIndex);
+	public Album getRootAlbum() {
+		return rootAlbum;
 	}
 
 	/**
@@ -924,7 +832,10 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 		hash.putString(")");
 
 		hash.putString("Albums(");
-		for (Album album : albums) {
+		for (Album album : rootAlbum.getAlbums()) {
+			if (!Album.NOT_EMPTY.apply(album)) {
+				continue;
+			}
 			hash.putString(album.getFingerprint());
 		}
 		hash.putString(")");
@@ -964,7 +875,7 @@ public class Sone implements Fingerprintable, Comparable<Sone> {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[identity=" + identity + ",requestUri=" + requestUri + ",insertUri(" + String.valueOf(insertUri).length() + "),friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + ")]";
+		return getClass().getName() + "[identity=" + identity + ",requestUri=" + requestUri + ",insertUri(" + String.valueOf(insertUri).length() + "),friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
 	}
 
 }

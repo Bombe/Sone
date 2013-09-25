@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.ajax;
 
 import java.io.StringWriter;
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 
 import com.google.common.base.Optional;
 
@@ -26,10 +27,12 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * This AJAX handler retrieves information and rendered representation of a
@@ -59,7 +62,7 @@ public class GetPostAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String postId = request.getHttpRequest().getParam("post");
 		Optional<Post> post = webInterface.getCore().getPost(postId);
 		if (!post.isPresent()) {
@@ -92,8 +95,8 @@ public class GetPostAjaxPage extends JsonPage {
 	 *            The currently logged in Sone (to store in the template)
 	 * @return The JSON representation of the post
 	 */
-	private JsonObject createJsonPost(FreenetRequest request, Post post, Sone currentSone) {
-		JsonObject jsonPost = new JsonObject();
+	private JsonNode createJsonPost(FreenetRequest request, Post post, Sone currentSone) {
+		ObjectNode jsonPost = new ObjectNode(instance);
 		jsonPost.put("id", post.getId());
 		jsonPost.put("sone", post.getSone().getId());
 		jsonPost.put("recipient", post.getRecipientId().orNull());

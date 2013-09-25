@@ -22,7 +22,6 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * AJAX page that lets the user move a profile field up or down.
@@ -51,7 +50,7 @@ public class MoveProfileFieldAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		Sone currentSone = getCurrentSone(request.getToadletContext());
 		Profile profile = currentSone.getProfile();
 		String fieldId = request.getHttpRequest().getParam("field");

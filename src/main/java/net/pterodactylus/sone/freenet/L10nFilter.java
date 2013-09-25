@@ -65,4 +65,5 @@ public class L10nFilter implements Filter {
 		}
 		return new MessageFormat(webInterface.getL10n().getString(String.valueOf(data)), new Locale(webInterface.getL10n().getSelectedLanguage().shortCode)).format(parameterValues.toArray());
 	}
+
 }

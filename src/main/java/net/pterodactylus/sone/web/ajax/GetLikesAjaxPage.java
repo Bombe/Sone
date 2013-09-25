@@ -17,9 +17,9 @@
 
 package net.pterodactylus.sone.web.ajax;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+import static net.pterodactylus.sone.data.Sone.NICE_NAME_COMPARATOR;
+
 import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
@@ -28,10 +28,12 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonArray;
-import net.pterodactylus.util.json.JsonObject;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 
 /**
  * AJAX page that retrieves the number of “likes” a {@link Post} has.
@@ -58,7 +60,7 @@ public class GetLikesAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String type = request.getHttpRequest().getParam("type", null);
 		String id = request.getHttpRequest().getParam(type, null);
 		if ((id == null) || (id.length() == 0)) {
@@ -102,12 +104,10 @@ public class GetLikesAjaxPage extends JsonPage {
 	 *            The Sones to convert to an array
 	 * @return The Sones, sorted by name
 	 */
-	private static JsonArray getSones(Set<Sone> sones) {
-		JsonArray soneArray = new JsonArray();
-		List<Sone> sortedSones = new ArrayList<Sone>(sones);
-		Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);
-		for (Sone sone : sortedSones) {
-			soneArray.add(new JsonObject().put("id", sone.getId()).put("name", SoneAccessor.getNiceName(sone)));
+	private static JsonNode getSones(Set<Sone> sones) {
+		ArrayNode soneArray = new ArrayNode(instance);
+		for (Sone sone : FluentIterable.from(sones).toSortedList(NICE_NAME_COMPARATOR)) {
+			soneArray.add(new ObjectNode(instance).put("id", sone.getId()).put("name", SoneAccessor.getNiceName(sone)));
 		}
 		return soneArray;
 	}

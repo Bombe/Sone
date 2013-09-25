@@ -20,7 +20,6 @@ package net.pterodactylus.sone.web.ajax;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * AJAX page that lets a Sone unfollow another Sone.
@@ -43,7 +42,7 @@ public class UnfollowSoneAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
 		if (!webInterface.getCore().getSone(soneId).isPresent()) {
 			return createErrorJsonObject("invalid-sone-id");

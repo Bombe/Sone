@@ -2,12 +2,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>sone</artifactId>
-	<version>0.8.6</version>
+	<version>0.8.7</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
 			<artifactId>utils</artifactId>
-			<version>0.12.3</version>
+			<version>${version.utils}</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
@@ -34,11 +34,6 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.pterodactylus</groupId>
-			<artifactId>utils.json</artifactId>
-			<version>0.1</version>
-		</dependency>
-		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>3.0</version>
@@ -53,6 +48,16 @@
 			<artifactId>commons-lang</artifactId>
 			<version>2.6</version>
 		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.code.findbugs</groupId>
+			<artifactId>jsr305</artifactId>
+			<version>2.0.1</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
@@ -62,9 +67,19 @@
 	</repositories>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<version.utils>0.12.4</version.utils>
+		<findbugs.timeout>600000</findbugs.timeout>
 	</properties>
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>2.5.2</version>
+				<configuration>
+					<timeout>${findbugs.timeout}</timeout>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

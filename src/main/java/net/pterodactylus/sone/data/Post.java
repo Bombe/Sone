@@ -28,7 +28,7 @@ import com.google.common.base.Predicate;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Post {
+public interface Post extends Identified {
 
 	/** Comparator for posts, sorts descending by time. */
 	public static final Comparator<Post> TIME_COMPARATOR = new Comparator<Post>() {
@@ -45,7 +45,7 @@ public interface Post {
 
 		@Override
 		public boolean apply(Post post) {
-			return post.getTime() <= System.currentTimeMillis();
+			return (post == null) ? false : post.getTime() <= System.currentTimeMillis();
 		}
 
 	};
@@ -77,10 +77,7 @@ public interface Post {
 	public Optional<String> getRecipientId();
 
 	/**
-	 * Returns the recipient of this post, if any. As this method can return
-	 * {@link Optional#absent()} if the post has a recipient which has not yet
-	 * been loaded, it is recommended to use {@link #hasRecipient()} to check
-	 * for the presence of a recipient.
+	 * Returns the recipient of this post, if any.
 	 *
 	 * @return The recipient of this post, or {@link Optional#absent()} if there
 	 *         is no recipient

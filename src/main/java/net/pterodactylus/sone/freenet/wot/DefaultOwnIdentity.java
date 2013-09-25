@@ -70,4 +70,18 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 		return insertUri;
 	}
 
+	//
+	// OBJECT METHODS
+	//
+
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		return super.equals(object);
+	}
+
 }

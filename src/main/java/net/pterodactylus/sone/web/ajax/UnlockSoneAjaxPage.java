@@ -21,7 +21,6 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 /**
  * Lets the user {@link Core#unlockSone(Sone) unlock} a {@link Sone}.
@@ -44,7 +43,7 @@ public class UnlockSoneAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Sone sone = webInterface.getCore().getLocalSone(soneId, false);
 		if (sone == null) {

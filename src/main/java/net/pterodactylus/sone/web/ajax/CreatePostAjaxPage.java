@@ -22,7 +22,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonObject;
 
 import com.google.common.base.Optional;
 
@@ -47,7 +46,7 @@ public class CreatePostAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		Sone sone = getCurrentSone(request.getToadletContext());
 		if (sone == null) {
 			return createErrorJsonObject("auth-required");

@@ -21,13 +21,16 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nonnull;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -44,7 +47,7 @@ import com.google.common.hash.Hashing;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class Album implements Fingerprintable {
+public class Album implements Identified, Fingerprintable {
 
 	/** Compares two {@link Album}s by {@link #getTitle()}. */
 	public static final Comparator<Album> TITLE_COMPARATOR = new Comparator<Album>() {
@@ -59,13 +62,27 @@ public class Album implements Fingerprintable {
 	public static final Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
 
 		@Override
+		@Nonnull
 		public List<Album> apply(Album album) {
+			if (album == null) {
+				return emptyList();
+			}
 			List<Album> albums = new ArrayList<Album>();
 			albums.add(album);
 			for (Album subAlbum : album.getAlbums()) {
 				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
 			}
 			return albums;
+		}
+	};
+
+	/** Function that transforms an album into the images it contains. */
+	public static final Function<Album, List<Image>> IMAGES = new Function<Album, List<Image>>() {
+
+		@Override
+		@Nonnull
+		public List<Image> apply(Album album) {
+			return (album != null) ? album.getImages() : Collections.<Image>emptyList();
 		}
 	};
 
@@ -77,11 +94,19 @@ public class Album implements Fingerprintable {
 
 		@Override
 		public boolean apply(Album album) {
+			/* so, we flatten all albums below the given one and check whether at least one album… */
 			return FluentIterable.from(asList(album)).transformAndConcat(FLATTENER).anyMatch(new Predicate<Album>() {
 
 				@Override
 				public boolean apply(Album album) {
-					return !album.getImages().isEmpty();
+					/* …contains any inserted images. */
+					return !album.getImages().isEmpty() && FluentIterable.from(album.getImages()).allMatch(new Predicate<Image>() {
+
+						@Override
+						public boolean apply(Image input) {
+							return input.isInserted();
+						}
+					});
 				}
 			});
 		}
@@ -186,7 +211,6 @@ public class Album implements Fingerprintable {
 	public void addAlbum(Album album) {
 		checkNotNull(album, "album must not be null");
 		checkArgument(album.getSone().equals(sone), "album must belong to the same Sone as this album");
-		checkState((this.parent == null) || (this.parent.equals(album.parent)), "album must not already be set to some other Sone");
 		album.setParent(this);
 		if (!albums.contains(album)) {
 			albums.add(album);
@@ -389,6 +413,16 @@ public class Album implements Fingerprintable {
 	 */
 	public boolean isEmpty() {
 		return albums.isEmpty() && images.isEmpty();
+	}
+
+	/**
+	 * Returns whether this album is an identitiy’s root album.
+	 *
+	 * @return {@code true} if this album is an identity’s root album, {@code
+	 *         false} otherwise
+	 */
+	public boolean isRoot() {
+		return parent == null;
 	}
 
 	/**

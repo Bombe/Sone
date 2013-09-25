@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Collection;
@@ -28,11 +30,13 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.json.JsonArray;
-import net.pterodactylus.util.json.JsonObject;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * AJAX handler to return all current notifications.
@@ -75,12 +79,12 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected JsonObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		Collection<Notification> notifications = webInterface.getNotifications().getNotifications();
 		List<Notification> filteredNotifications = ListNotificationFilters.filterNotifications(notifications, currentSone);
 		Collections.sort(filteredNotifications, Notification.CREATED_TIME_SORTER);
-		JsonArray jsonNotifications = new JsonArray();
+		ArrayNode jsonNotifications = new ArrayNode(instance);
 		for (Notification notification : filteredNotifications) {
 			jsonNotifications.add(createJsonNotification(request, notification));
 		}
@@ -100,8 +104,8 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	 *            The notification to create a JSON object
 	 * @return The JSON object
 	 */
-	private JsonObject createJsonNotification(FreenetRequest request, Notification notification) {
-		JsonObject jsonNotification = new JsonObject();
+	private JsonNode createJsonNotification(FreenetRequest request, Notification notification) {
+		ObjectNode jsonNotification = new ObjectNode(instance);
 		jsonNotification.put("id", notification.getId());
 		StringWriter notificationWriter = new StringWriter();
 		try {
@@ -140,8 +144,8 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	 *            The current Sone (may be {@code null})
 	 * @return The current options
 	 */
-	private static JsonObject createJsonOptions(Sone currentSone) {
-		JsonObject options = new JsonObject();
+	private static JsonNode createJsonOptions(Sone currentSone) {
+		ObjectNode options = new ObjectNode(instance);
 		if (currentSone != null) {
 			options.put("ShowNotification/NewSones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
 			options.put("ShowNotification/NewPosts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());

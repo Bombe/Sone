@@ -582,7 +582,7 @@
 				<div class="backlink"><a href="imageBrowser.html?sone=<%sone.id|html>"><%sone.niceName|html></a></div>
 			</div>
 
-			<%include include/browseAlbums.html albums=sone.albums>
+			<%include include/browseAlbums.html albums=sone.rootAlbum.albums>
 
 			<%if sone.local>
 				<div class="show-create-album hidden toggle-link"><a class="small-link">» <%= View.CreateAlbum.Title|l10n|html></a></div>

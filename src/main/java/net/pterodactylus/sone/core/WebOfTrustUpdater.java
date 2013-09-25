@@ -61,7 +61,7 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * Creates a new trust updater.
 	 *
 	 * @param webOfTrustConnector
-	 *            The web of trust connector
+	 * 		The web of trust connector
 	 */
 	@Inject
 	public WebOfTrustUpdater(WebOfTrustConnector webOfTrustConnector) {
@@ -74,19 +74,18 @@ public class WebOfTrustUpdater extends AbstractService {
 	//
 
 	/**
-	 * Updates the trust relation between the truster and the trustee. This
-	 * method will return immediately and perform a trust update in the
-	 * background.
+	 * Updates the trust relation between the truster and the trustee. This method
+	 * will return immediately and perform a trust update in the background.
 	 *
 	 * @param truster
-	 *            The identity giving the trust
+	 * 		The identity giving the trust
 	 * @param trustee
-	 *            The identity receiving the trust
+	 * 		The identity receiving the trust
 	 * @param score
-	 *            The new level of trust (from -100 to 100, may be {@code null}
-	 *            to remove the trust completely)
+	 * 		The new level of trust (from -100 to 100, may be {@code null} to remove
+	 * 		the trust completely)
 	 * @param comment
-	 *            The comment of the trust relation
+	 * 		The comment of the trust relation
 	 */
 	public void setTrust(OwnIdentity truster, Identity trustee, Integer score, String comment) {
 		SetTrustJob setTrustJob = new SetTrustJob(truster, trustee, score, comment);
@@ -105,22 +104,22 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * Adds the given context to the given own identity.
 	 *
 	 * @param ownIdentity
-	 *            The own identity to add the context to
+	 * 		The own identity to add the context to
 	 * @param context
-	 *            The context to add
+	 * 		The context to add
 	 */
 	public void addContext(OwnIdentity ownIdentity, String context) {
 		addContextWait(ownIdentity, context, false);
 	}
 
 	/**
-	 * Adds the given context to the given own identity, waiting for completion
-	 * of the operation.
+	 * Adds the given context to the given own identity, waiting for completion of
+	 * the operation.
 	 *
 	 * @param ownIdentity
-	 *            The own identity to add the context to
+	 * 		The own identity to add the context to
 	 * @param context
-	 *            The context to add
+	 * 		The context to add
 	 * @return {@code true} if the context was added successfully, {@code false}
 	 *         otherwise
 	 */
@@ -129,19 +128,19 @@ public class WebOfTrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Adds the given context to the given own identity, waiting for completion
-	 * of the operation.
+	 * Adds the given context to the given own identity, waiting for completion of
+	 * the operation.
 	 *
 	 * @param ownIdentity
-	 *            The own identity to add the context to
+	 * 		The own identity to add the context to
 	 * @param context
-	 *            The context to add
+	 * 		The context to add
 	 * @param wait
-	 *            {@code true} to wait for the end of the operation,
-	 *            {@code false} to return immediately
-	 * @return {@code true} if the context was added successfully, {@code false}
-	 *         if the context was not added successfully, or if the job should
-	 *         not wait for completion
+	 * 		{@code true} to wait for the end of the operation, {@code false} to return
+	 * 		immediately
+	 * @return {@code true} if the context was added successfully, {@code false} if
+	 *         the context was not added successfully, or if the job should not
+	 *         wait for completion
 	 */
 	private boolean addContextWait(OwnIdentity ownIdentity, String context, boolean wait) {
 		AddContextJob addContextJob = new AddContextJob(ownIdentity, context);
@@ -169,9 +168,9 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * Removes the given context from the given own identity.
 	 *
 	 * @param ownIdentity
-	 *            The own identity to remove the context from
+	 * 		The own identity to remove the context from
 	 * @param context
-	 *            The context to remove
+	 * 		The context to remove
 	 */
 	public void removeContext(OwnIdentity ownIdentity, String context) {
 		RemoveContextJob removeContextJob = new RemoveContextJob(ownIdentity, context);
@@ -189,11 +188,11 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * Sets a property on the given own identity.
 	 *
 	 * @param ownIdentity
-	 *            The own identity to set the property on
+	 * 		The own identity to set the property on
 	 * @param propertyName
-	 *            The name of the property to set
+	 * 		The name of the property to set
 	 * @param propertyValue
-	 *            The value of the property to set
+	 * 		The value of the property to set
 	 */
 	public void setProperty(OwnIdentity ownIdentity, String propertyName, String propertyValue) {
 		SetPropertyJob setPropertyJob = new SetPropertyJob(ownIdentity, propertyName, propertyValue);
@@ -212,9 +211,9 @@ public class WebOfTrustUpdater extends AbstractService {
 	 * Removes a property from the given own identity.
 	 *
 	 * @param ownIdentity
-	 *            The own identity to remove the property from
+	 * 		The own identity to remove the property from
 	 * @param propertyName
-	 *            The name of the property to remove
+	 * 		The name of the property to remove
 	 */
 	public void removeProperty(OwnIdentity ownIdentity, String propertyName) {
 		setProperty(ownIdentity, propertyName, null);
@@ -224,9 +223,7 @@ public class WebOfTrustUpdater extends AbstractService {
 	// SERVICE METHODS
 	//
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void serviceRun() {
 		while (!shouldStop()) {
@@ -246,9 +243,7 @@ public class WebOfTrustUpdater extends AbstractService {
 		}
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	/** {@inheritDoc} */
 	@Override
 	protected void serviceStop() {
 		try {
@@ -281,7 +276,7 @@ public class WebOfTrustUpdater extends AbstractService {
 
 		/**
 		 * Performs the actual update operation.
-		 * <p>
+		 * <p/>
 		 * The implementation of this class does nothing.
 		 */
 		public void run() {
@@ -289,8 +284,7 @@ public class WebOfTrustUpdater extends AbstractService {
 		}
 
 		/**
-		 * Waits for completion of this job or stopping of the WebOfTrust
-		 * updater.
+		 * Waits for completion of this job or stopping of the WebOfTrust updater.
 		 *
 		 * @return {@code true} if this job finished successfully, {@code false}
 		 *         otherwise
@@ -318,8 +312,7 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Signals that this job has finished.
 		 *
 		 * @param success
-		 *            {@code true} if this job finished successfully,
-		 *            {@code false} otherwise
+		 * 		{@code true} if this job finished successfully, {@code false} otherwise
 		 */
 		protected void finish(boolean success) {
 			synchronized (syncObject) {
@@ -332,72 +325,17 @@ public class WebOfTrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Base class for WebOfTrust trust update jobs.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class WebOfTrustTrustUpdateJob extends WebOfTrustUpdateJob {
-
-		/** The identity giving the trust. */
-		protected final OwnIdentity truster;
-
-		/** The identity receiving the trust. */
-		protected final Identity trustee;
-
-		/**
-		 * Creates a new trust update job.
-		 *
-		 * @param truster
-		 *            The identity giving the trust
-		 * @param trustee
-		 *            The identity receiving the trust
-		 */
-		@SuppressWarnings("synthetic-access")
-		public WebOfTrustTrustUpdateJob(OwnIdentity truster, Identity trustee) {
-			this.truster = truster;
-			this.trustee = trustee;
-		}
-
-		//
-		// OBJECT METHODS
-		//
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(Object object) {
-			if ((object == null) || !object.getClass().equals(getClass())) {
-				return false;
-			}
-			WebOfTrustTrustUpdateJob updateJob = (WebOfTrustTrustUpdateJob) object;
-			return ((truster == null) ? (updateJob.truster == null) : updateJob.truster.equals(truster)) && ((trustee == null) ? (updateJob.trustee == null) : updateJob.trustee.equals(trustee));
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return getClass().hashCode() ^ ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), (truster == null) ? null : truster.getId(), (trustee == null) ? null : trustee.getId());
-		}
-
-	}
-
-	/**
 	 * Update job that sets the trust relation between two identities.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetTrustJob extends WebOfTrustTrustUpdateJob {
+	private class SetTrustJob extends WebOfTrustUpdateJob {
+
+		/** The identity giving the trust. */
+		private final OwnIdentity truster;
+
+		/** The identity receiving the trust. */
+		private final Identity trustee;
 
 		/** The score of the relation. */
 		private final Integer score;
@@ -409,24 +347,23 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Creates a new set trust job.
 		 *
 		 * @param truster
-		 *            The identity giving the trust
+		 * 		The identity giving the trust
 		 * @param trustee
-		 *            The identity receiving the trust
+		 * 		The identity receiving the trust
 		 * @param score
-		 *            The score of the trust (from -100 to 100, may be
-		 *            {@code null} to remote the trust relation completely)
+		 * 		The score of the trust (from -100 to 100, may be {@code null} to remote
+		 * 		the trust relation completely)
 		 * @param comment
-		 *            The comment of the trust relation
+		 * 		The comment of the trust relation
 		 */
 		public SetTrustJob(OwnIdentity truster, Identity trustee, Integer score, String comment) {
-			super(truster, trustee);
+			this.truster = truster;
+			this.trustee = trustee;
 			this.score = score;
 			this.comment = comment;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		@SuppressWarnings("synthetic-access")
 		public void run() {
@@ -449,6 +386,32 @@ public class WebOfTrustUpdater extends AbstractService {
 			}
 		}
 
+		//
+		// OBJECT METHODS
+		//
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean equals(Object object) {
+			if ((object == null) || !object.getClass().equals(getClass())) {
+				return false;
+			}
+			SetTrustJob updateJob = (SetTrustJob) object;
+			return ((truster == null) ? (updateJob.truster == null) : updateJob.truster.equals(truster)) && ((trustee == null) ? (updateJob.trustee == null) : updateJob.trustee.equals(trustee));
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int hashCode() {
+			return getClass().hashCode() ^ ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), (truster == null) ? null : truster.getId(), (trustee == null) ? null : trustee.getId());
+		}
+
 	}
 
 	/**
@@ -468,9 +431,9 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Creates a new context update job.
 		 *
 		 * @param ownIdentity
-		 *            The own identity to update
+		 * 		The own identity to update
 		 * @param context
-		 *            The context to update
+		 * 		The context to update
 		 */
 		@SuppressWarnings("synthetic-access")
 		public WebOfTrustContextUpdateJob(OwnIdentity ownIdentity, String context) {
@@ -482,9 +445,7 @@ public class WebOfTrustUpdater extends AbstractService {
 		// OBJECT METHODS
 		//
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public boolean equals(Object object) {
 			if ((object == null) || !object.getClass().equals(getClass())) {
@@ -494,17 +455,13 @@ public class WebOfTrustUpdater extends AbstractService {
 			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.context.equals(context);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
 			return getClass().hashCode() ^ ownIdentity.hashCode() ^ context.hashCode();
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		public String toString() {
 			return String.format("%s[ownIdentity=%s,context=%s]", getClass().getSimpleName(), ownIdentity, context);
@@ -523,17 +480,15 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Creates a new add-context job.
 		 *
 		 * @param ownIdentity
-		 *            The own identity whose contexts to manage
+		 * 		The own identity whose contexts to manage
 		 * @param context
-		 *            The context to add
+		 * 		The context to add
 		 */
 		public AddContextJob(OwnIdentity ownIdentity, String context) {
 			super(ownIdentity, context);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		@SuppressWarnings("synthetic-access")
 		public void run() {
@@ -560,17 +515,15 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Creates a new remove-context job.
 		 *
 		 * @param ownIdentity
-		 *            The own identity whose contexts to manage
+		 * 		The own identity whose contexts to manage
 		 * @param context
-		 *            The context to remove
+		 * 		The context to remove
 		 */
 		public RemoveContextJob(OwnIdentity ownIdentity, String context) {
 			super(ownIdentity, context);
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		@SuppressWarnings("synthetic-access")
 		public void run() {
@@ -587,72 +540,17 @@ public class WebOfTrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Base class for update jobs that deal with properties.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	private class WebOfTrustPropertyUpdateJob extends WebOfTrustUpdateJob {
-
-		/** The own identity to update properties on. */
-		protected final OwnIdentity ownIdentity;
-
-		/** The name of the property to update. */
-		protected final String propertyName;
-
-		/**
-		 * Creates a new property update job.
-		 *
-		 * @param ownIdentity
-		 *            The own identity to update the property on
-		 * @param propertyName
-		 *            The name of the property to update
-		 */
-		@SuppressWarnings("synthetic-access")
-		public WebOfTrustPropertyUpdateJob(OwnIdentity ownIdentity, String propertyName) {
-			this.ownIdentity = ownIdentity;
-			this.propertyName = propertyName;
-		}
-
-		//
-		// OBJECT METHODS
-		//
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean equals(Object object) {
-			if ((object == null) || !object.getClass().equals(getClass())) {
-				return false;
-			}
-			WebOfTrustPropertyUpdateJob updateJob = (WebOfTrustPropertyUpdateJob) object;
-			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.propertyName.equals(propertyName);
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int hashCode() {
-			return getClass().hashCode() ^ ownIdentity.hashCode() ^ propertyName.hashCode();
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public String toString() {
-			return String.format("%s[ownIdentity=%s,propertyName=%s]", getClass().getSimpleName(), ownIdentity, propertyName);
-		}
-
-	}
-
-	/**
 	 * WebOfTrust update job that sets a property on an {@link OwnIdentity}.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetPropertyJob extends WebOfTrustPropertyUpdateJob {
+	private class SetPropertyJob extends WebOfTrustUpdateJob {
+
+		/** The own identity to update properties on. */
+		private final OwnIdentity ownIdentity;
+
+		/** The name of the property to update. */
+		private final String propertyName;
 
 		/** The value of the property to set. */
 		private final String propertyValue;
@@ -661,20 +559,19 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * Creates a new set-property job.
 		 *
 		 * @param ownIdentity
-		 *            The own identity to set the property on
+		 * 		The own identity to set the property on
 		 * @param propertyName
-		 *            The name of the property to set
+		 * 		The name of the property to set
 		 * @param propertyValue
-		 *            The value of the property to set
+		 * 		The value of the property to set
 		 */
 		public SetPropertyJob(OwnIdentity ownIdentity, String propertyName, String propertyValue) {
-			super(ownIdentity, propertyName);
+			this.ownIdentity = ownIdentity;
+			this.propertyName = propertyName;
 			this.propertyValue = propertyValue;
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		/** {@inheritDoc} */
 		@Override
 		@SuppressWarnings("synthetic-access")
 		public void run() {
@@ -691,6 +588,32 @@ public class WebOfTrustUpdater extends AbstractService {
 				logger.log(Level.WARNING, String.format("Could not set Property “%2$s” to “%3$s” on Own Identity %1$s!", ownIdentity, propertyName, propertyValue), pe1);
 				finish(false);
 			}
+		}
+
+		//
+		// OBJECT METHODS
+		//
+
+		/** {@inheritDoc} */
+		@Override
+		public boolean equals(Object object) {
+			if ((object == null) || !object.getClass().equals(getClass())) {
+				return false;
+			}
+			SetPropertyJob updateJob = (SetPropertyJob) object;
+			return updateJob.ownIdentity.equals(ownIdentity) && updateJob.propertyName.equals(propertyName);
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public int hashCode() {
+			return getClass().hashCode() ^ ownIdentity.hashCode() ^ propertyName.hashCode();
+		}
+
+		/** {@inheritDoc} */
+		@Override
+		public String toString() {
+			return String.format("%s[ownIdentity=%s,propertyName=%s]", getClass().getSimpleName(), ownIdentity, propertyName);
 		}
 
 	}

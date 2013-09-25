@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
+
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -90,7 +93,7 @@ public class SoneInserter extends AbstractService {
 	private final FreenetInterface freenetInterface;
 
 	/** The Sone to insert. */
-	private final Sone sone;
+	private volatile Sone sone;
 
 	/** Whether a modification has been detected. */
 	private volatile boolean modified = false;
@@ -123,8 +126,21 @@ public class SoneInserter extends AbstractService {
 	//
 
 	/**
-	 * Changes the insertion delay, i.e. the time the Sone inserter waits after
-	 * it has noticed a Sone modification before it starts the insert.
+	 * Sets the Sone to insert.
+	 *
+	 * @param sone
+	 * 		The Sone to insert
+	 * @return This Sone inserter
+	 */
+	public SoneInserter setSone(Sone sone) {
+		checkArgument((this.sone == null) || sone.equals(this.sone), "Sone to insert can not be set to a different Sone");
+		this.sone = sone;
+		return this;
+	}
+
+	/**
+	 * Changes the insertion delay, i.e. the time the Sone inserter waits after it
+	 * has noticed a Sone modification before it starts the insert.
 	 *
 	 * @param insertionDelay
 	 *            The insertion delay (in seconds)
@@ -175,12 +191,14 @@ public class SoneInserter extends AbstractService {
 		long lastModificationTime = 0;
 		String lastInsertedFingerprint = lastInsertFingerprint;
 		String lastFingerprint = "";
+		Sone sone;
 		while (!shouldStop()) {
 			try {
 				/* check every seconds. */
 				sleep(1000);
 
 				/* don’t insert locked Sones. */
+				sone = this.sone;
 				if (core.isLocked(sone)) {
 					/* trigger redetection when the Sone is unlocked. */
 					synchronized (sone) {
@@ -291,7 +309,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", FluentIterable.from(sone.getAlbums()).transformAndConcat(Album.FLATTENER).toList());
+			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
 		}
 
 		//
