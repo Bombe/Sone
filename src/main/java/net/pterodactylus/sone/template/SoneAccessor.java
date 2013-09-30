@@ -118,6 +118,8 @@ public class SoneAccessor extends ReflectionAccessor {
 			return trust;
 		} else if (member.equals("allImages")) {
 			return from(asList(sone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES);
+		} else if (member.equals("albums")) {
+			return sone.getRootAlbum().getAlbums();
 		}
 		return super.get(templateContext, object, member);
 	}
