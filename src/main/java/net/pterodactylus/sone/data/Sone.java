@@ -231,7 +231,7 @@ public class Sone implements Identified, Fingerprintable, Comparable<Sone> {
 	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
 
 	/** The root album containing all albums. */
-	private final Album rootAlbum = new Album().setSone(this);
+	private final Album rootAlbum = new AlbumImpl().setSone(this);
 
 	/** Sone-specific options. */
 	private Options options = new Options();
