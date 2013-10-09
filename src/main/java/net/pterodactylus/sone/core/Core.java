@@ -52,7 +52,6 @@ import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.AlbumImpl;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -641,7 +640,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		if (!create) {
 			return null;
 		}
-		Album newAlbum = new AlbumImpl(albumId);
+		Album newAlbum = database.newAlbumBuilder().withId(albumId).build();
 		database.storeAlbum(newAlbum);
 		return newAlbum;
 	}
@@ -1601,7 +1600,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The new album
 	 */
 	public Album createAlbum(Sone sone, Album parent) {
-		AlbumImpl album = new AlbumImpl();
+		Album album = database.newAlbumBuilder().randomId().build();
 		database.storeAlbum(album);
 		album.setSone(sone);
 		parent.addAlbum(album);
