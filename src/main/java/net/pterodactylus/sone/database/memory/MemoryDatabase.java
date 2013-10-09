@@ -17,7 +17,8 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -160,7 +161,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public Optional<Post> getPost(String postId) {
 		lock.readLock().lock();
 		try {
-			return Optional.fromNullable(allPosts.get(postId));
+			return fromNullable(allPosts.get(postId));
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -294,7 +295,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public Optional<PostReply> getPostReply(String id) {
 		lock.readLock().lock();
 		try {
-			return Optional.fromNullable(allPostReplies.get(id));
+			return fromNullable(allPostReplies.get(id));
 		} finally {
 			lock.readLock().unlock();
 		}
