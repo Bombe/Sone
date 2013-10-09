@@ -34,6 +34,7 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
@@ -98,6 +99,8 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** Whether post replies are known. */
 	private final Set<String> knownPostReplies = new HashSet<String>();
+
+	private final Map<String, Album> allAlbums = new HashMap<String, Album>();
 
 	/**
 	 * Creates a new memory database.
@@ -407,6 +410,44 @@ public class MemoryDatabase extends AbstractService implements Database {
 			for (PostReply postReply : sone.getReplies()) {
 				removePostReply(postReply);
 			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	//
+	// ALBUMPROVDER METHODS
+	//
+
+	@Override
+	public Optional<Album> getAlbum(String albumId) {
+		lock.readLock().lock();
+		try {
+			return fromNullable(allAlbums.get(albumId));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	//
+	// ALBUMSTORE METHODS
+	//
+
+	@Override
+	public void storeAlbum(Album album) {
+		lock.writeLock().lock();
+		try {
+			allAlbums.put(album.getId(), album);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public void removeAlbum(Album album) {
+		lock.writeLock().lock();
+		try {
+			allAlbums.remove(album.getId());
 		} finally {
 			lock.writeLock().unlock();
 		}
