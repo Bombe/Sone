@@ -188,9 +188,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** Trusted identities, sorted by own identities. */
 	private final Multimap<OwnIdentity, Identity> trustedIdentities = Multimaps.synchronizedSetMultimap(HashMultimap.<OwnIdentity, Identity>create());
 
-	/** All known albums. */
-	private final Map<String, Album> albums = new HashMap<String, Album>();
-
 	/** All known images. */
 	private final Map<String, Image> images = new HashMap<String, Image>();
 
@@ -637,14 +634,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *         given ID exists and {@code create} is {@code false}
 	 */
 	public Album getAlbum(String albumId, boolean create) {
-		synchronized (albums) {
-			Album album = albums.get(albumId);
-			if (create && (album == null)) {
-				album = new AlbumImpl(albumId);
-				albums.put(albumId, album);
-			}
-			return album;
+		Optional<Album> album = database.getAlbum(albumId);
+		if (album.isPresent()) {
+			return album.get();
 		}
+		if (!create) {
+			return null;
+		}
+		Album newAlbum = new AlbumImpl(albumId);
+		database.storeAlbum(newAlbum);
+		return newAlbum;
 	}
 
 	/**
@@ -1034,19 +1033,17 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			}
 			database.storePostReplies(sone, sone.getReplies());
-			synchronized (albums) {
-				synchronized (images) {
-					for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
-						albums.remove(album.getId());
-						for (Image image : album.getImages()) {
-							images.remove(image.getId());
-						}
+			synchronized (images) {
+				for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
+					database.removeAlbum(album);
+					for (Image image : album.getImages()) {
+						images.remove(image.getId());
 					}
-					for (Album album : sone.getRootAlbum().getAlbums()) {
-						albums.put(album.getId(), album);
-						for (Image image : album.getImages()) {
-							images.put(image.getId(), image);
-						}
+				}
+				for (Album album : sone.getRootAlbum().getAlbums()) {
+					database.storeAlbum(album);
+					for (Image image : album.getImages()) {
+						images.put(image.getId(), image);
 					}
 				}
 			}
@@ -1605,9 +1602,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public Album createAlbum(Sone sone, Album parent) {
 		AlbumImpl album = new AlbumImpl();
-		synchronized (albums) {
-			albums.put(album.getId(), album);
-		}
+		database.storeAlbum(album);
 		album.setSone(sone);
 		parent.addAlbum(album);
 		return album;
@@ -1627,9 +1622,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return;
 		}
 		album.getParent().removeAlbum(album);
-		synchronized (albums) {
-			albums.remove(album.getId());
-		}
+		database.removeAlbum(album);
 		touchConfiguration();
 	}
 
