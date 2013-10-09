@@ -39,6 +39,8 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.impl.AlbumBuilderImpl;
+import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
 import net.pterodactylus.sone.database.PostBuilder;
@@ -427,6 +429,15 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} finally {
 			lock.readLock().unlock();
 		}
+	}
+
+	//
+	// ALBUMBUILDERFACTORY METHODS
+	//
+
+	@Override
+	public AlbumBuilder newAlbumBuilder() {
+		return new AlbumBuilderImpl();
 	}
 
 	//
