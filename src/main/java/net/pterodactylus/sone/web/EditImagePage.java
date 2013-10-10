@@ -73,8 +73,7 @@ public class EditImagePage extends SoneTemplatePage {
 				if (title.length() == 0) {
 					templateContext.set("titleMissing", true);
 				}
-				image.setTitle(title);
-				image.setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
+				image.modify().setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
 			}
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException(returnPage);

@@ -187,9 +187,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** Trusted identities, sorted by own identities. */
 	private final Multimap<OwnIdentity, Identity> trustedIdentities = Multimaps.synchronizedSetMultimap(HashMultimap.<OwnIdentity, Identity>create());
 
-	/** All known images. */
-	private final Map<String, Image> images = new HashMap<String, Image>();
-
 	/** All temporary images. */
 	private final Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
 
@@ -669,14 +666,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *         none was created
 	 */
 	public Image getImage(String imageId, boolean create) {
-		synchronized (images) {
-			Image image = images.get(imageId);
-			if (create && (image == null)) {
-				image = new Image(imageId);
-				images.put(imageId, image);
-			}
-			return image;
+		Optional<Image> image = database.getImage(imageId);
+		if (image.isPresent()) {
+			return image.get();
 		}
+		if (!create) {
+			return null;
+		}
+		Image newImage = database.newImageBuilder().withId(imageId).build();
+		database.storeImage(newImage);
+		return newImage;
 	}
 
 	/**
@@ -1032,18 +1031,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			}
 			database.storePostReplies(sone, sone.getReplies());
-			synchronized (images) {
-				for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
-					database.removeAlbum(album);
-					for (Image image : album.getImages()) {
-						images.remove(image.getId());
-					}
+			for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
+				database.removeAlbum(album);
+				for (Image image : album.getImages()) {
+					database.removeImage(image);
 				}
-				for (Album album : sone.getRootAlbum().getAlbums()) {
-					database.storeAlbum(album);
-					for (Image image : album.getImages()) {
-						images.put(image.getId(), image);
-					}
+			}
+			for (Album album : sone.getRootAlbum().getAlbums()) {
+				database.storeAlbum(album);
+				for (Image image : album.getImages()) {
+					database.storeImage(image);
 				}
 			}
 			synchronized (sones) {
@@ -1286,8 +1283,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid album image encountered, aborting load!");
 				return;
 			}
-			Image image = getImage(imageId).setSone(sone).setCreationTime(creationTime).setKey(key);
-			image.setTitle(title).setDescription(description).setWidth(width).setHeight(height);
+			Image image = getImage(imageId).modify().setSone(sone).setCreationTime(creationTime).setKey(key).setTitle(title).setDescription(description).setWidth(width).setHeight(height).update();
 			album.addImage(image);
 		}
 
@@ -1642,11 +1638,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(temporaryImage, "temporaryImage must not be null");
 		checkArgument(sone.isLocal(), "sone must be a local Sone");
 		checkArgument(sone.equals(album.getSone()), "album must belong to the given Sone");
-		Image image = new Image(temporaryImage.getId()).setSone(sone).setCreationTime(System.currentTimeMillis());
+		Image image = database.newImageBuilder().withId(temporaryImage.getId()).build().modify().setSone(sone).setCreationTime(System.currentTimeMillis()).update();
 		album.addImage(image);
-		synchronized (images) {
-			images.put(image.getId(), image);
-		}
+		database.storeImage(image);
 		imageInserter.insertImage(temporaryImage, image);
 		return image;
 	}
@@ -1664,9 +1658,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkArgument(image.getSone().isLocal(), "image must belong to a local Sone");
 		deleteTemporaryImage(image.getId());
 		image.getAlbum().removeImage(image);
-		synchronized (images) {
-			images.remove(image.getId());
-		}
+		database.removeImage(image);
 		touchConfiguration();
 	}
 
@@ -2223,7 +2215,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Subscribe
 	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
 		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", imageInsertFinishedEvent.image(), imageInsertFinishedEvent.resultingUri()));
-		imageInsertFinishedEvent.image().setKey(imageInsertFinishedEvent.resultingUri().toString());
+		imageInsertFinishedEvent.image().modify().setKey(imageInsertFinishedEvent.resultingUri().toString()).update();
 		deleteTemporaryImage(imageInsertFinishedEvent.image().getId());
 		touchConfiguration();
 	}
