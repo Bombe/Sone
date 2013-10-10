@@ -1247,7 +1247,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid album found, aborting load!");
 				return;
 			}
-			Album album = getAlbum(albumId).setSone(sone).setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId);
+			Album album = getAlbum(albumId).setSone(sone).modify().setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId).update();
 			if (albumParentId != null) {
 				Album parentAlbum = getAlbum(albumParentId, false);
 				if (parentAlbum == null) {

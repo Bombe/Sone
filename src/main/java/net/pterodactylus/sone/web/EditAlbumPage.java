@@ -72,14 +72,14 @@ public class EditAlbumPage extends SoneTemplatePage {
 			if (webInterface.getCore().getImage(albumImageId, false) == null) {
 				albumImageId = null;
 			}
-			album.setAlbumImage(albumImageId);
+			album.modify().setAlbumImage(albumImageId).update();
 			String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
 			if (title.length() == 0) {
 				templateContext.set("titleMissing", true);
 				return;
 			}
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 1000).trim();
-			album.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
+			album.modify().setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}

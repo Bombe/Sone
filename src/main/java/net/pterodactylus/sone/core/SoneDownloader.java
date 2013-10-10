@@ -468,7 +468,7 @@ public class SoneDownloader extends AbstractService {
 						return null;
 					}
 				}
-				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description);
+				Album album = core.getAlbum(id).setSone(sone).modify().setTitle(title).setDescription(description).update();
 				if (parent != null) {
 					parent.addAlbum(album);
 				} else {
@@ -501,7 +501,7 @@ public class SoneDownloader extends AbstractService {
 						album.addImage(image);
 					}
 				}
-				album.setAlbumImage(albumImageId);
+				album.modify().setAlbumImage(albumImageId).update();
 			}
 		}
 

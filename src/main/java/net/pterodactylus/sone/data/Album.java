@@ -224,15 +224,6 @@ public interface Album extends Identified, Fingerprintable {
 	Image getAlbumImage();
 
 	/**
-	 * Sets the ID of the album image.
-	 *
-	 * @param id
-	 * 		The ID of the album image
-	 * @return This album
-	 */
-	Album setAlbumImage(String id);
-
-	/**
 	 * Returns whether this album contains any other albums or images.
 	 *
 	 * @return {@code true} if this album is empty, {@code false} otherwise
@@ -279,15 +270,6 @@ public interface Album extends Identified, Fingerprintable {
 	String getTitle();
 
 	/**
-	 * Sets the title of this album.
-	 *
-	 * @param title
-	 * 		The title of this album
-	 * @return This album
-	 */
-	Album setTitle(String title);
-
-	/**
 	 * Returns the description of this album.
 	 *
 	 * @return The description of this album
@@ -295,12 +277,31 @@ public interface Album extends Identified, Fingerprintable {
 	String getDescription();
 
 	/**
-	 * Sets the description of this album.
+	 * Returns a modifier for this album.
 	 *
-	 * @param description
-	 * 		The description of this album
-	 * @return This album
+	 * @return A modifier for this album
+	 * @throws IllegalStateException
+	 * 		if this album can not be modified
 	 */
-	Album setDescription(String description);
+	Modifier modify() throws IllegalStateException;
+
+	/**
+	 * Allows modifying an album. Modifications are only performed once {@link
+	 * #update()} has succesfully returned a new album with the modifications
+	 * made.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	interface Modifier {
+
+		Modifier setTitle(String title);
+
+		Modifier setDescription(String description);
+
+		Modifier setAlbumImage(String imageId);
+
+		Album update() throws IllegalStateException;
+
+	}
 
 }

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -29,6 +31,7 @@ import java.util.UUID;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.hash.Hasher;
@@ -242,12 +245,6 @@ public class AlbumImpl implements Album {
 	}
 
 	@Override
-	public AlbumImpl setAlbumImage(String id) {
-		this.albumImage = id;
-		return this;
-	}
-
-	@Override
 	public boolean isEmpty() {
 		return albums.isEmpty() && images.isEmpty();
 	}
@@ -280,20 +277,53 @@ public class AlbumImpl implements Album {
 	}
 
 	@Override
-	public Album setTitle(String title) {
-		this.title = checkNotNull(title, "title must not be null");
-		return this;
-	}
-
-	@Override
 	public String getDescription() {
 		return description;
 	}
 
 	@Override
-	public AlbumImpl setDescription(String description) {
-		this.description = checkNotNull(description, "description must not be null");
-		return this;
+	public Modifier modify() throws IllegalStateException {
+		Preconditions.checkState(getSone().isLocal(), "album must belong to a local Sone");
+		return new Modifier() {
+			private Optional<String> title = absent();
+
+			private Optional<String> description = absent();
+
+			private Optional<String> albumImage = absent();
+
+			@Override
+			public Modifier setTitle(String title) {
+				this.title = fromNullable(title);
+				return this;
+			}
+
+			@Override
+			public Modifier setDescription(String description) {
+				this.description = fromNullable(description);
+				return this;
+			}
+
+			@Override
+			public Modifier setAlbumImage(String imageId) {
+				this.albumImage = fromNullable(imageId);
+				return this;
+			}
+
+			@Override
+			public Album update() throws IllegalStateException {
+				checkState(!albumImage.isPresent() || images.containsKey(albumImage.get()), "album image must belong to this album");
+				if (title.isPresent()) {
+					AlbumImpl.this.title = title.get();
+				}
+				if (description.isPresent()) {
+					AlbumImpl.this.description = description.get();
+				}
+				if (albumImage.isPresent()) {
+					AlbumImpl.this.albumImage = albumImage.get();
+				}
+				return AlbumImpl.this;
+			}
+		};
 	}
 
 	//

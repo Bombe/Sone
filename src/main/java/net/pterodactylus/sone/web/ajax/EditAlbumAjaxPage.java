@@ -68,7 +68,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 		}
 		String title = request.getHttpRequest().getParam("title").trim();
 		String description = request.getHttpRequest().getParam("description").trim();
-		album.setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description));
+		album.modify().setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
 		webInterface.getCore().touchConfiguration();
 		return createSuccessJsonObject().put("albumId", album.getId()).put("title", album.getTitle()).put("description", album.getDescription());
 	}
