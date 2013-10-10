@@ -311,7 +311,7 @@ public class AlbumImpl implements Album {
 
 			@Override
 			public Album update() throws IllegalStateException {
-				checkState(!albumImage.isPresent() || images.containsKey(albumImage.get()), "album image must belong to this album");
+				checkState(!albumImage.isPresent(), "album image must belong to this album");
 				if (title.isPresent()) {
 					AlbumImpl.this.title = title.get();
 				}
