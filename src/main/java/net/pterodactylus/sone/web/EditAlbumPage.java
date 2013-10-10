@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
