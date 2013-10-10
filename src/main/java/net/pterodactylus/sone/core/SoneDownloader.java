@@ -35,6 +35,7 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneImpl;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.util.io.Closer;
@@ -239,7 +240,7 @@ public class SoneDownloader extends AbstractService {
 			return null;
 		}
 
-		Sone sone = new Sone(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
+		Sone sone = new SoneImpl(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
 
 		SimpleXML soneXml;
 		try {

@@ -62,6 +62,7 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneImpl;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
@@ -378,11 +379,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (sones) {
 			Sone sone = sones.get(id);
 			if ((sone == null) && create) {
-				sone = new Sone(id, true);
+				sone = new SoneImpl(id, true);
 				sones.put(id, sone);
 			}
 			if ((sone != null) && !sone.isLocal()) {
-				sone = new Sone(id, true);
+				sone = new SoneImpl(id, true);
 				sones.put(id, sone);
 			}
 			return sone;
@@ -419,7 +420,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (sones) {
 			Sone sone = sones.get(id);
 			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
-				sone = new Sone(id, false);
+				sone = new SoneImpl(id, false);
 				sones.put(id, sone);
 			}
 			return sone;
