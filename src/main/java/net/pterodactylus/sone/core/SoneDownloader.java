@@ -308,16 +308,8 @@ public class SoneDownloader extends AbstractService {
 			}
 		}
 
-		String soneInsertUri = soneXml.getValue("insert-uri", null);
-		if ((soneInsertUri != null) && (sone.getInsertUri() == null)) {
-			try {
-				sone.setInsertUri(new FreenetURI(soneInsertUri));
-				sone.setLatestEdition(Math.max(sone.getRequestUri().getEdition(), sone.getInsertUri().getEdition()));
-			} catch (MalformedURLException mue1) {
-				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, String.format("Downloaded Sone %s has invalid insert URI: %s", sone, soneInsertUri), mue1);
-				return null;
-			}
+		if (originalSone.getInsertUri() != null) {
+			sone.setInsertUri(originalSone.getInsertUri());
 		}
 
 		SimpleXML profileXml = soneXml.getNode("profile");
