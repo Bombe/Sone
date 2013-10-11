@@ -206,13 +206,28 @@ public class ImageImpl implements Image {
 				checkState(!key.isPresent() || (ImageImpl.this.key == null) || key.get().equals(ImageImpl.this.key), "can not change key once set");
 				checkState(!width.isPresent() || (ImageImpl.this.width == 0) || width.get().equals(ImageImpl.this.width), "can not change width once set");
 				checkState(!height.isPresent() || (ImageImpl.this.height == 0) || height.get().equals(ImageImpl.this.height), "can not change height once set");
-				ImageImpl.this.sone = sone.or(ImageImpl.this.sone);
-				ImageImpl.this.creationTime = creationTime.or(ImageImpl.this.creationTime);
-				ImageImpl.this.key = key.or(ImageImpl.this.key);
-				ImageImpl.this.title = title.or(ImageImpl.this.title);
-				ImageImpl.this.description = description.or(ImageImpl.this.description);
-				ImageImpl.this.width = width.or(ImageImpl.this.width);
-				ImageImpl.this.height = height.or(ImageImpl.this.height);
+
+				if (sone.isPresent()) {
+					ImageImpl.this.sone = sone.get();
+				}
+				if (creationTime.isPresent()) {
+					ImageImpl.this.creationTime = creationTime.get();
+				}
+				if (key.isPresent()) {
+					ImageImpl.this.key = key.get();
+				}
+				if (title.isPresent()) {
+					ImageImpl.this.title = title.get();
+				}
+				if (description.isPresent()) {
+					ImageImpl.this.description = description.get();
+				}
+				if (width.isPresent()) {
+					ImageImpl.this.width = width.get();
+				}
+				if (height.isPresent()) {
+					ImageImpl.this.height = height.get();
+				}
 
 				return ImageImpl.this;
 			}
