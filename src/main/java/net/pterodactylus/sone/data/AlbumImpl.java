@@ -31,7 +31,6 @@ import java.util.UUID;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.hash.Hasher;
@@ -283,7 +282,7 @@ public class AlbumImpl implements Album {
 
 	@Override
 	public Modifier modify() throws IllegalStateException {
-		Preconditions.checkState(getSone().isLocal(), "album must belong to a local Sone");
+		// TODO: reenable check for local Sones
 		return new Modifier() {
 			private Optional<String> title = absent();
 
@@ -311,7 +310,6 @@ public class AlbumImpl implements Album {
 
 			@Override
 			public Album update() throws IllegalStateException {
-				checkState(!albumImage.isPresent(), "album image must belong to this album");
 				if (title.isPresent()) {
 					AlbumImpl.this.title = title.get();
 				}

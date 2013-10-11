@@ -141,7 +141,7 @@ public class ImageImpl implements Image {
 	}
 
 	public Modifier modify() throws IllegalStateException {
-		checkState((sone == null) || sone.isLocal(), "only local images may be modified");
+		// TODO: reenable check for local images
 		return new Modifier() {
 			private Optional<Sone> sone = absent();
 
@@ -201,12 +201,11 @@ public class ImageImpl implements Image {
 
 			@Override
 			public Image update() throws IllegalStateException {
-				checkState(!sone.isPresent() || sone.get().equals(ImageImpl.this.sone), "can not change Sone once set");
+				checkState(!sone.isPresent() || (ImageImpl.this.sone == null) || sone.get().equals(ImageImpl.this.sone), "can not change Sone once set");
 				checkState(!creationTime.isPresent() || (ImageImpl.this.creationTime == 0), "can not change creation time once set");
-				checkState(!key.isPresent() || key.get().equals(ImageImpl.this.key), "can not change key once set");
-				checkState(!width.isPresent() || width.get().equals(ImageImpl.this.width), "can not change width once set");
-				checkState(!height.isPresent() || height.get().equals(ImageImpl.this.height), "can not change height once set");
-
+				checkState(!key.isPresent() || (ImageImpl.this.key == null) || key.get().equals(ImageImpl.this.key), "can not change key once set");
+				checkState(!width.isPresent() || (ImageImpl.this.width == 0) || width.get().equals(ImageImpl.this.width), "can not change width once set");
+				checkState(!height.isPresent() || (ImageImpl.this.height == 0) || height.get().equals(ImageImpl.this.height), "can not change height once set");
 				ImageImpl.this.sone = sone.or(ImageImpl.this.sone);
 				ImageImpl.this.creationTime = creationTime.or(ImageImpl.this.creationTime);
 				ImageImpl.this.key = key.or(ImageImpl.this.key);
