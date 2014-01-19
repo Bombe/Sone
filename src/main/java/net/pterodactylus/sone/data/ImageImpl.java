@@ -202,7 +202,7 @@ public class ImageImpl implements Image {
 			@Override
 			public Image update() throws IllegalStateException {
 				checkState(!sone.isPresent() || (ImageImpl.this.sone == null) || sone.get().equals(ImageImpl.this.sone), "can not change Sone once set");
-				checkState(!creationTime.isPresent() || (ImageImpl.this.creationTime == 0), "can not change creation time once set");
+				checkState(!creationTime.isPresent() || ((ImageImpl.this.creationTime == 0) || (ImageImpl.this.creationTime == creationTime.get())), "can not change creation time once set");
 				checkState(!key.isPresent() || (ImageImpl.this.key == null) || key.get().equals(ImageImpl.this.key), "can not change key once set");
 				checkState(!width.isPresent() || (ImageImpl.this.width == 0) || width.get().equals(ImageImpl.this.width), "can not change width once set");
 				checkState(!height.isPresent() || (ImageImpl.this.height == 0) || height.get().equals(ImageImpl.this.height), "can not change height once set");
