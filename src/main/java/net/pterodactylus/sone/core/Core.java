@@ -1763,7 +1763,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (sones) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
 				soneInserter.getValue().stop();
-				saveSone(soneInserter.getKey());
+				saveSone(getLocalSone(soneInserter.getKey().getId(), false));
 			}
 		}
 		saveConfiguration();
