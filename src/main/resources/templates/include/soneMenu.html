@@ -4,7 +4,7 @@
 		<%ifnull !sone.profile.avatar>
 			<%sone.profile.avatar|image-link max-width==64 max-height==64 mode==enlarge title=sone.niceName>
 		<%else>
-			<img src="/WebOfTrust/GetIdenticon?identity=<%sone.id|html>&amp;width=64&amp;height=64" width="64" height="64" alt="Avatar Image" />
+			<img src="/WebOfTrust/GetIdenticon?identity=<%sone.id|html>&amp;width=128&amp;height=128" width="64" height="64" alt="Avatar Image" />
 		<%/if>
 	</div>
 	<div class="inner-menu">

@@ -1,5 +1,5 @@
 /*
- * Sone - Database.java - Copyright © 2013 David Roden
+ * Sone - ImageBuilder.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,26 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.pterodactylus.sone.database;
 
-import com.google.common.util.concurrent.Service;
+import net.pterodactylus.sone.data.Image;
 
 /**
- * Database for Sone data. This interface combines the various provider, store,
- * and builder factory interfaces into a single interface and adds some methods
- * necessary for lifecycle management.
+ * Builder for {@link Image} objects.
  *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
  */
-public interface Database extends Service, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase {
+public interface ImageBuilder {
 
-	/**
-	 * Saves the database.
-	 *
-	 * @throws DatabaseException
-	 *             if an error occurs while saving
-	 */
-	public void save() throws DatabaseException;
+	ImageBuilder randomId();
+
+	ImageBuilder withId(String id);
+
+	Image build() throws IllegalStateException;
 
 }

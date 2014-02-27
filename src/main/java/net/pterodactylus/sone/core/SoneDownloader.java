@@ -35,6 +35,7 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneImpl;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.util.io.Closer;
@@ -239,7 +240,7 @@ public class SoneDownloader extends AbstractService {
 			return null;
 		}
 
-		Sone sone = new Sone(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
+		Sone sone = new SoneImpl(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
 
 		SimpleXML soneXml;
 		try {
@@ -307,16 +308,8 @@ public class SoneDownloader extends AbstractService {
 			}
 		}
 
-		String soneInsertUri = soneXml.getValue("insert-uri", null);
-		if ((soneInsertUri != null) && (sone.getInsertUri() == null)) {
-			try {
-				sone.setInsertUri(new FreenetURI(soneInsertUri));
-				sone.setLatestEdition(Math.max(sone.getRequestUri().getEdition(), sone.getInsertUri().getEdition()));
-			} catch (MalformedURLException mue1) {
-				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, String.format("Downloaded Sone %s has invalid insert URI: %s", sone, soneInsertUri), mue1);
-				return null;
-			}
+		if (originalSone.getInsertUri() != null) {
+			sone.setInsertUri(originalSone.getInsertUri());
 		}
 
 		SimpleXML profileXml = soneXml.getNode("profile");
@@ -468,7 +461,7 @@ public class SoneDownloader extends AbstractService {
 						return null;
 					}
 				}
-				Album album = core.getAlbum(id).setSone(sone).setTitle(title).setDescription(description);
+				Album album = core.getAlbum(id).setSone(sone).modify().setTitle(title).setDescription(description).update();
 				if (parent != null) {
 					parent.addAlbum(album);
 				} else {
@@ -495,13 +488,13 @@ public class SoneDownloader extends AbstractService {
 							logger.log(Level.WARNING, String.format("Downloaded Sone %s contains image %s with invalid dimensions (%s, %s)!", sone, imageId, imageWidthString, imageHeightString));
 							return null;
 						}
-						Image image = core.getImage(imageId).setSone(sone).setKey(imageKey).setCreationTime(creationTime);
-						image.setTitle(imageTitle).setDescription(imageDescription);
-						image.setWidth(imageWidth).setHeight(imageHeight);
+						Image image = core.getImage(imageId).modify().setSone(sone).setKey(imageKey).setCreationTime(creationTime).update();
+						image = image.modify().setTitle(imageTitle).setDescription(imageDescription).update();
+						image = image.modify().setWidth(imageWidth).setHeight(imageHeight).update();
 						album.addImage(image);
 					}
 				}
-				album.setAlbumImage(albumImageId);
+				album.modify().setAlbumImage(albumImageId).update();
 			}
 		}
 

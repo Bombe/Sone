@@ -43,7 +43,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 		if ("backlinks".equals(member)) {
 			List<Link> backlinks = new ArrayList<Link>();
 			Album currentAlbum = album;
-			while (!currentAlbum.equals(album.getSone().getRootAlbum())) {
+			while (!currentAlbum.isRoot()) {
 				backlinks.add(0, new Link("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getTitle()));
 				currentAlbum = currentAlbum.getParent();
 			}

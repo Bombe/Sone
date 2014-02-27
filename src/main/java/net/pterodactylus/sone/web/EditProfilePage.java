@@ -17,11 +17,14 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.text.TextFilter.filter;
+
 import java.util.List;
 
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
@@ -85,7 +88,8 @@ public class EditProfilePage extends SoneTemplatePage {
 				profile.setAvatar(webInterface.getCore().getImage(avatarId, false));
 				for (Field field : fields) {
 					String value = request.getHttpRequest().getPartAsStringFailsafe("field-" + field.getId(), 400);
-					field.setValue(value);
+					String filteredValue = filter(request.getHttpRequest().getHeader("Host"), value);
+					field.setValue(filteredValue);
 				}
 				currentSone.setProfile(profile);
 				webInterface.getCore().touchConfiguration();

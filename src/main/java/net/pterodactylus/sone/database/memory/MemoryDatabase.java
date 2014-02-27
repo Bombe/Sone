@@ -17,7 +17,8 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import static com.google.common.base.Preconditions.*;
+import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,12 +34,18 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.impl.AlbumBuilderImpl;
+import net.pterodactylus.sone.data.impl.ImageBuilderImpl;
+import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
+import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostDatabase;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -97,6 +104,10 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** Whether post replies are known. */
 	private final Set<String> knownPostReplies = new HashSet<String>();
+
+	private final Map<String, Album> allAlbums = new HashMap<String, Album>();
+
+	private final Map<String, Image> allImages = new HashMap<String, Image>();
 
 	/**
 	 * Creates a new memory database.
@@ -160,7 +171,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public Optional<Post> getPost(String postId) {
 		lock.readLock().lock();
 		try {
-			return Optional.fromNullable(allPosts.get(postId));
+			return fromNullable(allPosts.get(postId));
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -294,7 +305,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public Optional<PostReply> getPostReply(String id) {
 		lock.readLock().lock();
 		try {
-			return Optional.fromNullable(allPostReplies.get(id));
+			return fromNullable(allPostReplies.get(id));
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -406,6 +417,100 @@ public class MemoryDatabase extends AbstractService implements Database {
 			for (PostReply postReply : sone.getReplies()) {
 				removePostReply(postReply);
 			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	//
+	// ALBUMPROVDER METHODS
+	//
+
+	@Override
+	public Optional<Album> getAlbum(String albumId) {
+		lock.readLock().lock();
+		try {
+			return fromNullable(allAlbums.get(albumId));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	//
+	// ALBUMBUILDERFACTORY METHODS
+	//
+
+	@Override
+	public AlbumBuilder newAlbumBuilder() {
+		return new AlbumBuilderImpl();
+	}
+
+	//
+	// ALBUMSTORE METHODS
+	//
+
+	@Override
+	public void storeAlbum(Album album) {
+		lock.writeLock().lock();
+		try {
+			allAlbums.put(album.getId(), album);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public void removeAlbum(Album album) {
+		lock.writeLock().lock();
+		try {
+			allAlbums.remove(album.getId());
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	//
+	// IMAGEPROVIDER METHODS
+	//
+
+	@Override
+	public Optional<Image> getImage(String imageId) {
+		lock.readLock().lock();
+		try {
+			return fromNullable(allImages.get(imageId));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	//
+	// IMAGEBUILDERFACTORY METHODS
+	//
+
+	@Override
+	public ImageBuilder newImageBuilder() {
+		return new ImageBuilderImpl();
+	}
+
+	//
+	// IMAGESTORE METHODS
+	//
+
+	@Override
+	public void storeImage(Image image) {
+		lock.writeLock().lock();
+		try {
+			allImages.put(image.getId(), image);
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public void removeImage(Image image) {
+		lock.writeLock().lock();
+		try {
+			allImages.remove(image.getId());
 		} finally {
 			lock.writeLock().unlock();
 		}

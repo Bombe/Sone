@@ -1,5 +1,5 @@
 /*
- * Sone - Database.java - Copyright © 2013 David Roden
+ * Sone - AlbumBuilderFactory.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,23 +17,18 @@
 
 package net.pterodactylus.sone.database;
 
-import com.google.common.util.concurrent.Service;
-
 /**
- * Database for Sone data. This interface combines the various provider, store,
- * and builder factory interfaces into a single interface and adds some methods
- * necessary for lifecycle management.
+ * Factory for {@link AlbumBuilder}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Database extends Service, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase {
+public interface AlbumBuilderFactory {
 
 	/**
-	 * Saves the database.
+	 * Creates a new album builder.
 	 *
-	 * @throws DatabaseException
-	 *             if an error occurs while saving
+	 * @return A new album builder
 	 */
-	public void save() throws DatabaseException;
+	AlbumBuilder newAlbumBuilder();
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - Database.java - Copyright © 2013 David Roden
+ * Sone - MemoryAlbumBuilder.java - Copyright © 2013 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.data.impl;
 
-import com.google.common.util.concurrent.Service;
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.database.AlbumBuilder;
 
 /**
- * Database for Sone data. This interface combines the various provider, store,
- * and builder factory interfaces into a single interface and adds some methods
- * necessary for lifecycle management.
+ * {@link AlbumBuilder} implementation that creates {@link AlbumImpl} objects.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public interface Database extends Service, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase {
+public class AlbumBuilderImpl extends AbstractAlbumBuilder {
 
-	/**
-	 * Saves the database.
-	 *
-	 * @throws DatabaseException
-	 *             if an error occurs while saving
-	 */
-	public void save() throws DatabaseException;
+	@Override
+	public Album build() throws IllegalStateException {
+		validate();
+		return randomId ? new AlbumImpl() : new AlbumImpl(id);
+	}
 
 }
