@@ -53,7 +53,7 @@ public class UpdateChecker {
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
 
 	/** The current latest known edition. */
-	private static final int LATEST_EDITION = 60;
+	private static final int LATEST_EDITION = 61;
 
 	/** The event bus. */
 	private final EventBus eventBus;
