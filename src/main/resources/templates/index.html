@@ -13,6 +13,7 @@
 		<%foreachelse>
 			<p><%= Page.Index.PostList.Text.NoPostYet|l10n|html></p>
 			<p><%= Page.Index.PostList.Text.FollowSomeSones|l10n|html|replace needle=='{link}' replacement=='<a href="knownSones.html">'|replace needle=='{/link}' replacement=='</a>'></p>
+			<p><%= Page.Index.PostList.Text.AutoFollowOption|l10n|html|replace needle=='{link}' replacement=='<a href="options.html">'|replace needle=='{/link}' replacement=='</a>'></p>
 		<%/foreach>
 		<%include include/pagination.html pageParameter==page>
 	</div>
