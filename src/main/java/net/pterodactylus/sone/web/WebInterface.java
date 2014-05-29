@@ -796,6 +796,23 @@ public class WebInterface {
 		}
 	}
 
+	private boolean localSoneMentionedInNewPostOrReply(Post post) {
+		if (!post.getSone().isLocal()) {
+			if (!getMentionedSones(post.getText()).isEmpty() && !post.isKnown()) {
+				return true;
+			}
+		}
+		for (PostReply postReply : getCore().getReplies(post.getId())) {
+			if (postReply.getSone().isLocal()) {
+				continue;
+			}
+			if (!getMentionedSones(postReply.getText()).isEmpty() && !postReply.isKnown()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	//
 	// EVENT HANDLERS
 	//
@@ -857,7 +874,7 @@ public class WebInterface {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (!getMentionedSones(reply.getText()).isEmpty() && !isLocal && reply.getPost().isPresent() && (reply.getTime() <= System.currentTimeMillis())) {
+			if (reply.getPost().isPresent() && localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
 				mentionNotification.add(reply.getPost().get());
 				notificationManager.addNotification(mentionNotification);
 			}
@@ -887,7 +904,9 @@ public class WebInterface {
 	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
 		newPostNotification.remove(markPostKnownEvent.post());
 		localPostNotification.remove(markPostKnownEvent.post());
-		mentionNotification.remove(markPostKnownEvent.post());
+		if (!localSoneMentionedInNewPostOrReply(markPostKnownEvent.post())) {
+			mentionNotification.remove(markPostKnownEvent.post());
+		}
 	}
 
 	/**
@@ -898,9 +917,12 @@ public class WebInterface {
 	 */
 	@Subscribe
 	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
-		newReplyNotification.remove(markPostReplyKnownEvent.postReply());
-		localReplyNotification.remove(markPostReplyKnownEvent.postReply());
-		mentionNotification.remove(markPostReplyKnownEvent.postReply().getPost().get());
+		PostReply postReply = markPostReplyKnownEvent.postReply();
+		newReplyNotification.remove(postReply);
+		localReplyNotification.remove(postReply);
+		if (postReply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(postReply.getPost().get())) {
+			mentionNotification.remove(postReply.getPost().get());
+		}
 	}
 
 	/**
@@ -924,7 +946,9 @@ public class WebInterface {
 	public void postRemoved(PostRemovedEvent postRemovedEvent) {
 		newPostNotification.remove(postRemovedEvent.post());
 		localPostNotification.remove(postRemovedEvent.post());
-		mentionNotification.remove(postRemovedEvent.post());
+		if (!localSoneMentionedInNewPostOrReply(postRemovedEvent.post())) {
+			mentionNotification.remove(postRemovedEvent.post());
+		}
 	}
 
 	/**
@@ -938,14 +962,8 @@ public class WebInterface {
 		PostReply reply = postReplyRemovedEvent.postReply();
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
-		if (!getMentionedSones(reply.getText()).isEmpty() && reply.getPost().isPresent()) {
-			boolean isMentioned = false;
-			for (PostReply existingReply : getCore().getReplies(reply.getPostId())) {
-				isMentioned |= !reply.isKnown() && !getMentionedSones(existingReply.getText()).isEmpty();
-			}
-			if (!isMentioned) {
-				mentionNotification.remove(reply.getPost().get());
-			}
+		if (reply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
+			mentionNotification.remove(reply.getPost().get());
 		}
 	}
 
