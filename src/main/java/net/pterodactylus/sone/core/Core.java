@@ -994,10 +994,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				return;
 			}
 			/* find removed posts. */
+			Collection<Post> removedPosts = new ArrayList<Post>();
+			Collection<Post> newPosts = new ArrayList<Post>();
 			Collection<Post> existingPosts = database.getPosts(sone.getId());
 			for (Post oldPost : existingPosts) {
 				if (!sone.getPosts().contains(oldPost)) {
-					eventBus.post(new PostRemovedEvent(oldPost));
+					removedPosts.add(oldPost);
 				}
 			}
 			/* find new posts. */
@@ -1008,15 +1010,17 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				if (newPost.getTime() < getSoneFollowingTime(sone)) {
 					newPost.setKnown(true);
 				} else if (!newPost.isKnown()) {
-					eventBus.post(new NewPostFoundEvent(newPost));
+					newPosts.add(newPost);
 				}
 			}
 			/* store posts. */
 			database.storePosts(sone, sone.getPosts());
+			Collection<PostReply> newPostReplies = new ArrayList<PostReply>();
+			Collection<PostReply> removedPostReplies = new ArrayList<PostReply>();
 			if (!soneRescueMode) {
 				for (PostReply reply : storedSone.get().getReplies()) {
 					if (!sone.getReplies().contains(reply)) {
-						eventBus.post(new PostReplyRemovedEvent(reply));
+						removedPostReplies.add(reply);
 					}
 				}
 			}
@@ -1028,7 +1032,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				if (reply.getTime() < getSoneFollowingTime(sone)) {
 					reply.setKnown(true);
 				} else if (!reply.isKnown()) {
-					eventBus.post(new NewPostReplyFoundEvent(reply));
+					newPostReplies.add(reply);
 				}
 			}
 			database.storePostReplies(sone, sone.getReplies());
@@ -1037,6 +1041,18 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				for (Image image : album.getImages()) {
 					database.removeImage(image);
 				}
+			}
+			for (Post removedPost : removedPosts) {
+				eventBus.post(new PostRemovedEvent(removedPost));
+			}
+			for (Post newPost : newPosts) {
+				eventBus.post(new NewPostFoundEvent(newPost));
+			}
+			for (PostReply removedPostReply : removedPostReplies) {
+				eventBus.post(new PostReplyRemovedEvent(removedPostReply));
+			}
+			for (PostReply newPostReply : newPostReplies) {
+				eventBus.post(new NewPostReplyFoundEvent(newPostReply));
 			}
 			for (Album album : sone.getRootAlbum().getAlbums()) {
 				database.storeAlbum(album);
