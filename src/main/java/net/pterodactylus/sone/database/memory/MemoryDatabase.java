@@ -258,8 +258,8 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			/* remove all posts by the Sone. */
-			getPostsFrom(sone.getId()).clear();
-			for (Post post : posts) {
+			Collection<Post> oldPosts = getPostsFrom(sone.getId());
+			for (Post post : oldPosts) {
 				allPosts.remove(post.getId());
 				if (post.getRecipientId().isPresent()) {
 					getPostsTo(post.getRecipientId().get()).remove(post);
