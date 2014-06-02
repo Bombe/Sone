@@ -19,6 +19,7 @@ package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static net.pterodactylus.sone.data.Reply.TIME_COMPARATOR;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,8 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -38,7 +37,6 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.AlbumBuilderImpl;
 import net.pterodactylus.sone.data.impl.ImageBuilderImpl;
@@ -99,10 +97,16 @@ public class MemoryDatabase extends AbstractService implements Database {
 		public int compare(String leftString, String rightString) {
 			return leftString.compareTo(rightString);
 		}
-	}, PostReply.TIME_COMPARATOR);
+	}, TIME_COMPARATOR);
 
 	/** Replies by post. */
-	private final Map<String, SortedSet<PostReply>> postReplies = new HashMap<String, SortedSet<PostReply>>();
+	private final SortedSetMultimap<String, PostReply> postReplies = TreeMultimap.create(new Comparator<String>() {
+
+		@Override
+		public int compare(String leftString, String rightString) {
+			return leftString.compareTo(rightString);
+		}
+	}, TIME_COMPARATOR);
 
 	/** Whether post replies are known. */
 	private final Set<String> knownPostReplies = new HashSet<String>();
@@ -347,13 +351,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allPostReplies.put(postReply.getId(), postReply);
-			if (postReplies.containsKey(postReply.getPostId())) {
-				postReplies.get(postReply.getPostId()).add(postReply);
-			} else {
-				TreeSet<PostReply> replies = new TreeSet<PostReply>(Reply.TIME_COMPARATOR);
-				replies.add(postReply);
-				postReplies.put(postReply.getPostId(), replies);
-			}
+			postReplies.put(postReply.getPostId(), postReply);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -379,13 +377,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 			for (PostReply postReply : postReplies) {
 				allPostReplies.put(postReply.getId(), postReply);
 				sonePostReplies.put(postReply.getSone().getId(), postReply);
-				if (this.postReplies.containsKey(postReply.getPostId())) {
-					this.postReplies.get(postReply.getPostId()).add(postReply);
-				} else {
-					TreeSet<PostReply> replies = new TreeSet<PostReply>(Reply.TIME_COMPARATOR);
-					replies.add(postReply);
-					this.postReplies.put(postReply.getPostId(), replies);
-				}
+				this.postReplies.put(postReply.getPostId(), postReply);
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -400,9 +392,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 			allPostReplies.remove(postReply.getId());
 			if (postReplies.containsKey(postReply.getPostId())) {
 				postReplies.get(postReply.getPostId()).remove(postReply);
-				if (postReplies.get(postReply.getPostId()).isEmpty()) {
-					postReplies.remove(postReply.getPostId());
-				}
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -683,10 +672,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private Collection<PostReply> getRepliesFrom(String id) {
 		lock.readLock().lock();
 		try {
-			if (sonePostReplies.containsKey(id)) {
-				return Collections.unmodifiableCollection(sonePostReplies.get(id));
-			}
-			return Collections.emptySet();
+			return Collections.unmodifiableCollection(sonePostReplies.get(id));
 		} finally {
 			lock.readLock().unlock();
 		}
