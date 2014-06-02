@@ -54,6 +54,8 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.util.concurrent.AbstractService;
@@ -79,7 +81,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private final Map<String, Post> allPosts = new HashMap<String, Post>();
 
 	/** All posts by their Sones. */
-	private final Map<String, Collection<Post>> sonePosts = new HashMap<String, Collection<Post>>();
+	private final Multimap<String, Post> sonePosts = HashMultimap.create();
 
 	/** All posts by their recipient. */
 	private final Map<String, Collection<Post>> recipientPosts = new HashMap<String, Collection<Post>>();
@@ -608,26 +610,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * @return All posts
 	 */
 	private Collection<Post> getPostsFrom(String soneId) {
-		Collection<Post> posts = null;
 		lock.readLock().lock();
 		try {
-			posts = sonePosts.get(soneId);
+			return sonePosts.get(soneId);
 		} finally {
 			lock.readLock().unlock();
 		}
-		if (posts != null) {
-			return posts;
-		}
-
-		posts = new HashSet<Post>();
-		lock.writeLock().lock();
-		try {
-			sonePosts.put(soneId, posts);
-		} finally {
-			lock.writeLock().unlock();
-		}
-
-		return posts;
 	}
 
 	/**
