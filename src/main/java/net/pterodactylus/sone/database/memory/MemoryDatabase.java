@@ -84,7 +84,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private final Multimap<String, Post> sonePosts = HashMultimap.create();
 
 	/** All posts by their recipient. */
-	private final Map<String, Collection<Post>> recipientPosts = new HashMap<String, Collection<Post>>();
+	private final Multimap<String, Post> recipientPosts = HashMultimap.create();
 
 	/** Whether posts are known. */
 	private final Set<String> knownPosts = new HashSet<String>();
@@ -627,26 +627,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * @return All posts
 	 */
 	private Collection<Post> getPostsTo(String recipientId) {
-		Collection<Post> posts = null;
 		lock.readLock().lock();
 		try {
-			posts = recipientPosts.get(recipientId);
+			return recipientPosts.get(recipientId);
 		} finally {
 			lock.readLock().unlock();
 		}
-		if (posts != null) {
-			return posts;
-		}
-
-		posts = new HashSet<Post>();
-		lock.writeLock().lock();
-		try {
-			recipientPosts.put(recipientId, posts);
-		} finally {
-			lock.writeLock().unlock();
-		}
-
-		return posts;
 	}
 
 	/** Loads the known posts. */
