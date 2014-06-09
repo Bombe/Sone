@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.util.template.TemplateParser.parse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -125,6 +127,7 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
+import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
@@ -143,7 +146,6 @@ import net.pterodactylus.util.template.ReplaceFilter;
 import net.pterodactylus.util.template.StoreFilter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContextFactory;
-import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.web.RedirectPage;
@@ -287,38 +289,47 @@ public class WebInterface {
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template newSoneNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newSoneNotification.html"));
+		Template newSoneNotificationTemplate = parseTemplate("/templates/notify/newSoneNotification.html");
 		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate, false);
 
-		Template newPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
+		Template newPostNotificationTemplate = parseTemplate("/templates/notify/newPostNotification.html");
 		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
-		Template localPostNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newPostNotification.html"));
+		Template localPostNotificationTemplate = parseTemplate("/templates/notify/newPostNotification.html");
 		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", localPostNotificationTemplate, false);
 
-		Template newReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
+		Template newReplyNotificationTemplate = parseTemplate("/templates/notify/newReplyNotification.html");
 		newReplyNotification = new ListNotification<PostReply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
 
-		Template localReplyNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/newReplyNotification.html"));
+		Template localReplyNotificationTemplate = parseTemplate("/templates/notify/newReplyNotification.html");
 		localReplyNotification = new ListNotification<PostReply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 
-		Template mentionNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/mentionNotification.html"));
+		Template mentionNotificationTemplate = parseTemplate("/templates/notify/mentionNotification.html");
 		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
 
-		Template lockedSonesTemplate = TemplateParser.parse(createReader("/templates/notify/lockedSonesNotification.html"));
+		Template lockedSonesTemplate = parseTemplate("/templates/notify/lockedSonesNotification.html");
 		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
 
-		Template newVersionTemplate = TemplateParser.parse(createReader("/templates/notify/newVersionNotification.html"));
+		Template newVersionTemplate = parseTemplate("/templates/notify/newVersionNotification.html");
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 
-		Template insertingImagesTemplate = TemplateParser.parse(createReader("/templates/notify/inserting-images-notification.html"));
+		Template insertingImagesTemplate = parseTemplate("/templates/notify/inserting-images-notification.html");
 		insertingImagesNotification = new ListNotification<Image>("inserting-images-notification", "images", insertingImagesTemplate);
 
-		Template insertedImagesTemplate = TemplateParser.parse(createReader("/templates/notify/inserted-images-notification.html"));
+		Template insertedImagesTemplate = parseTemplate("/templates/notify/inserted-images-notification.html");
 		insertedImagesNotification = new ListNotification<Image>("inserted-images-notification", "images", insertedImagesTemplate);
 
-		Template imageInsertFailedTemplate = TemplateParser.parse(createReader("/templates/notify/image-insert-failed-notification.html"));
+		Template imageInsertFailedTemplate = parseTemplate("/templates/notify/image-insert-failed-notification.html");
 		imageInsertFailedNotification = new ListNotification<Image>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
+	}
+
+	private Template parseTemplate(String resourceName) {
+		Reader reader = createReader(resourceName);
+		try {
+			return parse(reader);
+		} finally {
+			Closer.close(reader);
+		}
 	}
 
 	//
@@ -509,7 +520,7 @@ public class WebInterface {
 	 */
 	public void setFirstStart(boolean firstStart) {
 		if (firstStart) {
-			Template firstStartNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/firstStartNotification.html"));
+			Template firstStartNotificationTemplate = parseTemplate("/templates/notify/firstStartNotification.html");
 			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
 			notificationManager.addNotification(firstStartNotification);
 		}
@@ -524,7 +535,7 @@ public class WebInterface {
 	 */
 	public void setNewConfig(boolean newConfig) {
 		if (newConfig && !hasFirstStartNotification()) {
-			Template configNotReadNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/configNotReadNotification.html"));
+			Template configNotReadNotificationTemplate = parseTemplate("/templates/notify/configNotReadNotification.html");
 			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
 			notificationManager.addNotification(configNotReadNotification);
 		}
@@ -555,7 +566,7 @@ public class WebInterface {
 		registerToadlets();
 
 		/* notification templates. */
-		Template startupNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/startupNotification.html"));
+		Template startupNotificationTemplate = parseTemplate("/templates/notify/startupNotification.html");
 
 		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
 		notificationManager.addNotification(startupNotification);
@@ -568,7 +579,7 @@ public class WebInterface {
 			}
 		}, 2, TimeUnit.MINUTES);
 
-		Template wotMissingNotificationTemplate = TemplateParser.parse(createReader("/templates/notify/wotMissingNotification.html"));
+		Template wotMissingNotificationTemplate = parseTemplate("/templates/notify/wotMissingNotification.html");
 		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
 		ticker.scheduleAtFixedRate(new Runnable() {
 
@@ -601,36 +612,36 @@ public class WebInterface {
 	 * Register all toadlets.
 	 */
 	private void registerToadlets() {
-		Template emptyTemplate = TemplateParser.parse(new StringReader(""));
-		Template loginTemplate = TemplateParser.parse(createReader("/templates/login.html"));
-		Template indexTemplate = TemplateParser.parse(createReader("/templates/index.html"));
-		Template newTemplate = TemplateParser.parse(createReader("/templates/new.html"));
-		Template knownSonesTemplate = TemplateParser.parse(createReader("/templates/knownSones.html"));
-		Template createSoneTemplate = TemplateParser.parse(createReader("/templates/createSone.html"));
-		Template createPostTemplate = TemplateParser.parse(createReader("/templates/createPost.html"));
-		Template createReplyTemplate = TemplateParser.parse(createReader("/templates/createReply.html"));
-		Template bookmarksTemplate = TemplateParser.parse(createReader("/templates/bookmarks.html"));
-		Template searchTemplate = TemplateParser.parse(createReader("/templates/search.html"));
-		Template editProfileTemplate = TemplateParser.parse(createReader("/templates/editProfile.html"));
-		Template editProfileFieldTemplate = TemplateParser.parse(createReader("/templates/editProfileField.html"));
-		Template deleteProfileFieldTemplate = TemplateParser.parse(createReader("/templates/deleteProfileField.html"));
-		Template viewSoneTemplate = TemplateParser.parse(createReader("/templates/viewSone.html"));
-		Template viewPostTemplate = TemplateParser.parse(createReader("/templates/viewPost.html"));
-		Template deletePostTemplate = TemplateParser.parse(createReader("/templates/deletePost.html"));
-		Template deleteReplyTemplate = TemplateParser.parse(createReader("/templates/deleteReply.html"));
-		Template deleteSoneTemplate = TemplateParser.parse(createReader("/templates/deleteSone.html"));
-		Template imageBrowserTemplate = TemplateParser.parse(createReader("/templates/imageBrowser.html"));
-		Template createAlbumTemplate = TemplateParser.parse(createReader("/templates/createAlbum.html"));
-		Template deleteAlbumTemplate = TemplateParser.parse(createReader("/templates/deleteAlbum.html"));
-		Template deleteImageTemplate = TemplateParser.parse(createReader("/templates/deleteImage.html"));
-		Template noPermissionTemplate = TemplateParser.parse(createReader("/templates/noPermission.html"));
-		Template optionsTemplate = TemplateParser.parse(createReader("/templates/options.html"));
-		Template rescueTemplate = TemplateParser.parse(createReader("/templates/rescue.html"));
-		Template aboutTemplate = TemplateParser.parse(createReader("/templates/about.html"));
-		Template invalidTemplate = TemplateParser.parse(createReader("/templates/invalid.html"));
-		Template postTemplate = TemplateParser.parse(createReader("/templates/include/viewPost.html"));
-		Template replyTemplate = TemplateParser.parse(createReader("/templates/include/viewReply.html"));
-		Template openSearchTemplate = TemplateParser.parse(createReader("/templates/xml/OpenSearch.xml"));
+		Template emptyTemplate = parse(new StringReader(""));
+		Template loginTemplate = parseTemplate("/templates/login.html");
+		Template indexTemplate = parseTemplate("/templates/index.html");
+		Template newTemplate = parseTemplate("/templates/new.html");
+		Template knownSonesTemplate = parseTemplate("/templates/knownSones.html");
+		Template createSoneTemplate = parseTemplate("/templates/createSone.html");
+		Template createPostTemplate = parseTemplate("/templates/createPost.html");
+		Template createReplyTemplate = parseTemplate("/templates/createReply.html");
+		Template bookmarksTemplate = parseTemplate("/templates/bookmarks.html");
+		Template searchTemplate = parseTemplate("/templates/search.html");
+		Template editProfileTemplate = parseTemplate("/templates/editProfile.html");
+		Template editProfileFieldTemplate = parseTemplate("/templates/editProfileField.html");
+		Template deleteProfileFieldTemplate = parseTemplate("/templates/deleteProfileField.html");
+		Template viewSoneTemplate = parseTemplate("/templates/viewSone.html");
+		Template viewPostTemplate = parseTemplate("/templates/viewPost.html");
+		Template deletePostTemplate = parseTemplate("/templates/deletePost.html");
+		Template deleteReplyTemplate = parseTemplate("/templates/deleteReply.html");
+		Template deleteSoneTemplate = parseTemplate("/templates/deleteSone.html");
+		Template imageBrowserTemplate = parseTemplate("/templates/imageBrowser.html");
+		Template createAlbumTemplate = parseTemplate("/templates/createAlbum.html");
+		Template deleteAlbumTemplate = parseTemplate("/templates/deleteAlbum.html");
+		Template deleteImageTemplate = parseTemplate("/templates/deleteImage.html");
+		Template noPermissionTemplate = parseTemplate("/templates/noPermission.html");
+		Template optionsTemplate = parseTemplate("/templates/options.html");
+		Template rescueTemplate = parseTemplate("/templates/rescue.html");
+		Template aboutTemplate = parseTemplate("/templates/about.html");
+		Template invalidTemplate = parseTemplate("/templates/invalid.html");
+		Template postTemplate = parseTemplate("/templates/include/viewPost.html");
+		Template replyTemplate = parseTemplate("/templates/include/viewReply.html");
+		Template openSearchTemplate = parseTemplate("/templates/xml/OpenSearch.xml");
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
@@ -788,7 +799,7 @@ public class WebInterface {
 		synchronized (soneInsertNotifications) {
 			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
 			if (templateNotification == null) {
-				templateNotification = new TemplateNotification(TemplateParser.parse(createReader("/templates/notify/soneInsertNotification.html")));
+				templateNotification = new TemplateNotification(parseTemplate("/templates/notify/soneInsertNotification.html"));
 				templateNotification.set("insertSone", sone);
 				soneInsertNotifications.put(sone, templateNotification);
 			}
