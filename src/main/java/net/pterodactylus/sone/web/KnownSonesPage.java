@@ -41,6 +41,9 @@ import com.google.common.collect.Ordering;
  */
 public class KnownSonesPage extends SoneTemplatePage {
 
+	private static final String defaultSortField = "name";
+	private static final String defaultSortOrder = "asc";
+
 	/**
 	 * Creates a “known Sones” page.
 	 *
@@ -66,8 +69,8 @@ public class KnownSonesPage extends SoneTemplatePage {
 		String sortField = request.getHttpRequest().getParam("sort");
 		String sortOrder = request.getHttpRequest().getParam("order");
 		String filter = request.getHttpRequest().getParam("filter");
-		templateContext.set("sort", (sortField != null) ? sortField : "name");
-		templateContext.set("order", (sortOrder != null) ? sortOrder : "asc");
+		templateContext.set("sort", (sortField != null) ? sortField : defaultSortField);
+		templateContext.set("order", (sortOrder != null) ? sortOrder : defaultSortOrder);
 		templateContext.set("filter", filter);
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		Collection<Sone> knownSones = Collections2.filter(webInterface.getCore().getSones(), Sone.EMPTY_SONE_FILTER);
