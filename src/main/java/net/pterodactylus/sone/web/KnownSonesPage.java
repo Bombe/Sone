@@ -41,8 +41,8 @@ import com.google.common.collect.Ordering;
  */
 public class KnownSonesPage extends SoneTemplatePage {
 
-	private static final String defaultSortField = "name";
-	private static final String defaultSortOrder = "asc";
+	private static final String defaultSortField = "activity";
+	private static final String defaultSortOrder = "desc";
 
 	/**
 	 * Creates a “known Sones” page.
