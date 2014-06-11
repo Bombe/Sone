@@ -212,7 +212,7 @@ public class SoneInserter extends AbstractService {
 					continue;
 				}
 
-				InsertInformation insertInformation = null;
+				boolean insertSoneNow = false;
 				synchronized (sone) {
 					String fingerprint = sone.getFingerprint();
 					if (!fingerprint.equals(lastFingerprint)) {
@@ -229,11 +229,12 @@ public class SoneInserter extends AbstractService {
 					}
 					if (modified && lastModificationTime.isPresent() && ((currentTimeMillis() - lastModificationTime.get()) > (insertionDelay * 1000))) {
 						lastInsertedFingerprint = fingerprint;
-						insertInformation = new InsertInformation(sone);
+						insertSoneNow = true;
 					}
 				}
 
-				if (insertInformation != null) {
+				if (insertSoneNow) {
+					InsertInformation insertInformation = new InsertInformation(sone);
 					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
 
 					boolean success = false;
