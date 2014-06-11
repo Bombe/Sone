@@ -268,10 +268,10 @@ public class SoneInserter extends AbstractService {
 					 */
 					if (success) {
 						synchronized (sone) {
-							if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
+							if (insertInformation.getFingerprint().equals(sone.getFingerprint())) {
 								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
 								lastModificationTime = absent();
-								lastInsertFingerprint = lastInsertedFingerprint;
+								lastInsertFingerprint = insertInformation.getFingerprint();
 								core.touchConfiguration();
 								modified = false;
 							}
@@ -293,6 +293,8 @@ public class SoneInserter extends AbstractService {
 	 */
 	private class InsertInformation {
 
+		private final String fingerprint;
+
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
 
@@ -303,6 +305,7 @@ public class SoneInserter extends AbstractService {
 		 *            The sone to insert
 		 */
 		public InsertInformation(Sone sone) {
+			this.fingerprint = sone.getFingerprint();
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
 			soneProperties.put("time", sone.getTime());
@@ -319,6 +322,10 @@ public class SoneInserter extends AbstractService {
 		//
 		// ACCESSORS
 		//
+
+		private String getFingerprint() {
+			return fingerprint;
+		}
 
 		/**
 		 * Returns the insert URI of the Sone.
