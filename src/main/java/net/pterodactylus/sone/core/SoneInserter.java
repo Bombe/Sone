@@ -194,7 +194,7 @@ public class SoneInserter extends AbstractService {
 		Sone sone;
 		while (!shouldStop()) {
 			try {
-				/* check every seconds. */
+				/* check every second. */
 				sleep(1000);
 
 				/* don’t insert locked Sones. */
