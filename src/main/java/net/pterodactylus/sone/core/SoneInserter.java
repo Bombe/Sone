@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.System.currentTimeMillis;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
@@ -52,6 +54,7 @@ import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
@@ -189,7 +192,7 @@ public class SoneInserter extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		long lastModificationTime = 0;
+		Optional<Long> lastModificationTime = absent();
 		String lastInsertedFingerprint = lastInsertFingerprint;
 		String lastFingerprint = "";
 		while (!shouldStop()) {
@@ -205,7 +208,7 @@ public class SoneInserter extends AbstractService {
 						modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
 					}
 					lastFingerprint = "";
-					lastModificationTime = 0;
+					lastModificationTime = absent();
 					continue;
 				}
 
@@ -215,16 +218,16 @@ public class SoneInserter extends AbstractService {
 					if (!fingerprint.equals(lastFingerprint)) {
 						if (fingerprint.equals(lastInsertedFingerprint)) {
 							modified = false;
-							lastModificationTime = 0;
+							lastModificationTime = absent();
 							logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
 						} else {
-							lastModificationTime = System.currentTimeMillis();
+							lastModificationTime = of(currentTimeMillis());
 							modified = true;
 							logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
 						}
 						lastFingerprint = fingerprint;
 					}
-					if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
+					if (modified && lastModificationTime.isPresent() && ((currentTimeMillis() - lastModificationTime.get()) > (insertionDelay * 1000))) {
 						lastInsertedFingerprint = fingerprint;
 						insertInformation = new InsertInformation(sone);
 					}
@@ -266,7 +269,7 @@ public class SoneInserter extends AbstractService {
 						synchronized (sone) {
 							if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
 								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
-								lastModificationTime = 0;
+								lastModificationTime = absent();
 								lastInsertFingerprint = lastInsertedFingerprint;
 								core.touchConfiguration();
 								modified = false;
