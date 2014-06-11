@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.System.currentTimeMillis;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
 import java.io.InputStreamReader;
@@ -235,11 +236,11 @@ public class SoneInserter extends AbstractService {
 					boolean success = false;
 					try {
 						sone.setStatus(SoneStatus.inserting);
-						long insertTime = System.currentTimeMillis();
+						long insertTime = currentTimeMillis();
 						insertInformation.setTime(insertTime);
 						eventBus.post(new SoneInsertingEvent(sone));
 						FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
-						eventBus.post(new SoneInsertedEvent(sone, System.currentTimeMillis() - insertTime));
+						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime));
 						/* at this point we might already be stopped. */
 						if (shouldStop()) {
 							/* if so, bail out, don’t change anything. */
