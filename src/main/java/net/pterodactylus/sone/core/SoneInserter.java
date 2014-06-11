@@ -99,9 +99,6 @@ public class SoneInserter extends AbstractService {
 	/** The Sone to insert. */
 	private volatile Sone sone;
 
-	/** Whether a modification has been detected. */
-	private volatile boolean modified = false;
-
 	/** The fingerprint of the last insert. */
 	private volatile String lastInsertFingerprint;
 
@@ -180,7 +177,7 @@ public class SoneInserter extends AbstractService {
 	 *         otherwise
 	 */
 	public boolean isModified() {
-		return modified;
+		return !lastInsertFingerprint.equals(sone.getFingerprint());
 	}
 
 	//
@@ -204,9 +201,6 @@ public class SoneInserter extends AbstractService {
 				Sone sone = this.sone;
 				if (core.isLocked(sone)) {
 					/* trigger redetection when the Sone is unlocked. */
-					synchronized (sone) {
-						modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
-					}
 					lastFingerprint = "";
 					lastModificationTime = absent();
 					continue;
@@ -217,17 +211,15 @@ public class SoneInserter extends AbstractService {
 					String fingerprint = sone.getFingerprint();
 					if (!fingerprint.equals(lastFingerprint)) {
 						if (fingerprint.equals(lastInsertedFingerprint)) {
-							modified = false;
 							lastModificationTime = absent();
 							logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
 						} else {
 							lastModificationTime = of(currentTimeMillis());
-							modified = true;
 							logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
 						}
 						lastFingerprint = fingerprint;
 					}
-					if (modified && lastModificationTime.isPresent() && ((currentTimeMillis() - lastModificationTime.get()) > (insertionDelay * 1000))) {
+					if (lastModificationTime.isPresent() && ((currentTimeMillis() - lastModificationTime.get()) > (insertionDelay * 1000))) {
 						lastInsertedFingerprint = fingerprint;
 						insertSoneNow = true;
 					}
@@ -273,7 +265,6 @@ public class SoneInserter extends AbstractService {
 								lastModificationTime = absent();
 								lastInsertFingerprint = insertInformation.getFingerprint();
 								core.touchConfiguration();
-								modified = false;
 							}
 						}
 					}
