@@ -66,11 +66,11 @@ public class KnownSonesPage extends SoneTemplatePage {
 	@Override
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		String sortField = request.getHttpRequest().getParam("sort");
-		String sortOrder = request.getHttpRequest().getParam("order");
+		String sortField = request.getHttpRequest().getParam("sort", defaultSortField);
+		String sortOrder = request.getHttpRequest().getParam("order", defaultSortOrder);
 		String filter = request.getHttpRequest().getParam("filter");
-		templateContext.set("sort", (sortField != null) ? sortField : defaultSortField);
-		templateContext.set("order", (sortOrder != null) ? sortOrder : defaultSortOrder);
+		templateContext.set("sort", sortField);
+		templateContext.set("order", sortOrder);
 		templateContext.set("filter", filter);
 		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		Collection<Sone> knownSones = Collections2.filter(webInterface.getCore().getSones(), Sone.EMPTY_SONE_FILTER);
