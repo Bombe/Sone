@@ -20,59 +20,62 @@ import org.junit.Test;
  */
 public class SoneModificationDetectorTest {
 
+	private final Ticker ticker = mock(Ticker.class);
+	private final Sone sone = mock(Sone.class);
+	private final Core core = mock(Core.class);
+	private final AtomicInteger insertionDelay = new AtomicInteger(60);
+	private final SoneModificationDetector soneModificationDetector;
+
+	public SoneModificationDetectorTest() {
+		when(sone.getFingerprint()).thenReturn("original");
+		soneModificationDetector = new SoneModificationDetector(ticker, core, sone, insertionDelay);
+	}
+
+	private void modifySone() {
+		when(sone.getFingerprint()).thenReturn("modified");
+	}
+
+	private void passTime(int seconds) {
+		when(ticker.read()).thenReturn(SECONDS.toNanos(seconds));
+	}
+
+	private void lockSone() {
+		when(core.isLocked(sone)).thenReturn(true);
+	}
+
 	@Test
 	public void modifiedSoneIsEligibleAfter60Seconds() {
-		Ticker ticker = mock(Ticker.class);
-		Sone sone = mock(Sone.class);
-		when(sone.getFingerprint()).thenReturn("original");
-		Core core = mock(Core.class);
-		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(ticker, core, sone, new AtomicInteger(60));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(sone.getFingerprint()).thenReturn("modified");
+		modifySone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(ticker.read()).thenReturn(SECONDS.toNanos(100));
+		passTime(100);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 	}
 
 	@Test
 	public void modifiedSoneIsNotEligibleAfter30Seconds() {
-		Ticker ticker = mock(Ticker.class);
-		Sone sone = mock(Sone.class);
-		when(sone.getFingerprint()).thenReturn("original");
-		Core core = mock(Core.class);
-		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(ticker, core, sone, new AtomicInteger(60));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(sone.getFingerprint()).thenReturn("modified");
-		when(ticker.read()).thenReturn(SECONDS.toNanos(30));
+		modifySone();
+		passTime(30);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 	}
 
 	@Test
 	public void lockedAndModifiedSoneIsNotEligibleAfter60Seconds() {
-		Ticker ticker = mock(Ticker.class);
-		Sone sone = mock(Sone.class);
-		when(sone.getFingerprint()).thenReturn("original");
-		Core core = mock(Core.class);
-		when(core.isLocked(sone)).thenReturn(true);
-		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(ticker, core, sone, new AtomicInteger(60));
+		lockSone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(sone.getFingerprint()).thenReturn("modified");
+		modifySone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(ticker.read()).thenReturn(SECONDS.toNanos(100));
+		passTime(100);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 	}
 
 	@Test
 	public void settingFingerprintWillResetTheEligibility() {
-		Ticker ticker = mock(Ticker.class);
-		Sone sone = mock(Sone.class);
-		when(sone.getFingerprint()).thenReturn("original");
-		Core core = mock(Core.class);
-		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(ticker, core, sone, new AtomicInteger(60));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(sone.getFingerprint()).thenReturn("modified");
+		modifySone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(ticker.read()).thenReturn(SECONDS.toNanos(100));
+		passTime(100);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 		soneModificationDetector.setFingerprint("modified");
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
@@ -80,16 +83,10 @@ public class SoneModificationDetectorTest {
 
 	@Test
 	public void changingInsertionDelayWillInfluenceEligibility() {
-		Ticker ticker = mock(Ticker.class);
-		Sone sone = mock(Sone.class);
-		when(sone.getFingerprint()).thenReturn("original");
-		Core core = mock(Core.class);
-		AtomicInteger insertionDelay = new AtomicInteger(60);
-		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(ticker, core, sone, insertionDelay);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(sone.getFingerprint()).thenReturn("modified");
+		modifySone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
-		when(ticker.read()).thenReturn(SECONDS.toNanos(100));
+		passTime(100);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 		insertionDelay.set(120);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
