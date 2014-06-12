@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.of;
 import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.System.currentTimeMillis;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
@@ -29,6 +27,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -54,7 +53,6 @@ import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
@@ -73,7 +71,7 @@ public class SoneInserter extends AbstractService {
 	private static final Logger logger = Logging.getLogger(SoneInserter.class);
 
 	/** The insertion delay (in seconds). */
-	private static volatile int insertionDelay = 60;
+	private static final AtomicInteger insertionDelay = new AtomicInteger(60);
 
 	/** The template factory used to create the templates. */
 	private static final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
@@ -147,7 +145,7 @@ public class SoneInserter extends AbstractService {
 	 *            The insertion delay (in seconds)
 	 */
 	public static void setInsertionDelay(int insertionDelay) {
-		SoneInserter.insertionDelay = insertionDelay;
+		SoneInserter.insertionDelay.set(insertionDelay);
 	}
 
 	/**
@@ -189,43 +187,13 @@ public class SoneInserter extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		Optional<Long> lastModificationTime = absent();
-		String lastInsertedFingerprint = lastInsertFingerprint;
-		String lastFingerprint = "";
+		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(core, sone, insertionDelay);
 		while (!shouldStop()) {
 			try {
 				/* check every second. */
 				sleep(1000);
 
-				/* don’t insert locked Sones. */
-				Sone sone = this.sone;
-				if (core.isLocked(sone)) {
-					/* trigger redetection when the Sone is unlocked. */
-					lastFingerprint = "";
-					lastModificationTime = absent();
-					continue;
-				}
-
-				boolean insertSoneNow = false;
-				synchronized (sone) {
-					String fingerprint = sone.getFingerprint();
-					if (!fingerprint.equals(lastFingerprint)) {
-						if (fingerprint.equals(lastInsertedFingerprint)) {
-							lastModificationTime = absent();
-							logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
-						} else {
-							lastModificationTime = of(currentTimeMillis());
-							logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
-						}
-						lastFingerprint = fingerprint;
-					}
-					if (lastModificationTime.isPresent() && ((currentTimeMillis() - lastModificationTime.get()) > (insertionDelay * 1000))) {
-						lastInsertedFingerprint = fingerprint;
-						insertSoneNow = true;
-					}
-				}
-
-				if (insertSoneNow) {
+				if (soneModificationDetector.isEligibleForInsert()) {
 					InsertInformation insertInformation = new InsertInformation(sone);
 					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
 
@@ -262,7 +230,7 @@ public class SoneInserter extends AbstractService {
 						synchronized (sone) {
 							if (insertInformation.getFingerprint().equals(sone.getFingerprint())) {
 								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
-								lastModificationTime = absent();
+								soneModificationDetector.setFingerprint(insertInformation.getFingerprint());
 								lastInsertFingerprint = insertInformation.getFingerprint();
 								core.touchConfiguration();
 							}
