@@ -45,10 +45,13 @@ public class SoneModificationDetectorTest {
 
 	@Test
 	public void modifiedSoneIsEligibleAfter60Seconds() {
+		assertThat(soneModificationDetector.isModified(), is(false));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		modifySone();
+		assertThat(soneModificationDetector.isModified(), is(true));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		passTime(100);
+		assertThat(soneModificationDetector.isModified(), is(true));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 	}
 

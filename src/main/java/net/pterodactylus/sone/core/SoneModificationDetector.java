@@ -64,6 +64,10 @@ class SoneModificationDetector {
 		return insertionDelayHasPassed();
 	}
 
+	public String getOriginalFingerprint() {
+		return originalFingerprint;
+	}
+
 	public void setFingerprint(String fingerprint) {
 		originalFingerprint = fingerprint;
 		lastFingerprint = originalFingerprint;
@@ -72,6 +76,10 @@ class SoneModificationDetector {
 
 	private boolean insertionDelayHasPassed() {
 		return lastModificationTime.isPresent() && (NANOSECONDS.toSeconds(ticker.read() - lastModificationTime.get()) >= insertionDelay.get());
+	}
+
+	public boolean isModified() {
+		return !sone.getFingerprint().equals(originalFingerprint);
 	}
 
 }

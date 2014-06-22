@@ -94,11 +94,10 @@ public class SoneInserter extends AbstractService {
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
+	private final SoneModificationDetector soneModificationDetector;
+
 	/** The Sone to insert. */
 	private volatile Sone sone;
-
-	/** The fingerprint of the last insert. */
-	private volatile String lastInsertFingerprint;
 
 	/**
 	 * Creates a new Sone inserter.
@@ -118,6 +117,7 @@ public class SoneInserter extends AbstractService {
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
+		this.soneModificationDetector = new SoneModificationDetector(core, sone, insertionDelay);
 	}
 
 	//
@@ -154,7 +154,7 @@ public class SoneInserter extends AbstractService {
 	 * @return The fingerprint of the last insert
 	 */
 	public String getLastInsertFingerprint() {
-		return lastInsertFingerprint;
+		return soneModificationDetector.getOriginalFingerprint();
 	}
 
 	/**
@@ -164,7 +164,7 @@ public class SoneInserter extends AbstractService {
 	 *            The fingerprint of the last insert
 	 */
 	public void setLastInsertFingerprint(String lastInsertFingerprint) {
-		this.lastInsertFingerprint = lastInsertFingerprint;
+		soneModificationDetector.setFingerprint(lastInsertFingerprint);
 	}
 
 	/**
@@ -175,7 +175,7 @@ public class SoneInserter extends AbstractService {
 	 *         otherwise
 	 */
 	public boolean isModified() {
-		return !lastInsertFingerprint.equals(sone.getFingerprint());
+		return soneModificationDetector.isModified();
 	}
 
 	//
@@ -187,7 +187,6 @@ public class SoneInserter extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		SoneModificationDetector soneModificationDetector = new SoneModificationDetector(core, sone, insertionDelay);
 		while (!shouldStop()) {
 			try {
 				/* check every second. */
@@ -231,7 +230,6 @@ public class SoneInserter extends AbstractService {
 							if (insertInformation.getFingerprint().equals(sone.getFingerprint())) {
 								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
 								soneModificationDetector.setFingerprint(insertInformation.getFingerprint());
-								lastInsertFingerprint = insertInformation.getFingerprint();
 								core.touchConfiguration();
 							}
 						}
