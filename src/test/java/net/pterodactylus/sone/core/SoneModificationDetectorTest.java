@@ -32,7 +32,11 @@ public class SoneModificationDetectorTest {
 	}
 
 	private void modifySone() {
-		when(sone.getFingerprint()).thenReturn("modified");
+		modifySone("");
+	}
+
+	private void modifySone(String uniqueValue) {
+		when(sone.getFingerprint()).thenReturn("modified" + uniqueValue);
 	}
 
 	private void passTime(int seconds) {
@@ -60,8 +64,24 @@ public class SoneModificationDetectorTest {
 	}
 
 	@Test
-	public void modifiedSoneIsNotEligibleAfter30Seconds() {
+	public void modifiedAndRemodifiedSoneIsEligibleAfter90Seconds() {
+		modifySone();
+		assertThat(soneModificationDetector.isModified(), is(true));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(30);
+		modifySone("2");
+		assertThat(soneModificationDetector.isModified(), is(true));
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(61);
+		assertThat(soneModificationDetector.isModified(), is(true));
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(91);
+		assertThat(soneModificationDetector.isModified(), is(true));
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
+	}
+
+	@Test
+	public void modifiedSoneIsNotEligibleAfter30Seconds() {
 		modifySone();
 		passTime(30);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
