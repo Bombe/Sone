@@ -47,6 +47,10 @@ public class SoneModificationDetectorTest {
 		when(core.isLocked(sone)).thenReturn(true);
 	}
 
+	private void unlockSone() {
+		when(core.isLocked(sone)).thenReturn(false);
+	}
+
 	@Test
 	public void sonesStartOutAsNotEligible() {
 		assertThat(soneModificationDetector.isModified(), is(false));
@@ -95,6 +99,20 @@ public class SoneModificationDetectorTest {
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		passTime(100);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+	}
+
+	@Test
+	public void lockingAndUnlockingASoneRestartsTheWaitPeriod() {
+		modifySone();
+		lockSone();
+		passTime(30);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		unlockSone();
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(60);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(90);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 	}
 
 	@Test
