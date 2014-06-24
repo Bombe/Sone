@@ -44,9 +44,13 @@ public class SoneModificationDetectorTest {
 	}
 
 	@Test
-	public void modifiedSoneIsEligibleAfter60Seconds() {
+	public void sonesStartOutAsNotEligible() {
 		assertThat(soneModificationDetector.isModified(), is(false));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+	}
+
+	@Test
+	public void modifiedSoneIsEligibleAfter60Seconds() {
 		modifySone();
 		assertThat(soneModificationDetector.isModified(), is(true));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
@@ -75,7 +79,6 @@ public class SoneModificationDetectorTest {
 
 	@Test
 	public void settingFingerprintWillResetTheEligibility() {
-		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		modifySone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		passTime(100);
@@ -86,7 +89,6 @@ public class SoneModificationDetectorTest {
 
 	@Test
 	public void changingInsertionDelayWillInfluenceEligibility() {
-		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		modifySone();
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 		passTime(100);
