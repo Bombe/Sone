@@ -195,7 +195,13 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			}
 		}
 
-		final Configuration startConfiguration = oldConfiguration;
+		final Configuration startConfiguration;
+		if ((newConfiguration != null) && (oldConfiguration != newConfiguration)) {
+			logger.log(Level.INFO, "Setting configuration to file-based configuration.");
+			startConfiguration = newConfiguration;
+		} else {
+			startConfiguration = oldConfiguration;
+		}
 		final EventBus eventBus = new EventBus();
 
 		/* Freenet injector configuration. */
@@ -264,10 +270,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			/* start core! */
 			core.start();
-			if ((newConfiguration != null) && (oldConfiguration != newConfiguration)) {
-				logger.log(Level.INFO, "Setting configuration to file-based configuration.");
-				core.setConfiguration(newConfiguration);
-			}
 			webInterface.start();
 			webInterface.setFirstStart(firstStart);
 			webInterface.setNewConfig(newConfig);

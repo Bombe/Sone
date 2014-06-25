@@ -127,7 +127,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final EventBus eventBus;
 
 	/** The configuration. */
-	private Configuration configuration;
+	private final Configuration configuration;
 
 	/** Whether we’re currently saving the configuration. */
 	private boolean storingConfiguration = false;
@@ -238,18 +238,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public long getStartupTime() {
 		return startupTime;
-	}
-
-	/**
-	 * Sets the configuration to use. This will automatically save the current
-	 * configuration to the given configuration.
-	 *
-	 * @param configuration
-	 *            The new configuration to use
-	 */
-	public void setConfiguration(Configuration configuration) {
-		this.configuration = configuration;
-		touchConfiguration();
 	}
 
 	/**
