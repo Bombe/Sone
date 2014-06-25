@@ -111,11 +111,10 @@ public class FreenetInterface {
 	 * @return The result of the fetch, or {@code null} if an error occured
 	 */
 	public Fetched fetchUri(FreenetURI uri) {
-		FetchResult fetchResult = null;
 		FreenetURI currentUri = new FreenetURI(uri);
 		while (true) {
 			try {
-				fetchResult = client.fetch(currentUri);
+				FetchResult fetchResult = client.fetch(currentUri);
 				return new Fetched(currentUri, fetchResult);
 			} catch (FetchException fe1) {
 				if (fe1.getMode() == FetchException.PERMANENT_REDIRECT) {

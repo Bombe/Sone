@@ -167,12 +167,11 @@ public class IdentityManager extends AbstractService {
 			Map<OwnIdentity, Map<String, Identity>> currentIdentities = new HashMap<OwnIdentity, Map<String, Identity>>();
 			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
 
-			Set<OwnIdentity> ownIdentities = null;
 			boolean identitiesLoaded = false;
 			try {
 				/* get all identities with the wanted context from WoT. */
 				logger.finer("Getting all Own Identities from WoT...");
-				ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
+				Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
 				logger.finest(String.format("Loaded %d Own Identities.", ownIdentities.size()));
 
 				/* load trusted identities. */
