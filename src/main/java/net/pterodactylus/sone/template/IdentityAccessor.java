@@ -55,9 +55,8 @@ public class IdentityAccessor extends ReflectionAccessor {
 		Identity identity = (Identity) object;
 		if ("uniqueNickname".equals(member)) {
 			int minLength = -1;
-			boolean found = false;
-			Set<OwnIdentity> ownIdentities = null;
-			ownIdentities = core.getIdentityManager().getAllOwnIdentities();
+			boolean found;
+			Set<OwnIdentity> ownIdentities = core.getIdentityManager().getAllOwnIdentities();
 			do {
 				boolean unique = true;
 				String abbreviatedWantedNickname = getAbbreviatedNickname(identity, ++minLength);

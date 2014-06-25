@@ -201,7 +201,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * @return The parsed phrases
 	 */
 	private static List<Phrase> parseSearchPhrases(String query) {
-		List<String> parsedPhrases = null;
+		List<String> parsedPhrases;
 		try {
 			parsedPhrases = StringEscaper.parseLine(query);
 		} catch (TextException te1) {
