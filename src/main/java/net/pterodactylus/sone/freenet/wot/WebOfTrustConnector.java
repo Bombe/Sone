@@ -566,8 +566,7 @@ public class WebOfTrustConnector {
 		 * @return The created simple field set constructor
 		 */
 		public static SimpleFieldSetConstructor create(boolean shortLived) {
-			SimpleFieldSetConstructor simpleFieldSetConstructor = new SimpleFieldSetConstructor(shortLived);
-			return simpleFieldSetConstructor;
+			return new SimpleFieldSetConstructor(shortLived);
 		}
 
 	}

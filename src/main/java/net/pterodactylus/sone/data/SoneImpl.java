@@ -371,8 +371,7 @@ public class SoneImpl implements Sone {
 	 * @return The friend Sones of this Sone
 	 */
 	public List<String> getFriends() {
-		List<String> friends = new ArrayList<String>(friendSones);
-		return friends;
+		return new ArrayList<String>(friendSones);
 	}
 
 	/**
