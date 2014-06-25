@@ -36,7 +36,7 @@ public interface PostReply extends Reply<PostReply> {
 
 		@Override
 		public boolean apply(PostReply postReply) {
-			return (postReply == null) ? false : postReply.getPost().isPresent();
+			return (postReply != null) && postReply.getPost().isPresent();
 		}
 	};
 

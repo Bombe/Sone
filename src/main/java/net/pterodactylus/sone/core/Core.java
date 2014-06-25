@@ -436,7 +436,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *         {@code false} otherwise
 	 */
 	public boolean isModifiedSone(Sone sone) {
-		return (soneInserters.containsKey(sone)) ? soneInserters.get(sone).isModified() : false;
+		return soneInserters.containsKey(sone) && soneInserters.get(sone).isModified();
 	}
 
 	/**

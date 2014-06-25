@@ -581,7 +581,7 @@ public class SearchPage extends SoneTemplatePage {
 
 			@Override
 			public boolean apply(Hit<?> hit) {
-				return (hit == null) ? false : hit.getScore() > 0;
+				return (hit != null) && (hit.getScore() > 0);
 			}
 
 		};

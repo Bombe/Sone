@@ -144,7 +144,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return (sone == null) ? false : sone.getTime() != 0;
+			return (sone != null) && (sone.getTime() != 0);
 		}
 	};
 
@@ -153,7 +153,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return (sone == null) ? false : sone.getIdentity() instanceof OwnIdentity;
+			return (sone != null) && (sone.getIdentity() instanceof OwnIdentity);
 		}
 
 	};
@@ -163,7 +163,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return (sone == null) ? false : !sone.getRootAlbum().getAlbums().isEmpty();
+			return (sone != null) && !sone.getRootAlbum().getAlbums().isEmpty();
 		}
 	};
 
