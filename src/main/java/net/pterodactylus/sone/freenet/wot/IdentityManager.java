@@ -150,7 +150,9 @@ public class IdentityManager extends AbstractService {
 	 * @return All own identities
 	 */
 	public Set<OwnIdentity> getAllOwnIdentities() {
-		return new HashSet<OwnIdentity>(currentOwnIdentities.values());
+		synchronized (syncObject) {
+			return new HashSet<OwnIdentity>(currentOwnIdentities.values());
+		}
 	}
 
 	//
