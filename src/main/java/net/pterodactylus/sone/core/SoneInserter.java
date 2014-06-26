@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.System.currentTimeMillis;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -342,15 +343,18 @@ public class SoneInserter extends AbstractService {
 		@SuppressWarnings("synthetic-access")
 		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
 			InputStreamReader templateInputStreamReader = null;
+			InputStream templateInputStream = null;
 			Template template;
 			try {
-				templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset);
+				templateInputStream = getClass().getResourceAsStream(templateName);
+				templateInputStreamReader = new InputStreamReader(templateInputStream, utf8Charset);
 				template = TemplateParser.parse(templateInputStreamReader);
 			} catch (TemplateException te1) {
 				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), te1);
 				return null;
 			} finally {
 				Closer.close(templateInputStreamReader);
+				Closer.close(templateInputStream);
 			}
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();

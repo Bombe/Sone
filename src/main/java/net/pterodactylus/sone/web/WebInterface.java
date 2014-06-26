@@ -324,11 +324,17 @@ public class WebInterface {
 	}
 
 	private Template parseTemplate(String resourceName) {
-		Reader reader = createReader(resourceName);
+		InputStream templateInputStream = null;
+		Reader reader = null;
 		try {
+			templateInputStream = getClass().getResourceAsStream(resourceName);
+			reader = new InputStreamReader(templateInputStream, "UTF-8");
 			return parse(reader);
+		} catch (UnsupportedEncodingException uee1) {
+			throw new RuntimeException("UTF-8 not supported.");
 		} finally {
 			Closer.close(reader);
+			Closer.close(templateInputStream);
 		}
 	}
 
@@ -744,22 +750,6 @@ public class WebInterface {
 			toadletContainer.unregister(pageToadlet);
 		}
 		toadletContainer.getPageMaker().removeNavigationCategory("Navigation.Menu.Sone.Name");
-	}
-
-	/**
-	 * Creates a {@link Reader} from the {@link InputStream} for the resource
-	 * with the given name.
-	 *
-	 * @param resourceName
-	 *            The name of the resource
-	 * @return A {@link Reader} for the resource
-	 */
-	private Reader createReader(String resourceName) {
-		try {
-			return new InputStreamReader(getClass().getResourceAsStream(resourceName), "UTF-8");
-		} catch (UnsupportedEncodingException uee1) {
-			return null;
-		}
 	}
 
 	/**
