@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
@@ -24,6 +25,8 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
@@ -36,6 +39,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import org.hamcrest.Matchers;
@@ -50,16 +54,16 @@ import org.junit.Test;
 public class IdentityLoaderTest {
 
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
-	private final IdentityLoader identityLoader = new IdentityLoader(webOfTrustConnector, of("Test"));
+	private final IdentityLoader identityLoader = new IdentityLoader(webOfTrustConnector, of(new Context("Test")));
 	private final IdentityLoader identityLoaderWithoutContext = new IdentityLoader(webOfTrustConnector);
 
 	@Before
 	public void setup() throws WebOfTrustException {
 		List<OwnIdentity> ownIdentities = createOwnIdentities();
 		when(webOfTrustConnector.loadAllOwnIdentities()).thenReturn(newHashSet(ownIdentities));
-		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(0)), anyString())).thenReturn(createTrustedIdentitiesForFirstOwnIdentity());
-		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(1)), anyString())).thenReturn(createTrustedIdentitiesForSecondOwnIdentity());
-		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(2)), anyString())).thenReturn(createTrustedIdentitiesForThirdOwnIdentity());
+		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(0)), any(Optional.class))).thenReturn(createTrustedIdentitiesForFirstOwnIdentity());
+		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(1)), any(Optional.class))).thenReturn(createTrustedIdentitiesForSecondOwnIdentity());
+		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(2)), any(Optional.class))).thenReturn(createTrustedIdentitiesForThirdOwnIdentity());
 	}
 
 	private List<OwnIdentity> createOwnIdentities() {
@@ -107,9 +111,9 @@ public class IdentityLoaderTest {
 		List<OwnIdentity> ownIdentities = createOwnIdentities();
 		Multimap<OwnIdentity, Identity> identities = identityLoader.loadIdentities();
 		verify(webOfTrustConnector).loadAllOwnIdentities();
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(0)), eq("Test"));
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), eq("Test"));
-		verify(webOfTrustConnector, never()).loadTrustedIdentities(eq(ownIdentities.get(2)), anyString());
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(0)), eq(of("Test")));
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), eq(of("Test")));
+		verify(webOfTrustConnector, never()).loadTrustedIdentities(eq(ownIdentities.get(2)), any(Optional.class));
 		assertThat(identities.keySet(), hasSize(2));
 		assertThat(identities.keySet(), containsInAnyOrder(ownIdentities.get(0), ownIdentities.get(1)));
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(0), createTrustedIdentitiesForFirstOwnIdentity());
@@ -121,9 +125,9 @@ public class IdentityLoaderTest {
 		List<OwnIdentity> ownIdentities = createOwnIdentities();
 		Multimap<OwnIdentity, Identity> identities = identityLoaderWithoutContext.loadIdentities();
 		verify(webOfTrustConnector).loadAllOwnIdentities();
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(0)), isNull(String.class));
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), isNull(String.class));
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(2)), isNull(String.class));
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(0)), eq(Optional.<String>absent()));
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), eq(Optional.<String>absent()));
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(2)), eq(Optional.<String>absent()));
 		assertThat(identities.keySet(), hasSize(3));
 		OwnIdentity firstOwnIdentity = ownIdentities.get(0);
 		OwnIdentity secondOwnIdentity = ownIdentities.get(1);

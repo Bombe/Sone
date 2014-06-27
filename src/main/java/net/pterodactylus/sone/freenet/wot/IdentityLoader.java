@@ -18,12 +18,16 @@
 package net.pterodactylus.sone.freenet.wot;
 
 import static com.google.common.collect.HashMultimap.create;
+import static net.pterodactylus.sone.freenet.wot.Context.extractContext;
 
 import java.util.Collection;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Multimap;
 
@@ -35,13 +39,13 @@ import com.google.common.collect.Multimap;
 public class IdentityLoader {
 
 	private final WebOfTrustConnector webOfTrustConnector;
-	private final Optional<String> context;
+	private final Optional<Context> context;
 
 	public IdentityLoader(WebOfTrustConnector webOfTrustConnector) {
-		this(webOfTrustConnector, Optional.<String>absent());
+		this(webOfTrustConnector, Optional.<Context>absent());
 	}
 
-	public IdentityLoader(WebOfTrustConnector webOfTrustConnector, Optional<String> context) {
+	public IdentityLoader(WebOfTrustConnector webOfTrustConnector, Optional<Context> context) {
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.context = context;
 	}
@@ -59,7 +63,7 @@ public class IdentityLoader {
 				continue;
 			}
 
-			Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context.orNull());
+			Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context.transform(extractContext));
 			currentIdentities.putAll(ownIdentity, trustedIdentities);
 		}
 
@@ -67,7 +71,7 @@ public class IdentityLoader {
 	}
 
 	private boolean identityDoesNotHaveTheCorrectContext(OwnIdentity ownIdentity) {
-		return context.isPresent() && !ownIdentity.hasContext(context.get());
+		return context.isPresent() && !ownIdentity.hasContext(context.transform(extractContext).get());
 	}
 
 }

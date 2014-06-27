@@ -31,6 +31,7 @@ import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -137,8 +138,8 @@ public class WebOfTrustConnector {
 	 * @throws PluginException
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
-	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).put("WantTrustValues", "true").get());
+	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, Optional<String> context) throws PluginException {
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", context.or("")).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<Identity>();
 		int identityCounter = -1;
