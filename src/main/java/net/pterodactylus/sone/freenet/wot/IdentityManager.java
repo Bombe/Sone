@@ -33,7 +33,6 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
-import com.google.inject.name.Named;
 
 /**
  * The identity manager takes care of loading and storing identities, their
@@ -74,11 +73,11 @@ public class IdentityManager extends AbstractService {
 	 *            contexts)
 	 */
 	@Inject
-	public IdentityManager(EventBus eventBus, WebOfTrustConnector webOfTrustConnector, @Named("WebOfTrustContext") String context) {
+	public IdentityManager(EventBus eventBus, WebOfTrustConnector webOfTrustConnector, Context context) {
 		super("Sone Identity Manager", false);
 		this.eventBus = eventBus;
 		this.webOfTrustConnector = webOfTrustConnector;
-		this.identityLoader = new IdentityLoader(webOfTrustConnector, fromNullable(context));
+		this.identityLoader = new IdentityLoader(webOfTrustConnector, fromNullable(context.getContext()));
 	}
 
 	//
