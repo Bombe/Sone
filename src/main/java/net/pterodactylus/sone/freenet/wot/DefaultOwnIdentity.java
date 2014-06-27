@@ -45,29 +45,33 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 		this.insertUri = insertUri;
 	}
 
-	/**
-	 * Copy constructor for an own identity.
-	 *
-	 * @param ownIdentity
-	 *            The own identity to copy
-	 */
-	public DefaultOwnIdentity(OwnIdentity ownIdentity) {
-		super(ownIdentity.getId(), ownIdentity.getNickname(), ownIdentity.getRequestUri());
-		this.insertUri = ownIdentity.getInsertUri();
-		setContexts(ownIdentity.getContexts());
-		setProperties(ownIdentity.getProperties());
-	}
-
 	//
 	// ACCESSORS
 	//
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String getInsertUri() {
 		return insertUri;
+	}
+
+	@Override
+	public OwnIdentity addContext(String context) {
+		return (OwnIdentity) super.addContext(context);
+	}
+
+	@Override
+	public OwnIdentity removeContext(String context) {
+		return (OwnIdentity) super.removeContext(context);
+	}
+
+	@Override
+	public OwnIdentity setProperty(String name, String value) {
+		return (OwnIdentity) super.setProperty(name, value);
+	}
+
+	@Override
+	public OwnIdentity removeProperty(String name) {
+		return (OwnIdentity) super.removeProperty(name);
 	}
 
 	//
