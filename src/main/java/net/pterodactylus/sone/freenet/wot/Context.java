@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Function;
+
 /**
  * Custom container for the Web of Trust context. This allows easier
  * configuration of dependency injection.
@@ -24,6 +28,14 @@ package net.pterodactylus.sone.freenet.wot;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Context {
+
+	public static final Function<Context, String> extractContext = new Function<Context, String>() {
+		@Nullable
+		@Override
+		public String apply(@Nullable Context context) {
+			return (context == null) ? null : context.getContext();
+		}
+	};
 
 	private final String context;
 
