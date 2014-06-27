@@ -30,6 +30,7 @@ import net.pterodactylus.sone.freenet.plugin.PluginException;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.Multimap;
+import com.google.inject.Inject;
 
 /**
  * Loads {@link OwnIdentity}s and the {@link Identity}s they trust.
@@ -45,6 +46,7 @@ public class IdentityLoader {
 		this(webOfTrustConnector, Optional.<Context>absent());
 	}
 
+	@Inject
 	public IdentityLoader(WebOfTrustConnector webOfTrustConnector, Optional<Context> context) {
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.context = context;
