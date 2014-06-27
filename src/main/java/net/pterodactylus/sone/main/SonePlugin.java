@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.main;
 
+import static com.google.common.base.Optional.of;
+
 import java.io.File;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -45,6 +47,7 @@ import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
 
+import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -225,7 +228,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Configuration.class).toInstance(startConfiguration);
 				bind(FreenetInterface.class).in(Singleton.class);
 				bind(PluginConnector.class).in(Singleton.class);
-				bind(Context.class).toInstance(new Context("Sone"));
+				Context context = new Context("Sone");
+				bind(Context.class).toInstance(context);
+				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(WebOfTrustConnector.class).in(Singleton.class);
 				bind(WebOfTrustUpdater.class).in(Singleton.class);
 				bind(IdentityManager.class).in(Singleton.class);
@@ -249,6 +254,11 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 						});
 					}
 				});
+			}
+
+			private TypeLiteral<Optional<Context>> getOptionalContextTypeLiteral() {
+				return new TypeLiteral<Optional<Context>>() {
+				};
 			}
 
 		};

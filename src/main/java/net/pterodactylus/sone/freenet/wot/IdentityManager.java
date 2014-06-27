@@ -68,16 +68,13 @@ public class IdentityManager extends AbstractService {
 	 *            The event bus
 	 * @param webOfTrustConnector
 	 *            The Web of Trust connector
-	 * @param context
-	 *            The context to focus on (may be {@code null} to ignore
-	 *            contexts)
 	 */
 	@Inject
-	public IdentityManager(EventBus eventBus, WebOfTrustConnector webOfTrustConnector, Context context) {
+	public IdentityManager(EventBus eventBus, WebOfTrustConnector webOfTrustConnector, IdentityLoader identityLoader) {
 		super("Sone Identity Manager", false);
 		this.eventBus = eventBus;
 		this.webOfTrustConnector = webOfTrustConnector;
-		this.identityLoader = new IdentityLoader(webOfTrustConnector, fromNullable(context.getContext()));
+		this.identityLoader = identityLoader;
 	}
 
 	//

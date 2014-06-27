@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.freenet.wot;
 
+import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.base.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.doThrow;
@@ -20,7 +22,7 @@ public class IdentityManagerTest {
 
 	private final EventBus eventBus = mock(EventBus.class);
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
-	private final IdentityManager identityManager = new IdentityManager(eventBus, webOfTrustConnector, new Context("Test"));
+	private final IdentityManager identityManager = new IdentityManager(eventBus, webOfTrustConnector, new IdentityLoader(webOfTrustConnector, of(new Context("Test"))));
 
 	@Test
 	public void identityManagerPingsWotConnector() throws PluginException {
