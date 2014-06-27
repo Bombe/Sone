@@ -17,24 +17,20 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import java.util.Collections;
-import java.util.HashMap;
+import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.collect.HashMultimap.create;
+
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.sone.freenet.wot.event.IdentityAddedEvent;
-import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent;
-import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
-import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
-import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 import com.google.inject.name.Named;
@@ -52,30 +48,19 @@ import com.google.inject.name.Named;
  */
 public class IdentityManager extends AbstractService {
 
-	/** Object used for synchronization. */
-	@SuppressWarnings("hiding")
-	private final Object syncObject = new Object() {
-		/* inner class for better lock names. */
-	};
-
 	/** The logger. */
 	private static final Logger logger = Logging.getLogger(IdentityManager.class);
 
 	/** The event bus. */
 	private final EventBus eventBus;
 
+	private final IdentityLoader identityLoader;
+
 	/** The Web of Trust connector. */
 	private final WebOfTrustConnector webOfTrustConnector;
 
-	/** The context to filter for. */
-	private final String context;
-
 	/** The currently known own identities. */
-	/* synchronize access on syncObject. */
-	private final Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
-
-	/** The last time all identities were loaded. */
-	private volatile long identitiesLastLoaded;
+	private final Set<OwnIdentity> currentOwnIdentities = Sets.newHashSet();
 
 	/**
 	 * Creates a new identity manager.
@@ -93,22 +78,12 @@ public class IdentityManager extends AbstractService {
 		super("Sone Identity Manager", false);
 		this.eventBus = eventBus;
 		this.webOfTrustConnector = webOfTrustConnector;
-		this.context = context;
+		this.identityLoader = new IdentityLoader(webOfTrustConnector, fromNullable(context));
 	}
 
 	//
 	// ACCESSORS
 	//
-
-	/**
-	 * Returns the last time all identities were loaded.
-	 *
-	 * @return The last time all identities were loaded (in milliseconds since
-	 *         Jan 1, 1970 UTC)
-	 */
-	public long getIdentitiesLastLoaded() {
-		return identitiesLastLoaded;
-	}
 
 	/**
 	 * Returns whether the Web of Trust plugin could be reached during the last
@@ -128,30 +103,13 @@ public class IdentityManager extends AbstractService {
 	}
 
 	/**
-	 * Returns the own identity with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the own identity
-	 * @return The own identity, or {@code null} if there is no such identity
-	 */
-	public OwnIdentity getOwnIdentity(String id) {
-		Set<OwnIdentity> allOwnIdentities = getAllOwnIdentities();
-		for (OwnIdentity ownIdentity : allOwnIdentities) {
-			if (ownIdentity.getId().equals(id)) {
-				return new DefaultOwnIdentity(ownIdentity);
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Returns all own identities.
 	 *
 	 * @return All own identities
 	 */
 	public Set<OwnIdentity> getAllOwnIdentities() {
-		synchronized (syncObject) {
-			return new HashSet<OwnIdentity>(currentOwnIdentities.values());
+		synchronized (currentOwnIdentities) {
+			return new HashSet<OwnIdentity>(currentOwnIdentities);
 		}
 	}
 
@@ -164,160 +122,27 @@ public class IdentityManager extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		Map<OwnIdentity, Map<String, Identity>> oldIdentities = Collections.emptyMap();
+		Multimap<OwnIdentity, Identity> oldIdentities = create();
+
 		while (!shouldStop()) {
-			Map<OwnIdentity, Map<String, Identity>> currentIdentities = new HashMap<OwnIdentity, Map<String, Identity>>();
-			Map<String, OwnIdentity> currentOwnIdentities = new HashMap<String, OwnIdentity>();
-
-			boolean identitiesLoaded = false;
 			try {
-				/* get all identities with the wanted context from WoT. */
-				logger.finer("Getting all Own Identities from WoT...");
-				Set<OwnIdentity> ownIdentities = webOfTrustConnector.loadAllOwnIdentities();
-				logger.finest(String.format("Loaded %d Own Identities.", ownIdentities.size()));
+				Multimap<OwnIdentity, Identity> currentIdentities = identityLoader.loadIdentities();
 
-				/* load trusted identities. */
-				for (OwnIdentity ownIdentity : ownIdentities) {
-					currentOwnIdentities.put(ownIdentity.getId(), ownIdentity);
-					Map<String, Identity> identities = new HashMap<String, Identity>();
-					currentIdentities.put(ownIdentity, identities);
+				IdentityChangeEventSender identityChangeEventSender = new IdentityChangeEventSender(eventBus, oldIdentities);
+				identityChangeEventSender.detectChanges(currentIdentities);
 
-					/*
-					 * if the context doesn’t match, skip getting trusted
-					 * identities.
-					 */
-					if ((context != null) && !ownIdentity.hasContext(context)) {
-						continue;
-					}
+				oldIdentities = currentIdentities;
 
-					/* load trusted identities. */
-					logger.finer(String.format("Getting trusted identities for %s...", ownIdentity.getId()));
-					Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context);
-					logger.finest(String.format("Got %d trusted identities.", trustedIdentities.size()));
-					for (Identity identity : trustedIdentities) {
-						identities.put(identity.getId(), identity);
-					}
+				synchronized (currentOwnIdentities) {
+					currentOwnIdentities.clear();
+					currentOwnIdentities.addAll(currentIdentities.keySet());
 				}
-				identitiesLoaded = true;
-				identitiesLastLoaded = System.currentTimeMillis();
 			} catch (WebOfTrustException wote1) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
 			}
 
-			if (identitiesLoaded) {
-
-				/* check for changes. */
-				checkOwnIdentities(currentOwnIdentities);
-
-				/* now check for changes in remote identities. */
-				for (OwnIdentity ownIdentity : currentOwnIdentities.values()) {
-
-					/* find new identities. */
-					for (Identity currentIdentity : currentIdentities.get(ownIdentity).values()) {
-						if (!oldIdentities.containsKey(ownIdentity) || !oldIdentities.get(ownIdentity).containsKey(currentIdentity.getId())) {
-							logger.finest(String.format("Identity added for %s: %s", ownIdentity.getId(), currentIdentity));
-							eventBus.post(new IdentityAddedEvent(ownIdentity, currentIdentity));
-						}
-					}
-
-					/* find removed identities. */
-					if (oldIdentities.containsKey(ownIdentity)) {
-						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
-							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
-								logger.finest(String.format("Identity removed for %s: %s", ownIdentity.getId(), oldIdentity));
-								eventBus.post(new IdentityRemovedEvent(ownIdentity, oldIdentity));
-							}
-						}
-
-						/* check for changes in the contexts. */
-						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
-							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
-								continue;
-							}
-							Identity newIdentity = currentIdentities.get(ownIdentity).get(oldIdentity.getId());
-							Set<String> oldContexts = oldIdentity.getContexts();
-							Set<String> newContexts = newIdentity.getContexts();
-							if (oldContexts.size() != newContexts.size()) {
-								logger.finest(String.format("Contexts changed for %s: was: %s, is now: %s", ownIdentity.getId(), oldContexts, newContexts));
-								eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
-								continue;
-							}
-							for (String oldContext : oldContexts) {
-								if (!newContexts.contains(oldContext)) {
-									logger.finest(String.format("Context was removed for %s: %s", ownIdentity.getId(), oldContext));
-									eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
-									break;
-								}
-							}
-						}
-
-						/* check for changes in the properties. */
-						for (Identity oldIdentity : oldIdentities.get(ownIdentity).values()) {
-							if (!currentIdentities.get(ownIdentity).containsKey(oldIdentity.getId())) {
-								continue;
-							}
-							Identity newIdentity = currentIdentities.get(ownIdentity).get(oldIdentity.getId());
-							Map<String, String> oldProperties = oldIdentity.getProperties();
-							Map<String, String> newProperties = newIdentity.getProperties();
-							if (oldProperties.size() != newProperties.size()) {
-								logger.finest(String.format("Properties changed for %s: was: %s, is now: %s", ownIdentity.getId(), oldProperties, newProperties));
-								eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
-								continue;
-							}
-							for (Entry<String, String> oldProperty : oldProperties.entrySet()) {
-								if (!newProperties.containsKey(oldProperty.getKey()) || !newProperties.get(oldProperty.getKey()).equals(oldProperty.getValue())) {
-									logger.finest(String.format("Property was removed for %s: %s", ownIdentity.getId(), oldProperty));
-									eventBus.post(new IdentityUpdatedEvent(ownIdentity, newIdentity));
-									break;
-								}
-							}
-						}
-					}
-				}
-
-				/* remember the current set of identities. */
-				oldIdentities = currentIdentities;
-			}
-
 			/* wait a minute before checking again. */
 			sleep(60 * 1000);
-		}
-	}
-
-	//
-	// PRIVATE METHODS
-	//
-
-	/**
-	 * Checks the given new list of own identities for added or removed own
-	 * identities, as compared to {@link #currentOwnIdentities}.
-	 *
-	 * @param newOwnIdentities
-	 *            The new own identities
-	 */
-	private void checkOwnIdentities(Map<String, OwnIdentity> newOwnIdentities) {
-		synchronized (syncObject) {
-
-			/* find removed own identities: */
-			for (OwnIdentity oldOwnIdentity : currentOwnIdentities.values()) {
-				OwnIdentity newOwnIdentity = newOwnIdentities.get(oldOwnIdentity.getId());
-				if ((newOwnIdentity == null) || ((context != null) && oldOwnIdentity.hasContext(context) && !newOwnIdentity.hasContext(context))) {
-					logger.finest(String.format("Own Identity removed: %s", oldOwnIdentity));
-					eventBus.post(new OwnIdentityRemovedEvent(new DefaultOwnIdentity(oldOwnIdentity)));
-				}
-			}
-
-			/* find added own identities. */
-			for (OwnIdentity currentOwnIdentity : newOwnIdentities.values()) {
-				OwnIdentity oldOwnIdentity = currentOwnIdentities.get(currentOwnIdentity.getId());
-				if (((oldOwnIdentity == null) && ((context == null) || currentOwnIdentity.hasContext(context))) || ((oldOwnIdentity != null) && (context != null) && (!oldOwnIdentity.hasContext(context) && currentOwnIdentity.hasContext(context)))) {
-					logger.finest(String.format("Own Identity added: %s", currentOwnIdentity));
-					eventBus.post(new OwnIdentityAddedEvent(new DefaultOwnIdentity(currentOwnIdentity)));
-				}
-			}
-
-			currentOwnIdentities.clear();
-			currentOwnIdentities.putAll(newOwnIdentities);
 		}
 	}
 

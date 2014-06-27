@@ -18,8 +18,13 @@
 package net.pterodactylus.sone.freenet.wot;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Nullable;
+
+import com.google.common.base.Function;
 
 /**
  * Interface for web of trust identities, defining all functions that can be
@@ -29,6 +34,20 @@ import java.util.Set;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Identity {
+
+	final Function<Identity, Collection<String>> TO_CONTEXTS = new Function<Identity, Collection<String>>() {
+		@Override
+		public Collection<String> apply(@Nullable Identity identity) {
+			return (identity == null) ? Collections.<String>emptyList() : identity.getContexts();
+		}
+	};
+
+	final Function<Identity, Map<String, String>> TO_PROPERTIES = new Function<Identity, Map<String, String>>() {
+		@Override
+		public Map<String, String> apply(@Nullable Identity identity) {
+			return (identity == null) ? Collections.<String, String>emptyMap() : identity.getProperties();
+		}
+	};
 
 	/**
 	 * Returns the ID of the identity.
