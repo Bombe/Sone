@@ -1,0 +1,106 @@
+package net.pterodactylus.sone.core;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
+
+import javax.annotation.Nullable;
+
+import net.pterodactylus.sone.core.Options.DefaultOption;
+import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.core.Options.OptionWatcher;
+
+import com.google.common.base.Predicate;
+import org.junit.Test;
+
+/**
+ * Unit test for {@link DefaultOption}.
+ *
+ * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ */
+public class DefaultOptionTest {
+
+	private final Object defaultValue = new Object();
+	private final Object acceptedValue = new Object();
+	private final Predicate<Object> matchesAcceptedValue = new Predicate<Object>() {
+		@Override
+		public boolean apply(@Nullable Object object) {
+			return acceptedValue.equals(object);
+		}
+	};
+
+	@Test
+	public void defaultOptionReturnsDefaultValueWhenUnset() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		assertThat(defaultOption.get(), is(defaultValue));
+	}
+
+	@Test
+	public void defaultOptionReturnsNullForRealWhenUnset() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		assertThat(defaultOption.getReal(), nullValue());
+	}
+
+	@Test
+	public void defaultOptionWillReturnSetValue() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		Object newValue = new Object();
+		defaultOption.set(newValue);
+		assertThat(defaultOption.get(), is(newValue));
+	}
+
+	@Test
+	public void defaultOptionWithValidatorAcceptsValidValues() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		defaultOption.set(acceptedValue);
+		assertThat(defaultOption.get(), is(acceptedValue));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void defaultOptionWithValidatorRejectsInvalidValues() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		defaultOption.set(new Object());
+	}
+
+	@Test
+	public void watcherIsNotifiedOnChange() {
+		final AtomicReference<Object> changedObject = new AtomicReference<Object>();
+		Object newValue = new Object();
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, new OptionWatcher<Object>() {
+			@Override
+			public void optionChanged(Option<Object> option, Object oldValue, Object newValue) {
+				assertThat(oldValue, nullValue());
+				changedObject.set(newValue);
+			}
+		});
+		defaultOption.set(newValue);
+		assertThat(defaultOption.get(), is(newValue));
+		assertThat(changedObject.get(), is(newValue));
+	}
+
+	@Test
+	public void watcherIsNotNotifiedIfValueIsSetTwice() {
+		final AtomicInteger changeCounter = new AtomicInteger();
+		Object newValue = new Object();
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, new OptionWatcher<Object>() {
+			@Override
+			public void optionChanged(Option<Object> option, Object oldValue, Object newValue) {
+				changeCounter.incrementAndGet();
+			}
+		});
+		defaultOption.set(newValue);
+		defaultOption.set(newValue);
+		assertThat(changeCounter.get(), is(1));
+	}
+
+	@Test
+	public void defaultOptionValidatesObjectsCorrectly() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		assertThat(defaultOption.validate(acceptedValue), is(true));
+		assertThat(defaultOption.validate(new Object()), is(false));
+	}
+
+}
