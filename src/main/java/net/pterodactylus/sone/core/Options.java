@@ -40,13 +40,6 @@ public class Options {
 	public static interface Option<T> {
 
 		/**
-		 * Returns the default value of the option.
-		 *
-		 * @return The default value of the option
-		 */
-		public T getDefault();
-
-		/**
 		 * Returns the current value of the option. If the current value is not
 		 * set (usually {@code null}), the default value is returned.
 		 *
@@ -179,14 +172,6 @@ public class Options {
 			this.defaultValue = defaultValue;
 			this.validator = validator;
 			this.optionWatcher = optionWatcher;
-		}
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public T getDefault() {
-			return defaultValue;
 		}
 
 		/**
