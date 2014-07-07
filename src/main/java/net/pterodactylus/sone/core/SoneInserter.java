@@ -201,7 +201,6 @@ public class SoneInserter extends AbstractService {
 					try {
 						sone.setStatus(SoneStatus.inserting);
 						long insertTime = currentTimeMillis();
-						insertInformation.setTime(insertTime);
 						eventBus.post(new SoneInsertingEvent(sone));
 						FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
 						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime));
@@ -266,7 +265,7 @@ public class SoneInserter extends AbstractService {
 			this.fingerprint = sone.getFingerprint();
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
-			soneProperties.put("time", sone.getTime());
+			soneProperties.put("time", currentTimeMillis());
 			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
@@ -292,16 +291,6 @@ public class SoneInserter extends AbstractService {
 		 */
 		public FreenetURI getInsertUri() {
 			return (FreenetURI) soneProperties.get("insertUri");
-		}
-
-		/**
-		 * Sets the time of the Sone at the time of the insert.
-		 *
-		 * @param time
-		 *            The time of the Sone
-		 */
-		public void setTime(long time) {
-			soneProperties.put("time", time);
 		}
 
 		//
