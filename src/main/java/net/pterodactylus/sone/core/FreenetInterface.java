@@ -128,16 +128,6 @@ public class FreenetInterface {
 	}
 
 	/**
-	 * Creates a key pair.
-	 *
-	 * @return The request key at index 0, the insert key at index 1
-	 */
-	public String[] generateKeyPair() {
-		FreenetURI[] keyPair = client.generateKeyPair("");
-		return new String[] { keyPair[1].toString(), keyPair[0].toString() };
-	}
-
-	/**
 	 * Inserts the image data of the given {@link TemporaryImage} and returns
 	 * the given insert token that can be used to add listeners or cancel the
 	 * insert.
