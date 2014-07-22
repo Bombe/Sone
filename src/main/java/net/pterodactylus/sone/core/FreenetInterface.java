@@ -42,7 +42,6 @@ import freenet.client.ClientMetadata;
 import freenet.client.FetchException;
 import freenet.client.FetchResult;
 import freenet.client.HighLevelSimpleClient;
-import freenet.client.HighLevelSimpleClientImpl;
 import freenet.client.InsertBlock;
 import freenet.client.InsertContext;
 import freenet.client.InsertException;
@@ -55,6 +54,7 @@ import freenet.keys.FreenetURI;
 import freenet.keys.InsertableClientSSK;
 import freenet.keys.USK;
 import freenet.node.Node;
+import freenet.node.RequestClient;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
 import freenet.support.io.ArrayBucket;
@@ -220,7 +220,7 @@ public class FreenetInterface {
 			};
 			soneUskCallbacks.put(sone.getId(), uskCallback);
 			boolean runBackgroundFetch = (System.currentTimeMillis() - sone.getTime()) < TimeUnit.DAYS.toMillis(7);
-			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, runBackgroundFetch, (HighLevelSimpleClientImpl) client);
+			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, runBackgroundFetch, (RequestClient) client);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe USK “%s”!", sone.getRequestUri()), mue1);
 		}
@@ -274,7 +274,7 @@ public class FreenetInterface {
 
 		};
 		try {
-			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (HighLevelSimpleClientImpl) client);
+			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (RequestClient) client);
 			uriUskCallbacks.put(uri, uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
