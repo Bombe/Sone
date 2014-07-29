@@ -41,6 +41,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
@@ -1988,14 +1989,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	private void loadConfiguration() {
 		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE), new OptionWatcher<Integer>() {
-
-			@Override
-			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
-				SoneInserter.setInsertionDelay(newValue);
-			}
-
-		}));
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE), new SetInsertionDelay()));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, Predicates.<Integer> or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));

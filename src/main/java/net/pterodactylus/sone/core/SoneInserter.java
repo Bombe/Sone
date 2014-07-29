@@ -32,6 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
@@ -54,6 +56,7 @@ import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
@@ -136,6 +139,11 @@ public class SoneInserter extends AbstractService {
 		checkArgument((this.sone == null) || sone.equals(this.sone), "Sone to insert can not be set to a different Sone");
 		this.sone = sone;
 		return this;
+	}
+
+	@VisibleForTesting
+	static AtomicInteger getInsertionDelay() {
+		return insertionDelay;
 	}
 
 	/**
@@ -239,6 +247,15 @@ public class SoneInserter extends AbstractService {
 				logger.log(Level.SEVERE, "SoneInserter threw an Exception!", t1);
 			}
 		}
+	}
+
+	static class SetInsertionDelay implements OptionWatcher<Integer> {
+
+		@Override
+		public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+			setInsertionDelay(newValue);
+		}
+
 	}
 
 	/**
