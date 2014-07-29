@@ -2,6 +2,7 @@ package net.pterodactylus.sone.core;
 
 import static freenet.keys.InsertableClientSSK.createRandom;
 import static freenet.node.RequestStarter.INTERACTIVE_PRIORITY_CLASS;
+import static freenet.node.RequestStarter.PREFETCH_PRIORITY_CLASS;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -332,6 +333,26 @@ public class FreenetInterfaceTest {
 		}).when(soneDownloader).fetchSone(sone);
 		callbackCaptor.getValue().onFoundEdition(0, null, null, null, false, (short) 0, null, false, false);
 		assertThat(downloadTriggered.await(1, SECONDS), is(false));
+	}
+
+	@Test
+	public void callbackForNormalUskUsesDifferentPriorities() {
+		Callback callback = mock(Callback.class);
+		FreenetURI uri = createRandom(randomSource, "test-0").getURI().uskForSSK();
+		freenetInterface.registerUsk(uri, callback);
+		assertThat(callbackCaptor.getValue().getPollingPriorityNormal(), is(PREFETCH_PRIORITY_CLASS));
+		assertThat(callbackCaptor.getValue().getPollingPriorityProgress(), is(INTERACTIVE_PRIORITY_CLASS));
+	}
+
+	@Test
+	public void callbackForNormalUskForwardsImportantParameters() throws MalformedURLException {
+		Callback callback = mock(Callback.class);
+		FreenetURI uri = createRandom(randomSource, "test-0").getURI().uskForSSK();
+		freenetInterface.registerUsk(uri, callback);
+		USK key = mock(USK.class);
+		when(key.getURI()).thenReturn(uri);
+		callbackCaptor.getValue().onFoundEdition(3, key, null, null, false, (short) 0, null, true, true);
+		verify(callback).editionFound(eq(uri), eq(3L), eq(true), eq(true));
 	}
 
 	@Test
