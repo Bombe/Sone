@@ -1,8 +1,10 @@
 package net.pterodactylus.sone.core;
 
 import static freenet.keys.InsertableClientSSK.createRandom;
+import static freenet.node.RequestStarter.INTERACTIVE_PRIORITY_CLASS;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.pterodactylus.sone.Matchers.delivers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -13,6 +15,8 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -24,6 +28,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.concurrent.CountDownLatch;
 
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
@@ -60,6 +65,8 @@ import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link FreenetInterface}.
@@ -76,6 +83,8 @@ public class FreenetInterfaceTest {
 	private final USKManager uskManager = mock(USKManager.class);
 	private FreenetInterface freenetInterface;
 	private final Sone sone = mock(Sone.class);
+	private final ArgumentCaptor<USKCallback> callbackCaptor = forClass(USKCallback.class);
+	private final SoneDownloader soneDownloader = mock(SoneDownloader.class);
 
 	@Before
 	public void setupFreenetInterface() {
@@ -91,6 +100,11 @@ public class FreenetInterfaceTest {
 		InsertableClientSSK insertSsk = createRandom(randomSource, "test-0");
 		when(sone.getId()).thenReturn(Base64.encode(insertSsk.getURI().getRoutingKey()));
 		when(sone.getRequestUri()).thenReturn(insertSsk.getURI().uskForSSK());
+	}
+
+	@Before
+	public void setupCallbackCaptorAndUskManager() {
+		doNothing().when(uskManager).subscribe(any(USK.class), callbackCaptor.capture(), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -281,6 +295,43 @@ public class FreenetInterfaceTest {
 		when(sone.getRequestUri()).thenReturn(new FreenetURI("KSK@GPLv3.txt"));
 		freenetInterface.unregisterUsk(sone);
 		verify(uskManager, never()).unsubscribe(any(USK.class), any(USKCallback.class));
+	}
+
+	@Test
+	public void callbackPrioritiesAreInteractive() {
+		freenetInterface.registerUsk(sone, null);
+		assertThat(callbackCaptor.getValue().getPollingPriorityNormal(), is(INTERACTIVE_PRIORITY_CLASS));
+		assertThat(callbackCaptor.getValue().getPollingPriorityProgress(), is(INTERACTIVE_PRIORITY_CLASS));
+	}
+
+	@Test
+	public void callbackForRegisteredSoneWithHigherEditionTriggersDownload() throws InterruptedException {
+		freenetInterface.registerUsk(sone, soneDownloader);
+		final CountDownLatch downloadTriggered = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				downloadTriggered.countDown();
+				return null;
+			}
+		}).when(soneDownloader).fetchSone(sone);
+		callbackCaptor.getValue().onFoundEdition(1, null, null, null, false, (short) 0, null, false, false);
+		assertThat(downloadTriggered.await(1, SECONDS), is(true));
+	}
+
+	@Test
+	public void callbackForRegisteredSoneWithTheSameEditionDoesNotTriggerDownload() throws InterruptedException {
+		freenetInterface.registerUsk(sone, soneDownloader);
+		final CountDownLatch downloadTriggered = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				downloadTriggered.countDown();
+				return null;
+			}
+		}).when(soneDownloader).fetchSone(sone);
+		callbackCaptor.getValue().onFoundEdition(0, null, null, null, false, (short) 0, null, false, false);
+		assertThat(downloadTriggered.await(1, SECONDS), is(false));
 	}
 
 	@Test
