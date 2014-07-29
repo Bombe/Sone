@@ -19,6 +19,8 @@ package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.not;
+import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -91,7 +93,6 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
@@ -343,13 +344,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Sone> getLocalSones() {
 		synchronized (sones) {
-			return FluentIterable.from(sones.values()).filter(new Predicate<Sone>() {
-
-				@Override
-				public boolean apply(Sone sone) {
-					return sone.isLocal();
-				}
-			}).toSet();
+			return FluentIterable.from(sones.values()).filter(LOCAL_SONE_FILTER).toSet();
 		}
 	}
 
@@ -384,13 +379,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Sone> getRemoteSones() {
 		synchronized (sones) {
-			return FluentIterable.from(sones.values()).filter(new Predicate<Sone>() {
-
-				@Override
-				public boolean apply(Sone sone) {
-					return !sone.isLocal();
-				}
-			}).toSet();
+			return FluentIterable.from(sones.values()).filter(not(LOCAL_SONE_FILTER)).toSet();
 		}
 	}
 
