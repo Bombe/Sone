@@ -76,6 +76,7 @@ import net.pterodactylus.sone.database.PostReplyProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
+import net.pterodactylus.sone.fcp.FcpInterface.SetActive;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
@@ -1998,14 +1999,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangePredicate(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangePredicate(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
-		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, new OptionWatcher<Boolean>() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
-				fcpInterface.setActive(newValue);
-			}
-		}));
+		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, fcpInterface.new SetActive()));
 		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, new OptionWatcher<Integer>() {
 
 			@Override

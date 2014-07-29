@@ -1,0 +1,32 @@
+package net.pterodactylus.sone.fcp;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
+import net.pterodactylus.sone.fcp.FcpInterface.SetActive;
+
+import org.junit.Test;
+
+/**
+ * Unit test for {@link FcpInterface} and its subclasses.
+ *
+ * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ */
+public class FcpInterfaceTest {
+
+	private final FcpInterface fcpInterface = new FcpInterface(null);
+	private final SetActive setActive = fcpInterface.new SetActive();
+
+	@Test
+	public void setActiveCanActivateFcpInterface() {
+		setActive.optionChanged(null, null, true);
+		assertThat(fcpInterface.isActive(), is(true));
+	}
+
+	@Test
+	public void setActiveCanDeactivateFcpInterface() {
+		setActive.optionChanged(null, null, false);
+		assertThat(fcpInterface.isActive(), is(false));
+	}
+
+}

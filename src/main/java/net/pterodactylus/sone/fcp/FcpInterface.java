@@ -26,18 +26,21 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
 import net.pterodactylus.util.logging.Logging;
-
-import com.google.inject.Inject;
 
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
 import freenet.pluginmanager.PluginReplySender;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.google.inject.Inject;
 
 /**
  * Implementation of an FCP interface for other clients or plugins to
@@ -105,6 +108,11 @@ public class FcpInterface {
 	//
 	// ACCESSORS
 	//
+
+	@VisibleForTesting
+	boolean isActive() {
+		return active;
+	}
 
 	/**
 	 * Sets whether the FCP interface should handle requests. If {@code active}
@@ -214,6 +222,15 @@ public class FcpInterface {
 		} else {
 			pluginReplySender.send(replyParameters);
 		}
+	}
+
+	public class SetActive implements OptionWatcher<Boolean> {
+
+		@Override
+		public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
+			setActive(newValue);
+		}
+
 	}
 
 }
