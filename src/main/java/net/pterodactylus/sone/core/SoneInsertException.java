@@ -26,33 +26,6 @@ public class SoneInsertException extends SoneException {
 
 	/**
 	 * Creates a new Sone insert exception.
-	 */
-	public SoneInsertException() {
-		super();
-	}
-
-	/**
-	 * Creates a new Sone insert exception.
-	 *
-	 * @param message
-	 *            The message of the exception
-	 */
-	public SoneInsertException(String message) {
-		super(message);
-	}
-
-	/**
-	 * Creates a new Sone insert exception.
-	 *
-	 * @param cause
-	 *            The cause of the exception
-	 */
-	public SoneInsertException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * Creates a new Sone insert exception.
 	 *
 	 * @param message
 	 *            The message of the exception
