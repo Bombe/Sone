@@ -39,8 +39,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Options.DefaultOption;
-import net.pterodactylus.sone.core.Options.Option;
-import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
@@ -75,8 +73,6 @@ import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.PostReplyProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.fcp.FcpInterface;
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
-import net.pterodactylus.sone.fcp.FcpInterface.SetActive;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
@@ -2000,15 +1996,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangePredicate(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
 		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, fcpInterface.new SetActive()));
-		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, new OptionWatcher<Integer>() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
-				fcpInterface.setFullAccessRequired(FullAccessRequired.values()[newValue]);
-			}
-
-		}));
+		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, fcpInterface.new SetFullAccessRequired()));
 
 		loadConfigurationValue("InsertionDelay");
 		loadConfigurationValue("PostsPerPage");

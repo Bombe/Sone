@@ -126,6 +126,11 @@ public class FcpInterface {
 		this.active = active;
 	}
 
+	@VisibleForTesting
+	FullAccessRequired getFullAccessRequired() {
+		return fullAccessRequired;
+	}
+
 	/**
 	 * Sets the action level for which full FCP access is required.
 	 *
@@ -229,6 +234,15 @@ public class FcpInterface {
 		@Override
 		public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
 			setActive(newValue);
+		}
+
+	}
+
+	public class SetFullAccessRequired implements OptionWatcher<Integer> {
+
+		@Override
+		public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
+			setFullAccessRequired(FullAccessRequired.values()[newValue]);
 		}
 
 	}
