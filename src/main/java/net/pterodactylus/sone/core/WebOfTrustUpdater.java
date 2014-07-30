@@ -34,6 +34,7 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
 
 /**
@@ -474,7 +475,8 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class AddContextJob extends WebOfTrustContextUpdateJob {
+	@VisibleForTesting
+	class AddContextJob extends WebOfTrustContextUpdateJob {
 
 		/**
 		 * Creates a new add-context job.
