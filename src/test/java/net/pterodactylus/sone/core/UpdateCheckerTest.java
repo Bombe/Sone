@@ -93,6 +93,7 @@ public class UpdateCheckerTest {
 		assertThat(updateFoundEvent.getValue().releaseTime(), is(11865368297000L));
 		assertThat(updateChecker.getLatestVersion(), is(new Version(99, 0, 0)));
 		assertThat(updateChecker.getLatestVersionDate(), is(11865368297000L));
+		assertThat(updateChecker.hasLatestVersion(), is(true));
 	}
 
 	private FetchResult createFutureFetchResult() {
@@ -195,6 +196,37 @@ public class UpdateCheckerTest {
 		Bucket fetched = new StringBucket("# MapConfigurationBackendVersion=1\n" +
 				"CurrentVersion/Version: 0.2\n" +
 				"CurrentVersion/ReleaseTime: invalid");
+		return new FetchResult(clientMetadata, fetched);
+	}
+
+	@Test
+	public void invalidPropertiesDoesNotCauseAnUpdateToBeFound() {
+		setupFetchResult(createMissingTimeFetchResult());
+		setupCallbackWithEdition(MAX_VALUE, true, false);
+		verifyAFreenetUriIsFetched();
+		verifyNoUpdateFoundEventIsFired();
+	}
+
+	private FetchResult createMissingTimeFetchResult() {
+		ClientMetadata clientMetadata = new ClientMetadata("application/xml");
+		Bucket fetched = new StringBucket("# MapConfigurationBackendVersion=1\n" +
+				"CurrentVersion/Version: 0.2\n");
+		return new FetchResult(clientMetadata, fetched);
+	}
+
+	@Test
+	public void invalidVersionDoesNotCauseAnUpdateToBeFound() {
+		setupFetchResult(createInvalidVersionFetchResult());
+		setupCallbackWithEdition(MAX_VALUE, true, false);
+		verifyAFreenetUriIsFetched();
+		verifyNoUpdateFoundEventIsFired();
+	}
+
+	private FetchResult createInvalidVersionFetchResult() {
+		ClientMetadata clientMetadata = new ClientMetadata("application/xml");
+		Bucket fetched = new StringBucket("# MapConfigurationBackendVersion=1\n" +
+				"CurrentVersion/Version: foo\n" +
+				"CurrentVersion/ReleaseTime: 1289417883000");
 		return new FetchResult(clientMetadata, fetched);
 	}
 
