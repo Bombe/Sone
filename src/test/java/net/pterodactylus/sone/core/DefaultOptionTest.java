@@ -103,4 +103,23 @@ public class DefaultOptionTest {
 		assertThat(defaultOption.validate(new Object()), is(false));
 	}
 
+	@Test
+	public void settingToNullWillRestoreDefaultValue() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		defaultOption.set(null);
+		assertThat(defaultOption.get(), is(defaultValue));
+	}
+
+	@Test
+	public void validateWithoutValidatorWillValidateNull() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		assertThat(defaultOption.validate(null), is(true));
+	}
+
+	@Test
+	public void validateWithValidatorWillValidateNull() {
+		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		assertThat(defaultOption.validate(null), is(true));
+	}
+
 }
