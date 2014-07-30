@@ -1503,16 +1503,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		eventBus.post(new NewPostReplyFoundEvent(reply));
 		sone.addReply(reply);
 		touchConfiguration();
-		localElementTicker.schedule(new Runnable() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void run() {
-				markReplyKnown(reply);
-			}
-		}, 10, TimeUnit.SECONDS);
+		localElementTicker.schedule(new MarkReplyKnown(reply), 10, TimeUnit.SECONDS);
 		return reply;
 	}
 
@@ -2186,6 +2177,22 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		@Override
 		public void run() {
 			markPostKnown(post);
+		}
+
+	}
+
+	@VisibleForTesting
+	class MarkReplyKnown implements Runnable {
+
+		private final PostReply postReply;
+
+		public MarkReplyKnown(PostReply postReply) {
+			this.postReply = postReply;
+		}
+
+		@Override
+		public void run() {
+			markReplyKnown(postReply);
 		}
 
 	}
