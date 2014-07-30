@@ -511,7 +511,8 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class RemoveContextJob extends WebOfTrustContextUpdateJob {
+	@VisibleForTesting
+	class RemoveContextJob extends WebOfTrustContextUpdateJob {
 
 		/**
 		 * Creates a new remove-context job.
