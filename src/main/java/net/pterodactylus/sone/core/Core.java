@@ -90,6 +90,7 @@ import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
@@ -1396,16 +1397,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		eventBus.post(new NewPostFoundEvent(post));
 		sone.addPost(post);
 		touchConfiguration();
-		localElementTicker.schedule(new Runnable() {
-
-			/**
-			 * {@inheritDoc}
-			 */
-			@Override
-			public void run() {
-				markPostKnown(post);
-			}
-		}, 10, TimeUnit.SECONDS);
+		localElementTicker.schedule(new MarkPostKnown(post), 10, TimeUnit.SECONDS);
 		return post;
 	}
 
@@ -2180,6 +2172,22 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		imageInsertFinishedEvent.image().modify().setKey(imageInsertFinishedEvent.resultingUri().toString()).update();
 		deleteTemporaryImage(imageInsertFinishedEvent.image().getId());
 		touchConfiguration();
+	}
+
+	@VisibleForTesting
+	class MarkPostKnown implements Runnable {
+
+		private final Post post;
+
+		public MarkPostKnown(Post post) {
+			this.post = post;
+		}
+
+		@Override
+		public void run() {
+			markPostKnown(post);
+		}
+
 	}
 
 }
