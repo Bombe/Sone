@@ -799,15 +799,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			}
 			soneDownloader.addSone(sone);
-			soneDownloaders.execute(new Runnable() {
-
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public void run() {
-					soneDownloader.fetchSone(sone, sone.getRequestUri());
-				}
-
-			});
+			soneDownloaders.execute(soneDownloader.new FetchSone(sone));
 			return sone;
 		}
 	}

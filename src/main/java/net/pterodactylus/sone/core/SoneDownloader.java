@@ -533,4 +533,19 @@ public class SoneDownloader extends AbstractService {
 		}
 	}
 
+	public class FetchSone implements Runnable {
+
+		private final Sone sone;
+
+		public FetchSone(Sone sone) {
+			this.sone = sone;
+		}
+
+		@Override
+		public void run() {
+			fetchSone(sone, sone.getRequestUri());
+		}
+
+	}
+
 }
