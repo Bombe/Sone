@@ -533,11 +533,11 @@ public class SoneDownloader extends AbstractService {
 		}
 	}
 
-	public class FetchSone implements Runnable {
+	public class FetchSoneWithUri implements Runnable {
 
 		private final Sone sone;
 
-		public FetchSone(Sone sone) {
+		public FetchSoneWithUri(Sone sone) {
 			this.sone = sone;
 		}
 

@@ -800,7 +800,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			}
 			soneDownloader.addSone(sone);
-			soneDownloaders.execute(soneDownloader.new FetchSone(sone));
+			soneDownloaders.execute(soneDownloader.new FetchSoneWithUri(sone));
 			return sone;
 		}
 	}

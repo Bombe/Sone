@@ -5,7 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import net.pterodactylus.sone.core.SoneDownloader.FetchSone;
+import net.pterodactylus.sone.core.SoneDownloader.FetchSoneWithUri;
 import net.pterodactylus.sone.data.Sone;
 
 import freenet.keys.FreenetURI;
@@ -20,13 +20,13 @@ import org.junit.Test;
 public class SoneDownloaderTest {
 
 	@Test
-	public void fetchSoneDownloadsSone() {
+	public void fetchSoneWithUriDownloadsSoneWithUri() {
 		SoneDownloader soneDownloader = mock(SoneDownloader.class);
 		Sone sone = mock(Sone.class);
 		FreenetURI soneUri = mock(FreenetURI.class);
 		when(sone.getRequestUri()).thenReturn(soneUri);
-		FetchSone fetchSone = soneDownloader.new FetchSone(sone);
-		fetchSone.run();
+		FetchSoneWithUri fetchSoneWithUri = soneDownloader.new FetchSoneWithUri(sone);
+		fetchSoneWithUri.run();
 		verify(soneDownloader).fetchSone(eq(sone), eq(soneUri));
 	}
 
