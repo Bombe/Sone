@@ -75,7 +75,7 @@ class SoneModificationDetector {
 	}
 
 	private boolean insertionDelayHasPassed() {
-		return lastModificationTime.isPresent() && (NANOSECONDS.toSeconds(ticker.read() - lastModificationTime.get()) >= insertionDelay.get());
+		return NANOSECONDS.toSeconds(ticker.read() - lastModificationTime.get()) >= insertionDelay.get();
 	}
 
 	public boolean isModified() {
