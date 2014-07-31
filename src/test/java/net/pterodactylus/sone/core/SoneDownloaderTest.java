@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import net.pterodactylus.sone.core.SoneDownloader.FetchSone;
 import net.pterodactylus.sone.core.SoneDownloader.FetchSoneWithUri;
 import net.pterodactylus.sone.data.Sone;
 
@@ -28,6 +29,15 @@ public class SoneDownloaderTest {
 		FetchSoneWithUri fetchSoneWithUri = soneDownloader.new FetchSoneWithUri(sone);
 		fetchSoneWithUri.run();
 		verify(soneDownloader).fetchSone(eq(sone), eq(soneUri));
+	}
+
+	@Test
+	public void fetchSoneDownloadsSone() {
+		SoneDownloader soneDownloader = mock(SoneDownloader.class);
+		Sone sone = mock(Sone.class);
+		FetchSone fetchSone = soneDownloader.new FetchSone(sone);
+		fetchSone.run();
+		verify(soneDownloader).fetchSone(eq(sone));
 	}
 
 }

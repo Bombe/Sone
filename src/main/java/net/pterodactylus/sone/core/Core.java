@@ -2090,22 +2090,15 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityUpdated(IdentityUpdatedEvent identityUpdatedEvent) {
-		final Identity identity = identityUpdatedEvent.identity();
-		soneDownloaders.execute(new Runnable() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void run() {
-				Sone sone = getRemoteSone(identity.getId(), false);
-				if (sone.isLocal()) {
-					return;
-				}
-				sone.setIdentity(identity);
-				sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
-				soneDownloader.addSone(sone);
-				soneDownloader.fetchSone(sone);
-			}
-		});
+		Identity identity = identityUpdatedEvent.identity();
+		final Sone sone = getRemoteSone(identity.getId(), false);
+		if (sone.isLocal()) {
+			return;
+		}
+		sone.setIdentity(identity);
+		sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
+		soneDownloader.addSone(sone);
+		soneDownloaders.execute(soneDownloader.new FetchSone(sone));
 	}
 
 	/**
