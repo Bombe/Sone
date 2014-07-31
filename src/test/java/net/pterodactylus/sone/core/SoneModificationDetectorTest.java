@@ -52,9 +52,19 @@ public class SoneModificationDetectorTest {
 	}
 
 	@Test
+	public void normalConstructorCanBeCalled() {
+		new SoneModificationDetector(core, sone, insertionDelay);
+	}
+
+	@Test
 	public void sonesStartOutAsNotEligible() {
 		assertThat(soneModificationDetector.isModified(), is(false));
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+	}
+
+	@Test
+	public void originalFingerprintIsRetained() {
+		assertThat(soneModificationDetector.getOriginalFingerprint(), is("original"));
 	}
 
 	@Test
