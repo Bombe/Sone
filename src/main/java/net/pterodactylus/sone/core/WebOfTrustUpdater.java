@@ -259,7 +259,8 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class WebOfTrustUpdateJob {
+	@VisibleForTesting
+	class WebOfTrustUpdateJob implements Runnable {
 
 		/** Object for synchronization. */
 		@SuppressWarnings("hiding")
@@ -280,6 +281,7 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * <p/>
 		 * The implementation of this class does nothing.
 		 */
+		@Override
 		public void run() {
 			/* does nothing. */
 		}
