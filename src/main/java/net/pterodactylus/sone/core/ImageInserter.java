@@ -31,6 +31,8 @@ import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.util.logging.Logging;
 
+import com.google.common.base.Function;
+
 /**
  * The image inserter is responsible for inserting images using
  * {@link FreenetInterface#insertImage(TemporaryImage, Image, InsertToken)} and
@@ -46,6 +48,7 @@ public class ImageInserter {
 
 	/** The freenet interface. */
 	private final FreenetInterface freenetInterface;
+	private final Function<Image, InsertToken> insertTokenSupplier;
 
 	/** The tokens of running inserts. */
 	private final Map<String, InsertToken> insertTokens = Collections.synchronizedMap(new HashMap<String, InsertToken>());
@@ -55,9 +58,12 @@ public class ImageInserter {
 	 *
 	 * @param freenetInterface
 	 *            The freenet interface
+	 * @param insertTokenSupplier
+	 *            The supplier for insert tokens
 	 */
-	public ImageInserter(FreenetInterface freenetInterface) {
+	public ImageInserter(FreenetInterface freenetInterface, Function<Image, InsertToken> insertTokenSupplier) {
 		this.freenetInterface = freenetInterface;
+		this.insertTokenSupplier = insertTokenSupplier;
 	}
 
 	/**
@@ -73,7 +79,7 @@ public class ImageInserter {
 		checkNotNull(image, "image must not be null");
 		checkArgument(image.getId().equals(temporaryImage.getId()), "image IDs must match");
 		try {
-			InsertToken insertToken = freenetInterface.new InsertToken(image);
+			InsertToken insertToken = insertTokenSupplier.apply(image);
 			insertTokens.put(image.getId(), insertToken);
 			freenetInterface.insertImage(temporaryImage, image, insertToken);
 		} catch (SoneException se1) {

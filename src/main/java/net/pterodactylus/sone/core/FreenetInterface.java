@@ -35,6 +35,8 @@ import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
+
+import com.google.common.base.Function;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
@@ -490,6 +492,15 @@ public class FreenetInterface {
 		@SuppressWarnings("synthetic-access")
 		public void onSuccess(BaseClientPutter clientPutter, ObjectContainer objectContainer) {
 			eventBus.post(new ImageInsertFinishedEvent(image, resultingUri));
+		}
+
+	}
+
+	public class InsertTokenSupplier implements Function<Image, InsertToken> {
+
+		@Override
+		public InsertToken apply(Image image) {
+			return new InsertToken(image);
 		}
 
 	}

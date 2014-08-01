@@ -220,7 +220,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
 		this.soneDownloader = new SoneDownloader(this, freenetInterface);
-		this.imageInserter = new ImageInserter(freenetInterface);
+		this.imageInserter = new ImageInserter(freenetInterface, freenetInterface.new InsertTokenSupplier());
 		this.updateChecker = new UpdateChecker(eventBus, freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
