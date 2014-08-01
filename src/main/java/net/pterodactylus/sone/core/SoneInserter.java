@@ -265,7 +265,8 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class InsertInformation {
+	@VisibleForTesting
+	class InsertInformation {
 
 		private final String fingerprint;
 
@@ -297,7 +298,8 @@ public class SoneInserter extends AbstractService {
 		// ACCESSORS
 		//
 
-		private String getFingerprint() {
+		@VisibleForTesting
+		String getFingerprint() {
 			return fingerprint;
 		}
 
