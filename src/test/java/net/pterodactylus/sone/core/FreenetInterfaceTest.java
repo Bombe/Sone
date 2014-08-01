@@ -34,6 +34,7 @@ import net.pterodactylus.sone.TestUtil;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
+import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.ImageImpl;
@@ -335,6 +336,13 @@ public class FreenetInterfaceTest {
 		Fetched fetched = new Fetched(freenetUri, fetchResult);
 		assertThat(fetched.getFreenetUri(), is(freenetUri));
 		assertThat(fetched.getFetchResult(), is(fetchResult));
+	}
+
+	@Test
+	public void insertTokenSupplierSuppliesInsertTokens() {
+		InsertTokenSupplier insertTokenSupplier = freenetInterface.new InsertTokenSupplier();
+		Image image = mock(Image.class);
+		assertThat(insertTokenSupplier.apply(image), notNullValue());
 	}
 
 }
