@@ -422,7 +422,8 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class WebOfTrustContextUpdateJob extends WebOfTrustUpdateJob {
+	@VisibleForTesting
+	class WebOfTrustContextUpdateJob extends WebOfTrustUpdateJob {
 
 		/** The own identity whose contexts to manage. */
 		protected final OwnIdentity ownIdentity;
