@@ -7,6 +7,7 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.pterodactylus.sone.Matchers.delivers;
+import static net.pterodactylus.sone.TestUtil.setFinalField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -25,12 +26,11 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.concurrent.CountDownLatch;
 
+import net.pterodactylus.sone.TestUtil;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
@@ -147,21 +147,6 @@ public class FreenetInterfaceTest {
 		return new FetchResult(clientMetadata, bucket);
 	}
 
-	private void setFinalField(Object object, String fieldName, Object value) {
-		try {
-			Field clientCoreField = object.getClass().getField(fieldName);
-			clientCoreField.setAccessible(true);
-			Field modifiersField = Field.class.getDeclaredField("modifiers");
-			modifiersField.setAccessible(true);
-			modifiersField.setInt(clientCoreField, clientCoreField.getModifiers() & ~Modifier.FINAL);
-			clientCoreField.set(object, value);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Test
 	public void insertingAnImage() throws SoneException, InsertException, IOException {
 		TemporaryImage temporaryImage = new TemporaryImage("image-id");
@@ -177,20 +162,8 @@ public class FreenetInterfaceTest {
 		when(highLevelSimpleClient.insert(insertBlockCaptor.capture(), eq(false), eq((String) null), eq(false), eq(insertContext), eq(insertToken), anyShort())).thenReturn(clientPutter);
 		freenetInterface.insertImage(temporaryImage, image, insertToken);
 		assertThat(insertBlockCaptor.getValue().getData().getInputStream(), delivers(new byte[] { 1, 2, 3, 4 }));
-		assertThat(this.<ClientPutter>getPrivateField(insertToken, "clientPutter"), is(clientPutter));
+		assertThat(TestUtil.<ClientPutter>getPrivateField(insertToken, "clientPutter"), is(clientPutter));
 		verify(eventBus).post(any(ImageInsertStartedEvent.class));
-	}
-
-	private <T> T getPrivateField(Object object, String fieldName) {
-		try {
-			Field field = object.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
-			return (T) field.get(object);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		}
 	}
 
 	@Test(expected = SoneInsertException.class)
