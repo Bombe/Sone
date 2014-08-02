@@ -116,12 +116,17 @@ public class SoneInserter extends AbstractService {
 	 *            The Sone to insert
 	 */
 	public SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone) {
+		this(core, eventBus, freenetInterface, sone, new SoneModificationDetector(core, sone, insertionDelay));
+	}
+
+	@VisibleForTesting
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone, SoneModificationDetector soneModificationDetector) {
 		super("Sone Inserter for “" + sone.getName() + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
-		this.soneModificationDetector = new SoneModificationDetector(core, sone, insertionDelay);
+		this.soneModificationDetector = soneModificationDetector;
 	}
 
 	//
