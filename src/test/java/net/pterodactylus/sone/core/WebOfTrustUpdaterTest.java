@@ -4,6 +4,7 @@ import static java.lang.Thread.sleep;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -13,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import net.pterodactylus.sone.core.WebOfTrustUpdater.AddContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.RemoveContextJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdater.SetPropertyJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.WebOfTrustContextUpdateJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.WebOfTrustUpdateJob;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
@@ -136,6 +138,87 @@ public class WebOfTrustUpdaterTest {
 		verify(webOfTrustConnector).removeContext(eq(ownIdentity), eq(CONTEXT));
 		verify(ownIdentity, never()).removeContext(eq(CONTEXT));
 		assertThat(removeContextJob.waitForCompletion(), is(false));
+	}
+
+	@Test
+	public void settingAPropertySetsTheProperty() throws PluginException {
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		SetPropertyJob setPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		setPropertyJob.run();
+		verify(webOfTrustConnector).setProperty(eq(ownIdentity), eq(propertyName), eq(propertyValue));
+		verify(ownIdentity).setProperty(eq(propertyName), eq(propertyValue));
+		assertThat(setPropertyJob.waitForCompletion(), is(true));
+	}
+
+	@Test
+	public void settingAPropertyToNullRemovesTheProperty() throws PluginException {
+		String propertyName = "property-name";
+		SetPropertyJob setPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, null);
+		setPropertyJob.run();
+		verify(webOfTrustConnector).removeProperty(eq(ownIdentity), eq(propertyName));
+		verify(ownIdentity).removeProperty(eq(propertyName));
+		assertThat(setPropertyJob.waitForCompletion(), is(true));
+	}
+
+	@Test
+	public void pluginExceptionWhileSettingAPropertyIsHandled() throws PluginException {
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		doThrow(PluginException.class).when(webOfTrustConnector).setProperty(eq(ownIdentity), eq(propertyName), eq(propertyValue));
+		SetPropertyJob setPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		setPropertyJob.run();
+		verify(webOfTrustConnector).setProperty(eq(ownIdentity), eq(propertyName), eq(propertyValue));
+		verify(ownIdentity, never()).setProperty(eq(propertyName), eq(propertyValue));
+		assertThat(setPropertyJob.waitForCompletion(), is(false));
+	}
+
+	@Test
+	public void setPropertyJobsWithSameClassPropertyAndValueAreEqual() {
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		SetPropertyJob firstSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		SetPropertyJob secondSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		assertThat(firstSetPropertyJob, is(secondSetPropertyJob));
+		assertThat(secondSetPropertyJob, is(firstSetPropertyJob));
+		assertThat(firstSetPropertyJob.hashCode(), is(secondSetPropertyJob.hashCode()));
+	}
+
+	@Test
+	public void setPropertyJobsWithDifferentClassesAreNotEqual() {
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		SetPropertyJob firstSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		SetPropertyJob secondSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue) {
+		};
+		assertThat(firstSetPropertyJob, not(is(secondSetPropertyJob)));
+	}
+
+	@Test
+	public void nullIsNotASetProjectJobEither() {
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		SetPropertyJob setPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		assertThat(setPropertyJob, not(is((Object) null)));
+	}
+
+	@Test
+	public void setPropertyJobsWithDifferentPropertiesAreNotEqual() {
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		SetPropertyJob firstSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		SetPropertyJob secondSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName + "2", propertyValue);
+		assertThat(firstSetPropertyJob, not(is(secondSetPropertyJob)));
+	}
+
+	@Test
+	public void setPropertyJobsWithDifferentOwnIdentitiesAreNotEqual() {
+		OwnIdentity otherOwnIdentity = mock(OwnIdentity.class);
+		String propertyName = "property-name";
+		String propertyValue = "property-value";
+		SetPropertyJob firstSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
+		SetPropertyJob secondSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(otherOwnIdentity, propertyName, propertyValue);
+		assertThat(firstSetPropertyJob, not(is(secondSetPropertyJob)));
 	}
 
 }

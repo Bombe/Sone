@@ -550,7 +550,8 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetPropertyJob extends WebOfTrustUpdateJob {
+	@VisibleForTesting
+	class SetPropertyJob extends WebOfTrustUpdateJob {
 
 		/** The own identity to update properties on. */
 		private final OwnIdentity ownIdentity;
