@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.core;
 
+import static freenet.client.InsertException.CANCELLED;
+import static freenet.client.InsertException.INTERNAL_ERROR;
 import static freenet.keys.InsertableClientSSK.createRandom;
 import static freenet.node.RequestStarter.INTERACTIVE_PRIORITY_CLASS;
 import static freenet.node.RequestStarter.PREFETCH_PRIORITY_CLASS;
@@ -21,6 +23,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
@@ -35,6 +38,9 @@ import net.pterodactylus.sone.core.FreenetInterface.Callback;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;
+import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
+import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.ImageImpl;
@@ -87,6 +93,8 @@ public class FreenetInterfaceTest {
 	private final Sone sone = mock(Sone.class);
 	private final ArgumentCaptor<USKCallback> callbackCaptor = forClass(USKCallback.class);
 	private final SoneDownloader soneDownloader = mock(SoneDownloader.class);
+	private final Image image = mock(Image.class);
+	private InsertToken insertToken;
 
 	@Before
 	public void setupFreenetInterface() {
@@ -95,6 +103,7 @@ public class FreenetInterfaceTest {
 		setFinalField(node, "random", randomSource);
 		setFinalField(nodeClientCore, "uskManager", uskManager);
 		freenetInterface = new FreenetInterface(eventBus, node);
+		insertToken = freenetInterface.new InsertToken(image);
 	}
 
 	@Before
@@ -339,9 +348,67 @@ public class FreenetInterfaceTest {
 	}
 
 	@Test
+	public void cancellingAnInsertWillFireImageInsertAbortedEvent() {
+		ClientPutter clientPutter = mock(ClientPutter.class);
+		insertToken.setClientPutter(clientPutter);
+		ArgumentCaptor<ImageInsertStartedEvent> imageInsertStartedEvent = forClass(ImageInsertStartedEvent.class);
+		verify(eventBus).post(imageInsertStartedEvent.capture());
+		assertThat(imageInsertStartedEvent.getValue().image(), is(image));
+		insertToken.cancel();
+		ArgumentCaptor<ImageInsertAbortedEvent> imageInsertAbortedEvent = forClass(ImageInsertAbortedEvent.class);
+		verify(eventBus, times(2)).post(imageInsertAbortedEvent.capture());
+		assertThat(imageInsertAbortedEvent.getValue().image(), is(image));
+	}
+
+	@Test
+	public void failureWithoutExceptionSendsFailedEvent() {
+		insertToken.onFailure(null, null, null);
+		ArgumentCaptor<ImageInsertFailedEvent> imageInsertFailedEvent = forClass(ImageInsertFailedEvent.class);
+		verify(eventBus).post(imageInsertFailedEvent.capture());
+		assertThat(imageInsertFailedEvent.getValue().image(), is(image));
+		assertThat(imageInsertFailedEvent.getValue().cause(), nullValue());
+	}
+
+	@Test
+	public void failureSendsFailedEventWithException() {
+		InsertException insertException = new InsertException(INTERNAL_ERROR, "Internal error", null);
+		insertToken.onFailure(insertException, null, null);
+		ArgumentCaptor<ImageInsertFailedEvent> imageInsertFailedEvent = forClass(ImageInsertFailedEvent.class);
+		verify(eventBus).post(imageInsertFailedEvent.capture());
+		assertThat(imageInsertFailedEvent.getValue().image(), is(image));
+		assertThat(imageInsertFailedEvent.getValue().cause(), is((Throwable) insertException));
+	}
+
+	@Test
+	public void failureBecauseCancelledByUserSendsAbortedEvent() {
+		InsertException insertException = new InsertException(CANCELLED, null);
+		insertToken.onFailure(insertException, null, null);
+		ArgumentCaptor<ImageInsertAbortedEvent> imageInsertAbortedEvent = forClass(ImageInsertAbortedEvent.class);
+		verify(eventBus).post(imageInsertAbortedEvent.capture());
+		assertThat(imageInsertAbortedEvent.getValue().image(), is(image));
+	}
+
+	@Test
+	public void ignoredMethodsDoNotThrowExceptions() {
+		insertToken.onMajorProgress(null);
+		insertToken.onFetchable(null, null);
+		insertToken.onGeneratedMetadata(null, null, null);
+	}
+
+	@Test
+	public void generatedUriIsPostedOnSuccess() {
+		FreenetURI generatedUri = mock(FreenetURI.class);
+		insertToken.onGeneratedURI(generatedUri, null, null);
+		insertToken.onSuccess(null, null);
+		ArgumentCaptor<ImageInsertFinishedEvent> imageInsertFinishedEvent = forClass(ImageInsertFinishedEvent.class);
+		verify(eventBus).post(imageInsertFinishedEvent.capture());
+		assertThat(imageInsertFinishedEvent.getValue().image(), is(image));
+		assertThat(imageInsertFinishedEvent.getValue().resultingUri(), is(generatedUri));
+	}
+
+	@Test
 	public void insertTokenSupplierSuppliesInsertTokens() {
 		InsertTokenSupplier insertTokenSupplier = freenetInterface.new InsertTokenSupplier();
-		Image image = mock(Image.class);
 		assertThat(insertTokenSupplier.apply(image), notNullValue());
 	}
 
