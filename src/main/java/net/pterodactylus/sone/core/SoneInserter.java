@@ -136,7 +136,7 @@ public class SoneInserter extends AbstractService {
 	 * @return This Sone inserter
 	 */
 	public SoneInserter setSone(Sone sone) {
-		checkArgument((this.sone == null) || sone.equals(this.sone), "Sone to insert can not be set to a different Sone");
+		checkArgument(sone.equals(this.sone), "Sone to insert can not be set to a different Sone");
 		this.sone = sone;
 		return this;
 	}
