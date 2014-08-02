@@ -99,7 +99,7 @@ public class SoneInserterTest {
 		Sone sone = mock(Sone.class);
 		SoneModificationDetector soneModificationDetector = mock(SoneModificationDetector.class);
 		when(soneModificationDetector.isModified()).thenReturn(true);
-		SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector);
+		SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector, 1);
 		assertThat(soneInserter.isModified(), is(true));
 	}
 
@@ -107,7 +107,7 @@ public class SoneInserterTest {
 	public void isModifiedIsFalseIfModificationDetectorSaysSo() {
 		Sone sone = mock(Sone.class);
 		SoneModificationDetector soneModificationDetector = mock(SoneModificationDetector.class);
-		SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector);
+		SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector, 1);
 		assertThat(soneInserter.isModified(), is(false));
 	}
 
@@ -136,7 +136,7 @@ public class SoneInserterTest {
 		SoneModificationDetector soneModificationDetector = mock(SoneModificationDetector.class);
 		when(soneModificationDetector.isEligibleForInsert()).thenReturn(true);
 		when(freenetInterface.insertDirectory(eq(insertUri), any(HashMap.class), eq("index.html"))).thenReturn(finalUri);
-		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector);
+		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector, 1);
 		doAnswer(new Answer<Void>() {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
@@ -162,7 +162,7 @@ public class SoneInserterTest {
 		Sone sone = createSone(insertUri, fingerprint);
 		SoneModificationDetector soneModificationDetector = mock(SoneModificationDetector.class);
 		when(soneModificationDetector.isEligibleForInsert()).thenReturn(true);
-		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector);
+		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector, 1);
 		when(freenetInterface.insertDirectory(eq(insertUri), any(HashMap.class), eq("index.html"))).thenAnswer(new Answer<FreenetURI>() {
 			@Override
 			public FreenetURI answer(InvocationOnMock invocation) throws Throwable {
@@ -187,7 +187,7 @@ public class SoneInserterTest {
 		String fingerprint = "fingerprint";
 		Sone sone = createSone(insertUri, fingerprint);
 		SoneModificationDetector soneModificationDetector = mock(SoneModificationDetector.class);
-		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector);
+		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector, 1);
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -211,7 +211,7 @@ public class SoneInserterTest {
 		Sone sone = createSone(insertUri, fingerprint);
 		SoneModificationDetector soneModificationDetector = mock(SoneModificationDetector.class);
 		when(soneModificationDetector.isEligibleForInsert()).thenReturn(true);
-		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector);
+		final SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, sone, soneModificationDetector, 1);
 		final SoneException soneException = new SoneException(new Exception());
 		when(freenetInterface.insertDirectory(eq(insertUri), any(HashMap.class), eq("index.html"))).thenAnswer(new Answer<FreenetURI>() {
 			@Override

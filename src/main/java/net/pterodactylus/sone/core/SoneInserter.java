@@ -99,6 +99,7 @@ public class SoneInserter extends AbstractService {
 	private final FreenetInterface freenetInterface;
 
 	private final SoneModificationDetector soneModificationDetector;
+	private final long delay;
 
 	/** The Sone to insert. */
 	private volatile Sone sone;
@@ -116,17 +117,18 @@ public class SoneInserter extends AbstractService {
 	 *            The Sone to insert
 	 */
 	public SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone) {
-		this(core, eventBus, freenetInterface, sone, new SoneModificationDetector(core, sone, insertionDelay));
+		this(core, eventBus, freenetInterface, sone, new SoneModificationDetector(core, sone, insertionDelay), 1000);
 	}
 
 	@VisibleForTesting
-	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone, SoneModificationDetector soneModificationDetector) {
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone, SoneModificationDetector soneModificationDetector, long delay) {
 		super("Sone Inserter for “" + sone.getName() + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.sone = sone;
 		this.soneModificationDetector = soneModificationDetector;
+		this.delay = delay;
 	}
 
 	//
@@ -204,7 +206,7 @@ public class SoneInserter extends AbstractService {
 		while (!shouldStop()) {
 			try {
 				/* check every second. */
-				sleep(1000);
+				sleep(delay);
 
 				if (soneModificationDetector.isEligibleForInsert()) {
 					InsertInformation insertInformation = new InsertInformation(sone);
