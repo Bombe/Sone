@@ -230,7 +230,7 @@ public class WebOfTrustUpdater extends AbstractService {
 		while (!shouldStop()) {
 			try {
 				WebOfTrustUpdateJob updateJob = updateJobs.take();
-				if (shouldStop() || (updateJob == stopJob)) {
+				if (shouldStop()) {
 					break;
 				}
 				logger.log(Level.FINE, "Running Trust Update Job: " + updateJob);
