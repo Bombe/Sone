@@ -372,11 +372,11 @@ public class WebOfTrustUpdater extends AbstractService {
 		public void run() {
 			try {
 				if (score != null) {
-					trustee.setTrust(truster, new Trust(score, null, 0));
 					webOfTrustConnector.setTrust(truster, trustee, score, comment);
+					trustee.setTrust(truster, new Trust(score, null, 0));
 				} else {
-					trustee.removeTrust(truster);
 					webOfTrustConnector.removeTrust(truster, trustee);
+					trustee.removeTrust(truster);
 				}
 				finish(true);
 			} catch (WebOfTrustException wote1) {
