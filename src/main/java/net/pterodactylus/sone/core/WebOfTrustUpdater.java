@@ -375,7 +375,7 @@ public class WebOfTrustUpdater extends AbstractService {
 					trustee.setTrust(truster, new Trust(score, null, 0));
 					webOfTrustConnector.setTrust(truster, trustee, score, comment);
 				} else {
-					trustee.setTrust(truster, null);
+					trustee.removeTrust(truster);
 					webOfTrustConnector.removeTrust(truster, trustee);
 				}
 				finish(true);
