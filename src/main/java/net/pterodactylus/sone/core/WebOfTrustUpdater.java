@@ -332,7 +332,8 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class SetTrustJob extends WebOfTrustUpdateJob {
+	@VisibleForTesting
+	class SetTrustJob extends WebOfTrustUpdateJob {
 
 		/** The identity giving the trust. */
 		private final OwnIdentity truster;

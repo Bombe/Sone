@@ -15,11 +15,15 @@ import static org.mockito.Mockito.when;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.AddContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.RemoveContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.SetPropertyJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdater.SetTrustJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.WebOfTrustContextUpdateJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.WebOfTrustUpdateJob;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
+import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
+import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 
 import org.junit.Test;
 
@@ -31,6 +35,9 @@ import org.junit.Test;
 public class WebOfTrustUpdaterTest {
 
 	private static final String CONTEXT = "test-context";
+	private static final Integer SCORE = 50;
+	private static final Integer OTHER_SCORE = 25;
+	private static final String TRUST_COMMENT = "set in a test";
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
 	private final WebOfTrustUpdater webOfTrustUpdater = new WebOfTrustUpdater(webOfTrustConnector);
 	private final OwnIdentity ownIdentity = when(mock(OwnIdentity.class).getId()).thenReturn("own-identity-id").getMock();
@@ -39,6 +46,7 @@ public class WebOfTrustUpdaterTest {
 	private final WebOfTrustContextUpdateJob contextUpdateJob = webOfTrustUpdater.new WebOfTrustContextUpdateJob(ownIdentity, CONTEXT);
 	private final AddContextJob addContextJob = webOfTrustUpdater.new AddContextJob(ownIdentity, CONTEXT);
 	private final RemoveContextJob removeContextJob = webOfTrustUpdater.new RemoveContextJob(ownIdentity, CONTEXT);
+	private final Identity trustee = when(mock(Identity.class).getId()).thenReturn("trustee-id").getMock();
 
 	private WebOfTrustUpdateJob createWebOfTrustUpdateJob(final boolean success) {
 		return webOfTrustUpdater.new WebOfTrustUpdateJob() {
@@ -219,6 +227,81 @@ public class WebOfTrustUpdaterTest {
 		SetPropertyJob firstSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(ownIdentity, propertyName, propertyValue);
 		SetPropertyJob secondSetPropertyJob = webOfTrustUpdater.new SetPropertyJob(otherOwnIdentity, propertyName, propertyValue);
 		assertThat(firstSetPropertyJob, not(is(secondSetPropertyJob)));
+	}
+
+	@Test
+	public void setTrustJobSetsTrust() throws PluginException {
+		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		setTrustJob.run();
+		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
+		verify(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		assertThat(setTrustJob.waitForCompletion(), is(true));
+	}
+
+	@Test
+	public void settingNullTrustRemovesTrust() throws WebOfTrustException {
+		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, null, TRUST_COMMENT);
+		setTrustJob.run();
+		verify(webOfTrustConnector).removeTrust(eq(ownIdentity), eq(trustee));
+		verify(trustee).removeTrust(eq(ownIdentity));
+		assertThat(setTrustJob.waitForCompletion(), is(true));
+	}
+
+	@Test
+	public void exceptionWhileSettingTrustIsCaught() throws PluginException {
+		doThrow(PluginException.class).when(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
+		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		setTrustJob.run();
+		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
+		verify(trustee, never()).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		assertThat(setTrustJob.waitForCompletion(), is(false));
+	}
+
+	@Test
+	public void setTrustJobsWithDifferentClassesAreNotEqual() {
+		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT) {
+		};
+		assertThat(firstSetTrustJob, not(is(secondSetTrustJob)));
+		assertThat(secondSetTrustJob, not(is(firstSetTrustJob)));
+	}
+
+	@Test
+	public void setTrustJobsWithDifferentTrustersAreNotEqual() {
+		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(mock(OwnIdentity.class), trustee, SCORE, TRUST_COMMENT);
+		assertThat(firstSetTrustJob, not(is(secondSetTrustJob)));
+		assertThat(secondSetTrustJob, not(is(firstSetTrustJob)));
+	}
+
+	@Test
+	public void setTrustJobsWithDifferentTrusteesAreNotEqual() {
+		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, mock(Identity.class), SCORE, TRUST_COMMENT);
+		assertThat(firstSetTrustJob, not(is(secondSetTrustJob)));
+		assertThat(secondSetTrustJob, not(is(firstSetTrustJob)));
+	}
+
+	@Test
+	public void setTrustJobsWithDifferentScoreAreEqual() {
+		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, OTHER_SCORE, TRUST_COMMENT);
+		assertThat(firstSetTrustJob, is(secondSetTrustJob));
+		assertThat(secondSetTrustJob, is(firstSetTrustJob));
+		assertThat(firstSetTrustJob.hashCode(), is(secondSetTrustJob.hashCode()));
+	}
+
+	@Test
+	public void setTrustJobDoesNotEqualNull() {
+		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		assertThat(setTrustJob, not(is((Object) null)));
+	}
+
+	@Test
+	public void toStringOfSetTrustJobContainsIdsOfTrusterAndTrustee() {
+		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		assertThat(setTrustJob.toString(), containsString(ownIdentity.getId()));
+		assertThat(setTrustJob.toString(), containsString(trustee.getId()));
 	}
 
 }
