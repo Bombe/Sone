@@ -360,8 +360,8 @@ public class WebOfTrustUpdater extends AbstractService {
 		 * 		The comment of the trust relation
 		 */
 		public SetTrustJob(OwnIdentity truster, Identity trustee, Integer score, String comment) {
-			this.truster = truster;
-			this.trustee = trustee;
+			this.truster = checkNotNull(truster, "truster must not be null");
+			this.trustee = checkNotNull(trustee, "trustee must not be null");
 			this.score = score;
 			this.comment = comment;
 		}
@@ -396,19 +396,19 @@ public class WebOfTrustUpdater extends AbstractService {
 				return false;
 			}
 			SetTrustJob updateJob = (SetTrustJob) object;
-			return ((truster == null) ? (updateJob.truster == null) : updateJob.truster.equals(truster)) && ((trustee == null) ? (updateJob.trustee == null) : updateJob.trustee.equals(trustee));
+			return updateJob.truster.equals(truster) && updateJob.trustee.equals(trustee);
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public int hashCode() {
-			return getClass().hashCode() ^ ((truster == null) ? 0 : truster.hashCode()) ^ ((trustee == null) ? 0 : trustee.hashCode());
+			return getClass().hashCode() ^ truster.hashCode() ^ trustee.hashCode();
 		}
 
 		/** {@inheritDoc} */
 		@Override
 		public String toString() {
-			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), (truster == null) ? null : truster.getId(), (trustee == null) ? null : trustee.getId());
+			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), truster.getId(), trustee.getId());
 		}
 
 	}
