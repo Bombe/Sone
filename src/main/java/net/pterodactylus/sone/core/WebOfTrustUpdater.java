@@ -102,18 +102,6 @@ public class WebOfTrustUpdater extends AbstractService {
 	}
 
 	/**
-	 * Adds the given context to the given own identity.
-	 *
-	 * @param ownIdentity
-	 * 		The own identity to add the context to
-	 * @param context
-	 * 		The context to add
-	 */
-	public void addContext(OwnIdentity ownIdentity, String context) {
-		addContextWait(ownIdentity, context, false);
-	}
-
-	/**
 	 * Adds the given context to the given own identity, waiting for completion of
 	 * the operation.
 	 *
