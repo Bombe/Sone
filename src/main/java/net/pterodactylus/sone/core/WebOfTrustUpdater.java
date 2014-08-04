@@ -113,25 +113,6 @@ public class WebOfTrustUpdater extends AbstractService {
 	 *         otherwise
 	 */
 	public boolean addContextWait(OwnIdentity ownIdentity, String context) {
-		return addContextWait(ownIdentity, context, true);
-	}
-
-	/**
-	 * Adds the given context to the given own identity, waiting for completion of
-	 * the operation.
-	 *
-	 * @param ownIdentity
-	 * 		The own identity to add the context to
-	 * @param context
-	 * 		The context to add
-	 * @param wait
-	 * 		{@code true} to wait for the end of the operation, {@code false} to return
-	 * 		immediately
-	 * @return {@code true} if the context was added successfully, {@code false} if
-	 *         the context was not added successfully, or if the job should not
-	 *         wait for completion
-	 */
-	private boolean addContextWait(OwnIdentity ownIdentity, String context, boolean wait) {
 		AddContextJob addContextJob = new AddContextJob(ownIdentity, context);
 		if (!updateJobs.contains(addContextJob)) {
 			logger.log(Level.FINER, "Adding Context Job: " + addContextJob);
@@ -140,10 +121,8 @@ public class WebOfTrustUpdater extends AbstractService {
 			} catch (InterruptedException ie1) {
 				/* the queue is unbounded so it should never block. */
 			}
-			if (wait) {
-				return addContextJob.waitForCompletion();
-			}
-		} else if (wait) {
+			return addContextJob.waitForCompletion();
+		} else {
 			for (WebOfTrustUpdateJob updateJob : updateJobs) {
 				if (updateJob.equals(addContextJob)) {
 					return updateJob.waitForCompletion();
