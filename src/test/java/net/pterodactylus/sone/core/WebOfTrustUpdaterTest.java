@@ -1,16 +1,22 @@
 package net.pterodactylus.sone.core;
 
 import static java.lang.Thread.sleep;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import net.pterodactylus.sone.core.WebOfTrustUpdater.AddContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdater.RemoveContextJob;
@@ -26,6 +32,8 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link WebOfTrustUpdater} and its subclasses.
@@ -38,6 +46,7 @@ public class WebOfTrustUpdaterTest {
 	private static final Integer SCORE = 50;
 	private static final Integer OTHER_SCORE = 25;
 	private static final String TRUST_COMMENT = "set in a test";
+	private static final String PROPERTY_NAME = "test-property";
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
 	private final WebOfTrustUpdater webOfTrustUpdater = new WebOfTrustUpdater(webOfTrustConnector);
 	private final OwnIdentity ownIdentity = when(mock(OwnIdentity.class).getId()).thenReturn("own-identity-id").getMock();
@@ -302,6 +311,169 @@ public class WebOfTrustUpdaterTest {
 		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
 		assertThat(setTrustJob.toString(), containsString(ownIdentity.getId()));
 		assertThat(setTrustJob.toString(), containsString(trustee.getId()));
+	}
+
+	@Test
+	public void webOfTrustUpdaterStopsWhenItShould() {
+		webOfTrustUpdater.stop();
+		webOfTrustUpdater.serviceRun();
+	}
+
+	@Test
+	public void webOfTrustUpdaterStopsAfterItWasStarted() {
+		webOfTrustUpdater.start();
+		webOfTrustUpdater.stop();
+	}
+
+	@Test
+	public void removePropertyRemovesProperty() throws InterruptedException, PluginException {
+		final CountDownLatch wotCallTriggered = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				wotCallTriggered.countDown();
+				return null;
+			}
+		}).when(webOfTrustConnector).removeProperty(eq(ownIdentity), eq(PROPERTY_NAME));
+		webOfTrustUpdater.removeProperty(ownIdentity, PROPERTY_NAME);
+		webOfTrustUpdater.start();
+		assertThat(wotCallTriggered.await(1, SECONDS), is(true));
+	}
+
+	@Test
+	public void multipleCallsToSetPropertyAreCollapsed() throws InterruptedException, PluginException {
+		final CountDownLatch wotCallTriggered = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				wotCallTriggered.countDown();
+				return null;
+			}
+		}).when(webOfTrustConnector).removeProperty(eq(ownIdentity), eq(PROPERTY_NAME));
+		webOfTrustUpdater.removeProperty(ownIdentity, PROPERTY_NAME);
+		webOfTrustUpdater.removeProperty(ownIdentity, PROPERTY_NAME);
+		webOfTrustUpdater.start();
+		assertThat(wotCallTriggered.await(1, SECONDS), is(true));
+		verify(webOfTrustConnector).removeProperty(eq(ownIdentity), eq(PROPERTY_NAME));
+	}
+
+	@Test
+	public void addContextWaitWaitsForTheContextToBeAdded() {
+		webOfTrustUpdater.start();
+		assertThat(webOfTrustUpdater.addContextWait(ownIdentity, CONTEXT), is(true));
+		verify(ownIdentity).addContext(eq(CONTEXT));
+	}
+
+	@Test
+	public void multipleCallsToAddContextAreCollapsed() throws InterruptedException, PluginException {
+		final AtomicInteger errorCount = new AtomicInteger();
+		final CountDownLatch addContextsFinished = new CountDownLatch(2);
+		for (int i = 1; i <= 2; i++) {
+			/* this is so fucking volatile. */
+			if (i > 1) {
+				sleep(200);
+			}
+			new Thread(new Runnable() {
+				public void run() {
+					if (!webOfTrustUpdater.addContextWait(ownIdentity, CONTEXT)) {
+						errorCount.incrementAndGet();
+					}
+					addContextsFinished.countDown();
+				}
+			}).start();
+		}
+		webOfTrustUpdater.start();
+		assertThat(addContextsFinished.await(1, SECONDS), is(true));
+		verify(ownIdentity).addContext(eq(CONTEXT));
+		assertThat(errorCount.get(), is(0));
+	}
+
+	@Test
+	public void removeContextRemovesAContext() throws InterruptedException, PluginException {
+		webOfTrustUpdater.start();
+		final CountDownLatch removeContextTrigger = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				removeContextTrigger.countDown();
+				return null;
+			}
+		}).when(ownIdentity).removeContext(eq(CONTEXT));
+		webOfTrustUpdater.removeContext(ownIdentity, CONTEXT);
+		removeContextTrigger.await(1, SECONDS);
+		verify(webOfTrustConnector).removeContext(eq(ownIdentity), eq(CONTEXT));
+		verify(ownIdentity).removeContext(eq(CONTEXT));
+	}
+
+	@Test
+	public void removeContextRequestsAreCoalesced() throws InterruptedException, PluginException {
+		final CountDownLatch contextRemovedTrigger = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				contextRemovedTrigger.countDown();
+				return null;
+			}
+		}).when(ownIdentity).removeContext(eq(CONTEXT));
+		for (int i = 1; i <= 2; i++) {
+			/* this is so fucking volatile. */
+			if (i > 1) {
+				sleep(200);
+			}
+			new Thread(new Runnable() {
+				public void run() {
+					webOfTrustUpdater.removeContext(ownIdentity, CONTEXT);
+				}
+			}).start();
+		}
+		webOfTrustUpdater.start();
+		assertThat(contextRemovedTrigger.await(1, SECONDS), is(true));
+		verify(webOfTrustConnector).removeContext(eq(ownIdentity), eq(CONTEXT));
+		verify(ownIdentity).removeContext(eq(CONTEXT));
+	}
+
+	@Test
+	public void setTrustSetsTrust() throws InterruptedException, PluginException {
+		final CountDownLatch trustSetTrigger =new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				trustSetTrigger.countDown();
+				return null;
+			}
+		}).when(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		webOfTrustUpdater.start();
+		webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		assertThat(trustSetTrigger.await(1, SECONDS), is(true));
+		verify(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
+	}
+
+	@Test
+	public void setTrustRequestsAreCoalesced() throws InterruptedException, PluginException {
+		final CountDownLatch trustSetTrigger = new CountDownLatch(1);
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+				trustSetTrigger.countDown();
+				return null;
+			}
+		}).when(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		for (int i = 1; i <= 2; i++) {
+			/* this is so fucking volatile. */
+			if (i > 1) {
+				sleep(200);
+			}
+			new Thread(new Runnable() {
+				public void run() {
+					webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+				}
+			}).start();
+		}
+		webOfTrustUpdater.start();
+		assertThat(trustSetTrigger.await(1, SECONDS), is(true));
+		verify(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
 	}
 
 }
