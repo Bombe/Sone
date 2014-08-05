@@ -326,7 +326,7 @@ public class Profile implements Fingerprintable {
 	public Field addField(String fieldName) throws IllegalArgumentException {
 		checkNotNull(fieldName, "fieldName must not be null");
 		checkArgument(fieldName.length() > 0, "fieldName must not be empty");
-		checkState(getFieldByName(fieldName) == null, "fieldName must be unique");
+		checkArgument(getFieldByName(fieldName) == null, "fieldName must be unique");
 		@SuppressWarnings("synthetic-access")
 		Field field = new Field().setName(fieldName);
 		fields.add(field);
