@@ -437,7 +437,7 @@ public class SoneDownloader extends AbstractService {
 				String title = albumXml.getValue("title", null);
 				String description = albumXml.getValue("description", "");
 				String albumImageId = albumXml.getValue("album-image", null);
-				if ((id == null) || (title == null) || (description == null)) {
+				if ((id == null) || (title == null)) {
 					logger.log(Level.WARNING, String.format("Downloaded Sone %s contains invalid album!", sone));
 					return null;
 				}
