@@ -330,7 +330,7 @@ public class SoneDownloader extends AbstractService {
 					return null;
 				}
 				try {
-					profile.addField(fieldName).setValue(fieldValue);
+					profile.addField(fieldName.trim()).setValue(fieldValue);
 				} catch (IllegalArgumentException iae1) {
 					logger.log(Level.WARNING, String.format("Duplicate field: %s", fieldName), iae1);
 					return null;
