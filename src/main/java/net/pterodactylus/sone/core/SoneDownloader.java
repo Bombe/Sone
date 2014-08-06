@@ -45,6 +45,7 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.w3c.dom.Document;
 
 import freenet.client.FetchResult;
@@ -177,7 +178,7 @@ public class SoneDownloader extends AbstractService {
 	 *            The requested URI
 	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
 	 */
-	public Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
+	private Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
 		logger.log(Level.FINEST, String.format("Parsing FetchResult (%d bytes, %s) for %s…", fetchResult.size(), fetchResult.getMimeType(), originalSone));
 		Bucket soneBucket = fetchResult.asBucket();
 		InputStream soneInputStream = null;
@@ -214,7 +215,8 @@ public class SoneDownloader extends AbstractService {
 	 * @throws SoneException
 	 *             if a parse error occurs, or the protocol is invalid
 	 */
-	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
+	@VisibleForTesting
+	protected Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
 		/* TODO - impose a size limit? */
 
 		Document document;
