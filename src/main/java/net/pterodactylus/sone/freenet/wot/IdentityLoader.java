@@ -17,19 +17,16 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import static com.google.common.collect.HashMultimap.create;
 import static net.pterodactylus.sone.freenet.wot.Context.extractContext;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 
 /**
@@ -52,13 +49,13 @@ public class IdentityLoader {
 		this.context = context;
 	}
 
-	public Multimap<OwnIdentity, Identity> loadIdentities() throws WebOfTrustException {
+	public Map<OwnIdentity, Collection<Identity>> loadIdentities() throws WebOfTrustException {
 		Collection<OwnIdentity> currentOwnIdentities = webOfTrustConnector.loadAllOwnIdentities();
 		return loadTrustedIdentitiesForOwnIdentities(currentOwnIdentities);
 	}
 
-	private Multimap<OwnIdentity, Identity> loadTrustedIdentitiesForOwnIdentities(Collection<OwnIdentity> ownIdentities) throws PluginException {
-		Multimap<OwnIdentity, Identity> currentIdentities = create();
+	private Map<OwnIdentity, Collection<Identity>> loadTrustedIdentitiesForOwnIdentities(Collection<OwnIdentity> ownIdentities) throws PluginException {
+		Map<OwnIdentity, Collection<Identity>> currentIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
 
 		for (OwnIdentity ownIdentity : ownIdentities) {
 			if (identityDoesNotHaveTheCorrectContext(ownIdentity)) {
@@ -66,7 +63,7 @@ public class IdentityLoader {
 			}
 
 			Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context.transform(extractContext));
-			currentIdentities.putAll(ownIdentity, trustedIdentities);
+			currentIdentities.put(ownIdentity, trustedIdentities);
 		}
 
 		return currentIdentities;

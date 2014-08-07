@@ -25,8 +25,11 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.pterodactylus.sone.freenet.wot.event.IdentityAddedEvent;
 import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent;
@@ -34,8 +37,6 @@ import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 
-import com.google.common.collect.ImmutableMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import org.junit.Test;
 
@@ -62,7 +63,7 @@ public class IdentityChangeEventSenderTest {
 
 	@Test
 	public void addingAnOwnIdentityIsDetectedAndReportedCorrectly() {
-		Multimap<OwnIdentity, Identity> newIdentities = createNewIdentities();
+		Map<OwnIdentity, Collection<Identity>> newIdentities = createNewIdentities();
 		identityChangeEventSender.detectChanges(newIdentities);
 		verify(eventBus).post(eq(new OwnIdentityRemovedEvent(ownIdentities.get(0))));
 		verify(eventBus).post(eq(new IdentityRemovedEvent(ownIdentities.get(0), identities.get(0))));
@@ -75,22 +76,18 @@ public class IdentityChangeEventSenderTest {
 		verify(eventBus).post(eq(new IdentityUpdatedEvent(ownIdentities.get(1), identities.get(1))));
 	}
 
-	private Multimap<OwnIdentity, Identity> createNewIdentities() {
-		ImmutableMultimap.Builder<OwnIdentity, Identity> oldIdentities = ImmutableMultimap.builder();
-		oldIdentities.put(ownIdentities.get(1), identities.get(3));
-		oldIdentities.put(ownIdentities.get(1), identities.get(2));
-		oldIdentities.put(ownIdentities.get(2), identities.get(1));
-		oldIdentities.put(ownIdentities.get(2), identities.get(2));
-		return oldIdentities.build();
+	private Map<OwnIdentity, Collection<Identity>> createNewIdentities() {
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		oldIdentities.put(ownIdentities.get(1), asList(identities.get(3), identities.get(2)));
+		oldIdentities.put(ownIdentities.get(2), asList(identities.get(1), identities.get(2)));
+		return oldIdentities;
 	}
 
-	private Multimap<OwnIdentity, Identity> createOldIdentities() {
-		ImmutableMultimap.Builder<OwnIdentity, Identity> oldIdentities = ImmutableMultimap.builder();
-		oldIdentities.put(ownIdentities.get(0), identities.get(0));
-		oldIdentities.put(ownIdentities.get(0), identities.get(1));
-		oldIdentities.put(ownIdentities.get(1), identities.get(0));
-		oldIdentities.put(ownIdentities.get(1), identities.get(1));
-		return oldIdentities.build();
+	private Map<OwnIdentity, Collection<Identity>> createOldIdentities() {
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		oldIdentities.put(ownIdentities.get(0), asList(identities.get(0), identities.get(1)));
+		oldIdentities.put(ownIdentities.get(1), asList(identities.get(0), identities.get(1)));
+		return oldIdentities;
 	}
 
 }

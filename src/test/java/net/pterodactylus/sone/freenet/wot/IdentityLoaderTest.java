@@ -17,19 +17,16 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -37,11 +34,11 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Multimap;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -64,13 +61,15 @@ public class IdentityLoaderTest {
 		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(0)), any(Optional.class))).thenReturn(createTrustedIdentitiesForFirstOwnIdentity());
 		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(1)), any(Optional.class))).thenReturn(createTrustedIdentitiesForSecondOwnIdentity());
 		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(2)), any(Optional.class))).thenReturn(createTrustedIdentitiesForThirdOwnIdentity());
+		when(webOfTrustConnector.loadTrustedIdentities(eq(ownIdentities.get(3)), any(Optional.class))).thenReturn(createTrustedIdentitiesForFourthOwnIdentity());
 	}
 
 	private List<OwnIdentity> createOwnIdentities() {
 		return newArrayList(
 				createOwnIdentity("O1", "ON1", "OR1", "OI1", asList("Test", "Test2"), ImmutableMap.of("KeyA", "ValueA", "KeyB", "ValueB")),
 				createOwnIdentity("O2", "ON2", "OR2", "OI2", asList("Test"), ImmutableMap.of("KeyC", "ValueC")),
-				createOwnIdentity("O3", "ON3", "OR3", "OI3", asList("Test2"), ImmutableMap.of("KeyE", "ValueE", "KeyD", "ValueD"))
+				createOwnIdentity("O3", "ON3", "OR3", "OI3", asList("Test2"), ImmutableMap.of("KeyE", "ValueE", "KeyD", "ValueD")),
+				createOwnIdentity("O4", "ON4", "OR$", "OI4", asList("Test"), ImmutableMap.of("KeyA", "ValueA", "KeyD", "ValueD"))
 		);
 	}
 
@@ -92,6 +91,10 @@ public class IdentityLoaderTest {
 		);
 	}
 
+	private Set<Identity> createTrustedIdentitiesForFourthOwnIdentity() {
+		return emptySet();
+	}
+
 	private OwnIdentity createOwnIdentity(String id, String nickname, String requestUri, String insertUri, List<String> contexts, ImmutableMap<String, String> properties) {
 		OwnIdentity ownIdentity = new DefaultOwnIdentity(id, nickname, requestUri, insertUri);
 		ownIdentity.setContexts(contexts);
@@ -109,36 +112,41 @@ public class IdentityLoaderTest {
 	@Test
 	public void loadingIdentities() throws WebOfTrustException {
 		List<OwnIdentity> ownIdentities = createOwnIdentities();
-		Multimap<OwnIdentity, Identity> identities = identityLoader.loadIdentities();
+		Map<OwnIdentity, Collection<Identity>> identities = identityLoader.loadIdentities();
 		verify(webOfTrustConnector).loadAllOwnIdentities();
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(0)), eq(of("Test")));
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), eq(of("Test")));
 		verify(webOfTrustConnector, never()).loadTrustedIdentities(eq(ownIdentities.get(2)), any(Optional.class));
-		assertThat(identities.keySet(), hasSize(2));
-		assertThat(identities.keySet(), containsInAnyOrder(ownIdentities.get(0), ownIdentities.get(1)));
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(3)), eq(of("Test")));
+		assertThat(identities.keySet(), hasSize(3));
+		assertThat(identities.keySet(), containsInAnyOrder(ownIdentities.get(0), ownIdentities.get(1), ownIdentities.get(3)));
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(0), createTrustedIdentitiesForFirstOwnIdentity());
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(1), createTrustedIdentitiesForSecondOwnIdentity());
+		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(3), createTrustedIdentitiesForFourthOwnIdentity());
 	}
 
 	@Test
 	public void loadingIdentitiesWithoutContext() throws WebOfTrustException {
 		List<OwnIdentity> ownIdentities = createOwnIdentities();
-		Multimap<OwnIdentity, Identity> identities = identityLoaderWithoutContext.loadIdentities();
+		Map<OwnIdentity, Collection<Identity>> identities = identityLoaderWithoutContext.loadIdentities();
 		verify(webOfTrustConnector).loadAllOwnIdentities();
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(0)), eq(Optional.<String>absent()));
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), eq(Optional.<String>absent()));
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(2)), eq(Optional.<String>absent()));
-		assertThat(identities.keySet(), hasSize(3));
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(3)), eq(Optional.<String>absent()));
+		assertThat(identities.keySet(), hasSize(4));
 		OwnIdentity firstOwnIdentity = ownIdentities.get(0);
 		OwnIdentity secondOwnIdentity = ownIdentities.get(1);
 		OwnIdentity thirdOwnIdentity = ownIdentities.get(2);
-		assertThat(identities.keySet(), containsInAnyOrder(firstOwnIdentity, secondOwnIdentity, thirdOwnIdentity));
+		OwnIdentity fourthOwnIdentity = ownIdentities.get(3);
+		assertThat(identities.keySet(), containsInAnyOrder(firstOwnIdentity, secondOwnIdentity, thirdOwnIdentity, fourthOwnIdentity));
 		verifyIdentitiesForOwnIdentity(identities, firstOwnIdentity, createTrustedIdentitiesForFirstOwnIdentity());
 		verifyIdentitiesForOwnIdentity(identities, secondOwnIdentity, createTrustedIdentitiesForSecondOwnIdentity());
 		verifyIdentitiesForOwnIdentity(identities, thirdOwnIdentity, createTrustedIdentitiesForThirdOwnIdentity());
+		verifyIdentitiesForOwnIdentity(identities, fourthOwnIdentity, createTrustedIdentitiesForFourthOwnIdentity());
 	}
 
-	private void verifyIdentitiesForOwnIdentity(Multimap<OwnIdentity, Identity> identities, OwnIdentity ownIdentity, Set<Identity> trustedIdentities) {
+	private void verifyIdentitiesForOwnIdentity(Map<OwnIdentity, Collection<Identity>> identities, OwnIdentity ownIdentity, Set<Identity> trustedIdentities) {
 		assertThat(identities.get(ownIdentity), Matchers.<Collection<Identity>>is(trustedIdentities));
 	}
 

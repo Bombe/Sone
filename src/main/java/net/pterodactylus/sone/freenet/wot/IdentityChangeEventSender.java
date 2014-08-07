@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import java.util.Collection;
+import java.util.Map;
+
 import net.pterodactylus.sone.freenet.wot.IdentityChangeDetector.IdentityProcessor;
 import net.pterodactylus.sone.freenet.wot.event.IdentityAddedEvent;
 import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent;
@@ -24,7 +27,6 @@ import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 
-import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 
 /**
@@ -37,14 +39,14 @@ import com.google.common.eventbus.EventBus;
 public class IdentityChangeEventSender {
 
 	private final EventBus eventBus;
-	private final Multimap<OwnIdentity, Identity> oldIdentities;
+	private final Map<OwnIdentity, Collection<Identity>> oldIdentities;
 
-	public IdentityChangeEventSender(EventBus eventBus, Multimap<OwnIdentity, Identity> oldIdentities) {
+	public IdentityChangeEventSender(EventBus eventBus, Map<OwnIdentity, Collection<Identity>> oldIdentities) {
 		this.eventBus = eventBus;
 		this.oldIdentities = oldIdentities;
 	}
 
-	public void detectChanges(Multimap<OwnIdentity, Identity> identities) {
+	public void detectChanges(Map<OwnIdentity, Collection<Identity>> identities) {
 		IdentityChangeDetector identityChangeDetector = new IdentityChangeDetector(oldIdentities.keySet());
 		identityChangeDetector.onNewIdentity(addNewOwnIdentityAndItsTrustedIdentities(identities));
 		identityChangeDetector.onRemovedIdentity(removeOwnIdentityAndItsTrustedIdentities(oldIdentities));
@@ -52,7 +54,7 @@ public class IdentityChangeEventSender {
 		identityChangeDetector.detectChanges(identities.keySet());
 	}
 
-	private IdentityProcessor addNewOwnIdentityAndItsTrustedIdentities(final Multimap<OwnIdentity, Identity> newIdentities) {
+	private IdentityProcessor addNewOwnIdentityAndItsTrustedIdentities(final Map<OwnIdentity, Collection<Identity>> newIdentities) {
 		return new IdentityProcessor() {
 			@Override
 			public void processIdentity(Identity identity) {
@@ -64,7 +66,7 @@ public class IdentityChangeEventSender {
 		};
 	}
 
-	private IdentityProcessor removeOwnIdentityAndItsTrustedIdentities(final Multimap<OwnIdentity, Identity> oldIdentities) {
+	private IdentityProcessor removeOwnIdentityAndItsTrustedIdentities(final Map<OwnIdentity, Collection<Identity>> oldIdentities) {
 		return new IdentityProcessor() {
 			@Override
 			public void processIdentity(Identity identity) {
@@ -76,16 +78,16 @@ public class IdentityChangeEventSender {
 		};
 	}
 
-	private IdentityProcessor detectChangesInTrustedIdentities(Multimap<OwnIdentity, Identity> newIdentities, Multimap<OwnIdentity, Identity> oldIdentities) {
+	private IdentityProcessor detectChangesInTrustedIdentities(Map<OwnIdentity, Collection<Identity>> newIdentities, Map<OwnIdentity, Collection<Identity>> oldIdentities) {
 		return new DefaultIdentityProcessor(oldIdentities, newIdentities);
 	}
 
 	private class DefaultIdentityProcessor implements IdentityProcessor {
 
-		private final Multimap<OwnIdentity, Identity> oldIdentities;
-		private final Multimap<OwnIdentity, Identity> newIdentities;
+		private final Map<OwnIdentity, Collection<Identity>> oldIdentities;
+		private final Map<OwnIdentity, Collection<Identity>> newIdentities;
 
-		public DefaultIdentityProcessor(Multimap<OwnIdentity, Identity> oldIdentities, Multimap<OwnIdentity, Identity> newIdentities) {
+		public DefaultIdentityProcessor(Map<OwnIdentity, Collection<Identity>> oldIdentities, Map<OwnIdentity, Collection<Identity>> newIdentities) {
 			this.oldIdentities = oldIdentities;
 			this.newIdentities = newIdentities;
 		}

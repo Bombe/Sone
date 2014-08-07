@@ -17,10 +17,10 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.collect.HashMultimap.create;
-
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,7 +29,6 @@ import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
@@ -118,11 +117,11 @@ public class IdentityManager extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		Multimap<OwnIdentity, Identity> oldIdentities = create();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
 
 		while (!shouldStop()) {
 			try {
-				Multimap<OwnIdentity, Identity> currentIdentities = identityLoader.loadIdentities();
+				Map<OwnIdentity, Collection<Identity>> currentIdentities = identityLoader.loadIdentities();
 
 				IdentityChangeEventSender identityChangeEventSender = new IdentityChangeEventSender(eventBus, oldIdentities);
 				identityChangeEventSender.detectChanges(currentIdentities);
