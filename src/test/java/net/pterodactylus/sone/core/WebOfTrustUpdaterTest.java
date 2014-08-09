@@ -15,7 +15,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.AddContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.RemoveContextJob;
@@ -361,30 +360,6 @@ public class WebOfTrustUpdaterTest {
 		webOfTrustUpdater.start();
 		assertThat(webOfTrustUpdater.addContextWait(ownIdentity, CONTEXT), is(true));
 		verify(ownIdentity).addContext(eq(CONTEXT));
-	}
-
-	@Test
-	public void multipleCallsToAddContextAreCollapsed() throws InterruptedException, PluginException {
-		final AtomicInteger errorCount = new AtomicInteger();
-		final CountDownLatch addContextsFinished = new CountDownLatch(2);
-		for (int i = 1; i <= 2; i++) {
-			/* this is so fucking volatile. */
-			if (i > 1) {
-				sleep(200);
-			}
-			new Thread(new Runnable() {
-				public void run() {
-					if (!webOfTrustUpdater.addContextWait(ownIdentity, CONTEXT)) {
-						errorCount.incrementAndGet();
-					}
-					addContextsFinished.countDown();
-				}
-			}).start();
-		}
-		webOfTrustUpdater.start();
-		assertThat(addContextsFinished.await(1, SECONDS), is(true));
-		verify(ownIdentity).addContext(eq(CONTEXT));
-		assertThat(errorCount.get(), is(0));
 	}
 
 	@Test
