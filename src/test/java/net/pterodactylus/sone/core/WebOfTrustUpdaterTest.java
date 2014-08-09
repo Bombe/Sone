@@ -408,7 +408,7 @@ public class WebOfTrustUpdaterTest {
 
 	@Test
 	public void setTrustSetsTrust() throws InterruptedException, PluginException {
-		final CountDownLatch trustSetTrigger =new CountDownLatch(1);
+		final CountDownLatch trustSetTrigger = new CountDownLatch(1);
 		doAnswer(new Answer<Void>() {
 			@Override
 			public Void answer(InvocationOnMock invocation) throws Throwable {
