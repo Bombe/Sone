@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.FreenetInterface;
 import net.pterodactylus.sone.core.WebOfTrustUpdater;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostProvider;
@@ -232,7 +233,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(WebOfTrustConnector.class).in(Singleton.class);
-				bind(WebOfTrustUpdater.class).in(Singleton.class);
+				bind(WebOfTrustUpdater.class).to(WebOfTrustUpdaterImpl.class).in(Singleton.class);
 				bind(IdentityManager.class).in(Singleton.class);
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
 				bind(FcpInterface.class).in(Singleton.class);

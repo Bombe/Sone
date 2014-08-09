@@ -11,19 +11,18 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.pterodactylus.sone.core.WebOfTrustUpdater.AddContextJob;
-import net.pterodactylus.sone.core.WebOfTrustUpdater.RemoveContextJob;
-import net.pterodactylus.sone.core.WebOfTrustUpdater.SetPropertyJob;
-import net.pterodactylus.sone.core.WebOfTrustUpdater.SetTrustJob;
-import net.pterodactylus.sone.core.WebOfTrustUpdater.WebOfTrustContextUpdateJob;
-import net.pterodactylus.sone.core.WebOfTrustUpdater.WebOfTrustUpdateJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.AddContextJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.RemoveContextJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.SetPropertyJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.SetTrustJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.WebOfTrustContextUpdateJob;
+import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.WebOfTrustUpdateJob;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
@@ -36,7 +35,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
- * Unit test for {@link WebOfTrustUpdater} and its subclasses.
+ * Unit test for {@link WebOfTrustUpdaterImpl} and its subclasses.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -48,7 +47,7 @@ public class WebOfTrustUpdaterTest {
 	private static final String TRUST_COMMENT = "set in a test";
 	private static final String PROPERTY_NAME = "test-property";
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
-	private final WebOfTrustUpdater webOfTrustUpdater = new WebOfTrustUpdater(webOfTrustConnector);
+	private final WebOfTrustUpdaterImpl webOfTrustUpdater = new WebOfTrustUpdaterImpl(webOfTrustConnector);
 	private final OwnIdentity ownIdentity = when(mock(OwnIdentity.class).getId()).thenReturn("own-identity-id").getMock();
 	private final WebOfTrustUpdateJob successfulWebOfTrustUpdateJob = createWebOfTrustUpdateJob(true);
 	private final WebOfTrustUpdateJob failingWebOfTrustUpdateJob = createWebOfTrustUpdateJob(false);
