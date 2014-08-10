@@ -39,6 +39,7 @@ import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.wot.Context;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
+import net.pterodactylus.sone.freenet.wot.IdentityManagerImpl;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.config.Configuration;
@@ -234,7 +235,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(WebOfTrustConnector.class).in(Singleton.class);
 				bind(WebOfTrustUpdater.class).to(WebOfTrustUpdaterImpl.class).in(Singleton.class);
-				bind(IdentityManager.class).in(Singleton.class);
+				bind(IdentityManager.class).to(IdentityManagerImpl.class).in(Singleton.class);
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
 				bind(FcpInterface.class).in(Singleton.class);
 				bind(Database.class).to(MemoryDatabase.class);

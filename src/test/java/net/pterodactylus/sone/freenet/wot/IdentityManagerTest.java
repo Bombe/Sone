@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.freenet.wot;
 
-import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Optional.of;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -14,7 +13,7 @@ import com.google.common.eventbus.EventBus;
 import org.junit.Test;
 
 /**
- * Unit test for {@link IdentityManager}.
+ * Unit test for {@link IdentityManagerImpl}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -22,7 +21,7 @@ public class IdentityManagerTest {
 
 	private final EventBus eventBus = mock(EventBus.class);
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
-	private final IdentityManager identityManager = new IdentityManager(eventBus, webOfTrustConnector, new IdentityLoader(webOfTrustConnector, of(new Context("Test"))));
+	private final IdentityManager identityManager = new IdentityManagerImpl(eventBus, webOfTrustConnector, new IdentityLoader(webOfTrustConnector, of(new Context("Test"))));
 
 	@Test
 	public void identityManagerPingsWotConnector() throws PluginException {
