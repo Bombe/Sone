@@ -33,8 +33,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
-import net.pterodactylus.sone.core.SoneDownloader.FetchSone;
-import net.pterodactylus.sone.core.SoneDownloader.FetchSoneWithUri;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumImpl;
 import net.pterodactylus.sone.data.Client;
@@ -63,7 +61,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 /**
- * Unit test for {@link SoneDownloader} and its subclasses.
+ * Unit test for {@link SoneDownloaderImpl} and its subclasses.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -71,7 +69,7 @@ public class SoneDownloaderTest {
 
 	private final Core core = mock(Core.class);
 	private final FreenetInterface freenetInterface = mock(FreenetInterface.class);
-	private final SoneDownloader soneDownloader = new SoneDownloader(core, freenetInterface);
+	private final SoneDownloaderImpl soneDownloader = new SoneDownloaderImpl(core, freenetInterface);
 	private final FreenetURI requestUri = mock(FreenetURI.class);
 	private final Sone sone = mock(Sone.class);
 	private final PostBuilder postBuilder = mock(PostBuilder.class);
@@ -622,26 +620,6 @@ public class SoneDownloaderTest {
 		soneDownloader.addSone(sone);
 		soneDownloader.stop();
 		verify(freenetInterface).unregisterUsk(sone);
-	}
-
-	@Test
-	public void fetchSoneWithUriDownloadsSoneWithUri() {
-		SoneDownloader soneDownloader = mock(SoneDownloader.class);
-		Sone sone = mock(Sone.class);
-		FreenetURI soneUri = mock(FreenetURI.class);
-		when(sone.getRequestUri()).thenReturn(soneUri);
-		FetchSoneWithUri fetchSoneWithUri = soneDownloader.new FetchSoneWithUri(sone);
-		fetchSoneWithUri.run();
-		verify(soneDownloader).fetchSone(eq(sone), eq(soneUri));
-	}
-
-	@Test
-	public void fetchSoneDownloadsSone() {
-		SoneDownloader soneDownloader = mock(SoneDownloader.class);
-		Sone sone = mock(Sone.class);
-		FetchSone fetchSone = soneDownloader.new FetchSone(sone);
-		fetchSone.run();
-		verify(soneDownloader).fetchSone(eq(sone));
 	}
 
 	@Test

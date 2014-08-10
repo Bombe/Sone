@@ -219,7 +219,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
 		this.identityManager = identityManager;
-		this.soneDownloader = new SoneDownloader(this, freenetInterface);
+		this.soneDownloader = new SoneDownloaderImpl(this, freenetInterface);
 		this.imageInserter = new ImageInserter(freenetInterface, freenetInterface.new InsertTokenSupplier());
 		this.updateChecker = new UpdateChecker(eventBus, freenetInterface);
 		this.webOfTrustUpdater = webOfTrustUpdater;
@@ -800,7 +800,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			}
 			soneDownloader.addSone(sone);
-			soneDownloaders.execute(soneDownloader.new FetchSoneWithUri(sone));
+			soneDownloaders.execute(soneDownloader.fetchSoneWithUriAction(sone));
 			return sone;
 		}
 	}
@@ -2098,7 +2098,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setIdentity(identity);
 		sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 		soneDownloader.addSone(sone);
-		soneDownloaders.execute(soneDownloader.new FetchSone(sone));
+		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
 	}
 
 	/**
