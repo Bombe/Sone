@@ -752,12 +752,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		Sone sone = addLocalSone(ownIdentity);
-		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
-		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
-		sone.getOptions().addBooleanOption("ShowNotification/NewSones", new DefaultOption<Boolean>(true));
-		sone.getOptions().addBooleanOption("ShowNotification/NewPosts", new DefaultOption<Boolean>(true));
-		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
-		sone.getOptions().addEnumOption("ShowCustomAvatars", new DefaultOption<ShowCustomAvatars>(ShowCustomAvatars.NEVER));
 
 		followSone(sone, "nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI");
 		touchConfiguration();
@@ -793,7 +787,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				if (newSone) {
 					eventBus.post(new NewSoneFoundEvent(sone));
 					for (Sone localSone : getLocalSones()) {
-						if (localSone.getOptions().getBooleanOption("AutoFollow").get()) {
+						if (localSone.getOptions().isAutoFollow()) {
 							followSone(localSone, sone.getId());
 						}
 					}
@@ -1104,14 +1098,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		logger.info(String.format("Loading local Sone: %s", sone));
 
-		/* initialize options. */
-		sone.getOptions().addBooleanOption("AutoFollow", new DefaultOption<Boolean>(false));
-		sone.getOptions().addBooleanOption("EnableSoneInsertNotifications", new DefaultOption<Boolean>(false));
-		sone.getOptions().addBooleanOption("ShowNotification/NewSones", new DefaultOption<Boolean>(true));
-		sone.getOptions().addBooleanOption("ShowNotification/NewPosts", new DefaultOption<Boolean>(true));
-		sone.getOptions().addBooleanOption("ShowNotification/NewReplies", new DefaultOption<Boolean>(true));
-		sone.getOptions().addEnumOption("ShowCustomAvatars", new DefaultOption<ShowCustomAvatars>(ShowCustomAvatars.NEVER));
-
 		/* load Sone. */
 		String sonePrefix = "Sone/" + sone.getId();
 		Long soneTime = configuration.getLongValue(sonePrefix + "/Time").getValue(null);
@@ -1279,12 +1265,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		/* load options. */
-		sone.getOptions().getBooleanOption("AutoFollow").set(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
-		sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
-		sone.getOptions().getBooleanOption("ShowNotification/NewSones").set(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(null));
-		sone.getOptions().getBooleanOption("ShowNotification/NewPosts").set(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(null));
-		sone.getOptions().getBooleanOption("ShowNotification/NewReplies").set(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(null));
-		sone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").set(ShowCustomAvatars.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(ShowCustomAvatars.NEVER.name())));
+		sone.getOptions().setAutoFollow(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
+		sone.getOptions().setSoneInsertNotificationEnabled(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
+		sone.getOptions().setShowNewSoneNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(null));
+		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(null));
+		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(null));
+		sone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(ShowCustomAvatars.NEVER.name())));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
@@ -1866,12 +1852,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Images/" + imageCounter + "/ID").setValue(null);
 
 			/* save options. */
-			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().getBooleanOption("AutoFollow").getReal());
-			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").setValue(sone.getOptions().getBooleanOption("ShowNotification/NewSones").getReal());
-			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").setValue(sone.getOptions().getBooleanOption("ShowNotification/NewPosts").getReal());
-			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").setValue(sone.getOptions().getBooleanOption("ShowNotification/NewReplies").getReal());
-			configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").setValue(sone.getOptions().getBooleanOption("EnableSoneInsertNotifications").getReal());
-			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get().name());
+			configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").setValue(sone.getOptions().isAutoFollow());
+			configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").setValue(sone.getOptions().isSoneInsertNotificationEnabled());
+			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").setValue(sone.getOptions().isShowNewSoneNotifications());
+			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").setValue(sone.getOptions().isShowNewPostNotifications());
+			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").setValue(sone.getOptions().isShowNewReplyNotifications());
+			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().getShowCustomAvatars().name());
 
 			configuration.save();
 

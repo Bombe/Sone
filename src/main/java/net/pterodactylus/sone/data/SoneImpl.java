@@ -28,7 +28,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Options;
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.util.logging.Logging;
 
@@ -102,7 +102,7 @@ public class SoneImpl implements Sone {
 	private final Album rootAlbum = new AlbumImpl().setSone(this);
 
 	/** Sone-specific options. */
-	private Options options = new Options();
+	private SoneOptions options = new DefaultSoneOptions();
 
 	/**
 	 * Creates a new Sone.
@@ -643,7 +643,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The options of this Sone
 	 */
-	public Options getOptions() {
+	public SoneOptions getOptions() {
 		return options;
 	}
 
@@ -654,7 +654,7 @@ public class SoneImpl implements Sone {
 	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
-	public void setOptions(Options options) {
+	public void setOptions(SoneOptions options) {
 		this.options = options;
 	}
 

@@ -65,17 +65,17 @@ public class OptionsPage extends SoneTemplatePage {
 			List<String> fieldErrors = new ArrayList<String>();
 			if (currentSone != null) {
 				boolean autoFollow = request.getHttpRequest().isPartSet("auto-follow");
-				currentSone.getOptions().getBooleanOption("AutoFollow").set(autoFollow);
+				currentSone.getOptions().setAutoFollow(autoFollow);
 				boolean enableSoneInsertNotifications = request.getHttpRequest().isPartSet("enable-sone-insert-notifications");
-				currentSone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(enableSoneInsertNotifications);
+				currentSone.getOptions().setSoneInsertNotificationEnabled(enableSoneInsertNotifications);
 				boolean showNotificationNewSones = request.getHttpRequest().isPartSet("show-notification-new-sones");
-				currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").set(showNotificationNewSones);
+				currentSone.getOptions().setShowNewSoneNotifications(showNotificationNewSones);
 				boolean showNotificationNewPosts = request.getHttpRequest().isPartSet("show-notification-new-posts");
-				currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").set(showNotificationNewPosts);
+				currentSone.getOptions().setShowNewPostNotifications(showNotificationNewPosts);
 				boolean showNotificationNewReplies = request.getHttpRequest().isPartSet("show-notification-new-replies");
-				currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").set(showNotificationNewReplies);
+				currentSone.getOptions().setShowNewReplyNotifications(showNotificationNewReplies);
 				String showCustomAvatars = request.getHttpRequest().getPartAsStringFailsafe("show-custom-avatars", 32);
-				currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").set(ShowCustomAvatars.valueOf(showCustomAvatars));
+				currentSone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(showCustomAvatars));
 				webInterface.getCore().touchConfiguration();
 			}
 			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
@@ -139,12 +139,12 @@ public class OptionsPage extends SoneTemplatePage {
 			templateContext.set("fieldErrors", fieldErrors);
 		}
 		if (currentSone != null) {
-			templateContext.set("auto-follow", currentSone.getOptions().getBooleanOption("AutoFollow").get());
-			templateContext.set("enable-sone-insert-notifications", currentSone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get());
-			templateContext.set("show-notification-new-sones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
-			templateContext.set("show-notification-new-posts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());
-			templateContext.set("show-notification-new-replies", currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get());
-			templateContext.set("show-custom-avatars", currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get().name());
+			templateContext.set("auto-follow", currentSone.getOptions().isAutoFollow());
+			templateContext.set("enable-sone-insert-notifications", currentSone.getOptions().isSoneInsertNotificationEnabled());
+			templateContext.set("show-notification-new-sones", currentSone.getOptions().isShowNewSoneNotifications());
+			templateContext.set("show-notification-new-posts", currentSone.getOptions().isShowNewPostNotifications());
+			templateContext.set("show-notification-new-replies", currentSone.getOptions().isShowNewReplyNotifications());
+			templateContext.set("show-custom-avatars", currentSone.getOptions().getShowCustomAvatars().name());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());

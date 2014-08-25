@@ -535,7 +535,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The options of this Sone
 	 */
-	Options getOptions();
+	SoneOptions getOptions();
 
 	/**
 	 * Sets the options of this Sone.
@@ -544,6 +544,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
-	void setOptions(Options options);
+	void setOptions(SoneOptions options);
 
 }

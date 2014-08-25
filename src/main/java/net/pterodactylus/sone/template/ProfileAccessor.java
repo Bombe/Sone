@@ -74,7 +74,7 @@ public class ProfileAccessor extends ReflectionAccessor {
 				/* always show your own avatars. */
 				return avatarId;
 			}
-			ShowCustomAvatars showCustomAvatars = currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get();
+			ShowCustomAvatars showCustomAvatars = currentSone.getOptions().getShowCustomAvatars();
 			if (showCustomAvatars == ShowCustomAvatars.NEVER) {
 				return null;
 			}

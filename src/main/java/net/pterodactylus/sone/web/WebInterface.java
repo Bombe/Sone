@@ -1011,7 +1011,7 @@ public class WebInterface {
 	public void soneInserting(SoneInsertingEvent soneInsertingEvent) {
 		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertingEvent.sone());
 		soneInsertNotification.set("soneStatus", "inserting");
-		if (soneInsertingEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		if (soneInsertingEvent.sone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
@@ -1027,7 +1027,7 @@ public class WebInterface {
 		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.sone());
 		soneInsertNotification.set("soneStatus", "inserted");
 		soneInsertNotification.set("insertDuration", soneInsertedEvent.insertDuration() / 1000);
-		if (soneInsertedEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		if (soneInsertedEvent.sone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
@@ -1043,7 +1043,7 @@ public class WebInterface {
 		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.sone());
 		soneInsertNotification.set("soneStatus", "insert-aborted");
 		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.cause());
-		if (soneInsertAbortedEvent.sone().getOptions().getBooleanOption("EnableSoneInsertNotifications").get()) {
+		if (soneInsertAbortedEvent.sone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
