@@ -17,9 +17,11 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import static java.util.Collections.emptySet;
 import static net.pterodactylus.sone.freenet.wot.Context.extractContext;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -59,6 +61,7 @@ public class IdentityLoader {
 
 		for (OwnIdentity ownIdentity : ownIdentities) {
 			if (identityDoesNotHaveTheCorrectContext(ownIdentity)) {
+				currentIdentities.put(ownIdentity, Collections.<Identity>emptySet());
 				continue;
 			}
 

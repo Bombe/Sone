@@ -25,6 +25,7 @@ import static java.util.Collections.emptySet;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -118,10 +120,11 @@ public class IdentityLoaderTest {
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(1)), eq(of("Test")));
 		verify(webOfTrustConnector, never()).loadTrustedIdentities(eq(ownIdentities.get(2)), any(Optional.class));
 		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities.get(3)), eq(of("Test")));
-		assertThat(identities.keySet(), hasSize(3));
-		assertThat(identities.keySet(), containsInAnyOrder(ownIdentities.get(0), ownIdentities.get(1), ownIdentities.get(3)));
+		assertThat(identities.keySet(), hasSize(4));
+		assertThat(identities.keySet(), containsInAnyOrder(ownIdentities.get(0), ownIdentities.get(1), ownIdentities.get(2), ownIdentities.get(3)));
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(0), createTrustedIdentitiesForFirstOwnIdentity());
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(1), createTrustedIdentitiesForSecondOwnIdentity());
+		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(2), Collections.<Identity>emptySet());
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities.get(3), createTrustedIdentitiesForFourthOwnIdentity());
 	}
 
