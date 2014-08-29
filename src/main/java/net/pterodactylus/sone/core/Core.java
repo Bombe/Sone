@@ -101,6 +101,7 @@ import com.google.common.collect.Multimaps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import freenet.keys.FreenetURI;
 
@@ -109,6 +110,7 @@ import freenet.keys.FreenetURI;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */

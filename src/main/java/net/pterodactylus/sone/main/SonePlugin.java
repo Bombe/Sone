@@ -224,25 +224,12 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 			@Override
 			protected void configure() {
-				bind(Core.class).in(Singleton.class);
-				bind(MemoryDatabase.class).in(Singleton.class);
 				bind(EventBus.class).toInstance(eventBus);
 				bind(Configuration.class).toInstance(startConfiguration);
-				bind(FreenetInterface.class).in(Singleton.class);
-				bind(PluginConnector.class).in(Singleton.class);
 				Context context = new Context("Sone");
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
-				bind(WebOfTrustConnector.class).in(Singleton.class);
-				bind(WebOfTrustUpdater.class).to(WebOfTrustUpdaterImpl.class).in(Singleton.class);
-				bind(IdentityManager.class).to(IdentityManagerImpl.class).in(Singleton.class);
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
-				bind(FcpInterface.class).in(Singleton.class);
-				bind(Database.class).to(MemoryDatabase.class);
-				bind(PostBuilderFactory.class).to(MemoryDatabase.class);
-				bind(PostReplyBuilderFactory.class).to(MemoryDatabase.class);
-				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
-				bind(PostProvider.class).to(MemoryDatabase.class);
 				bindListener(Matchers.any(), new TypeListener() {
 
 					@Override

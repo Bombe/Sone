@@ -35,6 +35,7 @@ import net.pterodactylus.util.service.AbstractService;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Updates WebOfTrust identity data in a background thread because communicating
@@ -42,6 +43,7 @@ import com.google.inject.Inject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrustUpdater {
 
 	/** The logger. */

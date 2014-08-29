@@ -58,12 +58,14 @@ import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Memory-based {@link PostDatabase} implementation.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The lock. */

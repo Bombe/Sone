@@ -21,6 +21,7 @@ import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import freenet.pluginmanager.FredPluginTalker;
 import freenet.pluginmanager.PluginNotFoundException;
@@ -35,6 +36,7 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class PluginConnector implements FredPluginTalker {
 
 	/** The event bus. */

@@ -41,6 +41,7 @@ import freenet.support.api.Bucket;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Implementation of an FCP interface for other clients or plugins to
@@ -48,6 +49,7 @@ import com.google.inject.Inject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class FcpInterface {
 
 	/**

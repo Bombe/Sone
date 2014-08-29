@@ -32,6 +32,7 @@ import net.pterodactylus.util.service.AbstractService;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * The identity manager takes care of loading and storing identities, their
@@ -44,6 +45,7 @@ import com.google.inject.Inject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class IdentityManagerImpl extends AbstractService implements IdentityManager {
 
 	/** The logger. */

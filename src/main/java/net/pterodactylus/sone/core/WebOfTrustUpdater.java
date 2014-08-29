@@ -4,11 +4,14 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.util.service.Service;
 
+import com.google.inject.ImplementedBy;
+
 /**
  * Updates WebOfTrust identity data.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@ImplementedBy(WebOfTrustUpdaterImpl.class)
 public interface WebOfTrustUpdater extends Service {
 
 	void setTrust(OwnIdentity truster, Identity trustee, Integer score, String comment);

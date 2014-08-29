@@ -35,6 +35,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
@@ -44,6 +45,7 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class WebOfTrustConnector {
 
 	/** The logger. */

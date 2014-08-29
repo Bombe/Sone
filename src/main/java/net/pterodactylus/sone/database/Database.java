@@ -17,7 +17,10 @@
 
 package net.pterodactylus.sone.database;
 
+import net.pterodactylus.sone.database.memory.MemoryDatabase;
+
 import com.google.common.util.concurrent.Service;
+import com.google.inject.ImplementedBy;
 
 /**
  * Database for Sone data. This interface combines the various provider, store,
@@ -26,6 +29,7 @@ import com.google.common.util.concurrent.Service;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@ImplementedBy(MemoryDatabase.class)
 public interface Database extends Service, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase {
 
 	/**

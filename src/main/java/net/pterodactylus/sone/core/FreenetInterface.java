@@ -39,6 +39,7 @@ import com.db4o.ObjectContainer;
 import com.google.common.base.Function;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchException;
@@ -66,6 +67,7 @@ import freenet.support.io.ArrayBucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class FreenetInterface {
 
 	/** The logger. */

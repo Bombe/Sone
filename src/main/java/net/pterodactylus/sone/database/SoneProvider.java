@@ -19,15 +19,18 @@ package net.pterodactylus.sone.database;
 
 import java.util.Collection;
 
+import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
+import com.google.inject.ImplementedBy;
 
 /**
  * Interface for objects that can provide {@link Sone}s by their ID.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@ImplementedBy(Core.class)
 public interface SoneProvider {
 
 	/**
