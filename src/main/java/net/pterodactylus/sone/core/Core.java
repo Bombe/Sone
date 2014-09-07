@@ -1108,24 +1108,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		String lastInsertFingerprint = configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").getValue("");
 
 		/* load profile. */
-		Profile profile = new Profile(sone);
-		profile.setFirstName(configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null));
-		profile.setMiddleName(configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null));
-		profile.setLastName(configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null));
-		profile.setBirthDay(configuration.getIntValue(sonePrefix + "/Profile/BirthDay").getValue(null));
-		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
-		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
-
-		/* load profile fields. */
-		while (true) {
-			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFields().size();
-			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
-			if (fieldName == null) {
-				break;
-			}
-			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
-			profile.addField(fieldName).setValue(fieldValue);
-		}
+		Profile profile = parseProfileFromConfiguration(configuration, sone, sonePrefix);
 
 		/* load posts. */
 		Set<Post> posts = new HashSet<Post>();
@@ -1306,6 +1289,29 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		logger.info(String.format("Sone loaded successfully: %s", sone));
+	}
+
+	private static Profile parseProfileFromConfiguration(Configuration configuration, Sone sone, String sonePrefix) {
+		Profile profile = new Profile(sone);
+		profile.setFirstName(configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null));
+		profile.setMiddleName(configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null));
+		profile.setLastName(configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null));
+		profile.setBirthDay(configuration.getIntValue(sonePrefix + "/Profile/BirthDay").getValue(null));
+		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
+		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
+
+		/* load profile fields. */
+		while (true) {
+			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFields().size();
+			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
+			if (fieldName == null) {
+				break;
+			}
+			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
+			profile.addField(fieldName).setValue(fieldValue);
+		}
+
+		return profile;
 	}
 
 	/**
