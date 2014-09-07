@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 
 import com.google.common.base.Optional;
 import org.hamcrest.Description;
@@ -95,6 +96,11 @@ public class Matchers {
 		return new PostMatcher(postId, time, text, recipient);
 	}
 
+	public static Matcher<PostReply> isPostReply(String postReplyId,
+			String postId, long time, String text) {
+		return new PostReplyMatcher(postReplyId, postId, time, text);
+	}
+
 	private static class PostMatcher extends TypeSafeDiagnosingMatcher<Post> {
 
 		private final String postId;
@@ -158,6 +164,58 @@ public class Matchers {
 				description.appendText(", directed at ")
 						.appendValue(recipient.get());
 			}
+		}
+
+	}
+
+	private static class PostReplyMatcher
+			extends TypeSafeDiagnosingMatcher<PostReply> {
+
+		private final String postReplyId;
+		private final String postId;
+		private final long time;
+		private final String text;
+
+		private PostReplyMatcher(String postReplyId, String postId, long time,
+				String text) {
+			this.postReplyId = postReplyId;
+			this.postId = postId;
+			this.time = time;
+			this.text = text;
+		}
+
+		@Override
+		protected boolean matchesSafely(PostReply postReply,
+				Description mismatchDescription) {
+			if (!postReply.getId().equals(postReplyId)) {
+				mismatchDescription.appendText("is post reply ")
+						.appendValue(postReply.getId());
+				return false;
+			}
+			if (!postReply.getPostId().equals(postId)) {
+				mismatchDescription.appendText("is reply to ")
+						.appendValue(postReply.getPostId());
+				return false;
+			}
+			if (postReply.getTime() != time) {
+				mismatchDescription.appendText("is created at @").appendValue(
+						postReply.getTime());
+				return false;
+			}
+			if (!postReply.getText().equals(text)) {
+				mismatchDescription.appendText("says ")
+						.appendValue(postReply.getText());
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("is post reply ").appendValue(postReplyId);
+			description.appendText(", replies to post ").appendValue(postId);
+			description.appendText(", is created at @").appendValue(time);
+			description.appendText(", says ").appendValue(text);
 		}
 
 	}

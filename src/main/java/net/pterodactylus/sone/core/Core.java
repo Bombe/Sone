@@ -39,6 +39,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
@@ -1122,22 +1123,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		/* load replies. */
-		Set<PostReply> replies = new HashSet<PostReply>();
-		while (true) {
-			String replyPrefix = sonePrefix + "/Replies/" + replies.size();
-			String replyId = configuration.getStringValue(replyPrefix + "/ID").getValue(null);
-			if (replyId == null) {
-				break;
-			}
-			String postId = configuration.getStringValue(replyPrefix + "/Post/ID").getValue(null);
-			long replyTime = configuration.getLongValue(replyPrefix + "/Time").getValue((long) 0);
-			String replyText = configuration.getStringValue(replyPrefix + "/Text").getValue(null);
-			if ((postId == null) || (replyTime == 0) || (replyText == null)) {
-				logger.log(Level.WARNING, "Invalid reply found, aborting load!");
-				return;
-			}
-			PostReplyBuilder postReplyBuilder = postReplyBuilder().withId(replyId).from(sone.getId()).to(postId).withTime(replyTime).withText(replyText);
-			replies.add(postReplyBuilder.build());
+		Collection<PostReply> replies;
+		try {
+			replies = configurationSoneParser.parsePostReplies(database);
+		} catch (InvalidPostReplyFound iprf) {
+			logger.log(Level.WARNING, "Invalid reply found, aborting load!");
+			return;
 		}
 
 		/* load post likes. */

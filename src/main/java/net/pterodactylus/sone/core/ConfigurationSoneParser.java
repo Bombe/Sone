@@ -7,10 +7,13 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
+import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.PostReplyBuilderFactory;
 import net.pterodactylus.util.config.Configuration;
 
 /**
@@ -106,6 +109,35 @@ public class ConfigurationSoneParser {
 		return (postRecipientId != null) && (postRecipientId.length() == 43);
 	}
 
+	public Collection<PostReply> parsePostReplies(
+			PostReplyBuilderFactory postReplyBuilderFactory) {
+		Set<PostReply> replies = new HashSet<PostReply>();
+		while (true) {
+			String replyPrefix = "/Replies/" + replies.size();
+			String replyId = getString(replyPrefix + "/ID", null);
+			if (replyId == null) {
+				break;
+			}
+			String postId = getString(replyPrefix + "/Post/ID", null);
+			long replyTime = getLong(replyPrefix + "/Time", 0L);
+			String replyText = getString(replyPrefix + "/Text", null);
+			if ((postId == null) || (replyTime == 0) || (replyText == null)) {
+				throw new InvalidPostReplyFound();
+			}
+			PostReplyBuilder postReplyBuilder = postReplyBuilderFactory
+					.newPostReplyBuilder()
+					.withId(replyId)
+					.from(sone.getId())
+					.to(postId)
+					.withTime(replyTime)
+					.withText(replyText);
+			replies.add(postReplyBuilder.build());
+		}
+		return replies;
+	}
+
 	public static class InvalidPostFound extends RuntimeException { }
+
+	public static class InvalidPostReplyFound extends RuntimeException { }
 
 }

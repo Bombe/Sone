@@ -5,8 +5,10 @@ import static com.google.common.base.Optional.of;
 import static java.lang.System.currentTimeMillis;
 import static java.util.UUID.randomUUID;
 import static net.pterodactylus.sone.Matchers.isPost;
+import static net.pterodactylus.sone.Matchers.isPostReply;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.emptyIterable;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
@@ -22,12 +24,16 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
+import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.PostReplyBuilderFactory;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.Value;
@@ -200,6 +206,68 @@ public class ConfigurationSoneParserTest {
 		setupPost("1", null, 0L, null, null);
 	}
 
+	@Test
+	public void postRepliesAreParsedCorrectly() {
+		setupPostReplies();
+		PostReplyBuilderFactory postReplyBuilderFactory =
+				new PostReplyBuilderFactory() {
+					@Override
+					public PostReplyBuilder newPostReplyBuilder() {
+						return new TestPostReplyBuilder();
+					}
+				};
+		Collection<PostReply> postReplies =
+				configurationSoneParser.parsePostReplies(
+						postReplyBuilderFactory);
+		assertThat(postReplies, hasSize(2));
+		assertThat(postReplies,
+				containsInAnyOrder(isPostReply("R0", "P0", 1000L, "T0"),
+						isPostReply("R1", "P1", 1001L, "T1")));
+	}
+
+	private void setupPostReplies() {
+		setupPostReply("0", "R0", "P0", 1000L, "T0");
+		setupPostReply("1", "R1", "P1", 1001L, "T1");
+		setupPostReply("2", null, null, 0L, null);
+	}
+
+	private void setupPostReply(String postReplyNumber, String postReplyId,
+			String postId, long time, String text) {
+		setupString("Sone/1/Replies/" + postReplyNumber + "/ID", postReplyId);
+		setupString("Sone/1/Replies/" + postReplyNumber + "/Post/ID", postId);
+		setupLong("Sone/1/Replies/" + postReplyNumber + "/Time", time);
+		setupString("Sone/1/Replies/" + postReplyNumber + "/Text", text);
+	}
+
+	@Test(expected = InvalidPostReplyFound.class)
+	public void missingPostIdIsRecognized() {
+		setupPostReplyWithMissingPostId();
+		configurationSoneParser.parsePostReplies(null);
+	}
+
+	private void setupPostReplyWithMissingPostId() {
+		setupPostReply("0", "R0", null, 1000L, "T0");
+	}
+
+	@Test(expected = InvalidPostReplyFound.class)
+	public void missingPostReplyTimeIsRecognized() {
+		setupPostReplyWithMissingPostReplyTime();
+		configurationSoneParser.parsePostReplies(null);
+	}
+
+	private void setupPostReplyWithMissingPostReplyTime() {
+		setupPostReply("0", "R0", "P0", 0L, "T0");
+	}
+
+	@Test(expected = InvalidPostReplyFound.class)
+	public void missingPostReplyTextIsRecognized() {
+		setupPostReplyWithMissingPostReplyText();
+		configurationSoneParser.parsePostReplies(null);
+	}
+
+	private void setupPostReplyWithMissingPostReplyText() {
+		setupPostReply("0", "R0", "P0", 1000L, null);
+	}
 
 	private static class TestValue<T> implements Value<T> {
 
@@ -285,6 +353,61 @@ public class ConfigurationSoneParserTest {
 		public Post build() throws IllegalStateException {
 			when(post.getRecipientId()).thenReturn(fromNullable(recipientId));
 			return post;
+		}
+
+	}
+
+	private static class TestPostReplyBuilder implements PostReplyBuilder {
+
+		private final PostReply postReply = mock(PostReply.class);
+
+		@Override
+		public PostReplyBuilder to(String postId) {
+			when(postReply.getPostId()).thenReturn(postId);
+			return this;
+		}
+
+		@Override
+		public PostReply build() throws IllegalStateException {
+			return postReply;
+		}
+
+		@Override
+		public PostReplyBuilder randomId() {
+			when(postReply.getId()).thenReturn(randomUUID().toString());
+			return this;
+		}
+
+		@Override
+		public PostReplyBuilder withId(String id) {
+			when(postReply.getId()).thenReturn(id);
+			return this;
+		}
+
+		@Override
+		public PostReplyBuilder from(String senderId) {
+			Sone sone = mock(Sone.class);
+			when(sone.getId()).thenReturn(senderId);
+			when(postReply.getSone()).thenReturn(sone);
+			return this;
+		}
+
+		@Override
+		public PostReplyBuilder currentTime() {
+			when(postReply.getTime()).thenReturn(currentTimeMillis());
+			return this;
+		}
+
+		@Override
+		public PostReplyBuilder withTime(long time) {
+			when(postReply.getTime()).thenReturn(time);
+			return this;
+		}
+
+		@Override
+		public PostReplyBuilder withText(String text) {
+			when(postReply.getText()).thenReturn(text);
+			return this;
 		}
 
 	}
