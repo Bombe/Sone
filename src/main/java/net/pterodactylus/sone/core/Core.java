@@ -446,22 +446,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns whether the target Sone is trusted by the origin Sone.
-	 *
-	 * @param origin
-	 *            The origin Sone
-	 * @param target
-	 *            The target Sone
-	 * @return {@code true} if the target Sone is trusted by the origin Sone
-	 */
-	public boolean isSoneTrusted(Sone origin, Sone target) {
-		checkNotNull(origin, "origin must not be null");
-		checkNotNull(target, "target must not be null");
-		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin’s identity must be an OwnIdentity");
-		return trustedIdentities.containsEntry(origin.getIdentity(), target.getIdentity());
-	}
-
-	/**
 	 * Returns a post builder.
 	 *
 	 * @return A new post builder
@@ -1329,34 +1313,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *
 	 * @param sone
 	 *            The Sone that creates the post
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, String text) {
-		return createPost(sone, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
-	 * @param time
-	 *            The time of the post
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, long time, String text) {
-		return createPost(sone, null, time, text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
 	 * @param recipient
 	 *            The recipient Sone, or {@code null} if this post does not have
 	 *            a recipient
@@ -1434,16 +1390,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		for (PostReply reply : getReplies(post.getId())) {
 			markReplyKnown(reply);
 		}
-	}
-
-	/**
-	 * Bookmarks the given post.
-	 *
-	 * @param post
-	 *            The post to bookmark
-	 */
-	public void bookmark(Post post) {
-		bookmarkPost(post.getId());
 	}
 
 	/**
@@ -1544,17 +1490,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Creates a new top-level album for the given Sone.
-	 *
-	 * @param sone
-	 *            The Sone to create the album for
-	 * @return The new album
-	 */
-	public Album createAlbum(Sone sone) {
-		return createAlbum(sone, sone.getRootAlbum());
-	}
-
-	/**
 	 * Creates a new album for the given Sone.
 	 *
 	 * @param sone
@@ -1618,7 +1553,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * Deletes the given image. This method will also delete a matching
 	 * temporary image.
 	 *
-	 * @see #deleteTemporaryImage(TemporaryImage)
+	 * @see #deleteTemporaryImage(String)
 	 * @param image
 	 *            The image to delete
 	 */
@@ -1647,17 +1582,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			temporaryImages.put(temporaryImage.getId(), temporaryImage);
 		}
 		return temporaryImage;
-	}
-
-	/**
-	 * Deletes the given temporary image.
-	 *
-	 * @param temporaryImage
-	 *            The temporary image to delete
-	 */
-	public void deleteTemporaryImage(TemporaryImage temporaryImage) {
-		checkNotNull(temporaryImage, "temporaryImage must not be null");
-		deleteTemporaryImage(temporaryImage.getId());
 	}
 
 	/**
