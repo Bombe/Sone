@@ -229,6 +229,20 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.database = database;
 	}
 
+	@VisibleForTesting
+	protected Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
+		super("Sone Core");
+		this.configuration = configuration;
+		this.freenetInterface = freenetInterface;
+		this.identityManager = identityManager;
+		this.soneDownloader = soneDownloader;
+		this.imageInserter = imageInserter;
+		this.updateChecker = updateChecker;
+		this.webOfTrustUpdater = webOfTrustUpdater;
+		this.eventBus = eventBus;
+		this.database = database;
+	}
+
 	//
 	// ACCESSORS
 	//
@@ -592,7 +606,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The ID of the album
 	 * @return The album with the given ID
 	 */
-	public Album getAlbum(String albumId) {
+	public Album getOrCreateAlbum(String albumId) {
 		return getAlbum(albumId, true);
 	}
 
@@ -1217,7 +1231,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid album found, aborting load!");
 				return;
 			}
-			Album album = getAlbum(albumId).setSone(sone).modify().setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId).update();
+			Album album = getOrCreateAlbum(albumId).setSone(sone).modify().setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId).update();
 			if (albumParentId != null) {
 				Album parentAlbum = getAlbum(albumParentId, false);
 				if (parentAlbum == null) {

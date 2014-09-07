@@ -455,7 +455,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 						return null;
 					}
 				}
-				Album album = core.getAlbum(id).setSone(sone).modify().setTitle(title).setDescription(description).update();
+				Album album = core.getOrCreateAlbum(id).setSone(sone).modify().setTitle(title).setDescription(description).update();
 				if (parent != null) {
 					parent.addAlbum(album);
 				} else {

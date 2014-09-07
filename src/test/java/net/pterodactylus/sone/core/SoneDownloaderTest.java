@@ -211,7 +211,7 @@ public class SoneDownloaderTest {
 	public void setupAlbums() {
 		albums.put("album-id-1", new AlbumImpl("album-id-1"));
 		albums.put("album-id-2", new AlbumImpl("album-id-2"));
-		when(core.getAlbum(anyString())).thenAnswer(new Answer<Album>() {
+		when(core.getOrCreateAlbum(anyString())).thenAnswer(new Answer<Album>() {
 			@Override
 			public Album answer(InvocationOnMock invocation) throws Throwable {
 				return albums.get(invocation.getArguments()[0]);
