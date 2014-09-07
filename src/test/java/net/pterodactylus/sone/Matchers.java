@@ -17,23 +17,17 @@
 
 package net.pterodactylus.sone;
 
-import static com.google.common.base.Objects.equal;
-import static com.google.common.collect.Iterators.size;
-import static java.util.Arrays.asList;
 import static java.util.regex.Pattern.compile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
-import freenet.support.SimpleFieldSet;
+import net.pterodactylus.sone.data.Post;
 
-import com.google.common.base.Objects;
-import com.google.common.collect.Lists;
+import com.google.common.base.Optional;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.hamcrest.TypeSafeMatcher;
 
 /**
@@ -89,10 +83,83 @@ public class Matchers {
 			}
 
 			@Override
-			protected void describeMismatchSafely(InputStream item, Description mismatchDescription) {
+			protected void describeMismatchSafely(InputStream item,
+					Description mismatchDescription) {
 				mismatchDescription.appendValue(readData);
 			}
 		};
+	}
+
+	public static Matcher<Post> isPost(String postId, long time,
+			String text, Optional<String> recipient) {
+		return new PostMatcher(postId, time, text, recipient);
+	}
+
+	private static class PostMatcher extends TypeSafeDiagnosingMatcher<Post> {
+
+		private final String postId;
+		private final long time;
+		private final String text;
+		private final Optional<String> recipient;
+
+		private PostMatcher(String postId, long time, String text,
+				Optional<String> recipient) {
+			this.postId = postId;
+			this.time = time;
+			this.text = text;
+			this.recipient = recipient;
+		}
+
+		@Override
+		protected boolean matchesSafely(Post post,
+				Description mismatchDescription) {
+			if (!post.getId().equals(postId)) {
+				mismatchDescription.appendText("ID is not ")
+						.appendValue(postId);
+				return false;
+			}
+			if (post.getTime() != time) {
+				mismatchDescription.appendText("Time is not @")
+						.appendValue(time);
+				return false;
+			}
+			if (!post.getText().equals(text)) {
+				mismatchDescription.appendText("Text is not ")
+						.appendValue(text);
+				return false;
+			}
+			if (recipient.isPresent()) {
+				if (!post.getRecipientId().isPresent()) {
+					mismatchDescription.appendText(
+							"Recipient not present");
+					return false;
+				}
+				if (!post.getRecipientId().get().equals(recipient.get())) {
+					mismatchDescription.appendText("Recipient is not ")
+							.appendValue(recipient.get());
+					return false;
+				}
+			} else {
+				if (post.getRecipientId().isPresent()) {
+					mismatchDescription.appendText("Recipient is present");
+					return false;
+				}
+			}
+			return true;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("is post with ID ")
+					.appendValue(postId);
+			description.appendText(", created at @").appendValue(time);
+			description.appendText(", text ").appendValue(text);
+			if (recipient.isPresent()) {
+				description.appendText(", directed at ")
+						.appendValue(recipient.get());
+			}
+		}
+
 	}
 
 }

@@ -38,6 +38,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
@@ -1108,28 +1109,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		String lastInsertFingerprint = configuration.getStringValue(sonePrefix + "/LastInsertFingerprint").getValue("");
 
 		/* load profile. */
-		Profile profile = parseProfileFromConfiguration(configuration, sone, sonePrefix);
+		ConfigurationSoneParser configurationSoneParser = new ConfigurationSoneParser(configuration, sone);
+		Profile profile = configurationSoneParser.parseProfile();
 
 		/* load posts. */
-		Set<Post> posts = new HashSet<Post>();
-		while (true) {
-			String postPrefix = sonePrefix + "/Posts/" + posts.size();
-			String postId = configuration.getStringValue(postPrefix + "/ID").getValue(null);
-			if (postId == null) {
-				break;
-			}
-			String postRecipientId = configuration.getStringValue(postPrefix + "/Recipient").getValue(null);
-			long postTime = configuration.getLongValue(postPrefix + "/Time").getValue((long) 0);
-			String postText = configuration.getStringValue(postPrefix + "/Text").getValue(null);
-			if ((postTime == 0) || (postText == null)) {
-				logger.log(Level.WARNING, "Invalid post found, aborting load!");
-				return;
-			}
-			PostBuilder postBuilder = postBuilder().withId(postId).from(sone.getId()).withTime(postTime).withText(postText);
-			if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
-				postBuilder.to(postRecipientId);
-			}
-			posts.add(postBuilder.build());
+		Collection<Post> posts;
+		try {
+			posts = configurationSoneParser.parsePosts(database);
+		} catch (InvalidPostFound ipf) {
+			logger.log(Level.WARNING, "Invalid post found, aborting load!");
+			return;
 		}
 
 		/* load replies. */
@@ -1289,29 +1278,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		logger.info(String.format("Sone loaded successfully: %s", sone));
-	}
-
-	private static Profile parseProfileFromConfiguration(Configuration configuration, Sone sone, String sonePrefix) {
-		Profile profile = new Profile(sone);
-		profile.setFirstName(configuration.getStringValue(sonePrefix + "/Profile/FirstName").getValue(null));
-		profile.setMiddleName(configuration.getStringValue(sonePrefix + "/Profile/MiddleName").getValue(null));
-		profile.setLastName(configuration.getStringValue(sonePrefix + "/Profile/LastName").getValue(null));
-		profile.setBirthDay(configuration.getIntValue(sonePrefix + "/Profile/BirthDay").getValue(null));
-		profile.setBirthMonth(configuration.getIntValue(sonePrefix + "/Profile/BirthMonth").getValue(null));
-		profile.setBirthYear(configuration.getIntValue(sonePrefix + "/Profile/BirthYear").getValue(null));
-
-		/* load profile fields. */
-		while (true) {
-			String fieldPrefix = sonePrefix + "/Profile/Fields/" + profile.getFields().size();
-			String fieldName = configuration.getStringValue(fieldPrefix + "/Name").getValue(null);
-			if (fieldName == null) {
-				break;
-			}
-			String fieldValue = configuration.getStringValue(fieldPrefix + "/Value").getValue("");
-			profile.addField(fieldName).setValue(fieldValue);
-		}
-
-		return profile;
 	}
 
 	/**
