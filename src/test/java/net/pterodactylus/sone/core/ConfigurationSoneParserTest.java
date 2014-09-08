@@ -21,6 +21,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
@@ -267,6 +268,21 @@ public class ConfigurationSoneParserTest {
 
 	private void setupPostReplyWithMissingPostReplyText() {
 		setupPostReply("0", "R0", "P0", 1000L, null);
+	}
+
+	@Test
+	public void likedPostIdsParsedCorrectly() {
+		setupLikedPostIds();
+		Set<String> likedPostIds =
+				configurationSoneParser.parseLikedPostIds();
+		assertThat(likedPostIds, containsInAnyOrder("P1", "P2", "P3"));
+	}
+
+	private void setupLikedPostIds() {
+		setupString("Sone/1/Likes/Post/0/ID", "P1");
+		setupString("Sone/1/Likes/Post/1/ID", "P2");
+		setupString("Sone/1/Likes/Post/2/ID", "P3");
+		setupString("Sone/1/Likes/Post/3/ID", null);
 	}
 
 	private static class TestValue<T> implements Value<T> {

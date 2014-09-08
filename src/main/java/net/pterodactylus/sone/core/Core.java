@@ -1132,14 +1132,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		/* load post likes. */
-		Set<String> likedPostIds = new HashSet<String>();
-		while (true) {
-			String likedPostId = configuration.getStringValue(sonePrefix + "/Likes/Post/" + likedPostIds.size() + "/ID").getValue(null);
-			if (likedPostId == null) {
-				break;
-			}
-			likedPostIds.add(likedPostId);
-		}
+		Set<String> likedPostIds =
+				configurationSoneParser.parseLikedPostIds();
 
 		/* load reply likes. */
 		Set<String> likedReplyIds = new HashSet<String>();

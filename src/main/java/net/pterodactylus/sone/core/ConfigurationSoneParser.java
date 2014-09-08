@@ -136,6 +136,20 @@ public class ConfigurationSoneParser {
 		return replies;
 	}
 
+	public Set<String> parseLikedPostIds() {
+		Set<String> likedPostIds = new HashSet<String>();
+		while (true) {
+			String likedPostId =
+					getString("/Likes/Post/" + likedPostIds.size() + "/ID",
+							null);
+			if (likedPostId == null) {
+				break;
+			}
+			likedPostIds.add(likedPostId);
+		}
+		return likedPostIds;
+	}
+
 	public static class InvalidPostFound extends RuntimeException { }
 
 	public static class InvalidPostReplyFound extends RuntimeException { }
