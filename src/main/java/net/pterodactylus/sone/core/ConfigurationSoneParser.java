@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.core;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -72,7 +71,7 @@ public class ConfigurationSoneParser {
 				.getValue(defaultValue);
 	}
 
-	public Collection<Post> parsePosts(PostBuilderFactory postBuilderFactory)
+	public Set<Post> parsePosts(PostBuilderFactory postBuilderFactory)
 	throws InvalidPostFound {
 		Set<Post> posts = new HashSet<Post>();
 		while (true) {
@@ -109,7 +108,7 @@ public class ConfigurationSoneParser {
 		return (postRecipientId != null) && (postRecipientId.length() == 43);
 	}
 
-	public Collection<PostReply> parsePostReplies(
+	public Set<PostReply> parsePostReplies(
 			PostReplyBuilderFactory postReplyBuilderFactory) {
 		Set<PostReply> replies = new HashSet<PostReply>();
 		while (true) {
