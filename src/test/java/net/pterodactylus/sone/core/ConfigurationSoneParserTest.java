@@ -300,6 +300,20 @@ public class ConfigurationSoneParserTest {
 		setupString("Sone/1/Likes/Reply/3/ID", null);
 	}
 
+	@Test
+	public void friendsAreParsedCorrectly() {
+		setupFriends();
+		Set<String> friends = configurationSoneParser.parseFriends();
+		assertThat(friends, containsInAnyOrder("F1", "F2", "F3"));
+	}
+
+	private void setupFriends() {
+		setupString("Sone/1/Friends/0/ID", "F1");
+		setupString("Sone/1/Friends/1/ID", "F2");
+		setupString("Sone/1/Friends/2/ID", "F3");
+		setupString("Sone/1/Friends/3/ID", null);
+	}
+
 	private static class TestValue<T> implements Value<T> {
 
 		private final AtomicReference<T> value = new AtomicReference<T>();

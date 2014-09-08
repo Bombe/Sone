@@ -1140,14 +1140,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				configurationSoneParser.parseLikedPostReplyIds();
 
 		/* load friends. */
-		Set<String> friends = new HashSet<String>();
-		while (true) {
-			String friendId = configuration.getStringValue(sonePrefix + "/Friends/" + friends.size() + "/ID").getValue(null);
-			if (friendId == null) {
-				break;
-			}
-			friends.add(friendId);
-		}
+		Set<String> friends = configurationSoneParser.parseFriends();
 
 		/* load albums. */
 		List<Album> topLevelAlbums = new ArrayList<Album>();

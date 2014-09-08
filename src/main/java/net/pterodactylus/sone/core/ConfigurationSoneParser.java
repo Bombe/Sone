@@ -162,6 +162,19 @@ public class ConfigurationSoneParser {
 		return likedPostReplyIds;
 	}
 
+	public Set<String> parseFriends() {
+		Set<String> friends = new HashSet<String>();
+		while (true) {
+			String friendId =
+					getString("/Friends/" + friends.size() + "/ID", null);
+			if (friendId == null) {
+				break;
+			}
+			friends.add(friendId);
+		}
+		return friends;
+	}
+
 	public static class InvalidPostFound extends RuntimeException { }
 
 	public static class InvalidPostReplyFound extends RuntimeException { }
