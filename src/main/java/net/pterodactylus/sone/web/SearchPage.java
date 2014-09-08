@@ -354,7 +354,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getAlbumId(String phrase) {
 		String albumId = phrase.startsWith("album://") ? phrase.substring(8) : phrase;
-		return (webInterface.getCore().getAlbum(albumId, false) != null) ? albumId : null;
+		return (webInterface.getCore().getAlbum(albumId) != null) ? albumId : null;
 	}
 
 	/**

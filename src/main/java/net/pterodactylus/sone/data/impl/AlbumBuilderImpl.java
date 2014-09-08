@@ -31,7 +31,7 @@ public class AlbumBuilderImpl extends AbstractAlbumBuilder {
 	@Override
 	public Album build() throws IllegalStateException {
 		validate();
-		return randomId ? new AlbumImpl() : new AlbumImpl(id);
+		return randomId ? new AlbumImpl(sone) : new AlbumImpl(sone, id);
 	}
 
 }

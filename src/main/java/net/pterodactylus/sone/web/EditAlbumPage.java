@@ -51,7 +51,7 @@ public class EditAlbumPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String albumId = request.getHttpRequest().getPartAsStringFailsafe("album", 36);
-			Album album = webInterface.getCore().getAlbum(albumId, false);
+			Album album = webInterface.getCore().getAlbum(albumId);
 			if (album == null) {
 				throw new RedirectException("invalid.html");
 			}

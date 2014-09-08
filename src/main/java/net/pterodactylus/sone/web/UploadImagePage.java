@@ -81,7 +81,7 @@ public class UploadImagePage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
-			Album parent = webInterface.getCore().getAlbum(parentId, false);
+			Album parent = webInterface.getCore().getAlbum(parentId);
 			if (parent == null) {
 				/* TODO - signal error */
 				return;

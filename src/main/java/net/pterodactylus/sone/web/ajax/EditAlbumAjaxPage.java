@@ -49,7 +49,7 @@ public class EditAlbumAjaxPage extends JsonPage {
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String albumId = request.getHttpRequest().getParam("album");
-		Album album = webInterface.getCore().getAlbum(albumId, false);
+		Album album = webInterface.getCore().getAlbum(albumId);
 		if (album == null) {
 			return createErrorJsonObject("invalid-album-id");
 		}

@@ -67,6 +67,7 @@ import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.SoneImpl;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
 import net.pterodactylus.sone.database.PostBuilder;
@@ -584,16 +585,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		return posts;
 	}
 
-	/**
-	 * Returns the album with the given ID, creating a new album if no album
-	 * with the given ID can be found.
-	 *
-	 * @param albumId
-	 *            The ID of the album
-	 * @return The album with the given ID
-	 */
-	public Album getOrCreateAlbum(String albumId) {
-		return getAlbum(albumId, true);
+	public AlbumBuilder albumBuilder() {
+		return database.newAlbumBuilder();
 	}
 
 	/**
@@ -602,23 +595,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *
 	 * @param albumId
 	 *            The ID of the album
-	 * @param create
-	 *            {@code true} to create a new album if none exists for the
-	 *            given ID
 	 * @return The album with the given ID, or {@code null} if no album with the
-	 *         given ID exists and {@code create} is {@code false}
+	 *         given ID exists
 	 */
-	public Album getAlbum(String albumId, boolean create) {
-		Optional<Album> album = database.getAlbum(albumId);
-		if (album.isPresent()) {
-			return album.get();
-		}
-		if (!create) {
-			return null;
-		}
-		Album newAlbum = database.newAlbumBuilder().withId(albumId).build();
-		database.storeAlbum(newAlbum);
-		return newAlbum;
+	public Album getAlbum(String albumId) {
+		return database.getAlbum(albumId).orNull();
 	}
 
 	/**
@@ -1159,9 +1140,17 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid album found, aborting load!");
 				return;
 			}
-			Album album = getOrCreateAlbum(albumId).setSone(sone).modify().setTitle(albumTitle).setDescription(albumDescription).setAlbumImage(albumImageId).update();
+			Album album = database.newAlbumBuilder()
+					.withId(albumId)
+					.by(sone)
+					.build()
+					.modify()
+					.setTitle(albumTitle)
+					.setDescription(albumDescription)
+					.setAlbumImage(albumImageId)
+					.update();
 			if (albumParentId != null) {
-				Album parentAlbum = getAlbum(albumParentId, false);
+				Album parentAlbum = getAlbum(albumParentId);
 				if (parentAlbum == null) {
 					logger.log(Level.WARNING, String.format("Invalid parent album ID: %s", albumParentId));
 					return;
@@ -1193,7 +1182,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.WARNING, "Invalid image found, aborting load!");
 				return;
 			}
-			Album album = getAlbum(albumId, false);
+			Album album = getAlbum(albumId);
 			if (album == null) {
 				logger.log(Level.WARNING, "Invalid album image encountered, aborting load!");
 				return;
@@ -1444,9 +1433,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The new album
 	 */
 	public Album createAlbum(Sone sone, Album parent) {
-		Album album = database.newAlbumBuilder().randomId().build();
+		Album album = database.newAlbumBuilder().randomId().by(sone).build();
 		database.storeAlbum(album);
-		album.setSone(sone);
 		parent.addAlbum(album);
 		return album;
 	}

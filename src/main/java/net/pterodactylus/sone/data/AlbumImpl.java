@@ -47,7 +47,7 @@ public class AlbumImpl implements Album {
 	private final String id;
 
 	/** The Sone this album belongs to. */
-	private Sone sone;
+	private final Sone sone;
 
 	/** Nested albums. */
 	private final List<Album> albums = new ArrayList<Album>();
@@ -71,8 +71,8 @@ public class AlbumImpl implements Album {
 	private String albumImage;
 
 	/** Creates a new album with a random ID. */
-	public AlbumImpl() {
-		this(UUID.randomUUID().toString());
+	public AlbumImpl(Sone sone) {
+		this(sone, UUID.randomUUID().toString());
 	}
 
 	/**
@@ -81,7 +81,8 @@ public class AlbumImpl implements Album {
 	 * @param id
 	 * 		The ID of the album
 	 */
-	public AlbumImpl(String id) {
+	public AlbumImpl(Sone sone, String id) {
+		this.sone = checkNotNull(sone, "Sone must not be null");
 		this.id = checkNotNull(id, "id must not be null");
 	}
 
@@ -97,14 +98,6 @@ public class AlbumImpl implements Album {
 	@Override
 	public Sone getSone() {
 		return sone;
-	}
-
-	@Override
-	public Album setSone(Sone sone) {
-		checkNotNull(sone, "sone must not be null");
-		checkState((this.sone == null) || (this.sone.equals(sone)), "album owner must not already be set to some other Sone");
-		this.sone = sone;
-		return this;
 	}
 
 	@Override

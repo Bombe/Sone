@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.database;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Sone;
 
 /**
  * Builder for {@link Album} objects.
@@ -41,6 +42,8 @@ public interface AlbumBuilder {
 	 * @return This album builder
 	 */
 	AlbumBuilder withId(String id);
+
+	AlbumBuilder by(Sone sone);
 
 	/**
 	 * Creates the album.

@@ -69,7 +69,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		String albumId = request.getHttpRequest().getParam("album", null);
 		if (albumId != null) {
-			Album album = webInterface.getCore().getAlbum(albumId, false);
+			Album album = webInterface.getCore().getAlbum(albumId);
 			templateContext.set("albumRequested", true);
 			templateContext.set("album", album);
 			templateContext.set("page", request.getHttpRequest().getParam("page"));

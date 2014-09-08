@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Optional.of;
+import static java.util.UUID.randomUUID;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.downloading;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.idle;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.unknown;
@@ -16,6 +17,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -34,7 +36,7 @@ import java.util.Set;
 
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.data.Album.Modifier;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.ImageImpl;
@@ -43,6 +45,7 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -53,7 +56,9 @@ import freenet.keys.FreenetURI;
 import freenet.support.api.Bucket;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ListMultimap;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -78,6 +83,10 @@ public class SoneDownloaderTest {
 	private final PostReplyBuilder postReplyBuilder = mock(PostReplyBuilder.class);
 	private final Set<PostReply> createdPostReplies = new HashSet<PostReply>();
 	private PostReply postReply = mock(PostReply.class);
+	private final AlbumBuilder albumBuilder = mock(AlbumBuilder.class);
+	private final ListMultimap<Album, Album> nestedAlbums = ArrayListMultimap.create();
+	private final ListMultimap<Album, Image> albumImages = ArrayListMultimap.create();
+	private Album album = mock(Album.class);
 	private final Map<String, Album> albums = new HashMap<String, Album>();
 
 	@Before
@@ -208,16 +217,113 @@ public class SoneDownloaderTest {
 	}
 
 	@Before
-	public void setupAlbums() {
-		albums.put("album-id-1", new AlbumImpl("album-id-1"));
-		albums.put("album-id-2", new AlbumImpl("album-id-2"));
-		when(core.getOrCreateAlbum(anyString())).thenAnswer(new Answer<Album>() {
+	public void setupAlbum() {
+		setupAlbum(album);
+	}
+
+	private void setupAlbum(final Album album) {
+		when(album.getAlbumImage()).thenReturn(mock(Image.class));
+		doAnswer(new Answer<Void>() {
 			@Override
-			public Album answer(InvocationOnMock invocation) throws Throwable {
-				return albums.get(invocation.getArguments()[0]);
+			public Void answer(InvocationOnMock invocation) {
+				nestedAlbums.put(album, (Album) invocation.getArguments()[0]);
+				return null;
+			}
+		}).when(album).addAlbum(any(Album.class));
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) {
+				albumImages.put(album, (Image) invocation.getArguments()[0]);
+				return null;
+			}
+		}).when(album).addImage(any(Image.class));
+		when(album.getAlbums()).thenAnswer(new Answer<List<Album>>() {
+			@Override
+			public List<Album> answer(InvocationOnMock invocation) {
+				return nestedAlbums.get(album);
 			}
 		});
-		when(core.getAlbum(anyString(), anyBoolean())).thenAnswer(new Answer<Album>() {
+		when(album.getImages()).thenAnswer(new Answer<List<Image>>() {
+			@Override
+			public List<Image> answer(InvocationOnMock invocation) {
+				return albumImages.get(album);
+			}
+		});
+		final Modifier albumModifier = new Modifier() {
+			private String title = album.getTitle();
+			private String description = album.getDescription();
+			private String imageId = album.getAlbumImage().getId();
+
+			@Override
+			public Modifier setTitle(String title) {
+				this.title = title;
+				return this;
+			}
+
+			@Override
+			public Modifier setDescription(String description) {
+				this.description = description;
+				return this;
+			}
+
+			@Override
+			public Modifier setAlbumImage(String imageId) {
+				this.imageId = imageId;
+				return this;
+			}
+
+			@Override
+			public Album update() throws IllegalStateException {
+				when(album.getTitle()).thenReturn(title);
+				when(album.getDescription()).thenReturn(description);
+				Image image = mock(Image.class);
+				when(image.getId()).thenReturn(imageId);
+				when(album.getAlbumImage()).thenReturn(image);
+				return album;
+			}
+		};
+		when(album.modify()).thenReturn(albumModifier);
+	}
+
+	@Before
+	public void setupAlbumBuilder() {
+		when(albumBuilder.withId(anyString())).thenAnswer(new Answer<AlbumBuilder>() {
+			@Override
+			public AlbumBuilder answer(InvocationOnMock invocation) {
+				when(album.getId()).thenReturn((String) invocation.getArguments()[0]);
+				return albumBuilder;
+			}
+		});
+		when(albumBuilder.randomId()).thenAnswer(new Answer<AlbumBuilder>() {
+			@Override
+			public AlbumBuilder answer(InvocationOnMock invocation) {
+				when(album.getId()).thenReturn(randomUUID().toString());
+				return albumBuilder;
+			}
+		});
+		when(albumBuilder.by(any(Sone.class))).thenAnswer(new Answer<AlbumBuilder>() {
+			@Override
+			public AlbumBuilder answer(InvocationOnMock invocation) {
+				when(album.getSone()).thenReturn((Sone) invocation.getArguments()[0]);
+				return albumBuilder;
+			}
+		});
+		when(albumBuilder.build()).thenAnswer(new Answer<Album>() {
+			@Override
+			public Album answer(InvocationOnMock invocation) {
+				Album album = SoneDownloaderTest.this.album;
+				albums.put(album.getId(), album);
+				SoneDownloaderTest.this.album = mock(Album.class);
+				setupAlbum(SoneDownloaderTest.this.album);
+				return album;
+			}
+		});
+		when(core.albumBuilder()).thenReturn(albumBuilder);
+	}
+
+	@Before
+	public void setupAlbums() {
+		when(core.getAlbum(anyString())).thenAnswer(new Answer<Album>() {
 			@Override
 			public Album answer(InvocationOnMock invocation) throws Throwable {
 				return albums.get(invocation.getArguments()[0]);

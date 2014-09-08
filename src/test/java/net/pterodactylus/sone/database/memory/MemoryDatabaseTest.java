@@ -20,9 +20,11 @@ package net.pterodactylus.sone.database.memory;
 import static com.google.common.base.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Mockito.mock;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
 import org.junit.Test;
@@ -38,7 +40,7 @@ public class MemoryDatabaseTest {
 
 	@Test
 	public void testBasicAlbumFunctionality() {
-		Album newAlbum = new AlbumImpl();
+		Album newAlbum = new AlbumImpl(mock(Sone.class));
 		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(Optional.<Album>absent()));
 		memoryDatabase.storeAlbum(newAlbum);
 		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(of(newAlbum)));

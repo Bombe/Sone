@@ -99,7 +99,7 @@ public class SoneImpl implements Sone {
 	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
 
 	/** The root album containing all albums. */
-	private final Album rootAlbum = new AlbumImpl().setSone(this);
+	private final Album rootAlbum = new AlbumImpl(this);
 
 	/** Sone-specific options. */
 	private SoneOptions options = new DefaultSoneOptions();

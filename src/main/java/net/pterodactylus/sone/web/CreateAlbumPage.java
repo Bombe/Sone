@@ -63,7 +63,7 @@ public class CreateAlbumPage extends SoneTemplatePage {
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 256).trim();
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
-			Album parent = webInterface.getCore().getAlbum(parentId, false);
+			Album parent = webInterface.getCore().getAlbum(parentId);
 			if (parentId.equals("")) {
 				parent = currentSone.getRootAlbum();
 			}

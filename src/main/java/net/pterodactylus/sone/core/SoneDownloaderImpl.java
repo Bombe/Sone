@@ -449,13 +449,20 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 				}
 				Album parent = null;
 				if (parentId != null) {
-					parent = core.getAlbum(parentId, false);
+					parent = core.getAlbum(parentId);
 					if (parent == null) {
 						logger.log(Level.WARNING, String.format("Downloaded Sone %s has album with invalid parent!", sone));
 						return null;
 					}
 				}
-				Album album = core.getOrCreateAlbum(id).setSone(sone).modify().setTitle(title).setDescription(description).update();
+				Album album = core.albumBuilder()
+						.withId(id)
+						.by(sone)
+						.build()
+						.modify()
+						.setTitle(title)
+						.setDescription(description)
+						.update();
 				if (parent != null) {
 					parent.addAlbum(album);
 				} else {
