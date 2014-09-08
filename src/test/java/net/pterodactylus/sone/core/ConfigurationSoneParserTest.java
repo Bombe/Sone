@@ -285,6 +285,21 @@ public class ConfigurationSoneParserTest {
 		setupString("Sone/1/Likes/Post/3/ID", null);
 	}
 
+	@Test
+	public void likedPostReplyIdsAreParsedCorrectly() {
+		setupLikedPostReplyIds();
+		Set<String> likedPostReplyIds =
+				configurationSoneParser.parseLikedPostReplyIds();
+		assertThat(likedPostReplyIds, containsInAnyOrder("R1", "R2", "R3"));
+	}
+
+	private void setupLikedPostReplyIds() {
+		setupString("Sone/1/Likes/Reply/0/ID", "R1");
+		setupString("Sone/1/Likes/Reply/1/ID", "R2");
+		setupString("Sone/1/Likes/Reply/2/ID", "R3");
+		setupString("Sone/1/Likes/Reply/3/ID", null);
+	}
+
 	private static class TestValue<T> implements Value<T> {
 
 		private final AtomicReference<T> value = new AtomicReference<T>();
