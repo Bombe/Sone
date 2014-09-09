@@ -114,8 +114,10 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private final Set<String> knownPostReplies = new HashSet<String>();
 
 	private final Map<String, Album> allAlbums = new HashMap<String, Album>();
+	private final Multimap<String, Album> soneAlbums = HashMultimap.create();
 
 	private final Map<String, Image> allImages = new HashMap<String, Image>();
+	private final Multimap<String, Image> soneImages = HashMultimap.create();
 
 	/**
 	 * Creates a new memory database.
@@ -447,6 +449,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allAlbums.put(album.getId(), album);
+			soneAlbums.put(album.getSone().getId(), album);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -457,6 +460,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allAlbums.remove(album.getId());
+			soneAlbums.remove(album.getSone().getId(), album);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -494,6 +498,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allImages.put(image.getId(), image);
+			soneImages.put(image.getSone().getId(), image);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -504,6 +509,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allImages.remove(image.getId());
+			soneImages.remove(image.getSone().getId(), image);
 		} finally {
 			lock.writeLock().unlock();
 		}
