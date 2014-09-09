@@ -20,6 +20,7 @@ package net.pterodactylus.sone.core;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.not;
+import static java.lang.String.format;
 import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
 
 import java.net.MalformedURLException;
@@ -38,6 +39,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
 import net.pterodactylus.sone.core.Options.DefaultOption;
@@ -1124,43 +1127,17 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		Set<String> friends = configurationSoneParser.parseFriends();
 
 		/* load albums. */
-		List<Album> topLevelAlbums = new ArrayList<Album>();
-		int albumCounter = 0;
-		while (true) {
-			String albumPrefix = sonePrefix + "/Albums/" + albumCounter++;
-			String albumId = configuration.getStringValue(albumPrefix + "/ID").getValue(null);
-			if (albumId == null) {
-				break;
-			}
-			String albumTitle = configuration.getStringValue(albumPrefix + "/Title").getValue(null);
-			String albumDescription = configuration.getStringValue(albumPrefix + "/Description").getValue(null);
-			String albumParentId = configuration.getStringValue(albumPrefix + "/Parent").getValue(null);
-			String albumImageId = configuration.getStringValue(albumPrefix + "/AlbumImage").getValue(null);
-			if ((albumTitle == null) || (albumDescription == null)) {
-				logger.log(Level.WARNING, "Invalid album found, aborting load!");
-				return;
-			}
-			Album album = database.newAlbumBuilder()
-					.withId(albumId)
-					.by(sone)
-					.build()
-					.modify()
-					.setTitle(albumTitle)
-					.setDescription(albumDescription)
-					.setAlbumImage(albumImageId)
-					.update();
-			if (albumParentId != null) {
-				Album parentAlbum = getAlbum(albumParentId);
-				if (parentAlbum == null) {
-					logger.log(Level.WARNING, String.format("Invalid parent album ID: %s", albumParentId));
-					return;
-				}
-				parentAlbum.addAlbum(album);
-			} else {
-				if (!topLevelAlbums.contains(album)) {
-					topLevelAlbums.add(album);
-				}
-			}
+		List<Album> topLevelAlbums;
+		try {
+			topLevelAlbums =
+					configurationSoneParser.parseTopLevelAlbums(database);
+		} catch (InvalidAlbumFound iaf) {
+			logger.log(Level.WARNING, "Invalid album found, aborting load!");
+			return;
+		} catch (InvalidParentAlbumFound ipaf) {
+			logger.log(Level.WARNING, format("Invalid parent album ID: %s",
+					ipaf.getAlbumParentId()));
+			return;
 		}
 
 		/* load images. */

@@ -1,14 +1,20 @@
 package net.pterodactylus.sone.core;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.AlbumBuilderFactory;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -175,8 +181,67 @@ public class ConfigurationSoneParser {
 		return friends;
 	}
 
+	public List<Album> parseTopLevelAlbums(
+			AlbumBuilderFactory albumBuilderFactory) {
+		Map<String, Album> albums = new HashMap<String, Album>();
+		List<Album> topLevelAlbums = new ArrayList<Album>();
+		int albumCounter = 0;
+		while (true) {
+			String albumPrefix = "/Albums/" + albumCounter++;
+			String albumId = getString(albumPrefix + "/ID", null);
+			if (albumId == null) {
+				break;
+			}
+			String albumTitle = getString(albumPrefix + "/Title", null);
+			String albumDescription =
+					getString(albumPrefix + "/Description", null);
+			String albumParentId = getString(albumPrefix + "/Parent", null);
+			String albumImageId =
+					getString(albumPrefix + "/AlbumImage", null);
+			if ((albumTitle == null) || (albumDescription == null)) {
+				throw new InvalidAlbumFound();
+			}
+			Album album = albumBuilderFactory.newAlbumBuilder()
+					.withId(albumId)
+					.by(sone)
+					.build()
+					.modify()
+					.setTitle(albumTitle)
+					.setDescription(albumDescription)
+					.setAlbumImage(albumImageId)
+					.update();
+			if (albumParentId != null) {
+				Album parentAlbum = albums.get(albumParentId);
+				if (parentAlbum == null) {
+					throw new InvalidParentAlbumFound(albumParentId);
+				}
+				parentAlbum.addAlbum(album);
+			} else {
+				topLevelAlbums.add(album);
+			}
+			albums.put(albumId, album);
+		}
+		return topLevelAlbums;
+	}
+
 	public static class InvalidPostFound extends RuntimeException { }
 
 	public static class InvalidPostReplyFound extends RuntimeException { }
+
+	public static class InvalidAlbumFound extends RuntimeException { }
+
+	public static class InvalidParentAlbumFound extends RuntimeException {
+
+		private final String albumParentId;
+
+		public InvalidParentAlbumFound(String albumParentId) {
+			this.albumParentId = albumParentId;
+		}
+
+		public String getAlbumParentId() {
+			return albumParentId;
+		}
+
+	}
 
 }

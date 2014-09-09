@@ -22,6 +22,7 @@ import static java.util.regex.Pattern.compile;
 import java.io.IOException;
 import java.io.InputStream;
 
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 
@@ -99,6 +100,86 @@ public class Matchers {
 	public static Matcher<PostReply> isPostReply(String postReplyId,
 			String postId, long time, String text) {
 		return new PostReplyMatcher(postReplyId, postId, time, text);
+	}
+
+	public static Matcher<Album> isAlbum(final String albumId,
+			final String parentAlbumId,
+			final String title, final String albumDescription,
+			final String imageId) {
+		return new TypeSafeDiagnosingMatcher<Album>() {
+			@Override
+			protected boolean matchesSafely(Album album,
+					Description mismatchDescription) {
+				if (!album.getId().equals(albumId)) {
+					mismatchDescription.appendText("ID is ")
+							.appendValue(album.getId());
+					return false;
+				}
+				if (parentAlbumId == null) {
+					if (album.getParent() != null) {
+						mismatchDescription.appendText("has parent album");
+						return false;
+					}
+				} else {
+					if (album.getParent() == null) {
+						mismatchDescription.appendText("has no parent album");
+						return false;
+					}
+					if (!album.getParent().getId().equals(parentAlbumId)) {
+						mismatchDescription.appendText("parent album is ")
+								.appendValue(album.getParent().getId());
+						return false;
+					}
+				}
+				if (!title.equals(album.getTitle())) {
+					mismatchDescription.appendText("has title ")
+							.appendValue(album.getTitle());
+					return false;
+				}
+				if (!albumDescription.equals(album.getDescription())) {
+					mismatchDescription.appendText("has description ")
+							.appendValue(album.getDescription());
+					return false;
+				}
+				if (imageId == null) {
+					if (album.getAlbumImage() != null) {
+						mismatchDescription.appendText("has album image");
+						return false;
+					}
+				} else {
+					if (album.getAlbumImage() == null) {
+						mismatchDescription.appendText("has no album image");
+						return false;
+					}
+					if (!album.getAlbumImage().getId().equals(imageId)) {
+						mismatchDescription.appendText("has album image ")
+								.appendValue(album.getAlbumImage().getId());
+						return false;
+					}
+				}
+				return true;
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("is album ").appendValue(albumId);
+				if (parentAlbumId == null) {
+					description.appendText(", has no parent");
+				} else {
+					description.appendText(", has parent ")
+							.appendValue(parentAlbumId);
+				}
+				description.appendText(", has title ").appendValue(title);
+				description.appendText(", has description ")
+						.appendValue(albumDescription);
+				if (imageId == null) {
+					description.appendText(", has no album image");
+				} else {
+					description.appendText(", has album image ")
+							.appendValue(imageId);
+				}
+			}
+		};
 	}
 
 	private static class PostMatcher extends TypeSafeDiagnosingMatcher<Post> {

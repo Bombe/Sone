@@ -4,6 +4,7 @@ import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Optional.of;
 import static java.lang.System.currentTimeMillis;
 import static java.util.UUID.randomUUID;
+import static net.pterodactylus.sone.Matchers.isAlbum;
 import static net.pterodactylus.sone.Matchers.isPost;
 import static net.pterodactylus.sone.Matchers.isPostReply;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,23 +15,33 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Album.Modifier;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.AlbumBuilder;
+import net.pterodactylus.sone.database.AlbumBuilderFactory;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -314,6 +325,80 @@ public class ConfigurationSoneParserTest {
 		setupString("Sone/1/Friends/3/ID", null);
 	}
 
+	@Test
+	public void topLevelAlbumsAreParsedCorrectly() {
+		setupTopLevelAlbums();
+		AlbumBuilderFactory albumBuilderFactory = createAlbumBuilderFactory();
+		List<Album> topLevelAlbums =
+				configurationSoneParser.parseTopLevelAlbums(
+						albumBuilderFactory);
+		assertThat(topLevelAlbums, hasSize(2));
+		Album firstAlbum = topLevelAlbums.get(0);
+		assertThat(firstAlbum, isAlbum("A1", null, "T1", "D1", "I1"));
+		assertThat(firstAlbum.getAlbums(), emptyIterable());
+		assertThat(firstAlbum.getImages(), emptyIterable());
+		Album secondAlbum = topLevelAlbums.get(1);
+		assertThat(secondAlbum, isAlbum("A2", null, "T2", "D2", null));
+		assertThat(secondAlbum.getAlbums(), hasSize(1));
+		assertThat(secondAlbum.getImages(), emptyIterable());
+		Album thirdAlbum = secondAlbum.getAlbums().get(0);
+		assertThat(thirdAlbum, isAlbum("A3", "A2", "T3", "D3", "I3"));
+		assertThat(thirdAlbum.getAlbums(), emptyIterable());
+		assertThat(thirdAlbum.getImages(), emptyIterable());
+	}
+
+	private void setupTopLevelAlbums() {
+		setupAlbum(0, "A1", null, "T1", "D1", "I1");
+		setupAlbum(1, "A2", null, "T2", "D2", null);
+		setupAlbum(2, "A3", "A2", "T3", "D3", "I3");
+		setupAlbum(3, null, null, null, null, null);
+	}
+
+	private void setupAlbum(int albumNumber, String albumId,
+			String parentAlbumId,
+			String title, String description, String imageId) {
+		final String albumPrefix = "Sone/1/Albums/" + albumNumber;
+		setupString(albumPrefix + "/ID", albumId);
+		setupString(albumPrefix + "/Title", title);
+		setupString(albumPrefix + "/Description", description);
+		setupString(albumPrefix + "/Parent", parentAlbumId);
+		setupString(albumPrefix + "/AlbumImage", imageId);
+	}
+
+	private AlbumBuilderFactory createAlbumBuilderFactory() {
+		AlbumBuilderFactory albumBuilderFactory =
+				mock(AlbumBuilderFactory.class);
+		when(albumBuilderFactory.newAlbumBuilder()).thenAnswer(
+				new Answer<AlbumBuilder>() {
+					@Override
+					public AlbumBuilder answer(InvocationOnMock invocation) {
+						return new TestAlbumBuilder();
+					}
+				});
+		return albumBuilderFactory;
+	}
+
+	@Test(expected = InvalidAlbumFound.class)
+	public void albumWithInvalidTitleIsRecognized() {
+		setupAlbum(0, "A1", null, null, "D1", "I1");
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+	}
+
+	@Test(expected = InvalidAlbumFound.class)
+	public void albumWithInvalidDescriptionIsRecognized() {
+		setupAlbum(0, "A1", null, "T1", null, "I1");
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+	}
+
+	@Test(expected = InvalidParentAlbumFound.class)
+	public void albumWithInvalidParentIsRecognized() {
+		setupAlbum(0, "A1", "A0", "T1", "D1", "I1");
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+	}
+
 	private static class TestValue<T> implements Value<T> {
 
 		private final AtomicReference<T> value = new AtomicReference<T>();
@@ -453,6 +538,121 @@ public class ConfigurationSoneParserTest {
 		public PostReplyBuilder withText(String text) {
 			when(postReply.getText()).thenReturn(text);
 			return this;
+		}
+
+	}
+
+	private static class TestAlbumBuilder implements AlbumBuilder {
+
+		private final Album album = mock(Album.class);
+		private final List<Album> albums = new ArrayList<Album>();
+		private final List<Image> images = new ArrayList<Image>();
+		private Album parentAlbum;
+		private String title;
+		private String description;
+		private String imageId;
+
+		public TestAlbumBuilder() {
+			when(album.getTitle()).thenAnswer(new Answer<String>() {
+				@Override
+				public String answer(InvocationOnMock invocation) {
+					return title;
+				}
+			});
+			when(album.getDescription()).thenAnswer(new Answer<String>() {
+				@Override
+				public String answer(InvocationOnMock invocation) {
+					return description;
+				}
+			});
+			when(album.getAlbumImage()).thenAnswer(new Answer<Image>() {
+				@Override
+				public Image answer(InvocationOnMock invocation) {
+					if (imageId == null) {
+						return null;
+					}
+					Image image = mock(Image.class);
+					when(image.getId()).thenReturn(imageId);
+					return image;
+				}
+			});
+			when(album.getAlbums()).thenReturn(albums);
+			when(album.getImages()).thenReturn(images);
+			doAnswer(new Answer<Void>() {
+				@Override
+				public Void answer(InvocationOnMock invocation) {
+					albums.add((Album) invocation.getArguments()[0]);
+					((Album) invocation.getArguments()[0]).setParent(album);
+					return null;
+				}
+			}).when(album).addAlbum(any(Album.class));
+			doAnswer(new Answer<Void>() {
+				@Override
+				public Void answer(InvocationOnMock invocation) {
+					images.add((Image) invocation.getArguments()[0]);
+					return null;
+				}
+			}).when(album).addImage(any(Image.class));
+			doAnswer(new Answer<Void>() {
+				@Override
+				public Void answer(InvocationOnMock invocation) {
+					parentAlbum = (Album) invocation.getArguments()[0];
+					return null;
+				}
+			}).when(album).setParent(any(Album.class));
+			when(album.getParent()).thenAnswer(new Answer<Album>() {
+				@Override
+				public Album answer(InvocationOnMock invocation) {
+					return parentAlbum;
+				}
+			});
+			when(album.modify()).thenReturn(new Modifier() {
+				@Override
+				public Modifier setTitle(String title) {
+					TestAlbumBuilder.this.title = title;
+					return this;
+				}
+
+				@Override
+				public Modifier setDescription(String description) {
+					TestAlbumBuilder.this.description = description;
+					return this;
+				}
+
+				@Override
+				public Modifier setAlbumImage(String imageId) {
+					TestAlbumBuilder.this.imageId = imageId;
+					return this;
+				}
+
+				@Override
+				public Album update() throws IllegalStateException {
+					return album;
+				}
+			});
+		}
+
+		@Override
+		public AlbumBuilder randomId() {
+			when(album.getId()).thenReturn(randomUUID().toString());
+			return this;
+		}
+
+		@Override
+		public AlbumBuilder withId(String id) {
+			when(album.getId()).thenReturn(id);
+			return this;
+		}
+
+		@Override
+		public AlbumBuilder by(Sone sone) {
+			when(album.getSone()).thenReturn(sone);
+			return this;
+		}
+
+		@Override
+		public Album build() throws IllegalStateException {
+			return album;
 		}
 
 	}
