@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.not;
 import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
 import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
 
 import java.net.MalformedURLException;
@@ -40,6 +41,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
@@ -1141,31 +1143,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		/* load images. */
-		int imageCounter = 0;
-		while (true) {
-			String imagePrefix = sonePrefix + "/Images/" + imageCounter++;
-			String imageId = configuration.getStringValue(imagePrefix + "/ID").getValue(null);
-			if (imageId == null) {
-				break;
-			}
-			String albumId = configuration.getStringValue(imagePrefix + "/Album").getValue(null);
-			String key = configuration.getStringValue(imagePrefix + "/Key").getValue(null);
-			String title = configuration.getStringValue(imagePrefix + "/Title").getValue(null);
-			String description = configuration.getStringValue(imagePrefix + "/Description").getValue(null);
-			Long creationTime = configuration.getLongValue(imagePrefix + "/CreationTime").getValue(null);
-			Integer width = configuration.getIntValue(imagePrefix + "/Width").getValue(null);
-			Integer height = configuration.getIntValue(imagePrefix + "/Height").getValue(null);
-			if ((albumId == null) || (key == null) || (title == null) || (description == null) || (creationTime == null) || (width == null) || (height == null)) {
-				logger.log(Level.WARNING, "Invalid image found, aborting load!");
-				return;
-			}
-			Album album = getAlbum(albumId);
-			if (album == null) {
-				logger.log(Level.WARNING, "Invalid album image encountered, aborting load!");
-				return;
-			}
-			Image image = getImage(imageId).modify().setSone(sone).setCreationTime(creationTime).setKey(key).setTitle(title).setDescription(description).setWidth(width).setHeight(height).update();
-			album.addImage(image);
+		try {
+			configurationSoneParser.parseImages(database);
+		} catch (InvalidImageFound iif) {
+			logger.log(WARNING, "Invalid image found, aborting load!");
+			return;
+		} catch (InvalidParentAlbumFound ipaf) {
+			logger.log(Level.WARNING,
+					format("Invalid album image (%s) encountered, aborting load!",
+							ipaf.getAlbumParentId()));
+			return;
 		}
 
 		/* load avatar. */

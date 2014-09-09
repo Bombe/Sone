@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.core;
 
+import static java.util.Collections.unmodifiableMap;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,11 +12,13 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.AlbumBuilderFactory;
+import net.pterodactylus.sone.database.ImageBuilderFactory;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -31,6 +35,8 @@ public class ConfigurationSoneParser {
 	private final Configuration configuration;
 	private final Sone sone;
 	private final String sonePrefix;
+	private final Map<String, Album> albums = new HashMap<String, Album>();
+	private final List<Album> topLevelAlbums = new ArrayList<Album>();
 
 	public ConfigurationSoneParser(Configuration configuration, Sone sone) {
 		this.configuration = configuration;
@@ -183,8 +189,6 @@ public class ConfigurationSoneParser {
 
 	public List<Album> parseTopLevelAlbums(
 			AlbumBuilderFactory albumBuilderFactory) {
-		Map<String, Album> albums = new HashMap<String, Album>();
-		List<Album> topLevelAlbums = new ArrayList<Album>();
 		int albumCounter = 0;
 		while (true) {
 			String albumPrefix = "/Albums/" + albumCounter++;
@@ -224,6 +228,59 @@ public class ConfigurationSoneParser {
 		return topLevelAlbums;
 	}
 
+	public Map<String, Album> getAlbums() {
+		return unmodifiableMap(albums);
+	}
+
+	public void parseImages(ImageBuilderFactory imageBuilderFactory) {
+		int imageCounter = 0;
+		while (true) {
+			String imagePrefix = "/Images/" + imageCounter++;
+			String imageId = getString(imagePrefix + "/ID", null);
+			if (imageId == null) {
+				break;
+			}
+			String albumId = getString(imagePrefix + "/Album", null);
+			String key = getString(imagePrefix + "/Key", null);
+			String title = getString(imagePrefix + "/Title", null);
+			String description =
+					getString(imagePrefix + "/Description", null);
+			Long creationTime = getLong(imagePrefix + "/CreationTime", null);
+			Integer width = getInt(imagePrefix + "/Width", null);
+			Integer height = getInt(imagePrefix + "/Height", null);
+			if (albumAttributesAreInvalid(albumId, key, title, description,
+					creationTime,
+					width, height)) {
+				throw new InvalidImageFound();
+			}
+			Album album = albums.get(albumId);
+			if (album == null) {
+				throw new InvalidParentAlbumFound(albumId);
+			}
+			Image image = imageBuilderFactory.newImageBuilder()
+					.withId(imageId)
+					.build()
+					.modify()
+					.setSone(sone)
+					.setCreationTime(creationTime)
+					.setKey(key)
+					.setTitle(title)
+					.setDescription(description)
+					.setWidth(width)
+					.setHeight(height)
+					.update();
+			album.addImage(image);
+		}
+	}
+
+	private boolean albumAttributesAreInvalid(String albumId, String key,
+			String title, String description, Long creationTime,
+			Integer width, Integer height) {
+		return (albumId == null) || (key == null) || (title == null) || (
+				description == null) || (creationTime == null) || (width
+				== null) || (height == null);
+	}
+
 	public static class InvalidPostFound extends RuntimeException { }
 
 	public static class InvalidPostReplyFound extends RuntimeException { }
@@ -243,5 +300,7 @@ public class ConfigurationSoneParser {
 		}
 
 	}
+
+	public static class InvalidImageFound extends RuntimeException { }
 
 }

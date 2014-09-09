@@ -5,6 +5,7 @@ import static com.google.common.base.Optional.of;
 import static java.lang.System.currentTimeMillis;
 import static java.util.UUID.randomUUID;
 import static net.pterodactylus.sone.Matchers.isAlbum;
+import static net.pterodactylus.sone.Matchers.isImage;
 import static net.pterodactylus.sone.Matchers.isPost;
 import static net.pterodactylus.sone.Matchers.isPostReply;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -25,10 +26,12 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
+import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
@@ -42,6 +45,8 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.AlbumBuilderFactory;
+import net.pterodactylus.sone.database.ImageBuilder;
+import net.pterodactylus.sone.database.ImageBuilderFactory;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -399,6 +404,129 @@ public class ConfigurationSoneParserTest {
 				createAlbumBuilderFactory());
 	}
 
+	@Test
+	public void imagesAreParsedCorrectly() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImages();
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+		Map<String, Album> albums = configurationSoneParser.getAlbums();
+		assertThat(albums.get("A1").getImages(),
+				contains(isImage("I1", 1000L, "K1", "T1", "D1", 16, 9)));
+		assertThat(albums.get("A2").getImages(), contains(
+				isImage("I2", 2000L, "K2", "T2", "D2", 16 * 2, 9 * 2)));
+		assertThat(albums.get("A3").getImages(), contains(
+				isImage("I3", 3000L, "K3", "T3", "D3", 16 * 3, 9 * 3)));
+	}
+
+	private void setupImages() {
+		setupImage(0, "I1", "A1", 1000L, "K1", "T1", "D1", 16, 9);
+		setupImage(1, "I2", "A2", 2000L, "K2", "T2", "D2", 16 * 2, 9 * 2);
+		setupImage(2, "I3", "A3", 3000L, "K3", "T3", "D3", 16 * 3, 9 * 3);
+		setupImage(3, null, null, 0L, null, null, null, 0, 0);
+	}
+
+	private void setupImage(int imageNumber, String id,
+			String parentAlbumId, Long creationTime, String key, String title,
+			String description, Integer width, Integer height) {
+		final String imagePrefix = "Sone/1/Images/" + imageNumber;
+		setupString(imagePrefix + "/ID", id);
+		setupString(imagePrefix + "/Album", parentAlbumId);
+		setupLong(imagePrefix + "/CreationTime", creationTime);
+		setupString(imagePrefix + "/Key", key);
+		setupString(imagePrefix + "/Title", title);
+		setupString(imagePrefix + "/Description", description);
+		setupInteger(imagePrefix + "/Width", width);
+		setupInteger(imagePrefix + "/Height", height);
+	}
+
+	private ImageBuilderFactory createImageBuilderFactory() {
+		ImageBuilderFactory imageBuilderFactory =
+				mock(ImageBuilderFactory.class);
+		when(imageBuilderFactory.newImageBuilder()).thenAnswer(
+				new Answer<ImageBuilder>() {
+					@Override
+					public ImageBuilder answer(InvocationOnMock invocation)
+					throws Throwable {
+						return new TestImageBuilder();
+					}
+				});
+		return imageBuilderFactory;
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingAlbumIdIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", null, 1000L, "K1", "T1", "D1", 16, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidParentAlbumFound.class)
+	public void invalidAlbumIdIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A4", 1000L, "K1", "T1", "D1", 16, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingCreationTimeIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A1", null, "K1", "T1", "D1", 16, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingKeyIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A1", 1000L, null, "T1", "D1", 16, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingTitleIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A1", 1000L, "K1", null, "D1", 16, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingDescriptionIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A1", 1000L, "K1", "T1", null, 16, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingWidthIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A1", 1000L, "K1", "T1", "D1", null, 9);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
+	@Test(expected = InvalidImageFound.class)
+	public void missingHeightIsRecognized() {
+		setupTopLevelAlbums();
+		configurationSoneParser.parseTopLevelAlbums(
+				createAlbumBuilderFactory());
+		setupImage(0, "I1", "A1", 1000L, "K1", "T1", "D1", 16, null);
+		configurationSoneParser.parseImages(createImageBuilderFactory());
+	}
+
 	private static class TestValue<T> implements Value<T> {
 
 		private final AtomicReference<T> value = new AtomicReference<T>();
@@ -653,6 +781,97 @@ public class ConfigurationSoneParserTest {
 		@Override
 		public Album build() throws IllegalStateException {
 			return album;
+		}
+
+	}
+
+	private static class TestImageBuilder implements ImageBuilder {
+
+		private final Image image;
+
+		private TestImageBuilder() {
+			image = mock(Image.class);
+			Image.Modifier imageModifier = new Image.Modifier() {
+				private Sone sone = image.getSone();
+				private long creationTime = image.getCreationTime();
+				private String key = image.getKey();
+				private String title = image.getTitle();
+				private String description = image.getDescription();
+				private int width = image.getWidth();
+				private int height = image.getHeight();
+
+				@Override
+				public Image.Modifier setSone(Sone sone) {
+					this.sone = sone;
+					return this;
+				}
+
+				@Override
+				public Image.Modifier setCreationTime(long creationTime) {
+					this.creationTime = creationTime;
+					return this;
+				}
+
+				@Override
+				public Image.Modifier setKey(String key) {
+					this.key = key;
+					return this;
+				}
+
+				@Override
+				public Image.Modifier setTitle(String title) {
+					this.title = title;
+					return this;
+				}
+
+				@Override
+				public Image.Modifier setDescription(String description) {
+					this.description = description;
+					return this;
+				}
+
+				@Override
+				public Image.Modifier setWidth(int width) {
+					this.width = width;
+					return this;
+				}
+
+				@Override
+				public Image.Modifier setHeight(int height) {
+					this.height = height;
+					return this;
+				}
+
+				@Override
+				public Image update() throws IllegalStateException {
+					when(image.getSone()).thenReturn(sone);
+					when(image.getCreationTime()).thenReturn(creationTime);
+					when(image.getKey()).thenReturn(key);
+					when(image.getTitle()).thenReturn(title);
+					when(image.getDescription()).thenReturn(description);
+					when(image.getWidth()).thenReturn(width);
+					when(image.getHeight()).thenReturn(height);
+					return image;
+				}
+			};
+			when(image.modify()).thenReturn(imageModifier);
+		}
+
+		@Override
+		public ImageBuilder randomId() {
+			when(image.getId()).thenReturn(randomUUID().toString());
+			return this;
+		}
+
+		@Override
+		public ImageBuilder withId(String id) {
+			when(image.getId()).thenReturn(id);
+			return this;
+		}
+
+		@Override
+		public Image build() throws IllegalStateException {
+			return image;
 		}
 
 	}

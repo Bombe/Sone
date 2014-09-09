@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 
@@ -178,6 +179,68 @@ public class Matchers {
 					description.appendText(", has album image ")
 							.appendValue(imageId);
 				}
+			}
+		};
+	}
+
+	public static Matcher<Image> isImage(final String id,
+			final long creationTime,
+			final String key, final String title,
+			final String imageDescription,
+			final int width, final int height) {
+		return new TypeSafeDiagnosingMatcher<Image>() {
+			@Override
+			protected boolean matchesSafely(Image image,
+					Description mismatchDescription) {
+				if (!image.getId().equals(id)) {
+					mismatchDescription.appendText("ID is ")
+							.appendValue(image.getId());
+					return false;
+				}
+				if (image.getCreationTime() != creationTime) {
+					mismatchDescription.appendText("created at @")
+							.appendValue(image.getCreationTime());
+					return false;
+				}
+				if (!image.getKey().equals(key)) {
+					mismatchDescription.appendText("key is ")
+							.appendValue(image.getKey());
+					return false;
+				}
+				if (!image.getTitle().equals(title)) {
+					mismatchDescription.appendText("title is ")
+							.appendValue(image.getTitle());
+					return false;
+				}
+				if (!image.getDescription().equals(imageDescription)) {
+					mismatchDescription.appendText("description is ")
+							.appendValue(image.getDescription());
+					return false;
+				}
+				if (image.getWidth() != width) {
+					mismatchDescription.appendText("width is ")
+							.appendValue(image.getWidth());
+					return false;
+				}
+				if (image.getHeight() != height) {
+					mismatchDescription.appendText("height is ")
+							.appendValue(image.getHeight());
+					return false;
+				}
+				return true;
+			}
+
+			@Override
+			public void describeTo(Description description) {
+				description.appendText("image with ID ").appendValue(id);
+				description.appendText(", created at @")
+						.appendValue(creationTime);
+				description.appendText(", has key ").appendValue(key);
+				description.appendText(", has title ").appendValue(title);
+				description.appendText(", has description ")
+						.appendValue(imageDescription);
+				description.appendText(", has width ").appendValue(width);
+				description.appendText(", has height ").appendValue(height);
 			}
 		};
 	}
