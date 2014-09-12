@@ -75,6 +75,7 @@ public class SoneDownloaderTest {
 	private final Core core = mock(Core.class);
 	private final FreenetInterface freenetInterface = mock(FreenetInterface.class);
 	private final SoneDownloaderImpl soneDownloader = new SoneDownloaderImpl(core, freenetInterface);
+	private final SoneUpdater soneUpdater = mock(SoneUpdater.class);
 	private final FreenetURI requestUri = mock(FreenetURI.class);
 	private final Sone sone = mock(Sone.class);
 	private final PostBuilder postBuilder = mock(PostBuilder.class);
@@ -341,7 +342,7 @@ public class SoneDownloaderTest {
 	@Test
 	public void addingASoneWillRegisterItsKey() {
 		soneDownloader.addSone(sone);
-		verify(freenetInterface).registerUsk(sone, soneDownloader);
+		verify(freenetInterface).registerUsk(eq(sone), any(SoneUpdater.class));
 		verify(freenetInterface, never()).unregisterUsk(sone);
 	}
 
@@ -349,7 +350,7 @@ public class SoneDownloaderTest {
 	public void addingASoneTwiceWillAlsoDeregisterItsKey() {
 		soneDownloader.addSone(sone);
 		soneDownloader.addSone(sone);
-		verify(freenetInterface, times(2)).registerUsk(sone, soneDownloader);
+		verify(freenetInterface, times(2)).registerUsk(eq(sone), any(SoneUpdater.class));
 		verify(freenetInterface).unregisterUsk(sone);
 	}
 
@@ -730,7 +731,7 @@ public class SoneDownloaderTest {
 
 	@Test
 	public void notBeingAbleToFetchAnUnknownSoneDoesNotUpdateCore() {
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verify(freenetInterface).fetchUri(requestUri);
 		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(unknown);
 		verify(core, never()).updateSone(any(Sone.class));
@@ -746,7 +747,7 @@ public class SoneDownloaderTest {
 	@Test
 	public void notBeingAbleToFetchAKnownSoneDoesNotUpdateCore() {
 		when(sone.getTime()).thenReturn(1000L);
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verify(freenetInterface).fetchUri(requestUri);
 		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(idle);
 		verify(core, never()).updateSone(any(Sone.class));
@@ -756,7 +757,7 @@ public class SoneDownloaderTest {
 	public void exceptionWhileFetchingAnUnknownSoneDoesNotUpdateCore() {
 		when(freenetInterface.fetchUri(requestUri)).thenThrow(NullPointerException.class);
 		try {
-			soneDownloader.fetchSone(sone);
+			soneDownloader.fetchSoneAction(sone).run();
 		} finally {
 			verify(freenetInterface).fetchUri(requestUri);
 			verifyThatSoneStatusWasChangedToDownloadingAndBackTo(unknown);
@@ -769,7 +770,7 @@ public class SoneDownloaderTest {
 		when(sone.getTime()).thenReturn(1000L);
 		when(freenetInterface.fetchUri(requestUri)).thenThrow(NullPointerException.class);
 		try {
-			soneDownloader.fetchSone(sone);
+			soneDownloader.fetchSoneAction(sone).run();
 		} finally {
 			verify(freenetInterface).fetchUri(requestUri);
 			verifyThatSoneStatusWasChangedToDownloadingAndBackTo(idle);
@@ -781,7 +782,7 @@ public class SoneDownloaderTest {
 	public void successfulFetchingOfSoneWithUskRequestUriUpdatesTheCoreWithASone() throws IOException {
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-no-payload.xml"));
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verifyThatParsedSoneHasTheSameIdAsTheOriginalSone();
 	}
 
@@ -796,7 +797,7 @@ public class SoneDownloaderTest {
 		when(requestUri.getKeyType()).thenReturn("SSK");
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-no-payload.xml"));
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verifyThatParsedSoneHasTheSameIdAsTheOriginalSone();
 	}
 
@@ -805,7 +806,7 @@ public class SoneDownloaderTest {
 		when(requestUri.getKeyType()).thenReturn("SSK");
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-with-zero-time.xml"));
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verifyThatParsedSoneHasTheSameIdAsTheOriginalSone();
 	}
 
@@ -813,7 +814,7 @@ public class SoneDownloaderTest {
 	public void fetchingSoneWithInvalidXmlWillNotUpdateTheCore() throws IOException {
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-not-xml.xml"));
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verify(core, never()).updateSone(any(Sone.class));
 	}
 
@@ -822,7 +823,7 @@ public class SoneDownloaderTest {
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-no-payload.xml"));
 		when(sone.getId()).thenThrow(NullPointerException.class);
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSone(sone);
+		soneDownloader.fetchSoneAction(sone).run();
 		verify(core, never()).updateSone(any(Sone.class));
 	}
 

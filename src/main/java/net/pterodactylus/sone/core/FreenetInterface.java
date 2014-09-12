@@ -182,16 +182,7 @@ public class FreenetInterface {
 		}
 	}
 
-	/**
-	 * Registers the USK for the given Sone and notifies the given
-	 * {@link SoneDownloader} if an update was found.
-	 *
-	 * @param sone
-	 *            The Sone to watch
-	 * @param soneDownloader
-	 *            The Sone download to notify on updates
-	 */
-	public void registerUsk(final Sone sone, final SoneDownloader soneDownloader) {
+	public void registerUsk(final Sone sone, final SoneUpdater soneUpdater) {
 		try {
 			logger.log(Level.FINE, String.format("Registering Sone “%s” for USK updates at %s…", sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" })));
 			USKCallback uskCallback = new USKCallback() {
@@ -200,10 +191,7 @@ public class FreenetInterface {
 				@SuppressWarnings("synthetic-access")
 				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
 					logger.log(Level.FINE, String.format("Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", sone, key, newKnownGood, newSlotToo));
-					if (edition > sone.getLatestEdition()) {
-						sone.setLatestEdition(edition);
-						new Thread(soneDownloader.fetchSoneAction(sone), "Sone Downloader").start();
-					}
+					soneUpdater.updateSone(sone, edition);
 				}
 
 				@Override

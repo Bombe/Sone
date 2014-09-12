@@ -14,7 +14,6 @@ import freenet.keys.FreenetURI;
 public interface SoneDownloader extends Service {
 
 	void addSone(Sone sone);
-	void fetchSone(Sone sone);
 	void fetchSone(Sone sone, FreenetURI soneUri);
 	Sone fetchSone(Sone sone, FreenetURI soneUri, boolean fetchOnly);
 

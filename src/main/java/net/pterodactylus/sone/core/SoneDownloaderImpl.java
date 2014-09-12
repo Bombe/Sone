@@ -103,18 +103,19 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		if (!sones.add(sone)) {
 			freenetInterface.unregisterUsk(sone);
 		}
-		freenetInterface.registerUsk(sone, this);
+		freenetInterface.registerUsk(sone, new SoneUpdater() {
+			@Override
+			public void updateSone(Sone sone, long edition) {
+				if (edition > sone.getLatestEdition()) {
+					sone.setLatestEdition(edition);
+					new Thread(fetchSoneAction(sone),
+							"Sone Downloader").start();
+				}
+			}
+		});
 	}
 
-	/**
-	 * Fetches the updated Sone. This method is a callback method for
-	 * {@link FreenetInterface#registerUsk(Sone, SoneDownloader)}.
-	 *
-	 * @param sone
-	 * 		The Sone to fetch
-	 */
-	@Override
-	public void fetchSone(Sone sone) {
+	private void fetchSone(Sone sone) {
 		fetchSone(sone, sone.getRequestUri().sskForUSK());
 	}
 

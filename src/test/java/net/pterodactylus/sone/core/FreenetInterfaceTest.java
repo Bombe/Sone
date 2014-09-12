@@ -93,6 +93,7 @@ public class FreenetInterfaceTest {
 	private final Sone sone = mock(Sone.class);
 	private final ArgumentCaptor<USKCallback> callbackCaptor = forClass(USKCallback.class);
 	private final SoneDownloader soneDownloader = mock(SoneDownloader.class);
+	private final SoneUpdater soneUpdater = mock(SoneUpdater.class);
 	private final Image image = mock(Image.class);
 	private InsertToken insertToken;
 
@@ -290,32 +291,9 @@ public class FreenetInterfaceTest {
 
 	@Test
 	public void callbackForRegisteredSoneWithHigherEditionTriggersDownload() throws InterruptedException {
-		freenetInterface.registerUsk(sone, soneDownloader);
-		final CountDownLatch downloadTriggered = new CountDownLatch(1);
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				downloadTriggered.countDown();
-				return null;
-			}
-		}).when(soneDownloader).fetchSone(sone);
+		freenetInterface.registerUsk(sone, soneUpdater);
 		callbackCaptor.getValue().onFoundEdition(1, null, null, null, false, (short) 0, null, false, false);
-		assertThat(downloadTriggered.await(1, SECONDS), is(true));
-	}
-
-	@Test
-	public void callbackForRegisteredSoneWithTheSameEditionDoesNotTriggerDownload() throws InterruptedException {
-		freenetInterface.registerUsk(sone, soneDownloader);
-		final CountDownLatch downloadTriggered = new CountDownLatch(1);
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				downloadTriggered.countDown();
-				return null;
-			}
-		}).when(soneDownloader).fetchSone(sone);
-		callbackCaptor.getValue().onFoundEdition(0, null, null, null, false, (short) 0, null, false, false);
-		assertThat(downloadTriggered.await(1, SECONDS), is(false));
+		verify(soneUpdater).updateSone(sone, 1);
 	}
 
 	@Test
