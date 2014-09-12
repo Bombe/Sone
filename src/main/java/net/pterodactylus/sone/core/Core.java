@@ -17,9 +17,11 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.not;
+import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
@@ -758,6 +760,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, "Given Identity is null!");
 			return null;
 		}
+		final Long latestEdition = fromNullable(tryParse(
+				identity.getProperty("Sone.LatestEdition"))).or(0L);
 		synchronized (sones) {
 			final Sone sone = getRemoteSone(identity.getId(), true);
 			if (sone.isLocal()) {
@@ -766,7 +770,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			sone.setIdentity(identity);
 			boolean newSone = sone.getRequestUri() == null;
 			sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
-			sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), (long) 0));
+			sone.setLatestEdition(latestEdition);
 			if (newSone) {
 				synchronized (knownSones) {
 					newSone = !knownSones.contains(sone.getId());
