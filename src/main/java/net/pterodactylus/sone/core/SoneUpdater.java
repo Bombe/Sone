@@ -10,6 +10,6 @@ import net.pterodactylus.sone.data.Sone;
  */
 public interface SoneUpdater {
 
-	void updateSone(Sone sone, long edition);
+	void updateSone(long edition);
 
 }

@@ -191,7 +191,7 @@ public class FreenetInterface {
 				@SuppressWarnings("synthetic-access")
 				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
 					logger.log(Level.FINE, String.format("Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", sone, key, newKnownGood, newSlotToo));
-					soneUpdater.updateSone(sone, edition);
+					soneUpdater.updateSone(edition);
 				}
 
 				@Override

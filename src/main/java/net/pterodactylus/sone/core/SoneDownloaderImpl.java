@@ -99,13 +99,13 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	 * 		The Sone to add
 	 */
 	@Override
-	public void addSone(Sone sone) {
+	public void addSone(final Sone sone) {
 		if (!sones.add(sone)) {
 			freenetInterface.unregisterUsk(sone);
 		}
 		freenetInterface.registerUsk(sone, new SoneUpdater() {
 			@Override
-			public void updateSone(Sone sone, long edition) {
+			public void updateSone(long edition) {
 				if (edition > sone.getLatestEdition()) {
 					sone.setLatestEdition(edition);
 					new Thread(fetchSoneAction(sone),

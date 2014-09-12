@@ -293,7 +293,7 @@ public class FreenetInterfaceTest {
 	public void callbackForRegisteredSoneWithHigherEditionTriggersDownload() throws InterruptedException {
 		freenetInterface.registerUsk(sone, soneUpdater);
 		callbackCaptor.getValue().onFoundEdition(1, null, null, null, false, (short) 0, null, false, false);
-		verify(soneUpdater).updateSone(sone, 1);
+		verify(soneUpdater).updateSone(1);
 	}
 
 	@Test
