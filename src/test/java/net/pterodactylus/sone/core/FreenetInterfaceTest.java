@@ -5,9 +5,6 @@ import static freenet.client.InsertException.INTERNAL_ERROR;
 import static freenet.keys.InsertableClientSSK.createRandom;
 import static freenet.node.RequestStarter.INTERACTIVE_PRIORITY_CLASS;
 import static freenet.node.RequestStarter.PREFETCH_PRIORITY_CLASS;
-import static java.lang.System.currentTimeMillis;
-import static java.util.concurrent.TimeUnit.DAYS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static net.pterodactylus.sone.Matchers.delivers;
 import static net.pterodactylus.sone.TestUtil.setFinalField;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -19,7 +16,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyShort;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -31,7 +27,6 @@ import static org.mockito.Mockito.withSettings;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.concurrent.CountDownLatch;
 
 import net.pterodactylus.sone.TestUtil;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
@@ -73,8 +68,6 @@ import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link FreenetInterface}.
@@ -92,8 +85,6 @@ public class FreenetInterfaceTest {
 	private FreenetInterface freenetInterface;
 	private final Sone sone = mock(Sone.class);
 	private final ArgumentCaptor<USKCallback> callbackCaptor = forClass(USKCallback.class);
-	private final SoneDownloader soneDownloader = mock(SoneDownloader.class);
-	private final SoneUpdater soneUpdater = mock(SoneUpdater.class);
 	private final Image image = mock(Image.class);
 	private InsertToken insertToken;
 
@@ -211,22 +202,8 @@ public class FreenetInterfaceTest {
 	@Test
 	public void soneWithWrongRequestUriWillNotBeSubscribed() throws MalformedURLException {
 		when(sone.getRequestUri()).thenReturn(new FreenetURI("KSK@GPLv3.txt"));
-		freenetInterface.registerUsk(sone, null);
+		freenetInterface.registerUsk(new FreenetURI("KSK@GPLv3.txt"), null);
 		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
-	}
-
-	@Test
-	public void registeringAUskForARecentlyModifiedSone() throws MalformedURLException {
-		when(sone.getTime()).thenReturn(currentTimeMillis() - DAYS.toMillis(1));
-		freenetInterface.registerUsk(sone, null);
-		verify(uskManager).subscribe(any(USK.class), any(USKCallback.class), eq(true), eq((RequestClient) highLevelSimpleClient));
-	}
-
-	@Test
-	public void registeringAUskForAnOldSone() throws MalformedURLException {
-		when(sone.getTime()).thenReturn(currentTimeMillis() - DAYS.toMillis(365));
-		freenetInterface.registerUsk(sone, null);
-		verify(uskManager).subscribe(any(USK.class), any(USKCallback.class), eq(false), eq((RequestClient) highLevelSimpleClient));
 	}
 
 	@Test
@@ -268,39 +245,26 @@ public class FreenetInterfaceTest {
 	}
 
 	@Test
-	public void unregisteringARegisteredSoneUnregistersTheSone() {
-		freenetInterface.registerUsk(sone, null);
+	public void unregisteringARegisteredSoneUnregistersTheSone()
+	throws MalformedURLException {
+		freenetInterface.registerActiveUsk(sone.getRequestUri(), mock(USKCallback.class));
 		freenetInterface.unregisterUsk(sone);
 		verify(uskManager).unsubscribe(any(USK.class), any(USKCallback.class));
 	}
 
 	@Test
 	public void unregisteringASoneWithAWrongRequestKeyWillNotUnsubscribe() throws MalformedURLException {
-		freenetInterface.registerUsk(sone, null);
 		when(sone.getRequestUri()).thenReturn(new FreenetURI("KSK@GPLv3.txt"));
+		freenetInterface.registerUsk(sone.getRequestUri(), null);
 		freenetInterface.unregisterUsk(sone);
 		verify(uskManager, never()).unsubscribe(any(USK.class), any(USKCallback.class));
 	}
 
 	@Test
-	public void callbackPrioritiesAreInteractive() {
-		freenetInterface.registerUsk(sone, null);
-		assertThat(callbackCaptor.getValue().getPollingPriorityNormal(), is(INTERACTIVE_PRIORITY_CLASS));
-		assertThat(callbackCaptor.getValue().getPollingPriorityProgress(), is(INTERACTIVE_PRIORITY_CLASS));
-	}
-
-	@Test
-	public void callbackForRegisteredSoneWithHigherEditionTriggersDownload() throws InterruptedException {
-		freenetInterface.registerUsk(sone, soneUpdater);
-		callbackCaptor.getValue().onFoundEdition(1, null, null, null, false, (short) 0, null, false, false);
-		verify(soneUpdater).updateSone(1);
-	}
-
-	@Test
 	public void callbackForNormalUskUsesDifferentPriorities() {
 		Callback callback = mock(Callback.class);
-		FreenetURI uri = createRandom(randomSource, "test-0").getURI().uskForSSK();
-		freenetInterface.registerUsk(uri, callback);
+		FreenetURI soneUri = createRandom(randomSource, "test-0").getURI().uskForSSK();
+		freenetInterface.registerUsk(soneUri, callback);
 		assertThat(callbackCaptor.getValue().getPollingPriorityNormal(), is(PREFETCH_PRIORITY_CLASS));
 		assertThat(callbackCaptor.getValue().getPollingPriorityProgress(), is(INTERACTIVE_PRIORITY_CLASS));
 	}

@@ -17,12 +17,17 @@
 
 package net.pterodactylus.sone.core;
 
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.DAYS;
+
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,8 +51,14 @@ import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
 
 import freenet.client.FetchResult;
+import freenet.client.async.ClientContext;
+import freenet.client.async.USKCallback;
 import freenet.keys.FreenetURI;
+import freenet.keys.USK;
+import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
+
+import com.db4o.ObjectContainer;
 
 import com.google.common.annotations.VisibleForTesting;
 import org.w3c.dom.Document;
@@ -103,16 +114,46 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		if (!sones.add(sone)) {
 			freenetInterface.unregisterUsk(sone);
 		}
-		freenetInterface.registerUsk(sone, new SoneUpdater() {
+		final USKCallback uskCallback = new USKCallback() {
+
 			@Override
-			public void updateSone(long edition) {
+			@SuppressWarnings("synthetic-access")
+			public void onFoundEdition(long edition, USK key,
+					ObjectContainer objectContainer,
+					ClientContext clientContext, boolean metadata,
+					short codec, byte[] data, boolean newKnownGood,
+					boolean newSlotToo) {
+				logger.log(Level.FINE, format(
+						"Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.",
+						sone, key, newKnownGood, newSlotToo));
 				if (edition > sone.getLatestEdition()) {
 					sone.setLatestEdition(edition);
 					new Thread(fetchSoneAction(sone),
 							"Sone Downloader").start();
 				}
 			}
-		});
+
+			@Override
+			public short getPollingPriorityProgress() {
+				return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
+			}
+
+			@Override
+			public short getPollingPriorityNormal() {
+				return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
+			}
+		};
+		if (soneHasBeenActiveRecently(sone)) {
+			freenetInterface.registerActiveUsk(sone.getRequestUri(),
+					uskCallback);
+		} else {
+			freenetInterface.registerPassiveUsk(sone.getRequestUri(),
+					uskCallback);
+		}
+	}
+
+	private boolean soneHasBeenActiveRecently(Sone sone) {
+		return (currentTimeMillis() - sone.getTime()) < DAYS.toMillis(7);
 	}
 
 	private void fetchSone(Sone sone) {

@@ -1,7 +1,9 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Optional.of;
+import static java.lang.System.currentTimeMillis;
 import static java.util.UUID.randomUUID;
+import static java.util.concurrent.TimeUnit.DAYS;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.downloading;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.idle;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.unknown;
@@ -33,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Album;
@@ -52,8 +55,14 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchResult;
+import freenet.client.async.ClientContext;
+import freenet.client.async.USKCallback;
 import freenet.keys.FreenetURI;
+import freenet.keys.USK;
+import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
+
+import com.db4o.ObjectContainer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
@@ -75,7 +84,6 @@ public class SoneDownloaderTest {
 	private final Core core = mock(Core.class);
 	private final FreenetInterface freenetInterface = mock(FreenetInterface.class);
 	private final SoneDownloaderImpl soneDownloader = new SoneDownloaderImpl(core, freenetInterface);
-	private final SoneUpdater soneUpdater = mock(SoneUpdater.class);
 	private final FreenetURI requestUri = mock(FreenetURI.class);
 	private final Sone sone = mock(Sone.class);
 	private final PostBuilder postBuilder = mock(PostBuilder.class);
@@ -97,6 +105,11 @@ public class SoneDownloaderTest {
 		when(sone.getId()).thenReturn("identity");
 		when(sone.getIdentity()).thenReturn(identity);
 		when(sone.getRequestUri()).thenReturn(requestUri);
+		when(sone.getTime()).thenReturn(currentTimeMillis() - DAYS.toMillis(1));
+	}
+
+	private void setupSoneAsUnknown() {
+		when(sone.getTime()).thenReturn(0L);
 	}
 
 	@Before
@@ -342,7 +355,8 @@ public class SoneDownloaderTest {
 	@Test
 	public void addingASoneWillRegisterItsKey() {
 		soneDownloader.addSone(sone);
-		verify(freenetInterface).registerUsk(eq(sone), any(SoneUpdater.class));
+		verify(freenetInterface).registerActiveUsk(eq(sone.getRequestUri()), any(
+				USKCallback.class));
 		verify(freenetInterface, never()).unregisterUsk(sone);
 	}
 
@@ -350,7 +364,8 @@ public class SoneDownloaderTest {
 	public void addingASoneTwiceWillAlsoDeregisterItsKey() {
 		soneDownloader.addSone(sone);
 		soneDownloader.addSone(sone);
-		verify(freenetInterface, times(2)).registerUsk(eq(sone), any(SoneUpdater.class));
+		verify(freenetInterface, times(2)).registerActiveUsk(eq(
+				sone.getRequestUri()), any(USKCallback.class));
 		verify(freenetInterface).unregisterUsk(sone);
 	}
 
@@ -731,6 +746,7 @@ public class SoneDownloaderTest {
 
 	@Test
 	public void notBeingAbleToFetchAnUnknownSoneDoesNotUpdateCore() {
+		setupSoneAsUnknown();
 		soneDownloader.fetchSoneAction(sone).run();
 		verify(freenetInterface).fetchUri(requestUri);
 		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(unknown);
@@ -746,7 +762,6 @@ public class SoneDownloaderTest {
 
 	@Test
 	public void notBeingAbleToFetchAKnownSoneDoesNotUpdateCore() {
-		when(sone.getTime()).thenReturn(1000L);
 		soneDownloader.fetchSoneAction(sone).run();
 		verify(freenetInterface).fetchUri(requestUri);
 		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(idle);
@@ -755,6 +770,7 @@ public class SoneDownloaderTest {
 
 	@Test(expected = NullPointerException.class)
 	public void exceptionWhileFetchingAnUnknownSoneDoesNotUpdateCore() {
+		setupSoneAsUnknown();
 		when(freenetInterface.fetchUri(requestUri)).thenThrow(NullPointerException.class);
 		try {
 			soneDownloader.fetchSoneAction(sone).run();
@@ -767,7 +783,6 @@ public class SoneDownloaderTest {
 
 	@Test(expected = NullPointerException.class)
 	public void exceptionWhileFetchingAKnownSoneDoesNotUpdateCore() {
-		when(sone.getTime()).thenReturn(1000L);
 		when(freenetInterface.fetchUri(requestUri)).thenThrow(NullPointerException.class);
 		try {
 			soneDownloader.fetchSoneAction(sone).run();
@@ -833,7 +848,7 @@ public class SoneDownloaderTest {
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
 		soneDownloader.fetchSone(sone, sone.getRequestUri(), true);
 		verify(core, never()).updateSone(any(Sone.class));
-		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(unknown);
+		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(idle);
 	}
 
 	private Fetched createFetchResult(FreenetURI uri, InputStream inputStream) throws IOException {

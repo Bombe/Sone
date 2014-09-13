@@ -17,11 +17,15 @@
 
 package net.pterodactylus.sone.core;
 
+import static freenet.keys.USK.create;
+import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
+import static net.pterodactylus.sone.freenet.Key.routingKey;
+
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -182,33 +186,30 @@ public class FreenetInterface {
 		}
 	}
 
-	public void registerUsk(final Sone sone, final SoneUpdater soneUpdater) {
+	public void registerActiveUsk(FreenetURI requestUri,
+			USKCallback uskCallback) {
 		try {
-			logger.log(Level.FINE, String.format("Registering Sone “%s” for USK updates at %s…", sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" })));
-			USKCallback uskCallback = new USKCallback() {
-
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
-					logger.log(Level.FINE, String.format("Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", sone, key, newKnownGood, newSlotToo));
-					soneUpdater.updateSone(edition);
-				}
-
-				@Override
-				public short getPollingPriorityProgress() {
-					return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
-				}
-
-				@Override
-				public short getPollingPriorityNormal() {
-					return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
-				}
-			};
-			soneUskCallbacks.put(sone.getId(), uskCallback);
-			boolean runBackgroundFetch = (System.currentTimeMillis() - sone.getTime()) < TimeUnit.DAYS.toMillis(7);
-			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, runBackgroundFetch, (RequestClient) client);
+			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			node.clientCore.uskManager.subscribe(create(requestUri),
+					uskCallback, true, (RequestClient) client);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not subscribe USK “%s”!", sone.getRequestUri()), mue1);
+			logger.log(WARNING, format("Could not subscribe USK “%s”!",
+					requestUri), mue1);
+		}
+	}
+
+	public void registerPassiveUsk(FreenetURI requestUri,
+			USKCallback uskCallback) {
+		try {
+			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			node.clientCore
+					.uskManager
+					.subscribe(create(requestUri), uskCallback, false,
+							(RequestClient) client);
+		} catch (MalformedURLException mue1) {
+			logger.log(WARNING,
+					format("Could not subscribe USK “%s”!", requestUri),
+					mue1);
 		}
 	}
 

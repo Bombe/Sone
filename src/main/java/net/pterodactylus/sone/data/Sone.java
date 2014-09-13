@@ -27,13 +27,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import net.pterodactylus.sone.core.Options;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 
 import freenet.keys.FreenetURI;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.primitives.Ints;
 
@@ -166,6 +170,17 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 			return (sone != null) && !sone.getRootAlbum().getAlbums().isEmpty();
 		}
 	};
+
+	public static final Function<Sone, String> toSoneXmlUri =
+			new Function<Sone, String>() {
+				@Nonnull
+				@Override
+				public String apply(@Nullable Sone input) {
+					return input.getRequestUri()
+							.setMetaString(new String[] { "sone.xml" })
+							.toString();
+				}
+			};
 
 	/**
 	 * Returns the identity of this Sone.
