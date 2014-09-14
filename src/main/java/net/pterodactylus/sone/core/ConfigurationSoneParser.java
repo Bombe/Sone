@@ -37,6 +37,7 @@ public class ConfigurationSoneParser {
 	private final String sonePrefix;
 	private final Map<String, Album> albums = new HashMap<String, Album>();
 	private final List<Album> topLevelAlbums = new ArrayList<Album>();
+	private final Map<String, Image> images = new HashMap<String, Image>();
 
 	public ConfigurationSoneParser(Configuration configuration, Sone sone) {
 		this.configuration = configuration;
@@ -270,7 +271,12 @@ public class ConfigurationSoneParser {
 					.setHeight(height)
 					.update();
 			album.addImage(image);
+			images.put(image.getId(), image);
 		}
+	}
+
+	public Map<String, Image> getImages() {
+		return images;
 	}
 
 	private boolean albumAttributesAreInvalid(String albumId, String key,

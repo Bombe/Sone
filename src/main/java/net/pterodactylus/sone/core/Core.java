@@ -1162,7 +1162,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		/* load avatar. */
 		String avatarId = configuration.getStringValue(sonePrefix + "/Profile/Avatar").getValue(null);
 		if (avatarId != null) {
-			profile.setAvatar(getImage(avatarId, false));
+			final Map<String, Image> images =
+					configurationSoneParser.getImages();
+			profile.setAvatar(images.get(avatarId));
 		}
 
 		/* load options. */
