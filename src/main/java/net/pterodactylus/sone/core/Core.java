@@ -25,6 +25,7 @@ import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
+import static net.pterodactylus.sone.data.Sone.toAllAlbums;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -1193,6 +1194,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				sone.getRootAlbum().addAlbum(album);
 			}
 			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
+			for (Album album : toAllAlbums.apply(sone)) {
+				database.storeAlbum(album);
+				for (Image image : album.getImages()) {
+					database.storeImage(image);
+				}
+			}
 		}
 		synchronized (knownSones) {
 			for (String friend : friends) {

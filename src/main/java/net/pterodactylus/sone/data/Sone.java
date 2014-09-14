@@ -23,6 +23,7 @@ import static net.pterodactylus.sone.data.Album.FLATTENER;
 import static net.pterodactylus.sone.data.Album.IMAGES;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -181,6 +182,14 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 							.toString();
 				}
 			};
+
+	public static final Function<Sone, List<Album>> toAllAlbums = new Function<Sone, List<Album>>() {
+		@Override
+		public List<Album> apply(@Nullable Sone sone) {
+			return (sone == null) ? Collections.<Album>emptyList() : FLATTENER.apply(
+					sone.getRootAlbum());
+		}
+	};
 
 	/**
 	 * Returns the identity of this Sone.
