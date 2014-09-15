@@ -1009,7 +1009,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (PostReply newPostReply : newPostReplies) {
 				eventBus.post(new NewPostReplyFoundEvent(newPostReply));
 			}
-			for (Album album : sone.getRootAlbum().getAlbums()) {
+			for (Album album : toAllAlbums.apply(sone)) {
 				database.storeAlbum(album);
 				for (Image image : album.getImages()) {
 					database.storeImage(image);
