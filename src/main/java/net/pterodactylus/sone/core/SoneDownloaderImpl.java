@@ -24,8 +24,10 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -477,6 +479,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 
 		/* parse albums. */
 		SimpleXML albumsXml = soneXml.getNode("albums");
+		Map<String, Image> allImages = new HashMap<String, Image>();
 		List<Album> topLevelAlbums = new ArrayList<Album>();
 		if (albumsXml != null) {
 			for (SimpleXML albumXml : albumsXml.getNodes("album")) {
@@ -535,6 +538,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 						image = image.modify().setTitle(imageTitle).setDescription(imageDescription).update();
 						image = image.modify().setWidth(imageWidth).setHeight(imageHeight).update();
 						album.addImage(image);
+						allImages.put(imageId, image);
 					}
 				}
 				album.modify().setAlbumImage(albumImageId).update();
@@ -543,7 +547,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 
 		/* process avatar. */
 		if (avatarId != null) {
-			profile.setAvatar(core.getImage(avatarId, false));
+			profile.setAvatar(allImages.get(avatarId));
 		}
 
 		/* okay, apparently everything was parsed correctly. Now import. */
