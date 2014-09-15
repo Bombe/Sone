@@ -641,6 +641,7 @@ public class WebInterface {
 		Template deleteAlbumTemplate = parseTemplate("/templates/deleteAlbum.html");
 		Template deleteImageTemplate = parseTemplate("/templates/deleteImage.html");
 		Template noPermissionTemplate = parseTemplate("/templates/noPermission.html");
+		Template emptyImageTitleTemplate = parseTemplate("/templates/emptyImageTitle.html");
 		Template optionsTemplate = parseTemplate("/templates/options.html");
 		Template rescueTemplate = parseTemplate("/templates/rescue.html");
 		Template aboutTemplate = parseTemplate("/templates/about.html");
@@ -692,6 +693,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.VERSION), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyImageTitle.html", emptyImageTitleTemplate, "Page.EmptyImageTitle.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("css/", "/static/css/", "text/css")));

@@ -71,7 +71,7 @@ public class EditImagePage extends SoneTemplatePage {
 				String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
 				String description = request.getHttpRequest().getPartAsStringFailsafe("description", 1024).trim();
 				if (title.length() == 0) {
-					templateContext.set("titleMissing", true);
+					throw new RedirectException("emptyImageTitle.html");
 				}
 				image.modify().setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
 			}

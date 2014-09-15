@@ -31,6 +31,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.ImageImpl.ImageTitleMustNotBeEmpty;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.text.TextFilter;
@@ -124,6 +125,8 @@ public class UploadImagePage extends SoneTemplatePage {
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
 				return;
+			} catch (ImageTitleMustNotBeEmpty itmnbe) {
+				throw new RedirectException("emptyImageTitle.html");
 			} finally {
 				Closer.close(imageDataInputStream);
 				Closer.flush(uploadedImage);
