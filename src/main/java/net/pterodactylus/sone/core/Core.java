@@ -78,6 +78,7 @@ import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.DatabaseException;
+import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -608,6 +609,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public Album getAlbum(String albumId) {
 		return database.getAlbum(albumId).orNull();
+	}
+
+	public ImageBuilder imageBuilder() {
+		return database.newImageBuilder();
 	}
 
 	/**
