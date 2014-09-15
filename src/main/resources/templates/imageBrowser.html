@@ -116,13 +116,20 @@
 						title = $(":input[name='title']:enabled", this.form).val();
 						description = $(":input[name='description']:enabled", this.form).val();
 						ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "title": title, "description": description }, function(data) {
-							if (data && data.success) {
-								getImage(data.imageId).find(".image-title").text(data.title);
-								getImage(data.imageId).find(".image-description").html(data.parsedDescription);
-								getImage(data.imageId).find(":input[name='title']").attr("defaultValue", title);
-								getImage(data.imageId).find(":input[name='description']").attr("defaultValue", data.description);
+                            var imageElement = getImage(data.imageId);
+                            var imageTitleInput = imageElement.find(":input[name='title']");
+                            var imageDescriptionInput = imageElement.find(":input[name='description']");
+                            if (data && data.success) {
+								imageElement.find(".image-title").text(data.title);
+								imageElement.find(".image-description").html(data.parsedDescription);
+								imageTitleInput.attr("defaultValue", data.title);
+								imageDescriptionInput.attr("defaultValue", data.description);
 								cancelImageEditing();
-							}
+							} else if (data && !data.success) {
+								imageTitleInput.attr("value", imageTitleInput.attr("defaultValue"));
+                                imageDescriptionInput.attr("value", imageDescriptionInput.attr("defaultValue"));
+                                cancelImageEditing();
+                            }
 						});
 						return false;
 					});
