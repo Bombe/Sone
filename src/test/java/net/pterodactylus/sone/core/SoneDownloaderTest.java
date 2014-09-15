@@ -15,7 +15,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -35,34 +34,28 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Album.Modifier;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.ImageImpl;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.database.AlbumBuilder;
+import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchResult;
-import freenet.client.async.ClientContext;
 import freenet.client.async.USKCallback;
 import freenet.keys.FreenetURI;
-import freenet.keys.USK;
-import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
-
-import com.db4o.ObjectContainer;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
@@ -97,6 +90,9 @@ public class SoneDownloaderTest {
 	private final ListMultimap<Album, Image> albumImages = ArrayListMultimap.create();
 	private Album album = mock(Album.class);
 	private final Map<String, Album> albums = new HashMap<String, Album>();
+	private final ImageBuilder imageBuilder = mock(ImageBuilder.class);
+	private Image image = mock(Image.class);
+	private final Map<String, Image> images = new HashMap<String, Image>();
 
 	@Before
 	public void setupSone() {
@@ -232,10 +228,7 @@ public class SoneDownloaderTest {
 
 	@Before
 	public void setupAlbum() {
-		setupAlbum(album);
-	}
-
-	private void setupAlbum(final Album album) {
+		final Album album = SoneDownloaderTest.this.album;
 		when(album.getAlbumImage()).thenReturn(mock(Image.class));
 		doAnswer(new Answer<Void>() {
 			@Override
@@ -328,7 +321,7 @@ public class SoneDownloaderTest {
 				Album album = SoneDownloaderTest.this.album;
 				albums.put(album.getId(), album);
 				SoneDownloaderTest.this.album = mock(Album.class);
-				setupAlbum(SoneDownloaderTest.this.album);
+				setupAlbum();
 				return album;
 			}
 		});
@@ -346,10 +339,114 @@ public class SoneDownloaderTest {
 	}
 
 	@Before
+	public void setupImage() {
+		final Image image = SoneDownloaderTest.this.image;
+		Image.Modifier modifier = new Image.Modifier() {
+			private Sone sone = image.getSone();
+			private long creationTime = image.getCreationTime();
+			private String key = image.getKey();
+			private String title = image.getTitle();
+			private String description = image.getDescription();
+			private int width = image.getWidth();
+			private int height = image.getHeight();
+
+			@Override
+			public Image.Modifier setSone(Sone sone) {
+				this.sone = sone;
+				return this;
+			}
+
+			@Override
+			public Image.Modifier setCreationTime(long creationTime) {
+				this.creationTime = creationTime;
+				return this;
+			}
+
+			@Override
+			public Image.Modifier setKey(String key) {
+				this.key = key;
+				return this;
+			}
+
+			@Override
+			public Image.Modifier setTitle(String title) {
+				this.title = title;
+				return this;
+			}
+
+			@Override
+			public Image.Modifier setDescription(String description) {
+				this.description = description;
+				return this;
+			}
+
+			@Override
+			public Image.Modifier setWidth(int width) {
+				this.width = width;
+				return this;
+			}
+
+			@Override
+			public Image.Modifier setHeight(int height) {
+				this.height = height;
+				return this;
+			}
+
+			@Override
+			public Image update() throws IllegalStateException {
+				when(image.getSone()).thenReturn(sone);
+				when(image.getCreationTime()).thenReturn(creationTime);
+				when(image.getKey()).thenReturn(key);
+				when(image.getTitle()).thenReturn(title);
+				when(image.getDescription()).thenReturn(description);
+				when(image.getWidth()).thenReturn(width);
+				when(image.getHeight()).thenReturn(height);
+				return image;
+			}
+		};
+		when(image.getSone()).thenReturn(sone);
+		when(image.modify()).thenReturn(modifier);
+	}
+
+	@Before
+	public void setupImageBuilder() {
+		when(imageBuilder.randomId()).thenAnswer(new Answer<ImageBuilder>() {
+			@Override
+			public ImageBuilder answer(InvocationOnMock invocation) {
+				when(image.getId()).thenReturn(randomUUID().toString());
+				return imageBuilder;
+			}
+		});
+		when(imageBuilder.withId(anyString())).thenAnswer(new Answer<ImageBuilder>() {
+			@Override
+			public ImageBuilder answer(InvocationOnMock invocation) {
+				when(image.getId()).thenReturn(
+						(String) invocation.getArguments()[0]);
+				return imageBuilder;
+			}
+		});
+		when(imageBuilder.build()).thenAnswer(new Answer<Image>() {
+			@Override
+			public Image answer(InvocationOnMock invocation) {
+				Image image = SoneDownloaderTest.this.image;
+				images.put(image.getId(), image);
+				SoneDownloaderTest.this.image = mock(Image.class);
+				setupImage();
+				return image;
+			}
+		});
+		when(core.imageBuilder()).thenReturn(imageBuilder);
+	}
+
+	@Before
 	public void setupImages() {
-		Image image = new ImageImpl("image-id");
-		when(core.getImage("image-id")).thenReturn(image);
-		when(core.getImage(eq("image-id"), anyBoolean())).thenReturn(image);
+		when(core.getImage(anyString())).thenAnswer(new Answer<Image>() {
+			@Override
+			public Image answer(InvocationOnMock invocation)
+			throws Throwable {
+				return images.get(invocation.getArguments()[0]);
+			}
+		});
 	}
 
 	@Test
