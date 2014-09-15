@@ -83,12 +83,10 @@ public class UploadImagePage extends SoneTemplatePage {
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
 			Album parent = webInterface.getCore().getAlbum(parentId);
 			if (parent == null) {
-				/* TODO - signal error */
-				return;
+				throw new RedirectException("noPermission.html");
 			}
 			if (!currentSone.equals(parent.getSone())) {
-				/* TODO - signal error. */
-				return;
+				throw new RedirectException("noPermission.html");
 			}
 			String name = request.getHttpRequest().getPartAsStringFailsafe("title", 200);
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 4000);
