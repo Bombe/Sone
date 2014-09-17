@@ -20,13 +20,17 @@ package net.pterodactylus.sone.database.memory;
 import static com.google.common.base.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -36,7 +40,30 @@ import org.junit.Test;
  */
 public class MemoryDatabaseTest {
 
+	private static final String SONE_ID = "sone";
+	private static final String RECIPIENT_ID = "recipient";
 	private final MemoryDatabase memoryDatabase = new MemoryDatabase(null, null);
+	private final Sone sone = mock(Sone.class);
+
+	@Before
+	public void setupSone() {
+		when(sone.getId()).thenReturn(SONE_ID);
+	}
+
+	@Test
+	public void postRecipientsAreDetectedCorrectly() {
+		Post postWithRecipient = mock(Post.class);
+		when(postWithRecipient.getSone()).thenReturn(sone);
+		when(postWithRecipient.getRecipientId()).thenReturn(of(RECIPIENT_ID));
+		memoryDatabase.storePost(postWithRecipient);
+		Post postWithoutRecipient = mock(Post.class);
+		when(postWithoutRecipient.getSone()).thenReturn(sone);
+		when(postWithoutRecipient.getRecipientId()).thenReturn(
+				Optional.<String>absent());
+		memoryDatabase.storePost(postWithoutRecipient);
+		assertThat(memoryDatabase.getDirectedPosts(RECIPIENT_ID),
+				contains(postWithRecipient));
+	}
 
 	@Test
 	public void testBasicAlbumFunctionality() {

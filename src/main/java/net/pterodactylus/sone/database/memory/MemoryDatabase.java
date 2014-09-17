@@ -19,6 +19,7 @@ package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.collect.FluentIterable.from;
 import static net.pterodactylus.sone.data.Reply.TIME_COMPARATOR;
 
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.SortedSetMultimap;
@@ -82,9 +84,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** All posts by their Sones. */
 	private final Multimap<String, Post> sonePosts = HashMultimap.create();
-
-	/** All posts by their recipient. */
-	private final Multimap<String, Post> recipientPosts = HashMultimap.create();
 
 	/** Whether posts are known. */
 	private final Set<String> knownPosts = new HashSet<String>();
@@ -195,11 +194,15 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** {@inheritDocs} */
 	@Override
-	public Collection<Post> getDirectedPosts(String recipientId) {
+	public Collection<Post> getDirectedPosts(final String recipientId) {
 		lock.readLock().lock();
 		try {
-			Collection<Post> posts = recipientPosts.get(recipientId);
-			return (posts == null) ? Collections.<Post>emptySet() : new HashSet<Post>(posts);
+			return from(sonePosts.values()).filter(new Predicate<Post>() {
+				@Override
+				public boolean apply(Post post) {
+					return post.getRecipientId().asSet().contains(recipientId);
+				}
+			}).toSet();
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -227,9 +230,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		try {
 			allPosts.put(post.getId(), post);
 			getPostsFrom(post.getSone().getId()).add(post);
-			if (post.getRecipientId().isPresent()) {
-				getPostsTo(post.getRecipientId().get()).add(post);
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -243,9 +243,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		try {
 			allPosts.remove(post.getId());
 			getPostsFrom(post.getSone().getId()).remove(post);
-			if (post.getRecipientId().isPresent()) {
-				getPostsTo(post.getRecipientId().get()).remove(post);
-			}
 			post.getSone().removePost(post);
 		} finally {
 			lock.writeLock().unlock();
@@ -269,18 +266,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 			Collection<Post> oldPosts = getPostsFrom(sone.getId());
 			for (Post post : oldPosts) {
 				allPosts.remove(post.getId());
-				if (post.getRecipientId().isPresent()) {
-					getPostsTo(post.getRecipientId().get()).remove(post);
-				}
 			}
 
 			/* add new posts. */
 			getPostsFrom(sone.getId()).addAll(posts);
 			for (Post post : posts) {
 				allPosts.put(post.getId(), post);
-				if (post.getRecipientId().isPresent()) {
-					getPostsTo(post.getRecipientId().get()).add(post);
-				}
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -297,9 +288,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 			getPostsFrom(sone.getId()).clear();
 			for (Post post : sone.getPosts()) {
 				allPosts.remove(post.getId());
-				if (post.getRecipientId().isPresent()) {
-					getPostsTo(post.getRecipientId().get()).remove(post);
-				}
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -610,23 +598,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.readLock().lock();
 		try {
 			return sonePosts.get(soneId);
-		} finally {
-			lock.readLock().unlock();
-		}
-	}
-
-	/**
-	 * Gets all posts that are directed the given Sone, creating a new collection
-	 * if there is none yet.
-	 *
-	 * @param recipientId
-	 * 		The ID of the Sone to get the posts for
-	 * @return All posts
-	 */
-	private Collection<Post> getPostsTo(String recipientId) {
-		lock.readLock().lock();
-		try {
-			return recipientPosts.get(recipientId);
 		} finally {
 			lock.readLock().unlock();
 		}
