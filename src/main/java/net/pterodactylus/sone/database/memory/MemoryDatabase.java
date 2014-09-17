@@ -100,15 +100,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}, TIME_COMPARATOR);
 
-	/** Replies by post. */
-	private final SortedSetMultimap<String, PostReply> postReplies = TreeMultimap.create(new Comparator<String>() {
-
-		@Override
-		public int compare(String leftString, String rightString) {
-			return leftString.compareTo(rightString);
-		}
-	}, TIME_COMPARATOR);
-
 	/** Whether post replies are known. */
 	private final Set<String> knownPostReplies = new HashSet<String>();
 
@@ -311,13 +302,16 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** {@inheritDocs} */
 	@Override
-	public List<PostReply> getReplies(String postId) {
+	public List<PostReply> getReplies(final String postId) {
 		lock.readLock().lock();
 		try {
-			if (!postReplies.containsKey(postId)) {
-				return Collections.emptyList();
-			}
-			return new ArrayList<PostReply>(postReplies.get(postId));
+			return from(allPostReplies.values())
+					.filter(new Predicate<PostReply>() {
+						@Override
+						public boolean apply(PostReply postReply) {
+							return postReply.getPostId().equals(postId);
+						}
+					}).toSortedList(TIME_COMPARATOR);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -343,7 +337,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allPostReplies.put(postReply.getId(), postReply);
-			postReplies.put(postReply.getPostId(), postReply);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -369,7 +362,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 			for (PostReply postReply : postReplies) {
 				allPostReplies.put(postReply.getId(), postReply);
 				sonePostReplies.put(postReply.getSone().getId(), postReply);
-				this.postReplies.put(postReply.getPostId(), postReply);
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -382,9 +374,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allPostReplies.remove(postReply.getId());
-			if (postReplies.containsKey(postReply.getPostId())) {
-				postReplies.get(postReply.getPostId()).remove(postReply);
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}

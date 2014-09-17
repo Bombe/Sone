@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumImpl;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
@@ -67,6 +68,34 @@ public class MemoryDatabaseTest {
 		when(postWithRecipient.getSone()).thenReturn(sone);
 		when(postWithRecipient.getRecipientId()).thenReturn(recipient);
 		return postWithRecipient;
+	}
+
+	@Test
+	public void postRepliesAreManagedCorrectly() {
+		Post firstPost = createPost(Optional.<String>absent());
+		PostReply firstPostFirstReply = createPostReply(firstPost, 1000L);
+		Post secondPost = createPost(Optional.<String>absent());
+		PostReply secondPostFirstReply = createPostReply(secondPost, 1000L);
+		PostReply secondPostSecondReply = createPostReply(secondPost, 2000L);
+		memoryDatabase.storePost(firstPost);
+		memoryDatabase.storePost(secondPost);
+		memoryDatabase.storePostReply(firstPostFirstReply);
+		memoryDatabase.storePostReply(secondPostFirstReply);
+		memoryDatabase.storePostReply(secondPostSecondReply);
+		assertThat(memoryDatabase.getReplies(firstPost.getId()),
+				contains(firstPostFirstReply));
+		assertThat(memoryDatabase.getReplies(secondPost.getId()),
+				contains(secondPostFirstReply, secondPostSecondReply));
+	}
+
+	private PostReply createPostReply(Post post, long time) {
+		PostReply postReply = mock(PostReply.class);
+		when(postReply.getId()).thenReturn(randomUUID().toString());
+		when(postReply.getTime()).thenReturn(time);
+		when(postReply.getPost()).thenReturn(of(post));
+		final String postId = post.getId();
+		when(postReply.getPostId()).thenReturn(postId);
+		return postReply;
 	}
 
 	@Test
