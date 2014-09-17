@@ -223,6 +223,42 @@ public class FreenetInterfaceTest {
 	}
 
 	@Test
+	public void registeringAnActiveUskWillSubscribeToItCorrectly() {
+		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI().uskForSSK();
+		final USKCallback uskCallback = mock(USKCallback.class);
+		freenetInterface.registerActiveUsk(freenetUri, uskCallback);
+		verify(uskManager).subscribe(any(USK.class), eq(uskCallback), eq(true), any(RequestClient.class));
+	}
+
+	@Test
+	public void registeringAnInactiveUskWillSubscribeToItCorrectly() {
+		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI().uskForSSK();
+		final USKCallback uskCallback = mock(USKCallback.class);
+		freenetInterface.registerPassiveUsk(freenetUri, uskCallback);
+		verify(uskManager).subscribe(any(USK.class), eq(uskCallback), eq(false), any(RequestClient.class));
+	}
+
+	@Test
+	public void registeringAnActiveNonUskWillNotSubscribeToAUsk()
+	throws MalformedURLException {
+		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
+	    freenetInterface.registerActiveUsk(freenetUri, null);
+		verify(uskManager, never()).subscribe(any(USK.class),
+				any(USKCallback.class), anyBoolean(),
+				eq((RequestClient) highLevelSimpleClient));
+	}
+
+	@Test
+	public void registeringAnInactiveNonUskWillNotSubscribeToAUsk()
+	throws MalformedURLException {
+		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
+	    freenetInterface.registerPassiveUsk(freenetUri, null);
+		verify(uskManager, never()).subscribe(any(USK.class),
+				any(USKCallback.class), anyBoolean(),
+				eq((RequestClient) highLevelSimpleClient));
+	}
+
+	@Test
 	public void unregisteringANotRegisteredUskDoesNothing() {
 		FreenetURI freenetURI = createRandom(randomSource, "test-0").getURI().uskForSSK();
 		freenetInterface.unregisterUsk(freenetURI);
