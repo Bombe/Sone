@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.of;
+import static java.util.UUID.randomUUID;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -52,17 +53,20 @@ public class MemoryDatabaseTest {
 
 	@Test
 	public void postRecipientsAreDetectedCorrectly() {
-		Post postWithRecipient = mock(Post.class);
-		when(postWithRecipient.getSone()).thenReturn(sone);
-		when(postWithRecipient.getRecipientId()).thenReturn(of(RECIPIENT_ID));
+		Post postWithRecipient = createPost(of(RECIPIENT_ID));
 		memoryDatabase.storePost(postWithRecipient);
-		Post postWithoutRecipient = mock(Post.class);
-		when(postWithoutRecipient.getSone()).thenReturn(sone);
-		when(postWithoutRecipient.getRecipientId()).thenReturn(
-				Optional.<String>absent());
+		Post postWithoutRecipient = createPost(Optional.<String>absent());
 		memoryDatabase.storePost(postWithoutRecipient);
 		assertThat(memoryDatabase.getDirectedPosts(RECIPIENT_ID),
 				contains(postWithRecipient));
+	}
+
+	private Post createPost(Optional<String> recipient) {
+		Post postWithRecipient = mock(Post.class);
+		when(postWithRecipient.getId()).thenReturn(randomUUID().toString());
+		when(postWithRecipient.getSone()).thenReturn(sone);
+		when(postWithRecipient.getRecipientId()).thenReturn(recipient);
+		return postWithRecipient;
 	}
 
 	@Test
