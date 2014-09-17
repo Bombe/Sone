@@ -239,13 +239,20 @@
 						title = $(":input[name='title']:enabled", this.form).val();
 						description = $(":input[name='description']:enabled", this.form).val();
 						ajaxGet("editAlbum.ajax", { "formPassword": getFormPassword(), "album": albumId, "title": title, "description": description }, function(data) {
-							if (data && data.success) {
-								getAlbum(data.albumId).find(".album-title").text(data.title);
-								getAlbum(data.albumId).find(".album-description").text(data.description);
-								getAlbum(data.albumId).find(":input[name='title']").attr("defaultValue", title);
-								getAlbum(data.albumId).find(":input[name='description']").attr("defaultValue", description);
-								cancelAlbumEditing();
-							}
+							if (data) {
+                                var albumTitleField = getAlbum(data.albumId).find(".album-title");
+                                var albumDescriptionField = getAlbum(data.albumId).find(".album-description");
+                                if (data.success) {
+                                    albumTitleField.text(data.title);
+                                    albumDescriptionField.text(data.description);
+                                    getAlbum(data.albumId).find(":input[name='title']").attr("defaultValue", title);
+                                    getAlbum(data.albumId).find(":input[name='description']").attr("defaultValue", description);
+                                } else {
+                                    albumTitleField.attr("value", albumTitleField.attr("defaultValue"));
+                                    albumDescriptionField.attr("value", albumDescriptionField.attr("defaultValue"));
+                                }
+                                cancelAlbumEditing();
+                            }
 						});
 						return false;
 					});

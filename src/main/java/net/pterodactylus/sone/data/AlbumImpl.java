@@ -303,6 +303,9 @@ public class AlbumImpl implements Album {
 
 			@Override
 			public Album update() throws IllegalStateException {
+				if (title.isPresent() && title.get().trim().isEmpty()) {
+					throw new AlbumTitleMustNotBeEmpty();
+				}
 				if (title.isPresent()) {
 					AlbumImpl.this.title = title.get();
 				}
@@ -316,6 +319,8 @@ public class AlbumImpl implements Album {
 			}
 		};
 	}
+
+	public static class AlbumTitleMustNotBeEmpty extends IllegalStateException { }
 
 	//
 	// FINGERPRINTABLE METHODS
