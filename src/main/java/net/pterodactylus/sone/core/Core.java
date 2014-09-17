@@ -1952,18 +1952,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		OwnIdentity ownIdentity = identityRemovedEvent.ownIdentity();
 		Identity identity = identityRemovedEvent.identity();
 		trustedIdentities.remove(ownIdentity, identity);
-		boolean foundIdentity = false;
 		for (Entry<OwnIdentity, Collection<Identity>> trustedIdentity : trustedIdentities.asMap().entrySet()) {
 			if (trustedIdentity.getKey().equals(ownIdentity)) {
 				continue;
 			}
 			if (trustedIdentity.getValue().contains(identity)) {
-				foundIdentity = true;
+				return;
 			}
-		}
-		if (foundIdentity) {
-			/* some local identity still trusts this identity, don’t remove. */
-			return;
 		}
 		Optional<Sone> sone = getSone(identity.getId());
 		if (!sone.isPresent()) {
