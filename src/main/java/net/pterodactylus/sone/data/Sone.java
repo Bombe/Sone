@@ -191,6 +191,15 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		}
 	};
 
+	public static final Function<Sone, List<Image>> toAllImages = new Function<Sone, List<Image>>() {
+		@Override
+		public List<Image> apply(@Nullable Sone sone) {
+			return (sone == null) ? Collections.<Image>emptyList() :
+					from(FLATTENER.apply(sone.getRootAlbum()))
+							.transformAndConcat(IMAGES).toList();
+		}
+	};
+
 	/**
 	 * Returns the identity of this Sone.
 	 *
