@@ -1,9 +1,6 @@
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Optional.of;
-import static java.lang.System.currentTimeMillis;
-import static java.util.UUID.randomUUID;
 import static net.pterodactylus.sone.Matchers.isAlbum;
 import static net.pterodactylus.sone.Matchers.isImage;
 import static net.pterodactylus.sone.Matchers.isPost;
@@ -16,28 +13,27 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
+import net.pterodactylus.sone.TestAlbumBuilder;
+import net.pterodactylus.sone.TestImageBuilder;
+import net.pterodactylus.sone.TestPostBuilder;
+import net.pterodactylus.sone.TestPostReplyBuilder;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Album.Modifier;
-import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
@@ -549,329 +545,6 @@ public class ConfigurationSoneParserTest {
 		@Override
 		public void setValue(T newValue) throws ConfigurationException {
 			value.set(newValue);
-		}
-
-	}
-
-	private static class TestPostBuilder implements PostBuilder {
-
-		private final Post post = mock(Post.class);
-		private String recipientId = null;
-
-		@Override
-		public PostBuilder copyPost(Post post) throws NullPointerException {
-			return this;
-		}
-
-		@Override
-		public PostBuilder from(String senderId) {
-			final Sone sone = mock(Sone.class);
-			when(sone.getId()).thenReturn(senderId);
-			when(post.getSone()).thenReturn(sone);
-			return this;
-		}
-
-		@Override
-		public PostBuilder randomId() {
-			when(post.getId()).thenReturn(randomUUID().toString());
-			return this;
-		}
-
-		@Override
-		public PostBuilder withId(String id) {
-			when(post.getId()).thenReturn(id);
-			return this;
-		}
-
-		@Override
-		public PostBuilder currentTime() {
-			when(post.getTime()).thenReturn(currentTimeMillis());
-			return this;
-		}
-
-		@Override
-		public PostBuilder withTime(long time) {
-			when(post.getTime()).thenReturn(time);
-			return this;
-		}
-
-		@Override
-		public PostBuilder withText(String text) {
-			when(post.getText()).thenReturn(text);
-			return this;
-		}
-
-		@Override
-		public PostBuilder to(String recipientId) {
-			this.recipientId = recipientId;
-			return this;
-		}
-
-		@Override
-		public Post build() throws IllegalStateException {
-			when(post.getRecipientId()).thenReturn(fromNullable(recipientId));
-			return post;
-		}
-
-	}
-
-	private static class TestPostReplyBuilder implements PostReplyBuilder {
-
-		private final PostReply postReply = mock(PostReply.class);
-
-		@Override
-		public PostReplyBuilder to(String postId) {
-			when(postReply.getPostId()).thenReturn(postId);
-			return this;
-		}
-
-		@Override
-		public PostReply build() throws IllegalStateException {
-			return postReply;
-		}
-
-		@Override
-		public PostReplyBuilder randomId() {
-			when(postReply.getId()).thenReturn(randomUUID().toString());
-			return this;
-		}
-
-		@Override
-		public PostReplyBuilder withId(String id) {
-			when(postReply.getId()).thenReturn(id);
-			return this;
-		}
-
-		@Override
-		public PostReplyBuilder from(String senderId) {
-			Sone sone = mock(Sone.class);
-			when(sone.getId()).thenReturn(senderId);
-			when(postReply.getSone()).thenReturn(sone);
-			return this;
-		}
-
-		@Override
-		public PostReplyBuilder currentTime() {
-			when(postReply.getTime()).thenReturn(currentTimeMillis());
-			return this;
-		}
-
-		@Override
-		public PostReplyBuilder withTime(long time) {
-			when(postReply.getTime()).thenReturn(time);
-			return this;
-		}
-
-		@Override
-		public PostReplyBuilder withText(String text) {
-			when(postReply.getText()).thenReturn(text);
-			return this;
-		}
-
-	}
-
-	private static class TestAlbumBuilder implements AlbumBuilder {
-
-		private final Album album = mock(Album.class);
-		private final List<Album> albums = new ArrayList<Album>();
-		private final List<Image> images = new ArrayList<Image>();
-		private Album parentAlbum;
-		private String title;
-		private String description;
-		private String imageId;
-
-		public TestAlbumBuilder() {
-			when(album.getTitle()).thenAnswer(new Answer<String>() {
-				@Override
-				public String answer(InvocationOnMock invocation) {
-					return title;
-				}
-			});
-			when(album.getDescription()).thenAnswer(new Answer<String>() {
-				@Override
-				public String answer(InvocationOnMock invocation) {
-					return description;
-				}
-			});
-			when(album.getAlbumImage()).thenAnswer(new Answer<Image>() {
-				@Override
-				public Image answer(InvocationOnMock invocation) {
-					if (imageId == null) {
-						return null;
-					}
-					Image image = mock(Image.class);
-					when(image.getId()).thenReturn(imageId);
-					return image;
-				}
-			});
-			when(album.getAlbums()).thenReturn(albums);
-			when(album.getImages()).thenReturn(images);
-			doAnswer(new Answer<Void>() {
-				@Override
-				public Void answer(InvocationOnMock invocation) {
-					albums.add((Album) invocation.getArguments()[0]);
-					((Album) invocation.getArguments()[0]).setParent(album);
-					return null;
-				}
-			}).when(album).addAlbum(any(Album.class));
-			doAnswer(new Answer<Void>() {
-				@Override
-				public Void answer(InvocationOnMock invocation) {
-					images.add((Image) invocation.getArguments()[0]);
-					return null;
-				}
-			}).when(album).addImage(any(Image.class));
-			doAnswer(new Answer<Void>() {
-				@Override
-				public Void answer(InvocationOnMock invocation) {
-					parentAlbum = (Album) invocation.getArguments()[0];
-					return null;
-				}
-			}).when(album).setParent(any(Album.class));
-			when(album.getParent()).thenAnswer(new Answer<Album>() {
-				@Override
-				public Album answer(InvocationOnMock invocation) {
-					return parentAlbum;
-				}
-			});
-			when(album.modify()).thenReturn(new Modifier() {
-				@Override
-				public Modifier setTitle(String title) {
-					TestAlbumBuilder.this.title = title;
-					return this;
-				}
-
-				@Override
-				public Modifier setDescription(String description) {
-					TestAlbumBuilder.this.description = description;
-					return this;
-				}
-
-				@Override
-				public Modifier setAlbumImage(String imageId) {
-					TestAlbumBuilder.this.imageId = imageId;
-					return this;
-				}
-
-				@Override
-				public Album update() throws IllegalStateException {
-					return album;
-				}
-			});
-		}
-
-		@Override
-		public AlbumBuilder randomId() {
-			when(album.getId()).thenReturn(randomUUID().toString());
-			return this;
-		}
-
-		@Override
-		public AlbumBuilder withId(String id) {
-			when(album.getId()).thenReturn(id);
-			return this;
-		}
-
-		@Override
-		public AlbumBuilder by(Sone sone) {
-			when(album.getSone()).thenReturn(sone);
-			return this;
-		}
-
-		@Override
-		public Album build() throws IllegalStateException {
-			return album;
-		}
-
-	}
-
-	private static class TestImageBuilder implements ImageBuilder {
-
-		private final Image image;
-
-		private TestImageBuilder() {
-			image = mock(Image.class);
-			Image.Modifier imageModifier = new Image.Modifier() {
-				private Sone sone = image.getSone();
-				private long creationTime = image.getCreationTime();
-				private String key = image.getKey();
-				private String title = image.getTitle();
-				private String description = image.getDescription();
-				private int width = image.getWidth();
-				private int height = image.getHeight();
-
-				@Override
-				public Image.Modifier setSone(Sone sone) {
-					this.sone = sone;
-					return this;
-				}
-
-				@Override
-				public Image.Modifier setCreationTime(long creationTime) {
-					this.creationTime = creationTime;
-					return this;
-				}
-
-				@Override
-				public Image.Modifier setKey(String key) {
-					this.key = key;
-					return this;
-				}
-
-				@Override
-				public Image.Modifier setTitle(String title) {
-					this.title = title;
-					return this;
-				}
-
-				@Override
-				public Image.Modifier setDescription(String description) {
-					this.description = description;
-					return this;
-				}
-
-				@Override
-				public Image.Modifier setWidth(int width) {
-					this.width = width;
-					return this;
-				}
-
-				@Override
-				public Image.Modifier setHeight(int height) {
-					this.height = height;
-					return this;
-				}
-
-				@Override
-				public Image update() throws IllegalStateException {
-					when(image.getSone()).thenReturn(sone);
-					when(image.getCreationTime()).thenReturn(creationTime);
-					when(image.getKey()).thenReturn(key);
-					when(image.getTitle()).thenReturn(title);
-					when(image.getDescription()).thenReturn(description);
-					when(image.getWidth()).thenReturn(width);
-					when(image.getHeight()).thenReturn(height);
-					return image;
-				}
-			};
-			when(image.modify()).thenReturn(imageModifier);
-		}
-
-		@Override
-		public ImageBuilder randomId() {
-			when(image.getId()).thenReturn(randomUUID().toString());
-			return this;
-		}
-
-		@Override
-		public ImageBuilder withId(String id) {
-			when(image.getId()).thenReturn(id);
-			return this;
-		}
-
-		@Override
-		public Image build() throws IllegalStateException {
-			return image;
 		}
 
 	}
