@@ -768,8 +768,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, "Given Identity is null!");
 			return null;
 		}
-		final Long latestEdition = fromNullable(tryParse(
-				identity.getProperty("Sone.LatestEdition"))).or(0L);
+		final Long latestEdition = tryParse(fromNullable(
+				identity.getProperty("Sone.LatestEdition")).or("0"));
 		synchronized (sones) {
 			final Sone sone = getRemoteSone(identity.getId(), true);
 			if (sone.isLocal()) {
