@@ -49,6 +49,8 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFou
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
 import net.pterodactylus.sone.core.Options.DefaultOption;
+import net.pterodactylus.sone.core.SoneChangeDetector.PostProcessor;
+import net.pterodactylus.sone.core.SoneChangeDetector.PostReplyProcessor;
 import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
@@ -946,7 +948,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            {@code true} if the stored Sone should be updated regardless
 	 *            of the age of the given Sone
 	 */
-	public void updateSone(Sone sone, boolean soneRescueMode) {
+	public void updateSone(final Sone sone, boolean soneRescueMode) {
 		Optional<Sone> storedSone = getSone(sone.getId());
 		if (storedSone.isPresent()) {
 			if (!soneRescueMode && !(sone.getTime() > storedSone.get().getTime())) {
@@ -954,65 +956,48 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				return;
 			}
 			/* find removed posts. */
-			Collection<Post> removedPosts = new ArrayList<Post>();
-			Collection<Post> newPosts = new ArrayList<Post>();
-			Collection<Post> existingPosts = database.getPosts(sone.getId());
-			for (Post oldPost : existingPosts) {
-				if (!sone.getPosts().contains(oldPost)) {
-					removedPosts.add(oldPost);
-				}
-			}
-			/* find new posts. */
-			for (Post newPost : sone.getPosts()) {
-				if (existingPosts.contains(newPost)) {
-					continue;
-				}
-				if (newPost.getTime() < getSoneFollowingTime(sone)) {
-					newPost.setKnown(true);
-				} else if (!newPost.isKnown()) {
-					newPosts.add(newPost);
-				}
-			}
-			/* store posts. */
-			database.storePosts(sone, sone.getPosts());
-			Collection<PostReply> newPostReplies = new ArrayList<PostReply>();
-			Collection<PostReply> removedPostReplies = new ArrayList<PostReply>();
-			if (!soneRescueMode) {
-				for (PostReply reply : storedSone.get().getReplies()) {
-					if (!sone.getReplies().contains(reply)) {
-						removedPostReplies.add(reply);
+			SoneChangeDetector soneChangeDetector = new SoneChangeDetector(storedSone.get());
+			soneChangeDetector.onNewPosts(new PostProcessor() {
+				@Override
+				public void processPost(Post post) {
+					if (post.getTime() < getSoneFollowingTime(sone)) {
+						post.setKnown(true);
+					} else if (!post.isKnown()) {
+						eventBus.post(new NewPostFoundEvent(post));
 					}
 				}
-			}
-			Set<PostReply> storedReplies = storedSone.get().getReplies();
-			for (PostReply reply : sone.getReplies()) {
-				if (storedReplies.contains(reply)) {
-					continue;
+			});
+			soneChangeDetector.onRemovedPosts(new PostProcessor() {
+				@Override
+				public void processPost(Post post) {
+					eventBus.post(new PostRemovedEvent(post));
 				}
-				if (reply.getTime() < getSoneFollowingTime(sone)) {
-					reply.setKnown(true);
-				} else if (!reply.isKnown()) {
-					newPostReplies.add(reply);
+			});
+			soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
+				@Override
+				public void processPostReply(PostReply postReply) {
+					if (postReply.getTime() < getSoneFollowingTime(sone)) {
+						postReply.setKnown(true);
+					} else if (!postReply.isKnown()) {
+						eventBus.post(new NewPostReplyFoundEvent(postReply));
+					}
 				}
-			}
+			});
+			soneChangeDetector.onRemovedPostReplies(new PostReplyProcessor() {
+				@Override
+				public void processPostReply(PostReply postReply) {
+					eventBus.post(new PostReplyRemovedEvent(postReply));
+				}
+			});
+			soneChangeDetector.detectChanges(sone);
+			/* store posts. */
+			database.storePosts(sone, sone.getPosts());
 			database.storePostReplies(sone, sone.getReplies());
 			for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
 				database.removeAlbum(album);
 				for (Image image : album.getImages()) {
 					database.removeImage(image);
 				}
-			}
-			for (Post removedPost : removedPosts) {
-				eventBus.post(new PostRemovedEvent(removedPost));
-			}
-			for (Post newPost : newPosts) {
-				eventBus.post(new NewPostFoundEvent(newPost));
-			}
-			for (PostReply removedPostReply : removedPostReplies) {
-				eventBus.post(new PostReplyRemovedEvent(removedPostReply));
-			}
-			for (PostReply newPostReply : newPostReplies) {
-				eventBus.post(new NewPostReplyFoundEvent(newPostReply));
 			}
 			for (Album album : toAllAlbums.apply(sone)) {
 				database.storeAlbum(album);
