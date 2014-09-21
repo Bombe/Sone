@@ -732,7 +732,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private Collection<PostReply> getRepliesFrom(String id) {
 		lock.readLock().lock();
 		try {
-			return Collections.unmodifiableCollection(sonePostReplies.get(id));
+			return unmodifiableCollection(sonePostReplies.get(id));
 		} finally {
 			lock.readLock().unlock();
 		}
