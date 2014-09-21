@@ -18,15 +18,29 @@
 package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.of;
+import static java.util.Arrays.asList;
 import static java.util.UUID.randomUUID;
+import static net.pterodactylus.sone.Matchers.isAlbum;
+import static net.pterodactylus.sone.Matchers.isImage;
+import static net.pterodactylus.sone.Matchers.isPost;
+import static net.pterodactylus.sone.Matchers.isPostReply;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import net.pterodactylus.sone.TestAlbumBuilder;
+import net.pterodactylus.sone.TestImageBuilder;
+import net.pterodactylus.sone.TestPostBuilder;
+import net.pterodactylus.sone.TestPostReplyBuilder;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
@@ -50,6 +64,137 @@ public class MemoryDatabaseTest {
 	@Before
 	public void setupSone() {
 		when(sone.getId()).thenReturn(SONE_ID);
+	}
+
+	@Test
+	public void storedSoneIsMadeAvailable() {
+		Post firstPost = new TestPostBuilder().withId("post1")
+				.from(SONE_ID)
+				.withTime(1000L)
+				.withText("post1")
+				.build();
+		Post secondPost = new TestPostBuilder().withId("post2")
+				.from(SONE_ID)
+				.withTime(2000L)
+				.withText("post2")
+				.to(RECIPIENT_ID)
+				.build();
+		List<Post> posts = asList(firstPost, secondPost);
+		when(sone.getPosts()).thenReturn(posts);
+		PostReply firstPostFirstReply =
+				new TestPostReplyBuilder().withId("reply1")
+						.from(SONE_ID)
+						.to(firstPost.getId())
+						.withTime(3000L)
+						.withText("reply1")
+						.build();
+		PostReply firstPostSecondReply =
+				new TestPostReplyBuilder().withId("reply3")
+						.from(RECIPIENT_ID)
+						.to(firstPost.getId())
+						.withTime(5000L)
+						.withText("reply3")
+						.build();
+		PostReply secondPostReply =
+				new TestPostReplyBuilder().withId("reply2")
+						.from(SONE_ID)
+						.to(secondPost.getId())
+						.withTime(4000L)
+						.withText("reply2")
+						.build();
+		Set<PostReply> postReplies = new HashSet<PostReply>(
+				asList(firstPostFirstReply, firstPostSecondReply,
+						secondPostReply));
+		when(sone.getReplies()).thenReturn(postReplies);
+		Album firstAlbum = new TestAlbumBuilder().withId("album1")
+				.by(sone)
+				.build()
+				.modify()
+				.setTitle("album1")
+				.setDescription("album-description1")
+				.update();
+		Album secondAlbum = new TestAlbumBuilder().withId("album2").by(
+				sone).build().modify().setTitle("album2").setDescription(
+				"album-description2").setAlbumImage("image1").update();
+		Album thirdAlbum = new TestAlbumBuilder().withId("album3").by(
+				sone).build().modify().setTitle("album3").setDescription(
+				"album-description3").update();
+		firstAlbum.addAlbum(thirdAlbum);
+		Album rootAlbum = mock(Album.class);
+		when(rootAlbum.getAlbums()).thenReturn(
+				asList(firstAlbum, secondAlbum));
+		when(sone.getRootAlbum()).thenReturn(rootAlbum);
+		Image firstImage = new TestImageBuilder().withId("image1")
+				.build()
+				.modify()
+				.setSone(sone)
+				.setCreationTime(1000L)
+				.setKey("KSK@image1")
+				.setTitle("image1")
+				.setDescription("image-description1")
+				.setWidth(16)
+				.setHeight(9)
+				.update();
+		Image secondImage = new TestImageBuilder().withId("image2")
+				.build()
+				.modify()
+				.setSone(sone)
+				.setCreationTime(2000L)
+				.setKey("KSK@image2")
+				.setTitle("image2")
+				.setDescription("image-description2")
+				.setWidth(32)
+				.setHeight(18)
+				.update();
+		Image thirdImage = new TestImageBuilder().withId("image3")
+				.build()
+				.modify()
+				.setSone(sone)
+				.setCreationTime(3000L)
+				.setKey("KSK@image3")
+				.setTitle("image3")
+				.setDescription("image-description3")
+				.setWidth(48)
+				.setHeight(27)
+				.update();
+		firstAlbum.addImage(firstImage);
+		firstAlbum.addImage(thirdImage);
+		secondAlbum.addImage(secondImage);
+		memoryDatabase.storeSone(sone);
+		assertThat(memoryDatabase.getPost("post1").get(),
+				isPost(firstPost.getId(), 1000L, "post1",
+						Optional.<String>absent()));
+		assertThat(memoryDatabase.getPost("post2").get(),
+				isPost(secondPost.getId(), 2000L, "post2", of(RECIPIENT_ID)));
+		assertThat(memoryDatabase.getPost("post3").isPresent(), is(false));
+		assertThat(memoryDatabase.getPostReply("reply1").get(),
+				isPostReply("reply1", "post1", 3000L, "reply1"));
+		assertThat(memoryDatabase.getPostReply("reply2").get(),
+				isPostReply("reply2", "post2", 4000L, "reply2"));
+		assertThat(memoryDatabase.getPostReply("reply3").get(),
+				isPostReply("reply3", "post1", 5000L, "reply3"));
+		assertThat(memoryDatabase.getPostReply("reply4").isPresent(),
+				is(false));
+		assertThat(memoryDatabase.getAlbum("album1").get(),
+				isAlbum("album1", null, "album1", "album-description1",
+						null));
+		assertThat(memoryDatabase.getAlbum("album2").get(),
+				isAlbum("album2", null, "album2", "album-description2",
+						"image1"));
+		assertThat(memoryDatabase.getAlbum("album3").get(),
+				isAlbum("album3", "album1", "album3", "album-description3",
+						null));
+		assertThat(memoryDatabase.getAlbum("album4").isPresent(), is(false));
+		assertThat(memoryDatabase.getImage("image1").get(),
+				isImage("image1", 1000L, "KSK@image1", "image1",
+						"image-description1", 16, 9));
+		assertThat(memoryDatabase.getImage("image2").get(),
+				isImage("image2", 2000L, "KSK@image2", "image2",
+						"image-description2", 32, 18));
+		assertThat(memoryDatabase.getImage("image3").get(),
+				isImage("image3", 3000L, "KSK@image3", "image3",
+						"image-description3", 48, 27));
+		assertThat(memoryDatabase.getImage("image4").isPresent(), is(false));
 	}
 
 	@Test

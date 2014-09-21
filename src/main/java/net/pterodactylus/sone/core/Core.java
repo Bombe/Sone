@@ -990,21 +990,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				}
 			});
 			soneChangeDetector.detectChanges(sone);
-			/* store posts. */
-			database.storePosts(sone, sone.getPosts());
-			database.storePostReplies(sone, sone.getReplies());
-			for (Album album : storedSone.get().getRootAlbum().getAlbums()) {
-				database.removeAlbum(album);
-				for (Image image : album.getImages()) {
-					database.removeImage(image);
-				}
-			}
-			for (Album album : toAllAlbums.apply(sone)) {
-				database.storeAlbum(album);
-				for (Image image : album.getImages()) {
-					database.storeImage(image);
-				}
-			}
+			database.storeSone(sone);
 			synchronized (sones) {
 				sone.setOptions(storedSone.get().getOptions());
 				sone.setKnown(storedSone.get().isKnown());

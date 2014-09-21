@@ -19,12 +19,15 @@ package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
+import static java.util.Collections.unmodifiableCollection;
 import static net.pterodactylus.sone.data.Reply.TIME_COMPARATOR;
+import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
+import static net.pterodactylus.sone.data.Sone.toAllAlbums;
+import static net.pterodactylus.sone.data.Sone.toAllImages;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,6 +81,8 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The configuration. */
 	private final Configuration configuration;
+
+	private final Map<String, Sone> allSones = new HashMap<String, Sone>();
 
 	/** All posts by their ID. */
 	private final Map<String, Post> allPosts = new HashMap<String, Post>();
@@ -159,6 +164,93 @@ public class MemoryDatabase extends AbstractService implements Database {
 			notifyStopped();
 		} catch (DatabaseException de1) {
 			notifyFailed(de1);
+		}
+	}
+
+	@Override
+	public void storeSone(Sone sone) {
+		lock.writeLock().lock();
+		try {
+			Collection<Post> removedPosts = sonePosts.removeAll(sone.getId());
+			for (Post removedPost : removedPosts) {
+				allPosts.remove(removedPost.getId());
+			}
+			Collection<PostReply> removedPostReplies =
+					sonePostReplies.removeAll(sone.getId());
+			for (PostReply removedPostReply : removedPostReplies) {
+				allPostReplies.remove(removedPostReply.getId());
+			}
+			Collection<Album> removedAlbums =
+					soneAlbums.removeAll(sone.getId());
+			for (Album removedAlbum : removedAlbums) {
+				allAlbums.remove(removedAlbum.getId());
+			}
+			Collection<Image> removedImages =
+					soneImages.removeAll(sone.getId());
+			for (Image removedImage : removedImages) {
+				allImages.remove(removedImage.getId());
+			}
+
+			allSones.put(sone.getId(), sone);
+			sonePosts.putAll(sone.getId(), sone.getPosts());
+			for (Post post : sone.getPosts()) {
+				allPosts.put(post.getId(), post);
+			}
+			sonePostReplies.putAll(sone.getId(), sone.getReplies());
+			for (PostReply postReply : sone.getReplies()) {
+				allPostReplies.put(postReply.getId(), postReply);
+			}
+			soneAlbums.putAll(sone.getId(), toAllAlbums.apply(sone));
+			for (Album album : toAllAlbums.apply(sone)) {
+				allAlbums.put(album.getId(), album);
+			}
+			soneImages.putAll(sone.getId(), toAllImages.apply(sone));
+			for (Image image : toAllImages.apply(sone)) {
+				allImages.put(image.getId(), image);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public Optional<Sone> getSone(String soneId) {
+		lock.readLock().lock();
+		try {
+			return fromNullable(allSones.get(soneId));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<Sone> getSones() {
+		lock.readLock().lock();
+		try {
+			return unmodifiableCollection(allSones.values());
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<Sone> getLocalSones() {
+		lock.readLock().lock();
+		try {
+			return from(allSones.values()).filter(LOCAL_SONE_FILTER).toSet();
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<Sone> getRemoteSones() {
+		lock.readLock().lock();
+		try {
+			return from(allSones.values())
+					.filter(not(LOCAL_SONE_FILTER)) .toSet();
+		} finally {
+			lock.readLock().unlock();
 		}
 	}
 
