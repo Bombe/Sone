@@ -346,9 +346,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Collection<Sone> getSones() {
-		synchronized (sones) {
-			return ImmutableSet.copyOf(sones.values());
-		}
+		return database.getSones();
 	}
 
 	/**
@@ -362,9 +360,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Optional<Sone> getSone(String id) {
-		synchronized (sones) {
-			return Optional.fromNullable(sones.get(id));
-		}
+		return database.getSone(id);
 	}
 
 	/**
@@ -372,9 +368,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Collection<Sone> getLocalSones() {
-		synchronized (sones) {
-			return FluentIterable.from(sones.values()).filter(LOCAL_SONE_FILTER).toSet();
-		}
+		return database.getLocalSones();
 	}
 
 	/**
@@ -407,9 +401,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Override
 	public Collection<Sone> getRemoteSones() {
-		synchronized (sones) {
-			return FluentIterable.from(sones.values()).filter(not(LOCAL_SONE_FILTER)).toSet();
-		}
+		return database.getRemoteSones();
 	}
 
 	/**
