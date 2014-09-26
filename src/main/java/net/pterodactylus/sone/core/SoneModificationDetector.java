@@ -23,34 +23,32 @@ import com.google.common.base.Ticker;
 class SoneModificationDetector {
 
 	private final Ticker ticker;
-	private final Core core;
-	private final Sone sone;
+	private final LockableFingerprintProvider lockableFingerprintProvider;
 	private final AtomicInteger insertionDelay;
 	private Optional<Long> lastModificationTime;
 	private String originalFingerprint;
 	private String lastFingerprint;
 
-	SoneModificationDetector(Core core, Sone sone, AtomicInteger insertionDelay) {
-		this(systemTicker(), core, sone, insertionDelay);
+	SoneModificationDetector(LockableFingerprintProvider lockableFingerprintProvider, AtomicInteger insertionDelay) {
+		this(systemTicker(), lockableFingerprintProvider, insertionDelay);
 	}
 
 	@VisibleForTesting
-	SoneModificationDetector(Ticker ticker, Core core, Sone sone, AtomicInteger insertionDelay) {
+	SoneModificationDetector(Ticker ticker, LockableFingerprintProvider lockableFingerprintProvider, AtomicInteger insertionDelay) {
 		this.ticker = ticker;
-		this.core = core;
-		this.sone = sone;
+		this.lockableFingerprintProvider = lockableFingerprintProvider;
 		this.insertionDelay = insertionDelay;
-		originalFingerprint = sone.getFingerprint();
+		originalFingerprint = lockableFingerprintProvider.getFingerprint();
 		lastFingerprint = originalFingerprint;
 	}
 
 	public boolean isEligibleForInsert() {
-		if (core.isLocked(sone)) {
+		if (lockableFingerprintProvider.isLocked()) {
 			lastModificationTime = absent();
 			lastFingerprint = "";
 			return false;
 		}
-		String fingerprint = sone.getFingerprint();
+		String fingerprint = lockableFingerprintProvider.getFingerprint();
 		if (originalFingerprint.equals(fingerprint)) {
 			lastModificationTime = absent();
 			lastFingerprint = fingerprint;
@@ -79,7 +77,20 @@ class SoneModificationDetector {
 	}
 
 	public boolean isModified() {
-		return !sone.getFingerprint().equals(originalFingerprint);
+		return !lockableFingerprintProvider.getFingerprint().equals(originalFingerprint);
+	}
+
+	/**
+	 * Provider for a fingerprint and the information if a {@link Sone} is locked. This
+	 * prevents us from having to lug a Sone object around.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	static interface LockableFingerprintProvider {
+
+		boolean isLocked();
+		String getFingerprint();
+
 	}
 
 }

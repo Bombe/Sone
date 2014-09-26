@@ -720,7 +720,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			sone.setKnown(true);
 			/* TODO - load posts ’n stuff */
 			sones.put(ownIdentity.getId(), sone);
-			final SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, sone);
+			SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
 			soneInserters.put(sone, soneInserter);
 			sone.setStatus(SoneStatus.idle);
 			loadSone(sone);
@@ -988,7 +988,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				sone.setKnown(storedSone.get().isKnown());
 				sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 				if (sone.isLocal()) {
-					soneInserters.get(storedSone.get()).setSone(sone);
 					touchConfiguration();
 				}
 				sones.put(sone.getId(), sone);

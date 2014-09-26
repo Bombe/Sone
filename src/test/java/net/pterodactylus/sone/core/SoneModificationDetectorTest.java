@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Ticker;
@@ -21,14 +22,14 @@ import org.junit.Test;
 public class SoneModificationDetectorTest {
 
 	private final Ticker ticker = mock(Ticker.class);
-	private final Sone sone = mock(Sone.class);
-	private final Core core = mock(Core.class);
 	private final AtomicInteger insertionDelay = new AtomicInteger(60);
 	private final SoneModificationDetector soneModificationDetector;
+	private final LockableFingerprintProvider lockableFingerprintProvider = mock(LockableFingerprintProvider.class);
 
 	public SoneModificationDetectorTest() {
-		when(sone.getFingerprint()).thenReturn("original");
-		soneModificationDetector = new SoneModificationDetector(ticker, core, sone, insertionDelay);
+		when(lockableFingerprintProvider.getFingerprint()).thenReturn("original");
+		when(lockableFingerprintProvider.isLocked()).thenReturn(false);
+		soneModificationDetector = new SoneModificationDetector(ticker, lockableFingerprintProvider, insertionDelay);
 	}
 
 	private void modifySone() {
@@ -36,7 +37,7 @@ public class SoneModificationDetectorTest {
 	}
 
 	private void modifySone(String uniqueValue) {
-		when(sone.getFingerprint()).thenReturn("modified" + uniqueValue);
+		when(lockableFingerprintProvider.getFingerprint()).thenReturn("modified" + uniqueValue);
 	}
 
 	private void passTime(int seconds) {
@@ -44,16 +45,16 @@ public class SoneModificationDetectorTest {
 	}
 
 	private void lockSone() {
-		when(core.isLocked(sone)).thenReturn(true);
+		when(lockableFingerprintProvider.isLocked()).thenReturn(true);
 	}
 
 	private void unlockSone() {
-		when(core.isLocked(sone)).thenReturn(false);
+		when(lockableFingerprintProvider.isLocked()).thenReturn(false);
 	}
 
 	@Test
 	public void normalConstructorCanBeCalled() {
-		new SoneModificationDetector(core, sone, insertionDelay);
+		new SoneModificationDetector(lockableFingerprintProvider, insertionDelay);
 	}
 
 	@Test

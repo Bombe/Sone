@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
@@ -34,6 +35,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
@@ -57,6 +59,7 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
@@ -100,9 +103,7 @@ public class SoneInserter extends AbstractService {
 
 	private final SoneModificationDetector soneModificationDetector;
 	private final long delay;
-
-	/** The Sone to insert. */
-	private volatile Sone sone;
+	private final String soneId;
 
 	/**
 	 * Creates a new Sone inserter.
@@ -113,20 +114,38 @@ public class SoneInserter extends AbstractService {
 	 *            The event bus
 	 * @param freenetInterface
 	 *            The freenet interface
-	 * @param sone
-	 *            The Sone to insert
+	 * @param soneId
+	 *            The ID of the Sone to insert
 	 */
-	public SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone) {
-		this(core, eventBus, freenetInterface, sone, new SoneModificationDetector(core, sone, insertionDelay), 1000);
+	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, final String soneId) {
+		this(core, eventBus, freenetInterface, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
+			@Override
+			public boolean isLocked() {
+				final Optional<Sone> sone = core.getSone(soneId);
+				if (!sone.isPresent()) {
+					return false;
+				}
+				return core.isLocked(sone.get());
+			}
+
+			@Override
+			public String getFingerprint() {
+				final Optional<Sone> sone = core.getSone(soneId);
+				if (!sone.isPresent()) {
+					return null;
+				}
+				return sone.get().getFingerprint();
+			}
+		}, insertionDelay), 1000);
 	}
 
 	@VisibleForTesting
-	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone, SoneModificationDetector soneModificationDetector, long delay) {
-		super("Sone Inserter for “" + sone.getName() + "”", false);
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
+		super("Sone Inserter for “" + soneId + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
-		this.sone = sone;
+		this.soneId = soneId;
 		this.soneModificationDetector = soneModificationDetector;
 		this.delay = delay;
 	}
@@ -134,19 +153,6 @@ public class SoneInserter extends AbstractService {
 	//
 	// ACCESSORS
 	//
-
-	/**
-	 * Sets the Sone to insert.
-	 *
-	 * @param sone
-	 * 		The Sone to insert
-	 * @return This Sone inserter
-	 */
-	public SoneInserter setSone(Sone sone) {
-		checkArgument(sone.equals(this.sone), "Sone to insert can not be set to a different Sone");
-		this.sone = sone;
-		return this;
-	}
 
 	@VisibleForTesting
 	static AtomicInteger getInsertionDelay() {
@@ -209,6 +215,12 @@ public class SoneInserter extends AbstractService {
 				sleep(delay);
 
 				if (soneModificationDetector.isEligibleForInsert()) {
+					Optional<Sone> soneOptional = core.getSone(soneId);
+					if (!soneOptional.isPresent()) {
+						logger.log(Level.WARNING, format("Sone %s has disappeared, exiting inserter.", soneId));
+						return;
+					}
+					Sone sone = soneOptional.get();
 					InsertInformation insertInformation = new InsertInformation(sone);
 					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
 
