@@ -440,7 +440,7 @@ public class WebInterface {
 		if (soneId == null) {
 			return null;
 		}
-		return getCore().getLocalSone(soneId, false);
+		return getCore().getLocalSone(soneId);
 	}
 
 	/**

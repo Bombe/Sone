@@ -55,7 +55,7 @@ public class CreateReplyAjaxPage extends JsonPage {
 		String postId = request.getHttpRequest().getParam("post");
 		String text = request.getHttpRequest().getParam("text").trim();
 		String senderId = request.getHttpRequest().getParam("sender");
-		Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+		Sone sender = webInterface.getCore().getLocalSone(senderId);
 		if (sender == null) {
 			sender = getCurrentSone(request.getToadletContext());
 		}

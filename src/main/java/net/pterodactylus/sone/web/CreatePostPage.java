@@ -63,7 +63,7 @@ public class CreatePostPage extends SoneTemplatePage {
 				String senderId = request.getHttpRequest().getPartAsStringFailsafe("sender", 43);
 				String recipientId = request.getHttpRequest().getPartAsStringFailsafe("recipient", 43);
 				Sone currentSone = getCurrentSone(request.getToadletContext());
-				Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+				Sone sender = webInterface.getCore().getLocalSone(senderId);
 				if (sender == null) {
 					sender = currentSone;
 				}

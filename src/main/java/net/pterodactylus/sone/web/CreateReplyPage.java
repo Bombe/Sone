@@ -66,7 +66,7 @@ public class CreateReplyPage extends SoneTemplatePage {
 			}
 			if (text.length() > 0) {
 				String senderId = request.getHttpRequest().getPartAsStringFailsafe("sender", 43);
-				Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+				Sone sender = webInterface.getCore().getLocalSone(senderId);
 				if (sender == null) {
 					sender = getCurrentSone(request.getToadletContext());
 				}

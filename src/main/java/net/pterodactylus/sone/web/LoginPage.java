@@ -70,7 +70,7 @@ public class LoginPage extends SoneTemplatePage {
 		templateContext.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
-			Sone selectedSone = webInterface.getCore().getLocalSone(soneId, false);
+			Sone selectedSone = webInterface.getCore().getLocalSone(soneId);
 			if (selectedSone != null) {
 				setCurrentSone(request.getToadletContext(), selectedSone);
 				String target = request.getHttpRequest().getParam("target");
