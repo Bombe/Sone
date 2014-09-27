@@ -73,7 +73,6 @@ public class SoneInserterTest {
 		InsertInformation insertInformation = soneInserter.new InsertInformation(sone);
 		HashMap<String, Object> manifestEntries = insertInformation.generateManifestEntries();
 		assertThat(manifestEntries.keySet(), containsInAnyOrder("index.html", "sone.xml"));
-		assertThat(insertInformation.getInsertUri(), is(insertUri));
 		assertThat(insertInformation.getFingerprint(), is(fingerprint));
 	}
 

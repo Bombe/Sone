@@ -346,10 +346,6 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			}
 		}
 
-		if (originalSone.getInsertUri() != null) {
-			sone.setInsertUri(originalSone.getInsertUri());
-		}
-
 		SimpleXML profileXml = soneXml.getNode("profile");
 		if (profileXml == null) {
 			/* TODO - mark Sone as bad. */

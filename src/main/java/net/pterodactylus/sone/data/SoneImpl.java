@@ -18,7 +18,9 @@
 package net.pterodactylus.sone.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -30,6 +32,7 @@ import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.freenet.wot.Identity;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.util.logging.Logging;
 
 import freenet.keys.FreenetURI;
@@ -140,24 +143,6 @@ public class SoneImpl implements Sone {
 	}
 
 	/**
-	 * Sets the identity of this Sone. The {@link Identity#getId() ID} of the
-	 * identity has to match this Sone’s {@link #getId()}.
-	 *
-	 * @param identity
-	 * 		The identity of this Sone
-	 * @return This Sone (for method chaining)
-	 * @throws IllegalArgumentException
-	 * 		if the ID of the identity does not match this Sone’s ID
-	 */
-	public SoneImpl setIdentity(Identity identity) throws IllegalArgumentException {
-		if (!identity.getId().equals(id)) {
-			throw new IllegalArgumentException("Identity’s ID does not match Sone’s ID!");
-		}
-		this.identity = identity;
-		return this;
-	}
-
-	/**
 	 * Returns the name of this Sone.
 	 *
 	 * @return The name of this Sone
@@ -209,26 +194,14 @@ public class SoneImpl implements Sone {
 	 * @return The insert URI of this Sone
 	 */
 	public FreenetURI getInsertUri() {
-		return (insertUri != null) ? insertUri.setSuggestedEdition(latestEdition) : null;
-	}
-
-	/**
-	 * Sets the insert URI of this Sone.
-	 *
-	 * @param insertUri
-	 * 		The insert URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone setInsertUri(FreenetURI insertUri) {
-		if (this.insertUri == null) {
-			this.insertUri = insertUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
-			return this;
+		if (!isLocal()) {
+			return null;
 		}
-		if (!this.insertUri.equalsKeypair(insertUri)) {
-			logger.log(Level.WARNING, String.format("Request URI %s tried to overwrite %s!", insertUri, this.insertUri));
-			return this;
+		try {
+			return new FreenetURI(((OwnIdentity) getIdentity()).getInsertUri()).setDocName("Sone").setMetaString(new String[0]);
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(format("Own identity %s's insert URI is incorrect.", getIdentity()), e);
 		}
-		return this;
 	}
 
 	/**

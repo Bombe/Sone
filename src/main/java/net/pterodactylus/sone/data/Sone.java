@@ -208,18 +208,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	Identity getIdentity();
 
 	/**
-	 * Sets the identity of this Sone. The {@link Identity#getId() ID} of the
-	 * identity has to match this Sone’s {@link #getId()}.
-	 *
-	 * @param identity
-	 * 		The identity of this Sone
-	 * @return This Sone (for method chaining)
-	 * @throws IllegalArgumentException
-	 * 		if the ID of the identity does not match this Sone’s ID
-	 */
-	Sone setIdentity(Identity identity) throws IllegalArgumentException;
-
-	/**
 	 * Returns the name of this Sone.
 	 *
 	 * @return The name of this Sone
@@ -255,15 +243,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @return The insert URI of this Sone
 	 */
 	FreenetURI getInsertUri();
-
-	/**
-	 * Sets the insert URI of this Sone.
-	 *
-	 * @param insertUri
-	 * 		The insert URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	Sone setInsertUri(FreenetURI insertUri);
 
 	/**
 	 * Returns the latest edition of this Sone.

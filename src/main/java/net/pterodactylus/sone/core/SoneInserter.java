@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
@@ -229,7 +228,7 @@ public class SoneInserter extends AbstractService {
 						sone.setStatus(SoneStatus.inserting);
 						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
-						FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+						FreenetURI finalUri = freenetInterface.insertDirectory(sone.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
 						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime));
 						/* at this point we might already be stopped. */
 						if (shouldStop()) {
@@ -304,7 +303,6 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("name", sone.getName());
 			soneProperties.put("time", currentTimeMillis());
 			soneProperties.put("requestUri", sone.getRequestUri());
-			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", Ordering.from(Post.TIME_COMPARATOR).sortedCopy(sone.getPosts()));
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
@@ -320,15 +318,6 @@ public class SoneInserter extends AbstractService {
 		@VisibleForTesting
 		String getFingerprint() {
 			return fingerprint;
-		}
-
-		/**
-		 * Returns the insert URI of the Sone.
-		 *
-		 * @return The insert URI of the Sone
-		 */
-		public FreenetURI getInsertUri() {
-			return (FreenetURI) soneProperties.get("insertUri");
 		}
 
 		//

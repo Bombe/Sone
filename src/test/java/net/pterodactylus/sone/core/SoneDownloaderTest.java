@@ -563,18 +563,6 @@ public class SoneDownloaderTest {
 	}
 
 	@Test
-	public void soneInsertUriIsCopiedToNewSone() throws SoneException {
-		InputStream inputStream = getClass().getResourceAsStream("sone-parser-no-payload.xml");
-		FreenetURI insertUri = mock(FreenetURI.class);
-		when(insertUri.setKeyType(anyString())).thenReturn(insertUri);
-		when(insertUri.setDocName(anyString())).thenReturn(insertUri);
-		when(insertUri.setMetaString(any(String[].class))).thenReturn(insertUri);
-		when(insertUri.setSuggestedEdition(anyLong())).thenReturn(insertUri);
-		when(sone.getInsertUri()).thenReturn(insertUri);
-		assertThat(soneDownloader.parseSone(sone, inputStream).getInsertUri(), is(insertUri));
-	}
-
-	@Test
 	public void parsingASoneSucceedsWithProfile() throws SoneException, MalformedURLException {
 		InputStream inputStream = getClass().getResourceAsStream("sone-parser-with-profile.xml");
 		final Profile profile = soneDownloader.parseSone(sone, inputStream).getProfile();
