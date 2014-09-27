@@ -233,7 +233,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public Collection<Sone> getSones() {
 		lock.readLock().lock();
 		try {
-			return unmodifiableCollection(allSones.values());
+			return new HashSet<Sone>(allSones.values());
 		} finally {
 			lock.readLock().unlock();
 		}
