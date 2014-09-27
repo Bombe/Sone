@@ -38,7 +38,6 @@ class SoneModificationDetector {
 		this.ticker = ticker;
 		this.lockableFingerprintProvider = lockableFingerprintProvider;
 		this.insertionDelay = insertionDelay;
-		originalFingerprint = lockableFingerprintProvider.getFingerprint();
 		lastFingerprint = originalFingerprint;
 	}
 

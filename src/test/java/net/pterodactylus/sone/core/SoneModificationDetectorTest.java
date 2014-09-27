@@ -12,6 +12,7 @@ import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintP
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Ticker;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -50,6 +51,11 @@ public class SoneModificationDetectorTest {
 
 	private void unlockSone() {
 		when(lockableFingerprintProvider.isLocked()).thenReturn(false);
+	}
+
+	@Before
+	public void setupOriginalFingerprint() {
+	    soneModificationDetector.setFingerprint("original");
 	}
 
 	@Test
