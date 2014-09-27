@@ -49,6 +49,8 @@ import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.SoneBuilder;
+import net.pterodactylus.sone.database.memory.MemorySoneBuilder;
 import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.client.ClientMetadata;
@@ -78,7 +80,7 @@ public class SoneDownloaderTest {
 	private final FreenetInterface freenetInterface = mock(FreenetInterface.class);
 	private final SoneDownloaderImpl soneDownloader = new SoneDownloaderImpl(core, freenetInterface);
 	private final FreenetURI requestUri = mock(FreenetURI.class);
-	private final Sone sone = mock(Sone.class);
+	private Sone sone = mock(Sone.class);
 	private final PostBuilder postBuilder = mock(PostBuilder.class);
 	private final List<Post> createdPosts = new ArrayList<Post>();
 	private Post post = mock(Post.class);
@@ -96,6 +98,7 @@ public class SoneDownloaderTest {
 
 	@Before
 	public void setupSone() {
+		Sone sone = SoneDownloaderTest.this.sone;
 		Identity identity = mock(Identity.class);
 		when(identity.getId()).thenReturn("identity");
 		when(sone.getId()).thenReturn("identity");
@@ -115,6 +118,16 @@ public class SoneDownloaderTest {
 		when(requestUri.setDocName(anyString())).thenReturn(requestUri);
 		when(requestUri.setMetaString(any(String[].class))).thenReturn(requestUri);
 		when(requestUri.getKeyType()).thenReturn("USK");
+	}
+
+	@Before
+	public void setupSoneBuilder() {
+		when(core.soneBuilder()).thenAnswer(new Answer<SoneBuilder>() {
+			@Override
+			public SoneBuilder answer(InvocationOnMock invocation) {
+				return new MemorySoneBuilder();
+			}
+		});
 	}
 
 	@Before
@@ -921,7 +934,7 @@ public class SoneDownloaderTest {
 	@Test
 	public void exceptionWhileFetchingSoneWillNotUpdateTheCore() throws IOException {
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-no-payload.xml"));
-		when(sone.getId()).thenThrow(NullPointerException.class);
+		when(core.soneBuilder()).thenReturn(null);
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
 		soneDownloader.fetchSoneAction(sone).run();
 		verify(core, never()).updateSone(any(Sone.class));

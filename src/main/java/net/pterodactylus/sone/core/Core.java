@@ -20,15 +20,11 @@ package net.pterodactylus.sone.core;
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Predicates.not;
 import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
-import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
 import static net.pterodactylus.sone.data.Sone.toAllAlbums;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,6 +81,7 @@ import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.PostReplyProvider;
+import net.pterodactylus.sone.database.SoneBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.wot.Identity;
@@ -109,15 +106,12 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-
-import freenet.keys.FreenetURI;
 
 /**
  * The Sone core.
@@ -186,10 +180,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** Sone rescuers. */
 	/* synchronize access on this on sones. */
 	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<Sone, SoneRescuer>();
-
-	/** All Sones. */
-	/* synchronize access on this on itself. */
-	private final Map<String, Sone> sones = new HashMap<String, Sone>();
 
 	/** All known Sones. */
 	private final Set<String> knownSones = new HashSet<String>();
@@ -317,7 +307,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public SoneRescuer getSoneRescuer(Sone sone) {
 		checkNotNull(sone, "sone must not be null");
 		checkArgument(sone.isLocal(), "sone must be local");
-		synchronized (sones) {
+		synchronized (soneRescuers) {
 			SoneRescuer soneRescuer = soneRescuers.get(sone);
 			if (soneRescuer == null) {
 				soneRescuer = new SoneRescuer(this, soneDownloader, sone);
@@ -339,6 +329,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (lockedSones) {
 			return lockedSones.contains(sone);
 		}
+	}
+
+	public SoneBuilder soneBuilder() {
+		return database.newSoneBuilder();
 	}
 
 	/**
@@ -376,24 +370,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *
 	 * @param id
 	 *            The ID of the Sone
-	 * @param create
-	 *            {@code true} to create a new Sone if none exists,
-	 *            {@code false} to return null if none exists
 	 * @return The Sone with the given ID, or {@code null}
 	 */
-	public Sone getLocalSone(String id, boolean create) {
-		synchronized (sones) {
-			Sone sone = sones.get(id);
-			if ((sone == null) && create) {
-				sone = new SoneImpl(id, true);
-				sones.put(id, sone);
-			}
-			if ((sone != null) && !sone.isLocal()) {
-				sone = new SoneImpl(id, true);
-				sones.put(id, sone);
-			}
-			return sone;
+	public Sone getLocalSone(String id) {
+		Optional<Sone> sone = database.getSone(id);
+		if (sone.isPresent() && sone.get().isLocal()) {
+			return sone.get();
 		}
+		return null;
 	}
 
 	/**
@@ -407,22 +391,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/**
 	 * Returns the remote Sone with the given ID.
 	 *
+	 *
 	 * @param id
 	 *            The ID of the remote Sone to get
-	 * @param create
-	 *            {@code true} to always create a Sone, {@code false} to return
-	 *            {@code null} if no Sone with the given ID exists
 	 * @return The Sone with the given ID
 	 */
-	public Sone getRemoteSone(String id, boolean create) {
-		synchronized (sones) {
-			Sone sone = sones.get(id);
-			if ((sone == null) && create && (id != null) && (id.length() == 43)) {
-				sone = new SoneImpl(id, false);
-				sones.put(id, sone);
-			}
-			return sone;
-		}
+	public Sone getRemoteSone(String id) {
+		return database.getSone(id).orNull();
 	}
 
 	/**
@@ -707,26 +682,19 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		logger.info(String.format("Adding Sone from OwnIdentity: %s", ownIdentity));
-		synchronized (sones) {
-			final Sone sone;
-			try {
-				sone = getLocalSone(ownIdentity.getId(), true).setIdentity(ownIdentity).setInsertUri(new FreenetURI(ownIdentity.getInsertUri())).setRequestUri(new FreenetURI(ownIdentity.getRequestUri()));
-			} catch (MalformedURLException mue1) {
-				logger.log(Level.SEVERE, String.format("Could not convert the Identity’s URIs to Freenet URIs: %s, %s", ownIdentity.getInsertUri(), ownIdentity.getRequestUri()), mue1);
-				return null;
-			}
-			sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), (long) 0));
-			sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
-			sone.setKnown(true);
-			/* TODO - load posts ’n stuff */
-			sones.put(ownIdentity.getId(), sone);
-			SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		Sone sone = database.newSoneBuilder().local().from(ownIdentity).build();
+		sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), 0L));
+		sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
+		sone.setKnown(true);
+		/* TODO - load posts ’n stuff */
+		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		synchronized (soneInserters) {
 			soneInserters.put(sone, soneInserter);
-			sone.setStatus(SoneStatus.idle);
-			loadSone(sone);
-			soneInserter.start();
-			return sone;
 		}
+		loadSone(sone);
+		sone.setStatus(SoneStatus.idle);
+		soneInserter.start();
+		return sone;
 	}
 
 	/**
@@ -762,33 +730,32 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		final Long latestEdition = tryParse(fromNullable(
 				identity.getProperty("Sone.LatestEdition")).or("0"));
-		synchronized (sones) {
-			final Sone sone = getRemoteSone(identity.getId(), true);
-			if (sone.isLocal()) {
-				return sone;
+		Optional<Sone> existingSone = getSone(identity.getId());
+		if (existingSone.isPresent() && existingSone.get().isLocal()) {
+			return existingSone.get();
+		}
+		boolean newSone = !existingSone.isPresent();
+		Sone sone = !newSone ? existingSone.get() : database.newSoneBuilder().from(identity).build();
+		sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
+		sone.setLatestEdition(latestEdition);
+		if (newSone) {
+			synchronized (knownSones) {
+				newSone = !knownSones.contains(sone.getId());
 			}
-			sone.setIdentity(identity);
-			boolean newSone = sone.getRequestUri() == null;
-			sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
-			sone.setLatestEdition(latestEdition);
+			sone.setKnown(!newSone);
 			if (newSone) {
-				synchronized (knownSones) {
-					newSone = !knownSones.contains(sone.getId());
-				}
-				sone.setKnown(!newSone);
-				if (newSone) {
-					eventBus.post(new NewSoneFoundEvent(sone));
-					for (Sone localSone : getLocalSones()) {
-						if (localSone.getOptions().isAutoFollow()) {
-							followSone(localSone, sone.getId());
-						}
+				eventBus.post(new NewSoneFoundEvent(sone));
+				for (Sone localSone : getLocalSones()) {
+					if (localSone.getOptions().isAutoFollow()) {
+						followSone(localSone, sone.getId());
 					}
 				}
 			}
-			soneDownloader.addSone(sone);
-			soneDownloaders.execute(soneDownloader.fetchSoneWithUriAction(sone));
-			return sone;
 		}
+		database.storeSone(sone);
+		soneDownloader.addSone(sone);
+		soneDownloaders.execute(soneDownloader.fetchSoneWithUriAction(sone));
+		return sone;
 	}
 
 	/**
@@ -983,14 +950,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			});
 			soneChangeDetector.detectChanges(sone);
 			database.storeSone(sone);
-			synchronized (sones) {
-				sone.setOptions(storedSone.get().getOptions());
-				sone.setKnown(storedSone.get().isKnown());
-				sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
-				if (sone.isLocal()) {
-					touchConfiguration();
-				}
-				sones.put(sone.getId(), sone);
+			sone.setOptions(storedSone.get().getOptions());
+			sone.setKnown(storedSone.get().isKnown());
+			sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
+			if (sone.isLocal()) {
+				touchConfiguration();
 			}
 		}
 	}
@@ -1008,15 +972,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, String.format("Tried to delete Sone of non-own identity: %s", sone));
 			return;
 		}
-		synchronized (sones) {
-			if (!getLocalSones().contains(sone)) {
-				logger.log(Level.WARNING, String.format("Tried to delete non-local Sone: %s", sone));
-				return;
-			}
-			sones.remove(sone.getId());
-			SoneInserter soneInserter = soneInserters.remove(sone);
-			soneInserter.stop();
+		if (!getLocalSones().contains(sone)) {
+			logger.log(Level.WARNING, String.format("Tried to delete non-local Sone: %s", sone));
+			return;
 		}
+		// FIXME – implement in database
+//		sones.remove(sone.getId());
+		SoneInserter soneInserter = soneInserters.remove(sone);
+		soneInserter.stop();
 		webOfTrustUpdater.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
 		webOfTrustUpdater.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
 		try {
@@ -1160,12 +1123,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (Album album : topLevelAlbums) {
 				sone.getRootAlbum().addAlbum(album);
 			}
-			soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
-			for (Album album : toAllAlbums.apply(sone)) {
-				database.storeAlbum(album);
-				for (Image image : album.getImages()) {
-					database.storeImage(image);
-				}
+			database.storeSone(sone);
+			synchronized (soneInserters) {
+				soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 			}
 		}
 		synchronized (knownSones) {
@@ -1173,11 +1133,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				knownSones.add(friend);
 			}
 		}
-		database.storePosts(sone, posts);
 		for (Post post : posts) {
 			post.setKnown(true);
 		}
-		database.storePostReplies(sone, replies);
 		for (PostReply reply : replies) {
 			reply.setKnown(true);
 		}
@@ -1528,10 +1486,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public void serviceStop() {
 		localElementTicker.shutdownNow();
-		synchronized (sones) {
+		synchronized (soneInserters) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
 				soneInserter.getValue().stop();
-				saveSone(getLocalSone(soneInserter.getKey().getId(), false));
+				saveSone(soneInserter.getKey());
 			}
 		}
 		saveConfiguration();
@@ -1893,11 +1851,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Subscribe
 	public void identityUpdated(IdentityUpdatedEvent identityUpdatedEvent) {
 		Identity identity = identityUpdatedEvent.identity();
-		final Sone sone = getRemoteSone(identity.getId(), false);
+		final Sone sone = getRemoteSone(identity.getId());
 		if (sone.isLocal()) {
 			return;
 		}
-		sone.setIdentity(identity);
 		sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
 		soneDownloader.addSone(sone);
 		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
@@ -1935,9 +1892,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		for (PostReply reply : sone.get().getReplies()) {
 			eventBus.post(new PostReplyRemovedEvent(reply));
 		}
-		synchronized (sones) {
-			sones.remove(identity.getId());
-		}
+//		TODO – implement in database
+//		sones.remove(identity.getId());
 		eventBus.post(new SoneRemovedEvent(sone.get()));
 	}
 

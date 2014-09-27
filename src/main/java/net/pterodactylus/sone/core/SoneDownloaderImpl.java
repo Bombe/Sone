@@ -45,6 +45,7 @@ import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.SoneImpl;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.SoneBuilder;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
@@ -278,7 +279,11 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			return null;
 		}
 
-		Sone sone = new SoneImpl(originalSone.getId(), originalSone.isLocal()).setIdentity(originalSone.getIdentity());
+		SoneBuilder soneBuilder = core.soneBuilder().from(originalSone.getIdentity());
+		if (originalSone.isLocal()) {
+			soneBuilder = soneBuilder.local();
+		}
+		Sone sone = soneBuilder.build();
 
 		SimpleXML soneXml;
 		try {

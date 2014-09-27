@@ -51,6 +51,7 @@ import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostDatabase;
 import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.SoneBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
@@ -165,6 +166,11 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} catch (DatabaseException de1) {
 			notifyFailed(de1);
 		}
+	}
+
+	@Override
+	public SoneBuilder newSoneBuilder() {
+		return new MemorySoneBuilder();
 	}
 
 	@Override

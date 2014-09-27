@@ -59,7 +59,7 @@ public class SoneImpl implements Sone {
 	private final boolean local;
 
 	/** The identity of this Sone. */
-	private Identity identity;
+	private final Identity identity;
 
 	/** The URI under which the Sone is stored in Freenet. */
 	private volatile FreenetURI requestUri;
@@ -110,13 +110,14 @@ public class SoneImpl implements Sone {
 	/**
 	 * Creates a new Sone.
 	 *
-	 * @param id
-	 * 		The ID of the Sone
+	 * @param identity
+	 * 		The identity of the Sone
 	 * @param local
 	 * 		{@code true} if the Sone is a local Sone, {@code false} otherwise
 	 */
-	public SoneImpl(String id, boolean local) {
-		this.id = id;
+	public SoneImpl(Identity identity, boolean local) {
+		this.id = identity.getId();
+		this.identity = identity;
 		this.local = local;
 	}
 
