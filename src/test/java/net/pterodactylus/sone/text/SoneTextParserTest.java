@@ -26,7 +26,7 @@ import com.google.common.base.Optional;
 
 import junit.framework.TestCase;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.SoneImpl;
+import net.pterodactylus.sone.data.impl.IdOnlySone;
 import net.pterodactylus.sone.database.SoneProvider;
 
 /**
@@ -186,16 +186,7 @@ public class SoneTextParserTest extends TestCase {
 		 */
 		@Override
 		public Optional<Sone> getSone(final String soneId) {
-			return Optional.<Sone>of(new SoneImpl(soneId, false) {
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				public String getName() {
-					return soneId;
-				}
-			});
+			return Optional.<Sone>of(new IdOnlySone(soneId));
 		}
 
 		/**

@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneImpl;
+import net.pterodactylus.sone.data.impl.IdOnlySone;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.io.Closer;
@@ -249,7 +250,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 								 * don’t use create=true above, we don’t want
 								 * the empty shell.
 								 */
-								sone = Optional.<Sone>of(new SoneImpl(soneId, false));
+								sone = Optional.<Sone>of(new IdOnlySone(soneId));
 							}
 							parts.add(new SonePart(sone.get()));
 							line = line.substring(50);
