@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * An own identity is an identity that the owner of the node has full control
  * over.
@@ -42,7 +44,7 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	 */
 	public DefaultOwnIdentity(String id, String nickname, String requestUri, String insertUri) {
 		super(id, nickname, requestUri);
-		this.insertUri = insertUri;
+		this.insertUri = checkNotNull(insertUri);
 	}
 
 	//
