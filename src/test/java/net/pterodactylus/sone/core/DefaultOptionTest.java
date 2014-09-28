@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.Options.Option;
-import net.pterodactylus.sone.core.Options.OptionWatcher;
 
 import com.google.common.base.Predicate;
 import org.junit.Test;
@@ -63,37 +62,6 @@ public class DefaultOptionTest {
 	public void defaultOptionWithValidatorRejectsInvalidValues() {
 		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
 		defaultOption.set(new Object());
-	}
-
-	@Test
-	public void watcherIsNotifiedOnChange() {
-		final AtomicReference<Object> changedObject = new AtomicReference<Object>();
-		Object newValue = new Object();
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, new OptionWatcher<Object>() {
-			@Override
-			public void optionChanged(Option<Object> option, Object oldValue, Object newValue) {
-				assertThat(oldValue, nullValue());
-				changedObject.set(newValue);
-			}
-		});
-		defaultOption.set(newValue);
-		assertThat(defaultOption.get(), is(newValue));
-		assertThat(changedObject.get(), is(newValue));
-	}
-
-	@Test
-	public void watcherIsNotNotifiedIfValueIsSetTwice() {
-		final AtomicInteger changeCounter = new AtomicInteger();
-		Object newValue = new Object();
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, new OptionWatcher<Object>() {
-			@Override
-			public void optionChanged(Option<Object> option, Object oldValue, Object newValue) {
-				changeCounter.incrementAndGet();
-			}
-		});
-		defaultOption.set(newValue);
-		defaultOption.set(newValue);
-		assertThat(changeCounter.get(), is(1));
 	}
 
 	@Test

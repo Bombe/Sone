@@ -79,32 +79,7 @@ public class Options {
 	}
 
 	/**
-	 * Interface for objects that want to be notified when an option changes its
-	 * value.
-	 *
-	 * @param <T>
-	 *            The type of the option
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	public static interface OptionWatcher<T> {
-
-		/**
-		 * Notifies an object that an option has been changed.
-		 *
-		 * @param option
-		 *            The option that has changed
-		 * @param oldValue
-		 *            The old value of the option
-		 * @param newValue
-		 *            The new value of the option
-		 */
-		public void optionChanged(Option<T> option, T oldValue, T newValue);
-
-	}
-
-	/**
-	 * Basic implementation of an {@link Option} that notifies an
-	 * {@link OptionWatcher} if the value changes.
+	 * Basic implementation of an {@link Option}.
 	 *
 	 * @param <T>
 	 *            The type of the option
@@ -121,9 +96,6 @@ public class Options {
 		/** The validator. */
 		private Predicate<T> validator;
 
-		/** The option watcher. */
-		private final OptionWatcher<T> optionWatcher;
-
 		/**
 		 * Creates a new default option.
 		 *
@@ -131,7 +103,7 @@ public class Options {
 		 *            The default value of the option
 		 */
 		public DefaultOption(T defaultValue) {
-			this(defaultValue, (OptionWatcher<T>) null);
+			this(defaultValue, null);
 		}
 
 		/**
@@ -143,35 +115,8 @@ public class Options {
 		 *            The validator for value validation (may be {@code null})
 		 */
 		public DefaultOption(T defaultValue, Predicate<T> validator) {
-			this(defaultValue, validator, null);
-		}
-
-		/**
-		 * Creates a new default option.
-		 *
-		 * @param defaultValue
-		 *            The default value of the option
-		 * @param optionWatchers
-		 *            The option watchers (may be {@code null})
-		 */
-		public DefaultOption(T defaultValue, OptionWatcher<T> optionWatchers) {
-			this(defaultValue, null, optionWatchers);
-		}
-
-		/**
-		 * Creates a new default option.
-		 *
-		 * @param defaultValue
-		 *            The default value of the option
-		 * @param validator
-		 *            The validator for value validation (may be {@code null})
-		 * @param optionWatcher
-		 *            The option watcher (may be {@code null})
-		 */
-		public DefaultOption(T defaultValue, Predicate<T> validator, OptionWatcher<T> optionWatcher) {
 			this.defaultValue = defaultValue;
 			this.validator = validator;
-			this.optionWatcher = optionWatcher;
 		}
 
 		/**
@@ -211,11 +156,6 @@ public class Options {
 			}
 			T oldValue = this.value;
 			this.value = value;
-			if (!get().equals(oldValue)) {
-				if (optionWatcher != null) {
-					optionWatcher.optionChanged(this, oldValue, get());
-				}
-			}
 		}
 
 	}
