@@ -1729,7 +1729,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangePredicate(0, 100)));
 		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangePredicate(-100, 100)));
 		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
-		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false, fcpInterface.new SetActive()));
+		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false));
 		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2, fcpInterface.new SetFullAccessRequired()));
 
 		loadConfigurationValue("InsertionDelay");

@@ -20,6 +20,8 @@ package net.pterodactylus.sone.core;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 
 import com.google.common.eventbus.EventBus;
 
@@ -344,6 +346,11 @@ public class Preferences {
 	 */
 	public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
 		options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
+		if (fcpInterfaceActive) {
+			eventBus.post(new FcpInterfaceActivatedEvent());
+		} else {
+			eventBus.post(new FcpInterfaceDeactivatedEvent());
+		}
 		return this;
 	}
 

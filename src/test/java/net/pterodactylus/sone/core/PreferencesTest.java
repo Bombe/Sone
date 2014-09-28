@@ -7,11 +7,14 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 
 import com.google.common.eventbus.EventBus;
 import org.junit.Before;
@@ -209,6 +212,20 @@ public class PreferencesTest {
 	public void gettingFcpInterfaceActiveIsForwardedToOption() {
 		assertThat(preferences.isFcpInterfaceActive(), is(true));
 		verify(booleanOption).get();
+	}
+
+	@Test
+	public void settingFcpInterfaceActiveIsForwardedToEventBus() {
+	    preferences.setFcpInterfaceActive(true);
+		verify(eventBus).post(any(FcpInterfaceActivatedEvent.class));
+		verifyNoMoreInteractions(eventBus);
+	}
+
+	@Test
+	public void settingFcpInterfaceInactiveIsForwardedToEventBus() {
+	    preferences.setFcpInterfaceActive(false);
+		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent.class));
+		verifyNoMoreInteractions(eventBus);
 	}
 
 	@Test

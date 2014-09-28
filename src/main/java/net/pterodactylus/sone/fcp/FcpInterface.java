@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
@@ -42,6 +44,7 @@ import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
@@ -118,15 +121,7 @@ public class FcpInterface {
 		return active.get();
 	}
 
-	/**
-	 * Sets whether the FCP interface should handle requests. If {@code active}
-	 * is {@code false}, all requests are answered with an error.
-	 *
-	 * @param active
-	 *            {@code true} to activate the FCP interface, {@code false} to
-	 *            deactivate the FCP interface
-	 */
-	public void setActive(boolean active) {
+	private void setActive(boolean active) {
 		this.active.set(active);
 	}
 
@@ -233,13 +228,14 @@ public class FcpInterface {
 		}
 	}
 
-	public class SetActive implements OptionWatcher<Boolean> {
+	@Subscribe
+	public void fcpInterfaceActivated(FcpInterfaceActivatedEvent fcpInterfaceActivatedEvent) {
+		setActive(true);
+	}
 
-		@Override
-		public void optionChanged(Option<Boolean> option, Boolean oldValue, Boolean newValue) {
-			setActive(newValue);
-		}
-
+	@Subscribe
+	public void fcpInterfaceDeactivated(FcpInterfaceDeactivatedEvent fcpInterfaceDeactivatedEvent) {
+		setActive(false);
 	}
 
 	public class SetFullAccessRequired implements OptionWatcher<Integer> {

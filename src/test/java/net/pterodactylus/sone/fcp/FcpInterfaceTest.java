@@ -6,8 +6,9 @@ import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import net.pterodactylus.sone.fcp.FcpInterface.SetActive;
 import net.pterodactylus.sone.fcp.FcpInterface.SetFullAccessRequired;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 
 import org.junit.Test;
 
@@ -19,18 +20,17 @@ import org.junit.Test;
 public class FcpInterfaceTest {
 
 	private final FcpInterface fcpInterface = new FcpInterface(null);
-	private final SetActive setActive = fcpInterface.new SetActive();
 	private final SetFullAccessRequired setFullAccessRequired = fcpInterface.new SetFullAccessRequired();
 
 	@Test
-	public void setActiveCanActivateFcpInterface() {
-		setActive.optionChanged(null, null, true);
+	public void fcpInterfaceCanBeActivated() {
+		fcpInterface.fcpInterfaceActivated(new FcpInterfaceActivatedEvent());
 		assertThat(fcpInterface.isActive(), is(true));
 	}
 
 	@Test
-	public void setActiveCanDeactivateFcpInterface() {
-		setActive.optionChanged(null, null, false);
+	public void fcpInterfaceCanBeDeactivated() {
+		fcpInterface.fcpInterfaceDeactivated(new FcpInterfaceDeactivatedEvent());
 		assertThat(fcpInterface.isActive(), is(false));
 	}
 
