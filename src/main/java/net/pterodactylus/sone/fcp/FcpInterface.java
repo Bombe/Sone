@@ -22,6 +22,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -74,7 +75,7 @@ public class FcpInterface {
 	private static final Logger logger = Logging.getLogger(FcpInterface.class);
 
 	/** Whether the FCP interface is currently active. */
-	private volatile boolean active;
+	private final AtomicBoolean active = new AtomicBoolean();
 
 	/** What function full access is required for. */
 	private volatile FullAccessRequired fullAccessRequired = FullAccessRequired.ALWAYS;
@@ -113,7 +114,7 @@ public class FcpInterface {
 
 	@VisibleForTesting
 	boolean isActive() {
-		return active;
+		return active.get();
 	}
 
 	/**
@@ -125,7 +126,7 @@ public class FcpInterface {
 	 *            deactivate the FCP interface
 	 */
 	public void setActive(boolean active) {
-		this.active = active;
+		this.active.set(active);
 	}
 
 	@VisibleForTesting
@@ -162,7 +163,7 @@ public class FcpInterface {
 	 *            {@link FredPluginFCP#ACCESS_FCP_RESTRICTED}
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
-		if (!active) {
+		if (!active.get()) {
 			try {
 				sendReply(pluginReplySender, null, new ErrorResponse(400, "FCP Interface deactivated"));
 			} catch (PluginNotFoundException pnfe1) {
