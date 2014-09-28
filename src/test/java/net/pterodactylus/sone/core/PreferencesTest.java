@@ -4,13 +4,16 @@ import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 
+import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -24,7 +27,8 @@ public class PreferencesTest {
 	private static final int INTEGER_VALUE = 1;
 	private static final String STRING_VALUE = "string-value";
 	private final Options options = mock(Options.class);
-	private final Preferences preferences = new Preferences(options);
+	private final EventBus eventBus = mock(EventBus.class);
+	private final Preferences preferences = new Preferences(eventBus, options);
 	private final Option<Integer> integerOption = when(mock(Option.class).get()).thenReturn(INTEGER_VALUE).getMock();
 	private final Option<Boolean> booleanOption = when(mock(Option.class).get()).thenReturn(true).getMock();
 	private final Option<String> stringOption = when(mock(Option.class).get()).thenReturn(STRING_VALUE).getMock();
@@ -61,6 +65,12 @@ public class PreferencesTest {
 	public void settingInsertionDelayIsForwardedToOptions() {
 		assertThat(preferences.setInsertionDelay(INTEGER_VALUE), instanceOf(Preferences.class));
 		verify(integerOption).set(INTEGER_VALUE);
+	}
+
+	@Test
+	public void settingInsertionDelayIsForwardedToEventBus() {
+		assertThat(preferences.setInsertionDelay(INTEGER_VALUE), instanceOf(Preferences.class));
+		verify(eventBus).post(any(InsertionDelayChangedEvent.class));
 	}
 
 	@Test

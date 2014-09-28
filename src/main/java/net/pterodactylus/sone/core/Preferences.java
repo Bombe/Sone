@@ -17,8 +17,11 @@
 
 package net.pterodactylus.sone.core;
 
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
+
+import com.google.common.eventbus.EventBus;
 
 /**
  * Convenience interface for external classes that want to access the core’s
@@ -28,16 +31,11 @@ import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
  */
 public class Preferences {
 
-	/** The wrapped options. */
+	private final EventBus eventBus;
 	private final Options options;
 
-	/**
-	 * Creates a new preferences object wrapped around the given options.
-	 *
-	 * @param options
-	 *            The options to wrap
-	 */
-	public Preferences(Options options) {
+	public Preferences(EventBus eventBus, Options options) {
+		this.eventBus = eventBus;
 		this.options = options;
 	}
 
@@ -72,6 +70,7 @@ public class Preferences {
 	 */
 	public Preferences setInsertionDelay(Integer insertionDelay) {
 		options.getIntegerOption("InsertionDelay").set(insertionDelay);
+		eventBus.post(new InsertionDelayChangedEvent(getInsertionDelay()));
 		return this;
 	}
 

@@ -2,6 +2,7 @@ package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
+import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.instanceOf;
@@ -20,7 +21,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashMap;
 
 import net.pterodactylus.sone.core.SoneInserter.InsertInformation;
-import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
@@ -31,6 +32,7 @@ import net.pterodactylus.sone.data.Sone;
 import freenet.keys.FreenetURI;
 
 import com.google.common.base.Optional;
+import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,8 +60,9 @@ public class SoneInserterTest {
 
 	@Test
 	public void insertionDelayIsForwardedToSoneInserter() {
-		SetInsertionDelay setInsertionDelay = new SetInsertionDelay();
-		setInsertionDelay.optionChanged(null, null, 15);
+		EventBus eventBus = new AsyncEventBus(sameThreadExecutor());
+		eventBus.register(new SoneInserter(core, eventBus, freenetInterface, "SoneId"));
+		eventBus.post(new InsertionDelayChangedEvent(15));
 		assertThat(SoneInserter.getInsertionDelay().get(), is(15));
 	}
 

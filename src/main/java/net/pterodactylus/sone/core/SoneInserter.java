@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
@@ -62,6 +63,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
@@ -267,13 +269,9 @@ public class SoneInserter extends AbstractService {
 		}
 	}
 
-	static class SetInsertionDelay implements OptionWatcher<Integer> {
-
-		@Override
-		public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
-			setInsertionDelay(newValue);
-		}
-
+	@Subscribe
+	public void insertionDelayChanged(InsertionDelayChangedEvent insertionDelayChangedEvent) {
+		setInsertionDelay(insertionDelayChangedEvent.getInsertionDelay());
 	}
 
 	/**

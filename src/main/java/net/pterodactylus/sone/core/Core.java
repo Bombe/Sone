@@ -46,7 +46,6 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound
 import net.pterodactylus.sone.core.Options.DefaultOption;
 import net.pterodactylus.sone.core.SoneChangeDetector.PostProcessor;
 import net.pterodactylus.sone.core.SoneChangeDetector.PostReplyProcessor;
-import net.pterodactylus.sone.core.SoneInserter.SetInsertionDelay;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
@@ -129,7 +128,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final Options options = new Options();
 
 	/** The preferences. */
-	private final Preferences preferences = new Preferences(options);
+	private final Preferences preferences;
 
 	/** The event bus. */
 	private final EventBus eventBus;
@@ -229,6 +228,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.database = database;
+		preferences = new Preferences(this.eventBus, options);
 	}
 
 	@VisibleForTesting
@@ -243,6 +243,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.database = database;
+		preferences = new Preferences(this.eventBus, options);
 	}
 
 	//
@@ -686,6 +687,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setKnown(true);
 		/* TODO - load posts ’n stuff */
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
 			soneInserters.put(sone, soneInserter);
 		}
@@ -1718,7 +1720,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	private void loadConfiguration() {
 		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE), new SetInsertionDelay()));
+		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE)));
 		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
 		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, Predicates.<Integer> or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
