@@ -28,8 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.core.Options.Option;
-import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;

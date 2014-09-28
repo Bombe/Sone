@@ -32,8 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Options.Option;
-import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
