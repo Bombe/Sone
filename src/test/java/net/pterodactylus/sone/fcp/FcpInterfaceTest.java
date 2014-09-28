@@ -6,9 +6,9 @@ import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import net.pterodactylus.sone.fcp.FcpInterface.SetFullAccessRequired;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 
 import org.junit.Test;
 
@@ -20,7 +20,6 @@ import org.junit.Test;
 public class FcpInterfaceTest {
 
 	private final FcpInterface fcpInterface = new FcpInterface(null);
-	private final SetFullAccessRequired setFullAccessRequired = fcpInterface.new SetFullAccessRequired();
 
 	@Test
 	public void fcpInterfaceCanBeActivated() {
@@ -36,19 +35,22 @@ public class FcpInterfaceTest {
 
 	@Test
 	public void setFullAccessRequiredCanSetAccessToNo() {
-		setFullAccessRequired.optionChanged(null, null, 0);
+		fcpInterface.fullAccessRequiredChanged(
+				new FullAccessRequiredChanged(NO));
 		assertThat(fcpInterface.getFullAccessRequired(), is(NO));
 	}
 
 	@Test
 	public void setFullAccessRequiredCanSetAccessToWriting() {
-		setFullAccessRequired.optionChanged(null, null, 1);
+		fcpInterface.fullAccessRequiredChanged(
+				new FullAccessRequiredChanged(WRITING));
 		assertThat(fcpInterface.getFullAccessRequired(), is(WRITING));
 	}
 
 	@Test
 	public void setFullAccessRequiredCanSetAccessToAlways() {
-		setFullAccessRequired.optionChanged(null, null, 2);
+		fcpInterface.fullAccessRequiredChanged(
+				new FullAccessRequiredChanged(ALWAYS));
 		assertThat(fcpInterface.getFullAccessRequired(), is(ALWAYS));
 	}
 

@@ -4,6 +4,7 @@ import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -15,10 +16,12 @@ import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 
 import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * Unit test for {@link Preferences}.
@@ -250,6 +253,15 @@ public class PreferencesTest {
 	public void settingFcpFullAccessRequiredToNullIsForwardedToOption() {
 		preferences.setFcpFullAccessRequired(null);
 		verify(integerOption).set(null);
+	}
+
+	@Test
+	public void settingFcpFullAccessRequiredIsForwardedToEventBus() {
+		preferences.setFcpFullAccessRequired(ALWAYS);
+		verify(integerOption).set(2);
+		ArgumentCaptor<FullAccessRequiredChanged> fullAccessRequiredChangedCaptor = forClass(FullAccessRequiredChanged.class);
+		verify(eventBus).post(fullAccessRequiredChangedCaptor.capture());
+		assertThat(fullAccessRequiredChangedCaptor.getValue().getFullAccessRequired(), is(ALWAYS));
 	}
 
 }

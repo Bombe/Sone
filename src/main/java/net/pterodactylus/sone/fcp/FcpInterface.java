@@ -32,6 +32,7 @@ import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.Options.OptionWatcher;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
@@ -130,13 +131,7 @@ public class FcpInterface {
 		return fullAccessRequired.get();
 	}
 
-	/**
-	 * Sets the action level for which full FCP access is required.
-	 *
-	 * @param fullAccessRequired
-	 *            The action level for which full FCP access is required
-	 */
-	public void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
+	private void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
 		this.fullAccessRequired.set(checkNotNull(fullAccessRequired, "fullAccessRequired must not be null"));
 	}
 
@@ -238,13 +233,9 @@ public class FcpInterface {
 		setActive(false);
 	}
 
-	public class SetFullAccessRequired implements OptionWatcher<Integer> {
-
-		@Override
-		public void optionChanged(Option<Integer> option, Integer oldValue, Integer newValue) {
-			setFullAccessRequired(FullAccessRequired.values()[newValue]);
-		}
-
+	@Subscribe
+	public void fullAccessRequiredChanged(FullAccessRequiredChanged fullAccessRequiredChanged) {
+		setFullAccessRequired(fullAccessRequiredChanged.getFullAccessRequired());
 	}
 
 }

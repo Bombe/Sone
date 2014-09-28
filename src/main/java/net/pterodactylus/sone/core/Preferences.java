@@ -22,6 +22,7 @@ import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 
 import com.google.common.eventbus.EventBus;
 
@@ -375,6 +376,7 @@ public class Preferences {
 	 */
 	public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
 		options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
+		eventBus.post(new FullAccessRequiredChanged(fcpFullAccessRequired));
 		return this;
 	}
 
