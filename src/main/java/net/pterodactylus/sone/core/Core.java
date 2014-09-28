@@ -23,7 +23,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
-import static net.pterodactylus.sone.data.Sone.toAllAlbums;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -71,7 +70,6 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.sone.data.SoneImpl;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
