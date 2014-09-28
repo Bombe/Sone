@@ -190,7 +190,10 @@ public class SoneImpl implements Sone {
 			return null;
 		}
 		try {
-			return new FreenetURI(((OwnIdentity) getIdentity()).getInsertUri()).setDocName("Sone").setMetaString(new String[0]);
+			return new FreenetURI(((OwnIdentity) getIdentity()).getInsertUri())
+					.setDocName("Sone")
+					.setMetaString(new String[0])
+					.setSuggestedEdition(latestEdition);
 		} catch (MalformedURLException e) {
 			throw new IllegalStateException(format("Own identity %s's insert URI is incorrect.", getIdentity()), e);
 		}
