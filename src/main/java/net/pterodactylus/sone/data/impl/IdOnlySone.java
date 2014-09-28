@@ -53,11 +53,6 @@ public class IdOnlySone implements Sone {
 	}
 
 	@Override
-	public Sone setRequestUri(FreenetURI requestUri) {
-		return null;
-	}
-
-	@Override
 	public FreenetURI getInsertUri() {
 		return null;
 	}

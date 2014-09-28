@@ -736,7 +736,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		boolean newSone = !existingSone.isPresent();
 		Sone sone = !newSone ? existingSone.get() : database.newSoneBuilder().from(identity).build();
-		sone.setRequestUri(SoneUri.create(identity.getRequestUri()));
 		sone.setLatestEdition(latestEdition);
 		if (newSone) {
 			synchronized (knownSones) {

@@ -228,15 +228,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	FreenetURI getRequestUri();
 
 	/**
-	 * Sets the request URI of this Sone.
-	 *
-	 * @param requestUri
-	 * 		The request URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	Sone setRequestUri(FreenetURI requestUri);
-
-	/**
 	 * Returns the insert URI of this Sone.
 	 *
 	 * @return The insert URI of this Sone

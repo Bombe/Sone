@@ -167,26 +167,17 @@ public class SoneImpl implements Sone {
 	 * @return The request URI of this Sone
 	 */
 	public FreenetURI getRequestUri() {
-		return (requestUri != null) ? requestUri.setSuggestedEdition(latestEdition) : null;
-	}
-
-	/**
-	 * Sets the request URI of this Sone.
-	 *
-	 * @param requestUri
-	 * 		The request URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone setRequestUri(FreenetURI requestUri) {
-		if (this.requestUri == null) {
-			this.requestUri = requestUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
-			return this;
+		try {
+			return new FreenetURI(getIdentity().getRequestUri())
+					.setKeyType("USK")
+					.setDocName("Sone")
+					.setMetaString(new String[0])
+					.setSuggestedEdition(latestEdition);
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(
+					format("Identity %s's request URI is incorrect.",
+							getIdentity()), e);
 		}
-		if (!this.requestUri.equalsKeypair(requestUri)) {
-			logger.log(Level.WARNING, String.format("Request URI %s tried to overwrite %s!", requestUri, this.requestUri));
-			return this;
-		}
-		return this;
 	}
 
 	/**

@@ -236,11 +236,6 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			Sone parsedSone = parseSone(originalSone, soneInputStream);
 			if (parsedSone != null) {
 				parsedSone.setLatestEdition(requestUri.getEdition());
-				if (requestUri.getKeyType().equals("USK")) {
-					parsedSone.setRequestUri(requestUri.setMetaString(new String[0]));
-				} else {
-					parsedSone.setRequestUri(requestUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]));
-				}
 			}
 			return parsedSone;
 		} catch (Exception e1) {
@@ -338,17 +333,6 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 				return null;
 			}
 			sone.setClient(new Client(clientName, clientVersion));
-		}
-
-		String soneRequestUri = soneXml.getValue("request-uri", null);
-		if (soneRequestUri != null) {
-			try {
-				sone.setRequestUri(new FreenetURI(soneRequestUri));
-			} catch (MalformedURLException mue1) {
-				/* TODO - mark Sone as bad. */
-				logger.log(Level.WARNING, String.format("Downloaded Sone %s has invalid request URI: %s", sone, soneRequestUri), mue1);
-				return null;
-			}
 		}
 
 		SimpleXML profileXml = soneXml.getNode("profile");
