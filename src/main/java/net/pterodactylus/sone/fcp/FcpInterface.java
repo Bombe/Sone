@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +79,7 @@ public class FcpInterface {
 	private final AtomicBoolean active = new AtomicBoolean();
 
 	/** What function full access is required for. */
-	private volatile FullAccessRequired fullAccessRequired = FullAccessRequired.ALWAYS;
+	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<FullAccessRequired>(FullAccessRequired.ALWAYS);
 
 	/** All available FCP commands. */
 	private final Map<String, AbstractSoneCommand> commands = Collections.synchronizedMap(new HashMap<String, AbstractSoneCommand>());
@@ -131,7 +132,7 @@ public class FcpInterface {
 
 	@VisibleForTesting
 	FullAccessRequired getFullAccessRequired() {
-		return fullAccessRequired;
+		return fullAccessRequired.get();
 	}
 
 	/**
@@ -141,7 +142,7 @@ public class FcpInterface {
 	 *            The action level for which full FCP access is required
 	 */
 	public void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
-		this.fullAccessRequired = checkNotNull(fullAccessRequired, "fullAccessRequired must not be null");
+		this.fullAccessRequired.set(checkNotNull(fullAccessRequired, "fullAccessRequired must not be null"));
 	}
 
 	//
@@ -172,7 +173,7 @@ public class FcpInterface {
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
-		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired == FullAccessRequired.ALWAYS))) {
+		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired.get() == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired.get() == FullAccessRequired.ALWAYS))) {
 			try {
 				sendReply(pluginReplySender, null, new ErrorResponse(401, "Not authorized"));
 			} catch (PluginNotFoundException pnfe1) {
