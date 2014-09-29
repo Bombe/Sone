@@ -1,16 +1,12 @@
-package net.pterodactylus.sone.core;
+package net.pterodactylus.sone.utils;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-
 import javax.annotation.Nullable;
 
-import net.pterodactylus.sone.core.Options.DefaultOption;
-import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.utils.DefaultOption;
 
 import com.google.common.base.Predicate;
 import org.junit.Test;

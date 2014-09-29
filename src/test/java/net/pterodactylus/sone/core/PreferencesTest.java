@@ -11,12 +11,12 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import net.pterodactylus.sone.core.Options.Option;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
+import net.pterodactylus.sone.utils.Option;
 
 import com.google.common.eventbus.EventBus;
 import org.junit.Before;

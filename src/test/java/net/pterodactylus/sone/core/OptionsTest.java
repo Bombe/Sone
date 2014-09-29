@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 
-import net.pterodactylus.sone.core.Options.Option;
+import net.pterodactylus.sone.utils.Option;
 
 import org.junit.Test;
 
