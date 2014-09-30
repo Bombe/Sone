@@ -22,12 +22,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 
 import net.pterodactylus.sone.TestAlbumBuilder;
 import net.pterodactylus.sone.TestImageBuilder;
 import net.pterodactylus.sone.TestPostBuilder;
 import net.pterodactylus.sone.TestPostReplyBuilder;
+import net.pterodactylus.sone.TestValue;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
@@ -48,8 +48,6 @@ import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilderFactory;
 import net.pterodactylus.util.config.Configuration;
-import net.pterodactylus.util.config.ConfigurationException;
-import net.pterodactylus.util.config.Value;
 
 import com.google.common.base.Optional;
 import org.hamcrest.Matchers;
@@ -521,32 +519,6 @@ public class ConfigurationSoneParserTest {
 				createAlbumBuilderFactory());
 		setupImage(0, "I1", "A1", 1000L, "K1", "T1", "D1", 16, null);
 		configurationSoneParser.parseImages(createImageBuilderFactory());
-	}
-
-	private static class TestValue<T> implements Value<T> {
-
-		private final AtomicReference<T> value = new AtomicReference<T>();
-
-		public TestValue(T originalValue) {
-			value.set(originalValue);
-		}
-
-		@Override
-		public T getValue() throws ConfigurationException {
-			return value.get();
-		}
-
-		@Override
-		public T getValue(T defaultValue) {
-			final T realValue = value.get();
-			return (realValue != null) ? realValue : defaultValue;
-		}
-
-		@Override
-		public void setValue(T newValue) throws ConfigurationException {
-			value.set(newValue);
-		}
-
 	}
 
 }
