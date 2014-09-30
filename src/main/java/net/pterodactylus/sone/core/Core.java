@@ -666,7 +666,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), 0L));
 		sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 		sone.setKnown(true);
-		/* TODO - load posts ’n stuff */
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
