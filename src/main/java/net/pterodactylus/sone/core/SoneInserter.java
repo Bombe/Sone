@@ -165,7 +165,7 @@ public class SoneInserter extends AbstractService {
 	 * @param insertionDelay
 	 *            The insertion delay (in seconds)
 	 */
-	public static void setInsertionDelay(int insertionDelay) {
+	private static void setInsertionDelay(int insertionDelay) {
 		SoneInserter.insertionDelay.set(insertionDelay);
 	}
 
