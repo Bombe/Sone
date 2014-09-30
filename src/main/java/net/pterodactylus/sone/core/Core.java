@@ -89,8 +89,6 @@ import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent;
 import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.utils.DefaultOption;
-import net.pterodactylus.sone.utils.IntegerRangePredicate;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
@@ -100,7 +98,6 @@ import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicates;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -123,9 +120,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();
-
-	/** The options. */
-	private final Options options = new Options();
 
 	/** The preferences. */
 	private final Preferences preferences;
@@ -228,7 +222,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.database = database;
-		preferences = new Preferences(this.eventBus, options);
+		preferences = new Preferences(eventBus);
 	}
 
 	@VisibleForTesting
@@ -243,7 +237,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.database = database;
-		preferences = new Preferences(this.eventBus, options);
+		preferences = new Preferences(eventBus);
 	}
 
 	//
@@ -1656,18 +1650,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 		/* store the options first. */
 		try {
-			configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
-			configuration.getIntValue("Option/InsertionDelay").setValue(options.getIntegerOption("InsertionDelay").getReal());
-			configuration.getIntValue("Option/PostsPerPage").setValue(options.getIntegerOption("PostsPerPage").getReal());
-			configuration.getIntValue("Option/ImagesPerPage").setValue(options.getIntegerOption("ImagesPerPage").getReal());
-			configuration.getIntValue("Option/CharactersPerPost").setValue(options.getIntegerOption("CharactersPerPost").getReal());
-			configuration.getIntValue("Option/PostCutOffLength").setValue(options.getIntegerOption("PostCutOffLength").getReal());
-			configuration.getBooleanValue("Option/RequireFullAccess").setValue(options.getBooleanOption("RequireFullAccess").getReal());
-			configuration.getIntValue("Option/PositiveTrust").setValue(options.getIntegerOption("PositiveTrust").getReal());
-			configuration.getIntValue("Option/NegativeTrust").setValue(options.getIntegerOption("NegativeTrust").getReal());
-			configuration.getStringValue("Option/TrustComment").setValue(options.getStringOption("TrustComment").getReal());
-			configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(options.getBooleanOption("ActivateFcpInterface").getReal());
-			configuration.getIntValue("Option/FcpFullAccessRequired").setValue(options.getIntegerOption("FcpFullAccessRequired").getReal());
+			preferences.saveTo(configuration);
 
 			/* save known Sones. */
 			int soneCounter = 0;
@@ -1719,30 +1702,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * Loads the configuration.
 	 */
 	private void loadConfiguration() {
-		/* create options. */
-		options.addIntegerOption("InsertionDelay", new DefaultOption<Integer>(60, new IntegerRangePredicate(0, Integer.MAX_VALUE)));
-		options.addIntegerOption("PostsPerPage", new DefaultOption<Integer>(10, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
-		options.addIntegerOption("ImagesPerPage", new DefaultOption<Integer>(9, new IntegerRangePredicate(1, Integer.MAX_VALUE)));
-		options.addIntegerOption("CharactersPerPost", new DefaultOption<Integer>(400, Predicates.<Integer> or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
-		options.addIntegerOption("PostCutOffLength", new DefaultOption<Integer>(200, Predicates.<Integer> or(new IntegerRangePredicate(50, Integer.MAX_VALUE), Predicates.equalTo(-1))));
-		options.addBooleanOption("RequireFullAccess", new DefaultOption<Boolean>(false));
-		options.addIntegerOption("PositiveTrust", new DefaultOption<Integer>(75, new IntegerRangePredicate(0, 100)));
-		options.addIntegerOption("NegativeTrust", new DefaultOption<Integer>(-25, new IntegerRangePredicate(-100, 100)));
-		options.addStringOption("TrustComment", new DefaultOption<String>("Set from Sone Web Interface"));
-		options.addBooleanOption("ActivateFcpInterface", new DefaultOption<Boolean>(false));
-		options.addIntegerOption("FcpFullAccessRequired", new DefaultOption<Integer>(2));
-
-		loadConfigurationValue("InsertionDelay");
-		loadConfigurationValue("PostsPerPage");
-		loadConfigurationValue("ImagesPerPage");
-		loadConfigurationValue("CharactersPerPost");
-		loadConfigurationValue("PostCutOffLength");
-		options.getBooleanOption("RequireFullAccess").set(configuration.getBooleanValue("Option/RequireFullAccess").getValue(null));
-		loadConfigurationValue("PositiveTrust");
-		loadConfigurationValue("NegativeTrust");
-		options.getStringOption("TrustComment").set(configuration.getStringValue("Option/TrustComment").getValue(null));
-		options.getBooleanOption("ActivateFcpInterface").set(configuration.getBooleanValue("Option/ActivateFcpInterface").getValue(null));
-		options.getIntegerOption("FcpFullAccessRequired").set(configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null));
+		new PreferencesLoader(preferences).loadFrom(configuration);
 
 		/* load known Sones. */
 		int soneCounter = 0;
@@ -1782,21 +1742,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 		}
 
-	}
-
-	/**
-	 * Loads an {@link Integer} configuration value for the option with the
-	 * given name, logging validation failures.
-	 *
-	 * @param optionName
-	 *            The name of the option to load
-	 */
-	private void loadConfigurationValue(String optionName) {
-		try {
-			options.getIntegerOption(optionName).set(configuration.getIntValue("Option/" + optionName).getValue(null));
-		} catch (IllegalArgumentException iae1) {
-			logger.log(Level.WARNING, String.format("Invalid value for %s in configuration, using default.", optionName));
-		}
 	}
 
 	/**

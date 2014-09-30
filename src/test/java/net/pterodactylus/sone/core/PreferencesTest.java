@@ -1,25 +1,23 @@
 package net.pterodactylus.sone.core;
 
 import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
-import net.pterodactylus.sone.utils.Option;
 
 import com.google.common.eventbus.EventBus;
-import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -30,238 +28,279 @@ import org.mockito.ArgumentCaptor;
  */
 public class PreferencesTest {
 
-	private static final int INTEGER_VALUE = 1;
-	private static final String STRING_VALUE = "string-value";
-	private final Options options = mock(Options.class);
 	private final EventBus eventBus = mock(EventBus.class);
-	private final Preferences preferences = new Preferences(eventBus, options);
-	private final Option<Integer> integerOption = when(mock(Option.class).get()).thenReturn(INTEGER_VALUE).getMock();
-	private final Option<Boolean> booleanOption = when(mock(Option.class).get()).thenReturn(true).getMock();
-	private final Option<String> stringOption = when(mock(Option.class).get()).thenReturn(STRING_VALUE).getMock();
+	private final Preferences preferences = new Preferences(eventBus);
 
-	@Before
-	public void setupOptions() {
-		when(integerOption.validate(INTEGER_VALUE)).thenReturn(true);
-		when(options.getIntegerOption("InsertionDelay")).thenReturn(integerOption);
-		when(options.getIntegerOption("PostsPerPage")).thenReturn(integerOption);
-		when(options.getIntegerOption("ImagesPerPage")).thenReturn(integerOption);
-		when(options.getIntegerOption("CharactersPerPost")).thenReturn(integerOption);
-		when(options.getIntegerOption("PostCutOffLength")).thenReturn(integerOption);
-		when(options.getBooleanOption("RequireFullAccess")).thenReturn(booleanOption);
-		when(options.getIntegerOption("PositiveTrust")).thenReturn(integerOption);
-		when(options.getIntegerOption("NegativeTrust")).thenReturn(integerOption);
-		when(options.getStringOption("TrustComment")).thenReturn(stringOption);
-		when(options.getBooleanOption("ActivateFcpInterface")).thenReturn(booleanOption);
-		when(options.getIntegerOption("FcpFullAccessRequired")).thenReturn(integerOption);
+	@After
+	public void tearDown() {
+		verifyNoMoreInteractions(eventBus);
 	}
 
 	@Test
-	public void testGettingInsertionDelay() {
-		assertThat(preferences.getInsertionDelay(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesRetainInsertionDelay() {
+		preferences.setInsertionDelay(15);
+		assertThat(preferences.getInsertionDelay(), is(15));
+		verify(eventBus).post(any(InsertionDelayChangedEvent.class));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidInsertionDelayIsRejected() {
+		preferences.setInsertionDelay(-15);
 	}
 
 	@Test
-	public void validationOfInsertionDelayIsForwardedToOptions() {
-		preferences.validateInsertionDelay(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
-	}
-
-	@Test
-	public void settingInsertionDelayIsForwardedToOptions() {
-		assertThat(preferences.setInsertionDelay(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
-	}
-
-	@Test
-	public void settingInsertionDelayIsForwardedToEventBus() {
-		assertThat(preferences.setInsertionDelay(INTEGER_VALUE), instanceOf(Preferences.class));
+	public void preferencesReturnDefaultValueWhenInsertionDelayIsSetToNull() {
+		preferences.setInsertionDelay(null);
+		assertThat(preferences.getInsertionDelay(), is(60));
 		verify(eventBus).post(any(InsertionDelayChangedEvent.class));
 	}
 
 	@Test
-	public void testGettingPostsPerPage() {
-		assertThat(preferences.getPostsPerPage(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesStartWithInsertionDelayDefaultValue() {
+		assertThat(preferences.getInsertionDelay(), is(60));
 	}
 
 	@Test
-	public void validationOfPostsPerPageIsForwardedToOptions() {
-		preferences.validatePostsPerPage(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
+	public void preferencesRetainPostsPerPage() {
+		preferences.setPostsPerPage(15);
+		assertThat(preferences.getPostsPerPage(), is(15));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidPostsPerPageIsRejected() {
+		preferences.setPostsPerPage(-15);
 	}
 
 	@Test
-	public void settingPostsPerPageIsForwardedToOptions() {
-		assertThat(preferences.setPostsPerPage(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
+	public void preferencesReturnDefaultValueWhenPostsPerPageIsSetToNull() {
+		preferences.setPostsPerPage(null);
+		assertThat(preferences.getPostsPerPage(), is(10));
 	}
 
 	@Test
-	public void testGettingImagesPerPage() {
-		assertThat(preferences.getImagesPerPage(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesStartWithPostsPerPageDefaultValue() {
+		assertThat(preferences.getPostsPerPage(), is(10));
 	}
 
 	@Test
-	public void validationOfImagesPerPageIsForwardedToOptions() {
-		preferences.validateImagesPerPage(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
+	public void preferencesRetainImagesPerPage() {
+		preferences.setImagesPerPage(15);
+		assertThat(preferences.getImagesPerPage(), is(15));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidImagesPerPageIsRejected() {
+		preferences.setImagesPerPage(-15);
 	}
 
 	@Test
-	public void settingImagesPerPageIsForwardedToOptions() {
-		assertThat(preferences.setImagesPerPage(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
+	public void preferencesReturnDefaultValueWhenImagesPerPageIsSetToNull() {
+		preferences.setImagesPerPage(null);
+		assertThat(preferences.getImagesPerPage(), is(9));
 	}
 
 	@Test
-	public void testGettingCharactersPerPost() {
-		assertThat(preferences.getCharactersPerPost(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesStartWithImagesPerPageDefaultValue() {
+		assertThat(preferences.getImagesPerPage(), is(9));
 	}
 
 	@Test
-	public void validationOfCharactersPerPostIsForwardedToOptions() {
-		preferences.validateCharactersPerPost(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
+	public void preferencesRetainCharactersPerPost() {
+		preferences.setCharactersPerPost(150);
+		assertThat(preferences.getCharactersPerPost(), is(150));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidCharactersPerPostIsRejected() {
+		preferences.setCharactersPerPost(-15);
 	}
 
 	@Test
-	public void settingCharactersPerPostIsForwardedToOptions() {
-		assertThat(preferences.setCharactersPerPost(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
+	public void preferencesReturnDefaultValueWhenCharactersPerPostIsSetToNull() {
+		preferences.setCharactersPerPost(null);
+		assertThat(preferences.getCharactersPerPost(), is(400));
 	}
 
 	@Test
-	public void testGettingPostCutOffLength() {
-		assertThat(preferences.getPostCutOffLength(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesStartWithCharactersPerPostDefaultValue() {
+		assertThat(preferences.getCharactersPerPost(), is(400));
 	}
 
 	@Test
-	public void validationOfPostCutOffLengthIsForwardedToOptions() {
-		preferences.validatePostCutOffLength(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
+	public void preferencesRetainPostCutOffLength() {
+		preferences.setPostCutOffLength(150);
+		assertThat(preferences.getPostCutOffLength(), is(150));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidPostCutOffLengthIsRejected() {
+		preferences.setPostCutOffLength(-15);
 	}
 
 	@Test
-	public void settingPostCutOffLengthIsForwardedToOptions() {
-		assertThat(preferences.setPostCutOffLength(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
+	public void preferencesReturnDefaultValueWhenPostCutOffLengthIsSetToNull() {
+		preferences.setPostCutOffLength(null);
+		assertThat(preferences.getPostCutOffLength(), is(200));
 	}
 
 	@Test
-	public void testGettingRequireFullAccess() {
-		assertThat(preferences.isRequireFullAccess(), is(true));
-		verify(booleanOption).get();
+	public void preferencesStartWithPostCutOffLengthDefaultValue() {
+		assertThat(preferences.getPostCutOffLength(), is(200));
 	}
 
 	@Test
-	public void settingRequireFullAccessIsForwardedToOption() {
+	public void preferencesRetainRequireFullAccessOfTrue() {
 		preferences.setRequireFullAccess(true);
-		verify(booleanOption).set(true);
+		assertThat(preferences.isRequireFullAccess(), is(true));
 	}
 
 	@Test
-	public void testGettingPositiveTrust() {
-		assertThat(preferences.getPositiveTrust(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesRetainRequireFullAccessOfFalse() {
+		preferences.setRequireFullAccess(false);
+		assertThat(preferences.isRequireFullAccess(), is(false));
 	}
 
 	@Test
-	public void validationOfPositiveTrustIsForwardedToOptions() {
-		preferences.validatePositiveTrust(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
+	public void preferencesReturnDefaultValueWhenRequireFullAccessIsSetToNull() {
+		preferences.setRequireFullAccess(null);
+		assertThat(preferences.isRequireFullAccess(), is(false));
 	}
 
 	@Test
-	public void settingPositiveTrustIsForwardedToOptions() {
-		assertThat(preferences.setPositiveTrust(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
+	public void preferencesStartWithRequireFullAccessDefaultValue() {
+		assertThat(preferences.isRequireFullAccess(), is(false));
 	}
 
 	@Test
-	public void testGettingNegativeTrust() {
-		assertThat(preferences.getNegativeTrust(), is(INTEGER_VALUE));
-		verify(integerOption).get();
+	public void preferencesRetainPositiveTrust() {
+		preferences.setPositiveTrust(15);
+		assertThat(preferences.getPositiveTrust(), is(15));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidPositiveTrustIsRejected() {
+		preferences.setPositiveTrust(-15);
 	}
 
 	@Test
-	public void validationOfNegativeTrustIsForwardedToOptions() {
-		preferences.validateNegativeTrust(INTEGER_VALUE);
-		verify(integerOption).validate(INTEGER_VALUE);
+	public void preferencesReturnDefaultValueWhenPositiveTrustIsSetToNull() {
+		preferences.setPositiveTrust(null);
+		assertThat(preferences.getPositiveTrust(), is(75));
 	}
 
 	@Test
-	public void settingNegativeTrustIsForwardedToOptions() {
-		assertThat(preferences.setNegativeTrust(INTEGER_VALUE), instanceOf(Preferences.class));
-		verify(integerOption).set(INTEGER_VALUE);
+	public void preferencesStartWithPositiveTrustDefaultValue() {
+		assertThat(preferences.getPositiveTrust(), is(75));
 	}
 
 	@Test
-	public void gettingTrustCommentIsForwardedToOption() {
-		assertThat(preferences.getTrustComment(), is(STRING_VALUE));
-		verify(stringOption).get();
+	public void preferencesRetainNegativeTrust() {
+		preferences.setNegativeTrust(-15);
+		assertThat(preferences.getNegativeTrust(), is(-15));
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void invalidNegativeTrustIsRejected() {
+		preferences.setNegativeTrust(150);
 	}
 
 	@Test
-	public void settingTrustCommentIsForwardedToOption() {
-		preferences.setTrustComment(STRING_VALUE);
-		verify(stringOption).set(STRING_VALUE);
+	public void preferencesReturnDefaultValueWhenNegativeTrustIsSetToNull() {
+		preferences.setNegativeTrust(null);
+		assertThat(preferences.getNegativeTrust(), is(-25));
 	}
 
 	@Test
-	public void gettingFcpInterfaceActiveIsForwardedToOption() {
-		assertThat(preferences.isFcpInterfaceActive(), is(true));
-		verify(booleanOption).get();
+	public void preferencesStartWithNegativeTrustDefaultValue() {
+		assertThat(preferences.getNegativeTrust(), is(-25));
 	}
 
 	@Test
-	public void settingFcpInterfaceActiveIsForwardedToEventBus() {
-	    preferences.setFcpInterfaceActive(true);
-		verify(eventBus).post(any(FcpInterfaceActivatedEvent.class));
-		verifyNoMoreInteractions(eventBus);
+	public void preferencesRetainTrustComment() {
+		preferences.setTrustComment("Trust");
+		assertThat(preferences.getTrustComment(), is("Trust"));
 	}
 
 	@Test
-	public void settingFcpInterfaceInactiveIsForwardedToEventBus() {
-	    preferences.setFcpInterfaceActive(false);
-		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent.class));
-		verifyNoMoreInteractions(eventBus);
+	public void preferencesReturnDefaultValueWhenTrustCommentIsSetToNull() {
+		preferences.setTrustComment(null);
+		assertThat(preferences.getTrustComment(),
+				is("Set from Sone Web Interface"));
 	}
 
 	@Test
-	public void settingFcpInterfaceActiveIsForwardedToOption() {
+	public void preferencesStartWithTrustCommentDefaultValue() {
+		assertThat(preferences.getTrustComment(),
+				is("Set from Sone Web Interface"));
+	}
+
+	@Test
+	public void preferencesRetainFcpInterfaceActiveOfTrue() {
 		preferences.setFcpInterfaceActive(true);
-		verify(booleanOption).set(true);
+		assertThat(preferences.isFcpInterfaceActive(), is(true));
+		verify(eventBus).post(any(FcpInterfaceActivatedEvent.class));
 	}
 
 	@Test
-	public void gettingFcpFullAccessRequired() {
-		assertThat(preferences.getFcpFullAccessRequired(), is(FullAccessRequired.values()[INTEGER_VALUE]));
-		verify(integerOption).get();
+	public void preferencesRetainFcpInterfaceActiveOfFalse() {
+		preferences.setFcpInterfaceActive(false);
+		assertThat(preferences.isFcpInterfaceActive(), is(false));
+		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent.class));
 	}
 
 	@Test
-	public void settingFcpFullAccessRequiredIsForwardedToOption() {
+	public void preferencesReturnDefaultValueWhenFcpInterfaceActiveIsSetToNull() {
+		preferences.setFcpInterfaceActive(null);
+		assertThat(preferences.isFcpInterfaceActive(), is(false));
+		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent.class));
+	}
+
+	@Test
+	public void preferencesStartWithFcpInterfaceActiveDefaultValue() {
+		assertThat(preferences.isFcpInterfaceActive(), is(false));
+	}
+
+	@Test
+	public void preferencesRetainFcpFullAccessRequiredOfNo() {
+		preferences.setFcpFullAccessRequired(NO);
+		assertThat(preferences.getFcpFullAccessRequired(), is(NO));
+		verifyFullAccessRequiredChangedEvent(NO);
+	}
+
+	private void verifyFullAccessRequiredChangedEvent(
+			FullAccessRequired fullAccessRequired) {
+		ArgumentCaptor<FullAccessRequiredChanged> fullAccessRequiredCaptor =
+				ArgumentCaptor.forClass(FullAccessRequiredChanged.class);
+		verify(eventBus).post(fullAccessRequiredCaptor.capture());
+		assertThat(
+				fullAccessRequiredCaptor.getValue().getFullAccessRequired(),
+				is(fullAccessRequired));
+	}
+
+	@Test
+	public void preferencesRetainFcpFullAccessRequiredOfWriting() {
+		preferences.setFcpFullAccessRequired(WRITING);
+		assertThat(preferences.getFcpFullAccessRequired(), is(WRITING));
+		verifyFullAccessRequiredChangedEvent(WRITING);
+	}
+
+	@Test
+	public void preferencesRetainFcpFullAccessRequiredOfAlways() {
 		preferences.setFcpFullAccessRequired(ALWAYS);
-		verify(integerOption).set(ALWAYS.ordinal());
+		assertThat(preferences.getFcpFullAccessRequired(), is(ALWAYS));
+		verifyFullAccessRequiredChangedEvent(ALWAYS);
 	}
 
 	@Test
-	public void settingFcpFullAccessRequiredToNullIsForwardedToOption() {
+	public void preferencesReturnDefaultValueWhenFcpFullAccessRequiredIsSetToNull() {
 		preferences.setFcpFullAccessRequired(null);
-		verify(integerOption).set(null);
+		assertThat(preferences.getFcpFullAccessRequired(), is(ALWAYS));
+		verifyFullAccessRequiredChangedEvent(ALWAYS);
 	}
 
 	@Test
-	public void settingFcpFullAccessRequiredIsForwardedToEventBus() {
-		preferences.setFcpFullAccessRequired(ALWAYS);
-		verify(integerOption).set(2);
-		ArgumentCaptor<FullAccessRequiredChanged> fullAccessRequiredChangedCaptor = forClass(FullAccessRequiredChanged.class);
-		verify(eventBus).post(fullAccessRequiredChangedCaptor.capture());
-		assertThat(fullAccessRequiredChangedCaptor.getValue().getFullAccessRequired(), is(ALWAYS));
+	public void preferencesStartWithFcpFullAccessRequiredDefaultValue() {
+		assertThat(preferences.getFcpFullAccessRequired(), is(ALWAYS));
 	}
 
 }
