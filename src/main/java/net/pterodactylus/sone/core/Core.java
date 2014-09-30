@@ -154,9 +154,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The trust updater. */
 	private final WebOfTrustUpdater webOfTrustUpdater;
 
-	/** The FCP interface. */
-	private volatile FcpInterface fcpInterface;
-
 	/** The times Sones were followed. */
 	private final Map<String, Long> soneFollowingTimes = new HashMap<String, Long>();
 
@@ -278,16 +275,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public UpdateChecker getUpdateChecker() {
 		return updateChecker;
-	}
-
-	/**
-	 * Sets the FCP interface to use.
-	 *
-	 * @param fcpInterface
-	 *            The FCP interface to use
-	 */
-	public void setFcpInterface(FcpInterface fcpInterface) {
-		this.fcpInterface = fcpInterface;
 	}
 
 	/**
