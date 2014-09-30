@@ -12,6 +12,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -219,6 +220,39 @@ public class SoneInserterTest {
 		assertThat(soneEvents.getAllValues().get(1), instanceOf(SoneInsertAbortedEvent.class));
 		assertThat(soneEvents.getAllValues().get(1).sone(), is(sone));
 		verify(core, never()).touchConfiguration();
+	}
+
+	@Test
+	public void soneInserterExitsIfSoneIsUnknown() {
+		SoneModificationDetector soneModificationDetector =
+				mock(SoneModificationDetector.class);
+		SoneInserter soneInserter =
+				new SoneInserter(core, eventBus, freenetInterface, "SoneId",
+						soneModificationDetector, 1);
+		when(soneModificationDetector.isEligibleForInsert()).thenReturn(true);
+		when(core.getSone("SoneId")).thenReturn(Optional.<Sone>absent());
+		soneInserter.serviceRun();
+	}
+
+	@Test
+	public void soneInserterCatchesExceptionAndContinues() {
+		SoneModificationDetector soneModificationDetector =
+				mock(SoneModificationDetector.class);
+		final SoneInserter soneInserter =
+				new SoneInserter(core, eventBus, freenetInterface, "SoneId",
+						soneModificationDetector, 1);
+		Answer<Optional<Sone>> stopInserterAndThrowException =
+				new Answer<Optional<Sone>>() {
+					@Override
+					public Optional<Sone> answer(
+							InvocationOnMock invocation) {
+						soneInserter.stop();
+						throw new NullPointerException();
+					}
+				};
+		when(soneModificationDetector.isEligibleForInsert()).thenAnswer(
+				stopInserterAndThrowException);
+		soneInserter.serviceRun();
 	}
 
 }
