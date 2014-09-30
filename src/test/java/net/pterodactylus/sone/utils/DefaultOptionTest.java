@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import javax.annotation.Nullable;
 
-import net.pterodactylus.sone.utils.DefaultOption;
-
 import com.google.common.base.Predicate;
 import org.junit.Test;
 
