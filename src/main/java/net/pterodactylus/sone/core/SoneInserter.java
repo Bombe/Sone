@@ -283,9 +283,7 @@ public class SoneInserter extends AbstractService {
 	class InsertInformation {
 
 		private final String fingerprint;
-
-		/** All properties of the Sone, copied for thread safety. */
-		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
+		private final ManifestCreator manifestCreator;
 
 		/**
 		 * Creates a new insert information container.
@@ -295,6 +293,7 @@ public class SoneInserter extends AbstractService {
 		 */
 		public InsertInformation(Sone sone) {
 			this.fingerprint = sone.getFingerprint();
+			Map<String, Object> soneProperties = new HashMap<String, Object>();
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
 			soneProperties.put("time", currentTimeMillis());
@@ -305,6 +304,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
+			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
 
 		//
@@ -329,31 +329,37 @@ public class SoneInserter extends AbstractService {
 			HashMap<String, Object> manifestEntries = new HashMap<String, Object>();
 
 			/* first, create an index.html. */
-			manifestEntries.put("index.html", createManifestElement("index.html", "text/html; charset=utf-8", "/templates/insert/index.html"));
+			manifestEntries.put("index.html", manifestCreator.createManifestElement(
+					"index.html", "text/html; charset=utf-8",
+					"/templates/insert/index.html"));
 
 			/* now, store the sone. */
-			manifestEntries.put("sone.xml", createManifestElement("sone.xml", "text/xml; charset=utf-8", "/templates/insert/sone.xml"));
+			manifestEntries.put("sone.xml", manifestCreator.createManifestElement(
+					"sone.xml", "text/xml; charset=utf-8",
+					"/templates/insert/sone.xml"));
 
 			return manifestEntries;
 		}
 
-		//
-		// PRIVATE METHODS
-		//
+	}
 
-		/**
-		 * Creates a new manifest element.
-		 *
-		 * @param name
-		 *            The name of the file
-		 * @param contentType
-		 *            The content type of the file
-		 * @param templateName
-		 *            The name of the template to render
-		 * @return The manifest element
-		 */
-		@SuppressWarnings("synthetic-access")
-		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
+	/**
+	 * Creates manifest elements for an insert by rendering a template.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	@VisibleForTesting
+	static class ManifestCreator {
+
+		private final Core core;
+		private final Map<String, Object> soneProperties;
+
+		ManifestCreator(Core core, Map<String, Object> soneProperties) {
+			this.core = core;
+			this.soneProperties = soneProperties;
+		}
+
+		public ManifestElement createManifestElement(String name, String contentType, String templateName) {
 			InputStreamReader templateInputStreamReader = null;
 			InputStream templateInputStream = null;
 			Template template;

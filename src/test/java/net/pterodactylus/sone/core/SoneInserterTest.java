@@ -1,27 +1,32 @@
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.of;
+import static com.google.common.io.ByteStreams.toByteArray;
 import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
+import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 import net.pterodactylus.sone.core.SoneInserter.InsertInformation;
+import net.pterodactylus.sone.core.SoneInserter.ManifestCreator;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
@@ -29,9 +34,12 @@ import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.main.SonePlugin;
 
+import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Optional;
 import com.google.common.eventbus.AsyncEventBus;
 import com.google.common.eventbus.EventBus;
@@ -65,19 +73,6 @@ public class SoneInserterTest {
 		eventBus.register(new SoneInserter(core, eventBus, freenetInterface, "SoneId"));
 		eventBus.post(new InsertionDelayChangedEvent(15));
 		assertThat(SoneInserter.getInsertionDelay().get(), is(15));
-	}
-
-	@Test
-	/* this test is hilariously bad. */
-	public void manifestEntriesAreCreated() {
-		FreenetURI insertUri = mock(FreenetURI.class);
-		String fingerprint = "fingerprint";
-		Sone sone = createSone(insertUri, fingerprint);
-		SoneInserter soneInserter = new SoneInserter(core, eventBus, freenetInterface, "SoneId");
-		InsertInformation insertInformation = soneInserter.new InsertInformation(sone);
-		HashMap<String, Object> manifestEntries = insertInformation.generateManifestEntries();
-		assertThat(manifestEntries.keySet(), containsInAnyOrder("index.html", "sone.xml"));
-		assertThat(insertInformation.getFingerprint(), is(fingerprint));
 	}
 
 	private Sone createSone(FreenetURI insertUri, String fingerprint) {
@@ -253,6 +248,44 @@ public class SoneInserterTest {
 		when(soneModificationDetector.isEligibleForInsert()).thenAnswer(
 				stopInserterAndThrowException);
 		soneInserter.serviceRun();
+	}
+
+	@Test
+	public void templateIsRenderedCorrectlyForManifestElement()
+	throws IOException {
+		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		soneProperties.put("id", "SoneId");
+		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
+		long now = currentTimeMillis();
+		when(core.getStartupTime()).thenReturn(now);
+		ManifestElement manifestElement = manifestCreator.createManifestElement("test.txt", "plain/text; charset=utf-8", "sone-inserter-manifest.txt");
+		assertThat(manifestElement.getName(), is("test.txt"));
+		assertThat(manifestElement.getMimeTypeOverride(), is("plain/text; charset=utf-8"));
+		String templateContent = new String(toByteArray(manifestElement.getData().getInputStream()), Charsets.UTF_8);
+		assertThat(templateContent, containsString("Sone Version: " + SonePlugin.VERSION.toString() + "\n"));
+		assertThat(templateContent, containsString("Core Startup: " + now + "\n"));
+		assertThat(templateContent, containsString("Sone ID: " + "SoneId" + "\n"));
+	}
+
+	@Test
+	public void invalidTemplateReturnsANullManifestElement() {
+		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
+		assertThat(manifestCreator.createManifestElement("test.txt",
+				"plain/text; charset=utf-8",
+				"sone-inserter-invalid-manifest.txt"),
+				nullValue());
+	}
+
+	@Test
+	public void errorWhileRenderingTemplateReturnsANullManifestElement() {
+		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
+		when(core.toString()).thenThrow(NullPointerException.class);
+		assertThat(manifestCreator.createManifestElement("test.txt",
+				"plain/text; charset=utf-8",
+				"sone-inserter-faulty-manifest.txt"),
+				nullValue());
 	}
 
 }
