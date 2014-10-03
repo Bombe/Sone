@@ -29,7 +29,7 @@ import com.google.inject.ImplementedBy;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @ImplementedBy(MemoryDatabase.class)
-public interface Database extends Service, SoneDatabase, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase {
+public interface Database extends Service, SoneDatabase, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase, BookmarkDatabase {
 
 	/**
 	 * Saves the database.

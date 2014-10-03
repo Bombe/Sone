@@ -25,6 +25,8 @@ import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
 
+import com.google.common.base.Optional;
+
 /**
  * Page that lets the user unbookmark a post.
  *
@@ -55,7 +57,10 @@ public class UnbookmarkPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			String id = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
-			webInterface.getCore().unbookmarkPost(id);
+			Optional<Post> post = webInterface.getCore().getPost(id);
+			if (post.isPresent()) {
+				webInterface.getCore().unbookmarkPost(post.get());
+			}
 			throw new RedirectException(returnPage);
 		}
 		String id = request.getHttpRequest().getParam("post");
@@ -63,7 +68,7 @@ public class UnbookmarkPage extends SoneTemplatePage {
 			Set<Post> posts = webInterface.getCore().getBookmarkedPosts();
 			for (Post post : posts) {
 				if (post.getSone() == null) {
-					webInterface.getCore().unbookmark(post);
+					webInterface.getCore().unbookmarkPost(post);
 				}
 			}
 			throw new RedirectException("bookmarks.html");

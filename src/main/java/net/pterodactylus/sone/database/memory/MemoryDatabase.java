@@ -115,6 +115,9 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private final Map<String, Image> allImages = new HashMap<String, Image>();
 	private final Multimap<String, Image> soneImages = HashMultimap.create();
 
+	private final MemoryBookmarkDatabase memoryBookmarkDatabase =
+			new MemoryBookmarkDatabase(this);
+
 	/**
 	 * Creates a new memory database.
 	 *
@@ -588,6 +591,31 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} finally {
 			lock.writeLock().unlock();
 		}
+	}
+
+	@Override
+	public void bookmarkPost(String postId) {
+		memoryBookmarkDatabase.bookmarkPost(postId);
+	}
+
+	@Override
+	public void bookmarkPost(Post post) {
+		memoryBookmarkDatabase.bookmarkPost(post);
+	}
+
+	@Override
+	public void unbookmarkPost(Post post) {
+		memoryBookmarkDatabase.unbookmarkPost(post);
+	}
+
+	@Override
+	public boolean isPostBookmarked(Post post) {
+		return memoryBookmarkDatabase.isPostBookmarked(post);
+	}
+
+	@Override
+	public Set<Post> getBookmarkedPosts() {
+		return memoryBookmarkDatabase.getBookmarkedPosts();
 	}
 
 	//

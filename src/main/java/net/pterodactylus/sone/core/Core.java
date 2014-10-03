@@ -175,10 +175,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The post database. */
 	private final Database database;
 
-	/** All bookmarked posts. */
-	/* synchronize access on itself. */
-	private final Set<String> bookmarkedPosts = new HashSet<String>();
-
 	/** Trusted identities, sorted by own identities. */
 	private final Multimap<OwnIdentity, Identity> trustedIdentities = Multimaps.synchronizedSetMultimap(HashMultimap.<OwnIdentity, Identity>create());
 
@@ -508,21 +504,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *         otherwise
 	 */
 	public boolean isBookmarked(Post post) {
-		return isPostBookmarked(post.getId());
-	}
-
-	/**
-	 * Returns whether the post with the given ID is bookmarked.
-	 *
-	 * @param id
-	 *            The ID of the post to check
-	 * @return {@code true} if the post with the given ID is bookmarked,
-	 *         {@code false} otherwise
-	 */
-	public boolean isPostBookmarked(String id) {
-		synchronized (bookmarkedPosts) {
-			return bookmarkedPosts.contains(id);
-		}
+		return database.isPostBookmarked(post);
 	}
 
 	/**
@@ -531,16 +513,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return All bookmarked posts
 	 */
 	public Set<Post> getBookmarkedPosts() {
-		Set<Post> posts = new HashSet<Post>();
-		synchronized (bookmarkedPosts) {
-			for (String bookmarkedPostId : bookmarkedPosts) {
-				Optional<Post> post = getPost(bookmarkedPostId);
-				if (post.isPresent()) {
-					posts.add(post.get());
-				}
-			}
-		}
-		return posts;
+		return database.getBookmarkedPosts();
 	}
 
 	public AlbumBuilder albumBuilder() {
@@ -1206,16 +1179,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 	}
 
-	/**
-	 * Bookmarks the post with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the post to bookmark
-	 */
-	public void bookmarkPost(String id) {
-		synchronized (bookmarkedPosts) {
-			bookmarkedPosts.add(id);
-		}
+	public void bookmarkPost(Post post) {
+		database.bookmarkPost(post);
 	}
 
 	/**
@@ -1224,20 +1189,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @param post
 	 *            The post to unbookmark
 	 */
-	public void unbookmark(Post post) {
-		unbookmarkPost(post.getId());
-	}
-
-	/**
-	 * Removes the post with the given ID from the bookmarks.
-	 *
-	 * @param id
-	 *            The ID of the post to unbookmark
-	 */
-	public void unbookmarkPost(String id) {
-		synchronized (bookmarkedPosts) {
-			bookmarkedPosts.remove(id);
-		}
+	public void unbookmarkPost(Post post) {
+		database.unbookmarkPost(post);
 	}
 
 	/**
@@ -1663,10 +1616,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 			/* save bookmarked posts. */
 			int bookmarkedPostCounter = 0;
-			synchronized (bookmarkedPosts) {
-				for (String bookmarkedPostId : bookmarkedPosts) {
-					configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(bookmarkedPostId);
-				}
+			for (Post bookmarkedPost : getBookmarkedPosts()) {
+				configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(bookmarkedPost.getId());
 			}
 			configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(null);
 
@@ -1723,9 +1674,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			if (bookmarkedPostId == null) {
 				break;
 			}
-			synchronized (bookmarkedPosts) {
-				bookmarkedPosts.add(bookmarkedPostId);
-			}
+			database.bookmarkPost(bookmarkedPostId);
 		}
 
 	}

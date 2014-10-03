@@ -17,8 +17,11 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+
+import com.google.common.base.Optional;
 
 /**
  * AJAX page that lets the user unbookmark a post.
@@ -50,7 +53,10 @@ public class UnbookmarkAjaxPage extends JsonPage {
 		if ((id == null) || (id.length() == 0)) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		webInterface.getCore().unbookmarkPost(id);
+		Optional<Post> post = webInterface.getCore().getPost(id);
+		if (post.isPresent()) {
+			webInterface.getCore().unbookmarkPost(post.get());
+		}
 		return createSuccessJsonObject();
 	}
 
