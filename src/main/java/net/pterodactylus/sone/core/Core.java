@@ -92,7 +92,6 @@ import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
@@ -636,7 +635,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		logger.info(String.format("Adding Sone from OwnIdentity: %s", ownIdentity));
 		Sone sone = database.newSoneBuilder().local().from(ownIdentity).build();
-		sone.setLatestEdition(Numbers.safeParseLong(ownIdentity.getProperty("Sone.LatestEdition"), 0L));
+		sone.setLatestEdition(fromNullable(tryParse(ownIdentity.getProperty("Sone.LatestEdition"))).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 		sone.setKnown(true);
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
@@ -1734,7 +1733,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		if (sone.isLocal()) {
 			return;
 		}
-		sone.setLatestEdition(Numbers.safeParseLong(identity.getProperty("Sone.LatestEdition"), sone.getLatestEdition()));
+		sone.setLatestEdition(fromNullable(tryParse(identity.getProperty("Sone.LatestEdition"))).or(sone.getLatestEdition()));
 		soneDownloader.addSone(sone);
 		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
 	}
