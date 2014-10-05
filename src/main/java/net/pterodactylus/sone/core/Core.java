@@ -79,7 +79,6 @@ import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.PostReplyProvider;
 import net.pterodactylus.sone.database.SoneBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
-import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
