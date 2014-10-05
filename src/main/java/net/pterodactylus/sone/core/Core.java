@@ -23,6 +23,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -90,7 +91,6 @@ import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
@@ -114,7 +114,7 @@ import com.google.inject.Singleton;
 public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(Core.class);
+	private static final Logger logger = getLogger("Sone.Core");
 
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();

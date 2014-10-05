@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -30,7 +32,6 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 
@@ -47,7 +48,7 @@ import freenet.clients.http.ToadletContext;
 public abstract class JsonPage implements FreenetPage {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(JsonPage.class);
+	private static final Logger logger = getLogger("Sone.Web.Ajax");
 
 	/** The JSON serializer. */
 	private static final ObjectMapper objectMapper = new ObjectMapper();

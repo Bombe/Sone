@@ -20,6 +20,7 @@ package net.pterodactylus.sone.core;
 import static freenet.keys.USK.create;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
+import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.freenet.Key.routingKey;
 
 import java.net.MalformedURLException;
@@ -36,7 +37,6 @@ import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.util.logging.Logging;
 
 import com.db4o.ObjectContainer;
 
@@ -75,7 +75,7 @@ import freenet.support.io.ArrayBucket;
 public class FreenetInterface {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(FreenetInterface.class);
+	private static final Logger logger = getLogger("Sone.FreenetInterface");
 
 	/** The event bus. */
 	private final EventBus eventBus;

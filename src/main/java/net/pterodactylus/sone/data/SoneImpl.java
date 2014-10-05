@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static java.util.logging.Logger.getLogger;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -33,7 +34,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.util.logging.Logging;
 
 import freenet.keys.FreenetURI;
 
@@ -50,7 +50,7 @@ import com.google.common.hash.Hashing;
 public class SoneImpl implements Sone {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneImpl.class);
+	private static final Logger logger = getLogger("Sone.Data");
 
 	/** The ID of this Sone. */
 	private final String id;

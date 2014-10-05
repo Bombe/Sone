@@ -18,8 +18,10 @@
 package net.pterodactylus.sone.main;
 
 import static com.google.common.base.Optional.of;
+import static java.util.logging.Logger.getLogger;
 
 import java.io.File;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -45,8 +47,6 @@ import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
-import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.logging.LoggingListener;
 import net.pterodactylus.util.version.Version;
 
 import com.google.common.base.Optional;
@@ -86,24 +86,30 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 	static {
 		/* initialize logging. */
-		Logging.setup("sone");
-		Logging.addLoggingListener(new LoggingListener() {
-
+		Logger soneLogger = getLogger("Sone");
+		soneLogger.addHandler(new Handler() {
 			@Override
-			public void logged(LogRecord logRecord) {
-				Class<?> loggerClass = Logging.getLoggerClass(logRecord.getLoggerName());
+			public void publish(LogRecord logRecord) {
 				int recordLevel = logRecord.getLevel().intValue();
 				if (recordLevel < Level.FINE.intValue()) {
-					freenet.support.Logger.debug(loggerClass, logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.debug(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.INFO.intValue()) {
-					freenet.support.Logger.minor(loggerClass, logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.minor(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.WARNING.intValue()) {
-					freenet.support.Logger.normal(loggerClass, logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.normal(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.SEVERE.intValue()) {
-					freenet.support.Logger.warning(loggerClass, logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.warning(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
 				} else {
-					freenet.support.Logger.error(loggerClass, logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.error(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
 				}
+			}
+
+			@Override
+			public void flush() {
+			}
+
+			@Override
+			public void close() {
 			}
 		});
 	}
@@ -112,7 +118,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	public static final Version VERSION = new Version(0, 8, 9);
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SonePlugin.class);
+	private static final Logger logger = getLogger("Sone.Plugin");
 
 	/** The plugin respirator. */
 	private PluginRespirator pluginRespirator;
@@ -263,25 +269,11 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		/* create the web interface. */
 		webInterface = injector.getInstance(WebInterface.class);
 
-		boolean startupFailed = true;
-		try {
-
-			/* start core! */
-			core.start();
-			webInterface.start();
-			webInterface.setFirstStart(firstStart);
-			webInterface.setNewConfig(newConfig);
-			startupFailed = false;
-		} finally {
-			if (startupFailed) {
-				/*
-				 * we let the exception bubble up but shut the logging down so
-				 * that the logfile is not swamped by the installed logging
-				 * handlers of the failed instances.
-				 */
-				Logging.shutdown();
-			}
-		}
+		/* start core! */
+		core.start();
+		webInterface.start();
+		webInterface.setFirstStart(firstStart);
+		webInterface.setNewConfig(newConfig);
 	}
 
 	/**
@@ -300,9 +292,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webOfTrustConnector.stop();
 		} catch (Throwable t1) {
 			logger.log(Level.SEVERE, "Error while shutting down!", t1);
-		} finally {
-			/* shutdown logger. */
-			Logging.shutdown();
 		}
 	}
 

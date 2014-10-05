@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.fcp;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,7 +35,6 @@ import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
-import net.pterodactylus.util.logging.Logging;
 
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
@@ -75,7 +75,7 @@ public class FcpInterface {
 	}
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(FcpInterface.class);
+	private static final Logger logger = getLogger("Sone.External.Fcp");
 
 	/** Whether the FCP interface is currently active. */
 	private final AtomicBoolean active = new AtomicBoolean();

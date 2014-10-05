@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.primitives.Ints.tryParse;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +40,6 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
@@ -64,7 +64,7 @@ import com.google.common.collect.Ordering;
 public class SearchPage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SearchPage.class);
+	private static final Logger logger = getLogger("Sone.Web.Search");
 
 	/** Short-term cache. */
 	private final LoadingCache<List<Phrase>, Set<Hit<Post>>> hitCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<List<Phrase>, Set<Hit<Post>>>() {

@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +30,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.util.logging.Logging;
 
 import com.google.common.base.Function;
 
@@ -44,7 +44,7 @@ import com.google.common.base.Function;
 public class ImageInserter {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(ImageInserter.class);
+	private static final Logger logger = getLogger("Sone.Image.Inserter");
 
 	/** The freenet interface. */
 	private final FreenetInterface freenetInterface;

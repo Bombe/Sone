@@ -20,6 +20,7 @@ package net.pterodactylus.sone.core;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.logging.Logger.getLogger;
 
 import java.io.InputStream;
 import java.util.HashSet;
@@ -31,7 +32,6 @@ import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
 import freenet.client.FetchResult;
@@ -53,7 +53,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class SoneDownloaderImpl extends AbstractService implements SoneDownloader {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneDownloaderImpl.class);
+	private static final Logger logger = getLogger("Sone.Downloader");
 
 	/** The maximum protocol version. */
 	private static final int MAX_PROTOCOL_VERSION = 0;

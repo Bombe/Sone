@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
 import java.io.InputStream;
@@ -45,7 +46,6 @@ import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -74,7 +74,7 @@ import freenet.keys.FreenetURI;
 public class SoneInserter extends AbstractService {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneInserter.class);
+	private static final Logger logger = getLogger("Sone.Inserter");
 
 	/** The insertion delay (in seconds). */
 	private static final AtomicInteger insertionDelay = new AtomicInteger(60);

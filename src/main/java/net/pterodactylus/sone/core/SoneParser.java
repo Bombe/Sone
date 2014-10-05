@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.core;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +22,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.SoneBuilder;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
@@ -34,7 +35,7 @@ import org.w3c.dom.Document;
  */
 public class SoneParser {
 
-	private static final Logger logger = Logging.getLogger(SoneParser.class);
+	private static final Logger logger = getLogger("Sone.Parser");
 	private static final int MAX_PROTOCOL_VERSION = 0;
 	private final Core core;
 

@@ -17,13 +17,14 @@
 
 package net.pterodactylus.sone.freenet;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.util.logging.Logger;
 
 import net.pterodactylus.util.config.AttributeNotFoundException;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.ExtendedConfigurationBackend;
-import net.pterodactylus.util.logging.Logging;
 import freenet.client.async.DatabaseDisabledException;
 import freenet.pluginmanager.PluginRespirator;
 import freenet.pluginmanager.PluginStore;
@@ -37,7 +38,7 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 
 	/** The logger. */
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logging.getLogger(PluginStoreConfigurationBackend.class);
+	private static final Logger logger = getLogger("Sone.Fred");
 
 	/** The plugin respirator. */
 	private final PluginRespirator pluginRespirator;

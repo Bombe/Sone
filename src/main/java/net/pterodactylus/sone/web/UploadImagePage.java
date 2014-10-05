@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,7 +39,6 @@ import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -55,7 +56,7 @@ import freenet.support.api.HTTPUploadedFile;
 public class UploadImagePage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(UploadImagePage.class);
+	private static final Logger logger = getLogger("Sone.Web.UploadImage");
 
 	/**
 	 * Creates a new “upload image” page.

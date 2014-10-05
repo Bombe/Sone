@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.page;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.net.URI;
@@ -28,7 +30,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
@@ -51,7 +52,7 @@ import freenet.support.HTMLNode;
 public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(FreenetTemplatePage.class);
+	private static final Logger logger = getLogger("Sone.Web.Freenet");
 
 	/** The path of the page. */
 	private final String path;

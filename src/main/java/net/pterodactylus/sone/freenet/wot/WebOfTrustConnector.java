@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,7 +30,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.number.Numbers;
 
 import com.google.common.base.Optional;
@@ -49,7 +50,7 @@ import freenet.support.api.Bucket;
 public class WebOfTrustConnector {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(WebOfTrustConnector.class);
+	private static final Logger logger = getLogger("Sone.WoT.Connector");
 
 	/** The name of the WoT plugin. */
 	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";

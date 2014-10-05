@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.util.template.TemplateParser.parse;
 
 import java.io.IOException;
@@ -128,7 +129,6 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
@@ -173,7 +173,7 @@ import freenet.support.api.HTTPRequest;
 public class WebInterface {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(WebInterface.class);
+	private static final Logger logger = getLogger("Sone.Web.Main");
 
 	/** The notification manager. */
 	private final NotificationManager notificationManager = new NotificationManager();

@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -30,7 +31,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -47,7 +47,7 @@ import com.google.inject.Singleton;
 public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrustUpdater {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(WebOfTrustUpdaterImpl.class);
+	private static final Logger logger = getLogger("Sone.WoT.Updater");
 
 	/** Stop job. */
 	@SuppressWarnings("synthetic-access")

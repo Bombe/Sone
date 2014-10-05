@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +28,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 
 import com.google.common.collect.Sets;
@@ -49,7 +50,7 @@ import com.google.inject.Singleton;
 public class IdentityManagerImpl extends AbstractService implements IdentityManager {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(IdentityManagerImpl.class);
+	private static final Logger logger = getLogger("Sone.Identities");
 
 	/** The event bus. */
 	private final EventBus eventBus;

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.text;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -33,7 +35,6 @@ import net.pterodactylus.sone.data.impl.IdOnlySone;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 
 import com.google.common.base.Optional;
 
@@ -47,7 +48,7 @@ import freenet.keys.FreenetURI;
 public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneTextParser.class);
+	private static final Logger logger = getLogger("Sone.Data.Parser");
 
 	/** Pattern to detect whitespace. */
 	private static final Pattern whitespacePattern = Pattern.compile("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]");
