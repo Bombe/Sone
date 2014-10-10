@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +27,6 @@ import java.util.List;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -143,7 +144,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 				Collections.sort(sortedSones, Sone.NICE_NAME_COMPARATOR);
 			}
 		}
-		Pagination<Sone> sonePagination = new Pagination<Sone>(sortedSones, 25).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(sortedSones, 25).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", sonePagination);
 		templateContext.set("knownSones", sonePagination.getItems());
 	}

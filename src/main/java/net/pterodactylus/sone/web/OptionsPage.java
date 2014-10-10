@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -78,31 +79,31 @@ public class OptionsPage extends SoneTemplatePage {
 				currentSone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(showCustomAvatars));
 				webInterface.getCore().touchConfiguration();
 			}
-			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
+			Integer insertionDelay = parseInt(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16), null);
 			if (!preferences.validateInsertionDelay(insertionDelay)) {
 				fieldErrors.add("insertion-delay");
 			} else {
 				preferences.setInsertionDelay(insertionDelay);
 			}
-			Integer postsPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
+			Integer postsPerPage = parseInt(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
 			if (!preferences.validatePostsPerPage(postsPerPage)) {
 				fieldErrors.add("posts-per-page");
 			} else {
 				preferences.setPostsPerPage(postsPerPage);
 			}
-			Integer imagesPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4), null);
+			Integer imagesPerPage = parseInt(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4), null);
 			if (!preferences.validateImagesPerPage(imagesPerPage)) {
 				fieldErrors.add("images-per-page");
 			} else {
 				preferences.setImagesPerPage(imagesPerPage);
 			}
-			Integer charactersPerPost = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
+			Integer charactersPerPost = parseInt(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
 			if (!preferences.validateCharactersPerPost(charactersPerPost)) {
 				fieldErrors.add("characters-per-post");
 			} else {
 				preferences.setCharactersPerPost(charactersPerPost);
 			}
-			Integer postCutOffLength = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("post-cut-off-length", 10), null);
+			Integer postCutOffLength = parseInt(request.getHttpRequest().getPartAsStringFailsafe("post-cut-off-length", 10), null);
 			if (!preferences.validatePostCutOffLength(postCutOffLength)) {
 				fieldErrors.add("post-cut-off-length");
 			} else {
@@ -110,13 +111,13 @@ public class OptionsPage extends SoneTemplatePage {
 			}
 			boolean requireFullAccess = request.getHttpRequest().isPartSet("require-full-access");
 			preferences.setRequireFullAccess(requireFullAccess);
-			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
+			Integer positiveTrust = parseInt(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3), null);
 			if (!preferences.validatePositiveTrust(positiveTrust)) {
 				fieldErrors.add("positive-trust");
 			} else {
 				preferences.setPositiveTrust(positiveTrust);
 			}
-			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
+			Integer negativeTrust = parseInt(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4), null);
 			if (!preferences.validateNegativeTrust(negativeTrust)) {
 				fieldErrors.add("negative-trust");
 			} else {
@@ -129,7 +130,7 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setTrustComment(trustComment);
 			boolean fcpInterfaceActive = request.getHttpRequest().isPartSet("fcp-interface-active");
 			preferences.setFcpInterfaceActive(fcpInterfaceActive);
-			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
+			Integer fcpFullAccessRequiredInteger = parseInt(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
 			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
 			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
 			webInterface.getCore().touchConfiguration();

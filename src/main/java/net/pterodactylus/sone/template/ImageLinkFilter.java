@@ -17,13 +17,16 @@
 
 package net.pterodactylus.sone.template;
 
+import static java.lang.Integer.MAX_VALUE;
+import static java.lang.String.valueOf;
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Map;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -77,8 +80,8 @@ public class ImageLinkFilter implements Filter {
 			return null;
 		}
 		String imageClass = String.valueOf(parameters.get("class"));
-		int maxWidth = Numbers.safeParseInteger(parameters.get("max-width"), Integer.MAX_VALUE);
-		int maxHeight = Numbers.safeParseInteger(parameters.get("max-height"), Integer.MAX_VALUE);
+		int maxWidth = parseInt(valueOf(parameters.get("max-width")), MAX_VALUE);
+		int maxHeight = parseInt(valueOf(parameters.get("max-height")), MAX_VALUE);
 		String mode = String.valueOf(parameters.get("mode"));
 		String title = String.valueOf(parameters.get("title"));
 

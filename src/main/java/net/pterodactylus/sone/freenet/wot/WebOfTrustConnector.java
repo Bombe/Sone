@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.freenet.wot;
 
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,7 +31,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
-import net.pterodactylus.util.number.Numbers;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.MapMaker;
@@ -156,9 +156,9 @@ public class WebOfTrustConnector {
 			DefaultIdentity identity = new DefaultIdentity(id, nickname, requestUri);
 			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
 			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
-			Integer trust = Numbers.safeParseInteger(fields.get("Trust" + identityCounter), null);
-			int score = Numbers.safeParseInteger(fields.get("Score" + identityCounter), 0);
-			int rank = Numbers.safeParseInteger(fields.get("Rank" + identityCounter), 0);
+			Integer trust = parseInt(fields.get("Trust" + identityCounter), null);
+			int score = parseInt(fields.get("Score" + identityCounter), 0);
+			int rank = parseInt(fields.get("Rank" + identityCounter), 0);
 			identity.setTrust(ownIdentity, new Trust(trust, score, rank));
 			identities.add(identity);
 		}

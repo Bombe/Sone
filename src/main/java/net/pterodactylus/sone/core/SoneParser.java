@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.core;
 
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+import static net.pterodactylus.sone.utils.NumberParsers.parseLong;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -22,7 +24,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.SoneBuilder;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
 
@@ -75,7 +76,7 @@ public class SoneParser {
 		Integer protocolVersion = null;
 		String soneProtocolVersion = soneXml.getValue("protocol-version", null);
 		if (soneProtocolVersion != null) {
-			protocolVersion = Numbers.safeParseInteger(soneProtocolVersion);
+			protocolVersion = parseInt(soneProtocolVersion, null);
 		}
 		if (protocolVersion == null) {
 			logger.log(Level.INFO, "No protocol version found, assuming 0.");
@@ -129,9 +130,9 @@ public class SoneParser {
 		String profileFirstName = profileXml.getValue("first-name", null);
 		String profileMiddleName = profileXml.getValue("middle-name", null);
 		String profileLastName = profileXml.getValue("last-name", null);
-		Integer profileBirthDay = Numbers.safeParseInteger(profileXml.getValue("birth-day", null));
-		Integer profileBirthMonth = Numbers.safeParseInteger(profileXml.getValue("birth-month", null));
-		Integer profileBirthYear = Numbers.safeParseInteger(profileXml.getValue("birth-year", null));
+		Integer profileBirthDay = parseInt(profileXml.getValue("birth-day", ""), null);
+		Integer profileBirthMonth = parseInt(profileXml.getValue("birth-month", ""), null);
+		Integer profileBirthYear = parseInt(profileXml.getValue("birth-year", ""), null);
 		Profile profile = new Profile(sone).setFirstName(profileFirstName).setMiddleName(profileMiddleName).setLastName(profileLastName);
 		profile.setBirthDay(profileBirthDay).setBirthMonth(profileBirthMonth).setBirthYear(profileBirthYear);
 		/* avatar is processed after images are loaded. */
@@ -295,9 +296,9 @@ public class SoneParser {
 							logger.log(Level.WARNING, String.format("Downloaded Sone %s contains invalid images!", sone));
 							return null;
 						}
-						long creationTime = Numbers.safeParseLong(imageCreationTimeString, 0L);
-						int imageWidth = Numbers.safeParseInteger(imageWidthString, 0);
-						int imageHeight = Numbers.safeParseInteger(imageHeightString, 0);
+						long creationTime = parseLong(imageCreationTimeString, 0L);
+						int imageWidth = parseInt(imageWidthString, 0);
+						int imageHeight = parseInt(imageHeightString, 0);
 						if ((imageWidth < 1) || (imageHeight < 1)) {
 							logger.log(Level.WARNING, String.format("Downloaded Sone %s contains image %s with invalid dimensions (%s, %s)!", sone, imageId, imageWidthString, imageHeightString));
 							return null;
