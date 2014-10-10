@@ -91,7 +91,7 @@ public class ParserFilter implements Filter {
 	 */
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
-		String text = String.valueOf(data);
+		String text = valueOf(data);
 		int length = parseInt(valueOf(parameters.get("length")), -1);
 		int cutOffLength = parseInt(valueOf(parameters.get("cut-off-length")), length);
 		Object sone = parameters.get("sone");
