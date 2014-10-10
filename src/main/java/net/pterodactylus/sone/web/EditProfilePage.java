@@ -25,7 +25,6 @@ import java.util.List;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
