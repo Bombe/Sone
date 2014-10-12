@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.core;
 
+import static freenet.support.io.Closer.close;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -31,7 +32,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.service.AbstractService;
 
 import freenet.client.FetchResult;
@@ -41,6 +41,7 @@ import freenet.keys.FreenetURI;
 import freenet.keys.USK;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
+import freenet.support.io.Closer;
 import com.db4o.ObjectContainer;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -237,8 +238,8 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		} catch (Exception e1) {
 			logger.log(Level.WARNING, String.format("Could not parse Sone from %s!", requestUri), e1);
 		} finally {
-			Closer.close(soneInputStream);
-			soneBucket.free();
+			close(soneInputStream);
+			close(soneBucket);
 		}
 		return null;
 	}
