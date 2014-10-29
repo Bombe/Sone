@@ -61,13 +61,6 @@ public class SoneImpl implements Sone {
 	/** The identity of this Sone. */
 	private final Identity identity;
 
-	/** The URI under which the Sone is stored in Freenet. */
-	private volatile FreenetURI requestUri;
-
-	/** The URI used to insert a new version of this Sone. */
-	/* This will be null for remote Sones! */
-	private volatile FreenetURI insertUri;
-
 	/** The latest edition of the Sone. */
 	private volatile long latestEdition;
 
@@ -710,7 +703,7 @@ public class SoneImpl implements Sone {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[identity=" + identity + ",requestUri=" + requestUri + ",insertUri(" + String.valueOf(insertUri).length() + "),friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
+		return getClass().getName() + "[identity=" + identity + ",friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
 	}
 
 }
