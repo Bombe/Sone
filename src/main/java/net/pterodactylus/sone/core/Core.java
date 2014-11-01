@@ -926,10 +926,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, String.format("Tried to delete non-local Sone: %s", sone));
 			return;
 		}
-		// FIXME – implement in database
-//		sones.remove(sone.getId());
 		SoneInserter soneInserter = soneInserters.remove(sone);
 		soneInserter.stop();
+		database.removeSone(sone);
 		webOfTrustUpdater.removeContext((OwnIdentity) sone.getIdentity(), "Sone");
 		webOfTrustUpdater.removeProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition");
 		try {
@@ -1761,16 +1760,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;
 		}
-		database.removePosts(sone.get());
-		for (Post post : sone.get().getPosts()) {
-			eventBus.post(new PostRemovedEvent(post));
-		}
-		database.removePostReplies(sone.get());
-		for (PostReply reply : sone.get().getReplies()) {
-			eventBus.post(new PostReplyRemovedEvent(reply));
-		}
-//		TODO – implement in database
-//		sones.remove(identity.getId());
+		database.removeSone(sone.get());
 		eventBus.post(new SoneRemovedEvent(sone.get()));
 	}
 
