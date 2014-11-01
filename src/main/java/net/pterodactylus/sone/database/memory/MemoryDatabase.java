@@ -180,6 +180,35 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public void storeSone(Sone sone) {
 		lock.writeLock().lock();
 		try {
+			removeSone(sone);
+
+			allSones.put(sone.getId(), sone);
+			sonePosts.putAll(sone.getId(), sone.getPosts());
+			for (Post post : sone.getPosts()) {
+				allPosts.put(post.getId(), post);
+			}
+			sonePostReplies.putAll(sone.getId(), sone.getReplies());
+			for (PostReply postReply : sone.getReplies()) {
+				allPostReplies.put(postReply.getId(), postReply);
+			}
+			soneAlbums.putAll(sone.getId(), toAllAlbums.apply(sone));
+			for (Album album : toAllAlbums.apply(sone)) {
+				allAlbums.put(album.getId(), album);
+			}
+			soneImages.putAll(sone.getId(), toAllImages.apply(sone));
+			for (Image image : toAllImages.apply(sone)) {
+				allImages.put(image.getId(), image);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public void removeSone(Sone sone) {
+		lock.writeLock().lock();
+		try {
+			allSones.remove(sone.getId());
 			Collection<Post> removedPosts = sonePosts.removeAll(sone.getId());
 			for (Post removedPost : removedPosts) {
 				allPosts.remove(removedPost.getId());
@@ -198,24 +227,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 					soneImages.removeAll(sone.getId());
 			for (Image removedImage : removedImages) {
 				allImages.remove(removedImage.getId());
-			}
-
-			allSones.put(sone.getId(), sone);
-			sonePosts.putAll(sone.getId(), sone.getPosts());
-			for (Post post : sone.getPosts()) {
-				allPosts.put(post.getId(), post);
-			}
-			sonePostReplies.putAll(sone.getId(), sone.getReplies());
-			for (PostReply postReply : sone.getReplies()) {
-				allPostReplies.put(postReply.getId(), postReply);
-			}
-			soneAlbums.putAll(sone.getId(), toAllAlbums.apply(sone));
-			for (Album album : toAllAlbums.apply(sone)) {
-				allAlbums.put(album.getId(), album);
-			}
-			soneImages.putAll(sone.getId(), toAllImages.apply(sone));
-			for (Image image : toAllImages.apply(sone)) {
-				allImages.put(image.getId(), image);
 			}
 		} finally {
 			lock.writeLock().unlock();

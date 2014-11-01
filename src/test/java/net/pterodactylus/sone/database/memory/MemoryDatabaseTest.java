@@ -27,6 +27,7 @@ import static net.pterodactylus.sone.Matchers.isPostReply;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -195,6 +196,13 @@ public class MemoryDatabaseTest {
 				isImage("image3", 3000L, "KSK@image3", "image3",
 						"image-description3", 48, 27));
 		assertThat(memoryDatabase.getImage("image4").isPresent(), is(false));
+	}
+
+	@Test
+	public void storedAndRemovedSoneIsNotAvailable() {
+	    storedSoneIsMadeAvailable();
+		memoryDatabase.removeSone(sone);
+		assertThat(memoryDatabase.getSones(), empty());
 	}
 
 	@Test

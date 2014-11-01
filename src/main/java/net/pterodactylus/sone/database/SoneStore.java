@@ -10,5 +10,6 @@ import net.pterodactylus.sone.data.Sone;
 public interface SoneStore {
 
 	void storeSone(Sone sone);
+	void removeSone(Sone sone);
 
 }
