@@ -45,9 +45,6 @@ public class CollectionAccessor extends ReflectionAccessor {
 	 */
 	@Override
 	public Object get(TemplateContext templateContext, Object object, String member) {
-		if (object == null) {
-			return null;
-		}
 		Collection<?> collection = (Collection<?>) object;
 		if (member.equals("soneNames")) {
 			List<Sone> sones = new ArrayList<Sone>();
