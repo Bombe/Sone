@@ -116,8 +116,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private final Map<String, Image> allImages = new HashMap<String, Image>();
 	private final Multimap<String, Image> soneImages = HashMultimap.create();
 
-	private final MemoryBookmarkDatabase memoryBookmarkDatabase =
-			new MemoryBookmarkDatabase(this);
+	private final MemoryBookmarkDatabase memoryBookmarkDatabase;
 
 	/**
 	 * Creates a new memory database.
@@ -132,6 +131,8 @@ public class MemoryDatabase extends AbstractService implements Database {
 		this.soneProvider = soneProvider;
 		this.configuration = configuration;
 		this.configurationLoader = new ConfigurationLoader(configuration);
+		memoryBookmarkDatabase =
+				new MemoryBookmarkDatabase(this, configurationLoader);
 	}
 
 	//
@@ -157,6 +158,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	/** {@inheritDocs} */
 	@Override
 	protected void doStart() {
+		memoryBookmarkDatabase.start();
 		loadKnownPosts();
 		loadKnownPostReplies();
 		notifyStarted();

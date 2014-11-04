@@ -21,10 +21,28 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final MemoryDatabase memoryDatabase;
+	private final ConfigurationLoader configurationLoader;
 	private final Set<String> bookmarkedPosts = new HashSet<String>();
 
-	public MemoryBookmarkDatabase(MemoryDatabase memoryDatabase) {
+	public MemoryBookmarkDatabase(MemoryDatabase memoryDatabase,
+			ConfigurationLoader configurationLoader) {
 		this.memoryDatabase = memoryDatabase;
+		this.configurationLoader = configurationLoader;
+	}
+
+	public void start() {
+		loadBookmarkedPosts();
+	}
+
+	private void loadBookmarkedPosts() {
+		Set<String> bookmarkedPosts = configurationLoader.loadBookmarkedPosts();
+		lock.writeLock().lock();
+		try {
+			this.bookmarkedPosts.clear();
+			this.bookmarkedPosts.addAll(bookmarkedPosts);
+		} finally {
+			lock.writeLock().unlock();
+		}
 	}
 
 	@Override

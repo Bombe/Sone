@@ -48,4 +48,19 @@ public class ConfigurationLoader {
 		return knownPostReplies;
 	}
 
+	public synchronized Set<String> loadBookmarkedPosts() {
+		Set<String> bookmarkedPosts = new HashSet<String>();
+		int postCounter = 0;
+		while (true) {
+			String bookmarkedPostId = configuration
+					.getStringValue("Bookmarks/Post/" + postCounter++ + "/ID")
+					.getValue(null);
+			if (bookmarkedPostId == null) {
+				break;
+			}
+			bookmarkedPosts.add(bookmarkedPostId);
+		}
+		return bookmarkedPosts;
+	}
+
 }

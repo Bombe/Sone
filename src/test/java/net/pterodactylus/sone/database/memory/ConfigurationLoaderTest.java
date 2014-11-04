@@ -48,4 +48,16 @@ public class ConfigurationLoaderTest {
 				containsInAnyOrder("PostReply1", "PostReply2"));
 	}
 
+	@Test
+	public void loaderCanLoadBookmarkedPosts() {
+		when(configuration.getStringValue("Bookmarks/Post/0/ID"))
+				.thenReturn(new TestValue<String>("Post2"));
+		when(configuration.getStringValue("Bookmarks/Post/1/ID"))
+				.thenReturn(new TestValue<String>("Post1"));
+		when(configuration.getStringValue("Bookmarks/Post/2/ID"))
+				.thenReturn(new TestValue<String>(null));
+		Set<String> knownPosts = configurationLoader.loadBookmarkedPosts();
+		assertThat(knownPosts, containsInAnyOrder("Post1", "Post2"));
+	}
+
 }
