@@ -1663,17 +1663,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 			++soneCounter;
 		}
-
-		/* load bookmarked posts. */
-		int bookmarkedPostCounter = 0;
-		while (true) {
-			String bookmarkedPostId = configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").getValue(null);
-			if (bookmarkedPostId == null) {
-				break;
-			}
-			database.bookmarkPost(bookmarkedPostId);
-		}
-
 	}
 
 	/**
