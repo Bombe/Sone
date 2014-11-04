@@ -4,8 +4,10 @@ import static com.google.common.base.Optional.fromNullable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -85,6 +87,18 @@ public class MemoryBookmarkDatabaseTest {
 			assertThat(bookmarkDatabase.isPostBookmarked(post),
 					is(!post.equals(randomPost)));
 		}
+	}
+
+	@Test
+	public void startingTheDatabaseLoadsBookmarkedPosts() {
+		bookmarkDatabase.start();
+		verify(configurationLoader).loadBookmarkedPosts();
+	}
+
+	@Test
+	public void stoppingTheDatabaseSavesTheBookmarkedPosts() {
+		bookmarkDatabase.stop();
+		verify(configurationLoader).saveBookmarkedPosts(any(Set.class));
 	}
 
 }
