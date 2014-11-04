@@ -82,6 +82,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The configuration. */
 	private final Configuration configuration;
+	private final ConfigurationLoader configurationLoader;
 
 	private final Map<String, Sone> allSones = new HashMap<String, Sone>();
 
@@ -130,6 +131,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public MemoryDatabase(SoneProvider soneProvider, Configuration configuration) {
 		this.soneProvider = soneProvider;
 		this.configuration = configuration;
+		this.configurationLoader = new ConfigurationLoader(configuration);
 	}
 
 	//
@@ -731,16 +733,11 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** Loads the known posts. */
 	private void loadKnownPosts() {
+		Set<String> knownPosts = configurationLoader.loadKnownPosts();
 		lock.writeLock().lock();
 		try {
-			int postCounter = 0;
-			while (true) {
-				String knownPostId = configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").getValue(null);
-				if (knownPostId == null) {
-					break;
-				}
-				knownPosts.add(knownPostId);
-			}
+			this.knownPosts.clear();
+			this.knownPosts.addAll(knownPosts);
 		} finally {
 			lock.writeLock().unlock();
 		}
