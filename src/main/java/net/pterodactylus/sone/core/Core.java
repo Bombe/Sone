@@ -1611,13 +1611,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* save known posts. */
 			database.save();
 
-			/* save bookmarked posts. */
-			int bookmarkedPostCounter = 0;
-			for (Post bookmarkedPost : getBookmarkedPosts()) {
-				configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(bookmarkedPost.getId());
-			}
-			configuration.getStringValue("Bookmarks/Post/" + bookmarkedPostCounter++ + "/ID").setValue(null);
-
 			/* now save it. */
 			configuration.save();
 
