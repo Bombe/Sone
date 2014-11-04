@@ -609,11 +609,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 	}
 
 	@Override
-	public void bookmarkPost(String postId) {
-		memoryBookmarkDatabase.bookmarkPost(postId);
-	}
-
-	@Override
 	public void bookmarkPost(Post post) {
 		memoryBookmarkDatabase.bookmarkPost(post);
 	}

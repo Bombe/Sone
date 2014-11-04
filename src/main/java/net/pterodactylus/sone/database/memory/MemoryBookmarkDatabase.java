@@ -46,16 +46,6 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 	}
 
 	@Override
-	public void bookmarkPost(String postId) {
-		lock.writeLock().lock();
-		try {
-			bookmarkedPosts.add(postId);
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	@Override
 	public void bookmarkPost(Post post) {
 		lock.writeLock().lock();
 		try {

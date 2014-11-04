@@ -87,12 +87,4 @@ public class MemoryBookmarkDatabaseTest {
 		}
 	}
 
-	@Test
-	public void addingABookmarkByIdBookmarksTheCorrectPost() {
-		Post randomPost = posts.values().iterator().next();
-		bookmarkDatabase.bookmarkPost(randomPost.getId());
-		assertThat(bookmarkDatabase.getBookmarkedPosts(),
-				contains(randomPost));
-	}
-
 }

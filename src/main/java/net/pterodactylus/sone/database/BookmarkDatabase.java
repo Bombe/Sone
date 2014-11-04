@@ -11,7 +11,6 @@ import net.pterodactylus.sone.data.Post;
  */
 public interface BookmarkDatabase {
 
-	void bookmarkPost(String postId); // FIXME – remove me
 	void bookmarkPost(Post post);
 	void unbookmarkPost(Post post);
 	boolean isPostBookmarked(Post post);
