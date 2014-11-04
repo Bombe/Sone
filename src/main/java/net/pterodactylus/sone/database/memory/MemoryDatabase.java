@@ -168,6 +168,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	@Override
 	protected void doStop() {
 		try {
+			memoryBookmarkDatabase.stop();
 			save();
 			notifyStopped();
 		} catch (DatabaseException de1) {

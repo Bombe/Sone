@@ -45,6 +45,19 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 		}
 	}
 
+	public void stop() {
+		saveBookmarkedPosts();
+	}
+
+	private void saveBookmarkedPosts() {
+		lock.readLock().lock();
+		try {
+			configurationLoader.saveBookmarkedPosts(this.bookmarkedPosts);
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
 	@Override
 	public void bookmarkPost(Post post) {
 		lock.writeLock().lock();
