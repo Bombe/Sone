@@ -1105,24 +1105,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The created post
 	 */
 	public Post createPost(Sone sone, Optional<Sone> recipient, String text) {
-		return createPost(sone, recipient, System.currentTimeMillis(), text);
-	}
-
-	/**
-	 * Creates a new post.
-	 *
-	 * @param sone
-	 *            The Sone that creates the post
-	 * @param recipient
-	 *            The recipient Sone, or {@code null} if this post does not have
-	 *            a recipient
-	 * @param time
-	 *            The time of the post
-	 * @param text
-	 *            The text of the post
-	 * @return The created post
-	 */
-	public Post createPost(Sone sone, Optional<Sone> recipient, long time, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
@@ -1130,7 +1112,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			return null;
 		}
 		PostBuilder postBuilder = database.newPostBuilder();
-		postBuilder.from(sone.getId()).randomId().withTime(time).withText(text.trim());
+		postBuilder.from(sone.getId()).randomId().currentTime().withText(text.trim());
 		if (recipient.isPresent()) {
 			postBuilder.to(recipient.get().getId());
 		}

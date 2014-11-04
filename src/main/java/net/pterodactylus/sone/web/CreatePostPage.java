@@ -69,7 +69,7 @@ public class CreatePostPage extends SoneTemplatePage {
 				}
 				Optional<Sone> recipient = webInterface.getCore().getSone(recipientId);
 				text = TextFilter.filter(request.getHttpRequest().getHeader("host"), text);
-				webInterface.getCore().createPost(sender, recipient, System.currentTimeMillis(), text);
+				webInterface.getCore().createPost(sender, recipient, text);
 				throw new RedirectException(returnPage);
 			}
 			templateContext.set("errorTextEmpty", true);
