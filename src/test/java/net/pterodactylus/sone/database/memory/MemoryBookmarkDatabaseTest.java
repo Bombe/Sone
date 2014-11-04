@@ -30,7 +30,8 @@ import org.mockito.stubbing.Answer;
 public class MemoryBookmarkDatabaseTest {
 
 	private final MemoryDatabase memoryDatabase = mock(MemoryDatabase.class);
-	private final ConfigurationLoader configurationLoader = mock(ConfigurationLoader.class);
+	private final ConfigurationLoader configurationLoader =
+			mock(ConfigurationLoader.class);
 	private final MemoryBookmarkDatabase bookmarkDatabase =
 			new MemoryBookmarkDatabase(memoryDatabase, configurationLoader);
 	private final Map<String, Post> posts = new HashMap<String, Post>();
