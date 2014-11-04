@@ -676,22 +676,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * Returns all replies by the given Sone.
-	 *
-	 * @param id
-	 * 		The ID of the Sone
-	 * @return The post replies of the Sone, sorted by time (newest first)
-	 */
-	private Collection<PostReply> getRepliesFrom(String id) {
-		lock.readLock().lock();
-		try {
-			return unmodifiableCollection(sonePostReplies.get(id));
-		} finally {
-			lock.readLock().unlock();
-		}
-	}
-
 	/** Loads the known post replies. */
 	private void loadKnownPostReplies() {
 		Set<String> knownPostReplies = configurationLoader.loadKnownPostReplies();
