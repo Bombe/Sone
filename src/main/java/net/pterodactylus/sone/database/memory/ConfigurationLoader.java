@@ -19,48 +19,30 @@ public class ConfigurationLoader {
 	}
 
 	public synchronized Set<String> loadKnownPosts() {
-		Set<String> knownPosts = new HashSet<String>();
-		int postCounter = 0;
-		while (true) {
-			String knownPostId = configuration
-					.getStringValue("KnownPosts/" + postCounter++ + "/ID")
-					.getValue(null);
-			if (knownPostId == null) {
-				break;
-			}
-			knownPosts.add(knownPostId);
-		}
-		return knownPosts;
+		return loadIds("KnownPosts");
 	}
 
 	public synchronized Set<String> loadKnownPostReplies() {
-		Set<String> knownPostReplies = new HashSet<String>();
-		int replyCounter = 0;
-		while (true) {
-			String knownReplyId = configuration
-					.getStringValue("KnownReplies/" + replyCounter++ + "/ID")
-					.getValue(null);
-			if (knownReplyId == null) {
-				break;
-			}
-			knownPostReplies.add(knownReplyId);
-		}
-		return knownPostReplies;
+		return loadIds("KnownReplies");
 	}
 
 	public synchronized Set<String> loadBookmarkedPosts() {
-		Set<String> bookmarkedPosts = new HashSet<String>();
-		int postCounter = 0;
+		return loadIds("Bookmarks/Post");
+	}
+
+	private Set<String> loadIds(String prefix) {
+		Set<String> ids = new HashSet<String>();
+		int idCounter = 0;
 		while (true) {
-			String bookmarkedPostId = configuration
-					.getStringValue("Bookmarks/Post/" + postCounter++ + "/ID")
+			String id = configuration
+					.getStringValue(prefix + "/" + idCounter++ + "/ID")
 					.getValue(null);
-			if (bookmarkedPostId == null) {
+			if (id == null) {
 				break;
 			}
-			bookmarkedPosts.add(bookmarkedPostId);
+			ids.add(id);
 		}
-		return bookmarkedPosts;
+		return ids;
 	}
 
 }
