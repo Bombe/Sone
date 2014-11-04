@@ -33,4 +33,19 @@ public class ConfigurationLoader {
 		return knownPosts;
 	}
 
+	public synchronized Set<String> loadKnownPostReplies() {
+		Set<String> knownPostReplies = new HashSet<String>();
+		int replyCounter = 0;
+		while (true) {
+			String knownReplyId = configuration
+					.getStringValue("KnownReplies/" + replyCounter++ + "/ID")
+					.getValue(null);
+			if (knownReplyId == null) {
+				break;
+			}
+			knownPostReplies.add(knownReplyId);
+		}
+		return knownPostReplies;
+	}
+
 }

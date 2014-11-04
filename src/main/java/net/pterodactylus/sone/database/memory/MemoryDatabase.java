@@ -782,16 +782,11 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** Loads the known post replies. */
 	private void loadKnownPostReplies() {
+		Set<String> knownPostReplies = configurationLoader.loadKnownPostReplies();
 		lock.writeLock().lock();
 		try {
-			int replyCounter = 0;
-			while (true) {
-				String knownReplyId = configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").getValue(null);
-				if (knownReplyId == null) {
-					break;
-				}
-				knownPostReplies.add(knownReplyId);
-			}
+			this.knownPostReplies.clear();
+			this.knownPostReplies.addAll(knownPostReplies);
 		} finally {
 			lock.writeLock().unlock();
 		}

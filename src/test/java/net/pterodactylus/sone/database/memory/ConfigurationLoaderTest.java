@@ -35,4 +35,17 @@ public class ConfigurationLoaderTest {
 		assertThat(knownPosts, containsInAnyOrder("Post1", "Post2"));
 	}
 
+	@Test
+	public void loaderCanLoadKnownPostReplies() {
+		when(configuration.getStringValue("KnownReplies/0/ID"))
+				.thenReturn(new TestValue<String>("PostReply2"));
+		when(configuration.getStringValue("KnownReplies/1/ID"))
+				.thenReturn(new TestValue<String>("PostReply1"));
+		when(configuration.getStringValue("KnownReplies/2/ID"))
+				.thenReturn(new TestValue<String>(null));
+		Set<String> knownPosts = configurationLoader.loadKnownPostReplies();
+		assertThat(knownPosts,
+				containsInAnyOrder("PostReply1", "PostReply2"));
+	}
+
 }
