@@ -74,6 +74,7 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 		lock.writeLock().lock();
 		try {
 			bookmarkedPosts.remove(post.getId());
+			saveBookmarkedPosts();
 		} finally {
 			lock.writeLock().unlock();
 		}

@@ -84,6 +84,16 @@ public class MemoryBookmarkDatabaseTest {
 	}
 
 	@Test
+	public void unbookmarkingAPostSavesTheDatabase() {
+		for (Post post : posts.values()) {
+			bookmarkDatabase.bookmarkPost(post);
+			bookmarkDatabase.unbookmarkPost(post);
+		}
+		verify(configurationLoader, times(posts.size() * 2))
+				.saveBookmarkedPosts(any(Set.class));
+	}
+
+	@Test
 	public void removingABookmarkRemovesTheCorrectBookmark() {
 		Set<Post> allPosts = new HashSet<Post>(posts.values());
 		for (Post post : allPosts) {
