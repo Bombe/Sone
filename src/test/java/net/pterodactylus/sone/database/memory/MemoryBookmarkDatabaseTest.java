@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -71,6 +72,15 @@ public class MemoryBookmarkDatabaseTest {
 		for (Post post : allPosts) {
 			assertThat(bookmarkDatabase.isPostBookmarked(post), is(true));
 		}
+	}
+
+	@Test
+	public void bookmarkingAPostSavesTheDatabase() {
+		for (Post post : posts.values()) {
+			bookmarkDatabase.bookmarkPost(post);
+		}
+		verify(configurationLoader, times(posts.size()))
+				.saveBookmarkedPosts(any(Set.class));
 	}
 
 	@Test

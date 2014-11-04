@@ -63,6 +63,7 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 		lock.writeLock().lock();
 		try {
 			bookmarkedPosts.add(post.getId());
+			saveBookmarkedPosts();
 		} finally {
 			lock.writeLock().unlock();
 		}
