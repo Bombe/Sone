@@ -38,32 +38,11 @@ public interface PostReplyStore {
 	public void storePostReply(PostReply postReply);
 
 	/**
-	 * Stores the given post replies as exclusive collection of post replies for
-	 * the given Sone. This will remove all other post replies from this Sone!
-	 *
-	 * @param sone
-	 *            The Sone to store all post replies for
-	 * @param postReplies
-	 *            The post replies of the Sone
-	 * @throws IllegalArgumentException
-	 *             if one of the replies does not belong to the given Sone
-	 */
-	public void storePostReplies(Sone sone, Collection<PostReply> postReplies) throws IllegalArgumentException;
-
-	/**
 	 * Removes the given post reply from this store.
 	 *
 	 * @param postReply
 	 *            The post reply to remove
 	 */
 	public void removePostReply(PostReply postReply);
-
-	/**
-	 * Removes all post replies of the given Sone.
-	 *
-	 * @param sone
-	 *            The Sone to remove all post replies for
-	 */
-	public void removePostReplies(Sone sone);
 
 }

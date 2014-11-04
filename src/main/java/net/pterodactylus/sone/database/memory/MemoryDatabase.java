@@ -357,51 +357,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/** {@inheritDocs} */
-	@Override
-	public void storePosts(Sone sone, Collection<Post> posts) throws IllegalArgumentException {
-		checkNotNull(sone, "sone must not be null");
-		/* verify that all posts are from the same Sone. */
-		for (Post post : posts) {
-			if (!sone.equals(post.getSone())) {
-				throw new IllegalArgumentException(String.format("Post from different Sone found: %s", post));
-			}
-		}
-
-		lock.writeLock().lock();
-		try {
-			/* remove all posts by the Sone. */
-			Collection<Post> oldPosts = getPostsFrom(sone.getId());
-			for (Post post : oldPosts) {
-				allPosts.remove(post.getId());
-			}
-
-			/* add new posts. */
-			getPostsFrom(sone.getId()).addAll(posts);
-			for (Post post : posts) {
-				allPosts.put(post.getId(), post);
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
-	public void removePosts(Sone sone) {
-		checkNotNull(sone, "sone must not be null");
-		lock.writeLock().lock();
-		try {
-			/* remove all posts by the Sone. */
-			getPostsFrom(sone.getId()).clear();
-			for (Post post : sone.getPosts()) {
-				allPosts.remove(post.getId());
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
 	//
 	// POSTREPLYPROVIDER METHODS
 	//
@@ -461,51 +416,10 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** {@inheritDocs} */
 	@Override
-	public void storePostReplies(Sone sone, Collection<PostReply> postReplies) {
-		checkNotNull(sone, "sone must not be null");
-		/* verify that all posts are from the same Sone. */
-		for (PostReply postReply : postReplies) {
-			if (!sone.equals(postReply.getSone())) {
-				throw new IllegalArgumentException(String.format("PostReply from different Sone found: %s", postReply));
-			}
-		}
-
-		lock.writeLock().lock();
-		try {
-			/* remove all post replies of the Sone. */
-			for (PostReply postReply : getRepliesFrom(sone.getId())) {
-				removePostReply(postReply);
-			}
-			for (PostReply postReply : postReplies) {
-				allPostReplies.put(postReply.getId(), postReply);
-				sonePostReplies.put(postReply.getSone().getId(), postReply);
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
 	public void removePostReply(PostReply postReply) {
 		lock.writeLock().lock();
 		try {
 			allPostReplies.remove(postReply.getId());
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
-	public void removePostReplies(Sone sone) {
-		checkNotNull(sone, "sone must not be null");
-
-		lock.writeLock().lock();
-		try {
-			for (PostReply postReply : sone.getReplies()) {
-				removePostReply(postReply);
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}
