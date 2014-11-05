@@ -864,7 +864,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.FINE, String.format("Downloaded Sone %s is not newer than stored Sone %s.", sone, storedSone));
 				return;
 			}
-			/* find removed posts. */
 			SoneChangeDetector soneChangeDetector = new SoneChangeDetector(storedSone.get());
 			soneChangeDetector.onNewPosts(new PostProcessor() {
 				@Override
