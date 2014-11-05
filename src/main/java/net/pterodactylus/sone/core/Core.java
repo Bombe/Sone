@@ -25,6 +25,7 @@ import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -864,6 +865,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.FINE, String.format("Downloaded Sone %s is not newer than stored Sone %s.", sone, storedSone));
 				return;
 			}
+			final List<Object> events = new ArrayList<Object>();
 			SoneChangeDetector soneChangeDetector = new SoneChangeDetector(storedSone.get());
 			soneChangeDetector.onNewPosts(new PostProcessor() {
 				@Override
@@ -871,14 +873,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 					if (post.getTime() < getSoneFollowingTime(sone)) {
 						post.setKnown(true);
 					} else if (!post.isKnown()) {
-						eventBus.post(new NewPostFoundEvent(post));
+						events.add(new NewPostFoundEvent(post));
 					}
 				}
 			});
 			soneChangeDetector.onRemovedPosts(new PostProcessor() {
 				@Override
 				public void processPost(Post post) {
-					eventBus.post(new PostRemovedEvent(post));
+					events.add(new PostRemovedEvent(post));
 				}
 			});
 			soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
@@ -887,18 +889,21 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 					if (postReply.getTime() < getSoneFollowingTime(sone)) {
 						postReply.setKnown(true);
 					} else if (!postReply.isKnown()) {
-						eventBus.post(new NewPostReplyFoundEvent(postReply));
+						events.add(new NewPostReplyFoundEvent(postReply));
 					}
 				}
 			});
 			soneChangeDetector.onRemovedPostReplies(new PostReplyProcessor() {
 				@Override
 				public void processPostReply(PostReply postReply) {
-					eventBus.post(new PostReplyRemovedEvent(postReply));
+					events.add(new PostReplyRemovedEvent(postReply));
 				}
 			});
 			soneChangeDetector.detectChanges(sone);
 			database.storeSone(sone);
+			for (Object event : events) {
+				eventBus.post(event);
+			}
 			sone.setOptions(storedSone.get().getOptions());
 			sone.setKnown(storedSone.get().isKnown());
 			sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
