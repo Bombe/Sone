@@ -87,6 +87,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	static {
 		/* initialize logging. */
 		Logger soneLogger = getLogger("Sone");
+		soneLogger.setUseParentHandlers(false);
 		soneLogger.addHandler(new Handler() {
 			@Override
 			public void publish(LogRecord logRecord) {
