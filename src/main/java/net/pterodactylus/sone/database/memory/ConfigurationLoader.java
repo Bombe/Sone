@@ -17,7 +17,7 @@ import net.pterodactylus.util.config.ConfigurationException;
 public class ConfigurationLoader {
 
 	private static final Logger logger =
-			Logger.getLogger(ConfigurationLoader.class.getName());
+			Logger.getLogger("Sone.Database.Memory.Configuration");
 	private final Configuration configuration;
 
 	public ConfigurationLoader(Configuration configuration) {
