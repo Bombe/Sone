@@ -865,41 +865,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				logger.log(Level.FINE, String.format("Downloaded Sone %s is not newer than stored Sone %s.", sone, storedSone));
 				return;
 			}
-			final List<Object> events = new ArrayList<Object>();
-			SoneChangeDetector soneChangeDetector = new SoneChangeDetector(storedSone.get());
-			soneChangeDetector.onNewPosts(new PostProcessor() {
-				@Override
-				public void processPost(Post post) {
-					if (post.getTime() < getSoneFollowingTime(sone)) {
-						post.setKnown(true);
-					} else if (!post.isKnown()) {
-						events.add(new NewPostFoundEvent(post));
-					}
-				}
-			});
-			soneChangeDetector.onRemovedPosts(new PostProcessor() {
-				@Override
-				public void processPost(Post post) {
-					events.add(new PostRemovedEvent(post));
-				}
-			});
-			soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
-				@Override
-				public void processPostReply(PostReply postReply) {
-					if (postReply.getTime() < getSoneFollowingTime(sone)) {
-						postReply.setKnown(true);
-					} else if (!postReply.isKnown()) {
-						events.add(new NewPostReplyFoundEvent(postReply));
-					}
-				}
-			});
-			soneChangeDetector.onRemovedPostReplies(new PostReplyProcessor() {
-				@Override
-				public void processPostReply(PostReply postReply) {
-					events.add(new PostReplyRemovedEvent(postReply));
-				}
-			});
-			soneChangeDetector.detectChanges(sone);
+			List<Object> events =
+					collectEventsForChangesInSone(storedSone.get(), sone);
 			database.storeSone(sone);
 			for (Object event : events) {
 				eventBus.post(event);
@@ -911,6 +878,47 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				touchConfiguration();
 			}
 		}
+	}
+
+	private List<Object> collectEventsForChangesInSone(Sone oldSone,
+			final Sone newSone) {
+		final List<Object> events = new ArrayList<Object>();
+		SoneChangeDetector soneChangeDetector = new SoneChangeDetector(
+				oldSone);
+		soneChangeDetector.onNewPosts(new PostProcessor() {
+			@Override
+			public void processPost(Post post) {
+				if (post.getTime() < getSoneFollowingTime(newSone)) {
+					post.setKnown(true);
+				} else if (!post.isKnown()) {
+					events.add(new NewPostFoundEvent(post));
+				}
+			}
+		});
+		soneChangeDetector.onRemovedPosts(new PostProcessor() {
+			@Override
+			public void processPost(Post post) {
+				events.add(new PostRemovedEvent(post));
+			}
+		});
+		soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
+			@Override
+			public void processPostReply(PostReply postReply) {
+				if (postReply.getTime() < getSoneFollowingTime(newSone)) {
+					postReply.setKnown(true);
+				} else if (!postReply.isKnown()) {
+					events.add(new NewPostReplyFoundEvent(postReply));
+				}
+			}
+		});
+		soneChangeDetector.onRemovedPostReplies(new PostReplyProcessor() {
+			@Override
+			public void processPostReply(PostReply postReply) {
+				events.add(new PostReplyRemovedEvent(postReply));
+			}
+		});
+		soneChangeDetector.detectChanges(newSone);
+		return events;
 	}
 
 	/**
