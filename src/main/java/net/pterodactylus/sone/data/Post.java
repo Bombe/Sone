@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Optional.absent;
+
 import java.util.Comparator;
 
 import com.google.common.base.Optional;
@@ -121,5 +123,66 @@ public interface Post extends Identified {
 	 * @return This post
 	 */
 	public Post setKnown(boolean known);
+
+	/**
+	 * Shell for a post that has not yet been loaded.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’
+	 *         Roden</a>
+	 */
+	public static class EmptyPost implements Post {
+
+		private final String id;
+
+		public EmptyPost(String id) {
+			this.id = id;
+		}
+
+		@Override
+		public String getId() {
+			return id;
+		}
+
+		@Override
+		public boolean isLoaded() {
+			return false;
+		}
+
+		@Override
+		public Sone getSone() {
+			return null;
+		}
+
+		@Override
+		public Optional<String> getRecipientId() {
+			return absent();
+		}
+
+		@Override
+		public Optional<Sone> getRecipient() {
+			return absent();
+		}
+
+		@Override
+		public long getTime() {
+			return 0;
+		}
+
+		@Override
+		public String getText() {
+			return null;
+		}
+
+		@Override
+		public boolean isKnown() {
+			return false;
+		}
+
+		@Override
+		public Post setKnown(boolean known) {
+			return this;
+		}
+
+	}
 
 }

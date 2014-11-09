@@ -8,6 +8,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Post.EmptyPost;
 import net.pterodactylus.sone.database.BookmarkDatabase;
 
 import com.google.common.base.Function;
@@ -94,11 +95,12 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 	public Set<Post> getBookmarkedPosts() {
 		lock.readLock().lock();
 		try {
-			return from(bookmarkedPosts).transformAndConcat(
-					new Function<String, Iterable<Post>>() {
+			return from(bookmarkedPosts).transform(
+					new Function<String, Post>() {
 						@Override
-						public Iterable<Post> apply(String postId) {
-							return memoryDatabase.getPost(postId).asSet();
+						public Post apply(String postId) {
+							return memoryDatabase.getPost(postId)
+									.or(new EmptyPost(postId));
 						}
 					}).toSet();
 		} finally {
