@@ -222,10 +222,10 @@ public class ListNotificationFilters {
 	 */
 	public static boolean isPostVisible(Sone sone, Post post) {
 		checkNotNull(post, "post must not be null");
-		Sone postSone = post.getSone();
-		if (postSone == null) {
+		if (!post.isLoaded()) {
 			return false;
 		}
+		Sone postSone = post.getSone();
 		if (sone != null) {
 			Trust trust = postSone.getIdentity().getTrust((OwnIdentity) sone.getIdentity());
 			if (trust != null) {
