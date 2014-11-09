@@ -98,6 +98,10 @@ public class Matchers {
 		return new PostMatcher(postId, time, text, recipient);
 	}
 
+	public static Matcher<Post> isPostWithId(String postId) {
+		return new PostIdMatcher(postId);
+	}
+
 	public static Matcher<PostReply> isPostReply(String postReplyId,
 			String postId, long time, String text) {
 		return new PostReplyMatcher(postReplyId, postId, time, text);
@@ -308,6 +312,31 @@ public class Matchers {
 				description.appendText(", directed at ")
 						.appendValue(recipient.get());
 			}
+		}
+
+	}
+
+	private static class PostIdMatcher extends TypeSafeDiagnosingMatcher<Post> {
+
+		private final String id;
+
+		private PostIdMatcher(String id) {
+			this.id = id;
+		}
+
+		@Override
+		protected boolean matchesSafely(Post item,
+				Description mismatchDescription) {
+			if (!item.getId().equals(id)) {
+				mismatchDescription.appendText("post has ID ").appendValue(item.getId());
+				return false;
+			}
+			return true;
+		}
+
+		@Override
+		public void describeTo(Description description) {
+			description.appendText("post with ID ").appendValue(id);
 		}
 
 	}

@@ -1,7 +1,9 @@
 package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.fromNullable;
+import static net.pterodactylus.sone.Matchers.isPostWithId;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -52,14 +54,20 @@ public class MemoryBookmarkDatabaseTest {
 
 	@Before
 	public void setupPosts() {
-		createPost("PostId1");
-		createPost("PostId2");
+		createAndRegisterPost("PostId1");
+		createAndRegisterPost("PostId2");
 	}
 
-	private void createPost(String postId) {
+	private Post createAndRegisterPost(String postId) {
+		Post post = createPost(postId);
+		posts.put(postId, post);
+		return post;
+	}
+
+	private Post createPost(String postId) {
 		Post post = mock(Post.class);
 		when(post.getId()).thenReturn(postId);
-		posts.put(postId, post);
+		return post;
 	}
 
 	@Test
@@ -119,6 +127,16 @@ public class MemoryBookmarkDatabaseTest {
 	public void stoppingTheDatabaseSavesTheBookmarkedPosts() {
 		bookmarkDatabase.stop();
 		verify(configurationLoader).saveBookmarkedPosts(any(Set.class));
+	}
+
+	@Test
+	public void bookmarkedPostsIncludeNotYetLoadedPosts() {
+		bookmarkDatabase.bookmarkPost(posts.get("PostId1"));
+		bookmarkDatabase.bookmarkPost(createPost("PostId3"));
+		final Set<Post> bookmarkedPosts =
+				bookmarkDatabase.getBookmarkedPosts();
+		assertThat(bookmarkedPosts,
+				contains(isPostWithId("PostId1"), isPostWithId("PostId3")));
 	}
 
 }
