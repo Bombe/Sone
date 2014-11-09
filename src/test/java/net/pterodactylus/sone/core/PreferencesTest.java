@@ -137,6 +137,11 @@ public class PreferencesTest {
 		preferences.setPostCutOffLength(-15);
 	}
 
+	@Test(expected = IllegalArgumentException.class)
+	public void cutOffLengthOfMinusOneIsNotAllowed() {
+		preferences.setPostCutOffLength(-1);
+	}
+
 	@Test
 	public void preferencesReturnDefaultValueWhenPostCutOffLengthIsSetToNull() {
 		preferences.setPostCutOffLength(null);

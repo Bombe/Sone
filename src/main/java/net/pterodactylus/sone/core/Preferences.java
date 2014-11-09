@@ -55,8 +55,7 @@ public class Preferences {
 			new DefaultOption<Integer>(400, Predicates.<Integer>or(
 					range(50, MAX_VALUE), equalTo(-1)));
 	private final Option<Integer> postCutOffLength =
-			new DefaultOption<Integer>(200, Predicates.<Integer>or(
-					range(50, MAX_VALUE), equalTo(-1)));
+			new DefaultOption<Integer>(200, range(50, MAX_VALUE));
 	private final Option<Boolean> requireFullAccess =
 			new DefaultOption<Boolean>(false);
 	private final Option<Integer> positiveTrust =

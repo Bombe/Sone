@@ -56,9 +56,13 @@ public class PreferencesLoader {
 	}
 
 	private void loadPostCutOffLength(Configuration configuration) {
-		preferences.setPostCutOffLength(
-				configuration.getIntValue("Option/PostCutOffLength")
-						.getValue(null));
+		try {
+			preferences.setPostCutOffLength(
+					configuration.getIntValue("Option/PostCutOffLength")
+							.getValue(null));
+		} catch (IllegalArgumentException iae1) {
+			/* previous versions allowed -1, ignore and use default. */
+		}
 	}
 
 	private void loadRequireFullAccess(Configuration configuration) {

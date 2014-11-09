@@ -3,6 +3,7 @@ package net.pterodactylus.sone.core;
 import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -68,6 +69,14 @@ public class PreferencesLoaderTest {
 		assertThat(preferences.getTrustComment(), is("Trusted"));
 		assertThat(preferences.isFcpInterfaceActive(), is(true));
 		assertThat(preferences.getFcpFullAccessRequired(), is(WRITING));
+	}
+
+	@Test
+	public void configurationIsLoadedCorrectlyWithCutOffLengthMinusOne() {
+	    setupConfiguration();
+		setupIntValue("PostCutOffLength", -1);
+		preferencesLoader.loadFrom(configuration);
+		assertThat(preferences.getPostCutOffLength(), not(is(-1)));
 	}
 
 }
