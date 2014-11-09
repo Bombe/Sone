@@ -68,7 +68,7 @@ public class BookmarksPage extends SoneTemplatePage {
 
 			@Override
 			public boolean apply(Post post) {
-				return post.getSone() != null;
+				return post.isLoaded();
 			}
 		});
 		List<Post> sortedPosts = new ArrayList<Post>(loadedPosts);
