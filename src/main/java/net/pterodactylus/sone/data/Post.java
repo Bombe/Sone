@@ -62,6 +62,14 @@ public interface Post extends Identified {
 	public String getId();
 
 	/**
+	 * Returns whether this post has already been loaded.
+	 *
+	 * @return {@code true} if this post has already been loaded, {@code
+	 * false} otherwise
+	 */
+	boolean isLoaded();
+
+	/**
 	 * Returns the Sone this post belongs to.
 	 *
 	 * @return The Sone of this post

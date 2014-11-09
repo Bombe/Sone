@@ -91,6 +91,11 @@ public class PostImpl implements Post {
 		return id.toString();
 	}
 
+	@Override
+	public boolean isLoaded() {
+		return true;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */
