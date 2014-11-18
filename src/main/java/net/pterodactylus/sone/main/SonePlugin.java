@@ -56,7 +56,7 @@ import com.google.inject.spi.InjectionListener;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
-import freenet.client.async.DatabaseDisabledException;
+import freenet.client.async.PersistenceDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
 import freenet.node.Node;
@@ -189,7 +189,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			try {
 				oldConfiguration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
 				logger.log(Level.INFO, "Plugin store loaded.");
-			} catch (DatabaseDisabledException dde1) {
+			} catch (PersistenceDisabledException pde1) {
 				logger.log(Level.SEVERE, "Could not load any configuration, using empty configuration!");
 				oldConfiguration = new Configuration(new MapConfigurationBackend());
 			}

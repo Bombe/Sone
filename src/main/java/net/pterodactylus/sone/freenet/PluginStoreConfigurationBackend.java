@@ -24,7 +24,7 @@ import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.ExtendedConfigurationBackend;
 import net.pterodactylus.util.logging.Logging;
-import freenet.client.async.DatabaseDisabledException;
+import freenet.client.async.PersistenceDisabledException;
 import freenet.pluginmanager.PluginRespirator;
 import freenet.pluginmanager.PluginStore;
 
@@ -50,15 +50,12 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	 *
 	 * @param pluginRespirator
 	 *            The plugin respirator
-	 * @throws DatabaseDisabledException
+	 * @throws PersistenceDisabledException
 	 *             if the plugin store is not available
 	 */
-	public PluginStoreConfigurationBackend(PluginRespirator pluginRespirator) throws DatabaseDisabledException {
+	public PluginStoreConfigurationBackend(PluginRespirator pluginRespirator) throws PersistenceDisabledException {
 		this.pluginRespirator = pluginRespirator;
 		this.pluginStore = pluginRespirator.getStore();
-		if (this.pluginStore == null) {
-			throw new DatabaseDisabledException();
-		}
 	}
 
 	/**
@@ -176,8 +173,8 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 	public void save() throws ConfigurationException {
 		try {
 			pluginRespirator.putStore(pluginStore);
-		} catch (DatabaseDisabledException dde1) {
-			throw new ConfigurationException("Could not store plugin store, database is disabled.", dde1);
+		} catch (PersistenceDisabledException pde1) {
+			throw new ConfigurationException("Could not store plugin store, persistence is disabled.", pde1);
 		}
 	}
 
