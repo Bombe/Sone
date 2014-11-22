@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
@@ -31,6 +31,15 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.data.Client;
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
