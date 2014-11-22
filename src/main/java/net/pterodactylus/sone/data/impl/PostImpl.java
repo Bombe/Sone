@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import java.util.UUID;
-
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.SoneProvider;
@@ -37,7 +35,7 @@ public class PostImpl implements Post {
 	private final SoneProvider soneProvider;
 
 	/** The GUID of the post. */
-	private final UUID id;
+	private final String id;
 
 	/** The ID of the owning Sone. */
 	private final String soneId;
@@ -72,7 +70,7 @@ public class PostImpl implements Post {
 	 */
 	public PostImpl(SoneProvider soneProvider, String id, String soneId, String recipientId, long time, String text) {
 		this.soneProvider = soneProvider;
-		this.id = UUID.fromString(id);
+		this.id = id;
 		this.soneId = soneId;
 		this.recipientId = recipientId;
 		this.time = time;
@@ -88,7 +86,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public String getId() {
-		return id.toString();
+		return id;
 	}
 
 	@Override
