@@ -1,8 +1,7 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.impl.ImageImpl;
-import net.pterodactylus.sone.data.impl.ImageImpl.ImageTitleMustNotBeEmpty;
+import net.pterodactylus.sone.data.Image.Modifier.ImageTitleMustNotBeEmpty;
 
 import org.junit.Test;
 

@@ -241,8 +241,6 @@ public class ImageImpl implements Image {
 		};
 	}
 
-	public static class ImageTitleMustNotBeEmpty extends IllegalStateException { }
-
 	//
 	// FINGERPRINTABLE METHODS
 	//
