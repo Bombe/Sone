@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
@@ -23,6 +23,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
+
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
 import com.google.common.hash.Hasher;

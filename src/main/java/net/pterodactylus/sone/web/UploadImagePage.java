@@ -33,7 +33,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.ImageImpl.ImageTitleMustNotBeEmpty;
+import net.pterodactylus.sone.data.impl.ImageImpl.ImageTitleMustNotBeEmpty;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.text.TextFilter;
