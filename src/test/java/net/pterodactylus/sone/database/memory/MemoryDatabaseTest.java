@@ -40,7 +40,7 @@ import net.pterodactylus.sone.TestImageBuilder;
 import net.pterodactylus.sone.TestPostBuilder;
 import net.pterodactylus.sone.TestPostReplyBuilder;
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.AlbumImpl;
+import net.pterodactylus.sone.data.impl.AlbumImpl;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;

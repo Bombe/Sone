@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.AlbumImpl;
 import net.pterodactylus.sone.database.AlbumBuilder;
 
 /**
