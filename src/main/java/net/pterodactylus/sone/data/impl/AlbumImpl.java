@@ -324,8 +324,6 @@ public class AlbumImpl implements Album {
 		};
 	}
 
-	public static class AlbumTitleMustNotBeEmpty extends IllegalStateException { }
-
 	//
 	// FINGERPRINTABLE METHODS
 	//

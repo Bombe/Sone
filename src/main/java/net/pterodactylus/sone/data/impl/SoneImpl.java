@@ -32,7 +32,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.impl.AlbumImpl;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;

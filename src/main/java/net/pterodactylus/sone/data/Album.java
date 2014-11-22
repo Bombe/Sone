@@ -292,6 +292,8 @@ public interface Album extends Identified, Fingerprintable {
 
 		Album update() throws IllegalStateException;
 
+		class AlbumTitleMustNotBeEmpty extends IllegalStateException { }
+
 	}
 
 }
