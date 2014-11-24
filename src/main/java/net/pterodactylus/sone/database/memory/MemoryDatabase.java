@@ -56,6 +56,7 @@ import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
@@ -236,6 +237,16 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} finally {
 			lock.writeLock().unlock();
 		}
+	}
+
+	@Override
+	public Function<String, Optional<Sone>> soneLoader() {
+		return new Function<String, Optional<Sone>>() {
+			@Override
+			public Optional<Sone> apply(String soneId) {
+				return getSone(soneId);
+			}
+		};
 	}
 
 	@Override

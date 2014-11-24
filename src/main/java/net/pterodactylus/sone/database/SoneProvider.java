@@ -22,6 +22,7 @@ import java.util.Collection;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.inject.ImplementedBy;
 
@@ -32,6 +33,8 @@ import com.google.inject.ImplementedBy;
  */
 @ImplementedBy(Core.class)
 public interface SoneProvider {
+
+	Function<String, Optional<Sone>> soneLoader();
 
 	/**
 	 * Returns the Sone with the given ID, or {@link Optional#absent()} if it

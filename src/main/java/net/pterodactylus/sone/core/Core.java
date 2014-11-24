@@ -96,6 +96,7 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
@@ -316,6 +317,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	@Override
 	public Collection<Sone> getSones() {
 		return database.getSones();
+	}
+
+	@Override
+	public Function<String, Optional<Sone>> soneLoader() {
+		return database.soneLoader();
 	}
 
 	/**
