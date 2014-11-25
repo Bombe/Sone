@@ -363,7 +363,7 @@ public class MemoryDatabaseTest {
 		when(sone.isLocal()).thenReturn(true);
 		memoryDatabase.addFriend(sone, "Friend1");
 		memoryDatabase.addFriend(sone, "Friend1");
-		verify(configuration, times(2)).getStringValue(anyString());
+		verify(configuration, times(3)).getStringValue(anyString());
 	}
 
 	@Test
@@ -380,9 +380,10 @@ public class MemoryDatabaseTest {
 
 	@Test
 	public void configurationIsNotWrittenWhenANonFriendIsRemoved() {
+		prepareConfigurationValues();
 		when(sone.isLocal()).thenReturn(true);
 		memoryDatabase.removeFriend(sone, "Friend1");
-		verify(configuration, never()).getStringValue(anyString());
+		verify(configuration).getStringValue(anyString());
 	}
 
 }

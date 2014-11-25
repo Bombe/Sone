@@ -43,6 +43,7 @@ class MemoryFriendDatabase {
 	}
 
 	void addFriend(String localSoneId, String friendSoneId) {
+		loadFriends(localSoneId);
 		lock.writeLock().lock();
 		try {
 			if (soneFriends.put(localSoneId, friendSoneId)) {
@@ -54,6 +55,7 @@ class MemoryFriendDatabase {
 	}
 
 	void removeFriend(String localSoneId, String friendSoneId) {
+		loadFriends(localSoneId);
 		lock.writeLock().lock();
 		try {
 			if (soneFriends.remove(localSoneId, friendSoneId)) {
