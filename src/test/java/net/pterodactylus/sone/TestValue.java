@@ -52,4 +52,8 @@ public class TestValue<T> implements Value<T> {
 		return String.valueOf(value.get());
 	}
 
+	public static <T> Value<T> from(T value) {
+		return new TestValue<T>(value);
+	}
+
 }
