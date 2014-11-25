@@ -726,7 +726,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void followSone(Sone sone, String soneId) {
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
-		sone.addFriend(soneId);
+		database.addFriend(sone, soneId);
 		synchronized (soneFollowingTimes) {
 			if (!soneFollowingTimes.containsKey(soneId)) {
 				long now = System.currentTimeMillis();
@@ -761,7 +761,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	public void unfollowSone(Sone sone, String soneId) {
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
-		sone.removeFriend(soneId);
+		database.removeFriend(sone, soneId);
 		boolean unfollowedSoneStillFollowed = false;
 		for (Sone localSone : getLocalSones()) {
 			unfollowedSoneStillFollowed |= localSone.hasFriend(soneId);
@@ -1027,9 +1027,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		Set<String> likedReplyIds =
 				configurationSoneParser.parseLikedPostReplyIds();
 
-		/* load friends. */
-		Set<String> friends = configurationSoneParser.parseFriends();
-
 		/* load albums. */
 		List<Album> topLevelAlbums;
 		try {
@@ -1081,9 +1078,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			sone.setReplies(replies);
 			sone.setLikePostIds(likedPostIds);
 			sone.setLikeReplyIds(likedReplyIds);
-			for (String friendId : friends) {
-				followSone(sone, friendId);
-			}
 			for (Album album : sone.getRootAlbum().getAlbums()) {
 				sone.getRootAlbum().removeAlbum(album);
 			}
@@ -1093,11 +1087,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			database.storeSone(sone);
 			synchronized (soneInserters) {
 				soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
-			}
-		}
-		synchronized (knownSones) {
-			for (String friend : friends) {
-				knownSones.add(friend);
 			}
 		}
 		for (Post post : posts) {
@@ -1512,13 +1501,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter++ + "/ID").setValue(replyId);
 			}
 			configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter + "/ID").setValue(null);
-
-			/* save friends. */
-			int friendCounter = 0;
-			for (String friendId : sone.getFriends()) {
-				configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter++ + "/ID").setValue(friendId);
-			}
-			configuration.getStringValue(sonePrefix + "/Friends/" + friendCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
 			List<Album> albums = FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).toList();

@@ -2,6 +2,7 @@ package net.pterodactylus.sone.database.memory;
 
 import static java.util.logging.Level.WARNING;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -22,6 +23,14 @@ public class ConfigurationLoader {
 
 	public ConfigurationLoader(Configuration configuration) {
 		this.configuration = configuration;
+	}
+
+	public synchronized Set<String> loadFriends(String localSoneId) {
+		return loadIds("Sone/" + localSoneId + "/Friends");
+	}
+
+	public void saveFriends(String soneId, Collection<String> friends) {
+		saveIds("Sone/" + soneId + "/Friends", friends);
 	}
 
 	public synchronized Set<String> loadKnownPosts() {
@@ -56,10 +65,10 @@ public class ConfigurationLoader {
 		saveIds("Bookmarks/Post", bookmarkedPosts);
 	}
 
-	private void saveIds(String prefix, Set<String> bookmarkedPosts) {
+	private void saveIds(String prefix, Collection<String> ids) {
 		try {
 			int idCounter = 0;
-			for (String id : bookmarkedPosts) {
+			for (String id : ids) {
 				configuration
 						.getStringValue(prefix + "/" + idCounter++ + "/ID")
 						.setValue(id);

@@ -126,16 +126,6 @@ public class IdOnlySone implements Sone {
 	}
 
 	@Override
-	public Sone addFriend(String friendSone) {
-		return this;
-	}
-
-	@Override
-	public Sone removeFriend(String friendSoneId) {
-		return this;
-	}
-
-	@Override
 	public List<Post> getPosts() {
 		return emptyList();
 	}

@@ -27,28 +27,42 @@ import static net.pterodactylus.sone.Matchers.isPostReply;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.emptyIterable;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import net.pterodactylus.sone.TestAlbumBuilder;
 import net.pterodactylus.sone.TestImageBuilder;
 import net.pterodactylus.sone.TestPostBuilder;
 import net.pterodactylus.sone.TestPostReplyBuilder;
+import net.pterodactylus.sone.TestValue;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.impl.AlbumImpl;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.util.config.Configuration;
+import net.pterodactylus.util.config.Value;
 
 import com.google.common.base.Optional;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 /**
  * Tests for {@link MemoryDatabase}.
@@ -59,7 +73,8 @@ public class MemoryDatabaseTest {
 
 	private static final String SONE_ID = "sone";
 	private static final String RECIPIENT_ID = "recipient";
-	private final MemoryDatabase memoryDatabase = new MemoryDatabase(null, null);
+	private final Configuration configuration = mock(Configuration.class);
+	private final MemoryDatabase memoryDatabase = new MemoryDatabase(null, configuration);
 	private final Sone sone = mock(Sone.class);
 
 	@Before
@@ -259,6 +274,115 @@ public class MemoryDatabaseTest {
 		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(of(newAlbum)));
 		memoryDatabase.removeAlbum(newAlbum);
 		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(Optional.<Album>absent()));
+	}
+
+	private void initializeFriends() {
+		when(configuration.getStringValue("Sone/" + SONE_ID + "/Friends/0/ID")).thenReturn(
+				new TestValue<String>("Friend1"));
+		when(configuration.getStringValue("Sone/" + SONE_ID + "/Friends/1/ID")).thenReturn(
+				new TestValue<String>("Friend2"));
+		when(configuration.getStringValue("Sone/" + SONE_ID + "/Friends/2/ID")).thenReturn(
+				new TestValue<String>(null));
+	}
+
+	@Test
+	public void friendsAreReturnedCorrectly() {
+		initializeFriends();
+		when(sone.isLocal()).thenReturn(true);
+		Collection<String> friends = memoryDatabase.getFriends(sone);
+		assertThat(friends, containsInAnyOrder("Friend1", "Friend2"));
+	}
+
+	@Test
+	public void friendsAreOnlyLoadedOnceFromConfiguration() {
+		friendsAreReturnedCorrectly();
+		memoryDatabase.getFriends(sone);
+		verify(configuration).getStringValue("Sone/" + SONE_ID + "/Friends/0/ID");
+	}
+
+	@Test
+	public void friendsAreOnlyReturnedForLocalSones() {
+		Collection<String> friends = memoryDatabase.getFriends(sone);
+		assertThat(friends, emptyIterable());
+		verify(configuration, never()).getStringValue("Sone/" + SONE_ID + "/Friends/0/ID");
+	}
+
+	@Test
+	public void checkingForAFriendReturnsTrue() {
+		initializeFriends();
+		when(sone.isLocal()).thenReturn(true);
+		assertThat(memoryDatabase.isFriend(sone, "Friend1"), is(true));
+	}
+
+	@Test
+	public void checkingForAFriendThatIsNotAFriendReturnsFalse() {
+		initializeFriends();
+		when(sone.isLocal()).thenReturn(true);
+		assertThat(memoryDatabase.isFriend(sone, "FriendX"), is(false));
+	}
+
+	@Test
+	public void checkingForAFriendOfRemoteSoneReturnsFalse() {
+		initializeFriends();
+		assertThat(memoryDatabase.isFriend(sone, "Friend1"), is(false));
+	}
+
+	private Map<String, Value<String>> prepareConfigurationValues() {
+		final Map<String, Value<String>> configurationValues = new HashMap<String, Value<String>>();
+		when(configuration.getStringValue(anyString())).thenAnswer(new Answer<Value<String>>() {
+			@Override
+			public Value<String> answer(InvocationOnMock invocation) throws Throwable {
+				Value<String> stringValue = new TestValue(null);
+				configurationValues.put((String) invocation.getArguments()[0], stringValue);
+				return stringValue;
+			}
+		});
+		return configurationValues;
+	}
+
+	@Test
+	public void friendIsAddedCorrectlyToLocalSone() {
+		Map<String, Value<String>> configurationValues = prepareConfigurationValues();
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.addFriend(sone, "Friend1");
+		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/0/ID"),
+				is(TestValue.from("Friend1")));
+		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/1/ID"),
+				is(TestValue.<String>from(null)));
+	}
+
+	@Test
+	public void friendIsNotAddedToRemoteSone() {
+		memoryDatabase.addFriend(sone, "Friend1");
+		verify(configuration, never()).getStringValue(anyString());
+	}
+
+	@Test
+	public void configurationIsWrittenOnceIfFriendIsAddedTwice() {
+		prepareConfigurationValues();
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.addFriend(sone, "Friend1");
+		memoryDatabase.addFriend(sone, "Friend1");
+		verify(configuration, times(2)).getStringValue(anyString());
+	}
+
+	@Test
+	public void friendIsRemovedCorrectlyFromLocalSone() {
+		Map<String, Value<String>> configurationValues = prepareConfigurationValues();
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.addFriend(sone, "Friend1");
+		memoryDatabase.removeFriend(sone, "Friend1");
+		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/0/ID"),
+				is(TestValue.<String>from(null)));
+		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/1/ID"),
+				is(TestValue.<String>from(null)));
+	}
+
+	@Test
+	public void configurationIsNotWrittenWhenANonFriendIsRemoved() {
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.removeFriend(sone, "Friend1");
+		verify(configuration, never()).getStringValue(anyString());
 	}
 
 }

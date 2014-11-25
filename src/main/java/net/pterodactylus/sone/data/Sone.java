@@ -354,24 +354,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	boolean hasFriend(String friendSoneId);
 
 	/**
-	 * Adds the given Sone as a friend Sone.
-	 *
-	 * @param friendSone
-	 * 		The friend Sone to add
-	 * @return This Sone (for method chaining)
-	 */
-	Sone addFriend(String friendSone);
-
-	/**
-	 * Removes the given Sone as a friend Sone.
-	 *
-	 * @param friendSoneId
-	 * 		The ID of the friend Sone to remove
-	 * @return This Sone (for method chaining)
-	 */
-	Sone removeFriend(String friendSoneId);
-
-	/**
 	 * Returns the list of posts of this Sone, sorted by time, newest first.
 	 *
 	 * @return All posts of this Sone

@@ -21,13 +21,13 @@ import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
-import static java.util.Collections.unmodifiableCollection;
 import static net.pterodactylus.sone.data.Reply.TIME_COMPARATOR;
 import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
 import static net.pterodactylus.sone.data.Sone.toAllAlbums;
 import static net.pterodactylus.sone.data.Sone.toAllImages;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -118,6 +118,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	private final Multimap<String, Image> soneImages = HashMultimap.create();
 
 	private final MemoryBookmarkDatabase memoryBookmarkDatabase;
+	private final MemoryFriendDatabase memoryFriendDatabase;
 
 	/**
 	 * Creates a new memory database.
@@ -134,6 +135,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		this.configurationLoader = new ConfigurationLoader(configuration);
 		memoryBookmarkDatabase =
 				new MemoryBookmarkDatabase(this, configurationLoader);
+		memoryFriendDatabase = new MemoryFriendDatabase(configurationLoader);
 	}
 
 	//
@@ -288,6 +290,38 @@ public class MemoryDatabase extends AbstractService implements Database {
 		} finally {
 			lock.readLock().unlock();
 		}
+	}
+
+	@Override
+	public Collection<String> getFriends(Sone localSone) {
+		if (!localSone.isLocal()) {
+			return Collections.emptySet();
+		}
+		return memoryFriendDatabase.getFriends(localSone.getId());
+	}
+
+	@Override
+	public boolean isFriend(Sone localSone, String friendSoneId) {
+		if (!localSone.isLocal()) {
+			return false;
+		}
+		return memoryFriendDatabase.isFriend(localSone.getId(), friendSoneId);
+	}
+
+	@Override
+	public void addFriend(Sone localSone, String friendSoneId) {
+		if (!localSone.isLocal()) {
+			return;
+		}
+		memoryFriendDatabase.addFriend(localSone.getId(), friendSoneId);
+	}
+
+	@Override
+	public void removeFriend(Sone localSone, String friendSoneId) {
+		if (!localSone.isLocal()) {
+			return;
+		}
+		memoryFriendDatabase.removeFriend(localSone.getId(), friendSoneId);
 	}
 
 	//
