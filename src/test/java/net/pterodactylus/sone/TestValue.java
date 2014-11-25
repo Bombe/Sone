@@ -5,11 +5,13 @@ import java.util.concurrent.atomic.AtomicReference;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.Value;
 
+import com.google.common.base.Objects;
+
 /**
-* Simple {@link Value} implementation.
-*
-* @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-*/
+ * Simple {@link Value} implementation.
+ *
+ * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ */
 public class TestValue<T> implements Value<T> {
 
 	private final AtomicReference<T> value = new AtomicReference<T>();
@@ -32,6 +34,22 @@ public class TestValue<T> implements Value<T> {
 	@Override
 	public void setValue(T newValue) throws ConfigurationException {
 		value.set(newValue);
+	}
+
+	@Override
+	public int hashCode() {
+		return value.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return (obj instanceof TestValue) && Objects.equal(value.get(),
+				((TestValue) obj).value.get());
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value.get());
 	}
 
 }
