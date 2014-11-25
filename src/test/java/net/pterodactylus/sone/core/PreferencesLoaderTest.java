@@ -38,20 +38,20 @@ public class PreferencesLoaderTest {
 		setupIntValue("PositiveTrust", 50);
 		setupIntValue("NegativeTrust", -50);
 		when(configuration.getStringValue("Option/TrustComment")).thenReturn(
-				new TestValue<String>("Trusted"));
+				TestValue.from("Trusted"));
 		setupBooleanValue("ActivateFcpInterface", true);
 		setupIntValue("FcpFullAccessRequired", 1);
 	}
 
 	private void setupIntValue(String optionName, int value) {
 		when(configuration.getIntValue("Option/" + optionName)).thenReturn(
-				new TestValue<Integer>(value));
+				TestValue.from(value));
 	}
 
 	private void setupBooleanValue(String optionName, boolean value) {
 		when(configuration.getBooleanValue(
 				"Option/" + optionName)).thenReturn(
-				new TestValue<Boolean>(value));
+				TestValue.from(value));
 	}
 
 	@Test

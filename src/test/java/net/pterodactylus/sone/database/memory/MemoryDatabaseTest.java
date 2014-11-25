@@ -278,11 +278,11 @@ public class MemoryDatabaseTest {
 
 	private void initializeFriends() {
 		when(configuration.getStringValue("Sone/" + SONE_ID + "/Friends/0/ID")).thenReturn(
-				new TestValue<String>("Friend1"));
+				TestValue.from("Friend1"));
 		when(configuration.getStringValue("Sone/" + SONE_ID + "/Friends/1/ID")).thenReturn(
-				new TestValue<String>("Friend2"));
+				TestValue.from("Friend2"));
 		when(configuration.getStringValue("Sone/" + SONE_ID + "/Friends/2/ID")).thenReturn(
-				new TestValue<String>(null));
+				TestValue.<String>from(null));
 	}
 
 	@Test
@@ -332,7 +332,7 @@ public class MemoryDatabaseTest {
 		when(configuration.getStringValue(anyString())).thenAnswer(new Answer<Value<String>>() {
 			@Override
 			public Value<String> answer(InvocationOnMock invocation) throws Throwable {
-				Value<String> stringValue = new TestValue(null);
+				Value<String> stringValue = TestValue.from(null);
 				configurationValues.put((String) invocation.getArguments()[0], stringValue);
 				return stringValue;
 			}

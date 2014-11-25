@@ -88,9 +88,9 @@ public class ConfigurationSoneParserTest {
 
 	private void setupEmptyProfile() {
 		when(configuration.getStringValue(anyString())).thenReturn(
-				new TestValue<String>(null));
+				TestValue.<String>from(null));
 		when(configuration.getIntValue(anyString())).thenReturn(
-				new TestValue<Integer>(null));
+				TestValue.<Integer>from(null));
 	}
 
 	@Test
@@ -128,12 +128,12 @@ public class ConfigurationSoneParserTest {
 
 	private void setupString(String nodeName, String value) {
 		when(configuration.getStringValue(eq(nodeName))).thenReturn(
-				new TestValue<String>(value));
+				TestValue.from(value));
 	}
 
 	private void setupInteger(String nodeName, Integer value) {
 		when(configuration.getIntValue(eq(nodeName))).thenReturn(
-				new TestValue<Integer>(value));
+				TestValue.from(value));
 	}
 
 	@Test
@@ -180,7 +180,7 @@ public class ConfigurationSoneParserTest {
 
 	private void setupLong(String nodeName, Long value) {
 		when(configuration.getLongValue(eq(nodeName))).thenReturn(
-				new TestValue<Long>(value));
+				TestValue.from(value));
 	}
 
 	@Test(expected = InvalidPostFound.class)

@@ -13,6 +13,7 @@ import java.util.Set;
 import net.pterodactylus.sone.TestValue;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
+import net.pterodactylus.util.config.Value;
 
 import org.junit.Test;
 
@@ -30,11 +31,11 @@ public class ConfigurationLoaderTest {
 	@Test
 	public void loaderCanLoadKnownPosts() {
 		when(configuration.getStringValue("KnownPosts/0/ID"))
-				.thenReturn(new TestValue<String>("Post2"));
+				.thenReturn(TestValue.from("Post2"));
 		when(configuration.getStringValue("KnownPosts/1/ID"))
-				.thenReturn(new TestValue<String>("Post1"));
+				.thenReturn(TestValue.from("Post1"));
 		when(configuration.getStringValue("KnownPosts/2/ID"))
-				.thenReturn(new TestValue<String>(null));
+				.thenReturn(TestValue.<String>from(null));
 		Set<String> knownPosts = configurationLoader.loadKnownPosts();
 		assertThat(knownPosts, containsInAnyOrder("Post1", "Post2"));
 	}
@@ -42,11 +43,11 @@ public class ConfigurationLoaderTest {
 	@Test
 	public void loaderCanLoadKnownPostReplies() {
 		when(configuration.getStringValue("KnownReplies/0/ID"))
-				.thenReturn(new TestValue<String>("PostReply2"));
+				.thenReturn(TestValue.from("PostReply2"));
 		when(configuration.getStringValue("KnownReplies/1/ID"))
-				.thenReturn(new TestValue<String>("PostReply1"));
+				.thenReturn(TestValue.from("PostReply1"));
 		when(configuration.getStringValue("KnownReplies/2/ID"))
-				.thenReturn(new TestValue<String>(null));
+				.thenReturn(TestValue.<String>from(null));
 		Set<String> knownPosts = configurationLoader.loadKnownPostReplies();
 		assertThat(knownPosts,
 				containsInAnyOrder("PostReply1", "PostReply2"));
@@ -55,31 +56,27 @@ public class ConfigurationLoaderTest {
 	@Test
 	public void loaderCanLoadBookmarkedPosts() {
 		when(configuration.getStringValue("Bookmarks/Post/0/ID"))
-				.thenReturn(new TestValue<String>("Post2"));
+				.thenReturn(TestValue.from("Post2"));
 		when(configuration.getStringValue("Bookmarks/Post/1/ID"))
-				.thenReturn(new TestValue<String>("Post1"));
+				.thenReturn(TestValue.from("Post1"));
 		when(configuration.getStringValue("Bookmarks/Post/2/ID"))
-				.thenReturn(new TestValue<String>(null));
+				.thenReturn(TestValue.<String>from(null));
 		Set<String> knownPosts = configurationLoader.loadBookmarkedPosts();
 		assertThat(knownPosts, containsInAnyOrder("Post1", "Post2"));
 	}
 
 	@Test
 	public void loaderCanSaveBookmarkedPosts() throws ConfigurationException {
-		final TestValue<String> post1 = new TestValue<String>(null);
-		final TestValue<String> post2 = new TestValue<String>(null);
-		final TestValue<String> post3 = new TestValue<String>(null);
-		when(configuration.getStringValue("Bookmarks/Post/0/ID"))
-				.thenReturn(post1);
-		when(configuration.getStringValue("Bookmarks/Post/1/ID"))
-				.thenReturn(post2);
-		when(configuration.getStringValue("Bookmarks/Post/2/ID"))
-				.thenReturn(post3);
-		HashSet<String> originalPosts =
-				new HashSet<String>(asList("Post1", "Post2"));
+		final Value<String> post1 = TestValue.<String>from(null);
+		final Value<String> post2 = TestValue.<String>from(null);
+		final Value<String> post3 = TestValue.<String>from(null);
+		when(configuration.getStringValue("Bookmarks/Post/0/ID")).thenReturn(post1);
+		when(configuration.getStringValue("Bookmarks/Post/1/ID")).thenReturn(post2);
+		when(configuration.getStringValue("Bookmarks/Post/2/ID")).thenReturn(post3);
+		HashSet<String> originalPosts = new HashSet<String>(asList("Post1", "Post2"));
 		configurationLoader.saveBookmarkedPosts(originalPosts);
-		HashSet<String> extractedPosts = new HashSet<String>(
-				asList(post1.getValue(), post2.getValue()));
+		HashSet<String> extractedPosts =
+				new HashSet<String>(asList(post1.getValue(), post2.getValue()));
 		assertThat(extractedPosts, containsInAnyOrder("Post1", "Post2"));
 		assertThat(post3.getValue(), nullValue());
 	}
