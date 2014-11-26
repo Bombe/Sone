@@ -27,14 +27,20 @@ import net.pterodactylus.sone.data.Sone;
 public class SoneInsertedEvent extends SoneEvent {
 
 	private final long insertDuration;
+	private final String insertFingerprint;
 
-	public SoneInsertedEvent(Sone sone, long insertDuration) {
+	public SoneInsertedEvent(Sone sone, long insertDuration, String insertFingerprint) {
 		super(sone);
 		this.insertDuration = insertDuration;
+		this.insertFingerprint = insertFingerprint;
 	}
 
 	public long insertDuration() {
 		return insertDuration;
+	}
+
+	public String insertFingerprint() {
+		return insertFingerprint;
 	}
 
 }

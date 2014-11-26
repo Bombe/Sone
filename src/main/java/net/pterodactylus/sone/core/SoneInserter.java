@@ -229,7 +229,7 @@ public class SoneInserter extends AbstractService {
 						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
 						FreenetURI finalUri = freenetInterface.insertDirectory(sone.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
-						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime));
+						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime, insertInformation.getFingerprint()));
 						/* at this point we might already be stopped. */
 						if (shouldStop()) {
 							/* if so, bail out, don’t change anything. */
