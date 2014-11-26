@@ -356,32 +356,6 @@ public class SoneImpl implements Sone {
 	}
 
 	/**
-	 * Adds the given Sone as a friend Sone.
-	 *
-	 * @param friendSone
-	 * 		The friend Sone to add
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone addFriend(String friendSone) {
-		if (!friendSone.equals(id)) {
-			friendSones.add(friendSone);
-		}
-		return this;
-	}
-
-	/**
-	 * Removes the given Sone as a friend Sone.
-	 *
-	 * @param friendSoneId
-	 * 		The ID of the friend Sone to remove
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone removeFriend(String friendSoneId) {
-		friendSones.remove(friendSoneId);
-		return this;
-	}
-
-	/**
 	 * Returns the list of posts of this Sone, sorted by time, newest first.
 	 *
 	 * @return All posts of this Sone
