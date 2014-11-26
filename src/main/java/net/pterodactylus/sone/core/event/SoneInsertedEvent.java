@@ -26,31 +26,13 @@ import net.pterodactylus.sone.data.Sone;
  */
 public class SoneInsertedEvent extends SoneEvent {
 
-	/** The duration of the insert. */
 	private final long insertDuration;
 
-	/**
-	 * Creates a new “Sone was inserted” event.
-	 *
-	 * @param sone
-	 *            The Sone that was inserted
-	 * @param insertDuration
-	 *            The duration of the insert (in milliseconds)
-	 */
 	public SoneInsertedEvent(Sone sone, long insertDuration) {
 		super(sone);
 		this.insertDuration = insertDuration;
 	}
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the duration of the insert.
-	 *
-	 * @return The duration of the insert (in milliseconds)
-	 */
 	public long insertDuration() {
 		return insertDuration;
 	}
