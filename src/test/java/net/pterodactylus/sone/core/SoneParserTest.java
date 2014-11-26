@@ -114,7 +114,7 @@ public class SoneParserTest {
 		when(core.soneBuilder()).thenAnswer(new Answer<SoneBuilder>() {
 			@Override
 			public SoneBuilder answer(InvocationOnMock invocation) {
-				return new MemorySoneBuilder();
+				return new MemorySoneBuilder(null);
 			}
 		});
 	}

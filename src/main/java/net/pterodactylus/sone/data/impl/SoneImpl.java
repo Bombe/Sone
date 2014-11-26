@@ -40,6 +40,7 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
+import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
@@ -59,6 +60,9 @@ public class SoneImpl implements Sone {
 
 	/** The logger. */
 	private static final Logger logger = getLogger("Sone.Data");
+
+	/** The database. */
+	private final Database database;
 
 	/** The ID of this Sone. */
 	private final String id;
@@ -87,9 +91,6 @@ public class SoneImpl implements Sone {
 	/** Whether this Sone is known. */
 	private volatile boolean known;
 
-	/** All friend Sones. */
-	private final Set<String> friendSones = new CopyOnWriteArraySet<String>();
-
 	/** All posts. */
 	private final Set<Post> posts = new CopyOnWriteArraySet<Post>();
 
@@ -111,12 +112,14 @@ public class SoneImpl implements Sone {
 	/**
 	 * Creates a new Sone.
 	 *
+	 * @param database The database
 	 * @param identity
 	 * 		The identity of the Sone
 	 * @param local
 	 * 		{@code true} if the Sone is a local Sone, {@code false} otherwise
 	 */
-	public SoneImpl(Identity identity, boolean local) {
+	public SoneImpl(Database database, Identity identity, boolean local) {
+		this.database = database;
 		this.id = identity.getId();
 		this.identity = identity;
 		this.local = local;
@@ -340,7 +343,7 @@ public class SoneImpl implements Sone {
 	 * @return The friend Sones of this Sone
 	 */
 	public Collection<String> getFriends() {
-		return new ArrayList<String>(friendSones);
+		return database.getFriends(this);
 	}
 
 	/**
@@ -352,7 +355,7 @@ public class SoneImpl implements Sone {
 	 *         false} otherwise
 	 */
 	public boolean hasFriend(String friendSoneId) {
-		return friendSones.contains(friendSoneId);
+		return database.isFriend(this, friendSoneId);
 	}
 
 	/**
@@ -685,7 +688,7 @@ public class SoneImpl implements Sone {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[identity=" + identity + ",friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
+		return getClass().getName() + "[identity=" + identity + ",posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
 	}
 
 }

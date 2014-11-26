@@ -181,7 +181,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	@Override
 	public SoneBuilder newSoneBuilder() {
-		return new MemorySoneBuilder();
+		return new MemorySoneBuilder(this);
 	}
 
 	@Override
