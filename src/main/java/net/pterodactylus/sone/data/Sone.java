@@ -341,7 +341,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	List<String> getFriends();
+	Collection<String> getFriends();
 
 	/**
 	 * Returns whether this Sone has the given Sone as a friend Sone.

@@ -339,7 +339,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	public List<String> getFriends() {
+	public Collection<String> getFriends() {
 		return new ArrayList<String>(friendSones);
 	}
 
