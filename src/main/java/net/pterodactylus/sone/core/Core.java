@@ -1410,6 +1410,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				saveSone(soneInserter.getKey());
 			}
 		}
+		synchronized (soneRescuers) {
+			for (SoneRescuer soneRescuer : soneRescuers.values()) {
+				soneRescuer.stop();
+			}
+		}
 		saveConfiguration();
 		database.stop();
 		webOfTrustUpdater.stop();
