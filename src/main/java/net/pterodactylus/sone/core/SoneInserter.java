@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -56,6 +57,7 @@ import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 
 import freenet.keys.FreenetURI;
+import freenet.support.api.Bucket;
 import freenet.support.api.ManifestElement;
 import freenet.support.api.RandomAccessBucket;
 import freenet.support.io.ArrayBucket;
@@ -257,6 +259,7 @@ public class SoneInserter extends AbstractService {
 						eventBus.post(new SoneInsertAbortedEvent(sone, se1));
 						logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
 					} finally {
+						insertInformation.close();
 						sone.setStatus(SoneStatus.idle);
 					}
 
@@ -293,6 +296,7 @@ public class SoneInserter extends AbstractService {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
+		private final Set<Bucket> buckets = new HashSet<Bucket>();
 
 		/**
 		 * Creates a new insert information container.
@@ -393,19 +397,22 @@ public class SoneInserter extends AbstractService {
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
-			RandomAccessBucket bucket = null;
 			try {
 				template.render(templateContext, writer);
-				bucket = new ArrayBucket(writer.toString().getBytes(Charsets.UTF_8));
+				RandomAccessBucket bucket = new ArrayBucket(writer.toString().getBytes(Charsets.UTF_8));
+				buckets.add(bucket);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
 			} catch (TemplateException te1) {
 				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), te1);
 				return null;
 			} finally {
 				Closer.close(writer);
-				if (bucket != null) {
-					bucket.free();
-				}
+			}
+		}
+
+		public void close() {
+			for (Bucket bucket : buckets) {
+				bucket.free();
 			}
 		}
 
