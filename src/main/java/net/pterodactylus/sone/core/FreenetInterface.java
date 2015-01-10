@@ -168,6 +168,8 @@ public class FreenetInterface {
 			insertToken.setClientPutter(clientPutter);
 		} catch (InsertException ie1) {
 			throw new SoneInsertException("Could not start image insert.", ie1);
+		} finally {
+			bucket.free();
 		}
 	}
 
