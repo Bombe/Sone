@@ -23,6 +23,7 @@ import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.DuplicateField;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -101,7 +102,7 @@ public class EditProfilePage extends SoneTemplatePage {
 					fields = profile.getFields();
 					webInterface.getCore().touchConfiguration();
 					throw new RedirectException("editProfile.html#profile-fields");
-				} catch (IllegalArgumentException iae1) {
+				} catch (DuplicateField df1) {
 					templateContext.set("fieldName", fieldName);
 					templateContext.set("duplicateFieldName", true);
 				}

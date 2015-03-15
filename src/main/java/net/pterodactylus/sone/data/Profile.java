@@ -326,7 +326,9 @@ public class Profile implements Fingerprintable {
 	public Field addField(String fieldName) throws IllegalArgumentException {
 		checkNotNull(fieldName, "fieldName must not be null");
 		checkArgument(fieldName.length() > 0, "fieldName must not be empty");
-		checkArgument(getFieldByName(fieldName) == null, "fieldName must be unique");
+		if (getFieldByName(fieldName) != null) {
+			throw new DuplicateField();
+		}
 		@SuppressWarnings("synthetic-access")
 		Field field = new Field().setName(fieldName);
 		fields.add(field);
@@ -552,5 +554,12 @@ public class Profile implements Fingerprintable {
 		}
 
 	}
+
+	/**
+	 * Exception that signals the addition of a field that already exists.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	public static class DuplicateField extends IllegalArgumentException { }
 
 }

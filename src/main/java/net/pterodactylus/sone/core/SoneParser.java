@@ -20,6 +20,7 @@ import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.DuplicateField;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -150,8 +151,8 @@ public class SoneParser {
 				}
 				try {
 					profile.addField(fieldName.trim()).setValue(fieldValue);
-				} catch (IllegalArgumentException iae1) {
-					logger.log(Level.WARNING, String.format("Duplicate field: %s", fieldName), iae1);
+				} catch (DuplicateField df1) {
+					logger.log(Level.WARNING, String.format("Duplicate field: %s", fieldName), df1);
 					return null;
 				}
 			}
