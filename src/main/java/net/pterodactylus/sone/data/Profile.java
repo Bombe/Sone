@@ -330,7 +330,7 @@ public class Profile implements Fingerprintable {
 			throw new DuplicateField();
 		}
 		@SuppressWarnings("synthetic-access")
-		Field field = new Field().setName(fieldName);
+		Field field = new Field().setName(fieldName).setValue("");
 		fields.add(field);
 		return field;
 	}
