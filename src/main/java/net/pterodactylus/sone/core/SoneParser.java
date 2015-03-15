@@ -21,6 +21,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.DuplicateField;
+import net.pterodactylus.sone.data.Profile.EmptyFieldName;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -151,6 +152,9 @@ public class SoneParser {
 				}
 				try {
 					profile.addField(fieldName.trim()).setValue(fieldValue);
+				} catch (EmptyFieldName efn1) {
+					logger.log(Level.WARNING, "Empty field name!", efn1);
+					return null;
 				} catch (DuplicateField df1) {
 					logger.log(Level.WARNING, String.format("Duplicate field: %s", fieldName), df1);
 					return null;
