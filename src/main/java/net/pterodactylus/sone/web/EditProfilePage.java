@@ -99,7 +99,6 @@ public class EditProfilePage extends SoneTemplatePage {
 				try {
 					profile.addField(fieldName);
 					currentSone.setProfile(profile);
-					fields = profile.getFields();
 					webInterface.getCore().touchConfiguration();
 					throw new RedirectException("editProfile.html#profile-fields");
 				} catch (DuplicateField df1) {
