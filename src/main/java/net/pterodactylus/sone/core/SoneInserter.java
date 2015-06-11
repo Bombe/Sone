@@ -26,6 +26,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,7 +38,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.sone.freenet.StringBucket;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.logging.Logging;
@@ -51,12 +51,16 @@ import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
+import com.google.common.base.Charsets;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 
-import freenet.client.async.ManifestElement;
 import freenet.keys.FreenetURI;
+import freenet.support.api.Bucket;
+import freenet.support.api.ManifestElement;
+import freenet.support.api.RandomAccessBucket;
+import freenet.support.io.ArrayBucket;
 
 /**
  * A Sone inserter is responsible for inserting a Sone if it has changed.
@@ -255,6 +259,7 @@ public class SoneInserter extends AbstractService {
 						eventBus.post(new SoneInsertAbortedEvent(sone, se1));
 						logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
 					} finally {
+						insertInformation.close();
 						sone.setStatus(SoneStatus.idle);
 					}
 
@@ -291,6 +296,7 @@ public class SoneInserter extends AbstractService {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
+		private final Set<Bucket> buckets = new HashSet<Bucket>();
 
 		/**
 		 * Creates a new insert information container.
@@ -391,19 +397,22 @@ public class SoneInserter extends AbstractService {
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.VERSION);
 			StringWriter writer = new StringWriter();
-			StringBucket bucket = null;
 			try {
 				template.render(templateContext, writer);
-				bucket = new StringBucket(writer.toString(), utf8Charset);
+				RandomAccessBucket bucket = new ArrayBucket(writer.toString().getBytes(Charsets.UTF_8));
+				buckets.add(bucket);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
 			} catch (TemplateException te1) {
 				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), te1);
 				return null;
 			} finally {
 				Closer.close(writer);
-				if (bucket != null) {
-					bucket.free();
-				}
+			}
+		}
+
+		public void close() {
+			for (Bucket bucket : buckets) {
+				bucket.free();
 			}
 		}
 

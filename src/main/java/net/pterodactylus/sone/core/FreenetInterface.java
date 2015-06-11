@@ -34,12 +34,12 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.util.logging.Logging;
 
-import com.db4o.ObjectContainer;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchException;
+import freenet.client.FetchException.FetchExceptionMode;
 import freenet.client.FetchResult;
 import freenet.client.HighLevelSimpleClient;
 import freenet.client.HighLevelSimpleClientImpl;
@@ -55,9 +55,12 @@ import freenet.keys.FreenetURI;
 import freenet.keys.InsertableClientSSK;
 import freenet.keys.USK;
 import freenet.node.Node;
+import freenet.node.RequestClient;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
+import freenet.support.api.RandomAccessBucket;
 import freenet.support.io.ArrayBucket;
+import freenet.support.io.ResumeFailedException;
 
 /**
  * Contains all necessary functionality for interacting with the Freenet node.
@@ -83,6 +86,18 @@ public class FreenetInterface {
 
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
+
+	private final RequestClient imageInserts = new RequestClient() {
+		@Override
+		public boolean persistent() {
+			return false;
+		}
+
+		@Override
+		public boolean realTimeFlag() {
+			return true;
+		}
+	};
 
 	/**
 	 * Creates a new Freenet interface.
@@ -118,7 +133,7 @@ public class FreenetInterface {
 				fetchResult = client.fetch(currentUri);
 				return new Fetched(currentUri, fetchResult);
 			} catch (FetchException fe1) {
-				if (fe1.getMode() == FetchException.PERMANENT_REDIRECT) {
+				if (fe1.getMode() == FetchExceptionMode.PERMANENT_REDIRECT) {
 					currentUri = fe1.newURI;
 					continue;
 				}
@@ -157,11 +172,12 @@ public class FreenetInterface {
 		InsertableClientSSK key = InsertableClientSSK.createRandom(node.random, "");
 		FreenetURI targetUri = key.getInsertURI().setDocName(filenameHint);
 		InsertContext insertContext = client.getInsertContext(true);
-		Bucket bucket = new ArrayBucket(temporaryImage.getImageData());
+		RandomAccessBucket bucket = new ArrayBucket(temporaryImage.getImageData());
+		insertToken.setBucket(bucket);
 		ClientMetadata metadata = new ClientMetadata(temporaryImage.getMimeType());
 		InsertBlock insertBlock = new InsertBlock(bucket, metadata, targetUri);
 		try {
-			ClientPutter clientPutter = client.insert(insertBlock, false, null, false, insertContext, insertToken, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
+			ClientPutter clientPutter = client.insert(insertBlock, null, false, insertContext, insertToken, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
 			insertToken.setClientPutter(clientPutter);
 		} catch (InsertException ie1) {
 			throw new SoneInsertException("Could not start image insert.", ie1);
@@ -205,7 +221,7 @@ public class FreenetInterface {
 
 				@Override
 				@SuppressWarnings("synthetic-access")
-				public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
+				public void onFoundEdition(long edition, USK key, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
 					logger.log(Level.FINE, String.format("Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", sone, key, newKnownGood, newSlotToo));
 					if (edition > sone.getLatestEdition()) {
 						sone.setLatestEdition(edition);
@@ -269,7 +285,7 @@ public class FreenetInterface {
 		USKCallback uskCallback = new USKCallback() {
 
 			@Override
-			public void onFoundEdition(long edition, USK key, ObjectContainer objectContainer, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
+			public void onFoundEdition(long edition, USK key, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
 				callback.editionFound(key.getURI(), edition, newKnownGood, newSlotToo);
 			}
 
@@ -401,6 +417,7 @@ public class FreenetInterface {
 
 		/** The client putter. */
 		private ClientPutter clientPutter;
+		private Bucket bucket;
 
 		/** The final URI. */
 		private volatile FreenetURI resultingUri;
@@ -432,6 +449,10 @@ public class FreenetInterface {
 			eventBus.post(new ImageInsertStartedEvent(image));
 		}
 
+		public void setBucket(Bucket bucket) {
+			this.bucket = bucket;
+		}
+
 		//
 		// ACTIONS
 		//
@@ -441,7 +462,7 @@ public class FreenetInterface {
 		 */
 		@SuppressWarnings("synthetic-access")
 		public void cancel() {
-			clientPutter.cancel(null, node.clientCore.clientContext);
+			clientPutter.cancel(node.clientCore.clientContext);
 			eventBus.post(new ImageInsertAbortedEvent(image));
 		}
 
@@ -449,12 +470,14 @@ public class FreenetInterface {
 		// INTERFACE ClientPutCallback
 		//
 
-		/**
-		 * {@inheritDoc}
-		 */
 		@Override
-		public void onMajorProgress(ObjectContainer objectContainer) {
-			/* ignore, we don’t care. */
+		public RequestClient getRequestClient() {
+			return imageInserts;
+		}
+
+		@Override
+		public void onResume(ClientContext context) throws ResumeFailedException {
+			/* ignore. */
 		}
 
 		/**
@@ -462,19 +485,20 @@ public class FreenetInterface {
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public void onFailure(InsertException insertException, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+		public void onFailure(InsertException insertException, BaseClientPutter clientPutter) {
 			if ((insertException != null) && ("Cancelled by user".equals(insertException.getMessage()))) {
 				eventBus.post(new ImageInsertAbortedEvent(image));
 			} else {
 				eventBus.post(new ImageInsertFailedEvent(image, insertException));
 			}
+			bucket.free();
 		}
 
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void onFetchable(BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+		public void onFetchable(BaseClientPutter clientPutter) {
 			/* ignore, we don’t care. */
 		}
 
@@ -482,7 +506,7 @@ public class FreenetInterface {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void onGeneratedMetadata(Bucket metadata, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+		public void onGeneratedMetadata(Bucket metadata, BaseClientPutter clientPutter) {
 			/* ignore, we don’t care. */
 		}
 
@@ -490,7 +514,7 @@ public class FreenetInterface {
 		 * {@inheritDoc}
 		 */
 		@Override
-		public void onGeneratedURI(FreenetURI generatedUri, BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+		public void onGeneratedURI(FreenetURI generatedUri, BaseClientPutter clientPutter) {
 			resultingUri = generatedUri;
 		}
 
@@ -499,8 +523,9 @@ public class FreenetInterface {
 		 */
 		@Override
 		@SuppressWarnings("synthetic-access")
-		public void onSuccess(BaseClientPutter clientPutter, ObjectContainer objectContainer) {
+		public void onSuccess(BaseClientPutter clientPutter) {
 			eventBus.post(new ImageInsertFinishedEvent(image, resultingUri));
+			bucket.free();
 		}
 
 	}
