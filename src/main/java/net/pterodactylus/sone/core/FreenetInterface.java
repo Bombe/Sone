@@ -161,6 +161,7 @@ public class FreenetInterface {
 		FreenetURI targetUri = key.getInsertURI().setDocName(filenameHint);
 		InsertContext insertContext = client.getInsertContext(true);
 		RandomAccessBucket bucket = new ArrayBucket(temporaryImage.getImageData());
+		insertToken.setBucket(bucket);
 		ClientMetadata metadata = new ClientMetadata(temporaryImage.getMimeType());
 		InsertBlock insertBlock = new InsertBlock(bucket, metadata, targetUri);
 		try {
@@ -168,8 +169,6 @@ public class FreenetInterface {
 			insertToken.setClientPutter(clientPutter);
 		} catch (InsertException ie1) {
 			throw new SoneInsertException("Could not start image insert.", ie1);
-		} finally {
-			bucket.free();
 		}
 	}
 
@@ -406,6 +405,7 @@ public class FreenetInterface {
 
 		/** The client putter. */
 		private ClientPutter clientPutter;
+		private Bucket bucket;
 
 		/** The final URI. */
 		private volatile FreenetURI resultingUri;
@@ -435,6 +435,10 @@ public class FreenetInterface {
 		public void setClientPutter(ClientPutter clientPutter) {
 			this.clientPutter = clientPutter;
 			eventBus.post(new ImageInsertStartedEvent(image));
+		}
+
+		public void setBucket(Bucket bucket) {
+			this.bucket = bucket;
 		}
 
 		//
@@ -475,6 +479,7 @@ public class FreenetInterface {
 			} else {
 				eventBus.post(new ImageInsertFailedEvent(image, insertException));
 			}
+			bucket.free();
 		}
 
 		/**
@@ -508,6 +513,7 @@ public class FreenetInterface {
 		@SuppressWarnings("synthetic-access")
 		public void onSuccess(BaseClientPutter clientPutter) {
 			eventBus.post(new ImageInsertFinishedEvent(image, resultingUri));
+			bucket.free();
 		}
 
 	}
