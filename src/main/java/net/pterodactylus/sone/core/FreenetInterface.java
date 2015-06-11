@@ -87,6 +87,18 @@ public class FreenetInterface {
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
 
+	private final RequestClient imageInserts = new RequestClient() {
+		@Override
+		public boolean persistent() {
+			return false;
+		}
+
+		@Override
+		public boolean realTimeFlag() {
+			return true;
+		}
+	};
+
 	/**
 	 * Creates a new Freenet interface.
 	 *
@@ -460,7 +472,7 @@ public class FreenetInterface {
 
 		@Override
 		public RequestClient getRequestClient() {
-			return clientPutter.getClient();
+			return imageInserts;
 		}
 
 		@Override
