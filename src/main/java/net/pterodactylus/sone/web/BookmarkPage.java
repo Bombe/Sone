@@ -17,10 +17,13 @@
 
 package net.pterodactylus.sone.web;
 
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+
+import com.google.common.base.Optional;
 
 /**
  * Page that lets the user bookmark a post.
@@ -52,7 +55,10 @@ public class BookmarkPage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			String id = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
-			webInterface.getCore().bookmarkPost(id);
+			Optional<Post> post = webInterface.getCore().getPost(id);
+			if (post.isPresent()) {
+				webInterface.getCore().bookmarkPost(post.get());
+			}
 			throw new RedirectException(returnPage);
 		}
 	}

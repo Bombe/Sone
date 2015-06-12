@@ -19,8 +19,13 @@ package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Predicates.not;
+import static com.google.common.collect.FluentIterable.from;
+import static net.pterodactylus.sone.data.Reply.TIME_COMPARATOR;
+import static net.pterodactylus.sone.data.Sone.LOCAL_SONE_FILTER;
+import static net.pterodactylus.sone.data.Sone.toAllAlbums;
+import static net.pterodactylus.sone.data.Sone.toAllImages;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,8 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -38,7 +41,6 @@ import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.AlbumBuilderImpl;
 import net.pterodactylus.sone.data.impl.ImageBuilderImpl;
@@ -49,21 +51,28 @@ import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostDatabase;
 import net.pterodactylus.sone.database.PostReplyBuilder;
+import net.pterodactylus.sone.database.SoneBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 /**
  * Memory-based {@link PostDatabase} implementation.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The lock. */
@@ -74,15 +83,15 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The configuration. */
 	private final Configuration configuration;
+	private final ConfigurationLoader configurationLoader;
+
+	private final Map<String, Sone> allSones = new HashMap<String, Sone>();
 
 	/** All posts by their ID. */
 	private final Map<String, Post> allPosts = new HashMap<String, Post>();
 
 	/** All posts by their Sones. */
-	private final Map<String, Collection<Post>> sonePosts = new HashMap<String, Collection<Post>>();
-
-	/** All posts by their recipient. */
-	private final Map<String, Collection<Post>> recipientPosts = new HashMap<String, Collection<Post>>();
+	private final Multimap<String, Post> sonePosts = HashMultimap.create();
 
 	/** Whether posts are known. */
 	private final Set<String> knownPosts = new HashSet<String>();
@@ -97,17 +106,19 @@ public class MemoryDatabase extends AbstractService implements Database {
 		public int compare(String leftString, String rightString) {
 			return leftString.compareTo(rightString);
 		}
-	}, PostReply.TIME_COMPARATOR);
-
-	/** Replies by post. */
-	private final Map<String, SortedSet<PostReply>> postReplies = new HashMap<String, SortedSet<PostReply>>();
+	}, TIME_COMPARATOR);
 
 	/** Whether post replies are known. */
 	private final Set<String> knownPostReplies = new HashSet<String>();
 
 	private final Map<String, Album> allAlbums = new HashMap<String, Album>();
+	private final Multimap<String, Album> soneAlbums = HashMultimap.create();
 
 	private final Map<String, Image> allImages = new HashMap<String, Image>();
+	private final Multimap<String, Image> soneImages = HashMultimap.create();
+
+	private final MemoryBookmarkDatabase memoryBookmarkDatabase;
+	private final MemoryFriendDatabase memoryFriendDatabase;
 
 	/**
 	 * Creates a new memory database.
@@ -121,6 +132,10 @@ public class MemoryDatabase extends AbstractService implements Database {
 	public MemoryDatabase(SoneProvider soneProvider, Configuration configuration) {
 		this.soneProvider = soneProvider;
 		this.configuration = configuration;
+		this.configurationLoader = new ConfigurationLoader(configuration);
+		memoryBookmarkDatabase =
+				new MemoryBookmarkDatabase(this, configurationLoader);
+		memoryFriendDatabase = new MemoryFriendDatabase(configurationLoader);
 	}
 
 	//
@@ -146,6 +161,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	/** {@inheritDocs} */
 	@Override
 	protected void doStart() {
+		memoryBookmarkDatabase.start();
 		loadKnownPosts();
 		loadKnownPostReplies();
 		notifyStarted();
@@ -155,11 +171,157 @@ public class MemoryDatabase extends AbstractService implements Database {
 	@Override
 	protected void doStop() {
 		try {
+			memoryBookmarkDatabase.stop();
 			save();
 			notifyStopped();
 		} catch (DatabaseException de1) {
 			notifyFailed(de1);
 		}
+	}
+
+	@Override
+	public SoneBuilder newSoneBuilder() {
+		return new MemorySoneBuilder(this);
+	}
+
+	@Override
+	public void storeSone(Sone sone) {
+		lock.writeLock().lock();
+		try {
+			removeSone(sone);
+
+			allSones.put(sone.getId(), sone);
+			sonePosts.putAll(sone.getId(), sone.getPosts());
+			for (Post post : sone.getPosts()) {
+				allPosts.put(post.getId(), post);
+			}
+			sonePostReplies.putAll(sone.getId(), sone.getReplies());
+			for (PostReply postReply : sone.getReplies()) {
+				allPostReplies.put(postReply.getId(), postReply);
+			}
+			soneAlbums.putAll(sone.getId(), toAllAlbums.apply(sone));
+			for (Album album : toAllAlbums.apply(sone)) {
+				allAlbums.put(album.getId(), album);
+			}
+			soneImages.putAll(sone.getId(), toAllImages.apply(sone));
+			for (Image image : toAllImages.apply(sone)) {
+				allImages.put(image.getId(), image);
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public void removeSone(Sone sone) {
+		lock.writeLock().lock();
+		try {
+			allSones.remove(sone.getId());
+			Collection<Post> removedPosts = sonePosts.removeAll(sone.getId());
+			for (Post removedPost : removedPosts) {
+				allPosts.remove(removedPost.getId());
+			}
+			Collection<PostReply> removedPostReplies =
+					sonePostReplies.removeAll(sone.getId());
+			for (PostReply removedPostReply : removedPostReplies) {
+				allPostReplies.remove(removedPostReply.getId());
+			}
+			Collection<Album> removedAlbums =
+					soneAlbums.removeAll(sone.getId());
+			for (Album removedAlbum : removedAlbums) {
+				allAlbums.remove(removedAlbum.getId());
+			}
+			Collection<Image> removedImages =
+					soneImages.removeAll(sone.getId());
+			for (Image removedImage : removedImages) {
+				allImages.remove(removedImage.getId());
+			}
+		} finally {
+			lock.writeLock().unlock();
+		}
+	}
+
+	@Override
+	public Function<String, Optional<Sone>> soneLoader() {
+		return new Function<String, Optional<Sone>>() {
+			@Override
+			public Optional<Sone> apply(String soneId) {
+				return getSone(soneId);
+			}
+		};
+	}
+
+	@Override
+	public Optional<Sone> getSone(String soneId) {
+		lock.readLock().lock();
+		try {
+			return fromNullable(allSones.get(soneId));
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<Sone> getSones() {
+		lock.readLock().lock();
+		try {
+			return new HashSet<Sone>(allSones.values());
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<Sone> getLocalSones() {
+		lock.readLock().lock();
+		try {
+			return from(allSones.values()).filter(LOCAL_SONE_FILTER).toSet();
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<Sone> getRemoteSones() {
+		lock.readLock().lock();
+		try {
+			return from(allSones.values())
+					.filter(not(LOCAL_SONE_FILTER)) .toSet();
+		} finally {
+			lock.readLock().unlock();
+		}
+	}
+
+	@Override
+	public Collection<String> getFriends(Sone localSone) {
+		if (!localSone.isLocal()) {
+			return Collections.emptySet();
+		}
+		return memoryFriendDatabase.getFriends(localSone.getId());
+	}
+
+	@Override
+	public boolean isFriend(Sone localSone, String friendSoneId) {
+		if (!localSone.isLocal()) {
+			return false;
+		}
+		return memoryFriendDatabase.isFriend(localSone.getId(), friendSoneId);
+	}
+
+	@Override
+	public void addFriend(Sone localSone, String friendSoneId) {
+		if (!localSone.isLocal()) {
+			return;
+		}
+		memoryFriendDatabase.addFriend(localSone.getId(), friendSoneId);
+	}
+
+	@Override
+	public void removeFriend(Sone localSone, String friendSoneId) {
+		if (!localSone.isLocal()) {
+			return;
+		}
+		memoryFriendDatabase.removeFriend(localSone.getId(), friendSoneId);
 	}
 
 	//
@@ -185,11 +347,15 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** {@inheritDocs} */
 	@Override
-	public Collection<Post> getDirectedPosts(String recipientId) {
+	public Collection<Post> getDirectedPosts(final String recipientId) {
 		lock.readLock().lock();
 		try {
-			Collection<Post> posts = recipientPosts.get(recipientId);
-			return (posts == null) ? Collections.<Post>emptySet() : new HashSet<Post>(posts);
+			return from(sonePosts.values()).filter(new Predicate<Post>() {
+				@Override
+				public boolean apply(Post post) {
+					return post.getRecipientId().asSet().contains(recipientId);
+				}
+			}).toSet();
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -217,9 +383,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		try {
 			allPosts.put(post.getId(), post);
 			getPostsFrom(post.getSone().getId()).add(post);
-			if (post.getRecipientId().isPresent()) {
-				getPostsTo(post.getRecipientId().get()).add(post);
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -233,64 +396,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		try {
 			allPosts.remove(post.getId());
 			getPostsFrom(post.getSone().getId()).remove(post);
-			if (post.getRecipientId().isPresent()) {
-				getPostsTo(post.getRecipientId().get()).remove(post);
-			}
 			post.getSone().removePost(post);
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
-	public void storePosts(Sone sone, Collection<Post> posts) throws IllegalArgumentException {
-		checkNotNull(sone, "sone must not be null");
-		/* verify that all posts are from the same Sone. */
-		for (Post post : posts) {
-			if (!sone.equals(post.getSone())) {
-				throw new IllegalArgumentException(String.format("Post from different Sone found: %s", post));
-			}
-		}
-
-		lock.writeLock().lock();
-		try {
-			/* remove all posts by the Sone. */
-			getPostsFrom(sone.getId()).clear();
-			for (Post post : posts) {
-				allPosts.remove(post.getId());
-				if (post.getRecipientId().isPresent()) {
-					getPostsTo(post.getRecipientId().get()).remove(post);
-				}
-			}
-
-			/* add new posts. */
-			getPostsFrom(sone.getId()).addAll(posts);
-			for (Post post : posts) {
-				allPosts.put(post.getId(), post);
-				if (post.getRecipientId().isPresent()) {
-					getPostsTo(post.getRecipientId().get()).add(post);
-				}
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
-	public void removePosts(Sone sone) {
-		checkNotNull(sone, "sone must not be null");
-		lock.writeLock().lock();
-		try {
-			/* remove all posts by the Sone. */
-			getPostsFrom(sone.getId()).clear();
-			for (Post post : sone.getPosts()) {
-				allPosts.remove(post.getId());
-				if (post.getRecipientId().isPresent()) {
-					getPostsTo(post.getRecipientId().get()).remove(post);
-				}
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -313,13 +419,16 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** {@inheritDocs} */
 	@Override
-	public List<PostReply> getReplies(String postId) {
+	public List<PostReply> getReplies(final String postId) {
 		lock.readLock().lock();
 		try {
-			if (!postReplies.containsKey(postId)) {
-				return Collections.emptyList();
-			}
-			return new ArrayList<PostReply>(postReplies.get(postId));
+			return from(allPostReplies.values())
+					.filter(new Predicate<PostReply>() {
+						@Override
+						public boolean apply(PostReply postReply) {
+							return postReply.getPostId().equals(postId);
+						}
+					}).toSortedList(TIME_COMPARATOR);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -345,46 +454,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allPostReplies.put(postReply.getId(), postReply);
-			if (postReplies.containsKey(postReply.getPostId())) {
-				postReplies.get(postReply.getPostId()).add(postReply);
-			} else {
-				TreeSet<PostReply> replies = new TreeSet<PostReply>(Reply.TIME_COMPARATOR);
-				replies.add(postReply);
-				postReplies.put(postReply.getPostId(), replies);
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
-	public void storePostReplies(Sone sone, Collection<PostReply> postReplies) {
-		checkNotNull(sone, "sone must not be null");
-		/* verify that all posts are from the same Sone. */
-		for (PostReply postReply : postReplies) {
-			if (!sone.equals(postReply.getSone())) {
-				throw new IllegalArgumentException(String.format("PostReply from different Sone found: %s", postReply));
-			}
-		}
-
-		lock.writeLock().lock();
-		try {
-			/* remove all post replies of the Sone. */
-			for (PostReply postReply : getRepliesFrom(sone.getId())) {
-				removePostReply(postReply);
-			}
-			for (PostReply postReply : postReplies) {
-				allPostReplies.put(postReply.getId(), postReply);
-				sonePostReplies.put(postReply.getSone().getId(), postReply);
-				if (this.postReplies.containsKey(postReply.getPostId())) {
-					this.postReplies.get(postReply.getPostId()).add(postReply);
-				} else {
-					TreeSet<PostReply> replies = new TreeSet<PostReply>(Reply.TIME_COMPARATOR);
-					replies.add(postReply);
-					this.postReplies.put(postReply.getPostId(), replies);
-				}
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -396,27 +465,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allPostReplies.remove(postReply.getId());
-			if (postReplies.containsKey(postReply.getPostId())) {
-				postReplies.get(postReply.getPostId()).remove(postReply);
-				if (postReplies.get(postReply.getPostId()).isEmpty()) {
-					postReplies.remove(postReply.getPostId());
-				}
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}
-	}
-
-	/** {@inheritDocs} */
-	@Override
-	public void removePostReplies(Sone sone) {
-		checkNotNull(sone, "sone must not be null");
-
-		lock.writeLock().lock();
-		try {
-			for (PostReply postReply : sone.getReplies()) {
-				removePostReply(postReply);
-			}
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -454,6 +502,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allAlbums.put(album.getId(), album);
+			soneAlbums.put(album.getSone().getId(), album);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -464,6 +513,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allAlbums.remove(album.getId());
+			soneAlbums.remove(album.getSone().getId(), album);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -501,6 +551,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allImages.put(image.getId(), image);
+			soneImages.put(image.getSone().getId(), image);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -511,9 +562,30 @@ public class MemoryDatabase extends AbstractService implements Database {
 		lock.writeLock().lock();
 		try {
 			allImages.remove(image.getId());
+			soneImages.remove(image.getSone().getId(), image);
 		} finally {
 			lock.writeLock().unlock();
 		}
+	}
+
+	@Override
+	public void bookmarkPost(Post post) {
+		memoryBookmarkDatabase.bookmarkPost(post);
+	}
+
+	@Override
+	public void unbookmarkPost(Post post) {
+		memoryBookmarkDatabase.unbookmarkPost(post);
+	}
+
+	@Override
+	public boolean isPostBookmarked(Post post) {
+		return memoryBookmarkDatabase.isPostBookmarked(post);
+	}
+
+	@Override
+	public Set<Post> getBookmarkedPosts() {
+		return memoryBookmarkDatabase.getBookmarkedPosts();
 	}
 
 	//
@@ -608,71 +680,21 @@ public class MemoryDatabase extends AbstractService implements Database {
 	 * @return All posts
 	 */
 	private Collection<Post> getPostsFrom(String soneId) {
-		Collection<Post> posts = null;
 		lock.readLock().lock();
 		try {
-			posts = sonePosts.get(soneId);
+			return sonePosts.get(soneId);
 		} finally {
 			lock.readLock().unlock();
 		}
-		if (posts != null) {
-			return posts;
-		}
-
-		posts = new HashSet<Post>();
-		lock.writeLock().lock();
-		try {
-			sonePosts.put(soneId, posts);
-		} finally {
-			lock.writeLock().unlock();
-		}
-
-		return posts;
-	}
-
-	/**
-	 * Gets all posts that are directed the given Sone, creating a new collection
-	 * if there is none yet.
-	 *
-	 * @param recipientId
-	 * 		The ID of the Sone to get the posts for
-	 * @return All posts
-	 */
-	private Collection<Post> getPostsTo(String recipientId) {
-		Collection<Post> posts = null;
-		lock.readLock().lock();
-		try {
-			posts = recipientPosts.get(recipientId);
-		} finally {
-			lock.readLock().unlock();
-		}
-		if (posts != null) {
-			return posts;
-		}
-
-		posts = new HashSet<Post>();
-		lock.writeLock().lock();
-		try {
-			recipientPosts.put(recipientId, posts);
-		} finally {
-			lock.writeLock().unlock();
-		}
-
-		return posts;
 	}
 
 	/** Loads the known posts. */
 	private void loadKnownPosts() {
+		Set<String> knownPosts = configurationLoader.loadKnownPosts();
 		lock.writeLock().lock();
 		try {
-			int postCounter = 0;
-			while (true) {
-				String knownPostId = configuration.getStringValue("KnownPosts/" + postCounter++ + "/ID").getValue(null);
-				if (knownPostId == null) {
-					break;
-				}
-				knownPosts.add(knownPostId);
-			}
+			this.knownPosts.clear();
+			this.knownPosts.addAll(knownPosts);
 		} finally {
 			lock.writeLock().unlock();
 		}
@@ -699,37 +721,13 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
-	/**
-	 * Returns all replies by the given Sone.
-	 *
-	 * @param id
-	 * 		The ID of the Sone
-	 * @return The post replies of the Sone, sorted by time (newest first)
-	 */
-	private Collection<PostReply> getRepliesFrom(String id) {
-		lock.readLock().lock();
-		try {
-			if (sonePostReplies.containsKey(id)) {
-				return Collections.unmodifiableCollection(sonePostReplies.get(id));
-			}
-			return Collections.emptySet();
-		} finally {
-			lock.readLock().unlock();
-		}
-	}
-
 	/** Loads the known post replies. */
 	private void loadKnownPostReplies() {
+		Set<String> knownPostReplies = configurationLoader.loadKnownPostReplies();
 		lock.writeLock().lock();
 		try {
-			int replyCounter = 0;
-			while (true) {
-				String knownReplyId = configuration.getStringValue("KnownReplies/" + replyCounter++ + "/ID").getValue(null);
-				if (knownReplyId == null) {
-					break;
-				}
-				knownPostReplies.add(knownReplyId);
-			}
+			this.knownPostReplies.clear();
+			this.knownPostReplies.addAll(knownPostReplies);
 		} finally {
 			lock.writeLock().unlock();
 		}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sone>
+	<protocol-version>0</protocol-version>
+	<time>1407197508000</time>
+	<profile></profile>
+	<posts>
+		<post>
+			<id>post-id</id>
+			<time>1407197508000</time>
+			<text>text</text>
+			<recipient>1234567890123456789012345678901234567890123</recipient>
+		</post>
+	</posts>
+</sone>

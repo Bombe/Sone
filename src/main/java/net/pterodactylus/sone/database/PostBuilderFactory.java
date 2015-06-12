@@ -17,11 +17,16 @@
 
 package net.pterodactylus.sone.database;
 
+import net.pterodactylus.sone.database.memory.MemoryDatabase;
+
+import com.google.inject.ImplementedBy;
+
 /**
  * Factory for {@link PostBuilder}s.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@ImplementedBy(MemoryDatabase.class)
 public interface PostBuilderFactory {
 
 	/**

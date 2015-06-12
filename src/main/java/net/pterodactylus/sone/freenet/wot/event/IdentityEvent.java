@@ -68,4 +68,18 @@ public abstract class IdentityEvent {
 		return identity;
 	}
 
+	@Override
+	public int hashCode() {
+		return ownIdentity().hashCode() ^ identity().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if ((object == null) || !object.getClass().equals(getClass())) {
+			return false;
+		}
+		IdentityEvent identityEvent = (IdentityEvent) object;
+		return ownIdentity().equals(identityEvent.ownIdentity()) && identity().equals(identityEvent.identity());
+	}
+
 }

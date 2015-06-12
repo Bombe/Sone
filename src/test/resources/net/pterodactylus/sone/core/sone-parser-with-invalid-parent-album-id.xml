@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sone>
+	<protocol-version>0</protocol-version>
+	<time>1407197508000</time>
+	<profile></profile>
+	<albums>
+		<album>
+			<id>album-id-1</id>
+			<parent>album-id-7</parent>
+			<title>album-title</title>
+			<description>album-description</description>
+		</album>
+	</albums>
+</sone>

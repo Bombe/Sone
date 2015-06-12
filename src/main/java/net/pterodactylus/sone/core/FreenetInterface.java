@@ -17,11 +17,16 @@
 
 package net.pterodactylus.sone.core;
 
+import static freenet.keys.USK.create;
+import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
+import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.freenet.Key.routingKey;
+
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,17 +37,17 @@ import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.util.logging.Logging;
 
+import com.google.common.base.Function;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchException;
 import freenet.client.FetchException.FetchExceptionMode;
 import freenet.client.FetchResult;
 import freenet.client.HighLevelSimpleClient;
-import freenet.client.HighLevelSimpleClientImpl;
 import freenet.client.InsertBlock;
 import freenet.client.InsertContext;
 import freenet.client.InsertException;
@@ -67,10 +72,11 @@ import freenet.support.io.ResumeFailedException;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class FreenetInterface {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(FreenetInterface.class);
+	private static final Logger logger = getLogger("Sone.FreenetInterface");
 
 	/** The event bus. */
 	private final EventBus eventBus;
@@ -126,11 +132,10 @@ public class FreenetInterface {
 	 * @return The result of the fetch, or {@code null} if an error occured
 	 */
 	public Fetched fetchUri(FreenetURI uri) {
-		FetchResult fetchResult = null;
 		FreenetURI currentUri = new FreenetURI(uri);
 		while (true) {
 			try {
-				fetchResult = client.fetch(currentUri);
+				FetchResult fetchResult = client.fetch(currentUri);
 				return new Fetched(currentUri, fetchResult);
 			} catch (FetchException fe1) {
 				if (fe1.getMode() == FetchExceptionMode.PERMANENT_REDIRECT) {
@@ -141,16 +146,6 @@ public class FreenetInterface {
 				return null;
 			}
 		}
-	}
-
-	/**
-	 * Creates a key pair.
-	 *
-	 * @return The request key at index 0, the insert key at index 1
-	 */
-	public String[] generateKeyPair() {
-		FreenetURI[] keyPair = client.generateKeyPair("");
-		return new String[] { keyPair[1].toString(), keyPair[0].toString() };
 	}
 
 	/**
@@ -205,51 +200,30 @@ public class FreenetInterface {
 		}
 	}
 
-	/**
-	 * Registers the USK for the given Sone and notifies the given
-	 * {@link SoneDownloader} if an update was found.
-	 *
-	 * @param sone
-	 *            The Sone to watch
-	 * @param soneDownloader
-	 *            The Sone download to notify on updates
-	 */
-	public void registerUsk(final Sone sone, final SoneDownloader soneDownloader) {
+	public void registerActiveUsk(FreenetURI requestUri,
+			USKCallback uskCallback) {
 		try {
-			logger.log(Level.FINE, String.format("Registering Sone “%s” for USK updates at %s…", sone, sone.getRequestUri().setMetaString(new String[] { "sone.xml" })));
-			USKCallback uskCallback = new USKCallback() {
-
-				@Override
-				@SuppressWarnings("synthetic-access")
-				public void onFoundEdition(long edition, USK key, ClientContext clientContext, boolean metadata, short codec, byte[] data, boolean newKnownGood, boolean newSlotToo) {
-					logger.log(Level.FINE, String.format("Found USK update for Sone “%s” at %s, new known good: %s, new slot too: %s.", sone, key, newKnownGood, newSlotToo));
-					if (edition > sone.getLatestEdition()) {
-						sone.setLatestEdition(edition);
-						new Thread(new Runnable() {
-
-							@Override
-							public void run() {
-								soneDownloader.fetchSone(sone);
-							}
-						}, "Sone Downloader").start();
-					}
-				}
-
-				@Override
-				public short getPollingPriorityProgress() {
-					return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
-				}
-
-				@Override
-				public short getPollingPriorityNormal() {
-					return RequestStarter.INTERACTIVE_PRIORITY_CLASS;
-				}
-			};
-			soneUskCallbacks.put(sone.getId(), uskCallback);
-			boolean runBackgroundFetch = (System.currentTimeMillis() - sone.getTime()) < TimeUnit.DAYS.toMillis(7);
-			node.clientCore.uskManager.subscribe(USK.create(sone.getRequestUri()), uskCallback, runBackgroundFetch, (HighLevelSimpleClientImpl) client);
+			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			node.clientCore.uskManager.subscribe(create(requestUri),
+					uskCallback, true, (RequestClient) client);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.WARNING, String.format("Could not subscribe USK “%s”!", sone.getRequestUri()), mue1);
+			logger.log(WARNING, format("Could not subscribe USK “%s”!",
+					requestUri), mue1);
+		}
+	}
+
+	public void registerPassiveUsk(FreenetURI requestUri,
+			USKCallback uskCallback) {
+		try {
+			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			node.clientCore
+					.uskManager
+					.subscribe(create(requestUri), uskCallback, false,
+							(RequestClient) client);
+		} catch (MalformedURLException mue1) {
+			logger.log(WARNING,
+					format("Could not subscribe USK “%s”!", requestUri),
+					mue1);
 		}
 	}
 
@@ -301,7 +275,7 @@ public class FreenetInterface {
 
 		};
 		try {
-			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (HighLevelSimpleClientImpl) client);
+			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (RequestClient) client);
 			uriUskCallbacks.put(uri, uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
@@ -464,6 +438,7 @@ public class FreenetInterface {
 		public void cancel() {
 			clientPutter.cancel(node.clientCore.clientContext);
 			eventBus.post(new ImageInsertAbortedEvent(image));
+			bucket.free();
 		}
 
 		//
@@ -526,6 +501,15 @@ public class FreenetInterface {
 		public void onSuccess(BaseClientPutter clientPutter) {
 			eventBus.post(new ImageInsertFinishedEvent(image, resultingUri));
 			bucket.free();
+		}
+
+	}
+
+	public class InsertTokenSupplier implements Function<Image, InsertToken> {
+
+		@Override
+		public InsertToken apply(Image image) {
+			return new InsertToken(image);
 		}
 
 	}

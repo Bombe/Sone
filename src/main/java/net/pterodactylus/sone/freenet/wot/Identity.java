@@ -18,8 +18,11 @@
 package net.pterodactylus.sone.freenet.wot;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+
+import com.google.common.base.Function;
 
 /**
  * Interface for web of trust identities, defining all functions that can be
@@ -29,6 +32,20 @@ import java.util.Set;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Identity {
+
+	public static final Function<Identity, Set<String>> TO_CONTEXTS = new Function<Identity, Set<String>>() {
+		@Override
+		public Set<String> apply(Identity identity) {
+			return (identity == null) ? Collections.<String>emptySet() : identity.getContexts();
+		}
+	};
+
+	public static final Function<Identity, Map<String, String>> TO_PROPERTIES = new Function<Identity, Map<String, String>>() {
+		@Override
+		public Map<String, String> apply(Identity input) {
+			return (input == null) ? Collections.<String, String>emptyMap() : input.getProperties();
+		}
+	};
 
 	/**
 	 * Returns the ID of the identity.
@@ -74,7 +91,7 @@ public interface Identity {
 	 * @param context
 	 *            The context to add
 	 */
-	public void addContext(String context);
+	public Identity addContext(String context);
 
 	/**
 	 * Sets all contexts of this identity.
@@ -90,7 +107,7 @@ public interface Identity {
 	 * @param context
 	 *            The context to remove
 	 */
-	public void removeContext(String context);
+	public Identity removeContext(String context);
 
 	/**
 	 * Returns all properties of this identity.
@@ -116,7 +133,7 @@ public interface Identity {
 	 * @param value
 	 *            The value of the property
 	 */
-	public void setProperty(String name, String value);
+	public Identity setProperty(String name, String value);
 
 	/**
 	 * Sets all properties of this identity.
@@ -132,7 +149,7 @@ public interface Identity {
 	 * @param name
 	 *            The name of the property to remove
 	 */
-	public void removeProperty(String name);
+	public Identity removeProperty(String name);
 
 	/**
 	 * Retrieves the trust that this identity receives from the given own
@@ -155,7 +172,7 @@ public interface Identity {
 	 * @param trust
 	 *            The trust given by the given own identity
 	 */
-	public void setTrust(OwnIdentity ownIdentity, Trust trust);
+	public Identity setTrust(OwnIdentity ownIdentity, Trust trust);
 
 	/**
 	 * Removes trust assignment from the given own identity for this identity.
@@ -164,6 +181,6 @@ public interface Identity {
 	 *            The own identity that removed the trust assignment for this
 	 *            identity
 	 */
-	public void removeTrust(OwnIdentity ownIdentity);
+	public Identity removeTrust(OwnIdentity ownIdentity);
 
 }

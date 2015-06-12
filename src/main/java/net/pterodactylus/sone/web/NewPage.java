@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,7 +32,6 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -77,7 +78,7 @@ public class NewPage extends SoneTemplatePage {
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 
 		/* paginate them. */
-		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}

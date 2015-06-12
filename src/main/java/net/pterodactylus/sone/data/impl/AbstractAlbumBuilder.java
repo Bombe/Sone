@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.AlbumBuilder;
 
 /**
@@ -34,6 +35,7 @@ public abstract class AbstractAlbumBuilder implements AlbumBuilder {
 
 	/** The ID of the album to create. */
 	protected String id;
+	protected Sone sone;
 
 	@Override
 	public AlbumBuilder randomId() {
@@ -44,6 +46,11 @@ public abstract class AbstractAlbumBuilder implements AlbumBuilder {
 	@Override
 	public AlbumBuilder withId(String id) {
 		this.id = id;
+		return this;
+	}
+
+	public AlbumBuilder by(Sone sone) {
+		this.sone = sone;
 		return this;
 	}
 
@@ -59,6 +66,7 @@ public abstract class AbstractAlbumBuilder implements AlbumBuilder {
 	 */
 	protected void validate() throws IllegalStateException {
 		checkState((randomId && (id == null)) || (!randomId && (id != null)), "exactly one of random ID or custom ID must be set");
+		checkState(sone != null, "Sone must not be null");
 	}
 
 }

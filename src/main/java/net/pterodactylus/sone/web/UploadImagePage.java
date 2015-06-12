@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -31,12 +33,12 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image.Modifier.ImageTitleMustNotBeEmpty;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -54,7 +56,7 @@ import freenet.support.api.HTTPUploadedFile;
 public class UploadImagePage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(UploadImagePage.class);
+	private static final Logger logger = getLogger("Sone.Web.UploadImage");
 
 	/**
 	 * Creates a new “upload image” page.
@@ -81,14 +83,12 @@ public class UploadImagePage extends SoneTemplatePage {
 		if (request.getMethod() == Method.POST) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
-			Album parent = webInterface.getCore().getAlbum(parentId, false);
+			Album parent = webInterface.getCore().getAlbum(parentId);
 			if (parent == null) {
-				/* TODO - signal error */
-				return;
+				throw new RedirectException("noPermission.html");
 			}
 			if (!currentSone.equals(parent.getSone())) {
-				/* TODO - signal error. */
-				return;
+				throw new RedirectException("noPermission.html");
 			}
 			String name = request.getHttpRequest().getPartAsStringFailsafe("title", 200);
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 4000);
@@ -96,7 +96,6 @@ public class UploadImagePage extends SoneTemplatePage {
 			Bucket fileBucket = uploadedFile.getData();
 			InputStream imageInputStream = null;
 			ByteArrayOutputStream imageDataOutputStream = null;
-			net.pterodactylus.sone.data.Image image = null;
 			try {
 				imageInputStream = fileBucket.getInputStream();
 				/* TODO - check length */
@@ -122,11 +121,13 @@ public class UploadImagePage extends SoneTemplatePage {
 				}
 				String mimeType = getMimeType(imageData);
 				TemporaryImage temporaryImage = webInterface.getCore().createTemporaryImage(mimeType, imageData);
-				image = webInterface.getCore().createImage(currentSone, parent, temporaryImage);
+				net.pterodactylus.sone.data.Image image = webInterface.getCore().createImage(currentSone, parent, temporaryImage);
 				image.modify().setTitle(name).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).setWidth(uploadedImage.getWidth(null)).setHeight(uploadedImage.getHeight(null)).update();
 			} catch (IOException ioe1) {
 				logger.log(Level.WARNING, "Could not read uploaded image!", ioe1);
 				return;
+			} catch (ImageTitleMustNotBeEmpty itmnbe) {
+				throw new RedirectException("emptyImageTitle.html");
 			} finally {
 				Closer.close(imageDataInputStream);
 				Closer.flush(uploadedImage);

@@ -18,20 +18,23 @@
 package net.pterodactylus.sone.fcp;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType;
 import net.pterodactylus.sone.freenet.fcp.Command.ErrorResponse;
 import net.pterodactylus.sone.freenet.fcp.Command.Response;
-import net.pterodactylus.util.logging.Logging;
-
-import com.google.inject.Inject;
 
 import freenet.pluginmanager.FredPluginFCP;
 import freenet.pluginmanager.PluginNotFoundException;
@@ -39,12 +42,18 @@ import freenet.pluginmanager.PluginReplySender;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class FcpInterface {
 
 	/**
@@ -66,13 +75,13 @@ public class FcpInterface {
 	}
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(FcpInterface.class);
+	private static final Logger logger = getLogger("Sone.External.Fcp");
 
 	/** Whether the FCP interface is currently active. */
-	private volatile boolean active;
+	private final AtomicBoolean active = new AtomicBoolean();
 
 	/** What function full access is required for. */
-	private volatile FullAccessRequired fullAccessRequired = FullAccessRequired.ALWAYS;
+	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<FullAccessRequired>(FullAccessRequired.ALWAYS);
 
 	/** All available FCP commands. */
 	private final Map<String, AbstractSoneCommand> commands = Collections.synchronizedMap(new HashMap<String, AbstractSoneCommand>());
@@ -106,26 +115,22 @@ public class FcpInterface {
 	// ACCESSORS
 	//
 
-	/**
-	 * Sets whether the FCP interface should handle requests. If {@code active}
-	 * is {@code false}, all requests are answered with an error.
-	 *
-	 * @param active
-	 *            {@code true} to activate the FCP interface, {@code false} to
-	 *            deactivate the FCP interface
-	 */
-	public void setActive(boolean active) {
-		this.active = active;
+	@VisibleForTesting
+	boolean isActive() {
+		return active.get();
 	}
 
-	/**
-	 * Sets the action level for which full FCP access is required.
-	 *
-	 * @param fullAccessRequired
-	 *            The action level for which full FCP access is required
-	 */
-	public void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
-		this.fullAccessRequired = checkNotNull(fullAccessRequired, "fullAccessRequired must not be null");
+	private void setActive(boolean active) {
+		this.active.set(active);
+	}
+
+	@VisibleForTesting
+	FullAccessRequired getFullAccessRequired() {
+		return fullAccessRequired.get();
+	}
+
+	private void setFullAccessRequired(FullAccessRequired fullAccessRequired) {
+		this.fullAccessRequired.set(checkNotNull(fullAccessRequired, "fullAccessRequired must not be null"));
 	}
 
 	//
@@ -147,7 +152,7 @@ public class FcpInterface {
 	 *            {@link FredPluginFCP#ACCESS_FCP_RESTRICTED}
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
-		if (!active) {
+		if (!active.get()) {
 			try {
 				sendReply(pluginReplySender, null, new ErrorResponse(400, "FCP Interface deactivated"));
 			} catch (PluginNotFoundException pnfe1) {
@@ -156,7 +161,7 @@ public class FcpInterface {
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
-		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired == FullAccessRequired.ALWAYS))) {
+		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired.get() == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired.get() == FullAccessRequired.ALWAYS))) {
 			try {
 				sendReply(pluginReplySender, null, new ErrorResponse(401, "Not authorized"));
 			} catch (PluginNotFoundException pnfe1) {
@@ -214,6 +219,21 @@ public class FcpInterface {
 		} else {
 			pluginReplySender.send(replyParameters);
 		}
+	}
+
+	@Subscribe
+	public void fcpInterfaceActivated(FcpInterfaceActivatedEvent fcpInterfaceActivatedEvent) {
+		setActive(true);
+	}
+
+	@Subscribe
+	public void fcpInterfaceDeactivated(FcpInterfaceDeactivatedEvent fcpInterfaceDeactivatedEvent) {
+		setActive(false);
+	}
+
+	@Subscribe
+	public void fullAccessRequiredChanged(FullAccessRequiredChanged fullAccessRequiredChanged) {
+		setFullAccessRequired(fullAccessRequiredChanged.getFullAccessRequired());
 	}
 
 }

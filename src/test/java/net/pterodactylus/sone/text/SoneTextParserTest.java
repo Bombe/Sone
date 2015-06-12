@@ -22,12 +22,13 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.google.common.base.Optional;
-
-import junit.framework.TestCase;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.SoneImpl;
+import net.pterodactylus.sone.data.impl.IdOnlySone;
 import net.pterodactylus.sone.database.SoneProvider;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import junit.framework.TestCase;
 
 /**
  * JUnit test case for {@link SoneTextParser}.
@@ -181,21 +182,22 @@ public class SoneTextParserTest extends TestCase {
 	 */
 	private static class TestSoneProvider implements SoneProvider {
 
+		@Override
+		public Function<String, Optional<Sone>> soneLoader() {
+			return new Function<String, Optional<Sone>>() {
+				@Override
+				public Optional<Sone> apply(String soneId) {
+					return getSone(soneId);
+				}
+			};
+		}
+
 		/**
 		 * {@inheritDoc}
 		 */
 		@Override
 		public Optional<Sone> getSone(final String soneId) {
-			return Optional.<Sone>of(new SoneImpl(soneId, false) {
-
-				/**
-				 * {@inheritDoc}
-				 */
-				@Override
-				public String getName() {
-					return soneId;
-				}
-			});
+			return Optional.<Sone>of(new IdOnlySone(soneId));
 		}
 
 		/**

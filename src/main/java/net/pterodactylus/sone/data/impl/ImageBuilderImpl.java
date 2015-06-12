@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.data.impl;
 
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.ImageImpl;
 import net.pterodactylus.sone.database.ImageBuilder;
 
 /**

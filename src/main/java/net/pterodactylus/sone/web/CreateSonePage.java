@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,7 +31,6 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -43,7 +44,7 @@ import freenet.clients.http.ToadletContext;
 public class CreateSonePage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(CreateSonePage.class);
+	private static final Logger logger = getLogger("Sone.Web.CreateSone");
 
 	/**
 	 * Creates a new “create Sone” page.

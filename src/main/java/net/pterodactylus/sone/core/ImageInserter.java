@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.logging.Logger.getLogger;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -29,7 +30,8 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.TemporaryImage;
-import net.pterodactylus.util.logging.Logging;
+
+import com.google.common.base.Function;
 
 /**
  * The image inserter is responsible for inserting images using
@@ -42,10 +44,11 @@ import net.pterodactylus.util.logging.Logging;
 public class ImageInserter {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(ImageInserter.class);
+	private static final Logger logger = getLogger("Sone.Image.Inserter");
 
 	/** The freenet interface. */
 	private final FreenetInterface freenetInterface;
+	private final Function<Image, InsertToken> insertTokenSupplier;
 
 	/** The tokens of running inserts. */
 	private final Map<String, InsertToken> insertTokens = Collections.synchronizedMap(new HashMap<String, InsertToken>());
@@ -55,9 +58,12 @@ public class ImageInserter {
 	 *
 	 * @param freenetInterface
 	 *            The freenet interface
+	 * @param insertTokenSupplier
+	 *            The supplier for insert tokens
 	 */
-	public ImageInserter(FreenetInterface freenetInterface) {
+	public ImageInserter(FreenetInterface freenetInterface, Function<Image, InsertToken> insertTokenSupplier) {
 		this.freenetInterface = freenetInterface;
+		this.insertTokenSupplier = insertTokenSupplier;
 	}
 
 	/**
@@ -73,7 +79,7 @@ public class ImageInserter {
 		checkNotNull(image, "image must not be null");
 		checkArgument(image.getId().equals(temporaryImage.getId()), "image IDs must match");
 		try {
-			InsertToken insertToken = freenetInterface.new InsertToken(image);
+			InsertToken insertToken = insertTokenSupplier.apply(image);
 			insertTokens.put(image.getId(), insertToken);
 			freenetInterface.insertImage(temporaryImage, image, insertToken);
 		} catch (SoneException se1) {

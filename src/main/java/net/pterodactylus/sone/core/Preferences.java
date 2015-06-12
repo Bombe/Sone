@@ -17,8 +17,24 @@
 
 package net.pterodactylus.sone.core;
 
+import static com.google.common.base.Predicates.equalTo;
+import static java.lang.Integer.MAX_VALUE;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS;
+import static net.pterodactylus.sone.utils.IntegerRangePredicate.range;
+
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
+import net.pterodactylus.sone.utils.DefaultOption;
+import net.pterodactylus.sone.utils.Option;
+import net.pterodactylus.util.config.Configuration;
+import net.pterodactylus.util.config.ConfigurationException;
+
+import com.google.common.base.Predicates;
+import com.google.common.eventbus.EventBus;
 
 /**
  * Convenience interface for external classes that want to access the core’s
@@ -28,17 +44,33 @@ import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
  */
 public class Preferences {
 
-	/** The wrapped options. */
-	private final Options options;
+	private final EventBus eventBus;
+	private final Option<Integer> insertionDelay =
+			new DefaultOption<Integer>(60, range(0, MAX_VALUE));
+	private final Option<Integer> postsPerPage =
+			new DefaultOption<Integer>(10, range(1, MAX_VALUE));
+	private final Option<Integer> imagesPerPage =
+			new DefaultOption<Integer>(9, range(1, MAX_VALUE));
+	private final Option<Integer> charactersPerPost =
+			new DefaultOption<Integer>(400, Predicates.<Integer>or(
+					range(50, MAX_VALUE), equalTo(-1)));
+	private final Option<Integer> postCutOffLength =
+			new DefaultOption<Integer>(200, range(50, MAX_VALUE));
+	private final Option<Boolean> requireFullAccess =
+			new DefaultOption<Boolean>(false);
+	private final Option<Integer> positiveTrust =
+			new DefaultOption<Integer>(75, range(0, 100));
+	private final Option<Integer> negativeTrust =
+			new DefaultOption<Integer>(-25, range(-100, 100));
+	private final Option<String> trustComment =
+			new DefaultOption<String>("Set from Sone Web Interface");
+	private final Option<Boolean> activateFcpInterface =
+			new DefaultOption<Boolean>(false);
+	private final Option<FullAccessRequired> fcpFullAccessRequired =
+			new DefaultOption<FullAccessRequired>(ALWAYS);
 
-	/**
-	 * Creates a new preferences object wrapped around the given options.
-	 *
-	 * @param options
-	 *            The options to wrap
-	 */
-	public Preferences(Options options) {
-		this.options = options;
+	public Preferences(EventBus eventBus) {
+		this.eventBus = eventBus;
 	}
 
 	/**
@@ -47,7 +79,7 @@ public class Preferences {
 	 * @return The insertion delay
 	 */
 	public int getInsertionDelay() {
-		return options.getIntegerOption("InsertionDelay").get();
+		return insertionDelay.get();
 	}
 
 	/**
@@ -59,7 +91,7 @@ public class Preferences {
 	 *         {@code false} otherwise
 	 */
 	public boolean validateInsertionDelay(Integer insertionDelay) {
-		return options.getIntegerOption("InsertionDelay").validate(insertionDelay);
+		return this.insertionDelay.validate(insertionDelay);
 	}
 
 	/**
@@ -71,7 +103,8 @@ public class Preferences {
 	 * @return This preferences
 	 */
 	public Preferences setInsertionDelay(Integer insertionDelay) {
-		options.getIntegerOption("InsertionDelay").set(insertionDelay);
+		this.insertionDelay.set(insertionDelay);
+		eventBus.post(new InsertionDelayChangedEvent(getInsertionDelay()));
 		return this;
 	}
 
@@ -81,7 +114,7 @@ public class Preferences {
 	 * @return The number of posts to show per page
 	 */
 	public int getPostsPerPage() {
-		return options.getIntegerOption("PostsPerPage").get();
+		return postsPerPage.get();
 	}
 
 	/**
@@ -93,7 +126,7 @@ public class Preferences {
 	 *         {@code false} otherwise
 	 */
 	public boolean validatePostsPerPage(Integer postsPerPage) {
-		return options.getIntegerOption("PostsPerPage").validate(postsPerPage);
+		return this.postsPerPage.validate(postsPerPage);
 	}
 
 	/**
@@ -104,7 +137,7 @@ public class Preferences {
 	 * @return This preferences object
 	 */
 	public Preferences setPostsPerPage(Integer postsPerPage) {
-		options.getIntegerOption("PostsPerPage").set(postsPerPage);
+		this.postsPerPage.set(postsPerPage);
 		return this;
 	}
 
@@ -114,7 +147,7 @@ public class Preferences {
 	 * @return The number of images to show per page
 	 */
 	public int getImagesPerPage() {
-		return options.getIntegerOption("ImagesPerPage").get();
+		return imagesPerPage.get();
 	}
 
 	/**
@@ -126,7 +159,7 @@ public class Preferences {
 	 *         {@code false} otherwise
 	 */
 	public boolean validateImagesPerPage(Integer imagesPerPage) {
-		return options.getIntegerOption("ImagesPerPage").validate(imagesPerPage);
+		return this.imagesPerPage.validate(imagesPerPage);
 	}
 
 	/**
@@ -137,7 +170,7 @@ public class Preferences {
 	 * @return This preferences object
 	 */
 	public Preferences setImagesPerPage(Integer imagesPerPage) {
-		options.getIntegerOption("ImagesPerPage").set(imagesPerPage);
+		this.imagesPerPage.set(imagesPerPage);
 		return this;
 	}
 
@@ -148,7 +181,7 @@ public class Preferences {
 	 * @return The numbers of characters per post
 	 */
 	public int getCharactersPerPost() {
-		return options.getIntegerOption("CharactersPerPost").get();
+		return charactersPerPost.get();
 	}
 
 	/**
@@ -160,7 +193,7 @@ public class Preferences {
 	 *         {@code false} otherwise
 	 */
 	public boolean validateCharactersPerPost(Integer charactersPerPost) {
-		return options.getIntegerOption("CharactersPerPost").validate(charactersPerPost);
+		return this.charactersPerPost.validate(charactersPerPost);
 	}
 
 	/**
@@ -172,7 +205,7 @@ public class Preferences {
 	 * @return This preferences objects
 	 */
 	public Preferences setCharactersPerPost(Integer charactersPerPost) {
-		options.getIntegerOption("CharactersPerPost").set(charactersPerPost);
+		this.charactersPerPost.set(charactersPerPost);
 		return this;
 	}
 
@@ -182,7 +215,7 @@ public class Preferences {
 	 * @return The number of characters of the snippet
 	 */
 	public int getPostCutOffLength() {
-		return options.getIntegerOption("PostCutOffLength").get();
+		return postCutOffLength.get();
 	}
 
 	/**
@@ -194,7 +227,7 @@ public class Preferences {
 	 *         valid, {@code false} otherwise
 	 */
 	public boolean validatePostCutOffLength(Integer postCutOffLength) {
-		return options.getIntegerOption("PostCutOffLength").validate(postCutOffLength);
+		return this.postCutOffLength.validate(postCutOffLength);
 	}
 
 	/**
@@ -205,7 +238,7 @@ public class Preferences {
 	 * @return This preferences
 	 */
 	public Preferences setPostCutOffLength(Integer postCutOffLength) {
-		options.getIntegerOption("PostCutOffLength").set(postCutOffLength);
+		this.postCutOffLength.set(postCutOffLength);
 		return this;
 	}
 
@@ -216,7 +249,7 @@ public class Preferences {
 	 *         otherwise
 	 */
 	public boolean isRequireFullAccess() {
-		return options.getBooleanOption("RequireFullAccess").get();
+		return requireFullAccess.get();
 	}
 
 	/**
@@ -227,7 +260,7 @@ public class Preferences {
 	 *            otherwise
 	 */
 	public void setRequireFullAccess(Boolean requireFullAccess) {
-		options.getBooleanOption("RequireFullAccess").set(requireFullAccess);
+		this.requireFullAccess.set(requireFullAccess);
 	}
 
 	/**
@@ -236,7 +269,7 @@ public class Preferences {
 	 * @return The positive trust
 	 */
 	public int getPositiveTrust() {
-		return options.getIntegerOption("PositiveTrust").get();
+		return positiveTrust.get();
 	}
 
 	/**
@@ -248,7 +281,7 @@ public class Preferences {
 	 *         otherwise
 	 */
 	public boolean validatePositiveTrust(Integer positiveTrust) {
-		return options.getIntegerOption("PositiveTrust").validate(positiveTrust);
+		return this.positiveTrust.validate(positiveTrust);
 	}
 
 	/**
@@ -260,7 +293,7 @@ public class Preferences {
 	 * @return This preferences
 	 */
 	public Preferences setPositiveTrust(Integer positiveTrust) {
-		options.getIntegerOption("PositiveTrust").set(positiveTrust);
+		this.positiveTrust.set(positiveTrust);
 		return this;
 	}
 
@@ -270,7 +303,7 @@ public class Preferences {
 	 * @return The negative trust
 	 */
 	public int getNegativeTrust() {
-		return options.getIntegerOption("NegativeTrust").get();
+		return negativeTrust.get();
 	}
 
 	/**
@@ -282,7 +315,7 @@ public class Preferences {
 	 *         otherwise
 	 */
 	public boolean validateNegativeTrust(Integer negativeTrust) {
-		return options.getIntegerOption("NegativeTrust").validate(negativeTrust);
+		return this.negativeTrust.validate(negativeTrust);
 	}
 
 	/**
@@ -294,7 +327,7 @@ public class Preferences {
 	 * @return The preferences
 	 */
 	public Preferences setNegativeTrust(Integer negativeTrust) {
-		options.getIntegerOption("NegativeTrust").set(negativeTrust);
+		this.negativeTrust.set(negativeTrust);
 		return this;
 	}
 
@@ -305,7 +338,7 @@ public class Preferences {
 	 * @return The trust comment
 	 */
 	public String getTrustComment() {
-		return options.getStringOption("TrustComment").get();
+		return trustComment.get();
 	}
 
 	/**
@@ -317,7 +350,7 @@ public class Preferences {
 	 * @return This preferences
 	 */
 	public Preferences setTrustComment(String trustComment) {
-		options.getStringOption("TrustComment").set(trustComment);
+		this.trustComment.set(trustComment);
 		return this;
 	}
 
@@ -330,7 +363,7 @@ public class Preferences {
 	 *         {@code false} otherwise
 	 */
 	public boolean isFcpInterfaceActive() {
-		return options.getBooleanOption("ActivateFcpInterface").get();
+		return activateFcpInterface.get();
 	}
 
 	/**
@@ -343,8 +376,13 @@ public class Preferences {
 	 *            to deactivate the FCP interface
 	 * @return This preferences object
 	 */
-	public Preferences setFcpInterfaceActive(boolean fcpInterfaceActive) {
-		options.getBooleanOption("ActivateFcpInterface").set(fcpInterfaceActive);
+	public Preferences setFcpInterfaceActive(Boolean fcpInterfaceActive) {
+		this.activateFcpInterface.set(fcpInterfaceActive);
+		if (isFcpInterfaceActive()) {
+			eventBus.post(new FcpInterfaceActivatedEvent());
+		} else {
+			eventBus.post(new FcpInterfaceDeactivatedEvent());
+		}
 		return this;
 	}
 
@@ -356,7 +394,7 @@ public class Preferences {
 	 *         is required
 	 */
 	public FullAccessRequired getFcpFullAccessRequired() {
-		return FullAccessRequired.values()[options.getIntegerOption("FcpFullAccessRequired").get()];
+		return fcpFullAccessRequired.get();
 	}
 
 	/**
@@ -367,9 +405,30 @@ public class Preferences {
 	 *            The action level
 	 * @return This preferences
 	 */
-	public Preferences setFcpFullAccessRequired(FullAccessRequired fcpFullAccessRequired) {
-		options.getIntegerOption("FcpFullAccessRequired").set((fcpFullAccessRequired != null) ? fcpFullAccessRequired.ordinal() : null);
+	public Preferences setFcpFullAccessRequired(
+			FullAccessRequired fcpFullAccessRequired) {
+		this.fcpFullAccessRequired.set(fcpFullAccessRequired);
+		eventBus.post(new FullAccessRequiredChanged(getFcpFullAccessRequired()));
 		return this;
+	}
+
+	public void saveTo(Configuration configuration) throws ConfigurationException {
+		configuration.getIntValue("Option/ConfigurationVersion").setValue(0);
+		configuration.getIntValue("Option/InsertionDelay").setValue(insertionDelay.getReal());
+		configuration.getIntValue("Option/PostsPerPage").setValue(postsPerPage.getReal());
+		configuration.getIntValue("Option/ImagesPerPage").setValue(imagesPerPage.getReal());
+		configuration.getIntValue("Option/CharactersPerPost").setValue(charactersPerPost.getReal());
+		configuration.getIntValue("Option/PostCutOffLength").setValue(postCutOffLength.getReal());
+		configuration.getBooleanValue("Option/RequireFullAccess").setValue(requireFullAccess.getReal());
+		configuration.getIntValue("Option/PositiveTrust").setValue(positiveTrust.getReal());
+		configuration.getIntValue("Option/NegativeTrust").setValue(negativeTrust.getReal());
+		configuration.getStringValue("Option/TrustComment").setValue(trustComment.getReal());
+		configuration.getBooleanValue("Option/ActivateFcpInterface").setValue(activateFcpInterface.getReal());
+		configuration.getIntValue("Option/FcpFullAccessRequired").setValue(toInt(fcpFullAccessRequired.getReal()));
+	}
+
+	private Integer toInt(FullAccessRequired fullAccessRequired) {
+		return (fullAccessRequired == null) ? null : fullAccessRequired.ordinal();
 	}
 
 }

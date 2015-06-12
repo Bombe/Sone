@@ -45,7 +45,7 @@ public class UnlockSoneAjaxPage extends JsonPage {
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
-		Sone sone = webInterface.getCore().getLocalSone(soneId, false);
+		Sone sone = webInterface.getCore().getLocalSone(soneId);
 		if (sone == null) {
 			return createErrorJsonObject("invalid-sone-id");
 		}

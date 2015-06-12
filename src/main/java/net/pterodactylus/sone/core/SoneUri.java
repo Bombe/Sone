@@ -17,11 +17,12 @@
 
 package net.pterodactylus.sone.core;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.util.logging.Logging;
 import freenet.keys.FreenetURI;
 
 /**
@@ -33,7 +34,7 @@ import freenet.keys.FreenetURI;
 public class SoneUri {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneUri.class);
+	private static final Logger logger = getLogger("Sone.Data");
 
 	/**
 	 * Generate a Sone URI from the given URI.

@@ -15,10 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.lang.String.format;
+import static java.util.logging.Logger.getLogger;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -28,9 +31,18 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.Options;
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Client;
+import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.SoneOptions;
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
+import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.util.logging.Logging;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
 import freenet.keys.FreenetURI;
 
@@ -47,7 +59,10 @@ import com.google.common.hash.Hashing;
 public class SoneImpl implements Sone {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneImpl.class);
+	private static final Logger logger = getLogger("Sone.Data");
+
+	/** The database. */
+	private final Database database;
 
 	/** The ID of this Sone. */
 	private final String id;
@@ -56,14 +71,7 @@ public class SoneImpl implements Sone {
 	private final boolean local;
 
 	/** The identity of this Sone. */
-	private Identity identity;
-
-	/** The URI under which the Sone is stored in Freenet. */
-	private volatile FreenetURI requestUri;
-
-	/** The URI used to insert a new version of this Sone. */
-	/* This will be null for remote Sones! */
-	private volatile FreenetURI insertUri;
+	private final Identity identity;
 
 	/** The latest edition of the Sone. */
 	private volatile long latestEdition;
@@ -83,9 +91,6 @@ public class SoneImpl implements Sone {
 	/** Whether this Sone is known. */
 	private volatile boolean known;
 
-	/** All friend Sones. */
-	private final Set<String> friendSones = new CopyOnWriteArraySet<String>();
-
 	/** All posts. */
 	private final Set<Post> posts = new CopyOnWriteArraySet<Post>();
 
@@ -99,21 +104,24 @@ public class SoneImpl implements Sone {
 	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
 
 	/** The root album containing all albums. */
-	private final Album rootAlbum = new AlbumImpl().setSone(this);
+	private final Album rootAlbum = new AlbumImpl(this);
 
 	/** Sone-specific options. */
-	private Options options = new Options();
+	private SoneOptions options = new DefaultSoneOptions();
 
 	/**
 	 * Creates a new Sone.
 	 *
-	 * @param id
-	 * 		The ID of the Sone
+	 * @param database The database
+	 * @param identity
+	 * 		The identity of the Sone
 	 * @param local
 	 * 		{@code true} if the Sone is a local Sone, {@code false} otherwise
 	 */
-	public SoneImpl(String id, boolean local) {
-		this.id = id;
+	public SoneImpl(Database database, Identity identity, boolean local) {
+		this.database = database;
+		this.id = identity.getId();
+		this.identity = identity;
 		this.local = local;
 	}
 
@@ -140,24 +148,6 @@ public class SoneImpl implements Sone {
 	}
 
 	/**
-	 * Sets the identity of this Sone. The {@link Identity#getId() ID} of the
-	 * identity has to match this Sone’s {@link #getId()}.
-	 *
-	 * @param identity
-	 * 		The identity of this Sone
-	 * @return This Sone (for method chaining)
-	 * @throws IllegalArgumentException
-	 * 		if the ID of the identity does not match this Sone’s ID
-	 */
-	public SoneImpl setIdentity(Identity identity) throws IllegalArgumentException {
-		if (!identity.getId().equals(id)) {
-			throw new IllegalArgumentException("Identity’s ID does not match Sone’s ID!");
-		}
-		this.identity = identity;
-		return this;
-	}
-
-	/**
 	 * Returns the name of this Sone.
 	 *
 	 * @return The name of this Sone
@@ -181,26 +171,17 @@ public class SoneImpl implements Sone {
 	 * @return The request URI of this Sone
 	 */
 	public FreenetURI getRequestUri() {
-		return (requestUri != null) ? requestUri.setSuggestedEdition(latestEdition) : null;
-	}
-
-	/**
-	 * Sets the request URI of this Sone.
-	 *
-	 * @param requestUri
-	 * 		The request URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone setRequestUri(FreenetURI requestUri) {
-		if (this.requestUri == null) {
-			this.requestUri = requestUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
-			return this;
+		try {
+			return new FreenetURI(getIdentity().getRequestUri())
+					.setKeyType("USK")
+					.setDocName("Sone")
+					.setMetaString(new String[0])
+					.setSuggestedEdition(latestEdition);
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(
+					format("Identity %s's request URI is incorrect.",
+							getIdentity()), e);
 		}
-		if (!this.requestUri.equalsKeypair(requestUri)) {
-			logger.log(Level.WARNING, String.format("Request URI %s tried to overwrite %s!", requestUri, this.requestUri));
-			return this;
-		}
-		return this;
 	}
 
 	/**
@@ -209,26 +190,17 @@ public class SoneImpl implements Sone {
 	 * @return The insert URI of this Sone
 	 */
 	public FreenetURI getInsertUri() {
-		return (insertUri != null) ? insertUri.setSuggestedEdition(latestEdition) : null;
-	}
-
-	/**
-	 * Sets the insert URI of this Sone.
-	 *
-	 * @param insertUri
-	 * 		The insert URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone setInsertUri(FreenetURI insertUri) {
-		if (this.insertUri == null) {
-			this.insertUri = insertUri.setKeyType("USK").setDocName("Sone").setMetaString(new String[0]);
-			return this;
+		if (!isLocal()) {
+			return null;
 		}
-		if (!this.insertUri.equalsKeypair(insertUri)) {
-			logger.log(Level.WARNING, String.format("Request URI %s tried to overwrite %s!", insertUri, this.insertUri));
-			return this;
+		try {
+			return new FreenetURI(((OwnIdentity) getIdentity()).getInsertUri())
+					.setDocName("Sone")
+					.setMetaString(new String[0])
+					.setSuggestedEdition(latestEdition);
+		} catch (MalformedURLException e) {
+			throw new IllegalStateException(format("Own identity %s's insert URI is incorrect.", getIdentity()), e);
 		}
-		return this;
 	}
 
 	/**
@@ -370,9 +342,8 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	public List<String> getFriends() {
-		List<String> friends = new ArrayList<String>(friendSones);
-		return friends;
+	public Collection<String> getFriends() {
+		return database.getFriends(this);
 	}
 
 	/**
@@ -384,33 +355,7 @@ public class SoneImpl implements Sone {
 	 *         false} otherwise
 	 */
 	public boolean hasFriend(String friendSoneId) {
-		return friendSones.contains(friendSoneId);
-	}
-
-	/**
-	 * Adds the given Sone as a friend Sone.
-	 *
-	 * @param friendSone
-	 * 		The friend Sone to add
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone addFriend(String friendSone) {
-		if (!friendSone.equals(id)) {
-			friendSones.add(friendSone);
-		}
-		return this;
-	}
-
-	/**
-	 * Removes the given Sone as a friend Sone.
-	 *
-	 * @param friendSoneId
-	 * 		The ID of the friend Sone to remove
-	 * @return This Sone (for method chaining)
-	 */
-	public Sone removeFriend(String friendSoneId) {
-		friendSones.remove(friendSoneId);
-		return this;
+		return database.isFriend(this, friendSoneId);
 	}
 
 	/**
@@ -644,7 +589,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The options of this Sone
 	 */
-	public Options getOptions() {
+	public SoneOptions getOptions() {
 		return options;
 	}
 
@@ -655,7 +600,7 @@ public class SoneImpl implements Sone {
 	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
-	public void setOptions(Options options) {
+	public void setOptions(SoneOptions options) {
 		this.options = options;
 	}
 
@@ -743,7 +688,7 @@ public class SoneImpl implements Sone {
 	/** {@inheritDoc} */
 	@Override
 	public String toString() {
-		return getClass().getName() + "[identity=" + identity + ",requestUri=" + requestUri + ",insertUri(" + String.valueOf(insertUri).length() + "),friends(" + friendSones.size() + "),posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
+		return getClass().getName() + "[identity=" + identity + ",posts(" + posts.size() + "),replies(" + replies.size() + "),albums(" + getRootAlbum().getAlbums().size() + ")]";
 	}
 
 }

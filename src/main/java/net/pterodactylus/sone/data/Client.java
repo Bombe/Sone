@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data;
 
+import static com.google.common.base.Objects.equal;
+
 /**
  * Container for the client information of a {@link Sone}.
  *
@@ -63,6 +65,15 @@ public class Client {
 	 */
 	public String getVersion() {
 		return version;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof Client)) {
+			return false;
+		}
+		Client client = (Client) object;
+		return equal(getName(), client.getName()) && equal(getVersion(), client.getVersion());
 	}
 
 }

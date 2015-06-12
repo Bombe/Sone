@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +27,6 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -40,7 +41,7 @@ public class LoginPage extends SoneTemplatePage {
 
 	/** The logger. */
 	@SuppressWarnings("unused")
-	private static final Logger logger = Logging.getLogger(LoginPage.class);
+	private static final Logger logger = getLogger("Sone.Web.Login");
 
 	/**
 	 * Creates a new login page.
@@ -70,7 +71,7 @@ public class LoginPage extends SoneTemplatePage {
 		templateContext.set("sones", localSones);
 		if (request.getMethod() == Method.POST) {
 			String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone-id", 100);
-			Sone selectedSone = webInterface.getCore().getLocalSone(soneId, false);
+			Sone selectedSone = webInterface.getCore().getLocalSone(soneId);
 			if (selectedSone != null) {
 				setCurrentSone(request.getToadletContext(), selectedSone);
 				String target = request.getHttpRequest().getParam("target");

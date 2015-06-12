@@ -20,14 +20,17 @@ package net.pterodactylus.sone.database;
 import java.util.Collection;
 
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.database.memory.MemoryDatabase;
 
 import com.google.common.base.Optional;
+import com.google.inject.ImplementedBy;
 
 /**
  * Interface for objects that can provide {@link Post}s by their ID.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@ImplementedBy(MemoryDatabase.class)
 public interface PostProvider {
 
 	/**

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.core;
 
+import static java.util.logging.Logger.getLogger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -30,7 +32,6 @@ import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.version.Version;
 
 import com.google.common.eventbus.EventBus;
@@ -47,7 +48,7 @@ import freenet.support.api.Bucket;
 public class UpdateChecker {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(UpdateChecker.class);
+	private static final Logger logger = getLogger("Sone.UpdateChecker");
 
 	/** The key of the Sone homepage. */
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";

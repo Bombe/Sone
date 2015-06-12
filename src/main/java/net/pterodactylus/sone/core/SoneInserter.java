@@ -17,9 +17,13 @@
 
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Preconditions.checkArgument;
+import static java.lang.String.format;
+import static java.lang.System.currentTimeMillis;
+import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
+import java.io.Closeable;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -27,9 +31,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
@@ -40,7 +47,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -51,10 +57,13 @@ import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
+import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 
 import freenet.keys.FreenetURI;
 import freenet.support.api.Bucket;
@@ -70,10 +79,10 @@ import freenet.support.io.ArrayBucket;
 public class SoneInserter extends AbstractService {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneInserter.class);
+	private static final Logger logger = getLogger("Sone.Inserter");
 
 	/** The insertion delay (in seconds). */
-	private static volatile int insertionDelay = 60;
+	private static final AtomicInteger insertionDelay = new AtomicInteger(60);
 
 	/** The template factory used to create the templates. */
 	private static final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
@@ -96,14 +105,9 @@ public class SoneInserter extends AbstractService {
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
-	/** The Sone to insert. */
-	private volatile Sone sone;
-
-	/** Whether a modification has been detected. */
-	private volatile boolean modified = false;
-
-	/** The fingerprint of the last insert. */
-	private volatile String lastInsertFingerprint;
+	private final SoneModificationDetector soneModificationDetector;
+	private final long delay;
+	private final String soneId;
 
 	/**
 	 * Creates a new Sone inserter.
@@ -114,32 +118,49 @@ public class SoneInserter extends AbstractService {
 	 *            The event bus
 	 * @param freenetInterface
 	 *            The freenet interface
-	 * @param sone
-	 *            The Sone to insert
+	 * @param soneId
+	 *            The ID of the Sone to insert
 	 */
-	public SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, Sone sone) {
-		super("Sone Inserter for “" + sone.getName() + "”", false);
+	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, final String soneId) {
+		this(core, eventBus, freenetInterface, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
+			@Override
+			public boolean isLocked() {
+				final Optional<Sone> sone = core.getSone(soneId);
+				if (!sone.isPresent()) {
+					return false;
+				}
+				return core.isLocked(sone.get());
+			}
+
+			@Override
+			public String getFingerprint() {
+				final Optional<Sone> sone = core.getSone(soneId);
+				if (!sone.isPresent()) {
+					return null;
+				}
+				return sone.get().getFingerprint();
+			}
+		}, insertionDelay), 1000);
+	}
+
+	@VisibleForTesting
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
+		super("Sone Inserter for “" + soneId + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
-		this.sone = sone;
+		this.soneId = soneId;
+		this.soneModificationDetector = soneModificationDetector;
+		this.delay = delay;
 	}
 
 	//
 	// ACCESSORS
 	//
 
-	/**
-	 * Sets the Sone to insert.
-	 *
-	 * @param sone
-	 * 		The Sone to insert
-	 * @return This Sone inserter
-	 */
-	public SoneInserter setSone(Sone sone) {
-		checkArgument((this.sone == null) || sone.equals(this.sone), "Sone to insert can not be set to a different Sone");
-		this.sone = sone;
-		return this;
+	@VisibleForTesting
+	static AtomicInteger getInsertionDelay() {
+		return insertionDelay;
 	}
 
 	/**
@@ -149,8 +170,8 @@ public class SoneInserter extends AbstractService {
 	 * @param insertionDelay
 	 *            The insertion delay (in seconds)
 	 */
-	public static void setInsertionDelay(int insertionDelay) {
-		SoneInserter.insertionDelay = insertionDelay;
+	private static void setInsertionDelay(int insertionDelay) {
+		SoneInserter.insertionDelay.set(insertionDelay);
 	}
 
 	/**
@@ -159,7 +180,7 @@ public class SoneInserter extends AbstractService {
 	 * @return The fingerprint of the last insert
 	 */
 	public String getLastInsertFingerprint() {
-		return lastInsertFingerprint;
+		return soneModificationDetector.getOriginalFingerprint();
 	}
 
 	/**
@@ -169,7 +190,7 @@ public class SoneInserter extends AbstractService {
 	 *            The fingerprint of the last insert
 	 */
 	public void setLastInsertFingerprint(String lastInsertFingerprint) {
-		this.lastInsertFingerprint = lastInsertFingerprint;
+		soneModificationDetector.setFingerprint(lastInsertFingerprint);
 	}
 
 	/**
@@ -180,7 +201,7 @@ public class SoneInserter extends AbstractService {
 	 *         otherwise
 	 */
 	public boolean isModified() {
-		return modified;
+		return soneModificationDetector.isModified();
 	}
 
 	//
@@ -192,59 +213,28 @@ public class SoneInserter extends AbstractService {
 	 */
 	@Override
 	protected void serviceRun() {
-		long lastModificationTime = 0;
-		String lastInsertedFingerprint = lastInsertFingerprint;
-		String lastFingerprint = "";
-		Sone sone;
 		while (!shouldStop()) {
 			try {
-				/* check every seconds. */
-				sleep(1000);
+				/* check every second. */
+				sleep(delay);
 
-				/* don’t insert locked Sones. */
-				sone = this.sone;
-				if (core.isLocked(sone)) {
-					/* trigger redetection when the Sone is unlocked. */
-					synchronized (sone) {
-						modified = !sone.getFingerprint().equals(lastInsertedFingerprint);
+				if (soneModificationDetector.isEligibleForInsert()) {
+					Optional<Sone> soneOptional = core.getSone(soneId);
+					if (!soneOptional.isPresent()) {
+						logger.log(Level.WARNING, format("Sone %s has disappeared, exiting inserter.", soneId));
+						return;
 					}
-					lastFingerprint = "";
-					lastModificationTime = 0;
-					continue;
-				}
-
-				InsertInformation insertInformation = null;
-				synchronized (sone) {
-					String fingerprint = sone.getFingerprint();
-					if (!fingerprint.equals(lastFingerprint)) {
-						if (fingerprint.equals(lastInsertedFingerprint)) {
-							modified = false;
-							lastModificationTime = 0;
-							logger.log(Level.FINE, String.format("Sone %s has been reverted to last insert state.", sone));
-						} else {
-							lastModificationTime = System.currentTimeMillis();
-							modified = true;
-							logger.log(Level.FINE, String.format("Sone %s has been modified, waiting %d seconds before inserting.", sone.getName(), insertionDelay));
-						}
-						lastFingerprint = fingerprint;
-					}
-					if (modified && (lastModificationTime > 0) && ((System.currentTimeMillis() - lastModificationTime) > (insertionDelay * 1000))) {
-						lastInsertedFingerprint = fingerprint;
-						insertInformation = new InsertInformation(sone);
-					}
-				}
-
-				if (insertInformation != null) {
+					Sone sone = soneOptional.get();
+					InsertInformation insertInformation = new InsertInformation(sone);
 					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
 
 					boolean success = false;
 					try {
 						sone.setStatus(SoneStatus.inserting);
-						long insertTime = System.currentTimeMillis();
-						insertInformation.setTime(insertTime);
+						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
-						FreenetURI finalUri = freenetInterface.insertDirectory(insertInformation.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
-						eventBus.post(new SoneInsertedEvent(sone, System.currentTimeMillis() - insertTime));
+						FreenetURI finalUri = freenetInterface.insertDirectory(sone.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime, insertInformation.getFingerprint()));
 						/* at this point we might already be stopped. */
 						if (shouldStop()) {
 							/* if so, bail out, don’t change anything. */
@@ -269,12 +259,10 @@ public class SoneInserter extends AbstractService {
 					 */
 					if (success) {
 						synchronized (sone) {
-							if (lastInsertedFingerprint.equals(sone.getFingerprint())) {
+							if (insertInformation.getFingerprint().equals(sone.getFingerprint())) {
 								logger.log(Level.FINE, String.format("Sone “%s” was not modified further, resetting counter…", sone));
-								lastModificationTime = 0;
-								lastInsertFingerprint = lastInsertedFingerprint;
+								soneModificationDetector.setFingerprint(insertInformation.getFingerprint());
 								core.touchConfiguration();
-								modified = false;
 							}
 						}
 					}
@@ -285,6 +273,11 @@ public class SoneInserter extends AbstractService {
 		}
 	}
 
+	@Subscribe
+	public void insertionDelayChanged(InsertionDelayChangedEvent insertionDelayChangedEvent) {
+		setInsertionDelay(insertionDelayChangedEvent.getInsertionDelay());
+	}
+
 	/**
 	 * Container for information that are required to insert a Sone. This
 	 * container merely exists to copy all relevant data without holding a lock
@@ -292,11 +285,13 @@ public class SoneInserter extends AbstractService {
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	private class InsertInformation {
+	@VisibleForTesting
+	class InsertInformation implements Closeable {
 
 		/** All properties of the Sone, copied for thread safety. */
 		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
-		private final Set<Bucket> buckets = new HashSet<Bucket>();
+		private final String fingerprint;
+		private final ManifestCreator manifestCreator;
 
 		/**
 		 * Creates a new insert information container.
@@ -305,40 +300,28 @@ public class SoneInserter extends AbstractService {
 		 *            The sone to insert
 		 */
 		public InsertInformation(Sone sone) {
+			this.fingerprint = sone.getFingerprint();
+			Map<String, Object> soneProperties = new HashMap<String, Object>();
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
-			soneProperties.put("time", sone.getTime());
+			soneProperties.put("time", currentTimeMillis());
 			soneProperties.put("requestUri", sone.getRequestUri());
-			soneProperties.put("insertUri", sone.getInsertUri());
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", Ordering.from(Post.TIME_COMPARATOR).sortedCopy(sone.getPosts()));
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
+			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
 
 		//
 		// ACCESSORS
 		//
 
-		/**
-		 * Returns the insert URI of the Sone.
-		 *
-		 * @return The insert URI of the Sone
-		 */
-		public FreenetURI getInsertUri() {
-			return (FreenetURI) soneProperties.get("insertUri");
-		}
-
-		/**
-		 * Sets the time of the Sone at the time of the insert.
-		 *
-		 * @param time
-		 *            The time of the Sone
-		 */
-		public void setTime(long time) {
-			soneProperties.put("time", time);
+		@VisibleForTesting
+		String getFingerprint() {
+			return fingerprint;
 		}
 
 		//
@@ -354,41 +337,56 @@ public class SoneInserter extends AbstractService {
 			HashMap<String, Object> manifestEntries = new HashMap<String, Object>();
 
 			/* first, create an index.html. */
-			manifestEntries.put("index.html", createManifestElement("index.html", "text/html; charset=utf-8", "/templates/insert/index.html"));
+			manifestEntries.put("index.html", manifestCreator.createManifestElement(
+					"index.html", "text/html; charset=utf-8",
+					"/templates/insert/index.html"));
 
 			/* now, store the sone. */
-			manifestEntries.put("sone.xml", createManifestElement("sone.xml", "text/xml; charset=utf-8", "/templates/insert/sone.xml"));
+			manifestEntries.put("sone.xml", manifestCreator.createManifestElement(
+					"sone.xml", "text/xml; charset=utf-8",
+					"/templates/insert/sone.xml"));
 
 			return manifestEntries;
 		}
 
-		//
-		// PRIVATE METHODS
-		//
+		@Override
+		public void close() {
+			manifestCreator.close();
+		}
 
-		/**
-		 * Creates a new manifest element.
-		 *
-		 * @param name
-		 *            The name of the file
-		 * @param contentType
-		 *            The content type of the file
-		 * @param templateName
-		 *            The name of the template to render
-		 * @return The manifest element
-		 */
-		@SuppressWarnings("synthetic-access")
-		private ManifestElement createManifestElement(String name, String contentType, String templateName) {
+	}
+
+	/**
+	 * Creates manifest elements for an insert by rendering a template.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	@VisibleForTesting
+	static class ManifestCreator implements Closeable {
+
+		private final Core core;
+		private final Map<String, Object> soneProperties;
+		private final Set<Bucket> buckets = new HashSet<Bucket>();
+
+		ManifestCreator(Core core, Map<String, Object> soneProperties) {
+			this.core = core;
+			this.soneProperties = soneProperties;
+		}
+
+		public ManifestElement createManifestElement(String name, String contentType, String templateName) {
 			InputStreamReader templateInputStreamReader = null;
+			InputStream templateInputStream = null;
 			Template template;
 			try {
-				templateInputStreamReader = new InputStreamReader(getClass().getResourceAsStream(templateName), utf8Charset);
+				templateInputStream = getClass().getResourceAsStream(templateName);
+				templateInputStreamReader = new InputStreamReader(templateInputStream, utf8Charset);
 				template = TemplateParser.parse(templateInputStreamReader);
 			} catch (TemplateException te1) {
 				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), te1);
 				return null;
 			} finally {
 				Closer.close(templateInputStreamReader);
+				Closer.close(templateInputStream);
 			}
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();

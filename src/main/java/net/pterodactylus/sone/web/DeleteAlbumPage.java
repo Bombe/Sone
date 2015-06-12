@@ -50,7 +50,7 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		if (request.getMethod() == Method.POST) {
 			String albumId = request.getHttpRequest().getPartAsStringFailsafe("album", 36);
-			Album album = webInterface.getCore().getAlbum(albumId, false);
+			Album album = webInterface.getCore().getAlbum(albumId);
 			if (album == null) {
 				throw new RedirectException("invalid.html");
 			}
@@ -68,7 +68,7 @@ public class DeleteAlbumPage extends SoneTemplatePage {
 			throw new RedirectException("imageBrowser.html?album=" + parentAlbum.getId());
 		}
 		String albumId = request.getHttpRequest().getParam("album");
-		Album album = webInterface.getCore().getAlbum(albumId, false);
+		Album album = webInterface.getCore().getAlbum(albumId);
 		if (album == null) {
 			throw new RedirectException("invalid.html");
 		}

@@ -52,7 +52,7 @@ public class UnlockSonePage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
-		Sone sone = webInterface.getCore().getLocalSone(soneId, false);
+		Sone sone = webInterface.getCore().getLocalSone(soneId);
 		if (sone != null) {
 			webInterface.getCore().unlockSone(sone);
 		}

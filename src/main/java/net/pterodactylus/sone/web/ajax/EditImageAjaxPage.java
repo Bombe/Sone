@@ -77,6 +77,9 @@ public class EditImageAjaxPage extends JsonPage {
 			return createSuccessJsonObject().put("sourceImageId", image.getId()).put("destinationImageId", swappedImage.getId());
 		}
 		String title = request.getHttpRequest().getParam("title").trim();
+		if (title.isEmpty()) {
+			return createErrorJsonObject("invalid-image-title");
+		}
 		String description = request.getHttpRequest().getParam("description").trim();
 		image.modify().setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
 		webInterface.getCore().touchConfiguration();

@@ -74,6 +74,7 @@ public class SoneRescuer extends AbstractService {
 	 *
 	 * @return {@code true} if the Sone rescuer is currently fetching a Sone
 	 */
+	@SuppressWarnings("unused") // used in rescue.html
 	public boolean isFetching() {
 		return fetching;
 	}
@@ -83,6 +84,7 @@ public class SoneRescuer extends AbstractService {
 	 *
 	 * @return The edition that is currently being downloaded
 	 */
+	@SuppressWarnings("unused") // used in rescue.html
 	public long getCurrentEdition() {
 		return currentEdition;
 	}
@@ -102,6 +104,7 @@ public class SoneRescuer extends AbstractService {
 	 *
 	 * @return The next edition the Sone rescuer can download
 	 */
+	@SuppressWarnings("unused") // used in rescue.html
 	public long getNextEdition() {
 		return currentEdition - 1;
 	}
@@ -124,6 +127,7 @@ public class SoneRescuer extends AbstractService {
 	 * @return {@code true} if the last fetch was successful, {@code false}
 	 *         otherwise
 	 */
+	@SuppressWarnings("unused") // used in rescue.html
 	public boolean isLastFetchSuccessful() {
 		return lastFetchSuccessful;
 	}

@@ -52,4 +52,18 @@ public abstract class OwnIdentityEvent {
 		return ownIdentity;
 	}
 
+	@Override
+	public int hashCode() {
+		return ownIdentity().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if ((object == null) || !object.getClass().equals(getClass())) {
+			return false;
+		}
+		OwnIdentityEvent ownIdentityEvent = (OwnIdentityEvent) object;
+		return ownIdentity().equals(ownIdentityEvent.ownIdentity());
+	}
+
 }

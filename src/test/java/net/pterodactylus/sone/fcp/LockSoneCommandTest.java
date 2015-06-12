@@ -20,7 +20,6 @@ package net.pterodactylus.sone.fcp;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -51,7 +50,7 @@ public class LockSoneCommandTest {
 		when(localSone.isLocal()).thenReturn(true);
 		Core core = mock(Core.class);
 		when(core.getSone(eq("LocalSone"))).thenReturn(Optional.of(localSone));
-		when(core.getLocalSone(eq("LocalSone"), anyBoolean())).thenReturn(localSone);
+		when(core.getLocalSone(eq("LocalSone"))).thenReturn(localSone);
 		SimpleFieldSet fields = new SimpleFieldSetBuilder().put("Sone", "LocalSone").get();
 
 		LockSoneCommand lockSoneCommand = new LockSoneCommand(core);

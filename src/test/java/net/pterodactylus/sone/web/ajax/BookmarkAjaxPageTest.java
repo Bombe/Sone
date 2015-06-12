@@ -4,10 +4,13 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import static com.google.common.base.Optional.of;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -18,6 +21,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 
@@ -36,6 +40,8 @@ public class BookmarkAjaxPageTest {
 	public void testBookmarkingExistingPost() throws URISyntaxException {
 		/* create mocks. */
 		Core core = mock(Core.class);
+		Post post = mock(Post.class);
+		when(core.getPost("abc")).thenReturn(of(post));
 		WebInterface webInterface = mock(WebInterface.class);
 		when(webInterface.getCore()).thenReturn(core);
 		HTTPRequest httpRequest = new HTTPRequestImpl(new URI("/ajax/bookmark.ajax?post=abc"), "GET");
@@ -51,8 +57,7 @@ public class BookmarkAjaxPageTest {
 		assertThat(jsonReturnObject.isSuccess(), is(true));
 
 		/* verify behaviour. */
-		verify(core, times(1)).bookmarkPost(anyString());
-		verify(core).bookmarkPost("abc");
+		verify(core).bookmarkPost(post);
 	}
 
 	@Test
@@ -75,7 +80,7 @@ public class BookmarkAjaxPageTest {
 		assertThat(((JsonErrorReturnObject) jsonReturnObject).getError(), is("invalid-post-id"));
 
 		/* verify behaviour. */
-		verify(core, never()).bookmarkPost(anyString());
+		verify(core, never()).bookmarkPost(any(Post.class));
 	}
 
 }

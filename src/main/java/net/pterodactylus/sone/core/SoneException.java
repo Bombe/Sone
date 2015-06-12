@@ -26,23 +26,6 @@ public class SoneException extends Exception {
 
 	/**
 	 * Creates a new Sone exception.
-	 */
-	public SoneException() {
-		super();
-	}
-
-	/**
-	 * Creates a new Sone exception.
-	 *
-	 * @param message
-	 *            The message of the exception
-	 */
-	public SoneException(String message) {
-		super(message);
-	}
-
-	/**
-	 * Creates a new Sone exception.
 	 *
 	 * @param cause
 	 *            The cause of the exception

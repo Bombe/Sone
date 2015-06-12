@@ -59,4 +59,8 @@ public class IntegerRangePredicate implements Predicate<Integer> {
 		return (value != null) && (value >= lowerBound) && (value <= upperBound);
 	}
 
+	public static IntegerRangePredicate range(int lowerBound, int upperBound) {
+		return new IntegerRangePredicate(lowerBound, upperBound);
+	}
+
 }
