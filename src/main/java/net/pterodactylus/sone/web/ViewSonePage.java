@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,7 +34,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -91,7 +92,7 @@ public class ViewSonePage extends SoneTemplatePage {
 		List<Post> sonePosts = sone.get().getPosts();
 		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone.get().getId()));
 		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
-		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
+		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());
 		Set<PostReply> replies = sone.get().getReplies();
@@ -113,7 +114,7 @@ public class ViewSonePage extends SoneTemplatePage {
 
 		});
 
-		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("repliedPostPage"), 0));
+		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("repliedPostPage"), 0));
 		templateContext.set("repliedPostPagination", repliedPostPagination);
 		templateContext.set("repliedPosts", repliedPostPagination.getItems());
 	}

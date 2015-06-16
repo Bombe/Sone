@@ -23,17 +23,21 @@ import static net.pterodactylus.sone.data.Album.FLATTENER;
 import static net.pterodactylus.sone.data.Album.IMAGES;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
-import net.pterodactylus.sone.core.Options;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 
 import freenet.keys.FreenetURI;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.primitives.Ints;
 
@@ -144,7 +148,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return (sone == null) ? false : sone.getTime() != 0;
+			return (sone != null) && (sone.getTime() != 0);
 		}
 	};
 
@@ -153,7 +157,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return (sone == null) ? false : sone.getIdentity() instanceof OwnIdentity;
+			return (sone != null) && (sone.getIdentity() instanceof OwnIdentity);
 		}
 
 	};
@@ -163,7 +167,35 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 		@Override
 		public boolean apply(Sone sone) {
-			return (sone == null) ? false : !sone.getRootAlbum().getAlbums().isEmpty();
+			return (sone != null) && !sone.getRootAlbum().getAlbums().isEmpty();
+		}
+	};
+
+	public static final Function<Sone, String> toSoneXmlUri =
+			new Function<Sone, String>() {
+				@Nonnull
+				@Override
+				public String apply(@Nullable Sone input) {
+					return input.getRequestUri()
+							.setMetaString(new String[] { "sone.xml" })
+							.toString();
+				}
+			};
+
+	public static final Function<Sone, List<Album>> toAllAlbums = new Function<Sone, List<Album>>() {
+		@Override
+		public List<Album> apply(@Nullable Sone sone) {
+			return (sone == null) ? Collections.<Album>emptyList() : FLATTENER.apply(
+					sone.getRootAlbum());
+		}
+	};
+
+	public static final Function<Sone, List<Image>> toAllImages = new Function<Sone, List<Image>>() {
+		@Override
+		public List<Image> apply(@Nullable Sone sone) {
+			return (sone == null) ? Collections.<Image>emptyList() :
+					from(FLATTENER.apply(sone.getRootAlbum()))
+							.transformAndConcat(IMAGES).toList();
 		}
 	};
 
@@ -173,18 +205,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @return The identity of this Sone
 	 */
 	Identity getIdentity();
-
-	/**
-	 * Sets the identity of this Sone. The {@link Identity#getId() ID} of the
-	 * identity has to match this Sone’s {@link #getId()}.
-	 *
-	 * @param identity
-	 * 		The identity of this Sone
-	 * @return This Sone (for method chaining)
-	 * @throws IllegalArgumentException
-	 * 		if the ID of the identity does not match this Sone’s ID
-	 */
-	Sone setIdentity(Identity identity) throws IllegalArgumentException;
 
 	/**
 	 * Returns the name of this Sone.
@@ -208,29 +228,11 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	FreenetURI getRequestUri();
 
 	/**
-	 * Sets the request URI of this Sone.
-	 *
-	 * @param requestUri
-	 * 		The request URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	Sone setRequestUri(FreenetURI requestUri);
-
-	/**
 	 * Returns the insert URI of this Sone.
 	 *
 	 * @return The insert URI of this Sone
 	 */
 	FreenetURI getInsertUri();
-
-	/**
-	 * Sets the insert URI of this Sone.
-	 *
-	 * @param insertUri
-	 * 		The insert URI of this Sone
-	 * @return This Sone (for method chaining)
-	 */
-	Sone setInsertUri(FreenetURI insertUri);
 
 	/**
 	 * Returns the latest edition of this Sone.
@@ -339,7 +341,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
-	List<String> getFriends();
+	Collection<String> getFriends();
 
 	/**
 	 * Returns whether this Sone has the given Sone as a friend Sone.
@@ -350,24 +352,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *         false} otherwise
 	 */
 	boolean hasFriend(String friendSoneId);
-
-	/**
-	 * Adds the given Sone as a friend Sone.
-	 *
-	 * @param friendSone
-	 * 		The friend Sone to add
-	 * @return This Sone (for method chaining)
-	 */
-	Sone addFriend(String friendSone);
-
-	/**
-	 * Removes the given Sone as a friend Sone.
-	 *
-	 * @param friendSoneId
-	 * 		The ID of the friend Sone to remove
-	 * @return This Sone (for method chaining)
-	 */
-	Sone removeFriend(String friendSoneId);
 
 	/**
 	 * Returns the list of posts of this Sone, sorted by time, newest first.
@@ -535,7 +519,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The options of this Sone
 	 */
-	Options getOptions();
+	SoneOptions getOptions();
 
 	/**
 	 * Sets the options of this Sone.
@@ -544,6 +528,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
-	void setOptions(Options options);
+	void setOptions(SoneOptions options);
 
 }

@@ -18,15 +18,15 @@
 package net.pterodactylus.sone.web;
 
 import static net.pterodactylus.sone.text.TextFilter.filter;
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 
 import java.util.List;
 
 import net.pterodactylus.sone.data.Profile;
+import net.pterodactylus.sone.data.Profile.DuplicateField;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -77,9 +77,9 @@ public class EditProfilePage extends SoneTemplatePage {
 				firstName = request.getHttpRequest().getPartAsStringFailsafe("first-name", 256).trim();
 				middleName = request.getHttpRequest().getPartAsStringFailsafe("middle-name", 256).trim();
 				lastName = request.getHttpRequest().getPartAsStringFailsafe("last-name", 256).trim();
-				birthDay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim());
-				birthMonth = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim());
-				birthYear = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim());
+				birthDay = parseInt(request.getHttpRequest().getPartAsStringFailsafe("birth-day", 256).trim(), null);
+				birthMonth = parseInt(request.getHttpRequest().getPartAsStringFailsafe("birth-month", 256).trim(), null);
+				birthYear = parseInt(request.getHttpRequest().getPartAsStringFailsafe("birth-year", 256).trim(), null);
 				avatarId = request.getHttpRequest().getPartAsStringFailsafe("avatarId", 36);
 				profile.setFirstName(firstName.length() > 0 ? firstName : null);
 				profile.setMiddleName(middleName.length() > 0 ? middleName : null);
@@ -99,10 +99,9 @@ public class EditProfilePage extends SoneTemplatePage {
 				try {
 					profile.addField(fieldName);
 					currentSone.setProfile(profile);
-					fields = profile.getFields();
 					webInterface.getCore().touchConfiguration();
 					throw new RedirectException("editProfile.html#profile-fields");
-				} catch (IllegalArgumentException iae1) {
+				} catch (DuplicateField df1) {
 					templateContext.set("fieldName", fieldName);
 					templateContext.set("duplicateFieldName", true);
 				}

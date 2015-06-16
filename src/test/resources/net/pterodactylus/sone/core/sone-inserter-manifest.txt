@@ -1,0 +1,3 @@
+Sone Version: <% version>
+Core Startup: <% core.startupTime>
+Sone ID: <% currentSone.id>

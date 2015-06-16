@@ -59,12 +59,12 @@ public class ListNotificationFilters {
 		List<Notification> filteredNotifications = new ArrayList<Notification>();
 		for (Notification notification : notifications) {
 			if (notification.getId().equals("new-sone-notification")) {
-				if ((currentSone != null) && (!currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get())) {
+				if ((currentSone != null) && !currentSone.getOptions().isShowNewSoneNotifications()) {
 					continue;
 				}
 				filteredNotifications.add(notification);
 			} else if (notification.getId().equals("new-post-notification")) {
-				if ((currentSone != null) && (!currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get())) {
+				if ((currentSone != null) && !currentSone.getOptions().isShowNewPostNotifications()) {
 					continue;
 				}
 				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone, true);
@@ -72,7 +72,7 @@ public class ListNotificationFilters {
 					filteredNotifications.add(filteredNotification);
 				}
 			} else if (notification.getId().equals("new-reply-notification")) {
-				if ((currentSone != null) && (!currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get())) {
+				if ((currentSone != null) && !currentSone.getOptions().isShowNewReplyNotifications()) {
 					continue;
 				}
 				ListNotification<PostReply> filteredNotification = filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
@@ -222,10 +222,10 @@ public class ListNotificationFilters {
 	 */
 	public static boolean isPostVisible(Sone sone, Post post) {
 		checkNotNull(post, "post must not be null");
-		Sone postSone = post.getSone();
-		if (postSone == null) {
+		if (!post.isLoaded()) {
 			return false;
 		}
+		Sone postSone = post.getSone();
 		if (sone != null) {
 			Trust trust = postSone.getIdentity().getTrust((OwnIdentity) sone.getIdentity());
 			if (trust != null) {

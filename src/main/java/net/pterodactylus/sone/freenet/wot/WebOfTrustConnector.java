@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
+import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,12 +31,12 @@ import java.util.logging.Logger;
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
-import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.number.Numbers;
 
+import com.google.common.base.Optional;
 import com.google.common.collect.MapMaker;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
@@ -43,10 +46,11 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class WebOfTrustConnector {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(WebOfTrustConnector.class);
+	private static final Logger logger = getLogger("Sone.WoT.Connector");
 
 	/** The name of the WoT plugin. */
 	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";
@@ -137,8 +141,8 @@ public class WebOfTrustConnector {
 	 * @throws PluginException
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
-	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, String context) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context == null) ? "" : context).put("WantTrustValues", "true").get());
+	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, Optional<String> context) throws PluginException {
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", context.or("")).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<Identity>();
 		int identityCounter = -1;
@@ -152,9 +156,9 @@ public class WebOfTrustConnector {
 			DefaultIdentity identity = new DefaultIdentity(id, nickname, requestUri);
 			identity.setContexts(parseContexts("Contexts" + identityCounter + ".", fields));
 			identity.setProperties(parseProperties("Properties" + identityCounter + ".", fields));
-			Integer trust = Numbers.safeParseInteger(fields.get("Trust" + identityCounter), null);
-			int score = Numbers.safeParseInteger(fields.get("Score" + identityCounter), 0);
-			int rank = Numbers.safeParseInteger(fields.get("Rank" + identityCounter), 0);
+			Integer trust = parseInt(fields.get("Trust" + identityCounter), null);
+			int score = parseInt(fields.get("Score" + identityCounter), 0);
+			int rank = parseInt(fields.get("Rank" + identityCounter), 0);
 			identity.setTrust(ownIdentity, new Trust(trust, score, rank));
 			identities.add(identity);
 		}
@@ -566,8 +570,7 @@ public class WebOfTrustConnector {
 		 * @return The created simple field set constructor
 		 */
 		public static SimpleFieldSetConstructor create(boolean shortLived) {
-			SimpleFieldSetConstructor simpleFieldSetConstructor = new SimpleFieldSetConstructor(shortLived);
-			return simpleFieldSetConstructor;
+			return new SimpleFieldSetConstructor(shortLived);
 		}
 
 	}

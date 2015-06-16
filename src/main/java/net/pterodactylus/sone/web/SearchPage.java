@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.web;
 
+import static com.google.common.base.Optional.fromNullable;
+import static com.google.common.primitives.Ints.tryParse;
+import static java.util.logging.Logger.getLogger;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -36,8 +40,6 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
-import net.pterodactylus.util.logging.Logging;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
@@ -62,7 +64,7 @@ import com.google.common.collect.Ordering;
 public class SearchPage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SearchPage.class);
+	private static final Logger logger = getLogger("Sone.Web.Search");
 
 	/** Short-term cache. */
 	private final LoadingCache<List<Phrase>, Set<Hit<Post>>> hitCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<List<Phrase>, Set<Hit<Post>>>() {
@@ -149,8 +151,8 @@ public class SearchPage extends SoneTemplatePage {
 		List<Post> resultPosts = FluentIterable.from(sortedPostHits).transform(new HitMapper<Post>()).toList();
 
 		/* pagination. */
-		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("sonePage"), 0));
-		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(Numbers.safeParseInteger(request.getHttpRequest().getParam("postPage"), 0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(fromNullable(tryParse(request.getHttpRequest().getParam("sonePage"))).or(0));
+		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(fromNullable(tryParse(request.getHttpRequest().getParam("postPage"))).or(0));
 
 		templateContext.set("sonePagination", sonePagination);
 		templateContext.set("soneHits", sonePagination.getItems());
@@ -201,7 +203,7 @@ public class SearchPage extends SoneTemplatePage {
 	 * @return The parsed phrases
 	 */
 	private static List<Phrase> parseSearchPhrases(String query) {
-		List<String> parsedPhrases = null;
+		List<String> parsedPhrases;
 		try {
 			parsedPhrases = StringEscaper.parseLine(query);
 		} catch (TextException te1) {
@@ -354,7 +356,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	private String getAlbumId(String phrase) {
 		String albumId = phrase.startsWith("album://") ? phrase.substring(8) : phrase;
-		return (webInterface.getCore().getAlbum(albumId, false) != null) ? albumId : null;
+		return (webInterface.getCore().getAlbum(albumId) != null) ? albumId : null;
 	}
 
 	/**
@@ -581,7 +583,7 @@ public class SearchPage extends SoneTemplatePage {
 
 			@Override
 			public boolean apply(Hit<?> hit) {
-				return (hit == null) ? false : hit.getScore() > 0;
+				return (hit != null) && (hit.getScore() > 0);
 			}
 
 		};

@@ -19,6 +19,7 @@ package net.pterodactylus.sone.template;
 
 import static com.google.common.collect.FluentIterable.from;
 import static java.util.Arrays.asList;
+import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.Album.FLATTENER;
 import static net.pterodactylus.sone.data.Album.IMAGES;
 
@@ -33,7 +34,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
-import net.pterodactylus.util.logging.Logging;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateContext;
@@ -58,7 +58,7 @@ import net.pterodactylus.util.template.TemplateContext;
 public class SoneAccessor extends ReflectionAccessor {
 
 	/** The logger. */
-	private static final Logger logger = Logging.getLogger(SoneAccessor.class);
+	private static final Logger logger = getLogger("Sone.Data");
 
 	/** The core. */
 	private final Core core;

@@ -54,7 +54,7 @@ public class CreatePostAjaxPage extends JsonPage {
 		String recipientId = request.getHttpRequest().getParam("recipient");
 		Optional<Sone> recipient = webInterface.getCore().getSone(recipientId);
 		String senderId = request.getHttpRequest().getParam("sender");
-		Sone sender = webInterface.getCore().getLocalSone(senderId, false);
+		Sone sender = webInterface.getCore().getLocalSone(senderId);
 		if (sender == null) {
 			sender = sone;
 		}

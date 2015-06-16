@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +27,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -65,44 +66,44 @@ public class OptionsPage extends SoneTemplatePage {
 			List<String> fieldErrors = new ArrayList<String>();
 			if (currentSone != null) {
 				boolean autoFollow = request.getHttpRequest().isPartSet("auto-follow");
-				currentSone.getOptions().getBooleanOption("AutoFollow").set(autoFollow);
+				currentSone.getOptions().setAutoFollow(autoFollow);
 				boolean enableSoneInsertNotifications = request.getHttpRequest().isPartSet("enable-sone-insert-notifications");
-				currentSone.getOptions().getBooleanOption("EnableSoneInsertNotifications").set(enableSoneInsertNotifications);
+				currentSone.getOptions().setSoneInsertNotificationEnabled(enableSoneInsertNotifications);
 				boolean showNotificationNewSones = request.getHttpRequest().isPartSet("show-notification-new-sones");
-				currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").set(showNotificationNewSones);
+				currentSone.getOptions().setShowNewSoneNotifications(showNotificationNewSones);
 				boolean showNotificationNewPosts = request.getHttpRequest().isPartSet("show-notification-new-posts");
-				currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").set(showNotificationNewPosts);
+				currentSone.getOptions().setShowNewPostNotifications(showNotificationNewPosts);
 				boolean showNotificationNewReplies = request.getHttpRequest().isPartSet("show-notification-new-replies");
-				currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").set(showNotificationNewReplies);
+				currentSone.getOptions().setShowNewReplyNotifications(showNotificationNewReplies);
 				String showCustomAvatars = request.getHttpRequest().getPartAsStringFailsafe("show-custom-avatars", 32);
-				currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").set(ShowCustomAvatars.valueOf(showCustomAvatars));
+				currentSone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(showCustomAvatars));
 				webInterface.getCore().touchConfiguration();
 			}
-			Integer insertionDelay = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16));
+			Integer insertionDelay = parseInt(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16), null);
 			if (!preferences.validateInsertionDelay(insertionDelay)) {
 				fieldErrors.add("insertion-delay");
 			} else {
 				preferences.setInsertionDelay(insertionDelay);
 			}
-			Integer postsPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
+			Integer postsPerPage = parseInt(request.getHttpRequest().getPartAsStringFailsafe("posts-per-page", 4), null);
 			if (!preferences.validatePostsPerPage(postsPerPage)) {
 				fieldErrors.add("posts-per-page");
 			} else {
 				preferences.setPostsPerPage(postsPerPage);
 			}
-			Integer imagesPerPage = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4), null);
+			Integer imagesPerPage = parseInt(request.getHttpRequest().getPartAsStringFailsafe("images-per-page", 4), null);
 			if (!preferences.validateImagesPerPage(imagesPerPage)) {
 				fieldErrors.add("images-per-page");
 			} else {
 				preferences.setImagesPerPage(imagesPerPage);
 			}
-			Integer charactersPerPost = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
+			Integer charactersPerPost = parseInt(request.getHttpRequest().getPartAsStringFailsafe("characters-per-post", 10), null);
 			if (!preferences.validateCharactersPerPost(charactersPerPost)) {
 				fieldErrors.add("characters-per-post");
 			} else {
 				preferences.setCharactersPerPost(charactersPerPost);
 			}
-			Integer postCutOffLength = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("post-cut-off-length", 10), null);
+			Integer postCutOffLength = parseInt(request.getHttpRequest().getPartAsStringFailsafe("post-cut-off-length", 10), null);
 			if (!preferences.validatePostCutOffLength(postCutOffLength)) {
 				fieldErrors.add("post-cut-off-length");
 			} else {
@@ -110,13 +111,13 @@ public class OptionsPage extends SoneTemplatePage {
 			}
 			boolean requireFullAccess = request.getHttpRequest().isPartSet("require-full-access");
 			preferences.setRequireFullAccess(requireFullAccess);
-			Integer positiveTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3));
+			Integer positiveTrust = parseInt(request.getHttpRequest().getPartAsStringFailsafe("positive-trust", 3), null);
 			if (!preferences.validatePositiveTrust(positiveTrust)) {
 				fieldErrors.add("positive-trust");
 			} else {
 				preferences.setPositiveTrust(positiveTrust);
 			}
-			Integer negativeTrust = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4));
+			Integer negativeTrust = parseInt(request.getHttpRequest().getPartAsStringFailsafe("negative-trust", 4), null);
 			if (!preferences.validateNegativeTrust(negativeTrust)) {
 				fieldErrors.add("negative-trust");
 			} else {
@@ -129,7 +130,7 @@ public class OptionsPage extends SoneTemplatePage {
 			preferences.setTrustComment(trustComment);
 			boolean fcpInterfaceActive = request.getHttpRequest().isPartSet("fcp-interface-active");
 			preferences.setFcpInterfaceActive(fcpInterfaceActive);
-			Integer fcpFullAccessRequiredInteger = Numbers.safeParseInteger(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
+			Integer fcpFullAccessRequiredInteger = parseInt(request.getHttpRequest().getPartAsStringFailsafe("fcp-full-access-required", 1), preferences.getFcpFullAccessRequired().ordinal());
 			FullAccessRequired fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequiredInteger];
 			preferences.setFcpFullAccessRequired(fcpFullAccessRequired);
 			webInterface.getCore().touchConfiguration();
@@ -139,12 +140,12 @@ public class OptionsPage extends SoneTemplatePage {
 			templateContext.set("fieldErrors", fieldErrors);
 		}
 		if (currentSone != null) {
-			templateContext.set("auto-follow", currentSone.getOptions().getBooleanOption("AutoFollow").get());
-			templateContext.set("enable-sone-insert-notifications", currentSone.getOptions().getBooleanOption("EnableSoneInsertNotifications").get());
-			templateContext.set("show-notification-new-sones", currentSone.getOptions().getBooleanOption("ShowNotification/NewSones").get());
-			templateContext.set("show-notification-new-posts", currentSone.getOptions().getBooleanOption("ShowNotification/NewPosts").get());
-			templateContext.set("show-notification-new-replies", currentSone.getOptions().getBooleanOption("ShowNotification/NewReplies").get());
-			templateContext.set("show-custom-avatars", currentSone.getOptions().<ShowCustomAvatars> getEnumOption("ShowCustomAvatars").get().name());
+			templateContext.set("auto-follow", currentSone.getOptions().isAutoFollow());
+			templateContext.set("enable-sone-insert-notifications", currentSone.getOptions().isSoneInsertNotificationEnabled());
+			templateContext.set("show-notification-new-sones", currentSone.getOptions().isShowNewSoneNotifications());
+			templateContext.set("show-notification-new-posts", currentSone.getOptions().isShowNewPostNotifications());
+			templateContext.set("show-notification-new-replies", currentSone.getOptions().isShowNewReplyNotifications());
+			templateContext.set("show-custom-avatars", currentSone.getOptions().getShowCustomAvatars().name());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());

@@ -134,6 +134,8 @@ public interface Image extends Identified, Fingerprintable {
 
 		Image update() throws IllegalStateException;
 
+		class ImageTitleMustNotBeEmpty extends IllegalStateException { }
+
 	}
 
 }

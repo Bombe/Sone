@@ -94,6 +94,11 @@ class MemoryPost implements Post {
 		return id.toString();
 	}
 
+	@Override
+	public boolean isLoaded() {
+		return true;
+	}
+
 	/**
 	 * {@inheritDoc}
 	 */

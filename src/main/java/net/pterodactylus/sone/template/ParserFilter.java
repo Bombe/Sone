@@ -17,6 +17,9 @@
 
 package net.pterodactylus.sone.template;
 
+import static java.lang.String.valueOf;
+import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -38,7 +41,6 @@ import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.text.SoneTextParserContext;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.number.Numbers;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -89,9 +91,9 @@ public class ParserFilter implements Filter {
 	 */
 	@Override
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
-		String text = String.valueOf(data);
-		int length = Numbers.safeParseInteger(parameters.get("length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("length"))), -1));
-		int cutOffLength = Numbers.safeParseInteger(parameters.get("cut-off-length"), Numbers.safeParseInteger(templateContext.get(String.valueOf(parameters.get("cut-off-length"))), length));
+		String text = valueOf(data);
+		int length = parseInt(valueOf(parameters.get("length")), -1);
+		int cutOffLength = parseInt(valueOf(parameters.get("cut-off-length")), length);
 		Object sone = parameters.get("sone");
 		if (sone instanceof String) {
 			sone = core.getSone((String) sone).orNull();

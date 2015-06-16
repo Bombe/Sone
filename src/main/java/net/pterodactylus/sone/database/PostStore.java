@@ -45,25 +45,4 @@ public interface PostStore {
 	 */
 	public void removePost(Post post);
 
-	/**
-	 * Stores the given posts as all posts of a single {@link Sone}. This method
-	 * will removed all other posts from the Sone!
-	 *
-	 * @param sone
-	 *            The Sone to store the posts for
-	 * @param posts
-	 *            The posts to store
-	 * @throws IllegalArgumentException
-	 *             if posts do not all belong to the same Sone
-	 */
-	public void storePosts(Sone sone, Collection<Post> posts) throws IllegalArgumentException;
-
-	/**
-	 * Removes all posts of the given {@link Sone}
-	 *
-	 * @param sone
-	 *            The Sone to remove all posts for
-	 */
-	public void removePosts(Sone sone);
-
 }

@@ -193,7 +193,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 */
 	@Override
 	public boolean isLinkExcepted(URI link) {
-		return (page instanceof FreenetPage) ? ((FreenetPage) page).isLinkExcepted(link) : false;
+		return (page instanceof FreenetPage) && ((FreenetPage) page).isLinkExcepted(link);
 	}
 
 }

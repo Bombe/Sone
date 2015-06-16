@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -63,12 +64,16 @@ public class CreateAlbumPage extends SoneTemplatePage {
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 256).trim();
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);
-			Album parent = webInterface.getCore().getAlbum(parentId, false);
+			Album parent = webInterface.getCore().getAlbum(parentId);
 			if (parentId.equals("")) {
 				parent = currentSone.getRootAlbum();
 			}
 			Album album = webInterface.getCore().createAlbum(currentSone, parent);
-			album.modify().setTitle(name).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
+			try {
+				album.modify().setTitle(name).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
+			} catch (AlbumTitleMustNotBeEmpty atmnbe) {
+				throw new RedirectException("emptyAlbumTitle.html");
+			}
 			webInterface.getCore().touchConfiguration();
 			throw new RedirectException("imageBrowser.html?album=" + album.getId());
 		}

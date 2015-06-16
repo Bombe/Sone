@@ -17,8 +17,11 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+
+import com.google.common.base.Optional;
 
 /**
  * AJAX page that lets the user bookmark a post.
@@ -50,7 +53,10 @@ public class BookmarkAjaxPage extends JsonPage {
 		if ((id == null) || (id.length() == 0)) {
 			return createErrorJsonObject("invalid-post-id");
 		}
-		webInterface.getCore().bookmarkPost(id);
+		Optional<Post> post = webInterface.getCore().getPost(id);
+		if (post.isPresent()) {
+			webInterface.getCore().bookmarkPost(post.get());
+		}
 		return createSuccessJsonObject();
 	}
 

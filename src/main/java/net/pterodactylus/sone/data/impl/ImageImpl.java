@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
@@ -23,6 +23,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.util.UUID;
+
+import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
 import com.google.common.hash.Hasher;
@@ -204,6 +208,9 @@ public class ImageImpl implements Image {
 				checkState(!sone.isPresent() || (ImageImpl.this.sone == null) || sone.get().equals(ImageImpl.this.sone), "can not change Sone once set");
 				checkState(!creationTime.isPresent() || ((ImageImpl.this.creationTime == 0) || (ImageImpl.this.creationTime == creationTime.get())), "can not change creation time once set");
 				checkState(!key.isPresent() || (ImageImpl.this.key == null) || key.get().equals(ImageImpl.this.key), "can not change key once set");
+				if (title.isPresent() && title.get().trim().isEmpty()) {
+					throw new ImageTitleMustNotBeEmpty();
+				}
 				checkState(!width.isPresent() || (ImageImpl.this.width == 0) || width.get().equals(ImageImpl.this.width), "can not change width once set");
 				checkState(!height.isPresent() || (ImageImpl.this.height == 0) || height.get().equals(ImageImpl.this.height), "can not change height once set");
 

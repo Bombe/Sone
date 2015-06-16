@@ -32,4 +32,9 @@ public interface OwnIdentity extends Identity {
 	 */
 	public String getInsertUri();
 
+	public OwnIdentity addContext(String context);
+	public OwnIdentity removeContext(String context);
+	public OwnIdentity setProperty(String name, String value);
+	public OwnIdentity removeProperty(String name);
+
 }

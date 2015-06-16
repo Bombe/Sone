@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sone>
+	<protocol-version>0</protocol-version>
+	<time>1407197508000</time>
+	<profile></profile>
+	<albums>
+		<album>
+			<id>album-id-1</id>
+			<title>album-title</title>
+			<description>album-description</description>
+			<images>
+				<image>
+					<id>image-id</id>
+					<creation-time>1407197508000</creation-time>
+					<key>KSK@GPLv3.txt</key>
+					<title>image-title</title>
+				</image>
+			</images>
+		</album>
+		<album>
+			<id>album-id-2</id>
+			<parent>album-id-1</parent>
+			<title>album-title-2</title>
+			<description>album-description-2</description>
+		</album>
+	</albums>
+</sone>

@@ -116,16 +116,6 @@ public interface Album extends Identified, Fingerprintable {
 	Sone getSone();
 
 	/**
-	 * Sets the owner of the album. The owner can only be set as long as the
-	 * current owner is {@code null}.
-	 *
-	 * @param sone
-	 * 		The album owner
-	 * @return This album
-	 */
-	Album setSone(Sone sone);
-
-	/**
 	 * Returns the nested albums.
 	 *
 	 * @return The nested albums
@@ -301,6 +291,8 @@ public interface Album extends Identified, Fingerprintable {
 		Modifier setAlbumImage(String imageId);
 
 		Album update() throws IllegalStateException;
+
+		class AlbumTitleMustNotBeEmpty extends IllegalStateException { }
 
 	}
 

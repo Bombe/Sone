@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sone>
+	<protocol-version>0</protocol-version>
+	<time>1407197508000</time>
+	<profile>
+		<first-name>first</first-name>
+		<middle-name>middle</middle-name>
+		<last-name>last</last-name>
+		<birth-day>18</birth-day>
+		<birth-month>12</birth-month>
+		<birth-year>1976</birth-year>
+	</profile>
+</sone>
