@@ -118,6 +118,11 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	/** The version. */
 	public static final Version VERSION = new Version("rc1", 0, 9);
 
+	/** The current year at time of release. */
+	private static final int YEAR = 2015;
+	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
+	private static final int LATEST_EDITION = 65;
+
 	/** The logger. */
 	private static final Logger logger = getLogger("Sone.Plugin");
 
@@ -168,6 +173,14 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	public PluginL10n l10n() {
 		return l10n;
+	}
+
+	public static int getYear() {
+		return YEAR;
+	}
+
+	public static String getHomepage() {
+		return SONE_HOMEPAGE + LATEST_EDITION;
 	}
 
 	//

@@ -29,35 +29,23 @@ import net.pterodactylus.util.version.Version;
  */
 public class AboutPage extends SoneTemplatePage {
 
-	/** The version to display. */
 	private final Version version;
+	private final int year;
+	private final String homepage;
 
-	/**
-	 * Creates a new “about” page.
-	 *
-	 * @param template
-	 *            The template to render
-	 * @param webInterface
-	 *            The Sone web interface
-	 * @param version
-	 *            The version to display
-	 */
-	public AboutPage(Template template, WebInterface webInterface, Version version) {
+	public AboutPage(Template template, WebInterface webInterface, Version version, int year, String homepage) {
 		super("about.html", template, "Page.About.Title", webInterface, false);
 		this.version = version;
+		this.year = year;
+		this.homepage = homepage;
 	}
 
-	//
-	// TEMPLATEPAGE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		templateContext.set("version", version);
+		templateContext.set("year", year);
+		templateContext.set("homepage", homepage);
 	}
 
 }
