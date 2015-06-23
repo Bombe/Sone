@@ -11,7 +11,7 @@
 	<h2><%= Page.About.Homepage.Title|l10n|html></h2>
 
 	<p>
-		<%= Page.About.Homepage.Description|l10n|html|replace needle=="{link}" replacement=='<a href="/USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/49/">'|replace needle=="{/link}" replacement=='</a>'>
+		<%= Page.About.Homepage.Description|l10n|html|replace needle=="{link}" replacement=='<a href="/<% homepage|html>/">'|replace needle=="{/link}" replacement=='</a>'>
 	</p>
 
 	<h2><%= Page.About.License.Title|l10n|html></h2>

@@ -31,11 +31,13 @@ public class AboutPage extends SoneTemplatePage {
 
 	private final Version version;
 	private final int year;
+	private final String homepage;
 
-	public AboutPage(Template template, WebInterface webInterface, Version version, int year) {
+	public AboutPage(Template template, WebInterface webInterface, Version version, int year, String homepage) {
 		super("about.html", template, "Page.About.Title", webInterface, false);
 		this.version = version;
 		this.year = year;
+		this.homepage = homepage;
 	}
 
 	@Override
@@ -43,6 +45,7 @@ public class AboutPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 		templateContext.set("version", version);
 		templateContext.set("year", year);
+		templateContext.set("homepage", homepage);
 	}
 
 }
