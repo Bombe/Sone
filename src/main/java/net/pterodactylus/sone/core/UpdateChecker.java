@@ -50,12 +50,6 @@ public class UpdateChecker {
 	/** The logger. */
 	private static final Logger logger = getLogger("Sone.UpdateChecker");
 
-	/** The key of the Sone homepage. */
-	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-
-	/** The current latest known edition. */
-	private static final int LATEST_EDITION = 65;
-
 	/** The event bus. */
 	private final EventBus eventBus;
 
@@ -141,7 +135,7 @@ public class UpdateChecker {
 	 */
 	public void start() {
 		try {
-			currentUri = new FreenetURI(SONE_HOMEPAGE + LATEST_EDITION);
+			currentUri = new FreenetURI(SonePlugin.getHomepage());
 		} catch (MalformedURLException mue1) {
 			/* this can not really happen unless I screw up. */
 			logger.log(Level.SEVERE, "Sone Homepage URI invalid!", mue1);
