@@ -641,7 +641,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		logger.info(String.format("Adding Sone from OwnIdentity: %s", ownIdentity));
 		Sone sone = database.newSoneBuilder().local().from(ownIdentity).build();
-		sone.setLatestEdition(fromNullable(tryParse(ownIdentity.getProperty("Sone.LatestEdition"))).or(0L));
+		String property = fromNullable(ownIdentity.getProperty("Sone.LatestEdition")).or("0");
+		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 		sone.setKnown(true);
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
