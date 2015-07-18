@@ -645,13 +645,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
 		sone.setKnown(true);
+		loadSone(sone);
+		sone.setStatus(SoneStatus.idle);
+		database.storeSone(sone);
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
 			soneInserters.put(sone, soneInserter);
 		}
-		loadSone(sone);
-		sone.setStatus(SoneStatus.idle);
 		soneInserter.start();
 		return sone;
 	}
@@ -1085,7 +1086,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (Album album : topLevelAlbums) {
 				sone.getRootAlbum().addAlbum(album);
 			}
-			database.storeSone(sone);
 			synchronized (soneInserters) {
 				soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 			}
