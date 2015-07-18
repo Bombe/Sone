@@ -72,6 +72,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.Trust;
+import net.pterodactylus.sone.main.ReparseFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.template.AlbumAccessor;
@@ -274,6 +275,7 @@ public class WebInterface {
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
 		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), templateContextFactory, soneTextParser));
+		templateContextFactory.addFilter("reparse", new ReparseFilter());
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
 		templateContextFactory.addFilter("sort", new CollectionSortFilter());
