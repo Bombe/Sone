@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.common.base.Ticker;
 
@@ -76,7 +77,7 @@ class SoneModificationDetector {
 	}
 
 	public boolean isModified() {
-		return !lockableFingerprintProvider.getFingerprint().equals(originalFingerprint);
+		return !Objects.equal(lockableFingerprintProvider.getFingerprint(), originalFingerprint);
 	}
 
 	/**
