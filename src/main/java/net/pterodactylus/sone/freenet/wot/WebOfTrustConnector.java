@@ -126,7 +126,7 @@ public class WebOfTrustConnector {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity) throws PluginException {
-		return loadTrustedIdentities(ownIdentity, null);
+		return loadTrustedIdentities(ownIdentity, Optional.<String>absent());
 	}
 
 	/**
