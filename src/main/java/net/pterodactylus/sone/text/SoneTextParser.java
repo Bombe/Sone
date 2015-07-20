@@ -59,41 +59,21 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	 */
 	private enum LinkType {
 
-		/** Link is a KSK. */
-		KSK("KSK@"),
+		KSK("KSK@", true),
+		CHK("CHK@", true),
+		SSK("SSK@", true),
+		USK("USK@", true),
+		HTTP("http://", false),
+		HTTPS("https://", false),
+		SONE("sone://", false),
+		POST("post://", false);
 
-		/** Link is a CHK. */
-		CHK("CHK@"),
-
-		/** Link is an SSK. */
-		SSK("SSK@"),
-
-		/** Link is a USK. */
-		USK("USK@"),
-
-		/** Link is HTTP. */
-		HTTP("http://"),
-
-		/** Link is HTTPS. */
-		HTTPS("https://"),
-
-		/** Link is a Sone. */
-		SONE("sone://"),
-
-		/** Link is a post. */
-		POST("post://");
-
-		/** The scheme identifying this link type. */
 		private final String scheme;
+		private final boolean freenetLink;
 
-		/**
-		 * Creates a new link type identified by the given scheme.
-		 *
-		 * @param scheme
-		 *            The scheme of the link type
-		 */
-		private LinkType(String scheme) {
+		LinkType(String scheme, boolean freenetLink) {
 			this.scheme = scheme;
+			this.freenetLink = freenetLink;
 		}
 
 		/**
@@ -103,6 +83,10 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		 */
 		public String getScheme() {
 			return scheme;
+		}
+
+		public boolean isFreenetLink() {
+			return freenetLink;
 		}
 
 	}
@@ -211,7 +195,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 
 					/* cut off “freenet:” from before keys. */
-					if (((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
+					if (linkType.isFreenetLink() && (next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
 						next -= 8;
 						line = line.substring(0, next) + line.substring(next + 8);
 					}
