@@ -19,6 +19,8 @@ package net.pterodactylus.sone.freenet.wot;
 
 import static com.google.common.base.Objects.equal;
 
+import com.google.common.base.Objects;
+
 /**
  * Container class for trust in the web of trust.
  *
@@ -88,6 +90,11 @@ public class Trust {
 		}
 		Trust trust = (Trust) object;
 		return equal(getExplicit(), trust.getExplicit()) && equal(getImplicit(), trust.getImplicit()) && equal(getDistance(), trust.getDistance());
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hashCode(explicit, implicit, distance);
 	}
 
 	/** {@inheritDoc} */
