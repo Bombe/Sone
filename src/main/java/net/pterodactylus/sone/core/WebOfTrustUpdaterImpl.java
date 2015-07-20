@@ -47,7 +47,7 @@ import com.google.inject.Singleton;
 public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrustUpdater {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.WoT.Updater");
+	private static final Logger logger = getLogger(WebOfTrustUpdaterImpl.class.getName());
 
 	/** Stop job. */
 	@SuppressWarnings("synthetic-access")

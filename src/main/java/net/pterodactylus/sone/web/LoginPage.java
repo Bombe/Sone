@@ -41,7 +41,7 @@ public class LoginPage extends SoneTemplatePage {
 
 	/** The logger. */
 	@SuppressWarnings("unused")
-	private static final Logger logger = getLogger("Sone.Web.Login");
+	private static final Logger logger = getLogger(LoginPage.class.getName());
 
 	/**
 	 * Creates a new login page.

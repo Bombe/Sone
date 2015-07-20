@@ -174,7 +174,7 @@ import freenet.support.api.HTTPRequest;
 public class WebInterface {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.Main");
+	private static final Logger logger = getLogger(WebInterface.class.getName());
 
 	/** The notification manager. */
 	private final NotificationManager notificationManager = new NotificationManager();

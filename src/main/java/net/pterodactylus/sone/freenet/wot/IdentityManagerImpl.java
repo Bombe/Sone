@@ -50,7 +50,7 @@ import com.google.inject.Singleton;
 public class IdentityManagerImpl extends AbstractService implements IdentityManager {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Identities");
+	private static final Logger logger = getLogger(IdentityManagerImpl.class.getName());
 
 	/** The event bus. */
 	private final EventBus eventBus;

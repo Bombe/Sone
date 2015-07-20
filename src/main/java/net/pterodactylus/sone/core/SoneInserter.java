@@ -79,7 +79,7 @@ import freenet.support.io.ArrayBucket;
 public class SoneInserter extends AbstractService {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Inserter");
+	private static final Logger logger = getLogger(SoneInserter.class.getName());
 
 	/** The insertion delay (in seconds). */
 	private static final AtomicInteger insertionDelay = new AtomicInteger(60);

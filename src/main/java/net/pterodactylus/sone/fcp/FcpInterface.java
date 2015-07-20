@@ -75,7 +75,7 @@ public class FcpInterface {
 	}
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.External.Fcp");
+	private static final Logger logger = getLogger(FcpInterface.class.getName());
 
 	/** Whether the FCP interface is currently active. */
 	private final AtomicBoolean active = new AtomicBoolean();
