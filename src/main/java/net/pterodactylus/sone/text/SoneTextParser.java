@@ -143,15 +143,8 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				 */
 				boolean lineComplete = true;
 				while (line.length() > 0) {
-					int nextKsk = line.indexOf("KSK@");
-					int nextChk = line.indexOf("CHK@");
-					int nextSsk = line.indexOf("SSK@");
-					int nextUsk = line.indexOf("USK@");
-					int nextHttp = line.indexOf("http://");
-					int nextHttps = line.indexOf("https://");
-					int nextSone = line.indexOf("sone://");
-					int nextPost = line.indexOf("post://");
-					if ((nextKsk == -1) && (nextChk == -1) && (nextSsk == -1) && (nextUsk == -1) && (nextHttp == -1) && (nextHttps == -1) && (nextSone == -1) && (nextPost == -1)) {
+					Optional<NextLink> nextLink = NextLink.findNextLink(line);
+					if (!nextLink.isPresent()) {
 						if (lineComplete && !lastLineEmpty) {
 							parts.add(new PlainTextPart("\n" + line));
 						} else {
@@ -159,40 +152,8 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						}
 						break;
 					}
-					int next = Integer.MAX_VALUE;
-					LinkType linkType = null;
-					if ((nextKsk > -1) && (nextKsk < next)) {
-						next = nextKsk;
-						linkType = LinkType.KSK;
-					}
-					if ((nextChk > -1) && (nextChk < next)) {
-						next = nextChk;
-						linkType = LinkType.CHK;
-					}
-					if ((nextSsk > -1) && (nextSsk < next)) {
-						next = nextSsk;
-						linkType = LinkType.SSK;
-					}
-					if ((nextUsk > -1) && (nextUsk < next)) {
-						next = nextUsk;
-						linkType = LinkType.USK;
-					}
-					if ((nextHttp > -1) && (nextHttp < next)) {
-						next = nextHttp;
-						linkType = LinkType.HTTP;
-					}
-					if ((nextHttps > -1) && (nextHttps < next)) {
-						next = nextHttps;
-						linkType = LinkType.HTTPS;
-					}
-					if ((nextSone > -1) && (nextSone < next)) {
-						next = nextSone;
-						linkType = LinkType.SONE;
-					}
-					if ((nextPost > -1) && (nextPost < next)) {
-						next = nextPost;
-						linkType = LinkType.POST;
-					}
+					LinkType linkType = nextLink.get().getLinkType();
+					int next = nextLink.get().getPosition();
 
 					/* cut off “freenet:” from before keys. */
 					if (linkType.isFreenetLink() && (next >= 8) && (line.substring(next - 8, next).equals("freenet:"))) {
@@ -216,7 +177,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					String link = line.substring(0, nextSpace);
 					String name = link;
 					logger.log(Level.FINER, String.format("Found link: %s", link));
-					logger.log(Level.FINEST, String.format("CHK: %d, SSK: %d, USK: %d", nextChk, nextSsk, nextUsk));
 
 					/* if there is no text after the scheme, it’s not a link! */
 					if (link.equals(linkType.getScheme())) {
@@ -325,6 +285,42 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			parts.removePart(partIndex);
 		}
 		return parts;
+	}
+
+	private static class NextLink {
+
+		private final int position;
+		private final LinkType linkType;
+
+		private NextLink(int position, LinkType linkType) {
+			this.position = position;
+			this.linkType = linkType;
+		}
+
+		public int getPosition() {
+			return position;
+		}
+
+		public LinkType getLinkType() {
+			return linkType;
+		}
+
+		public static Optional<NextLink> findNextLink(String line) {
+			int earliestLinkPosition = Integer.MAX_VALUE;
+			LinkType linkType = null;
+			for (LinkType possibleLinkType : LinkType.values()) {
+				int nextLinkPosition = line.indexOf(possibleLinkType.getScheme());
+				if (nextLinkPosition > -1) {
+					if (nextLinkPosition < earliestLinkPosition) {
+						earliestLinkPosition = nextLinkPosition;
+						linkType = possibleLinkType;
+					}
+				}
+			}
+			return earliestLinkPosition < Integer.MAX_VALUE ?
+					Optional.of(new NextLink(earliestLinkPosition, linkType)) : Optional.<NextLink>absent();
+		}
+
 	}
 
 }
