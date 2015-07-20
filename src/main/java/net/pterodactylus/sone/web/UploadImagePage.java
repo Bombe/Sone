@@ -56,7 +56,7 @@ import freenet.support.api.HTTPUploadedFile;
 public class UploadImagePage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.UploadImage");
+	private static final Logger logger = getLogger(UploadImagePage.class.getName());
 
 	/**
 	 * Creates a new “upload image” page.

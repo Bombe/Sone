@@ -76,7 +76,7 @@ import freenet.support.io.ResumeFailedException;
 public class FreenetInterface {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.FreenetInterface");
+	private static final Logger logger = getLogger(FreenetInterface.class.getName());
 
 	/** The event bus. */
 	private final EventBus eventBus;

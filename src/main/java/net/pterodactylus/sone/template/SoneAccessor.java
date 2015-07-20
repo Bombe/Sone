@@ -58,7 +58,7 @@ import net.pterodactylus.util.template.TemplateContext;
 public class SoneAccessor extends ReflectionAccessor {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Data");
+	private static final Logger logger = getLogger(SoneAccessor.class.getName());
 
 	/** The core. */
 	private final Core core;

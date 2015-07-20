@@ -54,7 +54,7 @@ import com.google.common.annotations.VisibleForTesting;
 public class SoneDownloaderImpl extends AbstractService implements SoneDownloader {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Downloader");
+	private static final Logger logger = getLogger(SoneDownloaderImpl.class.getName());
 
 	/** The maximum protocol version. */
 	private static final int MAX_PROTOCOL_VERSION = 0;

@@ -44,7 +44,7 @@ import freenet.clients.http.ToadletContext;
 public class CreateSonePage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.CreateSone");
+	private static final Logger logger = getLogger(CreateSonePage.class.getName());
 
 	/**
 	 * Creates a new “create Sone” page.

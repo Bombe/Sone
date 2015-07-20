@@ -116,7 +116,7 @@ import com.google.inject.Singleton;
 public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Core");
+	private static final Logger logger = getLogger(Core.class.getName());
 
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();

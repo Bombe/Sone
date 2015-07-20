@@ -59,7 +59,7 @@ import com.google.common.hash.Hashing;
 public class SoneImpl implements Sone {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Data");
+	private static final Logger logger = getLogger(SoneImpl.class.getName());
 
 	/** The database. */
 	private final Database database;

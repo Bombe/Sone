@@ -34,7 +34,7 @@ import freenet.keys.FreenetURI;
 public class SoneUri {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Data");
+	private static final Logger logger = getLogger(SoneUri.class.getName());
 
 	/**
 	 * Generate a Sone URI from the given URI.
