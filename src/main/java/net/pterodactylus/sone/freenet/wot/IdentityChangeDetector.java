@@ -142,7 +142,7 @@ public class IdentityChangeDetector {
 		return new Predicate<Identity>() {
 			@Override
 			public boolean apply(Identity identity) {
-				return identities.containsKey(identity.getId());
+				return (identity != null) && identities.containsKey(identity.getId());
 			}
 		};
 	}
