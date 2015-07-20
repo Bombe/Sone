@@ -209,7 +209,7 @@ public class AlbumImpl implements Album {
 		checkArgument(image.getAlbum().equals(this), "image must belong to this album");
 		int oldIndex = imageIds.indexOf(image.getId());
 		if (oldIndex <= 0) {
-			return null;
+			return image;
 		}
 		imageIds.remove(image.getId());
 		imageIds.add(oldIndex - 1, image.getId());
@@ -224,7 +224,7 @@ public class AlbumImpl implements Album {
 		checkArgument(image.getAlbum().equals(this), "image must belong to this album");
 		int oldIndex = imageIds.indexOf(image.getId());
 		if ((oldIndex == -1) || (oldIndex >= (imageIds.size() - 1))) {
-			return null;
+			return image;
 		}
 		imageIds.remove(image.getId());
 		imageIds.add(oldIndex + 1, image.getId());
