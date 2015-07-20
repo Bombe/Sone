@@ -278,7 +278,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		}
 		for (int partIndex = parts.size() - 1; partIndex >= 0; --partIndex) {
 			Part part = parts.getPart(partIndex);
-			if (!(part instanceof PlainTextPart) || !"\n".equals(((PlainTextPart) part).getText())) {
+			if (!(part instanceof PlainTextPart) || !"\n".equals(part.getText())) {
 				break;
 			}
 			parts.removePart(partIndex);
