@@ -171,17 +171,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		}
 	};
 
-	public static final Function<Sone, String> toSoneXmlUri =
-			new Function<Sone, String>() {
-				@Nonnull
-				@Override
-				public String apply(@Nullable Sone input) {
-					return input.getRequestUri()
-							.setMetaString(new String[] { "sone.xml" })
-							.toString();
-				}
-			};
-
 	public static final Function<Sone, List<Album>> toAllAlbums = new Function<Sone, List<Album>>() {
 		@Override
 		public List<Album> apply(@Nullable Sone sone) {
