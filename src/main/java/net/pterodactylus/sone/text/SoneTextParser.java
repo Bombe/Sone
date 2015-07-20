@@ -168,7 +168,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					if (next > 0) {
 						parts.add(new PlainTextPart(line.substring(0, next)));
 						line = line.substring(next);
-						next = 0;
 					}
 					lineComplete = false;
 
