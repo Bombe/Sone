@@ -687,8 +687,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, "Given Identity is null!");
 			return null;
 		}
-		final Long latestEdition = tryParse(fromNullable(
-				identity.getProperty("Sone.LatestEdition")).or("0"));
+		String property = fromNullable(identity.getProperty("Sone.LatestEdition")).or("0");
+		long latestEdition = fromNullable(tryParse(property)).or(0L);
 		Optional<Sone> existingSone = getSone(identity.getId());
 		if (existingSone.isPresent() && existingSone.get().isLocal()) {
 			return existingSone.get();
