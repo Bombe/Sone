@@ -220,7 +220,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						continue;
 					}
 
-					if ((linkType == LinkType.KSK) || (linkType == LinkType.CHK) || (linkType == LinkType.SSK) || (linkType == LinkType.USK)) {
+					if (linkType.isFreenetLink()) {
 						FreenetURI uri;
 						if (name.indexOf('?') > -1) {
 							name = name.substring(0, name.indexOf('?'));
