@@ -134,7 +134,7 @@ public class AlbumImpl implements Album {
 		checkArgument(equals(album.getParent()), "album must belong to this album");
 		int oldIndex = albums.indexOf(album);
 		if (oldIndex <= 0) {
-			return null;
+			return album;
 		}
 		albums.remove(oldIndex);
 		albums.add(oldIndex - 1, album);
@@ -148,7 +148,7 @@ public class AlbumImpl implements Album {
 		checkArgument(equals(album.getParent()), "album must belong to this album");
 		int oldIndex = albums.indexOf(album);
 		if ((oldIndex < 0) || (oldIndex >= (albums.size() - 1))) {
-			return null;
+			return album;
 		}
 		albums.remove(oldIndex);
 		albums.add(oldIndex + 1, album);
