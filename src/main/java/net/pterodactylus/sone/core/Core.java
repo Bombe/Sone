@@ -651,6 +651,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			soneInserters.put(sone, soneInserter);
 		}
 		loadSone(sone);
+		database.storeSone(sone);
 		sone.setStatus(SoneStatus.idle);
 		soneInserter.start();
 		return sone;
@@ -1085,7 +1086,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (Album album : topLevelAlbums) {
 				sone.getRootAlbum().addAlbum(album);
 			}
-			database.storeSone(sone);
 			synchronized (soneInserters) {
 				soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 			}
