@@ -49,12 +49,12 @@ class SoneModificationDetector {
 			return false;
 		}
 		String fingerprint = lockableFingerprintProvider.getFingerprint();
-		if (originalFingerprint.equals(fingerprint)) {
+		if (fingerprint.equals(originalFingerprint)) {
 			lastModificationTime = absent();
 			lastFingerprint = fingerprint;
 			return false;
 		}
-		if (!lastFingerprint.equals(fingerprint)) {
+		if (!Objects.equal(lastFingerprint, fingerprint)) {
 			lastModificationTime = of(ticker.read());
 			lastFingerprint = fingerprint;
 			return false;
