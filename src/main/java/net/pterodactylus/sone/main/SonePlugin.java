@@ -45,7 +45,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
@@ -88,7 +87,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 							return Class.forName(key);
 						}
 					});
-			
+
 			@Override
 			public void publish(LogRecord logRecord) {
 				int recordLevel = logRecord.getLevel().intValue();
