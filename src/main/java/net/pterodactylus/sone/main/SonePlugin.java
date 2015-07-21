@@ -75,9 +75,10 @@ import freenet.support.api.Bucket;
  */
 public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
 
+	private static final Logger soneLogger = getLogger("net.pterodactylus.sone");
+
 	static {
 		/* initialize logging. */
-		Logger soneLogger = getLogger("net.pterodactylus.sone");
 		soneLogger.setUseParentHandlers(false);
 		soneLogger.addHandler(new Handler() {
 			private final LoadingCache<String, Class<?>> classCache = CacheBuilder.newBuilder()
@@ -295,6 +296,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
+		deregisterLoggerHandlers();
 		try {
 			/* stop the web interface. */
 			webInterface.stop();
@@ -306,6 +308,12 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webOfTrustConnector.stop();
 		} catch (Throwable t1) {
 			logger.log(Level.SEVERE, "Error while shutting down!", t1);
+		}
+	}
+
+	private void deregisterLoggerHandlers() {
+		for (Handler handler : soneLogger.getHandlers()) {
+			soneLogger.removeHandler(handler);
 		}
 	}
 
