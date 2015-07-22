@@ -71,7 +71,7 @@ public class SoneModificationDetectorTest {
 
 	@Test
 	public void originalFingerprintIsRetained() {
-		assertThat(soneModificationDetector.getOriginalFingerprint(), is("original"));
+		assertThat(soneModificationDetector.getLastInsertFingerprint(), is("original"));
 	}
 
 	@Test

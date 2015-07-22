@@ -180,7 +180,7 @@ public class SoneInserter extends AbstractService {
 	 * @return The fingerprint of the last insert
 	 */
 	public String getLastInsertFingerprint() {
-		return soneModificationDetector.getOriginalFingerprint();
+		return soneModificationDetector.getLastInsertFingerprint();
 	}
 
 	/**

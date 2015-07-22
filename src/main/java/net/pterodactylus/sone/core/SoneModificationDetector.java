@@ -27,8 +27,8 @@ class SoneModificationDetector {
 	private final LockableFingerprintProvider lockableFingerprintProvider;
 	private final AtomicInteger insertionDelay;
 	private Optional<Long> lastModificationTime;
-	private String originalFingerprint;
-	private String lastFingerprint;
+	private String lastInsertFingerprint;
+	private String lastCheckFingerprint;
 
 	SoneModificationDetector(LockableFingerprintProvider lockableFingerprintProvider, AtomicInteger insertionDelay) {
 		this(systemTicker(), lockableFingerprintProvider, insertionDelay);
@@ -39,36 +39,36 @@ class SoneModificationDetector {
 		this.ticker = ticker;
 		this.lockableFingerprintProvider = lockableFingerprintProvider;
 		this.insertionDelay = insertionDelay;
-		lastFingerprint = originalFingerprint;
+		lastCheckFingerprint = lastInsertFingerprint;
 	}
 
 	public boolean isEligibleForInsert() {
 		if (lockableFingerprintProvider.isLocked()) {
 			lastModificationTime = absent();
-			lastFingerprint = "";
+			lastCheckFingerprint = "";
 			return false;
 		}
 		String fingerprint = lockableFingerprintProvider.getFingerprint();
-		if (fingerprint.equals(originalFingerprint)) {
+		if (fingerprint.equals(lastInsertFingerprint)) {
 			lastModificationTime = absent();
-			lastFingerprint = fingerprint;
+			lastCheckFingerprint = fingerprint;
 			return false;
 		}
-		if (!Objects.equal(lastFingerprint, fingerprint)) {
+		if (!Objects.equal(lastCheckFingerprint, fingerprint)) {
 			lastModificationTime = of(ticker.read());
-			lastFingerprint = fingerprint;
+			lastCheckFingerprint = fingerprint;
 			return false;
 		}
 		return insertionDelayHasPassed();
 	}
 
-	public String getOriginalFingerprint() {
-		return originalFingerprint;
+	public String getLastInsertFingerprint() {
+		return lastInsertFingerprint;
 	}
 
 	public void setFingerprint(String fingerprint) {
-		originalFingerprint = fingerprint;
-		lastFingerprint = originalFingerprint;
+		lastInsertFingerprint = fingerprint;
+		lastCheckFingerprint = lastInsertFingerprint;
 		lastModificationTime = absent();
 	}
 
@@ -77,7 +77,7 @@ class SoneModificationDetector {
 	}
 
 	public boolean isModified() {
-		return !Objects.equal(lockableFingerprintProvider.getFingerprint(), originalFingerprint);
+		return !Objects.equal(lockableFingerprintProvider.getFingerprint(), lastInsertFingerprint);
 	}
 
 	/**
