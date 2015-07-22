@@ -152,4 +152,34 @@ public class SoneModificationDetectorTest {
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
 	}
 
+	@Test
+	public void soneWithoutOriginalFingerprintIsNotEligibleAfter59Seconds() {
+		SoneModificationDetector soneModificationDetector = createDetectorWithoutOriginalFingerprint();
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(59);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+	}
+
+	private SoneModificationDetector createDetectorWithoutOriginalFingerprint() {
+		return new SoneModificationDetector(ticker, new LockableFingerprintProvider() {
+			@Override
+			public boolean isLocked() {
+				return false;
+			}
+
+			@Override
+			public String getFingerprint() {
+				return "changed";
+			}
+		}, insertionDelay);
+	}
+
+	@Test
+	public void soneWithoutOriginalFingerprintIsEligibleAfter60Seconds() {
+		SoneModificationDetector soneModificationDetector = createDetectorWithoutOriginalFingerprint();
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(60);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
+	}
+
 }
