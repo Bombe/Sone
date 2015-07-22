@@ -27,21 +27,9 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.core.FreenetInterface;
-import net.pterodactylus.sone.core.WebOfTrustUpdater;
-import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl;
-import net.pterodactylus.sone.database.Database;
-import net.pterodactylus.sone.database.PostBuilderFactory;
-import net.pterodactylus.sone.database.PostProvider;
-import net.pterodactylus.sone.database.PostReplyBuilderFactory;
-import net.pterodactylus.sone.database.SoneProvider;
-import net.pterodactylus.sone.database.memory.MemoryDatabase;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
-import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.wot.Context;
-import net.pterodactylus.sone.freenet.wot.IdentityManager;
-import net.pterodactylus.sone.freenet.wot.IdentityManagerImpl;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.config.Configuration;
@@ -50,11 +38,13 @@ import net.pterodactylus.util.config.MapConfigurationBackend;
 import net.pterodactylus.util.version.Version;
 
 import com.google.common.base.Optional;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Singleton;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
@@ -84,24 +74,34 @@ import freenet.support.api.Bucket;
  */
 public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
 
+	private static final Logger soneLogger = getLogger("net.pterodactylus.sone");
+
 	static {
 		/* initialize logging. */
-		Logger soneLogger = getLogger("Sone");
 		soneLogger.setUseParentHandlers(false);
 		soneLogger.addHandler(new Handler() {
+			private final LoadingCache<String, Class<?>> classCache = CacheBuilder.newBuilder()
+					.build(new CacheLoader<String, Class<?>>() {
+						@Override
+						public Class<?> load(String key) throws Exception {
+							return Class.forName(key);
+						}
+					});
+
 			@Override
 			public void publish(LogRecord logRecord) {
 				int recordLevel = logRecord.getLevel().intValue();
+				Class<?> loggingClass = classCache.getUnchecked(logRecord.getLoggerName());
 				if (recordLevel < Level.FINE.intValue()) {
-					freenet.support.Logger.debug(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.debug(loggingClass, logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.INFO.intValue()) {
-					freenet.support.Logger.minor(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.minor(loggingClass, logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.WARNING.intValue()) {
-					freenet.support.Logger.normal(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.normal(loggingClass, logRecord.getMessage(), logRecord.getThrown());
 				} else if (recordLevel < Level.SEVERE.intValue()) {
-					freenet.support.Logger.warning(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.warning(loggingClass, logRecord.getMessage(), logRecord.getThrown());
 				} else {
-					freenet.support.Logger.error(logRecord.getLoggerName(), logRecord.getMessage(), logRecord.getThrown());
+					freenet.support.Logger.error(loggingClass, logRecord.getMessage(), logRecord.getThrown());
 				}
 			}
 
@@ -116,15 +116,15 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 9, 2);
+	public static final Version VERSION = new Version(0, 9, 3);
 
 	/** The current year at time of release. */
 	private static final int YEAR = 2015;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-	private static final int LATEST_EDITION = 69;
+	private static final int LATEST_EDITION = 70;
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Plugin");
+	private static final Logger logger = getLogger(SonePlugin.class.getName());
 
 	/** The plugin respirator. */
 	private PluginRespirator pluginRespirator;
@@ -295,6 +295,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
+		deregisterLoggerHandlers();
 		try {
 			/* stop the web interface. */
 			webInterface.stop();
@@ -306,6 +307,12 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webOfTrustConnector.stop();
 		} catch (Throwable t1) {
 			logger.log(Level.SEVERE, "Error while shutting down!", t1);
+		}
+	}
+
+	private void deregisterLoggerHandlers() {
+		for (Handler handler : soneLogger.getHandlers()) {
+			soneLogger.removeHandler(handler);
 		}
 	}
 

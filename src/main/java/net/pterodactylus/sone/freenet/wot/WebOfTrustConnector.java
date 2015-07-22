@@ -50,7 +50,7 @@ import freenet.support.api.Bucket;
 public class WebOfTrustConnector {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.WoT.Connector");
+	private static final Logger logger = getLogger(WebOfTrustConnector.class.getName());
 
 	/** The name of the WoT plugin. */
 	private static final String WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust";
@@ -126,7 +126,7 @@ public class WebOfTrustConnector {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity) throws PluginException {
-		return loadTrustedIdentities(ownIdentity, null);
+		return loadTrustedIdentities(ownIdentity, Optional.<String>absent());
 	}
 
 	/**

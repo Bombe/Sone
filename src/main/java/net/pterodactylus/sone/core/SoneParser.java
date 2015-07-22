@@ -38,7 +38,7 @@ import org.w3c.dom.Document;
  */
 public class SoneParser {
 
-	private static final Logger logger = getLogger("Sone.Parser");
+	private static final Logger logger = getLogger(SoneParser.class.getName());
 	private static final int MAX_PROTOCOL_VERSION = 0;
 	private final Core core;
 

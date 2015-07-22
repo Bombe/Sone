@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
-import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Ticker;
 import org.junit.Before;
@@ -71,7 +70,7 @@ public class SoneModificationDetectorTest {
 
 	@Test
 	public void originalFingerprintIsRetained() {
-		assertThat(soneModificationDetector.getOriginalFingerprint(), is("original"));
+		assertThat(soneModificationDetector.getLastInsertFingerprint(), is("original"));
 	}
 
 	@Test
@@ -150,6 +149,36 @@ public class SoneModificationDetectorTest {
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 		insertionDelay.set(120);
 		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+	}
+
+	@Test
+	public void soneWithoutOriginalFingerprintIsNotEligibleAfter59Seconds() {
+		SoneModificationDetector soneModificationDetector = createDetectorWithoutOriginalFingerprint();
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(59);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+	}
+
+	private SoneModificationDetector createDetectorWithoutOriginalFingerprint() {
+		return new SoneModificationDetector(ticker, new LockableFingerprintProvider() {
+			@Override
+			public boolean isLocked() {
+				return false;
+			}
+
+			@Override
+			public String getFingerprint() {
+				return "changed";
+			}
+		}, insertionDelay);
+	}
+
+	@Test
+	public void soneWithoutOriginalFingerprintIsEligibleAfter60Seconds() {
+		SoneModificationDetector soneModificationDetector = createDetectorWithoutOriginalFingerprint();
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(false));
+		passTime(60);
+		assertThat(soneModificationDetector.isEligibleForInsert(), is(true));
 	}
 
 }

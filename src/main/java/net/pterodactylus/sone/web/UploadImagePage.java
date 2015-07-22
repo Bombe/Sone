@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import static com.google.common.base.Optional.fromNullable;
 import static java.util.logging.Logger.getLogger;
 
 import java.awt.Image;
@@ -55,8 +56,8 @@ import freenet.support.api.HTTPUploadedFile;
  */
 public class UploadImagePage extends SoneTemplatePage {
 
-	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.UploadImage");
+	private static final Logger logger = getLogger(UploadImagePage.class.getName());
+	private static final String UNKNOWN_MIME_TYPE = "application/octet-stream";
 
 	/**
 	 * Creates a new “upload image” page.
@@ -154,12 +155,13 @@ public class UploadImagePage extends SoneTemplatePage {
 			ImageInputStream imageInputStream = ImageIO.createImageInputStream(imageDataInputStream);
 			Iterator<ImageReader> imageReaders = ImageIO.getImageReaders(imageInputStream);
 			if (imageReaders.hasNext()) {
-				return imageReaders.next().getOriginatingProvider().getMIMETypes()[0];
+				return fromNullable(imageReaders.next().getOriginatingProvider().getMIMETypes())
+						.or(new String[] { UNKNOWN_MIME_TYPE })[0];
 			}
 		} catch (IOException ioe1) {
 			logger.log(Level.FINE, "Could not detect MIME type for image.", ioe1);
 		}
-		return "application/octet-stream";
+		return UNKNOWN_MIME_TYPE;
 	}
 
 }

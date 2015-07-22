@@ -48,7 +48,7 @@ import freenet.clients.http.ToadletContext;
 public abstract class JsonPage implements FreenetPage {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.Ajax");
+	private static final Logger logger = getLogger(JsonPage.class.getName());
 
 	/** The JSON serializer. */
 	private static final ObjectMapper objectMapper = new ObjectMapper();

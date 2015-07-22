@@ -44,7 +44,7 @@ import com.google.common.base.Function;
 public class ImageInserter {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Image.Inserter");
+	private static final Logger logger = getLogger(ImageInserter.class.getName());
 
 	/** The freenet interface. */
 	private final FreenetInterface freenetInterface;

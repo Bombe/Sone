@@ -38,7 +38,7 @@ public class PluginStoreConfigurationBackend implements ExtendedConfigurationBac
 
 	/** The logger. */
 	@SuppressWarnings("unused")
-	private static final Logger logger = getLogger("Sone.Fred");
+	private static final Logger logger = getLogger(PluginStoreConfigurationBackend.class.getName());
 
 	/** The plugin respirator. */
 	private final PluginRespirator pluginRespirator;

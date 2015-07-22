@@ -52,7 +52,7 @@ import freenet.support.HTMLNode;
 public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.Freenet");
+	private static final Logger logger = getLogger(FreenetTemplatePage.class.getName());
 
 	/** The path of the page. */
 	private final String path;

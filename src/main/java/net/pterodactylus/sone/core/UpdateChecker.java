@@ -48,7 +48,7 @@ import freenet.support.api.Bucket;
 public class UpdateChecker {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.UpdateChecker");
+	private static final Logger logger = getLogger(UpdateChecker.class.getName());
 
 	/** The event bus. */
 	private final EventBus eventBus;

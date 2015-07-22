@@ -64,7 +64,7 @@ import com.google.common.collect.Ordering;
 public class SearchPage extends SoneTemplatePage {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Web.Search");
+	private static final Logger logger = getLogger(SearchPage.class.getName());
 
 	/** Short-term cache. */
 	private final LoadingCache<List<Phrase>, Set<Hit<Post>>> hitCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<List<Phrase>, Set<Hit<Post>>>() {

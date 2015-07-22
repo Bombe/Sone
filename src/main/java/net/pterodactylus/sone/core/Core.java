@@ -116,7 +116,7 @@ import com.google.inject.Singleton;
 public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
 
 	/** The logger. */
-	private static final Logger logger = getLogger("Sone.Core");
+	private static final Logger logger = getLogger(Core.class.getName());
 
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();
@@ -651,6 +651,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			soneInserters.put(sone, soneInserter);
 		}
 		loadSone(sone);
+		database.storeSone(sone);
 		sone.setStatus(SoneStatus.idle);
 		soneInserter.start();
 		return sone;
@@ -687,8 +688,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			logger.log(Level.WARNING, "Given Identity is null!");
 			return null;
 		}
-		final Long latestEdition = tryParse(fromNullable(
-				identity.getProperty("Sone.LatestEdition")).or("0"));
+		String property = fromNullable(identity.getProperty("Sone.LatestEdition")).or("0");
+		long latestEdition = fromNullable(tryParse(property)).or(0L);
 		Optional<Sone> existingSone = getSone(identity.getId());
 		if (existingSone.isPresent() && existingSone.get().isLocal()) {
 			return existingSone.get();
@@ -1064,11 +1065,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 
 		/* load options. */
-		sone.getOptions().setAutoFollow(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(null));
-		sone.getOptions().setSoneInsertNotificationEnabled(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(null));
-		sone.getOptions().setShowNewSoneNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(null));
-		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(null));
-		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(null));
+		sone.getOptions().setAutoFollow(configuration.getBooleanValue(sonePrefix + "/Options/AutoFollow").getValue(false));
+		sone.getOptions().setSoneInsertNotificationEnabled(configuration.getBooleanValue(sonePrefix + "/Options/EnableSoneInsertNotifications").getValue(false));
+		sone.getOptions().setShowNewSoneNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(true));
+		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(true));
+		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(true));
 		sone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(ShowCustomAvatars.NEVER.name())));
 
 		/* if we’re still here, Sone was loaded successfully. */
@@ -1085,7 +1086,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			for (Album album : topLevelAlbums) {
 				sone.getRootAlbum().addAlbum(album);
 			}
-			database.storeSone(sone);
 			synchronized (soneInserters) {
 				soneInserters.get(sone).setLastInsertFingerprint(lastInsertFingerprint);
 			}

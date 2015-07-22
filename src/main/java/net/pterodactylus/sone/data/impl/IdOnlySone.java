@@ -18,6 +18,8 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.keys.FreenetURI;
 
+import com.google.common.base.Objects;
+
 /**
  * {@link Sone} implementation that only stores the ID of a Sone and returns
  * {@code null}, {@code 0}, or empty collections where appropriate.
@@ -238,6 +240,16 @@ public class IdOnlySone implements Sone {
 	@Override
 	public String getId() {
 		return id;
+	}
+
+	@Override
+	public int hashCode() {
+		return id.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		return (object != null) && (object.getClass() == getClass()) && Objects.equal(id, ((IdOnlySone) object).id);
 	}
 
 }
