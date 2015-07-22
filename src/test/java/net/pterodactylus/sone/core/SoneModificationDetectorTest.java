@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
-import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Ticker;
 import org.junit.Before;
