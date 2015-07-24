@@ -84,7 +84,7 @@ public class ImageLinkFilter implements Filter {
 		int maxWidth = parseInt(valueOf(parameters.get("max-width")), MAX_VALUE);
 		int maxHeight = parseInt(valueOf(parameters.get("max-height")), MAX_VALUE);
 		String mode = valueOf(parameters.get("mode"));
-		String title = valueOf(parameters.get("title"));
+		String title = Optional.fromNullable(parameters.get("title")).transform(getStringValue()).orNull();
 
 		TemplateContext linkTemplateContext = templateContextFactory.createTemplateContext();
 		linkTemplateContext.set("class", imageClass);
