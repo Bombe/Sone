@@ -80,12 +80,7 @@ public class ImageLinkFilter implements Filter {
 		if (image == null) {
 			return null;
 		}
-		String imageClass = Optional.fromNullable(parameters.get("class")).transform(new Function<Object, String>() {
-			@Override
-			public String apply(Object input) {
-				return (input != null) ? input.toString() : null;
-			}
-		}).orNull();
+		String imageClass = Optional.fromNullable(parameters.get("class")).transform(getStringValue()).orNull();
 		int maxWidth = parseInt(valueOf(parameters.get("max-width")), MAX_VALUE);
 		int maxHeight = parseInt(valueOf(parameters.get("max-height")), MAX_VALUE);
 		String mode = valueOf(parameters.get("mode"));
@@ -121,6 +116,15 @@ public class ImageLinkFilter implements Filter {
 		StringWriter stringWriter = new StringWriter();
 		linkTemplate.render(linkTemplateContext, stringWriter);
 		return stringWriter.toString();
+	}
+
+	private Function<Object, String> getStringValue() {
+		return new Function<Object, String>() {
+			@Override
+			public String apply(Object input) {
+				return (input != null) ? input.toString() : null;
+			}
+		};
 	}
 
 }
