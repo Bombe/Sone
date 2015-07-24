@@ -33,6 +33,7 @@ import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 /**
@@ -79,7 +80,12 @@ public class ImageLinkFilter implements Filter {
 		if (image == null) {
 			return null;
 		}
-		String imageClass = valueOf(parameters.get("class"));
+		String imageClass = Optional.fromNullable(parameters.get("class")).transform(new Function<Object, String>() {
+			@Override
+			public String apply(Object input) {
+				return (input != null) ? input.toString() : null;
+			}
+		}).orNull();
 		int maxWidth = parseInt(valueOf(parameters.get("max-width")), MAX_VALUE);
 		int maxHeight = parseInt(valueOf(parameters.get("max-height")), MAX_VALUE);
 		String mode = valueOf(parameters.get("mode"));
