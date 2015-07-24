@@ -325,16 +325,13 @@ public class SoneParser {
 		}
 
 		/* okay, apparently everything was parsed correctly. Now import. */
-		/* atomic setter operation on the Sone. */
-		synchronized (sone) {
-			sone.setProfile(profile);
-			sone.setPosts(posts);
-			sone.setReplies(replies);
-			sone.setLikePostIds(likedPostIds);
-			sone.setLikeReplyIds(likedReplyIds);
-			for (Album album : topLevelAlbums) {
-				sone.getRootAlbum().addAlbum(album);
-			}
+		sone.setProfile(profile);
+		sone.setPosts(posts);
+		sone.setReplies(replies);
+		sone.setLikePostIds(likedPostIds);
+		sone.setLikeReplyIds(likedReplyIds);
+		for (Album album : topLevelAlbums) {
+			sone.getRootAlbum().addAlbum(album);
 		}
 
 		return sone;
