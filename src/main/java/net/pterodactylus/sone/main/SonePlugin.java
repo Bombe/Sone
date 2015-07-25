@@ -295,7 +295,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
-		deregisterLoggerHandlers();
 		try {
 			/* stop the web interface. */
 			webInterface.stop();
@@ -307,6 +306,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webOfTrustConnector.stop();
 		} catch (Throwable t1) {
 			logger.log(Level.SEVERE, "Error while shutting down!", t1);
+		} finally {
+			deregisterLoggerHandlers();
 		}
 	}
 
