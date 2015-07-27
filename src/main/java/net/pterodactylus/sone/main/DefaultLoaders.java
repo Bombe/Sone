@@ -9,6 +9,9 @@ import java.io.UnsupportedEncodingException;
 
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.web.Page;
+import net.pterodactylus.util.web.Request;
+import net.pterodactylus.util.web.StaticPage;
 
 /**
  * Default {@link Loaders} implementation that loads resources from the classpath.
@@ -31,6 +34,11 @@ public class DefaultLoaders implements Loaders {
 			Closer.close(reader);
 			Closer.close(templateInputStream);
 		}
+	}
+
+	@Override
+	public <REQ extends Request> Page<REQ> loadStaticPage(String pathPrefix, String basePath, String mimeType) {
+		return new StaticPage<REQ>(pathPrefix, basePath, mimeType);
 	}
 
 }

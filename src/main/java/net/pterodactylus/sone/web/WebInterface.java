@@ -146,7 +146,6 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.web.RedirectPage;
-import net.pterodactylus.util.web.StaticPage;
 import net.pterodactylus.util.web.TemplatePage;
 
 import com.google.common.collect.Collections2;
@@ -685,9 +684,9 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyAlbumTitle.html", emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("css/", "/static/css/", "text/css")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("javascript/", "/static/javascript/", "text/javascript")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new StaticPage<FreenetRequest>("images/", "/static/images/", "image/png")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
