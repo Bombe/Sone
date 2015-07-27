@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.web.Method;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
@@ -50,6 +51,9 @@ public class DebugLoadersTest {
 		loaders = new DebugLoaders(templatePath);
 		File templateFile = new File(templatePath, "template.txt");
 		Files.write("<%if foo>foo<%else>bar<%/if>", templateFile, Charsets.UTF_8);
+		new File(templatePath, "templates").mkdir();
+		File secondTemplateFile = new File(templatePath, "templates/template.txt");
+		Files.write("<%if foo>foo<%else>bar<%/if>", secondTemplateFile, Charsets.UTF_8);
 	}
 
 	@Test
@@ -72,6 +76,14 @@ public class DebugLoadersTest {
 		page.handleRequest(request, response);
 		assertThat(response.getContentType(), startsWith("text/plain"));
 		assertThat(response.getStatusCode(), is(200));
+	}
+
+	@Test
+	public void templateProviderLocatesTemplatesInFileSystem() {
+		TemplateProvider templateProvider = loaders.getTemplateProvider();
+		Template template = templateProvider.getTemplate(templateContext, "template.txt");
+		template.render(templateContext, stringWriter);
+		assertThat(stringWriter.toString(), is("bar"));
 	}
 
 }

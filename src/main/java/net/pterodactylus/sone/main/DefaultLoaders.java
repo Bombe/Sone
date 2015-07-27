@@ -7,8 +7,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 
+import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.io.Closer;
+import net.pterodactylus.util.template.ClassPathTemplateProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Request;
 import net.pterodactylus.util.web.StaticPage;
@@ -39,6 +42,11 @@ public class DefaultLoaders implements Loaders {
 	@Override
 	public <REQ extends Request> Page<REQ> loadStaticPage(String pathPrefix, String basePath, String mimeType) {
 		return new StaticPage<REQ>(pathPrefix, basePath, mimeType);
+	}
+
+	@Override
+	public TemplateProvider getTemplateProvider() {
+		return new ClassPathTemplateProvider(WebInterface.class, "/templates/");
 	}
 
 }

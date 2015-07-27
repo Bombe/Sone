@@ -129,7 +129,6 @@ import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
-import net.pterodactylus.util.template.ClassPathTemplateProvider;
 import net.pterodactylus.util.template.CollectionSortFilter;
 import net.pterodactylus.util.template.ContainsFilter;
 import net.pterodactylus.util.template.DateFilter;
@@ -285,7 +284,7 @@ public class WebInterface {
 		templateContextFactory.addFilter("mod", new ModFilter());
 		templateContextFactory.addFilter("paginate", new PaginationFilter());
 		templateContextFactory.addProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
-		templateContextFactory.addProvider(new ClassPathTemplateProvider(WebInterface.class, "/templates/"));
+		templateContextFactory.addProvider(loaders.getTemplateProvider());
 		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 

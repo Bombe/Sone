@@ -2,6 +2,7 @@ package net.pterodactylus.sone.main;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.startsWith;
 import static org.mockito.Mockito.mock;
 
@@ -15,6 +16,7 @@ import java.net.URISyntaxException;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.web.Method;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
@@ -55,6 +57,13 @@ public class DefaultLoadersTest {
 		staticPage.handleRequest(request, response);
 		assertThat(response.getContentType(), startsWith("text/plain"));
 		assertThat(response.getStatusCode(), is(200));
+	}
+
+	@Test
+	public void templateIsLocatedInClasspath() {
+		TemplateProvider templateProvider = loaders.getTemplateProvider();
+		Template template = templateProvider.getTemplate(templateContext, "about.html");
+		assertThat(template, notNullValue());
 	}
 
 }

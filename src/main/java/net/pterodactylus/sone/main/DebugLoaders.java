@@ -4,7 +4,9 @@ import java.io.File;
 
 import net.pterodactylus.sone.template.FilesystemTemplate;
 import net.pterodactylus.sone.web.ReloadingPage;
+import net.pterodactylus.util.template.FilesystemTemplateProvider;
 import net.pterodactylus.util.template.Template;
+import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Request;
 
@@ -29,6 +31,11 @@ public class DebugLoaders implements Loaders {
 	@Override
 	public <REQ extends Request> Page<REQ> loadStaticPage(String basePath, String prefix, String mimeType) {
 		return new ReloadingPage<REQ>(basePath, new File(filesystemPath, prefix).getAbsolutePath(), mimeType);
+	}
+
+	@Override
+	public TemplateProvider getTemplateProvider() {
+		return new FilesystemTemplateProvider(new File(filesystemPath, "/templates/").getAbsolutePath());
 	}
 
 }
