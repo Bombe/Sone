@@ -41,7 +41,8 @@ public class DefaultLoaders implements Loaders {
 
 	@Override
 	public <REQ extends Request> Page<REQ> loadStaticPage(String pathPrefix, String basePath, String mimeType) {
-		return new StaticPage<REQ>(pathPrefix, basePath, mimeType);
+		return new StaticPage<REQ>(pathPrefix, basePath, mimeType) {
+		};
 	}
 
 	@Override
