@@ -884,72 +884,46 @@ public class WebInterface {
 		newSoneNotification.remove(markSoneKnownEvent.sone());
 	}
 
-	/**
-	 * Notifies the web interface that a {@link Post} was marked as known.
-	 *
-	 * @param markPostKnownEvent
-	 *            The event
-	 */
 	@Subscribe
 	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
-		newPostNotification.remove(markPostKnownEvent.post());
-		localPostNotification.remove(markPostKnownEvent.post());
-		if (!localSoneMentionedInNewPostOrReply(markPostKnownEvent.post())) {
-			mentionNotification.remove(markPostKnownEvent.post());
-		}
+		removePost(markPostKnownEvent.post());
 	}
 
-	/**
-	 * Notifies the web interface that a {@link PostReply} was marked as known.
-	 *
-	 * @param markPostReplyKnownEvent
-	 *            The event
-	 */
 	@Subscribe
 	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
-		PostReply postReply = markPostReplyKnownEvent.postReply();
-		newReplyNotification.remove(postReply);
-		localReplyNotification.remove(postReply);
-		if (postReply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(postReply.getPost().get())) {
-			mentionNotification.remove(postReply.getPost().get());
-		}
+		removeReply(markPostReplyKnownEvent.postReply());
 	}
 
-	/**
-	 * Notifies the web interface that a {@link Sone} was removed.
-	 *
-	 * @param soneRemovedEvent
-	 *            The event
-	 */
 	@Subscribe
 	public void soneRemoved(SoneRemovedEvent soneRemovedEvent) {
 		newSoneNotification.remove(soneRemovedEvent.sone());
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Post} was removed.
-	 *
-	 * @param postRemovedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void postRemoved(PostRemovedEvent postRemovedEvent) {
-		newPostNotification.remove(postRemovedEvent.post());
-		localPostNotification.remove(postRemovedEvent.post());
-		if (!localSoneMentionedInNewPostOrReply(postRemovedEvent.post())) {
-			mentionNotification.remove(postRemovedEvent.post());
+		for (Post post : soneRemovedEvent.sone().getPosts()) {
+			removePost(post);
+		}
+		for (PostReply postReply : soneRemovedEvent.sone().getReplies()) {
+			removeReply(postReply);
 		}
 	}
 
-	/**
-	 * Notifies the web interface that a {@link PostReply} was removed.
-	 *
-	 * @param postReplyRemovedEvent
-	 *            The event
-	 */
+	@Subscribe
+	public void postRemoved(PostRemovedEvent postRemovedEvent) {
+		removePost(postRemovedEvent.post());
+	}
+
+	private void removePost(Post post) {
+		newPostNotification.remove(post);
+		localPostNotification.remove(post);
+		if (!localSoneMentionedInNewPostOrReply(post)) {
+			mentionNotification.remove(post);
+		}
+	}
+
 	@Subscribe
 	public void replyRemoved(PostReplyRemovedEvent postReplyRemovedEvent) {
-		PostReply reply = postReplyRemovedEvent.postReply();
+		removeReply(postReplyRemovedEvent.postReply());
+	}
+
+	private void removeReply(PostReply reply) {
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
 		if (reply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
