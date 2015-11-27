@@ -116,7 +116,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 9, 3);
+	public static final Version VERSION = new Version(0, 9, 4);
 
 	/** The current year at time of release. */
 	private static final int YEAR = 2015;
