@@ -1,5 +1,5 @@
 /*
- * Sone - ImageLinkFilter.java - Copyright © 2011–2013 David Roden
+ * Sone - ImageLinkFilter.java - Copyright © 2011–2015 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 /**
@@ -79,11 +80,11 @@ public class ImageLinkFilter implements Filter {
 		if (image == null) {
 			return null;
 		}
-		String imageClass = valueOf(parameters.get("class"));
+		String imageClass = Optional.fromNullable(parameters.get("class")).transform(getStringValue()).orNull();
 		int maxWidth = parseInt(valueOf(parameters.get("max-width")), MAX_VALUE);
 		int maxHeight = parseInt(valueOf(parameters.get("max-height")), MAX_VALUE);
 		String mode = valueOf(parameters.get("mode"));
-		String title = valueOf(parameters.get("title"));
+		String title = Optional.fromNullable(parameters.get("title")).transform(getStringValue()).orNull();
 
 		TemplateContext linkTemplateContext = templateContextFactory.createTemplateContext();
 		linkTemplateContext.set("class", imageClass);
@@ -115,6 +116,15 @@ public class ImageLinkFilter implements Filter {
 		StringWriter stringWriter = new StringWriter();
 		linkTemplate.render(linkTemplateContext, stringWriter);
 		return stringWriter.toString();
+	}
+
+	private Function<Object, String> getStringValue() {
+		return new Function<Object, String>() {
+			@Override
+			public String apply(Object input) {
+				return (input != null) ? input.toString() : null;
+			}
+		};
 	}
 
 }

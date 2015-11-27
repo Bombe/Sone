@@ -1,5 +1,5 @@
 /*
- * Sone - SonePlugin.java - Copyright © 2010–2013 David Roden
+ * Sone - SonePlugin.java - Copyright © 2010–2015 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -116,12 +116,12 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 9, 3);
+	public static final Version VERSION = new Version(0, 9, 4);
 
 	/** The current year at time of release. */
 	private static final int YEAR = 2015;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-	private static final int LATEST_EDITION = 70;
+	private static final int LATEST_EDITION = 71;
 
 	/** The logger. */
 	private static final Logger logger = getLogger(SonePlugin.class.getName());
@@ -250,6 +250,12 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
+				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
+					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
+					if (path != null) {
+						bind(Loaders.class).toInstance(new DebugLoaders(path));
+					}
+				}
 				bindListener(Matchers.any(), new TypeListener() {
 
 					@Override
@@ -295,7 +301,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
-		deregisterLoggerHandlers();
 		try {
 			/* stop the web interface. */
 			webInterface.stop();
@@ -307,6 +312,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			webOfTrustConnector.stop();
 		} catch (Throwable t1) {
 			logger.log(Level.SEVERE, "Error while shutting down!", t1);
+		} finally {
+			deregisterLoggerHandlers();
 		}
 	}
 

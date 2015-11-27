@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>sone</artifactId>
-	<version>0.9.3</version>
+	<version>0.9.4</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
@@ -25,6 +25,12 @@
 			<groupId>org.hamcrest</groupId>
 			<artifactId>hamcrest-all</artifactId>
 			<version>1.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jsoup</groupId>
+			<artifactId>jsoup</artifactId>
+			<version>1.7.1</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.freenetproject</groupId>
