@@ -66,7 +66,8 @@ public class UpdateChecker {
 	private long latestEdition;
 
 	/** The current latest known version. */
-	private Version currentLatestVersion = SonePlugin.VERSION;
+	private Version currentLatestVersion;
+	private final Version currentRunningVersion;
 
 	/** The release date of the latest version. */
 	private long latestVersionDate;
@@ -80,9 +81,11 @@ public class UpdateChecker {
 	 *            The freenet interface to use
 	 */
 	@Inject
-	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface) {
+	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface, Version currentVersion) {
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
+		this.currentRunningVersion = currentVersion;
+		this.currentLatestVersion = currentVersion;
 	}
 
 	//
@@ -96,7 +99,7 @@ public class UpdateChecker {
 	 * @return {@code true} if a new version was found
 	 */
 	public boolean hasLatestVersion() {
-		return currentLatestVersion.compareTo(SonePlugin.VERSION) > 0;
+		return currentLatestVersion.compareTo(currentRunningVersion) > 0;
 	}
 
 	/**

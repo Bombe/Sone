@@ -44,7 +44,8 @@ public class UpdateCheckerTest {
 
 	private final EventBus eventBus = mock(EventBus.class);
 	private final FreenetInterface freenetInterface = mock(FreenetInterface.class);
-	private final UpdateChecker updateChecker = new UpdateChecker(eventBus, freenetInterface);
+	private final Version currentVersion = new Version(1, 0, 0);
+	private final UpdateChecker updateChecker = new UpdateChecker(eventBus, freenetInterface, currentVersion);
 
 	@Before
 	public void startUpdateChecker() {
@@ -54,7 +55,7 @@ public class UpdateCheckerTest {
 	@Test
 	public void newUpdateCheckerDoesNotHaveALatestVersion() {
 		assertThat(updateChecker.hasLatestVersion(), is(false));
-		assertThat(updateChecker.getLatestVersion(), is(VERSION));
+		assertThat(updateChecker.getLatestVersion(), is(currentVersion));
 	}
 
 	@Test
