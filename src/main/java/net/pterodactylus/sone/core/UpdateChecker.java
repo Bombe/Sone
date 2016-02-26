@@ -224,9 +224,22 @@ public class UpdateChecker {
 		if (version.compareTo(currentLatestVersion) > 0) {
 			currentLatestVersion = version;
 			latestVersionDate = releaseTime;
-			logger.log(Level.INFO, String.format("Found new version: %s (%tc)", version, new Date(releaseTime)));
-			eventBus.post(new UpdateFoundEvent(version, releaseTime, edition));
+			boolean disruptive = disruptiveVersionBetweenCurrentAndFound(properties);
+			logger.log(Level.INFO, String.format("Found new version: %s (%tc%s)", version, new Date(releaseTime), disruptive ? ", disruptive" : ""));
+			eventBus.post(new UpdateFoundEvent(version, releaseTime, edition, disruptive));
 		}
+	}
+
+	private boolean disruptiveVersionBetweenCurrentAndFound(Properties properties) {
+		for (String key : properties.stringPropertyNames()) {
+			if (key.startsWith("DisruptiveVersion/")) {
+				Version disruptiveVersion = Version.parse(key.substring("DisruptiveVersion/".length()));
+				if (disruptiveVersion.compareTo(currentRunningVersion) > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

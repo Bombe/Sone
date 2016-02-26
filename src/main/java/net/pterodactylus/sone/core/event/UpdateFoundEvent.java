@@ -26,61 +26,32 @@ import net.pterodactylus.util.version.Version;
  */
 public class UpdateFoundEvent {
 
-	/** The version that was found. */
 	private final Version version;
-
-	/** The time the update was released. */
 	private final long releaseTime;
-
-	/** The latest edition of the update page. */
 	private final long latestEdition;
+	private final boolean disruptive;
 
-	/**
-	 * Creates a new “update found” event.
-	 *
-	 * @param version
-	 *            The version of the update
-	 * @param releaseTime
-	 *            The release time of the update
-	 * @param latestEdition
-	 *            The latest edition of the update page
-	 */
-	public UpdateFoundEvent(Version version, long releaseTime, long latestEdition) {
+	public UpdateFoundEvent(Version version, long releaseTime, long latestEdition, boolean disruptive) {
 		this.version = version;
 		this.releaseTime = releaseTime;
 		this.latestEdition = latestEdition;
+		this.disruptive = disruptive;
 	}
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the version of the update.
-	 *
-	 * @return The version of the update
-	 */
 	public Version version() {
 		return version;
 	}
 
-	/**
-	 * Returns the release time of the update.
-	 *
-	 * @return The releae time of the update (in milliseconds since Jan 1, 1970
-	 *         UTC)
-	 */
 	public long releaseTime() {
 		return releaseTime;
 	}
 
-	/**
-	 * Returns the latest edition of the update page.
-	 *
-	 * @return The latest edition of the update page
-	 */
 	public long latestEdition() {
 		return latestEdition;
+	}
+
+	public boolean disruptive() {
+		return disruptive;
 	}
 
 }

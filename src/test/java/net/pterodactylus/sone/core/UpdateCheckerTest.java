@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.core;
 
 import static java.lang.Long.MAX_VALUE;
-import static net.pterodactylus.sone.main.SonePlugin.VERSION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
@@ -88,21 +87,31 @@ public class UpdateCheckerTest {
 		setupFetchResult(createFutureFetchResult());
 		setupCallbackWithEdition(MAX_VALUE, true, false);
 		verifyAFreenetUriIsFetched();
-		ArgumentCaptor<UpdateFoundEvent> updateFoundEvent = forClass(UpdateFoundEvent.class);
-		verify(eventBus, times(1)).post(updateFoundEvent.capture());
-		assertThat(updateFoundEvent.getValue().version(), is(new Version(99, 0, 0)));
-		assertThat(updateFoundEvent.getValue().releaseTime(), is(11865368297000L));
-		assertThat(updateChecker.getLatestVersion(), is(new Version(99, 0, 0)));
-		assertThat(updateChecker.getLatestVersionDate(), is(11865368297000L));
-		assertThat(updateChecker.hasLatestVersion(), is(true));
+		verifyEventIsFired(new Version(99, 0, 0), 11865368297000L, false);
+		verifyThatUpdateCheckerKnowsLatestVersion(new Version(99, 0, 0), 11865368297000L);
 	}
 
 	private FetchResult createFutureFetchResult() {
 		ClientMetadata clientMetadata = new ClientMetadata("application/xml");
 		Bucket fetched = new ArrayBucket(("# MapConfigurationBackendVersion=1\n" +
 				"CurrentVersion/Version: 99.0.0\n" +
-				"CurrentVersion/ReleaseTime: 11865368297000").getBytes());
+				"CurrentVersion/ReleaseTime: 11865368297000\n" +
+				"DisruptiveVersion/0.1.2: true").getBytes());
 		return new FetchResult(clientMetadata, fetched);
+	}
+
+	private void verifyEventIsFired(Version version, long releaseTime, boolean disruptive) {
+		ArgumentCaptor<UpdateFoundEvent> updateFoundEvent = forClass(UpdateFoundEvent.class);
+		verify(eventBus, times(1)).post(updateFoundEvent.capture());
+		assertThat(updateFoundEvent.getValue().version(), is(version));
+		assertThat(updateFoundEvent.getValue().releaseTime(), is(releaseTime));
+		assertThat(updateFoundEvent.getValue().disruptive(), is(disruptive));
+	}
+
+	private void verifyThatUpdateCheckerKnowsLatestVersion(Version version, long releaseTime) {
+		assertThat(updateChecker.getLatestVersion(), is(version));
+		assertThat(updateChecker.getLatestVersionDate(), is(releaseTime));
+		assertThat(updateChecker.hasLatestVersion(), is(true));
 	}
 
 	@Test
@@ -228,6 +237,24 @@ public class UpdateCheckerTest {
 		Bucket fetched = new ArrayBucket(("# MapConfigurationBackendVersion=1\n" +
 				"CurrentVersion/Version: foo\n" +
 				"CurrentVersion/ReleaseTime: 1289417883000").getBytes());
+		return new FetchResult(clientMetadata, fetched);
+	}
+
+	@Test
+	public void disruptiveVersionGetsNotification() {
+		setupFetchResult(createDisruptiveVersionFetchResult());
+		setupCallbackWithEdition(MAX_VALUE, true, false);
+		verifyAFreenetUriIsFetched();
+		verifyEventIsFired(new Version(1, 2, 3), 1289417883000L, true);
+		verifyThatUpdateCheckerKnowsLatestVersion(new Version(1, 2, 3), 1289417883000L);
+	}
+
+	private FetchResult createDisruptiveVersionFetchResult() {
+		ClientMetadata clientMetadata = new ClientMetadata("application/xml");
+		Bucket fetched = new ArrayBucket(("# MapConfigurationBackendVersion=1\n" +
+				"CurrentVersion/Version: 1.2.3\n" +
+				"CurrentVersion/ReleaseTime: 1289417883000\n" +
+				"DisruptiveVersion/1.2.3: true").getBytes());
 		return new FetchResult(clientMetadata, fetched);
 	}
 
