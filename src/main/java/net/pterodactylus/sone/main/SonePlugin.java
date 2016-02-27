@@ -250,6 +250,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
+				bind(Version.class).toInstance(VERSION);
 				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
 					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
 					if (path != null) {

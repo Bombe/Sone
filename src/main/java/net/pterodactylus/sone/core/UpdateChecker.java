@@ -28,6 +28,8 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Singleton;
+
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.main.SonePlugin;
@@ -45,6 +47,7 @@ import freenet.support.api.Bucket;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class UpdateChecker {
 
 	/** The logger. */
@@ -63,7 +66,8 @@ public class UpdateChecker {
 	private long latestEdition;
 
 	/** The current latest known version. */
-	private Version currentLatestVersion = SonePlugin.VERSION;
+	private Version currentLatestVersion;
+	private final Version currentRunningVersion;
 
 	/** The release date of the latest version. */
 	private long latestVersionDate;
@@ -77,9 +81,11 @@ public class UpdateChecker {
 	 *            The freenet interface to use
 	 */
 	@Inject
-	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface) {
+	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface, Version currentVersion) {
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
+		this.currentRunningVersion = currentVersion;
+		this.currentLatestVersion = currentVersion;
 	}
 
 	//
@@ -93,7 +99,7 @@ public class UpdateChecker {
 	 * @return {@code true} if a new version was found
 	 */
 	public boolean hasLatestVersion() {
-		return currentLatestVersion.compareTo(SonePlugin.VERSION) > 0;
+		return currentLatestVersion.compareTo(currentRunningVersion) > 0;
 	}
 
 	/**
@@ -218,9 +224,22 @@ public class UpdateChecker {
 		if (version.compareTo(currentLatestVersion) > 0) {
 			currentLatestVersion = version;
 			latestVersionDate = releaseTime;
-			logger.log(Level.INFO, String.format("Found new version: %s (%tc)", version, new Date(releaseTime)));
-			eventBus.post(new UpdateFoundEvent(version, releaseTime, edition));
+			boolean disruptive = disruptiveVersionBetweenCurrentAndFound(properties);
+			logger.log(Level.INFO, String.format("Found new version: %s (%tc%s)", version, new Date(releaseTime), disruptive ? ", disruptive" : ""));
+			eventBus.post(new UpdateFoundEvent(version, releaseTime, edition, disruptive));
 		}
+	}
+
+	private boolean disruptiveVersionBetweenCurrentAndFound(Properties properties) {
+		for (String key : properties.stringPropertyNames()) {
+			if (key.startsWith("DisruptiveVersion/")) {
+				Version disruptiveVersion = Version.parse(key.substring("DisruptiveVersion/".length()));
+				if (disruptiveVersion.compareTo(currentRunningVersion) > 0) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 }

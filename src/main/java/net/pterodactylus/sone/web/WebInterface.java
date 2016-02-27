@@ -1019,9 +1019,10 @@ public class WebInterface {
 	 */
 	@Subscribe
 	public void updateFound(UpdateFoundEvent updateFoundEvent) {
-		newVersionNotification.getTemplateContext().set("latestVersion", updateFoundEvent.version());
-		newVersionNotification.getTemplateContext().set("latestEdition", updateFoundEvent.latestEdition());
-		newVersionNotification.getTemplateContext().set("releaseTime", updateFoundEvent.releaseTime());
+		newVersionNotification.set("latestVersion", updateFoundEvent.version());
+		newVersionNotification.set("latestEdition", updateFoundEvent.latestEdition());
+		newVersionNotification.set("releaseTime", updateFoundEvent.releaseTime());
+		newVersionNotification.set("disruptive", updateFoundEvent.disruptive());
 		notificationManager.addNotification(newVersionNotification);
 	}
 
