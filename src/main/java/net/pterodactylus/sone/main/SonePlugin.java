@@ -183,6 +183,10 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		return SONE_HOMEPAGE + LATEST_EDITION;
 	}
 
+	public static long getLatestEdition() {
+		return LATEST_EDITION;
+	}
+
 	//
 	// FREDPLUGIN METHODS
 	//

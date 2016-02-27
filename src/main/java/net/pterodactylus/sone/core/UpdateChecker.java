@@ -63,7 +63,7 @@ public class UpdateChecker {
 	private FreenetURI currentUri;
 
 	/** The latest known edition. */
-	private long latestEdition;
+	private long latestEdition = SonePlugin.getLatestEdition();
 
 	/** The current latest known version. */
 	private Version currentLatestVersion;
