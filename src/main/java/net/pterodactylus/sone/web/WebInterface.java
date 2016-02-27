@@ -1022,6 +1022,7 @@ public class WebInterface {
 		newVersionNotification.getTemplateContext().set("latestVersion", updateFoundEvent.version());
 		newVersionNotification.getTemplateContext().set("latestEdition", updateFoundEvent.latestEdition());
 		newVersionNotification.getTemplateContext().set("releaseTime", updateFoundEvent.releaseTime());
+		newVersionNotification.getTemplateContext().set("disruptive", updateFoundEvent.disruptive());
 		notificationManager.addNotification(newVersionNotification);
 	}
 
