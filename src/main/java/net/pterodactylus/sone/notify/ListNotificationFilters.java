@@ -108,7 +108,7 @@ public class ListNotificationFilters {
 	 * @return The filtered new-post notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	public static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone, boolean soneRequired) {
+	private static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone, boolean soneRequired) {
 		if (soneRequired && (currentSone == null)) {
 			return null;
 		}
@@ -144,7 +144,7 @@ public class ListNotificationFilters {
 	 * @return The filtered new-reply notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	public static ListNotification<PostReply> filterNewReplyNotification(ListNotification<PostReply> newReplyNotification, Sone currentSone) {
+	private static ListNotification<PostReply> filterNewReplyNotification(ListNotification<PostReply> newReplyNotification, Sone currentSone) {
 		if (currentSone == null) {
 			return null;
 		}
