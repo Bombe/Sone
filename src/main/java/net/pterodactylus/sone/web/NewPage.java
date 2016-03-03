@@ -74,7 +74,7 @@ public class NewPage extends SoneTemplatePage {
 		}
 
 		/* filter and sort them. */
-		List<Post> sortedPosts = ListNotificationFilters.filterPosts(new ArrayList<Post>(posts), webInterface.getCurrentSone(request.getToadletContext(), false));
+		List<Post> sortedPosts = ListNotificationFilters.filterPosts(posts, webInterface.getCurrentSone(request.getToadletContext(), false));
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 
 		/* paginate them. */
