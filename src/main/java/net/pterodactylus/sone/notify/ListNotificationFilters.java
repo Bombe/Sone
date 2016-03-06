@@ -248,10 +248,7 @@ public class ListNotificationFilters {
 				return false;
 			}
 		}
-		if (post.getTime() > System.currentTimeMillis()) {
-			return false;
-		}
-		return true;
+		return post.getTime() <= System.currentTimeMillis();
 	}
 
 	/**
@@ -290,10 +287,7 @@ public class ListNotificationFilters {
 		if (!isPostVisible(sone, post.get())) {
 			return false;
 		}
-		if (reply.getTime() > System.currentTimeMillis()) {
-			return false;
-		}
-		return true;
+		return reply.getTime() <= System.currentTimeMillis();
 	}
 
 }
