@@ -67,22 +67,22 @@ public class ListNotificationFilters {
 				if ((currentSone != null) && !currentSone.getOptions().isShowNewPostNotifications()) {
 					continue;
 				}
-				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone, true);
-				if (filteredNotification != null) {
-					filteredNotifications.add(filteredNotification);
+				Optional<ListNotification<Post>> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone, true);
+				if (filteredNotification.isPresent()) {
+					filteredNotifications.add(filteredNotification.get());
 				}
 			} else if (notification.getId().equals("new-reply-notification")) {
 				if ((currentSone != null) && !currentSone.getOptions().isShowNewReplyNotifications()) {
 					continue;
 				}
-				ListNotification<PostReply> filteredNotification = filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
-				if (filteredNotification != null) {
-					filteredNotifications.add(filteredNotification);
+				Optional<ListNotification<PostReply>> filteredNotification = filterNewReplyNotification((ListNotification<PostReply>) notification, currentSone);
+				if (filteredNotification.isPresent()) {
+					filteredNotifications.add(filteredNotification.get());
 				}
 			} else if (notification.getId().equals("mention-notification")) {
-				ListNotification<Post> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null, false);
-				if (filteredNotification != null) {
-					filteredNotifications.add(filteredNotification);
+				Optional<ListNotification<Post>> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null, false);
+				if (filteredNotification.isPresent()) {
+					filteredNotifications.add(filteredNotification.get());
 				}
 			} else {
 				filteredNotifications.add(notification);
@@ -108,9 +108,9 @@ public class ListNotificationFilters {
 	 * @return The filtered new-post notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	private static ListNotification<Post> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone, boolean soneRequired) {
+	private static Optional<ListNotification<Post>> filterNewPostNotification(ListNotification<Post> newPostNotification, Sone currentSone, boolean soneRequired) {
 		if (soneRequired && (currentSone == null)) {
-			return null;
+			return Optional.absent();
 		}
 		List<Post> newPosts = new ArrayList<Post>();
 		for (Post post : newPostNotification.getElements()) {
@@ -119,15 +119,15 @@ public class ListNotificationFilters {
 			}
 		}
 		if (newPosts.isEmpty()) {
-			return null;
+			return Optional.absent();
 		}
 		if (newPosts.size() == newPostNotification.getElements().size()) {
-			return newPostNotification;
+			return Optional.of(newPostNotification);
 		}
 		ListNotification<Post> filteredNotification = new ListNotification<Post>(newPostNotification);
 		filteredNotification.setElements(newPosts);
 		filteredNotification.setLastUpdateTime(newPostNotification.getLastUpdatedTime());
-		return filteredNotification;
+		return Optional.of(filteredNotification);
 	}
 
 	/**
@@ -144,9 +144,9 @@ public class ListNotificationFilters {
 	 * @return The filtered new-reply notification, or {@code null} if the
 	 *         notification should be removed
 	 */
-	private static ListNotification<PostReply> filterNewReplyNotification(ListNotification<PostReply> newReplyNotification, Sone currentSone) {
+	private static Optional<ListNotification<PostReply>> filterNewReplyNotification(ListNotification<PostReply> newReplyNotification, Sone currentSone) {
 		if (currentSone == null) {
-			return null;
+			return Optional.absent();
 		}
 		List<PostReply> newReplies = new ArrayList<PostReply>();
 		for (PostReply reply : newReplyNotification.getElements()) {
@@ -155,15 +155,15 @@ public class ListNotificationFilters {
 			}
 		}
 		if (newReplies.isEmpty()) {
-			return null;
+			return Optional.absent();
 		}
 		if (newReplies.size() == newReplyNotification.getElements().size()) {
-			return newReplyNotification;
+			return Optional.of(newReplyNotification);
 		}
 		ListNotification<PostReply> filteredNotification = new ListNotification<PostReply>(newReplyNotification);
 		filteredNotification.setElements(newReplies);
 		filteredNotification.setLastUpdateTime(newReplyNotification.getLastUpdatedTime());
-		return filteredNotification;
+		return Optional.of(filteredNotification);
 	}
 
 	/**
