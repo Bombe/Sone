@@ -39,13 +39,13 @@ import com.google.common.base.Optional;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
-public class ListNotificationFilters {
+public class ListNotificationFilter {
 
 	private final PostVisibilityFilter postVisibilityFilter;
 	private final ReplyVisibilityFilter replyVisibilityFilter;
 
 	@Inject
-	public ListNotificationFilters(@Nonnull PostVisibilityFilter postVisibilityFilter, @Nonnull ReplyVisibilityFilter replyVisibilityFilter) {
+	public ListNotificationFilter(@Nonnull PostVisibilityFilter postVisibilityFilter, @Nonnull ReplyVisibilityFilter replyVisibilityFilter) {
 		this.postVisibilityFilter = postVisibilityFilter;
 		this.replyVisibilityFilter = replyVisibilityFilter;
 	}

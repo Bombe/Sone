@@ -75,7 +75,7 @@ import net.pterodactylus.sone.main.Loaders;
 import net.pterodactylus.sone.main.ReparseFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.notify.ListNotificationFilter;
 import net.pterodactylus.sone.notify.PostVisibilityFilter;
 import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
 import net.pterodactylus.sone.template.AlbumAccessor;
@@ -201,7 +201,7 @@ public class WebInterface {
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
 
-	private final ListNotificationFilters listNotificationFilters;
+	private final ListNotificationFilter listNotificationFilter;
 	private final PostVisibilityFilter postVisibilityFilter;
 	private final ReplyVisibilityFilter replyVisibilityFilter;
 
@@ -254,10 +254,10 @@ public class WebInterface {
 	 *            The Sone plugin
 	 */
 	@Inject
-	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilters listNotificationFilters, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter) {
+	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
-		this.listNotificationFilters = listNotificationFilters;
+		this.listNotificationFilter = listNotificationFilter;
 		this.postVisibilityFilter = postVisibilityFilter;
 		this.replyVisibilityFilter = replyVisibilityFilter;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
@@ -475,7 +475,7 @@ public class WebInterface {
 
 	@Nonnull
 	public Collection<Notification> getNotifications(@Nullable Sone currentSone) {
-		return listNotificationFilters.filterNotifications(notificationManager.getNotifications(), currentSone);
+		return listNotificationFilter.filterNotifications(notificationManager.getNotifications(), currentSone);
 	}
 
 	/**

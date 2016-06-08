@@ -31,17 +31,17 @@ import org.hamcrest.Matchers;
 import org.junit.Test;
 
 /**
- * Unit test for {@link ListNotificationFiltersTest}.
+ * Unit test for {@link ListNotificationFilterTest}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class ListNotificationFiltersTest {
+public class ListNotificationFilterTest {
 
 	private static final String LOCAL_ID = "local-id";
 
 	private final PostVisibilityFilter postVisibilityFilter = mock(PostVisibilityFilter.class);
 	private final ReplyVisibilityFilter replyVisibilityFilter = mock(ReplyVisibilityFilter.class);
-	private final ListNotificationFilters listNotificationFilters = new ListNotificationFilters(postVisibilityFilter, replyVisibilityFilter);
+	private final ListNotificationFilter listNotificationFilter = new ListNotificationFilter(postVisibilityFilter, replyVisibilityFilter);
 
 	private final Sone localSone = mock(Sone.class);
 	private final SoneOptions soneOptions = mock(SoneOptions.class);
@@ -50,7 +50,7 @@ public class ListNotificationFiltersTest {
 	private final List<ListNotification<PostReply>> newReplyNotifications = Arrays.asList(createNewReplyNotification());
 	private final List<ListNotification<Post>> mentionNotifications = Arrays.asList(createMentionNotification());
 
-	public ListNotificationFiltersTest() {
+	public ListNotificationFilterTest() {
 		when(localSone.getId()).thenReturn(LOCAL_ID);
 		when(localSone.isLocal()).thenReturn(true);
 		when(localSone.getIdentity()).thenReturn(localIdentity);
@@ -61,15 +61,15 @@ public class ListNotificationFiltersTest {
 	@Test
 	public void filterIsOnlyCreatedOnce() {
 	    Injector injector = Guice.createInjector();
-		ListNotificationFilters firstFilter = injector.getInstance(ListNotificationFilters.class);
-		ListNotificationFilters secondFilter = injector.getInstance(ListNotificationFilters.class);
+		ListNotificationFilter firstFilter = injector.getInstance(ListNotificationFilter.class);
+		ListNotificationFilter secondFilter = injector.getInstance(ListNotificationFilter.class);
 		assertThat(firstFilter, sameInstance(secondFilter));
 	}
 
 	@Test
 	public void newSoneNotificationsAreNotRemovedIfNotLoggedIn() {
 		List<Notification> notifications = Arrays.asList(createNewSoneNotification());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(notifications, null);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(notifications, null);
 		assertThat(filteredNotifications, contains(notifications.get(0)));
 	}
 
@@ -82,7 +82,7 @@ public class ListNotificationFiltersTest {
 	@Test
 	public void newSoneNotificationsAreRemovedIfLoggedInAndNewSonesShouldNotBeShown() {
 		List<Notification> notifications = Arrays.asList(createNewSoneNotification());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(notifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(notifications, localSone);
 		assertThat(filteredNotifications, emptyIterable());
 	}
 
@@ -90,7 +90,7 @@ public class ListNotificationFiltersTest {
 	public void newSoneNotificationsAreNotRemovedIfLoggedInAndNewSonesShouldBeShown() {
 		List<Notification> notifications = Arrays.asList(createNewSoneNotification());
 		when(soneOptions.isShowNewSoneNotifications()).thenReturn(true);
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(notifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(notifications, localSone);
 		assertThat(filteredNotifications, contains(notifications.get(0)));
 	}
 
@@ -104,7 +104,7 @@ public class ListNotificationFiltersTest {
 	@Test
 	public void newPostNotificationIsNotShownIfOptionsSetAccordingly() {
 		List<ListNotification<Post>> notifications = Arrays.asList(createNewPostNotification());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(notifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(notifications, localSone);
 		assertThat(filteredNotifications, hasSize(0));
 	}
 
@@ -125,7 +125,7 @@ public class ListNotificationFiltersTest {
 		activateNewPostNotifications();
 		addPostToPostNotification(newPostNotifications);
 		setPostVisibilityPredicate(Predicates.<Post>alwaysFalse());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newPostNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newPostNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(0));
 	}
 
@@ -134,7 +134,7 @@ public class ListNotificationFiltersTest {
 		activateNewPostNotifications();
 		addPostToPostNotification(newPostNotifications);
 		setPostVisibilityPredicate(Predicates.<Post>alwaysTrue());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newPostNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newPostNotifications, localSone);
 		assertThat(filteredNotifications, contains((Notification) newPostNotifications.get(0)));
 	}
 
@@ -143,7 +143,7 @@ public class ListNotificationFiltersTest {
 		activateNewPostNotifications();
 		addPostToPostNotification(newPostNotifications);
 		setPostVisibilityPredicate(Predicates.<Post>alwaysTrue());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newPostNotifications, null);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newPostNotifications, null);
 		assertThat(filteredNotifications, Matchers.<Notification>emptyIterable());
 	}
 
@@ -158,7 +158,7 @@ public class ListNotificationFiltersTest {
 				return post.equals(newPostNotifications.get(0).getElements().get(1));
 			}
 		});
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newPostNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newPostNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(1));
 		assertThat(((ListNotification<Post>) filteredNotifications.get(0)).getElements().get(0), is(newPostNotifications.get(0).getElements().get(1)));
 	}
@@ -193,7 +193,7 @@ public class ListNotificationFiltersTest {
 				return postReply.equals(newReplyNotifications.get(0).getElements().get(1));
 			}
 		});
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newReplyNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newReplyNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(1));
 		assertThat(((ListNotification<PostReply>) filteredNotifications.get(0)).getElements().get(0), is(newReplyNotifications.get(0).getElements().get(1)));
 	}
@@ -204,7 +204,7 @@ public class ListNotificationFiltersTest {
 		addReplyToNewReplyNotification(newReplyNotifications);
 		addReplyToNewReplyNotification(newReplyNotifications);
 		setReplyVisibilityPredicate(Predicates.<PostReply>alwaysTrue());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newReplyNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newReplyNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(1));
 		assertThat(filteredNotifications.get(0), is((Notification) newReplyNotifications.get(0)));
 		assertThat(((ListNotification<PostReply>) filteredNotifications.get(0)).getElements(), hasSize(2));
@@ -216,7 +216,7 @@ public class ListNotificationFiltersTest {
 		addReplyToNewReplyNotification(newReplyNotifications);
 		addReplyToNewReplyNotification(newReplyNotifications);
 		setReplyVisibilityPredicate(Predicates.<PostReply>alwaysFalse());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newReplyNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newReplyNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(0));
 	}
 
@@ -225,7 +225,7 @@ public class ListNotificationFiltersTest {
 		addReplyToNewReplyNotification(newReplyNotifications);
 		addReplyToNewReplyNotification(newReplyNotifications);
 		setReplyVisibilityPredicate(Predicates.<PostReply>alwaysTrue());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newReplyNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newReplyNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(0));
 	}
 
@@ -234,7 +234,7 @@ public class ListNotificationFiltersTest {
 		addReplyToNewReplyNotification(newReplyNotifications);
 		addReplyToNewReplyNotification(newReplyNotifications);
 		setReplyVisibilityPredicate(Predicates.<PostReply>alwaysTrue());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(newReplyNotifications, null);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(newReplyNotifications, null);
 		assertThat(filteredNotifications, hasSize(0));
 	}
 
@@ -255,7 +255,7 @@ public class ListNotificationFiltersTest {
 				return post.equals(mentionNotifications.get(0).getElements().get(1));
 			}
 		});
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(mentionNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(mentionNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(1));
 		assertThat(((ListNotification<Post>) filteredNotifications.get(0)).getElements().get(0), is(mentionNotifications.get(0).getElements().get(1)));
 	}
@@ -265,7 +265,7 @@ public class ListNotificationFiltersTest {
 		addPostToPostNotification(mentionNotifications);
 		addPostToPostNotification(mentionNotifications);
 		setPostVisibilityPredicate(Predicates.<Post>alwaysFalse());
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(mentionNotifications, localSone);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(mentionNotifications, localSone);
 		assertThat(filteredNotifications, hasSize(0));
 	}
 
@@ -274,7 +274,7 @@ public class ListNotificationFiltersTest {
 		Notification notification = mock(Notification.class);
 		when(notification.getId()).thenReturn("random-notification");
 		List<Notification> notifications = Arrays.asList(notification);
-		List<Notification> filteredNotifications = listNotificationFilters.filterNotifications(notifications, null);
+		List<Notification> filteredNotifications = listNotificationFilter.filterNotifications(notifications, null);
 		assertThat(filteredNotifications, contains(notification));
 	}
 
