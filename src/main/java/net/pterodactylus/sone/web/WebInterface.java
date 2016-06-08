@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web;
 
+import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.util.template.TemplateParser.parse;
 
@@ -37,6 +38,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
@@ -72,6 +75,9 @@ import net.pterodactylus.sone.main.Loaders;
 import net.pterodactylus.sone.main.ReparseFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
+import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.notify.PostVisibilityFilter;
+import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
 import net.pterodactylus.sone.template.AlbumAccessor;
 import net.pterodactylus.sone.template.CollectionAccessor;
 import net.pterodactylus.sone.template.CssClassNameFilter;
@@ -147,17 +153,18 @@ import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.TemplatePage;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.eventbus.Subscribe;
-import com.google.inject.Inject;
-
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
+
+import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.Subscribe;
+import com.google.inject.Inject;
 
 /**
  * Bundles functionality that a web interface of a Freenet plugin needs, e.g.
@@ -193,6 +200,10 @@ public class WebInterface {
 
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
+
+	private final ListNotificationFilters listNotificationFilters;
+	private final PostVisibilityFilter postVisibilityFilter;
+	private final ReplyVisibilityFilter replyVisibilityFilter;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -243,9 +254,12 @@ public class WebInterface {
 	 *            The Sone plugin
 	 */
 	@Inject
-	public WebInterface(SonePlugin sonePlugin, Loaders loaders) {
+	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilters listNotificationFilters, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
+		this.listNotificationFilters = listNotificationFilters;
+		this.postVisibilityFilter = postVisibilityFilter;
+		this.replyVisibilityFilter = replyVisibilityFilter;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 
@@ -454,6 +468,16 @@ public class WebInterface {
 		return notificationManager;
 	}
 
+	@Nonnull
+	public Optional<Notification> getNotification(@Nonnull String notificationId) {
+		return Optional.fromNullable(notificationManager.getNotification(notificationId));
+	}
+
+	@Nonnull
+	public Collection<Notification> getNotifications(@Nullable Sone currentSone) {
+		return listNotificationFilters.filterNotifications(notificationManager.getNotifications(), currentSone);
+	}
+
 	/**
 	 * Returns the l10n helper of the node.
 	 *
@@ -491,6 +515,15 @@ public class WebInterface {
 		return ImmutableSet.<Post> builder().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).build();
 	}
 
+	@Nonnull
+	public Collection<Post> getNewPosts(@Nullable Sone currentSone) {
+		Set<Post> allNewPosts = ImmutableSet.<Post> builder()
+				.addAll(newPostNotification.getElements())
+				.addAll(localPostNotification.getElements())
+				.build();
+		return from(allNewPosts).filter(postVisibilityFilter.isVisible(currentSone)).toSet();
+	}
+
 	/**
 	 * Returns the replies that have been announced as new in the
 	 * {@link #newReplyNotification}.
@@ -499,6 +532,15 @@ public class WebInterface {
 	 */
 	public Set<PostReply> getNewReplies() {
 		return ImmutableSet.<PostReply> builder().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).build();
+	}
+
+	@Nonnull
+	public Collection<PostReply> getNewReplies(@Nullable Sone currentSone) {
+		Set<PostReply> allNewReplies = ImmutableSet.<PostReply>builder()
+				.addAll(newReplyNotification.getElements())
+				.addAll(localReplyNotification.getElements())
+				.build();
+		return from(allNewReplies).filter(replyVisibilityFilter.isVisible(currentSone)).toSet();
 	}
 
 	/**
@@ -638,7 +680,7 @@ public class WebInterface {
 
 		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this), "Index"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this, postVisibilityFilter), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new NewPage(newTemplate, this), "New"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));

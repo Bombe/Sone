@@ -21,15 +21,12 @@ import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import com.google.common.collect.Collections2;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.notify.PostVisibilityFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
@@ -37,8 +34,7 @@ import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that displays all new posts and replies. The posts are filtered using
- * {@link ListNotificationFilters#filterPosts(java.util.Collection, net.pterodactylus.sone.data.Sone)}
- * and sorted by time.
+ * {@link PostVisibilityFilter#isPostVisible(Sone, Post)} and sorted by time.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -68,17 +64,16 @@ public class NewPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 
 		/* collect new elements from notifications. */
-		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts());
-		for (PostReply reply : Collections2.filter(webInterface.getNewReplies(), PostReply.HAS_POST_FILTER)) {
+		List<Post> posts = new ArrayList<Post>(webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false)));
+		for (PostReply reply : webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false))) {
 			posts.add(reply.getPost().get());
 		}
 
 		/* filter and sort them. */
-		List<Post> sortedPosts = ListNotificationFilters.filterPosts(posts, webInterface.getCurrentSone(request.getToadletContext(), false));
-		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Collections.sort(posts, Post.TIME_COMPARATOR);
 
 		/* paginate them. */
-		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}
