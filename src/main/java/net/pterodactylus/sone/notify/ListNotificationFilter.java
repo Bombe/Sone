@@ -81,7 +81,7 @@ public class ListNotificationFilter {
 				if (!currentSone.getOptions().isShowNewPostNotifications()) {
 					continue;
 				}
-				Optional<ListNotification<Post>> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, currentSone);
+				Optional<ListNotification<Post>> filteredNotification = filterPostNotification((ListNotification<Post>) notification, currentSone);
 				if (filteredNotification.isPresent()) {
 					filteredNotifications.add(filteredNotification.get());
 				}
@@ -98,7 +98,7 @@ public class ListNotificationFilter {
 					filteredNotifications.add(filteredNotification.get());
 				}
 			} else if (notification.getId().equals("mention-notification")) {
-				Optional<ListNotification<Post>> filteredNotification = filterNewPostNotification((ListNotification<Post>) notification, null);
+				Optional<ListNotification<Post>> filteredNotification = filterPostNotification((ListNotification<Post>) notification, null);
 				if (filteredNotification.isPresent()) {
 					filteredNotifications.add(filteredNotification.get());
 				}
@@ -119,7 +119,7 @@ public class ListNotificationFilter {
 	 * @return The filtered post notification, or {@link Optional#absent()} if the notification should be removed
 	 */
 	@Nonnull
-	private Optional<ListNotification<Post>> filterNewPostNotification(@Nonnull ListNotification<Post> postNotification,
+	private Optional<ListNotification<Post>> filterPostNotification(@Nonnull ListNotification<Post> postNotification,
 			@Nullable Sone currentSone) {
 		List<Post> newPosts = from(postNotification.getElements()).filter(postVisibilityFilter.isVisible(currentSone)).toList();
 		if (newPosts.isEmpty()) {
