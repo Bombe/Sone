@@ -87,10 +87,9 @@ public class PostVisibilityFilter {
 	@Nonnull
 	public Predicate<Post> isVisible(@Nullable final Sone currentSone) {
 		return new Predicate<Post>() {
-			@Nonnull
 			@Override
 			public boolean apply(@Nullable Post post) {
-				return isPostVisible(currentSone, post);
+				return (post != null) && isPostVisible(currentSone, post);
 			}
 		};
 	}

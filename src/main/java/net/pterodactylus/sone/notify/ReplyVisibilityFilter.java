@@ -62,10 +62,9 @@ public class ReplyVisibilityFilter {
 	@Nonnull
 	public Predicate<PostReply> isVisible(@Nullable final Sone currentSone) {
 		return new Predicate<PostReply>() {
-			@Nonnull
 			@Override
 			public boolean apply(@Nullable PostReply postReply) {
-				return isReplyVisible(currentSone, postReply);
+				return (postReply != null) && isReplyVisible(currentSone, postReply);
 			}
 		};
 	}
