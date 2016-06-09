@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -72,8 +73,10 @@ public class ReloadingPage<REQ extends Request> implements Page<REQ> {
 		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
 		String filename = path.substring(lastSlash + 1);
-		InputStream fileInputStream = new FileInputStream(new File(filesystemPath, filename));
-		if (fileInputStream == null) {
+		InputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream(new File(filesystemPath, filename));
+		} catch (FileNotFoundException fnfe1) {
 			return response.setStatusCode(404).setStatusText("Not found.");
 		}
 		OutputStream contentOutputStream = response.getContent();
