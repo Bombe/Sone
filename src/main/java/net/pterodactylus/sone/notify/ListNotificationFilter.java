@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -109,32 +110,27 @@ public class ListNotificationFilter {
 	}
 
 	/**
-	 * Filters the new posts of the given notification. If {@code currentSone}
-	 * is {@code null} and {@code soneRequired} is {@code true}, {@code null} is
-	 * returned and the notification is subsequently removed. Otherwise only
-	 * posts that are posted by friend Sones of the given Sone are retained; all
-	 * other posts are removed.
+	 * Filters the posts of the given notification.
 	 *
-	 * @param newPostNotification
-	 * 		The new-post notification
+	 * @param postNotification
+	 * 		The post notification
 	 * @param currentSone
 	 * 		The current Sone, or {@code null} if not logged in
-	 * @return The filtered new-post notification, or {@code null} if the
-	 * notification should be removed
+	 * @return The filtered post notification, or {@link Optional#absent()} if the notification should be removed
 	 */
 	@Nonnull
-	private Optional<ListNotification<Post>> filterNewPostNotification(@Nonnull ListNotification<Post> newPostNotification,
-			@Nonnull Sone currentSone) {
-		List<Post> newPosts = from(newPostNotification.getElements()).filter(postVisibilityFilter.isVisible(currentSone)).toList();
+	private Optional<ListNotification<Post>> filterNewPostNotification(@Nonnull ListNotification<Post> postNotification,
+			@Nullable Sone currentSone) {
+		List<Post> newPosts = from(postNotification.getElements()).filter(postVisibilityFilter.isVisible(currentSone)).toList();
 		if (newPosts.isEmpty()) {
 			return Optional.absent();
 		}
-		if (newPosts.size() == newPostNotification.getElements().size()) {
-			return Optional.of(newPostNotification);
+		if (newPosts.size() == postNotification.getElements().size()) {
+			return Optional.of(postNotification);
 		}
-		ListNotification<Post> filteredNotification = new ListNotification<Post>(newPostNotification);
+		ListNotification<Post> filteredNotification = new ListNotification<Post>(postNotification);
 		filteredNotification.setElements(newPosts);
-		filteredNotification.setLastUpdateTime(newPostNotification.getLastUpdatedTime());
+		filteredNotification.setLastUpdateTime(postNotification.getLastUpdatedTime());
 		return Optional.of(filteredNotification);
 	}
 
