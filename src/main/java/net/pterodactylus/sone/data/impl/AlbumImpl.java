@@ -70,9 +70,6 @@ public class AlbumImpl implements Album {
 	/** The description of this album. */
 	private String description;
 
-	/** The ID of the album picture. */
-	private String albumImage;
-
 	/** Creates a new album with a random ID. */
 	public AlbumImpl(Sone sone) {
 		this(sone, UUID.randomUUID().toString());
@@ -176,9 +173,6 @@ public class AlbumImpl implements Album {
 			image.getAlbum().removeImage(image);
 		}
 		image.setAlbum(this);
-		if (imageIds.isEmpty() && (albumImage == null)) {
-			albumImage = image.getId();
-		}
 		if (!imageIds.contains(image.getId())) {
 			imageIds.add(image.getId());
 			images.put(image.getId(), image);
@@ -192,13 +186,6 @@ public class AlbumImpl implements Album {
 		checkArgument(image.getSone().equals(sone), "image must belong to the same Sone as this album");
 		imageIds.remove(image.getId());
 		images.remove(image.getId());
-		if (image.getId().equals(albumImage)) {
-			if (images.isEmpty()) {
-				albumImage = null;
-			} else {
-				albumImage = images.values().iterator().next().getId();
-			}
-		}
 	}
 
 	@Override
@@ -229,14 +216,6 @@ public class AlbumImpl implements Album {
 		imageIds.remove(image.getId());
 		imageIds.add(oldIndex + 1, image.getId());
 		return images.get(imageIds.get(oldIndex));
-	}
-
-	@Override
-	public Image getAlbumImage() {
-		if (albumImage == null) {
-			return null;
-		}
-		return Optional.fromNullable(images.get(albumImage)).or(images.values().iterator().next());
 	}
 
 	@Override
@@ -284,8 +263,6 @@ public class AlbumImpl implements Album {
 
 			private Optional<String> description = absent();
 
-			private Optional<String> albumImage = absent();
-
 			@Override
 			public Modifier setTitle(String title) {
 				this.title = fromNullable(title);
@@ -299,12 +276,6 @@ public class AlbumImpl implements Album {
 			}
 
 			@Override
-			public Modifier setAlbumImage(String imageId) {
-				this.albumImage = fromNullable(imageId);
-				return this;
-			}
-
-			@Override
 			public Album update() throws IllegalStateException {
 				if (title.isPresent() && title.get().trim().isEmpty()) {
 					throw new AlbumTitleMustNotBeEmpty();
@@ -314,9 +285,6 @@ public class AlbumImpl implements Album {
 				}
 				if (description.isPresent()) {
 					AlbumImpl.this.description = description.get();
-				}
-				if (albumImage.isPresent()) {
-					AlbumImpl.this.albumImage = albumImage.get();
 				}
 				return AlbumImpl.this;
 			}
@@ -334,9 +302,6 @@ public class AlbumImpl implements Album {
 		hash.putString("ID(").putString(id).putString(")");
 		hash.putString("Title(").putString(title).putString(")");
 		hash.putString("Description(").putString(description).putString(")");
-		if (albumImage != null) {
-			hash.putString("AlbumImage(").putString(albumImage).putString(")");
-		}
 
 		/* add nested albums. */
 		hash.putString("Albums(");

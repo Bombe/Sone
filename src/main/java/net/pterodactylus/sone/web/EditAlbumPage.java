@@ -68,11 +68,6 @@ public class EditAlbumPage extends SoneTemplatePage {
 				webInterface.getCore().touchConfiguration();
 				throw new RedirectException("imageBrowser.html?album=" + album.getParent().getId());
 			}
-			String albumImageId = request.getHttpRequest().getPartAsStringFailsafe("album-image", 36);
-			if (webInterface.getCore().getImage(albumImageId, false) == null) {
-				albumImageId = null;
-			}
-			album.modify().setAlbumImage(albumImageId).update();
 			String title = request.getHttpRequest().getPartAsStringFailsafe("title", 100).trim();
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 1000).trim();
 			try {

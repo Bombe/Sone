@@ -53,7 +53,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 			}
 			backlinks.add(0, new Link("imageBrowser.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
 			return backlinks;
-		} else if ("randomImage".equals(member)) {
+		} else if ("albumImage".equals(member)) {
 			List<Image> images = album.getImages();
 			return images.isEmpty() ? null : images.get(random.nextInt(images.size()));
 		}

@@ -333,15 +333,15 @@ public class ConfigurationSoneParserTest {
 						albumBuilderFactory);
 		assertThat(topLevelAlbums, hasSize(2));
 		Album firstAlbum = topLevelAlbums.get(0);
-		assertThat(firstAlbum, isAlbum("A1", null, "T1", "D1", "I1"));
+		assertThat(firstAlbum, isAlbum("A1", null, "T1", "D1"));
 		assertThat(firstAlbum.getAlbums(), emptyIterable());
 		assertThat(firstAlbum.getImages(), emptyIterable());
 		Album secondAlbum = topLevelAlbums.get(1);
-		assertThat(secondAlbum, isAlbum("A2", null, "T2", "D2", null));
+		assertThat(secondAlbum, isAlbum("A2", null, "T2", "D2"));
 		assertThat(secondAlbum.getAlbums(), hasSize(1));
 		assertThat(secondAlbum.getImages(), emptyIterable());
 		Album thirdAlbum = secondAlbum.getAlbums().get(0);
-		assertThat(thirdAlbum, isAlbum("A3", "A2", "T3", "D3", "I3"));
+		assertThat(thirdAlbum, isAlbum("A3", "A2", "T3", "D3"));
 		assertThat(thirdAlbum.getAlbums(), emptyIterable());
 		assertThat(thirdAlbum.getImages(), emptyIterable());
 	}

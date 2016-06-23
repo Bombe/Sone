@@ -104,7 +104,7 @@ public class AlbumAccessorTest {
 		when(album.getImages()).thenReturn(albumImages);
 		int matchedImage = 0;
 		for (int i = 0; i < 1000; i++) {
-			Image randomImage = (Image) albumAccessor.get(null, album, "randomImage");
+			Image randomImage = (Image) albumAccessor.get(null, album, "albumImage");
 			if (randomImage == image) {
 				matchedImage++;
 			}
@@ -115,7 +115,7 @@ public class AlbumAccessorTest {
 	@Test
 	public void albumImageIsNullIfThereAreNoImagesInAnAlbum() {
 		when(album.getImages()).thenReturn(Collections.<Image>emptyList());
-		assertThat(albumAccessor.get(null, album, "randomImage"), nullValue());
+		assertThat(albumAccessor.get(null, album, "albumImage"), nullValue());
 	}
 
 }

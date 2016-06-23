@@ -46,17 +46,6 @@ public class TestAlbumBuilder implements AlbumBuilder {
 				return description;
 			}
 		});
-		when(album.getAlbumImage()).thenAnswer(new Answer<Image>() {
-			@Override
-			public Image answer(InvocationOnMock invocation) {
-				if (imageId == null) {
-					return null;
-				}
-				Image image = mock(Image.class);
-				when(image.getId()).thenReturn(imageId);
-				return image;
-			}
-		});
 		when(album.getAlbums()).thenReturn(albums);
 		when(album.getImages()).thenReturn(images);
 		doAnswer(new Answer<Void>() {
@@ -97,12 +86,6 @@ public class TestAlbumBuilder implements AlbumBuilder {
 			@Override
 			public Modifier setDescription(String description) {
 				TestAlbumBuilder.this.description = description;
-				return this;
-			}
-
-			@Override
-			public Modifier setAlbumImage(String imageId) {
-				TestAlbumBuilder.this.imageId = imageId;
 				return this;
 			}
 

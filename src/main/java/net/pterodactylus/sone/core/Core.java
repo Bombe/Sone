@@ -1518,7 +1518,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				configuration.getStringValue(albumPrefix + "/Title").setValue(album.getTitle());
 				configuration.getStringValue(albumPrefix + "/Description").setValue(album.getDescription());
 				configuration.getStringValue(albumPrefix + "/Parent").setValue(album.getParent().equals(sone.getRootAlbum()) ? null : album.getParent().getId());
-				configuration.getStringValue(albumPrefix + "/AlbumImage").setValue(album.getAlbumImage() == null ? null : album.getAlbumImage().getId());
 			}
 			configuration.getStringValue(sonePrefix + "/Albums/" + albumCounter + "/ID").setValue(null);
 

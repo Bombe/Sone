@@ -131,7 +131,7 @@ public class MemoryDatabaseTest {
 				.update();
 		Album secondAlbum = new TestAlbumBuilder().withId("album2").by(
 				sone).build().modify().setTitle("album2").setDescription(
-				"album-description2").setAlbumImage("image1").update();
+				"album-description2").update();
 		Album thirdAlbum = new TestAlbumBuilder().withId("album3").by(
 				sone).build().modify().setTitle("album3").setDescription(
 				"album-description3").update();
@@ -192,14 +192,11 @@ public class MemoryDatabaseTest {
 		assertThat(memoryDatabase.getPostReply("reply4").isPresent(),
 				is(false));
 		assertThat(memoryDatabase.getAlbum("album1").get(),
-				isAlbum("album1", null, "album1", "album-description1",
-						null));
+				isAlbum("album1", null, "album1", "album-description1"));
 		assertThat(memoryDatabase.getAlbum("album2").get(),
-				isAlbum("album2", null, "album2", "album-description2",
-						"image1"));
+				isAlbum("album2", null, "album2", "album-description2"));
 		assertThat(memoryDatabase.getAlbum("album3").get(),
-				isAlbum("album3", "album1", "album3", "album-description3",
-						null));
+				isAlbum("album3", "album1", "album3", "album-description3"));
 		assertThat(memoryDatabase.getAlbum("album4").isPresent(), is(false));
 		assertThat(memoryDatabase.getImage("image1").get(),
 				isImage("image1", 1000L, "KSK@image1", "image1",

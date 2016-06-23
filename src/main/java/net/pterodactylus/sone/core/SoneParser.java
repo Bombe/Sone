@@ -261,7 +261,6 @@ public class SoneParser {
 				String parentId = albumXml.getValue("parent", null);
 				String title = albumXml.getValue("title", null);
 				String description = albumXml.getValue("description", "");
-				String albumImageId = albumXml.getValue("album-image", null);
 				if ((id == null) || (title == null)) {
 					logger.log(Level.WARNING, String.format("Downloaded Sone %s contains invalid album!", sone));
 					return null;
@@ -315,7 +314,6 @@ public class SoneParser {
 						allImages.put(imageId, image);
 					}
 				}
-				album.modify().setAlbumImage(albumImageId).update();
 			}
 		}
 

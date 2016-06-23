@@ -623,7 +623,7 @@
 						<%ifnull album.albumImage>
 							<img src="images/unknown-image-0.png" width="333" height="250" alt="<% album.title|html> (<%album.sone.niceName|html>)" title="<% album.title|html> (<%album.sone.niceName|html>)" style="position: relative; top: 0px; left: -41px;" />
 						<%else><!-- TODO -->
-							<% album.randomImage|image-link max-width==250 max-height==250 mode==enlarge title=album.title>
+							<% album.albumImage|image-link max-width==250 max-height==250 mode==enlarge title=album.title>
 						<%/if>
 					</a>
 				</div>

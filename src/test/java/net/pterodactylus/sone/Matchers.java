@@ -109,8 +109,7 @@ public class Matchers {
 
 	public static Matcher<Album> isAlbum(final String albumId,
 			final String parentAlbumId,
-			final String title, final String albumDescription,
-			final String imageId) {
+			final String title, final String albumDescription) {
 		return new TypeSafeDiagnosingMatcher<Album>() {
 			@Override
 			protected boolean matchesSafely(Album album,
@@ -146,22 +145,6 @@ public class Matchers {
 							.appendValue(album.getDescription());
 					return false;
 				}
-				if (imageId == null) {
-					if (album.getAlbumImage() != null) {
-						mismatchDescription.appendText("has album image");
-						return false;
-					}
-				} else {
-					if (album.getAlbumImage() == null) {
-						mismatchDescription.appendText("has no album image");
-						return false;
-					}
-					if (!album.getAlbumImage().getId().equals(imageId)) {
-						mismatchDescription.appendText("has album image ")
-								.appendValue(album.getAlbumImage().getId());
-						return false;
-					}
-				}
 				return true;
 			}
 
@@ -177,12 +160,6 @@ public class Matchers {
 				description.appendText(", has title ").appendValue(title);
 				description.appendText(", has description ")
 						.appendValue(albumDescription);
-				if (imageId == null) {
-					description.appendText(", has no album image");
-				} else {
-					description.appendText(", has album image ")
-							.appendValue(imageId);
-				}
 			}
 		};
 	}
