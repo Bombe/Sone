@@ -19,6 +19,8 @@ package net.pterodactylus.sone.text;
 
 import java.io.IOException;
 import java.io.Reader;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Interface for parsers that can create {@link Part}s from a text source
@@ -39,6 +41,7 @@ public interface Parser<C extends ParserContext> {
 	 *            The text source
 	 * @return The parsed parts
 	 */
-	public Iterable<Part> parse(C context, String source);
+	@Nonnull
+	Iterable<Part> parse(@Nullable C context, @Nonnull String source);
 
 }

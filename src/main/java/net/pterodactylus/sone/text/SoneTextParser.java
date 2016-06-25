@@ -28,6 +28,9 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.IdOnlySone;
@@ -117,8 +120,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nonnull
 	@Override
-	public Iterable<Part> parse(SoneTextParserContext context, String source) {
+	public Iterable<Part> parse(@Nullable SoneTextParserContext context, @Nonnull String source) {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = new BufferedReader(new StringReader(source));
 		try {
