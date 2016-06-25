@@ -108,7 +108,7 @@ public class ParserFilter implements Filter {
 				List<Part> shortenedParts = new ArrayList<Part>();
 				for (Part part : parts) {
 					if (part instanceof PlainTextPart) {
-						String longText = ((PlainTextPart) part).getText();
+						String longText = part.getText();
 						if (allPartsLength < cutOffLength) {
 							if ((allPartsLength + longText.length()) > cutOffLength) {
 								shortenedParts.add(new PlainTextPart(longText.substring(0, cutOffLength - allPartsLength) + "…"));
@@ -121,7 +121,7 @@ public class ParserFilter implements Filter {
 						if (allPartsLength < cutOffLength) {
 							shortenedParts.add(part);
 						}
-						allPartsLength += ((LinkPart) part).getText().length();
+						allPartsLength += part.getText().length();
 					} else {
 						if (allPartsLength < cutOffLength) {
 							shortenedParts.add(part);
