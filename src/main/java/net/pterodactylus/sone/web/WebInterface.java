@@ -21,7 +21,6 @@ import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.util.template.TemplateParser.parse;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,7 +35,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -795,14 +793,10 @@ public class WebInterface {
 	private Collection<Sone> getMentionedSones(String text) {
 		/* we need no context to find mentioned Sones. */
 		Set<Sone> mentionedSones = new HashSet<Sone>();
-		try {
-			for (Part part : soneTextParser.parse(null, text)) {
-				if (part instanceof SonePart) {
-					mentionedSones.add(((SonePart) part).getSone());
-				}
+		for (Part part : soneTextParser.parse(null, text)) {
+			if (part instanceof SonePart) {
+				mentionedSones.add(((SonePart) part).getSone());
 			}
-		} catch (IOException ioe1) {
-			logger.log(Level.WARNING, String.format("Could not parse post text: %s", text), ioe1);
 		}
 		return Collections2.filter(mentionedSones, Sone.LOCAL_SONE_FILTER);
 	}

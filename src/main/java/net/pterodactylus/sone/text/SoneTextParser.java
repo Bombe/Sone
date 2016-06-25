@@ -118,7 +118,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterable<Part> parse(SoneTextParserContext context, String source) throws IOException {
+	public Iterable<Part> parse(SoneTextParserContext context, String source) {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = new BufferedReader(new StringReader(source));
 		try {
@@ -271,6 +271,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				}
 				lastLineEmpty = false;
 			}
+		} catch (IOException ioe1) {
+			// a buffered reader around a string reader should never throw.
+			throw new RuntimeException(ioe1);
 		} finally {
 			Closer.close(bufferedReader);
 		}

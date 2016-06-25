@@ -38,9 +38,7 @@ public interface Parser<C extends ParserContext> {
 	 * @param source
 	 *            The text source
 	 * @return The parsed parts
-	 * @throws IOException
-	 *             if an I/O error occurs
 	 */
-	public Iterable<Part> parse(C context, String source) throws IOException;
+	public Iterable<Part> parse(C context, String source);
 
 }

@@ -101,41 +101,37 @@ public class ParserFilter implements Filter {
 		FreenetRequest request = (FreenetRequest) templateContext.get("request");
 		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);
 		StringWriter parsedTextWriter = new StringWriter();
-		try {
-			Iterable<Part> parts = soneTextParser.parse(context, text);
-			if (length > -1) {
-				int allPartsLength = 0;
-				List<Part> shortenedParts = new ArrayList<Part>();
-				for (Part part : parts) {
-					if (part instanceof PlainTextPart) {
-						String longText = part.getText();
-						if (allPartsLength < cutOffLength) {
-							if ((allPartsLength + longText.length()) > cutOffLength) {
-								shortenedParts.add(new PlainTextPart(longText.substring(0, cutOffLength - allPartsLength) + "…"));
-							} else {
-								shortenedParts.add(part);
-							}
-						}
-						allPartsLength += longText.length();
-					} else if (part instanceof LinkPart) {
-						if (allPartsLength < cutOffLength) {
-							shortenedParts.add(part);
-						}
-						allPartsLength += part.getText().length();
-					} else {
-						if (allPartsLength < cutOffLength) {
+		Iterable<Part> parts = soneTextParser.parse(context, text);
+		if (length > -1) {
+			int allPartsLength = 0;
+			List<Part> shortenedParts = new ArrayList<Part>();
+			for (Part part : parts) {
+				if (part instanceof PlainTextPart) {
+					String longText = part.getText();
+					if (allPartsLength < cutOffLength) {
+						if ((allPartsLength + longText.length()) > cutOffLength) {
+							shortenedParts.add(new PlainTextPart(longText.substring(0, cutOffLength - allPartsLength) + "…"));
+						} else {
 							shortenedParts.add(part);
 						}
 					}
-				}
-				if (allPartsLength >= length) {
-					parts = shortenedParts;
+					allPartsLength += longText.length();
+				} else if (part instanceof LinkPart) {
+					if (allPartsLength < cutOffLength) {
+						shortenedParts.add(part);
+					}
+					allPartsLength += part.getText().length();
+				} else {
+					if (allPartsLength < cutOffLength) {
+						shortenedParts.add(part);
+					}
 				}
 			}
-			render(parsedTextWriter, parts);
-		} catch (IOException ioe1) {
-			/* no exceptions in a StringReader or StringWriter, ignore. */
+			if (allPartsLength >= length) {
+				parts = shortenedParts;
+			}
 		}
+		render(parsedTextWriter, parts);
 		return parsedTextWriter.toString();
 	}
 
@@ -252,26 +248,22 @@ public class ParserFilter implements Filter {
 	private void render(Writer writer, PostPart postPart) {
 		SoneTextParser parser = new SoneTextParser(core, core);
 		SoneTextParserContext parserContext = new SoneTextParserContext(null, postPart.getPost().getSone());
-		try {
-			Iterable<Part> parts = parser.parse(parserContext, postPart.getPost().getText());
-			StringBuilder excerpt = new StringBuilder();
-			for (Part part : parts) {
-				excerpt.append(part.getText());
-				if (excerpt.length() > 20) {
-					int lastSpace = excerpt.lastIndexOf(" ", 20);
-					if (lastSpace > -1) {
-						excerpt.setLength(lastSpace);
-					} else {
-						excerpt.setLength(20);
-					}
-					excerpt.append("…");
-					break;
+		Iterable<Part> parts = parser.parse(parserContext, postPart.getPost().getText());
+		StringBuilder excerpt = new StringBuilder();
+		for (Part part : parts) {
+			excerpt.append(part.getText());
+			if (excerpt.length() > 20) {
+				int lastSpace = excerpt.lastIndexOf(" ", 20);
+				if (lastSpace > -1) {
+					excerpt.setLength(lastSpace);
+				} else {
+					excerpt.setLength(20);
 				}
+				excerpt.append("…");
+				break;
 			}
-			renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), excerpt.toString(), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
-		} catch (IOException ioe1) {
-			/* StringReader shouldn’t throw. */
 		}
+		renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), excerpt.toString(), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
 	}
 
 	/**
