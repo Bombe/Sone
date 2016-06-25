@@ -102,7 +102,7 @@ public class ParserFilter implements Filter {
 		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);
 		StringWriter parsedTextWriter = new StringWriter();
 		try {
-			Iterable<Part> parts = soneTextParser.parse(context, new StringReader(text));
+			Iterable<Part> parts = soneTextParser.parse(context, text);
 			if (length > -1) {
 				int allPartsLength = 0;
 				List<Part> shortenedParts = new ArrayList<Part>();
@@ -253,7 +253,7 @@ public class ParserFilter implements Filter {
 		SoneTextParser parser = new SoneTextParser(core, core);
 		SoneTextParserContext parserContext = new SoneTextParserContext(null, postPart.getPost().getSone());
 		try {
-			Iterable<Part> parts = parser.parse(parserContext, new StringReader(postPart.getPost().getText()));
+			Iterable<Part> parts = parser.parse(parserContext, postPart.getPost().getText());
 			StringBuilder excerpt = new StringBuilder();
 			for (Part part : parts) {
 				excerpt.append(part.getText());

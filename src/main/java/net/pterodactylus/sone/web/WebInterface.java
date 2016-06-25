@@ -796,7 +796,7 @@ public class WebInterface {
 		/* we need no context to find mentioned Sones. */
 		Set<Sone> mentionedSones = new HashSet<Sone>();
 		try {
-			for (Part part : soneTextParser.parse(null, new StringReader(text))) {
+			for (Part part : soneTextParser.parse(null, text)) {
 				if (part instanceof SonePart) {
 					mentionedSones.add(((SonePart) part).getSone());
 				}

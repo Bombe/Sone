@@ -21,7 +21,7 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -118,9 +118,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Iterable<Part> parse(SoneTextParserContext context, Reader source) throws IOException {
+	public Iterable<Part> parse(SoneTextParserContext context, String source) throws IOException {
 		PartContainer parts = new PartContainer();
-		BufferedReader bufferedReader = (source instanceof BufferedReader) ? (BufferedReader) source : new BufferedReader(source);
+		BufferedReader bufferedReader = new BufferedReader(new StringReader(source));
 		try {
 			String line;
 			boolean lastLineEmpty = true;
@@ -272,9 +272,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				lastLineEmpty = false;
 			}
 		} finally {
-			if (bufferedReader != source) {
-				Closer.close(bufferedReader);
-			}
+			Closer.close(bufferedReader);
 		}
 		for (int partIndex = parts.size() - 1; partIndex >= 0; --partIndex) {
 			Part part = parts.getPart(partIndex);
