@@ -122,7 +122,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	 */
 	@Nonnull
 	@Override
-	public Iterable<Part> parse(@Nullable SoneTextParserContext context, @Nonnull String source) {
+	public Iterable<Part> parse(@Nonnull String source, @Nullable SoneTextParserContext context) {
 		PartContainer parts = new PartContainer();
 		BufferedReader bufferedReader = new BufferedReader(new StringReader(source));
 		try {

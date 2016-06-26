@@ -20,7 +20,7 @@ package net.pterodactylus.sone.text;
 /**
  * Context for the {@link Parser}. This interface needs to be implemented by
  * {@link Parser}s that need to provide more information than just the text to
- * parse to {@link Parser#parse(ParserContext, String)}.
+ * parse to {@link Parser#parse(String, ParserContext)}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */

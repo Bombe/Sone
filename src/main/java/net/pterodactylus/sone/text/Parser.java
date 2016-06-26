@@ -35,13 +35,13 @@ public interface Parser<C extends ParserContext> {
 	/**
 	 * Create one or more {@link Part}s from the given text source.
 	 *
-	 * @param context
-	 *            The parser context (may be {@code null})
 	 * @param source
 	 *            The text source
+	 * @param context
+	 *            The parser context (may be {@code null})
 	 * @return The parsed parts
 	 */
 	@Nonnull
-	Iterable<Part> parse(@Nullable C context, @Nonnull String source);
+	Iterable<Part> parse(@Nonnull String source, @Nullable C context);
 
 }

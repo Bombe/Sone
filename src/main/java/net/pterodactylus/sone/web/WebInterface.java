@@ -793,7 +793,7 @@ public class WebInterface {
 	private Collection<Sone> getMentionedSones(String text) {
 		/* we need no context to find mentioned Sones. */
 		Set<Sone> mentionedSones = new HashSet<Sone>();
-		for (Part part : soneTextParser.parse(null, text)) {
+		for (Part part : soneTextParser.parse(text, null)) {
 			if (part instanceof SonePart) {
 				mentionedSones.add(((SonePart) part).getSone());
 			}

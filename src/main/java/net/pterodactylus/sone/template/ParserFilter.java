@@ -101,7 +101,7 @@ public class ParserFilter implements Filter {
 		FreenetRequest request = (FreenetRequest) templateContext.get("request");
 		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);
 		StringWriter parsedTextWriter = new StringWriter();
-		Iterable<Part> parts = soneTextParser.parse(context, text);
+		Iterable<Part> parts = soneTextParser.parse(text, context);
 		if (length > -1) {
 			int allPartsLength = 0;
 			List<Part> shortenedParts = new ArrayList<Part>();
@@ -248,7 +248,7 @@ public class ParserFilter implements Filter {
 	private void render(Writer writer, PostPart postPart) {
 		SoneTextParser parser = new SoneTextParser(core, core);
 		SoneTextParserContext parserContext = new SoneTextParserContext(null, postPart.getPost().getSone());
-		Iterable<Part> parts = parser.parse(parserContext, postPart.getPost().getText());
+		Iterable<Part> parts = parser.parse(postPart.getPost().getText(), parserContext);
 		StringBuilder excerpt = new StringBuilder();
 		for (Part part : parts) {
 			excerpt.append(part.getText());
