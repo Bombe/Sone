@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.text;
 
-import java.io.IOException;
 import java.io.Reader;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

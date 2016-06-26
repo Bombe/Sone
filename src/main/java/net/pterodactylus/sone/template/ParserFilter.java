@@ -20,7 +20,6 @@ package net.pterodactylus.sone.template;
 import static java.lang.String.valueOf;
 import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
