@@ -21,7 +21,9 @@ import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
@@ -64,16 +66,17 @@ public class NewPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 
 		/* collect new elements from notifications. */
-		List<Post> posts = new ArrayList<Post>(webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false)));
+		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false)));
 		for (PostReply reply : webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false))) {
 			posts.add(reply.getPost().get());
 		}
 
 		/* filter and sort them. */
-		Collections.sort(posts, Post.TIME_COMPARATOR);
+		List<Post> sortedPosts = new ArrayList(posts);
+		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 
 		/* paginate them. */
-		Pagination<Post> pagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}
