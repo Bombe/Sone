@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.web.WebTestUtils.redirectsTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -13,7 +14,6 @@ import net.pterodactylus.sone.core.UpdateChecker;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
@@ -21,9 +21,6 @@ import net.pterodactylus.util.web.Method;
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
-import org.hamcrest.Description;
-import org.hamcrest.Matcher;
-import org.hamcrest.TypeSafeDiagnosingMatcher;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -71,24 +68,6 @@ public class UploadImagePageTest {
 		when(httpRequest.getPartAsStringFailsafe(eq("title"), anyInt())).thenReturn("  ");
 		expectedException.expect(redirectsTo("emptyImageTitle.html"));
 		uploadImagePage.processTemplate(request, templateContext);
-	}
-
-	private Matcher<RedirectException> redirectsTo(final String page) {
-		return new TypeSafeDiagnosingMatcher<RedirectException>() {
-			@Override
-			protected boolean matchesSafely(RedirectException exception, Description mismatchDescription) {
-				if (!exception.getTarget().equals(page)) {
-					mismatchDescription.appendText("target is ").appendValue(exception.getTarget());
-					return false;
-				}
-				return true;
-			}
-
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("target is ").appendValue(page);
-			}
-		};
 	}
 
 }
