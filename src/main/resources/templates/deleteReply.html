@@ -7,7 +7,7 @@
 	<form method="post">
 		<input type="hidden" name="formPassword" value="<% formPassword|html>" />
 		<input type="hidden" name="returnPage" value="<% returnPage|html>" />
-		<input type="hidden" name="reply" value="<% reply.id|html>" />
+		<input type="hidden" name="reply" value="<% reply|html>" />
 		<button type="submit" name="confirmDelete" value="1"><%= Page.DeleteReply.Button.Yes|l10n|html></button>
 		<button type="submit" name="abortDelete" value="1"><%= Page.DeleteReply.Button.No|l10n|html></button>
 	</form>
