@@ -58,7 +58,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
-			if (!reply.get().getSone().isLocal()) {
+			if (!reply.isPresent() || !reply.get().getSone().isLocal()) {
 				throw new RedirectException("noPermission.html");
 			}
 			if (request.getHttpRequest().isPartSet("confirmDelete")) {
