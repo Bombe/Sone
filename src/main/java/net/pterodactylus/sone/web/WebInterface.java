@@ -933,12 +933,6 @@ public class WebInterface {
 	@Subscribe
 	public void soneRemoved(SoneRemovedEvent soneRemovedEvent) {
 		newSoneNotification.remove(soneRemovedEvent.sone());
-		for (Post post : soneRemovedEvent.sone().getPosts()) {
-			removePost(post);
-		}
-		for (PostReply postReply : soneRemovedEvent.sone().getReplies()) {
-			removeReply(postReply);
-		}
 	}
 
 	@Subscribe

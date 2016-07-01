@@ -1729,8 +1729,14 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;
 		}
-		database.removeSone(sone.get());
+		for (PostReply postReply : sone.get().getReplies()) {
+			eventBus.post(new PostReplyRemovedEvent(postReply));
+		}
+		for (Post post : sone.get().getPosts()) {
+			eventBus.post(new PostRemovedEvent(post));
+		}
 		eventBus.post(new SoneRemovedEvent(sone.get()));
+		database.removeSone(sone.get());
 	}
 
 	/**
