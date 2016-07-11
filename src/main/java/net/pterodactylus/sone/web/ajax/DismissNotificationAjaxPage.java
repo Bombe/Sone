@@ -1,5 +1,5 @@
 /*
- * Sone - DismissNotificationAjaxPage.java - Copyright © 2010–2015 David Roden
+ * Sone - DismissNotificationAjaxPage.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,8 @@ package net.pterodactylus.sone.web.ajax;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
+
+import com.google.common.base.Optional;
 
 /**
  * AJAX page that lets the user dismiss a notification.
@@ -44,14 +46,14 @@ public class DismissNotificationAjaxPage extends JsonPage {
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		String notificationId = request.getHttpRequest().getParam("notification");
-		Notification notification = webInterface.getNotifications().getNotification(notificationId);
-		if (notification == null) {
+		Optional<Notification> notification = webInterface.getNotification(notificationId);
+		if (!notification.isPresent()) {
 			return createErrorJsonObject("invalid-notification-id");
 		}
-		if (!notification.isDismissable()) {
+		if (!notification.get().isDismissable()) {
 			return createErrorJsonObject("not-dismissable");
 		}
-		notification.dismiss();
+		notification.get().dismiss();
 		return createSuccessJsonObject();
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Sone - NewPage.java - Copyright © 2013–2015 David Roden
+ * Sone - NewPage.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.google.common.collect.Collections2;
-
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.notify.PostVisibilityFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
@@ -37,8 +36,7 @@ import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Page that displays all new posts and replies. The posts are filtered using
- * {@link ListNotificationFilters#filterPosts(java.util.Collection, net.pterodactylus.sone.data.Sone)}
- * and sorted by time.
+ * {@link PostVisibilityFilter#isPostVisible(Sone, Post)} and sorted by time.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
@@ -68,13 +66,13 @@ public class NewPage extends SoneTemplatePage {
 		super.processTemplate(request, templateContext);
 
 		/* collect new elements from notifications. */
-		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts());
-		for (PostReply reply : Collections2.filter(webInterface.getNewReplies(), PostReply.HAS_POST_FILTER)) {
+		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false)));
+		for (PostReply reply : webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false))) {
 			posts.add(reply.getPost().get());
 		}
 
 		/* filter and sort them. */
-		List<Post> sortedPosts = ListNotificationFilters.filterPosts(new ArrayList<Post>(posts), webInterface.getCurrentSone(request.getToadletContext(), false));
+		List<Post> sortedPosts = new ArrayList(posts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 
 		/* paginate them. */

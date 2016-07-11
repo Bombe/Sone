@@ -1,5 +1,5 @@
 /*
- * Sone - IndexPage.java - Copyright © 2010–2015 David Roden
+ * Sone - IndexPage.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,14 +26,13 @@ import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.notify.PostVisibilityFilter;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 
 /**
@@ -44,14 +43,11 @@ import com.google.common.collect.Collections2;
  */
 public class IndexPage extends SoneTemplatePage {
 
-	/**
-	 * @param template
-	 *            The template to render
-	 * @param webInterface
-	 *            The Sone web interface
-	 */
-	public IndexPage(Template template, WebInterface webInterface) {
+	private final PostVisibilityFilter postVisibilityFilter;
+
+	public IndexPage(Template template, WebInterface webInterface, PostVisibilityFilter postVisibilityFilter) {
 		super("index.html", template, "Page.Index.Title", webInterface, true);
+		this.postVisibilityFilter = postVisibilityFilter;
 	}
 
 	//
@@ -81,14 +77,7 @@ public class IndexPage extends SoneTemplatePage {
 				}
 			}
 		}
-		allPosts = Collections2.filter(allPosts, new Predicate<Post>() {
-
-			@Override
-			public boolean apply(Post post) {
-				return ListNotificationFilters.isPostVisible(currentSone, post);
-			}
-		});
-		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
+		allPosts = Collections2.filter(allPosts, postVisibilityFilter.isVisible(currentSone));
 		List<Post> sortedPosts = new ArrayList<Post>(allPosts);
 		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
 		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));

@@ -1,5 +1,5 @@
 /*
- * Sone - DismissNotificationPage.java - Copyright © 2010–2015 David Roden
+ * Sone - DismissNotificationPage.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
+
+import com.google.common.base.Optional;
 
 /**
  * Page that lets the user dismiss a notification.
@@ -52,9 +54,9 @@ public class DismissNotificationPage extends SoneTemplatePage {
 	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		String notificationId = request.getHttpRequest().getPartAsStringFailsafe("notification", 36);
-		Notification notification = webInterface.getNotifications().getNotification(notificationId);
-		if ((notification != null) && notification.isDismissable()) {
-			notification.dismiss();
+		Optional<Notification> notification = webInterface.getNotification(notificationId);
+		if (notification.isPresent() && notification.get().isDismissable()) {
+			notification.get().dismiss();
 		}
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		throw new RedirectException(returnPage);

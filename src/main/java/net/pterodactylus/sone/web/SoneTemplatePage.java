@@ -1,5 +1,5 @@
 /*
- * Sone - SoneTemplatePage.java - Copyright © 2010–2015 David Roden
+ * Sone - SoneTemplatePage.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package net.pterodactylus.sone.web;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,19 +28,18 @@ import java.util.Map;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 /**
  * Base page for the Sone web interface.
@@ -56,21 +56,6 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 
 	/** Whether to require a login. */
 	private final boolean requireLogin;
-
-	/**
-	 * Creates a new template page for Sone that does not require the user to be
-	 * logged in.
-	 *
-	 * @param path
-	 *            The path of the page
-	 * @param template
-	 *            The template to render
-	 * @param webInterface
-	 *            The Sone web interface
-	 */
-	public SoneTemplatePage(String path, Template template, WebInterface webInterface) {
-		this(path, template, null, webInterface, false);
-	}
 
 	/**
 	 * Creates a new template page for Sone that does not require the user to be
@@ -263,7 +248,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
 		templateContext.set("latestVersionTime", webInterface.getCore().getUpdateChecker().getLatestVersionDate());
-		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
+		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications(currentSone));
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		templateContext.set("notifications", notifications);
 		templateContext.set("notificationHash", notifications.hashCode());

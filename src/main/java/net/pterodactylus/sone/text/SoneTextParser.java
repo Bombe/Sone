@@ -1,5 +1,5 @@
 /*
- * Sone - SoneTextParser.java - Copyright © 2010–2015 David Roden
+ * Sone - SoneTextParser.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,12 +21,15 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.Reader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
@@ -117,10 +120,11 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nonnull
 	@Override
-	public Iterable<Part> parse(SoneTextParserContext context, Reader source) throws IOException {
+	public Iterable<Part> parse(@Nonnull String source, @Nullable SoneTextParserContext context) {
 		PartContainer parts = new PartContainer();
-		BufferedReader bufferedReader = (source instanceof BufferedReader) ? (BufferedReader) source : new BufferedReader(source);
+		BufferedReader bufferedReader = new BufferedReader(new StringReader(source));
 		try {
 			String line;
 			boolean lastLineEmpty = true;
@@ -271,10 +275,11 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				}
 				lastLineEmpty = false;
 			}
+		} catch (IOException ioe1) {
+			// a buffered reader around a string reader should never throw.
+			throw new RuntimeException(ioe1);
 		} finally {
-			if (bufferedReader != source) {
-				Closer.close(bufferedReader);
-			}
+			Closer.close(bufferedReader);
 		}
 		for (int partIndex = parts.size() - 1; partIndex >= 0; --partIndex) {
 			Part part = parts.getPart(partIndex);

@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>net.pterodactylus</groupId>
 	<artifactId>sone</artifactId>
-	<version>0.9.4</version>
+	<version>0.9.5</version>
 	<dependencies>
 		<dependency>
 			<groupId>net.pterodactylus</groupId>
@@ -118,6 +118,7 @@
 				<artifactId>maven-assembly-plugin</artifactId>
 				<version>2.2-beta-5</version>
 				<configuration>
+					<finalName>sone</finalName>
 					<descriptorRefs>
 						<descriptorRef>jar-with-dependencies</descriptorRef>
 					</descriptorRefs>
@@ -154,7 +155,7 @@
 			<plugin>
 				<groupId>org.jacoco</groupId>
 				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.7.1.201405082137</version>
+				<version>0.7.6.201602180812</version>
 				<executions>
 					<execution>
 						<id>default-prepare-agent</id>
@@ -192,6 +193,19 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.pitest</groupId>
+				<artifactId>pitest-maven</artifactId>
+				<version>1.1.10</version>
+				<configuration>
+					<targetClasses>
+						<param>net.pterodactylus.sone.*</param>
+					</targetClasses>
+					<targetTests>
+						<param>net.pterodactylus.sone.*</param>
+					</targetTests>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

@@ -1,5 +1,5 @@
 /*
- * Sone - GetStatusAjaxPage.java - Copyright © 2010–2015 David Roden
+ * Sone - GetStatusAjaxPage.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -31,7 +32,8 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
+import net.pterodactylus.sone.notify.PostVisibilityFilter;
+import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -40,8 +42,6 @@ import net.pterodactylus.util.notify.Notification;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
@@ -88,20 +88,11 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonSones.add(createJsonSone(sone));
 		}
 		/* load notifications. */
-		List<Notification> notifications = ListNotificationFilters.filterNotifications(webInterface.getNotifications().getNotifications(), currentSone);
+		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications(currentSone));
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		/* load new posts. */
-		Collection<Post> newPosts = webInterface.getNewPosts();
-		if (currentSone != null) {
-			newPosts = Collections2.filter(newPosts, new Predicate<Post>() {
+		Collection<Post> newPosts = webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false));
 
-				@Override
-				public boolean apply(Post post) {
-					return ListNotificationFilters.isPostVisible(currentSone, post);
-				}
-
-			});
-		}
 		ArrayNode jsonPosts = new ArrayNode(instance);
 		for (Post post : newPosts) {
 			ObjectNode jsonPost = new ObjectNode(instance);
@@ -112,19 +103,8 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
-		Collection<PostReply> newReplies = webInterface.getNewReplies();
-		if (currentSone != null) {
-			newReplies = Collections2.filter(newReplies, new Predicate<PostReply>() {
+		Collection<PostReply> newReplies = webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false));
 
-				@Override
-				public boolean apply(PostReply reply) {
-					return ListNotificationFilters.isReplyVisible(currentSone, reply);
-				}
-
-			});
-		}
-		/* remove replies to unknown posts. */
-		newReplies = Collections2.filter(newReplies, PostReply.HAS_POST_FILTER);
 		ArrayNode jsonReplies = new ArrayNode(instance);
 		for (PostReply reply : newReplies) {
 			ObjectNode jsonReply = new ObjectNode(instance);

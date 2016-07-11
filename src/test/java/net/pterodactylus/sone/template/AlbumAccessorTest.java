@@ -1,15 +1,22 @@
 package net.pterodactylus.sone.template;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.lessThanOrEqualTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.TestUtil;
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 
@@ -88,6 +95,27 @@ public class AlbumAccessorTest {
 				description.appendText(", named ").appendValue(name);
 			}
 		};
+	}
+
+	@Test
+	public void albumImageIsGeneratedRandomly() {
+		Image image = mock(Image.class);
+		List<Image> albumImages = Arrays.asList(mock(Image.class), image);
+		when(album.getImages()).thenReturn(albumImages);
+		int matchedImage = 0;
+		for (int i = 0; i < 1000; i++) {
+			Image randomImage = (Image) albumAccessor.get(null, album, "albumImage");
+			if (randomImage == image) {
+				matchedImage++;
+			}
+		}
+		assertThat(matchedImage, allOf(greaterThanOrEqualTo(250), lessThanOrEqualTo(750)));
+	}
+
+	@Test
+	public void albumImageIsNullIfThereAreNoImagesInAnAlbum() {
+		when(album.getImages()).thenReturn(Collections.<Image>emptyList());
+		assertThat(albumAccessor.get(null, album, "albumImage"), nullValue());
 	}
 
 }

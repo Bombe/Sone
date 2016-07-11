@@ -1,5 +1,5 @@
 /*
- * Sone - SoneTextParserTest.java - Copyright © 2011–2015 David Roden
+ * Sone - SoneTextParserTest.java - Copyright © 2011–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.text;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -53,17 +52,17 @@ public class SoneTextParserTest extends TestCase {
 		Iterable<Part> parts;
 
 		/* check basic operation. */
-		parts = soneTextParser.parse(null, new StringReader("Test."));
+		parts = soneTextParser.parse("Test.", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Test.", convertText(parts, PlainTextPart.class));
 
 		/* check empty lines at start and end. */
-		parts = soneTextParser.parse(null, new StringReader("\nTest.\n\n"));
+		parts = soneTextParser.parse("\nTest.\n\n", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Test.", convertText(parts, PlainTextPart.class));
 
 		/* check duplicate empty lines in the text. */
-		parts = soneTextParser.parse(null, new StringReader("\nTest.\n\n\nTest."));
+		parts = soneTextParser.parse("\nTest.\n\n\nTest.", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Test.\n\nTest.", convertText(parts, PlainTextPart.class));
 	}
@@ -80,17 +79,17 @@ public class SoneTextParserTest extends TestCase {
 		Iterable<Part> parts;
 
 		/* check basic links. */
-		parts = soneTextParser.parse(null, new StringReader("KSK@gpl.txt"));
+		parts = soneTextParser.parse("KSK@gpl.txt", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "[KSK@gpl.txt|gpl.txt|gpl.txt]", convertText(parts, FreenetLinkPart.class));
 
 		/* check embedded links. */
-		parts = soneTextParser.parse(null, new StringReader("Link is KSK@gpl.txt\u200b."));
+		parts = soneTextParser.parse("Link is KSK@gpl.txt\u200b.", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\u200b.", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
 
 		/* check embedded links and line breaks. */
-		parts = soneTextParser.parse(null, new StringReader("Link is KSK@gpl.txt\nKSK@test.dat\n"));
+		parts = soneTextParser.parse("Link is KSK@gpl.txt\nKSK@test.dat\n", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
 	}
@@ -107,7 +106,7 @@ public class SoneTextParserTest extends TestCase {
 		Iterable<Part> parts;
 
 		/* check basic links. */
-		parts = soneTextParser.parse(null, new StringReader("Some text.\n\nLink to sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU and stuff."));
+		parts = soneTextParser.parse("Some text.\n\nLink to sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU and stuff.", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", convertText(parts, PlainTextPart.class, SonePart.class));
 	}
@@ -125,7 +124,7 @@ public class SoneTextParserTest extends TestCase {
 		Iterable<Part> parts;
 
 		/* check empty http links. */
-		parts = soneTextParser.parse(null, new StringReader("Some text. Empty link: http:// – nice!"));
+		parts = soneTextParser.parse("Some text. Empty link: http:// – nice!", null);
 		assertNotNull("Parts", parts);
 		assertEquals("Part Text", "Some text. Empty link: http:// – nice!", convertText(parts, PlainTextPart.class));
 	}

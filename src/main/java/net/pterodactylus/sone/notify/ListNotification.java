@@ -1,5 +1,5 @@
 /*
- * Sone - ListNotification.java - Copyright © 2010–2015 David Roden
+ * Sone - ListNotification.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -194,15 +194,7 @@ public class ListNotification<T> extends TemplateNotification {
 		if (!key.equals(listNotification.key)) {
 			return false;
 		}
-		if (elements.size() != listNotification.elements.size()) {
-			return false;
-		}
-		for (int index = 0; index < elements.size(); ++index) {
-			if (!elements.get(index).equals(listNotification.elements.get(index))) {
-				return false;
-			}
-		}
-		return true;
+		return elements.equals(listNotification.elements);
 	}
 
 }

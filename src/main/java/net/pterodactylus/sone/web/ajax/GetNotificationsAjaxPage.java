@@ -1,5 +1,5 @@
 /*
- * Sone - GetNotificationsAjaxPage.java - Copyright © 2011–2015 David Roden
+ * Sone - GetNotificationsAjaxPage.java - Copyright © 2011–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,13 +21,12 @@ import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.notify.ListNotificationFilters;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
@@ -81,14 +80,13 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
-		Collection<Notification> notifications = webInterface.getNotifications().getNotifications();
-		List<Notification> filteredNotifications = ListNotificationFilters.filterNotifications(notifications, currentSone);
-		Collections.sort(filteredNotifications, Notification.CREATED_TIME_SORTER);
+		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications(currentSone));
+		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		ArrayNode jsonNotifications = new ArrayNode(instance);
-		for (Notification notification : filteredNotifications) {
+		for (Notification notification : notifications) {
 			jsonNotifications.add(createJsonNotification(request, notification));
 		}
-		return createSuccessJsonObject().put("notificationHash", filteredNotifications.hashCode()).put("notifications", jsonNotifications).put("options", createJsonOptions(currentSone));
+		return createSuccessJsonObject().put("notificationHash", notifications.hashCode()).put("notifications", jsonNotifications).put("options", createJsonOptions(currentSone));
 	}
 
 	//

@@ -718,6 +718,7 @@ function ajaxifyPost(postElement) {
 					sone.find(".post#post-" + postId + " .create-reply .sender").hide();
 					sone.find(".post#post-" + postId + " .create-reply .select-sender").show();
 					sone.find(".post#post-" + postId + " .create-reply :input[name=sender]").val(getCurrentSoneId());
+					updateReplyTimes(replyId);
 				} else {
 					alert(error);
 				}

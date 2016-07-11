@@ -1,5 +1,5 @@
 /*
- * Sone - Album.java - Copyright © 2011–2015 David Roden
+ * Sone - Album.java - Copyright © 2011–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -206,14 +206,6 @@ public interface Album extends Identified, Fingerprintable {
 	Image moveImageDown(Image image);
 
 	/**
-	 * Returns the album image of this album, or {@code null} if no album image has
-	 * been set.
-	 *
-	 * @return The image to show when this album is listed
-	 */
-	Image getAlbumImage();
-
-	/**
 	 * Returns whether this album contains any other albums or images.
 	 *
 	 * @return {@code true} if this album is empty, {@code false} otherwise
@@ -287,8 +279,6 @@ public interface Album extends Identified, Fingerprintable {
 		Modifier setTitle(String title);
 
 		Modifier setDescription(String description);
-
-		Modifier setAlbumImage(String imageId);
 
 		Album update() throws IllegalStateException;
 

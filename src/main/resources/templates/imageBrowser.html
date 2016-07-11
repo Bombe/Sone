@@ -353,17 +353,6 @@
 						<input type="hidden" name="formPassword" value="<%formPassword|html>" />
 						<input type="hidden" name="album" value="<%album.id|html>" />
 
-						<%if ! album.images.empty>
-							<div>
-								<label for="album-image"><%= Page.ImageBrowser.Album.Label.AlbumImage|l10n|html></label>
-								<select name="album-image">
-									<option disabled="disabled"><%= Page.ImageBrowser.Album.AlbumImage.Choose|l10n|html></option>
-									<%foreach album.images image>
-										<option value="<% image.id|html>"<%if album.albumImage.id|match value=image.id> selected="selected"<%/if>><% image.title|html></option>
-									<%/foreach>
-								</select>
-							</div>
-						<%/if>
 						<div>
 							<label for="title"><%= Page.ImageBrowser.Album.Label.Title|l10n|html></label>
 							<input type="text" name="title" value="<%album.title|html>" />

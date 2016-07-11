@@ -201,8 +201,6 @@ public class ConfigurationSoneParser {
 			String albumDescription =
 					getString(albumPrefix + "/Description", null);
 			String albumParentId = getString(albumPrefix + "/Parent", null);
-			String albumImageId =
-					getString(albumPrefix + "/AlbumImage", null);
 			if ((albumTitle == null) || (albumDescription == null)) {
 				throw new InvalidAlbumFound();
 			}
@@ -213,7 +211,6 @@ public class ConfigurationSoneParser {
 					.modify()
 					.setTitle(albumTitle)
 					.setDescription(albumDescription)
-					.setAlbumImage(albumImageId)
 					.update();
 			if (albumParentId != null) {
 				Album parentAlbum = albums.get(albumParentId);

@@ -243,7 +243,6 @@ public class SoneParserTest {
 	@Before
 	public void setupAlbum() {
 		final Album album = SoneParserTest.this.album;
-		when(album.getAlbumImage()).thenReturn(mock(Image.class));
 		doAnswer(new Answer<Void>() {
 			@Override
 			public Void answer(InvocationOnMock invocation) {
@@ -273,7 +272,6 @@ public class SoneParserTest {
 		final Modifier albumModifier = new Modifier() {
 			private String title = album.getTitle();
 			private String description = album.getDescription();
-			private String imageId = album.getAlbumImage().getId();
 
 			@Override
 			public Modifier setTitle(String title) {
@@ -288,18 +286,9 @@ public class SoneParserTest {
 			}
 
 			@Override
-			public Modifier setAlbumImage(String imageId) {
-				this.imageId = imageId;
-				return this;
-			}
-
-			@Override
 			public Album update() throws IllegalStateException {
 				when(album.getTitle()).thenReturn(title);
 				when(album.getDescription()).thenReturn(description);
-				Image image = mock(Image.class);
-				when(image.getId()).thenReturn(imageId);
-				when(album.getAlbumImage()).thenReturn(image);
 				return album;
 			}
 		};

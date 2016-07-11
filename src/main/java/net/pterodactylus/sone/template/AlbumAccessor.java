@@ -1,5 +1,5 @@
 /*
- * Sone - AlbumAccessor.java - Copyright © 2011–2015 David Roden
+ * Sone - AlbumAccessor.java - Copyright © 2011–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@ package net.pterodactylus.sone.template;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateContext;
@@ -33,6 +35,8 @@ import net.pterodactylus.util.template.TemplateContext;
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AlbumAccessor extends ReflectionAccessor {
+
+	private final Random random = new Random();
 
 	/**
 	 * {@inheritDoc}
@@ -49,6 +53,9 @@ public class AlbumAccessor extends ReflectionAccessor {
 			}
 			backlinks.add(0, new Link("imageBrowser.html?sone=" + album.getSone().getId(), SoneAccessor.getNiceName(album.getSone())));
 			return backlinks;
+		} else if ("albumImage".equals(member)) {
+			List<Image> images = album.getImages();
+			return images.isEmpty() ? null : images.get(random.nextInt(images.size()));
 		}
 		return super.get(templateContext, object, member);
 	}

@@ -1,5 +1,5 @@
 /*
- * Sone - UploadImagePage.java - Copyright © 2011–2015 David Roden
+ * Sone - UploadImagePage.java - Copyright © 2011–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -91,7 +91,10 @@ public class UploadImagePage extends SoneTemplatePage {
 			if (!currentSone.equals(parent.getSone())) {
 				throw new RedirectException("noPermission.html");
 			}
-			String name = request.getHttpRequest().getPartAsStringFailsafe("title", 200);
+			String name = request.getHttpRequest().getPartAsStringFailsafe("title", 200).trim();
+			if (name.length() == 0) {
+				throw new RedirectException("emptyImageTitle.html");
+			}
 			String description = request.getHttpRequest().getPartAsStringFailsafe("description", 4000);
 			HTTPUploadedFile uploadedFile = request.getHttpRequest().getUploadedFile("image");
 			Bucket fileBucket = uploadedFile.getData();

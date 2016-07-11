@@ -1,5 +1,5 @@
 /*
- * Sone - GetTimesAjaxPage.java - Copyright © 2010–2015 David Roden
+ * Sone - GetTimesAjaxPage.java - Copyright © 2010–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify it under
  * the terms of the GNU General Public License as published by the Free Software
@@ -150,10 +150,10 @@ public class GetTimesAjaxPage extends JsonPage {
 		String text;
 		long refresh;
 		if (age < 0) {
-			text = webInterface.getL10n().getDefaultString("View.Time.InTheFuture");
+			text = webInterface.getL10n().getString("View.Time.InTheFuture");
 			refresh = TimeUnit.MINUTES.toMillis(5);
 		} else if (age < TimeUnit.SECONDS.toMillis(20)) {
-			text = webInterface.getL10n().getDefaultString("View.Time.AFewSecondsAgo");
+			text = webInterface.getL10n().getString("View.Time.AFewSecondsAgo");
 			refresh = TimeUnit.SECONDS.toMillis(10);
 		} else if (age < TimeUnit.SECONDS.toMillis(45)) {
 			text = webInterface.getL10n().getString("View.Time.HalfAMinuteAgo");
