@@ -124,6 +124,22 @@ public class SoneTextParserTest {
 		assertThat("Part Text", "Some text (and a link: [http://example.sone/abc_(def)|example.sone/abc_(def)|example.sone/abc_(def)]) – nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
 	}
 
+	@Test
+	public void punctuationIsIgnoredAtEndOfLinkBeforeWhitespace() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc. Nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]. Nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
+
+	@Test
+	public void multiplePunctuationCharactersAreIgnoredAtEndOfLinkBeforeWhitespace() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc... Nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]... Nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
+
 	/**
 	 * Converts all given {@link Part}s into a string, validating that the
 	 * part’s classes match only the expected classes.

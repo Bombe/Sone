@@ -296,6 +296,13 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			return line.length();
 		}
 		int nextWhitespace = matcher.start();
+		int lastPunctuation = nextWhitespace;
+		while (isPunctuation(line.charAt(lastPunctuation - 1))) {
+			lastPunctuation -= 1;
+		}
+		if (lastPunctuation < nextWhitespace) {
+			return lastPunctuation;
+		}
 		int openParens = 0;
 		for (int i = 0; i < nextWhitespace; i++) {
 			switch (line.charAt(i)) {
@@ -311,6 +318,10 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			}
 		}
 		return nextWhitespace;
+	}
+
+	private boolean isPunctuation(char character) {
+		return character == '.';
 	}
 
 	private static class NextLink {
