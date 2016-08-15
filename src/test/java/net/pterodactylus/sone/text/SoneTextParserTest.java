@@ -40,16 +40,6 @@ import org.junit.Test;
  */
 public class SoneTextParserTest {
 
-	//
-	// ACTIONS
-	//
-
-	/**
-	 * Tests basic plain-text operation of the parser.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testPlainText() throws IOException {
@@ -72,12 +62,6 @@ public class SoneTextParserTest {
 		assertThat("Part Text", "Test.\n\nTest.", is(convertText(parts, PlainTextPart.class)));
 	}
 
-	/**
-	 * Tests parsing of KSK links.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings("static-method")
 	@Test
 	public void testKSKLinks() throws IOException {
@@ -100,12 +84,6 @@ public class SoneTextParserTest {
 		assertThat("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]", is(convertText(parts, PlainTextPart.class, FreenetLinkPart.class)));
 	}
 
-	/**
-	 * Test case for a bug that was discovered in 0.6.7.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings({ "synthetic-access", "static-method" })
 	@Test
 	public void testEmptyLinesAndSoneLinks() throws IOException {
@@ -118,13 +96,6 @@ public class SoneTextParserTest {
 		assertThat("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", is(convertText(parts, PlainTextPart.class, SonePart.class)));
 	}
 
-	/**
-	 * Test for a bug discovered in Sone 0.8.4 where a plain “http://” would be
-	 * parsed into a link.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings({ "synthetic-access", "static-method" })
 	@Test
 	public void testEmpyHttpLinks() throws IOException {
@@ -137,9 +108,6 @@ public class SoneTextParserTest {
 		assertThat("Part Text", "Some text. Empty link: http:// – nice!", is(convertText(parts, PlainTextPart.class)));
 	}
 
-	//
-	// PRIVATE METHODS
-	//
 
 	/**
 	 * Converts all given {@link Part}s into a string, validating that the
