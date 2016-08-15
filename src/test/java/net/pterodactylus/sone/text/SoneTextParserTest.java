@@ -108,6 +108,21 @@ public class SoneTextParserTest {
 		assertThat("Part Text", "Some text. Empty link: http:// – nice!", is(convertText(parts, PlainTextPart.class)));
 	}
 
+	@Test
+	public void httpLinkWithoutParensEndsAtNextClosingParen() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc) – nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text (and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]) – nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
+
+	@Test
+	public void httpLinkWithOpenedAndClosedParensEndsAtNextClosingParen() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc_(def)) – nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text (and a link: [http://example.sone/abc_(def)|example.sone/abc_(def)|example.sone/abc_(def)]) – nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
 
 	/**
 	 * Converts all given {@link Part}s into a string, validating that the

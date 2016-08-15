@@ -175,9 +175,8 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 					lineComplete = false;
 
-					Matcher matcher = whitespacePattern.matcher(line);
-					int nextSpace = matcher.find(0) ? matcher.start() : line.length();
-					String link = line.substring(0, nextSpace);
+					int endOfLink = findEndOfLink(line);
+					String link = line.substring(0, endOfLink);
 					String name = link;
 					logger.log(Level.FINER, String.format("Found link: %s", link));
 
@@ -271,7 +270,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						}
 						parts.add(new LinkPart(link, name));
 					}
-					line = line.substring(nextSpace);
+					line = line.substring(endOfLink);
 				}
 				lastLineEmpty = false;
 			}
@@ -289,6 +288,29 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			parts.removePart(partIndex);
 		}
 		return parts;
+	}
+
+	private int findEndOfLink(String line) {
+		Matcher matcher = whitespacePattern.matcher(line);
+		if (!matcher.find(0)) {
+			return line.length();
+		}
+		int nextWhitespace = matcher.start();
+		int openParens = 0;
+		for (int i = 0; i < nextWhitespace; i++) {
+			switch (line.charAt(i)) {
+				case '(':
+					openParens++;
+					break;
+				case ')':
+					openParens--;
+					if (openParens < 0) {
+						return i;
+					}
+				default:
+			}
+		}
+		return nextWhitespace;
 	}
 
 	private static class NextLink {
