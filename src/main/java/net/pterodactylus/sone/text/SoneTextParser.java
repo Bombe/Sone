@@ -321,7 +321,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	}
 
 	private boolean isPunctuation(char character) {
-		return character == '.';
+		return (character == '.') || (character == ',');
 	}
 
 	private static class NextLink {
