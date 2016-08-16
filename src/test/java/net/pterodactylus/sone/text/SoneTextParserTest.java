@@ -17,8 +17,12 @@
 
 package net.pterodactylus.sone.text;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.isIn;
+import static org.hamcrest.Matchers.notNullValue;
+
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 
 import net.pterodactylus.sone.data.Sone;
@@ -27,111 +31,114 @@ import net.pterodactylus.sone.database.SoneProvider;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * JUnit test case for {@link SoneTextParser}.
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class SoneTextParserTest extends TestCase {
+public class SoneTextParserTest {
 
-	//
-	// ACTIONS
-	//
-
-	/**
-	 * Tests basic plain-text operation of the parser.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings("static-method")
+	@Test
 	public void testPlainText() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts;
 
 		/* check basic operation. */
 		parts = soneTextParser.parse("Test.", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Test.", convertText(parts, PlainTextPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Test.", is(convertText(parts, PlainTextPart.class)));
 
 		/* check empty lines at start and end. */
 		parts = soneTextParser.parse("\nTest.\n\n", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Test.", convertText(parts, PlainTextPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Test.", is(convertText(parts, PlainTextPart.class)));
 
 		/* check duplicate empty lines in the text. */
 		parts = soneTextParser.parse("\nTest.\n\n\nTest.", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Test.\n\nTest.", convertText(parts, PlainTextPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Test.\n\nTest.", is(convertText(parts, PlainTextPart.class)));
 	}
 
-	/**
-	 * Tests parsing of KSK links.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings("static-method")
+	@Test
 	public void testKSKLinks() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts;
 
 		/* check basic links. */
 		parts = soneTextParser.parse("KSK@gpl.txt", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "[KSK@gpl.txt|gpl.txt|gpl.txt]", convertText(parts, FreenetLinkPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "[KSK@gpl.txt|gpl.txt|gpl.txt]", is(convertText(parts, FreenetLinkPart.class)));
 
 		/* check embedded links. */
 		parts = soneTextParser.parse("Link is KSK@gpl.txt\u200b.", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\u200b.", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\u200b.", is(convertText(parts, PlainTextPart.class, FreenetLinkPart.class)));
 
 		/* check embedded links and line breaks. */
 		parts = soneTextParser.parse("Link is KSK@gpl.txt\nKSK@test.dat\n", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]", convertText(parts, PlainTextPart.class, FreenetLinkPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]", is(convertText(parts, PlainTextPart.class, FreenetLinkPart.class)));
 	}
 
-	/**
-	 * Test case for a bug that was discovered in 0.6.7.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings({ "synthetic-access", "static-method" })
+	@Test
 	public void testEmptyLinesAndSoneLinks() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(new TestSoneProvider(), null);
 		Iterable<Part> parts;
 
 		/* check basic links. */
 		parts = soneTextParser.parse("Some text.\n\nLink to sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU and stuff.", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", convertText(parts, PlainTextPart.class, SonePart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff.", is(convertText(parts, PlainTextPart.class, SonePart.class)));
 	}
 
-	/**
-	 * Test for a bug discovered in Sone 0.8.4 where a plain “http://” would be
-	 * parsed into a link.
-	 *
-	 * @throws IOException
-	 *             if an I/O error occurs
-	 */
 	@SuppressWarnings({ "synthetic-access", "static-method" })
+	@Test
 	public void testEmpyHttpLinks() throws IOException {
 		SoneTextParser soneTextParser = new SoneTextParser(new TestSoneProvider(), null);
 		Iterable<Part> parts;
 
 		/* check empty http links. */
 		parts = soneTextParser.parse("Some text. Empty link: http:// – nice!", null);
-		assertNotNull("Parts", parts);
-		assertEquals("Part Text", "Some text. Empty link: http:// – nice!", convertText(parts, PlainTextPart.class));
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text. Empty link: http:// – nice!", is(convertText(parts, PlainTextPart.class)));
 	}
 
-	//
-	// PRIVATE METHODS
-	//
+	@Test
+	public void httpLinkWithoutParensEndsAtNextClosingParen() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc) – nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text (and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]) – nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
+
+	@Test
+	public void httpLinkWithOpenedAndClosedParensEndsAtNextClosingParen() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc_(def)) – nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text (and a link: [http://example.sone/abc_(def)|example.sone/abc_(def)|example.sone/abc_(def)]) – nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
+
+	@Test
+	public void punctuationIsIgnoredAtEndOfLinkBeforeWhitespace() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc. Nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]. Nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
+
+	@Test
+	public void multiplePunctuationCharactersAreIgnoredAtEndOfLinkBeforeWhitespace() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc... Nice!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", "Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]... Nice!", is(convertText(parts, PlainTextPart.class, LinkPart.class)));
+	}
 
 	/**
 	 * Converts all given {@link Part}s into a string, validating that the
@@ -147,16 +154,9 @@ public class SoneTextParserTest extends TestCase {
 	private static String convertText(Iterable<Part> parts, Class<?>... validClasses) {
 		StringBuilder text = new StringBuilder();
 		for (Part part : parts) {
-			assertNotNull("Part", part);
-			boolean classValid = validClasses.length == 0;
-			for (Class<?> validClass : validClasses) {
-				if (validClass.isAssignableFrom(part.getClass())) {
-					classValid = true;
-					break;
-				}
-			}
-			if (!classValid) {
-				fail("Part’s Class (" + part.getClass() + ") is not one of " + Arrays.toString(validClasses));
+			assertThat("Part", part, notNullValue());
+			if (validClasses.length != 0) {
+				assertThat("Part’s class", part.getClass(), isIn(validClasses));
 			}
 			if (part instanceof PlainTextPart) {
 				text.append(((PlainTextPart) part).getText());
