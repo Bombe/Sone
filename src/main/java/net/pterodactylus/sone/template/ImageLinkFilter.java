@@ -45,7 +45,7 @@ import com.google.common.base.Optional;
 public class ImageLinkFilter implements Filter {
 
 	/** The template to render for the &lt;img&gt; tag. */
-	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<img<%ifnull !class> class=\"<%class|css>\"<%/if> src=\"<%src|html><%if forceDownload>?forcedownload=true<%/if>\" alt=\"<%alt|html>\" title=\"<%title|html>\" width=\"<%width|html>\" height=\"<%height|html>\" style=\"position: relative;<%ifnull ! top>top: <% top|html>;<%/if><%ifnull ! left>left: <% left|html>;<%/if>\"/>"));
+	private static final Template linkTemplate = TemplateParser.parse(new StringReader("<img<%ifnull !class> class=\"<%class|css>\"<%/if> src=\"<%src|html>\" alt=\"<%alt|html>\" title=\"<%title|html>\" width=\"<%width|html>\" height=\"<%height|html>\" style=\"position: relative;<%ifnull ! top>top: <% top|html>;<%/if><%ifnull ! left>left: <% left|html>;<%/if>\"/>"));
 
 	/** The core. */
 	private final Core core;
@@ -90,7 +90,6 @@ public class ImageLinkFilter implements Filter {
 		linkTemplateContext.set("class", imageClass);
 		if (image.isInserted()) {
 			linkTemplateContext.set("src", "/" + image.getKey());
-			linkTemplateContext.set("forceDownload", true);
 		} else {
 			linkTemplateContext.set("src", "getImage.html?image=" + image.getId());
 		}
