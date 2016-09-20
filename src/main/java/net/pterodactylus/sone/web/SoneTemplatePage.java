@@ -243,7 +243,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
 		templateContext.set("request", request);
-		templateContext.set("currentVersion", SonePlugin.VERSION);
+		templateContext.set("currentVersion", SonePlugin.getPluginVersion());
 		templateContext.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
 		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());

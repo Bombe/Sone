@@ -260,7 +260,7 @@ public class SoneInserterTest {
 		assertThat(manifestElement.getName(), is("test.txt"));
 		assertThat(manifestElement.getMimeTypeOverride(), is("plain/text; charset=utf-8"));
 		String templateContent = new String(toByteArray(manifestElement.getData().getInputStream()), Charsets.UTF_8);
-		assertThat(templateContent, containsString("Sone Version: " + SonePlugin.VERSION.toString() + "\n"));
+		assertThat(templateContent, containsString("Sone Version: " + SonePlugin.getPluginVersion() + "\n"));
 		assertThat(templateContent, containsString("Core Startup: " + now + "\n"));
 		assertThat(templateContent, containsString("Sone ID: " + "SoneId" + "\n"));
 	}

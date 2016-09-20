@@ -393,7 +393,7 @@ public class SoneInserter extends AbstractService {
 			templateContext.set("core", core);
 			templateContext.set("currentSone", soneProperties);
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
-			templateContext.set("version", SonePlugin.VERSION);
+			templateContext.set("version", SonePlugin.getPluginVersion());
 			StringWriter writer = new StringWriter();
 			try {
 				template.render(templateContext, writer);

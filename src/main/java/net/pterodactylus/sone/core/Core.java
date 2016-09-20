@@ -643,7 +643,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		Sone sone = database.newSoneBuilder().local().from(ownIdentity).build();
 		String property = fromNullable(ownIdentity.getProperty("Sone.LatestEdition")).or("0");
 		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
-		sone.setClient(new Client("Sone", SonePlugin.VERSION.toString()));
+		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
 		eventBus.register(soneInserter);

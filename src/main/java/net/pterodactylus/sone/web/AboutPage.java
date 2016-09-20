@@ -29,11 +29,11 @@ import net.pterodactylus.util.version.Version;
  */
 public class AboutPage extends SoneTemplatePage {
 
-	private final Version version;
+	private final String version;
 	private final int year;
 	private final String homepage;
 
-	public AboutPage(Template template, WebInterface webInterface, Version version, int year, String homepage) {
+	public AboutPage(Template template, WebInterface webInterface, String version, int year, String homepage) {
 		super("about.html", template, "Page.About.Title", webInterface, false);
 		this.version = version;
 		this.year = year;

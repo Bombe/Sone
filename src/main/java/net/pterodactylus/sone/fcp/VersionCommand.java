@@ -45,7 +45,7 @@ public class VersionCommand extends AbstractSoneCommand {
 	 */
 	@Override
 	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
-		return new Response("Version", new SimpleFieldSetBuilder().put("Version", SonePlugin.VERSION.toString()).put("ProtocolVersion", 1).get());
+		return new Response("Version", new SimpleFieldSetBuilder().put("Version", SonePlugin.getPluginVersion()).put("ProtocolVersion", 1).get());
 	}
 
 }

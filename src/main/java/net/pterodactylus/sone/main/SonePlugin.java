@@ -116,7 +116,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The version. */
-	public static final Version VERSION = new Version(0, 9, 5);
+	private static final Version VERSION = new Version(0, 9, 5);
 
 	/** The current year at time of release. */
 	private static final int YEAR = 2016;
@@ -173,6 +173,10 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	public PluginL10n l10n() {
 		return l10n;
+	}
+
+	public static String getPluginVersion() {
+		return VERSION.toString();
 	}
 
 	public static int getYear() {
