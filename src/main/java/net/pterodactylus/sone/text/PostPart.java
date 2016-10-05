@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.text;
 
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Post;
 
 /**
@@ -26,39 +30,17 @@ import net.pterodactylus.sone.data.Post;
  */
 public class PostPart implements Part {
 
-	/** The post this part refers to. */
 	private final Post post;
 
-	/**
-	 * Creates a new post part.
-	 *
-	 * @param post
-	 *            The referenced post
-	 */
-	public PostPart(Post post) {
-		this.post = post;
+	public PostPart(@Nonnull Post post) {
+		this.post = Objects.requireNonNull(post);
 	}
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the post referenced by this part.
-	 *
-	 * @return The post referenced by this part
-	 */
+	@Nonnull
 	public Post getPost() {
 		return post;
 	}
 
-	//
-	// PART METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String getText() {
 		return post.getText();

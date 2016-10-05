@@ -30,4 +30,9 @@ public class PostPartTest {
 		assertThat(part.getText(), is("text"));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForPost() {
+	    new PostPart(null);
+	}
+
 }
