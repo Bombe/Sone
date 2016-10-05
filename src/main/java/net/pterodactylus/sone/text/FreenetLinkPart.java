@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.text;
 
+import javax.annotation.Nonnull;
+
 /**
  * {@link LinkPart} implementation that stores an additional attribute: if the
  * link is an SSK or USK link and the post was created by an identity that owns
@@ -26,49 +28,17 @@ package net.pterodactylus.sone.text;
  */
 public class FreenetLinkPart extends LinkPart {
 
-	/** Whether the link is trusted. */
 	private final boolean trusted;
 
-	/**
-	 * Creates a new freenet link part.
-	 *
-	 * @param link
-	 *            The link of the part
-	 * @param text
-	 *            The text of the part
-	 * @param trusted
-	 *            {@code true} if the link is trusted, {@code false} otherwise
-	 */
-	public FreenetLinkPart(String link, String text, boolean trusted) {
+	public FreenetLinkPart(@Nonnull String link, @Nonnull String text, boolean trusted) {
 		this(link, text, text, trusted);
 	}
 
-	/**
-	 * Creates a new freenet link part.
-	 *
-	 * @param link
-	 *            The link of the part
-	 * @param text
-	 *            The text of the part
-	 * @param title
-	 *            The title of the part
-	 * @param trusted
-	 *            {@code true} if the link is trusted, {@code false} otherwise
-	 */
-	public FreenetLinkPart(String link, String text, String title, boolean trusted) {
+	public FreenetLinkPart(@Nonnull String link, @Nonnull String text, @Nonnull String title, boolean trusted) {
 		super(link, text, title);
 		this.trusted = trusted;
 	}
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns whether the link is trusted.
-	 *
-	 * @return {@code true} if the link is trusted, {@code false} otherwise
-	 */
 	public boolean isTrusted() {
 		return trusted;
 	}

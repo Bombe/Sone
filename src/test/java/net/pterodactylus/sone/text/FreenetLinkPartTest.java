@@ -39,4 +39,29 @@ public class FreenetLinkPartTest {
 		assertThat(new FreenetLinkPart("link", "text", true).getTitle(), is("text"));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForLink() {
+		new FreenetLinkPart(null, "text", "title", true);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForText() {
+		new FreenetLinkPart("link", null, "title", true);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForLinkInSecondaryConstructor() {
+		new FreenetLinkPart(null, "text", true);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForTextInSecondaryConstructor() {
+		new FreenetLinkPart("link", null, true);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForTitle() {
+		new FreenetLinkPart("link", "text", null, true);
+	}
+
 }
