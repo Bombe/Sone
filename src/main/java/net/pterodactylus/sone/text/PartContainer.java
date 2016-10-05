@@ -23,6 +23,9 @@ import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
 
 /**
  * Part implementation that can contain an arbitrary amount of other parts.
@@ -33,61 +36,27 @@ import java.util.NoSuchElementException;
  */
 public class PartContainer implements Part, Iterable<Part> {
 
-	/** The parts to render. */
 	private final List<Part> parts = new ArrayList<Part>();
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Adds a part to render.
-	 *
-	 * @param part
-	 *            The part to add
-	 */
-	public void add(Part part) {
-		parts.add(part);
+	public void add(@Nonnull Part part) {
+		parts.add(Objects.requireNonNull(part));
 	}
 
-	/**
-	 * Returns the part at the given index.
-	 *
-	 * @param index
-	 *            The index of the part
-	 * @return The part
-	 */
+	@Nonnull
 	public Part getPart(int index) {
 		return parts.get(index);
 	}
 
-	/**
-	 * Removes the part at the given index.
-	 *
-	 * @param index
-	 *            The index of the part to remove
-	 */
 	public void removePart(int index) {
 		parts.remove(index);
 	}
 
-	/**
-	 * Returns the number of parts.
-	 *
-	 * @return The number of parts
-	 */
 	public int size() {
 		return parts.size();
 	}
 
-	//
-	// PART METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
+	@Nonnull
 	public String getText() {
 		StringBuilder partText = new StringBuilder();
 		for (Part part : parts) {
@@ -96,14 +65,8 @@ public class PartContainer implements Part, Iterable<Part> {
 		return partText.toString();
 	}
 
-	//
-	// ITERABLE METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
+	@Nonnull
 	@SuppressWarnings("synthetic-access")
 	public Iterator<Part> iterator() {
 		return new Iterator<Part>() {

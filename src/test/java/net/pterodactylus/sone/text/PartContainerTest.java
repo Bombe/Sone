@@ -24,6 +24,11 @@ public class PartContainerTest {
 		assertThat(container.size(), is(0));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void canNotAddNullPart() {
+	    container.add(null);
+	}
+
 	@Test
 	public void containerWithSinglePartHasSizeOne() {
 		container.add(mock(Part.class));
