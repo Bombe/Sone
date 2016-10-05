@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.text;
 
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
 
@@ -27,39 +31,17 @@ import net.pterodactylus.sone.template.SoneAccessor;
  */
 public class SonePart implements Part {
 
-	/** The referenced {@link Sone}. */
 	private final Sone sone;
 
-	/**
-	 * Creates a new Sone part.
-	 *
-	 * @param sone
-	 *            The referenced Sone
-	 */
-	public SonePart(Sone sone) {
-		this.sone = sone;
+	public SonePart(@Nonnull Sone sone) {
+		this.sone = Objects.requireNonNull(sone);
 	}
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the referenced Sone.
-	 *
-	 * @return The referenced Sone
-	 */
+	@Nonnull
 	public Sone getSone() {
 		return sone;
 	}
 
-	//
-	// PART METHODS
-	//
-
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	public String getText() {
 		return SoneAccessor.getNiceName(sone);

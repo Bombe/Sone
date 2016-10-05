@@ -34,4 +34,9 @@ public class SonePartTest {
 		assertThat(part.getText(), is("sone"));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForSone() {
+	    new SonePart(null);
+	}
+
 }
