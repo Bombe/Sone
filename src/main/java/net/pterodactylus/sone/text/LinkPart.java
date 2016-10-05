@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.text;
 
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
 /**
  * {@link Part} implementation that can hold a link. A link contains of three
  * attributes: the link itself, the text that is shown instead of the link, and
@@ -26,75 +30,32 @@ package net.pterodactylus.sone.text;
  */
 public class LinkPart implements Part {
 
-	/** The link of this part. */
 	private final String link;
-
-	/** The text of this part. */
 	private final String text;
-
-	/** The title of this part. */
 	private final String title;
 
-	/**
-	 * Creates a new link part.
-	 *
-	 * @param link
-	 *            The link of the link part
-	 * @param text
-	 *            The text of the link part
-	 */
-	public LinkPart(String link, String text) {
+	public LinkPart(@Nonnull String link, @Nonnull String text) {
 		this(link, text, text);
 	}
 
-	/**
-	 * Creates a new link part.
-	 *
-	 * @param link
-	 *            The link of the link part
-	 * @param text
-	 *            The text of the link part
-	 * @param title
-	 *            The title of the link part
-	 */
-	public LinkPart(String link, String text, String title) {
-		this.link = link;
-		this.text = text;
-		this.title = title;
+	public LinkPart(@Nonnull String link, @Nonnull String text, @Nonnull String title) {
+		this.link = Objects.requireNonNull(link);
+		this.text = Objects.requireNonNull(text);
+		this.title = Objects.requireNonNull(title);
 	}
 
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the link of this part.
-	 *
-	 * @return The link of this part
-	 */
+	@Nonnull
 	public String getLink() {
 		return link;
 	}
 
-	/**
-	 * Returns the title of this part.
-	 *
-	 * @return The title of this part
-	 */
+	@Nonnull
 	public String getTitle() {
 		return title;
 	}
 
-	//
-	// PART METHODS
-	//
-
-	/**
-	 * Returns the text of this part.
-	 *
-	 * @return The text of this part
-	 */
 	@Override
+	@Nonnull
 	public String getText() {
 		return text;
 	}

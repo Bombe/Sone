@@ -34,4 +34,29 @@ public class LinkPartTest {
 		assertThat(new LinkPart("link", "text").getTitle(), is("text"));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForLink() {
+		new LinkPart(null, "text", "title");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForText() {
+		new LinkPart("link", null, "title");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForLinkInSecondaryConstructor() {
+		new LinkPart(null, "text");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForTextInSecondaryConstructor() {
+		new LinkPart("link", null);
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForTitle() {
+		new LinkPart("link", "text", null);
+	}
+
 }
