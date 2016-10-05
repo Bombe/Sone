@@ -17,6 +17,10 @@
 
 package net.pterodactylus.sone.text;
 
+import java.util.Objects;
+
+import javax.annotation.Nonnull;
+
 /**
  * {@link Part} implementation that holds a single piece of text.
  *
@@ -24,29 +28,14 @@ package net.pterodactylus.sone.text;
  */
 public class PlainTextPart implements Part {
 
-	/** The text of the part. */
 	private final String text;
 
-	/**
-	 * Creates a new plain-text part.
-	 *
-	 * @param text
-	 *            The text of the part
-	 */
-	public PlainTextPart(String text) {
-		this.text = text;
+	public PlainTextPart(@Nonnull String text) {
+		this.text = Objects.requireNonNull(text);
 	}
 
-	//
-	// PART METHODS
-	//
-
-	/**
-	 * Returns the text of this part.
-	 *
-	 * @return The text of this part
-	 */
 	@Override
+	@Nonnull
 	public String getText() {
 		return text;
 	}

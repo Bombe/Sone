@@ -19,4 +19,9 @@ public class PlainTextPartTest {
 		assertThat(part.getText(), is("text"));
 	}
 
+	@Test(expected = NullPointerException.class)
+	public void nullIsNotAllowedForText() {
+	    new PlainTextPart(null);
+	}
+
 }
