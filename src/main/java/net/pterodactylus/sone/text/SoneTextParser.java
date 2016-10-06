@@ -177,7 +177,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 					int endOfLink = findEndOfLink(line);
 					String link = line.substring(0, endOfLink);
-					String name = link;
 					logger.log(Level.FINER, String.format("Found link: %s", link));
 
 					/* if there is no text after the scheme, it’s not a link! */
@@ -187,89 +186,25 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						continue;
 					}
 
-					if (linkType == LinkType.SONE) {
-						if (line.length() >= (7 + 43)) {
-							String soneId = line.substring(7, 50);
-							Optional<Sone> sone = soneProvider.getSone(soneId);
-							if (!sone.isPresent()) {
-								/*
-								 * don’t use create=true above, we don’t want
-								 * the empty shell.
-								 */
-								sone = Optional.<Sone>of(new IdOnlySone(soneId));
-							}
-							parts.add(new SonePart(sone.get()));
-							line = line.substring(50);
-						} else {
-							parts.add(new PlainTextPart(line));
-							line = "";
-						}
-						continue;
-					}
-					if (linkType == LinkType.POST) {
-						if (line.length() >= (7 + 36)) {
-							String postId = line.substring(7, 43);
-							Optional<Post> post = postProvider.getPost(postId);
-							if (post.isPresent()) {
-								parts.add(new PostPart(post.get()));
-							} else {
-								parts.add(new PlainTextPart(line.substring(0, 43)));
-							}
-							line = line.substring(43);
-						} else {
-							parts.add(new PlainTextPart(line));
-							line = "";
-						}
-						continue;
+					switch (linkType) {
+						case SONE:
+							renderSoneLink(parts, link);
+							break;
+						case POST:
+							renderPostLink(parts, link);
+							break;
+						case KSK:
+						case CHK:
+						case SSK:
+						case USK:
+							renderFreenetLink(parts, link, linkType, context);
+							break;
+						case HTTP:
+						case HTTPS:
+							renderHttpLink(parts, link, linkType);
+							break;
 					}
 
-					if (linkType.isFreenetLink()) {
-						FreenetURI uri;
-						if (name.indexOf('?') > -1) {
-							name = name.substring(0, name.indexOf('?'));
-						}
-						if (name.endsWith("/")) {
-							name = name.substring(0, name.length() - 1);
-						}
-						try {
-							uri = new FreenetURI(name);
-							name = uri.lastMetaString();
-							if (name == null) {
-								name = uri.getDocName();
-							}
-							if (name == null) {
-								name = link.substring(0, Math.min(9, link.length()));
-							}
-							boolean fromPostingSone = ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (context != null) && (context.getPostingSone() != null) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
-							parts.add(new FreenetLinkPart(link, name, fromPostingSone));
-						} catch (MalformedURLException mue1) {
-							/* not a valid link, insert as plain text. */
-							parts.add(new PlainTextPart(link));
-						} catch (NullPointerException npe1) {
-							/* FreenetURI sometimes throws these, too. */
-							parts.add(new PlainTextPart(link));
-						} catch (ArrayIndexOutOfBoundsException aioobe1) {
-							/* oh, and these, too. */
-							parts.add(new PlainTextPart(link));
-						}
-					} else if ((linkType == LinkType.HTTP) || (linkType == LinkType.HTTPS)) {
-						name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
-						int firstSlash = name.indexOf('/');
-						int lastSlash = name.lastIndexOf('/');
-						if ((lastSlash - firstSlash) > 3) {
-							name = name.substring(0, firstSlash + 1) + "…" + name.substring(lastSlash);
-						}
-						if (name.endsWith("/")) {
-							name = name.substring(0, name.length() - 1);
-						}
-						if (((name.indexOf('/') > -1) && (name.indexOf('.') < name.lastIndexOf('.', name.indexOf('/'))) || ((name.indexOf('/') == -1) && (name.indexOf('.') < name.lastIndexOf('.')))) && name.startsWith("www.")) {
-							name = name.substring(4);
-						}
-						if (name.indexOf('?') > -1) {
-							name = name.substring(0, name.indexOf('?'));
-						}
-						parts.add(new LinkPart(link, name));
-					}
 					line = line.substring(endOfLink);
 				}
 				lastLineEmpty = false;
@@ -288,6 +223,81 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			parts.removePart(partIndex);
 		}
 		return parts;
+	}
+
+	private void renderSoneLink(PartContainer parts, String line) {
+		if (line.length() >= (7 + 43)) {
+			String soneId = line.substring(7, 50);
+			Optional<Sone> sone = soneProvider.getSone(soneId);
+			parts.add(new SonePart(sone.or(new IdOnlySone(soneId))));
+		} else {
+			parts.add(new PlainTextPart(line));
+		}
+	}
+
+	private void renderPostLink(PartContainer parts, String line) {
+		if (line.length() >= (7 + 36)) {
+			String postId = line.substring(7, 43);
+			Optional<Post> post = postProvider.getPost(postId);
+			if (post.isPresent()) {
+				parts.add(new PostPart(post.get()));
+			} else {
+				parts.add(new PlainTextPart(line.substring(0, 43)));
+			}
+		} else {
+			parts.add(new PlainTextPart(line));
+		}
+	}
+
+	private void renderFreenetLink(PartContainer parts, String link, LinkType linkType, @Nullable SoneTextParserContext context) {
+		String name = link;
+		if (name.indexOf('?') > -1) {
+			name = name.substring(0, name.indexOf('?'));
+		}
+		if (name.endsWith("/")) {
+			name = name.substring(0, name.length() - 1);
+		}
+		try {
+			FreenetURI uri = new FreenetURI(name);
+			name = uri.lastMetaString();
+			if (name == null) {
+				name = uri.getDocName();
+			}
+			if (name == null) {
+				name = link.substring(0, Math.min(9, link.length()));
+			}
+			boolean fromPostingSone = ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (context != null) && (context.getPostingSone() != null) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
+			parts.add(new FreenetLinkPart(link, name, fromPostingSone));
+		} catch (MalformedURLException mue1) {
+			/* not a valid link, insert as plain text. */
+			parts.add(new PlainTextPart(link));
+		} catch (NullPointerException npe1) {
+			/* FreenetURI sometimes throws these, too. */
+			parts.add(new PlainTextPart(link));
+		} catch (ArrayIndexOutOfBoundsException aioobe1) {
+			/* oh, and these, too. */
+			parts.add(new PlainTextPart(link));
+		}
+	}
+
+	private void renderHttpLink(PartContainer parts, String link, LinkType linkType) {
+		String name;
+		name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
+		int firstSlash = name.indexOf('/');
+		int lastSlash = name.lastIndexOf('/');
+		if ((lastSlash - firstSlash) > 3) {
+			name = name.substring(0, firstSlash + 1) + "…" + name.substring(lastSlash);
+		}
+		if (name.endsWith("/")) {
+			name = name.substring(0, name.length() - 1);
+		}
+		if (((name.indexOf('/') > -1) && (name.indexOf('.') < name.lastIndexOf('.', name.indexOf('/'))) || ((name.indexOf('/') == -1) && (name.indexOf('.') < name.lastIndexOf('.')))) && name.startsWith("www.")) {
+			name = name.substring(4);
+		}
+		if (name.indexOf('?') > -1) {
+			name = name.substring(0, name.indexOf('?'));
+		}
+		parts.add(new LinkPart(link, name));
 	}
 
 	private int findEndOfLink(String line) {
