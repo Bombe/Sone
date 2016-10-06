@@ -25,8 +25,10 @@ import static org.hamcrest.Matchers.notNullValue;
 import java.io.IOException;
 import java.util.Collection;
 
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.IdOnlySone;
+import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 
 import com.google.common.base.Function;
@@ -59,6 +61,175 @@ public class SoneTextParserTest {
 		parts = soneTextParser.parse("\nTest.\n\n\nTest.", null);
 		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class), is("Test.\n\nTest."));
+	}
+
+	@Test
+	public void consecutiveLinesAreSeparatedByLinefeed() {
+		Iterable<Part> parts = soneTextParser.parse("Text.\nText", null);
+		assertThat("Part Text", convertText(parts), is("Text.\nText"));
+	}
+
+	@Test
+	public void freenetLinksHaveTheFreenetPrefixRemoved() {
+		Iterable<Part> parts = soneTextParser.parse("freenet:KSK@gpl.txt", null);
+		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt|gpl.txt|gpl.txt]"));
+	}
+
+	@Test
+	public void onlyTheFirstItemInALineIsPrefixedWithALineBreak() {
+		Iterable<Part> parts = soneTextParser.parse("Text.\nKSK@gpl.txt and KSK@gpl.txt", null);
+		assertThat("Part Text", convertText(parts), is("Text.\n[KSK@gpl.txt|gpl.txt|gpl.txt] and [KSK@gpl.txt|gpl.txt|gpl.txt]"));
+	}
+
+	@Test
+	public void soneLinkWithTooShortSoneIdIsRenderedAsPlainText() {
+		Iterable<Part> parts = soneTextParser.parse("sone://too-short", null);
+		assertThat("Part Text", convertText(parts), is("sone://too-short"));
+	}
+
+	@Test
+	public void soneLinkIsRenderedCorrectlyIfSoneIsNotPresent() {
+		SoneTextParser parser = new SoneTextParser(new AbsentSoneProvider(), null);
+		Iterable<Part> parts = parser.parse("sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU", null);
+		assertThat("Part Text", convertText(parts), is("[Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU]"));
+	}
+
+	@Test
+	public void postLinkIsRenderedAsPlainTextIfPostIdIsTooShort() {
+		Iterable<Part> parts = soneTextParser.parse("post://too-short", null);
+		assertThat("Part Text", convertText(parts), is("post://too-short"));
+	}
+
+	@Test
+	public void postLinkIsRenderedCorrectlyIfPostIsPresent() {
+		SoneTextParser parser = new SoneTextParser(null, new TestPostProvider());
+		Iterable<Part> parts = parser.parse("post://f3757817-b45a-497a-803f-9c5aafc10dc6", null);
+		assertThat("Part Text", convertText(parts), is("[Post|f3757817-b45a-497a-803f-9c5aafc10dc6|text]"));
+	}
+
+	@Test
+	public void postLinkIsRenderedAsPlainTextIfPostIsAbsent() {
+		SoneTextParser parser = new SoneTextParser(null, new AbsentPostProvider());
+		Iterable<Part> parts = parser.parse("post://f3757817-b45a-497a-803f-9c5aafc10dc6", null);
+		assertThat("Part Text", convertText(parts), is("post://f3757817-b45a-497a-803f-9c5aafc10dc6"));
+	}
+
+	@Test
+	public void nameOfFreenetLinkDoesNotContainUrlParameters() {
+	    Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt?max-size=12345", null);
+		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt?max-size=12345|gpl.txt|gpl.txt]"));
+	}
+
+	@Test
+	public void trailingSlashInFreenetLinkIsRemovedForName() {
+		Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt/", null);
+		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt/|gpl.txt|gpl.txt]"));
+	}
+
+	@Test
+	public void lastMetaStringOfFreenetLinkIsUsedAsName() {
+		Iterable<Part> parts = soneTextParser.parse("CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/COPYING", null);
+		assertThat("Part Text", convertText(parts), is("[CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/COPYING|COPYING|COPYING]"));
+	}
+
+	@Test
+	public void freenetLinkWithoutMetaStringsAndDocNameGetsFirstNineCharactersOfKeyAsName() {
+		Iterable<Part> parts = soneTextParser.parse("CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8", null);
+		assertThat("Part Text", convertText(parts), is("[CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8|CHK@qM1nm|CHK@qM1nm]"));
+	}
+
+	@Test
+	public void malformedKeyIsRenderedAsPlainText() {
+		Iterable<Part> parts = soneTextParser.parse("CHK@qM1nmgU", null);
+		assertThat("Part Text", convertText(parts), is("CHK@qM1nmgU"));
+	}
+
+	@Test
+	public void httpsLinkHasItsPathsShortened() {
+		Iterable<Part> parts = soneTextParser.parse("https://test.test/some-long-path/file.txt", null);
+		assertThat("Part Text", convertText(parts), is("[https://test.test/some-long-path/file.txt|test.test/…/file.txt|test.test/…/file.txt]"));
+	}
+
+	@Test
+	public void httpLinksHaveTheirLastSlashRemoved() {
+	    Iterable<Part> parts = soneTextParser.parse("http://test.test/test/", null);
+		assertThat("Part Text", convertText(parts), is("[http://test.test/test/|test.test/…|test.test/…]"));
+	}
+
+	@Test
+	public void wwwPrefixIsRemovedForHostnameWithTwoDotsAndNoPath() {
+		Iterable<Part> parts = soneTextParser.parse("http://www.test.test", null);
+		assertThat("Part Text", convertText(parts), is("[http://www.test.test|test.test|test.test]"));
+	}
+
+	@Test
+	public void wwwPrefixIsRemovedForHostnameWithTwoDotsAndAPath() {
+		Iterable<Part> parts = soneTextParser.parse("http://www.test.test/test.html", null);
+		assertThat("Part Text", convertText(parts), is("[http://www.test.test/test.html|test.test/test.html|test.test/test.html]"));
+	}
+
+	@Test
+	public void hostnameIsKeptIntactIfNotBeginningWithWww() {
+		Iterable<Part> parts = soneTextParser.parse("http://test.test.test/test.html", null);
+		assertThat("Part Text", convertText(parts), is("[http://test.test.test/test.html|test.test.test/test.html|test.test.test/test.html]"));
+	}
+
+	@Test
+	public void hostnameWithOneDotButNoSlashIsKeptIntact() {
+		Iterable<Part> parts = soneTextParser.parse("http://test.test", null);
+		assertThat("Part Text", convertText(parts), is("[http://test.test|test.test|test.test]"));
+	}
+
+	@Test
+	public void urlParametersAreRemovedForHttpLinks() {
+		Iterable<Part> parts = soneTextParser.parse("http://test.test?foo=bar", null);
+		assertThat("Part Text", convertText(parts), is("[http://test.test?foo=bar|test.test|test.test]"));
+	}
+
+	@Test
+	public void emptyStringIsParsedCorrectly() {
+		Iterable<Part> parts = soneTextParser.parse("", null);
+		assertThat("Part Text", convertText(parts), is(""));
+	}
+
+	@Test
+	public void linksAreParsedInCorrectOrder() {
+		Iterable<Part> parts = soneTextParser.parse("KSK@ CHK@", null);
+		assertThat("Part Text", convertText(parts), is("KSK@ CHK@"));
+	}
+
+	@Test
+	public void sskLinkWithoutContextIsNotTrusted() {
+		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", null);
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
+	}
+
+	@Test
+	public void sskLinkWithContextWithoutSoneIsNotTrusted() {
+		SoneTextParserContext context = new SoneTextParserContext(null, null);
+		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
+	}
+
+	@Test
+	public void sskLinkWithContextWithDifferentSoneIsNotTrusted() {
+		SoneTextParserContext context = new SoneTextParserContext(null, new IdOnlySone("DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU"));
+		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
+	}
+
+	@Test
+	public void sskLinkWithContextWithCorrectSoneIsTrusted() {
+		SoneTextParserContext context = new SoneTextParserContext(null, new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
+		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|trusted|test|test]"));
+	}
+
+	@Test
+	public void uskLinkWithContextWithCorrectSoneIsTrusted() {
+		SoneTextParserContext context = new SoneTextParserContext(null, new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
+		Iterable<Part> parts = soneTextParser.parse("USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0", context);
+		assertThat("Part Text", convertText(parts), is("[USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|trusted|test|test]"));
 	}
 
 	@SuppressWarnings("static-method")
@@ -168,6 +339,9 @@ public class SoneTextParserTest {
 			} else if (part instanceof SonePart) {
 				SonePart sonePart = (SonePart) part;
 				text.append("[Sone|").append(sonePart.getSone().getId()).append(']');
+			} else if (part instanceof PostPart) {
+				PostPart postPart = (PostPart) part;
+				text.append("[Post|").append(postPart.getPost().getId()).append("|").append(postPart.getPost().getText()).append("]");
 			}
 		}
 		return text.toString();
@@ -220,6 +394,88 @@ public class SoneTextParserTest {
 		@Override
 		public Collection<Sone> getRemoteSones() {
 			return null;
+		}
+
+	}
+
+	private static class AbsentSoneProvider extends TestSoneProvider {
+
+		@Override
+		public Optional<Sone> getSone(String soneId) {
+			return Optional.absent();
+		}
+
+	}
+
+	private static class TestPostProvider implements PostProvider {
+
+		@Override
+		public Optional<Post> getPost(final String postId) {
+			return Optional.<Post>of(new Post() {
+				@Override
+				public String getId() {
+					return postId;
+				}
+
+				@Override
+				public boolean isLoaded() {
+					return false;
+				}
+
+				@Override
+				public Sone getSone() {
+					return null;
+				}
+
+				@Override
+				public Optional<String> getRecipientId() {
+					return null;
+				}
+
+				@Override
+				public Optional<Sone> getRecipient() {
+					return null;
+				}
+
+				@Override
+				public long getTime() {
+					return 0;
+				}
+
+				@Override
+				public String getText() {
+					return "text";
+				}
+
+				@Override
+				public boolean isKnown() {
+					return false;
+				}
+
+				@Override
+				public Post setKnown(boolean known) {
+					return null;
+				}
+			});
+		}
+
+		@Override
+		public Collection<Post> getPosts(String soneId) {
+			return null;
+		}
+
+		@Override
+		public Collection<Post> getDirectedPosts(String recipientId) {
+			return null;
+		}
+
+	}
+
+	private static class AbsentPostProvider extends TestPostProvider {
+
+		@Override
+		public Optional<Post> getPost(String postId) {
+			return Optional.absent();
 		}
 
 	}
