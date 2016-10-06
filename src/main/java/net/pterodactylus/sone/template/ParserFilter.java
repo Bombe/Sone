@@ -39,7 +39,6 @@ import net.pterodactylus.sone.text.PostPart;
 import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.text.SoneTextParserContext;
-import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -97,8 +96,7 @@ public class ParserFilter implements Filter {
 		if (sone instanceof String) {
 			sone = core.getSone((String) sone).orNull();
 		}
-		FreenetRequest request = (FreenetRequest) templateContext.get("request");
-		SoneTextParserContext context = new SoneTextParserContext(request, (Sone) sone);
+		SoneTextParserContext context = new SoneTextParserContext((Sone) sone);
 		StringWriter parsedTextWriter = new StringWriter();
 		Iterable<Part> parts = soneTextParser.parse(text, context);
 		if (length > -1) {
@@ -246,7 +244,7 @@ public class ParserFilter implements Filter {
 	 */
 	private void render(Writer writer, PostPart postPart) {
 		SoneTextParser parser = new SoneTextParser(core, core);
-		SoneTextParserContext parserContext = new SoneTextParserContext(null, postPart.getPost().getSone());
+		SoneTextParserContext parserContext = new SoneTextParserContext(postPart.getPost().getSone());
 		Iterable<Part> parts = parser.parse(postPart.getPost().getText(), parserContext);
 		StringBuilder excerpt = new StringBuilder();
 		for (Part part : parts) {

@@ -206,28 +206,28 @@ public class SoneTextParserTest {
 
 	@Test
 	public void sskLinkWithContextWithoutSoneIsNotTrusted() {
-		SoneTextParserContext context = new SoneTextParserContext(null, null);
+		SoneTextParserContext context = new SoneTextParserContext(null);
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
 		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
 	}
 
 	@Test
 	public void sskLinkWithContextWithDifferentSoneIsNotTrusted() {
-		SoneTextParserContext context = new SoneTextParserContext(null, new IdOnlySone("DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU"));
+		SoneTextParserContext context = new SoneTextParserContext(new IdOnlySone("DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU"));
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
 		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
 	}
 
 	@Test
 	public void sskLinkWithContextWithCorrectSoneIsTrusted() {
-		SoneTextParserContext context = new SoneTextParserContext(null, new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
+		SoneTextParserContext context = new SoneTextParserContext(new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
 		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|trusted|test|test]"));
 	}
 
 	@Test
 	public void uskLinkWithContextWithCorrectSoneIsTrusted() {
-		SoneTextParserContext context = new SoneTextParserContext(null, new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
+		SoneTextParserContext context = new SoneTextParserContext(new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
 		Iterable<Part> parts = soneTextParser.parse("USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0", context);
 		assertThat("Part Text", convertText(parts), is("[USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|trusted|test|test]"));
 	}

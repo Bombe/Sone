@@ -29,32 +29,17 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  */
 public class SoneTextParserContext implements ParserContext {
 
-	/** The request being processed. */
-	private final FreenetRequest request;
-
 	/** The posting Sone. */
 	private final Sone postingSone;
 
 	/**
 	 * Creates a new link parser context.
 	 *
-	 * @param request
-	 *            The request being processed
 	 * @param postingSone
 	 *            The posting Sone
 	 */
-	public SoneTextParserContext(FreenetRequest request, Sone postingSone) {
-		this.request = request;
+	public SoneTextParserContext(Sone postingSone) {
 		this.postingSone = postingSone;
-	}
-
-	/**
-	 * Returns the request that is currently being processed.
-	 *
-	 * @return The request being processed
-	 */
-	public FreenetRequest getRequest() {
-		return request;
 	}
 
 	/**
