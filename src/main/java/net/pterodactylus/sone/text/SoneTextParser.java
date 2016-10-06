@@ -21,6 +21,7 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.util.logging.Level;
@@ -36,7 +37,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.IdOnlySone;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
-import net.pterodactylus.util.io.Closer;
 
 import com.google.common.base.Optional;
 
@@ -124,8 +124,8 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	@Override
 	public Iterable<Part> parse(@Nonnull String source, @Nullable SoneTextParserContext context) {
 		PartContainer parts = new PartContainer();
-		BufferedReader bufferedReader = new BufferedReader(new StringReader(source));
-		try {
+		try (Reader sourceReader = new StringReader(source);
+				BufferedReader bufferedReader = new BufferedReader(sourceReader)) {
 			String line;
 			boolean lastLineEmpty = true;
 			int emptyLines = 0;
@@ -212,8 +212,6 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		} catch (IOException ioe1) {
 			// a buffered reader around a string reader should never throw.
 			throw new RuntimeException(ioe1);
-		} finally {
-			Closer.close(bufferedReader);
 		}
 		for (int partIndex = parts.size() - 1; partIndex >= 0; --partIndex) {
 			Part part = parts.getPart(partIndex);
