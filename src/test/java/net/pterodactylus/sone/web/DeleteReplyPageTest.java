@@ -24,7 +24,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-import org.mockito.Matchers;
 
 /**
  * Unit test for {@link DeleteReplyPage}.
@@ -45,7 +44,7 @@ public class DeleteReplyPageTest {
 
 	@Before
 	public void setupWebInterface() {
-		when(webInterface.getNotifications(Matchers.any(Sone.class))).thenReturn(Collections.<Notification>emptyList());
+		when(webInterface.getNotifications(any(Sone.class))).thenReturn(Collections.<Notification>emptyList());
 	}
 
 	@Before

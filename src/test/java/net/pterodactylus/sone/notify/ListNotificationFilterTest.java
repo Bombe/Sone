@@ -29,6 +29,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.hamcrest.Matchers;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 /**
  * Unit test for {@link ListNotificationFilterTest}.
@@ -117,7 +118,7 @@ public class ListNotificationFilterTest {
 	}
 
 	private void setPostVisibilityPredicate(Predicate<Post> value) {
-		when(postVisibilityFilter.isVisible(any(Sone.class))).thenReturn(value);
+		when(postVisibilityFilter.isVisible(ArgumentMatchers.<Sone>any())).thenReturn(value);
 	}
 
 	@Test
