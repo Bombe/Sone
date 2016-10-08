@@ -1,7 +1,7 @@
 package net.pterodactylus.sone;
 
 import static java.util.UUID.randomUUID;
-import static org.mockito.Matchers.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

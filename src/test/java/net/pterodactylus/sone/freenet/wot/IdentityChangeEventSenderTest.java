@@ -21,7 +21,7 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 import static net.pterodactylus.sone.freenet.wot.Identities.createIdentity;
 import static net.pterodactylus.sone.freenet.wot.Identities.createOwnIdentity;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
