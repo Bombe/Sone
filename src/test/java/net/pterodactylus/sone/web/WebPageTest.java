@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -12,6 +13,7 @@ import java.util.ArrayList;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.UpdateChecker;
+import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
@@ -22,9 +24,12 @@ import net.pterodactylus.util.web.Method;
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
+import com.google.common.base.Optional;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 /**
  * Base class for web page tests.
@@ -74,6 +79,20 @@ public abstract class WebPageTest {
 			throw new RuntimeException(e);
 		}
 		when(freenetRequest.getMethod()).thenReturn(method);
+	}
+
+	protected void addHttpRequestParameter(String name, final String value) {
+		when(httpRequest.getPartAsStringFailsafe(eq(name), anyInt())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				int maxLength = invocation.getArgument(1);
+				return value.substring(0, Math.min(maxLength, value.length()));
+			}
+		});
+	}
+
+	protected void addPost(String postId, Post post) {
+		when(core.getPost(postId)).thenReturn(Optional.fromNullable(post));
 	}
 
 }
