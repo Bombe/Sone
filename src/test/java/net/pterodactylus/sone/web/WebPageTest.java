@@ -55,9 +55,13 @@ public abstract class WebPageTest {
 	}
 
 	@Before
-	public final void setupWebInterface() {
+	public final void setupCore() {
 		UpdateChecker updateChecker = mock(UpdateChecker.class);
 		when(webInterface.getCore().getUpdateChecker()).thenReturn(updateChecker);
+	}
+
+	@Before
+	public final void setupWebInterface() {
 		when(webInterface.getCurrentSone(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone);
 		when(webInterface.getNotifications(currentSone)).thenReturn(new ArrayList<Notification>());
