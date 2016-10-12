@@ -211,6 +211,7 @@
 					<targetTests>
 						<param>net.pterodactylus.sone.*</param>
 					</targetTests>
+					<timestampedReports>false</timestampedReports>
 				</configuration>
 			</plugin>
 		</plugins>
