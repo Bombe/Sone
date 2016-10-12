@@ -211,6 +211,10 @@
 					<targetTests>
 						<param>net.pterodactylus.sone.*</param>
 					</targetTests>
+					<outputFormats>
+						<outputFormat>HTML</outputFormat>
+						<outputFormat>XML</outputFormat>
+					</outputFormats>
 					<timestampedReports>false</timestampedReports>
 				</configuration>
 			</plugin>
