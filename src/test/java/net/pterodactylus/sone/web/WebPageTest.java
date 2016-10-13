@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web;
 
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -57,6 +58,12 @@ public abstract class WebPageTest {
 	public final void setupFreenetRequest() {
 		when(freenetRequest.getToadletContext()).thenReturn(toadletContext);
 		when(freenetRequest.getHttpRequest()).thenReturn(httpRequest);
+		when(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				return "";
+			}
+		});
 	}
 
 	@Before
