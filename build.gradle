@@ -1,0 +1,95 @@
+group = 'net.pterodactylus'
+version = '0.9.5'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.1.10'
+    }
+}
+
+repositories {
+     maven { url "http://maven.pterodactylus.net/" }
+     mavenCentral()
+}
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+tasks.withType(JavaCompile) {
+	options.encoding = 'UTF-8'
+}
+
+configurations {
+    provided {
+        dependencies.all { dep ->
+            configurations.default.exclude group: dep.group, module: dep.name
+        }
+    }
+    compile.extendsFrom provided
+}
+ 
+dependencies {
+    provided group: 'org.freenetproject', name: 'fred', version:'0.7.5.1475'
+    provided group: 'org.freenetproject', name: 'freenet-ext', version:'29'
+    provided group: 'org.bouncycastle', name: 'bcprov-jdk15on', version:'1.54'
+
+    compile group: 'net.pterodactylus', name: 'utils', version:'0.12.4'
+    compile group: 'com.google.inject', name: 'guice', version:'3.0'
+    compile group: 'com.google.guava', name: 'guava', version:'14.0.1'
+    compile group: 'commons-lang', name: 'commons-lang', version:'2.6'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version:'2.1.2'
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version:'2.0.1'
+
+    testCompile group: 'junit', name: 'junit', version:'4.11'
+    testCompile group: 'org.mockito', name: 'mockito-core', version:'2.1.0'
+    testCompile group: 'org.jsoup', name: 'jsoup', version:'1.7.1'
+    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version:'1.3'
+}
+
+task fatJar(type: Jar) {
+    archiveName = project.name + '-jar-with-dependencies.jar'
+    from { (configurations.runtime - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) } }
+    manifest {
+        attributes('Plugin-Main-Class': 'net.pterodactylus.sone.main.SonePlugin')
+    }
+    with jar
+}
+
+javadoc {
+    options {
+        quiet()
+        showFromPrivate()
+        footer('© 2010–2013 David ‘Bombe’ Roden')
+        links('http://docs.oracle.com/javase/7/docs/api/')
+    }
+    failOnError = false
+}
+
+apply plugin: 'jacoco'
+
+jacoco {
+    toolVersion = '0.7.7.201606060606'
+}
+
+jacocoTestReport.dependsOn test
+
+apply plugin: 'info.solidsoft.pitest'
+
+pitest {
+    outputFormats = ['HTML', 'XML']
+    timestampedReports = false
+    timeoutFactor = 3.0
+}
+
+apply plugin: 'findbugs'
+
+findbugs {
+    ignoreFailures = true
+}
+
+apply plugin: 'idea'
