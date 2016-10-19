@@ -300,19 +300,12 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 	private int findEndOfLink(String line) {
 		Matcher matcher = whitespacePattern.matcher(line);
-		if (!matcher.find(0)) {
-			return line.length();
-		}
-		int nextWhitespace = matcher.start();
-		int lastPunctuation = nextWhitespace;
-		while (isPunctuation(line.charAt(lastPunctuation - 1))) {
-			lastPunctuation -= 1;
-		}
-		if (lastPunctuation < nextWhitespace) {
-			return lastPunctuation;
+		int endOfLink = matcher.find() ? matcher.start() : line.length();
+		while ((endOfLink > 0) && isPunctuation(line.charAt(endOfLink - 1))) {
+			endOfLink--;
 		}
 		int openParens = 0;
-		for (int i = 0; i < nextWhitespace; i++) {
+		for (int i = 0; i < endOfLink; i++) {
 			switch (line.charAt(i)) {
 				case '(':
 					openParens++;
@@ -325,10 +318,10 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				default:
 			}
 		}
-		return nextWhitespace;
+		return endOfLink;
 	}
 
-	private boolean isPunctuation(char character) {
+	private static boolean isPunctuation(char character) {
 		return (character == '.') || (character == ',');
 	}
 

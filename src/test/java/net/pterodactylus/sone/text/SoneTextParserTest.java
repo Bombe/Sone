@@ -281,6 +281,13 @@ public class SoneTextParserTest {
 	}
 
 	@Test
+	public void uskLinkEndsAtFirstNonNumericNonSlashCharacterAfterVersionNumber() {
+		Iterable<Part> parts = soneTextParser.parse("Some link (USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0). Nice", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", convertText(parts), is("Some link ([USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test|test]). Nice"));
+	}
+
+	@Test
 	public void httpLinkWithOpenedAndClosedParensEndsAtNextClosingParen() {
 		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc_(def)) – nice!", null);
 		assertThat("Parts", parts, notNullValue());
