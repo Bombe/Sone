@@ -90,7 +90,7 @@ public class ViewSonePage extends SoneTemplatePage {
 		}
 		List<Post> sonePosts = sone.get().getPosts();
 		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone.get().getId()));
-		Collections.sort(sonePosts, Post.TIME_COMPARATOR);
+		Collections.sort(sonePosts, Post.NEWEST_FIRST);
 		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());

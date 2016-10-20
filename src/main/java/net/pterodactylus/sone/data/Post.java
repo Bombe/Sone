@@ -33,7 +33,7 @@ import com.google.common.base.Predicate;
 public interface Post extends Identified {
 
 	/** Comparator for posts, sorts descending by time. */
-	public static final Comparator<Post> TIME_COMPARATOR = new Comparator<Post>() {
+	public static final Comparator<Post> NEWEST_FIRST = new Comparator<Post>() {
 
 		@Override
 		public int compare(Post leftPost, Post rightPost) {

@@ -368,7 +368,7 @@ public class SoneImpl implements Sone {
 		synchronized (this) {
 			sortedPosts = new ArrayList<Post>(posts);
 		}
-		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 		return sortedPosts;
 	}
 
