@@ -61,6 +61,7 @@ public class CreateAlbumPageTest extends WebPageTest {
 			verify(newAlbum.modify()).setTitle("new name");
 			verify(newAlbum.modify()).setDescription("new description");
 			verify(newAlbum.modify()).update();
+			verify(core).touchConfiguration();
 		}
 	}
 
