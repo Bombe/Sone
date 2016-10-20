@@ -26,8 +26,6 @@ import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
 
-import org.apache.commons.lang.StringUtils;
-
 /**
  * {@link PostReplyBuilder} implementation that creates {@link PostReplyImpl}
  * objects.
@@ -63,7 +61,7 @@ public class PostReplyBuilderImpl extends AbstractPostReplyBuilder {
 		checkState((randomId && (id == null)) || (!randomId && (id != null)), "either random ID nor custom ID must be set");
 		checkState(senderId != null, "sender must not be null");
 		checkState((currentTime && (time == 0)) || (!currentTime && (time >= 0)), "either current time or custom time must be set");
-		checkState(!StringUtils.isBlank(text), "text must not be empty");
+		checkState((text != null) && !text.trim().isEmpty(), "text must not be empty");
 		checkState(postId != null, "post must not be null");
 
 		/* create new post reply. */
