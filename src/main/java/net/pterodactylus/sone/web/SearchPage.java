@@ -593,7 +593,7 @@ public class SearchPage extends SoneTemplatePage {
 
 			@Override
 			public int compare(Hit<?> leftHit, Hit<?> rightHit) {
-				return (rightHit.getScore() < leftHit.getScore()) ? -1 : ((rightHit.getScore() > leftHit.getScore()) ? 1 : 0);
+				return Double.compare(rightHit.getScore(), leftHit.getScore());
 			}
 
 		};
