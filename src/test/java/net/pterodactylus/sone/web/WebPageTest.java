@@ -69,7 +69,7 @@ public abstract class WebPageTest {
 	@Before
 	public final void setupCore() {
 		UpdateChecker updateChecker = mock(UpdateChecker.class);
-		when(webInterface.getCore().getUpdateChecker()).thenReturn(updateChecker);
+		when(core.getUpdateChecker()).thenReturn(updateChecker);
 	}
 
 	@Before
