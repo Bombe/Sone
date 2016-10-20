@@ -65,8 +65,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String albumId = request.getHttpRequest().getParam("album", null);
 		if (albumId != null) {
 			Album album = webInterface.getCore().getAlbum(albumId);

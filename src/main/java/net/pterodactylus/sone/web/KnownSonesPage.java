@@ -65,8 +65,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String sortField = request.getHttpRequest().getParam("sort", defaultSortField);
 		String sortOrder = request.getHttpRequest().getParam("order", defaultSortOrder);
 		String filter = request.getHttpRequest().getParam("filter");

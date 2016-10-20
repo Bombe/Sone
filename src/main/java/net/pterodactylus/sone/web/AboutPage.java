@@ -41,8 +41,7 @@ public class AboutPage extends SoneTemplatePage {
 	}
 
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		templateContext.set("version", version);
 		templateContext.set("year", year);
 		templateContext.set("homepage", homepage);

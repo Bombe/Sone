@@ -101,8 +101,7 @@ public class SearchPage extends SoneTemplatePage {
 	 */
 	@Override
 	@SuppressWarnings("synthetic-access")
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String query = request.getHttpRequest().getParam("query").trim();
 		if (query.length() == 0) {
 			throw new RedirectException("index.html");

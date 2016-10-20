@@ -53,8 +53,7 @@ public class CreateAlbumPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.POST) {
 			String name = request.getHttpRequest().getPartAsStringFailsafe("name", 64).trim();
 			if (name.length() == 0) {

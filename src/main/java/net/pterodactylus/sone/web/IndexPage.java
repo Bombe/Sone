@@ -58,8 +58,7 @@ public class IndexPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		final Sone currentSone = getCurrentSone(request.getToadletContext());
 		Collection<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(currentSone.getPosts());

@@ -50,8 +50,7 @@ public class DeleteImagePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String imageId = (request.getMethod() == Method.POST) ? request.getHttpRequest().getPartAsStringFailsafe("image", 36) : request.getHttpRequest().getParam("image");
 		Image image = webInterface.getCore().getImage(imageId, false);
 		if (image == null) {

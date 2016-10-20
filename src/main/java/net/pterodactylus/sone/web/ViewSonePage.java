@@ -80,8 +80,7 @@ public class ViewSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
 		templateContext.set("sone", sone.orNull());

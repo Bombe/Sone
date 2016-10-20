@@ -51,8 +51,7 @@ public class DismissNotificationPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String notificationId = request.getHttpRequest().getPartAsStringFailsafe("notification", 36);
 		Optional<Notification> notification = webInterface.getNotification(notificationId);
 		if (notification.isPresent() && notification.get().isDismissable()) {

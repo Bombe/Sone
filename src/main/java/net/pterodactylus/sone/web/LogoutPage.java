@@ -47,9 +47,8 @@ public class LogoutPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		setCurrentSone(request.getToadletContext(), null);
-		super.processTemplate(request, templateContext);
 		throw new RedirectException("index.html");
 	}
 

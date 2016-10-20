@@ -58,8 +58,7 @@ public class OptionsPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		Preferences preferences = webInterface.getCore().getPreferences();
 		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);
 		if (request.getMethod() == Method.POST) {
