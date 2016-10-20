@@ -70,6 +70,8 @@ public abstract class WebPageTest {
 	public final void setupCore() {
 		UpdateChecker updateChecker = mock(UpdateChecker.class);
 		when(core.getUpdateChecker()).thenReturn(updateChecker);
+		when(core.getLocalSone(anyString())).thenReturn(null);
+		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
 	}
 
 	@Before
@@ -100,6 +102,14 @@ public abstract class WebPageTest {
 
 	protected void addPost(String postId, Post post) {
 		when(core.getPost(postId)).thenReturn(Optional.fromNullable(post));
+	}
+
+	protected void addSone(String soneId, Sone sone) {
+		when(core.getSone(eq(soneId))).thenReturn(Optional.fromNullable(sone));
+	}
+
+	protected void addLocalSone(String soneId, Sone sone) {
+		when(core.getLocalSone(eq(soneId))).thenReturn(sone);
 	}
 
 }
