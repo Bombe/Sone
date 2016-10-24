@@ -72,6 +72,7 @@ public abstract class WebPageTest {
 		when(core.getUpdateChecker()).thenReturn(updateChecker);
 		when(core.getLocalSone(anyString())).thenReturn(null);
 		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
+		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
 	}
 
 	@Before
