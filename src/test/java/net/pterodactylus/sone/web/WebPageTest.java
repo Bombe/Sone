@@ -11,11 +11,15 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.UpdateChecker;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
@@ -53,6 +57,8 @@ public abstract class WebPageTest {
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
 	protected final ToadletContext toadletContext = mock(ToadletContext.class);
 
+	private final Set<OwnIdentity> ownIdentities = new HashSet<>();
+	private final List<Sone> localSones = new ArrayList<>();
 
 	@Before
 	public final void setupFreenetRequest() {
@@ -71,8 +77,14 @@ public abstract class WebPageTest {
 		UpdateChecker updateChecker = mock(UpdateChecker.class);
 		when(core.getUpdateChecker()).thenReturn(updateChecker);
 		when(core.getLocalSone(anyString())).thenReturn(null);
+		when(core.getLocalSones()).thenReturn(localSones);
 		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
 		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
+	}
+
+	@Before
+	public final void setupIdentityManager() {
+		when(core.getIdentityManager().getAllOwnIdentities()).thenReturn(ownIdentities);
 	}
 
 	@Before
@@ -80,6 +92,11 @@ public abstract class WebPageTest {
 		when(webInterface.getCurrentSone(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone);
 		when(webInterface.getNotifications(currentSone)).thenReturn(new ArrayList<Notification>());
+	}
+
+	protected void unsetCurrentSone() {
+		when(webInterface.getCurrentSone(toadletContext)).thenReturn(null);
+		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null);
 	}
 
 	protected void request(String uri, Method method) {
@@ -111,6 +128,11 @@ public abstract class WebPageTest {
 
 	protected void addLocalSone(String soneId, Sone sone) {
 		when(core.getLocalSone(eq(soneId))).thenReturn(sone);
+		localSones.add(sone);
+	}
+
+	protected void addOwnIdentity(OwnIdentity ownIdentity) {
+		ownIdentities.add(ownIdentity);
 	}
 
 }
