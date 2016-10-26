@@ -19,8 +19,6 @@ package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import org.apache.commons.lang.StringUtils;
-
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.SoneProvider;
@@ -163,7 +161,7 @@ public abstract class AbstractPostBuilder implements PostBuilder {
 		checkState((randomId && (id == null)) || (!randomId && (id != null)), "exactly one of random ID or custom ID must be set");
 		checkState(senderId != null, "sender must not be null");
 		checkState((currentTime && (time == 0)) || (!currentTime && (time > 0)), "one of current time or custom time must be set");
-		checkState(!StringUtils.isBlank(text), "text must not be empty");
+		checkState((text != null) && !text.trim().isEmpty(), "text must not be empty");
 		checkState((recipientId == null) || !recipientId.equals(senderId), "sender and recipient must not be the same");
 	}
 

@@ -70,8 +70,7 @@ public class ViewPostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String postId = request.getHttpRequest().getParam("post");
 		boolean raw = request.getHttpRequest().getParam("raw").equals("true");
 		Optional<Post> post = webInterface.getCore().getPost(postId);

@@ -52,8 +52,7 @@ public class UnbookmarkPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.POST) {
 			String id = request.getHttpRequest().getPartAsStringFailsafe("post", 36);
 			String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);

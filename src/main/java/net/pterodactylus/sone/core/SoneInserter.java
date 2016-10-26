@@ -307,7 +307,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("time", currentTimeMillis());
 			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("profile", sone.getProfile());
-			soneProperties.put("posts", Ordering.from(Post.TIME_COMPARATOR).sortedCopy(sone.getPosts()));
+			soneProperties.put("posts", Ordering.from(Post.NEWEST_FIRST).sortedCopy(sone.getPosts()));
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
@@ -393,7 +393,7 @@ public class SoneInserter extends AbstractService {
 			templateContext.set("core", core);
 			templateContext.set("currentSone", soneProperties);
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
-			templateContext.set("version", SonePlugin.VERSION);
+			templateContext.set("version", SonePlugin.getPluginVersion());
 			StringWriter writer = new StringWriter();
 			try {
 				template.render(templateContext, writer);

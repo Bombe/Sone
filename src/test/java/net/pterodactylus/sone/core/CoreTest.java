@@ -1,11 +1,11 @@
 package net.pterodactylus.sone.core;
 
-import static org.mockito.Matchers.argThat;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.hamcrest.MockitoHamcrest.argThat;
 
 import net.pterodactylus.sone.core.Core.MarkPostKnown;
 import net.pterodactylus.sone.core.Core.MarkReplyKnown;

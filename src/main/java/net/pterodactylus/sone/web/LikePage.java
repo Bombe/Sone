@@ -51,8 +51,7 @@ public class LikePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.POST) {
 			String type = request.getHttpRequest().getPartAsStringFailsafe("type", 16);
 			String id = request.getHttpRequest().getPartAsStringFailsafe(type, 36);

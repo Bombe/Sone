@@ -52,8 +52,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String replyId = request.getHttpRequest().getPartAsStringFailsafe("reply", 36);
 		Optional<PostReply> reply = webInterface.getCore().getPostReply(replyId);
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);

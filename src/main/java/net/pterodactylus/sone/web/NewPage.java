@@ -62,9 +62,7 @@ public class NewPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
-
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		/* collect new elements from notifications. */
 		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false)));
 		for (PostReply reply : webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false))) {
@@ -73,7 +71,7 @@ public class NewPage extends SoneTemplatePage {
 
 		/* filter and sort them. */
 		List<Post> sortedPosts = new ArrayList(posts);
-		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 
 		/* paginate them. */
 		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));

@@ -61,8 +61,7 @@ public class BookmarksPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		Set<Post> allPosts = webInterface.getCore().getBookmarkedPosts();
 		Collection<Post> loadedPosts = Collections2.filter(allPosts, new Predicate<Post>() {
 
@@ -72,7 +71,7 @@ public class BookmarksPage extends SoneTemplatePage {
 			}
 		});
 		List<Post> sortedPosts = new ArrayList<Post>(loadedPosts);
-		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());

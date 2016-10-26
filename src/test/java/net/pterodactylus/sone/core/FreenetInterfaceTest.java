@@ -10,10 +10,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyShort;
-import static org.mockito.Matchers.eq;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyShort;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -69,6 +69,7 @@ import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 
 /**
  * Unit test for {@link FreenetInterface}.
@@ -198,7 +199,7 @@ public class FreenetInterfaceTest {
 
 	@Test(expected = SoneException.class)
 	public void insertExceptionIsForwardedAsSoneException() throws InsertException, SoneException {
-		when(highLevelSimpleClient.insertManifest(any(FreenetURI.class), any(HashMap.class), any(String.class))).thenThrow(InsertException.class);
+		when(highLevelSimpleClient.insertManifest(ArgumentMatchers.<FreenetURI>any(), ArgumentMatchers.<HashMap<String, Object>>any(), ArgumentMatchers.<String>any())).thenThrow(InsertException.class);
 		freenetInterface.insertDirectory(null, null, null);
 	}
 

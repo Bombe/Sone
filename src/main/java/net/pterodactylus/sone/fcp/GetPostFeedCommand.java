@@ -74,7 +74,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
 
 		List<Post> sortedPosts = new ArrayList<Post>(allPosts);
-		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 
 		if (sortedPosts.size() < startPost) {
 			return new Response("PostFeed", encodePosts(Collections.<Post> emptyList(), "Posts.", false));

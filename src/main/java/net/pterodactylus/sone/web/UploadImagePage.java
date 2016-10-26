@@ -79,8 +79,7 @@ public class UploadImagePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.POST) {
 			Sone currentSone = getCurrentSone(request.getToadletContext());
 			String parentId = request.getHttpRequest().getPartAsStringFailsafe("parent", 36);

@@ -50,8 +50,7 @@ public class LockSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String soneId = request.getHttpRequest().getPartAsStringFailsafe("sone", 44);
 		Sone sone = webInterface.getCore().getLocalSone(soneId);
 		if (sone != null) {

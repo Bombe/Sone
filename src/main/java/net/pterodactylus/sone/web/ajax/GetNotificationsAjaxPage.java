@@ -113,7 +113,7 @@ public class GetNotificationsAjaxPage extends JsonPage {
 				templateContext.set("currentSone", webInterface.getCurrentSone(request.getToadletContext(), false));
 				templateContext.set("localSones", webInterface.getCore().getLocalSones());
 				templateContext.set("request", request);
-				templateContext.set("currentVersion", SonePlugin.VERSION);
+				templateContext.set("currentVersion", SonePlugin.getPluginVersion());
 				templateContext.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
 				templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 				templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());

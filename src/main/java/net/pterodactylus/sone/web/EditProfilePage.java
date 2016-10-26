@@ -59,8 +59,7 @@ public class EditProfilePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		ToadletContext toadletContenxt = request.getToadletContext();
 		Sone currentSone = getCurrentSone(toadletContenxt);
 		Profile profile = currentSone.getProfile();

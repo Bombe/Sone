@@ -3,24 +3,13 @@ package net.pterodactylus.sone.web;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.notify.Notification;
-import net.pterodactylus.util.template.Template;
-import net.pterodactylus.util.template.TemplateContext;
-
-import freenet.clients.http.ToadletContext;
 
 import com.google.common.base.Optional;
 import org.junit.Before;
@@ -31,25 +20,13 @@ import org.junit.Test;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class NewPageTest {
+public class NewPageTest extends WebPageTest {
 
-	private final Template template = mock(Template.class);
-	private final WebInterface webInterface = mock(WebInterface.class, RETURNS_DEEP_STUBS);
 	private final NewPage newPage = new NewPage(template, webInterface);
-	private final Sone currentSone = mock(Sone.class);
-	private final TemplateContext templateContext = new TemplateContext();
-	private final FreenetRequest freenetRequest = mock(FreenetRequest.class, RETURNS_DEEP_STUBS);
 
 	@Before
-	public void setupFreenetRequest() {
-		when(freenetRequest.getToadletContext()).thenReturn(mock(ToadletContext.class));
-	}
-
-	@Before
-	public void setupWebInterface() {
+	public void setupNumberOfPostsPerPage() {
 		when(webInterface.getCore().getPreferences().getPostsPerPage()).thenReturn(5);
-		when(webInterface.getCurrentSone(any(ToadletContext.class), anyBoolean())).thenReturn(currentSone);
-		when(webInterface.getNotifications(any(Sone.class))).thenReturn(Collections.<Notification>emptyList());
 	}
 
 	@Test

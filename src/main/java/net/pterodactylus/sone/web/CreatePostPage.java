@@ -54,8 +54,7 @@ public class CreatePostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String returnPage = request.getHttpRequest().getPartAsStringFailsafe("returnPage", 256);
 		if (request.getMethod() == Method.POST) {
 			String text = request.getHttpRequest().getPartAsStringFailsafe("text", 65536).trim();

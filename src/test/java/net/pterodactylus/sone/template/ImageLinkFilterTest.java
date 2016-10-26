@@ -73,7 +73,7 @@ public class ImageLinkFilterTest {
 		String result = String.valueOf(imageLinkFilter.format(templateContext, image, ImmutableMap.<String, Object>of()));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("class"), is(""));
-		assertThat(imageElement.attr("src"), is("/image-key?forcedownload=true"));
+		assertThat(imageElement.attr("src"), is("/image-key"));
 		assertThat(imageElement.attr("title"), is("image title"));
 		assertThat(imageElement.attr("alt"), is("image description"));
 		assertThat(imageElement.attr("width"), is("640"));
@@ -138,7 +138,7 @@ public class ImageLinkFilterTest {
 		String result = String.valueOf(imageLinkFilter.format(templateContext, "image-id", ImmutableMap.<String, Object>of()));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("class"), is(""));
-		assertThat(imageElement.attr("src"), is("/image-key?forcedownload=true"));
+		assertThat(imageElement.attr("src"), is("/image-key"));
 		assertThat(imageElement.attr("title"), is("image title"));
 		assertThat(imageElement.attr("alt"), is("image description"));
 		assertThat(imageElement.attr("width"), is("640"));

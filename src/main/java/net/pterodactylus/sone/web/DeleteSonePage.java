@@ -52,8 +52,7 @@ public class DeleteSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().isPartSet("deleteSone")) {
 				Sone currentSone = getCurrentSone(request.getToadletContext());

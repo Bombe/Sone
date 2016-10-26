@@ -57,8 +57,7 @@ public class MarkAsKnownPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		String type = request.getHttpRequest().getPartAsStringFailsafe("type", 5);
 		if (!type.equals("sone") && !type.equals("post") && !type.equals("reply")) {
 			throw new RedirectException("invalid.html");

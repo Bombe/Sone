@@ -96,8 +96,7 @@ public class CreateSonePage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
 		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);
 		templateContext.set("sones", localSones);

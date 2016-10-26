@@ -52,8 +52,7 @@ public class DeletePostPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.GET) {
 			String postId = request.getHttpRequest().getParam("post");
 			String returnPage = request.getHttpRequest().getParam("returnPage");

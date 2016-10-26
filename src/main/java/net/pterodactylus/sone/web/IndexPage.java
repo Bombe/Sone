@@ -58,8 +58,7 @@ public class IndexPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		final Sone currentSone = getCurrentSone(request.getToadletContext());
 		Collection<Post> allPosts = new ArrayList<Post>();
 		allPosts.addAll(currentSone.getPosts());
@@ -79,7 +78,7 @@ public class IndexPage extends SoneTemplatePage {
 		}
 		allPosts = Collections2.filter(allPosts, postVisibilityFilter.isVisible(currentSone));
 		List<Post> sortedPosts = new ArrayList<Post>(allPosts);
-		Collections.sort(sortedPosts, Post.TIME_COMPARATOR);
+		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());

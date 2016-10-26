@@ -48,8 +48,7 @@ public class EditAlbumPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		if (request.getMethod() == Method.POST) {
 			String albumId = request.getHttpRequest().getPartAsStringFailsafe("album", 36);
 			Album album = webInterface.getCore().getAlbum(albumId);

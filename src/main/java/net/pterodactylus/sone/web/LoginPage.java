@@ -63,8 +63,7 @@ public class LoginPage extends SoneTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		super.processTemplate(request, templateContext);
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		/* get all own identities. */
 		List<Sone> localSones = new ArrayList<Sone>(webInterface.getCore().getLocalSones());
 		Collections.sort(localSones, Sone.NICE_NAME_COMPARATOR);

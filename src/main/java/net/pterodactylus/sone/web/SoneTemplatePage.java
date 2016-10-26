@@ -236,14 +236,14 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 * {@inheritDoc}
 	 */
 	@Override
-	protected void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
+	protected final void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
 		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		templateContext.set("core", webInterface.getCore());
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
 		templateContext.set("request", request);
-		templateContext.set("currentVersion", SonePlugin.VERSION);
+		templateContext.set("currentVersion", SonePlugin.getPluginVersion());
 		templateContext.set("hasLatestVersion", webInterface.getCore().getUpdateChecker().hasLatestVersion());
 		templateContext.set("latestEdition", webInterface.getCore().getUpdateChecker().getLatestEdition());
 		templateContext.set("latestVersion", webInterface.getCore().getUpdateChecker().getLatestVersion());
@@ -252,6 +252,10 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		templateContext.set("notifications", notifications);
 		templateContext.set("notificationHash", notifications.hashCode());
+		handleRequest(request, templateContext);
+	}
+
+	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 	}
 
 	/**
