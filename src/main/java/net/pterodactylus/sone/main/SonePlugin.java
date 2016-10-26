@@ -121,7 +121,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	/** The current year at time of release. */
 	private static final int YEAR = 2016;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-	private static final int LATEST_EDITION = 72;
+	private static final int LATEST_EDITION = 73;
 
 	/** The logger. */
 	private static final Logger logger = getLogger(SonePlugin.class.getName());
