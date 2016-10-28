@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.text;
 
+import static java.lang.String.format;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isIn;
@@ -313,6 +314,42 @@ public class SoneTextParserTest {
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]?"));
 	}
 
+	@Test
+	public void correctFreemailAddressIsLinkedToCorrectly() {
+		Iterable<Part> parts = soneTextParser.parse("Mail me at sone@t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail!", null);
+		assertThat("Part Text", convertText(parts), is("Mail me at [Freemail|sone|t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra|nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI]!"));
+	}
+
+	@Test
+	public void freemailAddressWithInvalidFreemailIdIsParsedAsText() {
+		Iterable<Part> parts = soneTextParser.parse("Mail me at sone@t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqr8.freemail!", null);
+		assertThat("Part Text", convertText(parts), is("Mail me at sone@t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqr8.freemail!"));
+	}
+
+	@Test
+	public void freemailAddressWithInvalidSizedFreemailIdIsParsedAsText() {
+		Iterable<Part> parts = soneTextParser.parse("Mail me at sone@4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail!", null);
+		assertThat("Part Text", convertText(parts), is("Mail me at sone@4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail!"));
+	}
+
+	@Test
+	public void freemailAddressWithoutLocalPartIsParsedAsText() {
+		Iterable<Part> parts = soneTextParser.parse("     @t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail!", null);
+		assertThat("Part Text", convertText(parts), is("     @t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail!"));
+	}
+
+	@Test
+	public void correctFreemailAddressIsParsedCorrectly() {
+		Iterable<Part> parts = soneTextParser.parse("sone@t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail", null);
+		assertThat("Part Text", convertText(parts), is("[Freemail|sone|t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra|nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI]"));
+	}
+
+	@Test
+	public void localPartOfFreemailAddressCanContainLettersDigitsMinusDotUnderscore() {
+		Iterable<Part> parts = soneTextParser.parse("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._@t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra.freemail", null);
+		assertThat("Part Text", convertText(parts), is("[Freemail|ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._|t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra|nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI]"));
+	}
+
 	/**
 	 * Converts all given {@link Part}s into a string, validating that the
 	 * part’s classes match only the expected classes.
@@ -336,6 +373,9 @@ public class SoneTextParserTest {
 			} else if (part instanceof FreenetLinkPart) {
 				FreenetLinkPart freenetLinkPart = (FreenetLinkPart) part;
 				text.append('[').append(freenetLinkPart.getLink()).append('|').append(freenetLinkPart.isTrusted() ? "trusted|" : "").append(freenetLinkPart.getTitle()).append('|').append(freenetLinkPart.getText()).append(']');
+			} else if (part instanceof FreemailPart) {
+				FreemailPart freemailPart = (FreemailPart) part;
+				text.append(format("[Freemail|%s|%s|%s]", freemailPart.getEmailLocalPart(), freemailPart.getFreemailId(), freemailPart.getIdentityId()));
 			} else if (part instanceof LinkPart) {
 				LinkPart linkPart = (LinkPart) part;
 				text.append('[').append(linkPart.getLink()).append('|').append(linkPart.getTitle()).append('|').append(linkPart.getText()).append(']');

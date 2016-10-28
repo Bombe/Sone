@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.text;
 
+import static com.google.common.base.Optional.absent;
+import static com.google.common.base.Optional.of;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.BufferedReader;
@@ -39,8 +41,10 @@ import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 
 import com.google.common.base.Optional;
+import org.bitpedia.util.Base32;
 
 import freenet.keys.FreenetURI;
+import freenet.support.Base64;
 
 /**
  * {@link Parser} implementation that can recognize Freenet URIs.
@@ -54,6 +58,38 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 	/** Pattern to detect whitespace. */
 	private static final Pattern whitespacePattern = Pattern.compile("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]");
+
+	private static class NextLink {
+
+		private final int position;
+		private final String link;
+		private final String remainder;
+		private final LinkType linkType;
+
+		private NextLink(int position, String link, String remainder, LinkType linkType) {
+			this.position = position;
+			this.link = link;
+			this.remainder = remainder;
+			this.linkType = linkType;
+		}
+
+		public int getPosition() {
+			return position;
+		}
+
+		public String getLink() {
+			return link;
+		}
+
+		public String getRemainder() {
+			return remainder;
+		}
+
+		public LinkType getLinkType() {
+			return linkType;
+		}
+
+	}
 
 	/**
 	 * Enumeration for all recognized link types.
@@ -69,7 +105,39 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		HTTP("http://", false),
 		HTTPS("https://", false),
 		SONE("sone://", false),
-		POST("post://", false);
+		POST("post://", false),
+
+		FREEMAIL("", true) {
+			@Override
+			public Optional<NextLink> findNext(String line) {
+				int nextFreemailSuffix = line.indexOf(".freemail");
+				if (nextFreemailSuffix < 54) {
+					/* 52 chars for the id, 1 on @, at least 1 for the local part. */
+					return absent();
+				}
+				if (line.charAt(nextFreemailSuffix - 53) != '@') {
+					return absent();
+				}
+				if (!line.substring(nextFreemailSuffix - 52, nextFreemailSuffix).matches("^[a-z2-7]*$")) {
+					return absent();
+				}
+				int startOfLocalPart = nextFreemailSuffix - 54;
+				if (!isAllowedInLocalPart(line.charAt(startOfLocalPart))) {
+					return absent();
+				}
+				while ((startOfLocalPart > 0) && isAllowedInLocalPart(line.charAt(startOfLocalPart - 1))) {
+					startOfLocalPart--;
+				}
+				return of(new NextLink(startOfLocalPart, line.substring(startOfLocalPart, nextFreemailSuffix + 9), line.substring(nextFreemailSuffix + 9), this));
+			}
+
+			private boolean isAllowedInLocalPart(char character) {
+				return ((character >= 'A') && (character <= 'Z'))
+						|| ((character >= 'a') && (character <= 'z'))
+						|| ((character >= '0') && (character <= '9'))
+						|| (character == '.') || (character == '-') || (character == '_');
+			}
+		};
 
 		private final String scheme;
 		private final boolean freenetLink;
@@ -90,6 +158,38 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 		public boolean isFreenetLink() {
 			return freenetLink;
+		}
+
+		public Optional<NextLink> findNext(String line) {
+			int nextLinkPosition = line.indexOf(getScheme());
+			if (nextLinkPosition == -1) {
+				return absent();
+			}
+			int endOfLink = findEndOfLink(line.substring(nextLinkPosition));
+			return of(new NextLink(nextLinkPosition, line.substring(nextLinkPosition, nextLinkPosition + endOfLink), line.substring(nextLinkPosition + endOfLink), this));
+		}
+
+		private static int findEndOfLink(String line) {
+			Matcher matcher = whitespacePattern.matcher(line);
+			int endOfLink = matcher.find() ? matcher.start() : line.length();
+			while (isPunctuation(line.charAt(endOfLink - 1))) {
+				endOfLink--;
+			}
+			int openParens = 0;
+			for (int i = 0; i < endOfLink; i++) {
+				switch (line.charAt(i)) {
+					case '(':
+						openParens++;
+						break;
+					case ')':
+						openParens--;
+						if (openParens < 0) {
+							return i;
+						}
+					default:
+				}
+			}
+			return endOfLink;
 		}
 
 	}
@@ -147,7 +247,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				 */
 				boolean lineComplete = true;
 				while (line.length() > 0) {
-					Optional<NextLink> nextLink = NextLink.findNextLink(line);
+					Optional<NextLink> nextLink = findNextLink(line);
 					if (!nextLink.isPresent()) {
 						if (lineComplete && !lastLineEmpty) {
 							parts.add(new PlainTextPart("\n" + line));
@@ -175,8 +275,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 					}
 					lineComplete = false;
 
-					int endOfLink = findEndOfLink(line);
-					String link = line.substring(0, endOfLink);
+					String link = nextLink.get().getLink();
 					logger.log(Level.FINER, String.format("Found link: %s", link));
 
 					/* if there is no text after the scheme, it’s not a link! */
@@ -203,9 +302,11 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 						case HTTPS:
 							renderHttpLink(parts, link, linkType);
 							break;
+						case FREEMAIL:
+							renderFreemailLink(parts, link);
 					}
 
-					line = line.substring(endOfLink);
+					line = nextLink.get().getRemainder();
 				}
 				lastLineEmpty = false;
 			}
@@ -221,6 +322,20 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			parts.removePart(partIndex);
 		}
 		return parts;
+	}
+
+	public static Optional<NextLink> findNextLink(String line) {
+		int earliestLinkPosition = Integer.MAX_VALUE;
+		NextLink earliestNextLink = null;
+		for (LinkType possibleLinkType : LinkType.values()) {
+			Optional<NextLink> nextLink = possibleLinkType.findNext(line);
+			if (nextLink.isPresent()) {
+				if (nextLink.get().getPosition() < earliestLinkPosition) {
+					earliestNextLink = nextLink.get();
+				}
+			}
+		}
+		return Optional.fromNullable(earliestNextLink);
 	}
 
 	private void renderSoneLink(PartContainer parts, String line) {
@@ -298,67 +413,16 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		parts.add(new LinkPart(link, name));
 	}
 
-	private int findEndOfLink(String line) {
-		Matcher matcher = whitespacePattern.matcher(line);
-		int endOfLink = matcher.find() ? matcher.start() : line.length();
-		while ((endOfLink > 0) && isPunctuation(line.charAt(endOfLink - 1))) {
-			endOfLink--;
-		}
-		int openParens = 0;
-		for (int i = 0; i < endOfLink; i++) {
-			switch (line.charAt(i)) {
-				case '(':
-					openParens++;
-					break;
-				case ')':
-					openParens--;
-					if (openParens < 0) {
-						return i;
-					}
-				default:
-			}
-		}
-		return endOfLink;
+	private void renderFreemailLink(PartContainer parts, String line) {
+		int separator = line.indexOf('@');
+		String freemailId = line.substring(separator + 1, separator + 53);
+		String identityId = Base64.encode(Base32.decode(freemailId));
+		String emailLocalPart = line.substring(0, separator);
+		parts.add(new FreemailPart(emailLocalPart, freemailId, identityId));
 	}
 
 	private static boolean isPunctuation(char character) {
 		return (character == '.') || (character == ',') || (character == '!') || (character == '?');
-	}
-
-	private static class NextLink {
-
-		private final int position;
-		private final LinkType linkType;
-
-		private NextLink(int position, LinkType linkType) {
-			this.position = position;
-			this.linkType = linkType;
-		}
-
-		public int getPosition() {
-			return position;
-		}
-
-		public LinkType getLinkType() {
-			return linkType;
-		}
-
-		public static Optional<NextLink> findNextLink(String line) {
-			int earliestLinkPosition = Integer.MAX_VALUE;
-			LinkType linkType = null;
-			for (LinkType possibleLinkType : LinkType.values()) {
-				int nextLinkPosition = line.indexOf(possibleLinkType.getScheme());
-				if (nextLinkPosition > -1) {
-					if (nextLinkPosition < earliestLinkPosition) {
-						earliestLinkPosition = nextLinkPosition;
-						linkType = possibleLinkType;
-					}
-				}
-			}
-			return earliestLinkPosition < Integer.MAX_VALUE ?
-					Optional.of(new NextLink(earliestLinkPosition, linkType)) : Optional.<NextLink>absent();
-		}
-
 	}
 
 }
