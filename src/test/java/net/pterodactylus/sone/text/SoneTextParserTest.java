@@ -49,17 +49,14 @@ public class SoneTextParserTest {
 	public void testPlainText() throws IOException {
 		/* check basic operation. */
 		Iterable<Part> parts = soneTextParser.parse("Test.", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class), is("Test."));
 
 		/* check empty lines at start and end. */
 		parts = soneTextParser.parse("\nTest.\n\n", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class), is("Test."));
 
 		/* check duplicate empty lines in the text. */
 		parts = soneTextParser.parse("\nTest.\n\n\nTest.", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class), is("Test.\n\nTest."));
 	}
 
@@ -237,17 +234,14 @@ public class SoneTextParserTest {
 	public void testKSKLinks() throws IOException {
 		/* check basic links. */
 		Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, FreenetLinkPart.class), is("[KSK@gpl.txt|gpl.txt|gpl.txt]"));
 
 		/* check embedded links. */
 		parts = soneTextParser.parse("Link is KSK@gpl.txt\u200b.", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, FreenetLinkPart.class), is("Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\u200b."));
 
 		/* check embedded links and line breaks. */
 		parts = soneTextParser.parse("Link is KSK@gpl.txt\nKSK@test.dat\n", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, FreenetLinkPart.class), is("Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]"));
 	}
 
@@ -258,7 +252,6 @@ public class SoneTextParserTest {
 
 		/* check basic links. */
 		Iterable<Part> parts = soneTextParser.parse("Some text.\n\nLink to sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU and stuff.", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, SonePart.class), is("Some text.\n\nLink to [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] and stuff."));
 	}
 
@@ -269,63 +262,54 @@ public class SoneTextParserTest {
 
 		/* check empty http links. */
 		Iterable<Part> parts = soneTextParser.parse("Some text. Empty link: http:// – nice!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class), is("Some text. Empty link: http:// – nice!"));
 	}
 
 	@Test
 	public void httpLinkWithoutParensEndsAtNextClosingParen() {
 		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc) – nice!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text (and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]) – nice!"));
 	}
 
 	@Test
 	public void uskLinkEndsAtFirstNonNumericNonSlashCharacterAfterVersionNumber() {
 		Iterable<Part> parts = soneTextParser.parse("Some link (USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0). Nice", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts), is("Some link ([USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test|test]). Nice"));
 	}
 
 	@Test
 	public void httpLinkWithOpenedAndClosedParensEndsAtNextClosingParen() {
 		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc_(def)) – nice!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text (and a link: [http://example.sone/abc_(def)|example.sone/abc_(def)|example.sone/abc_(def)]) – nice!"));
 	}
 
 	@Test
 	public void punctuationIsIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc. Nice!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]. Nice!"));
 	}
 
 	@Test
 	public void multiplePunctuationCharactersAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc... Nice!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]... Nice!"));
 	}
 
 	@Test
 	public void commasAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc, nice!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc], nice!"));
 	}
 
 	@Test
 	public void exclamationMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc!", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]!"));
 	}
 
 	@Test
 	public void questionMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc?", null);
-		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]?"));
 	}
 
