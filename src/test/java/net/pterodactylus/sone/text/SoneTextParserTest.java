@@ -317,6 +317,22 @@ public class SoneTextParserTest {
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc], nice!"));
 	}
 
+	@Test
+	public void exclamationMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc!", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]!"));
+	}
+
+	@Test
+	public void questionMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
+		SoneTextParser soneTextParser = new SoneTextParser(null, null);
+		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc?", null);
+		assertThat("Parts", parts, notNullValue());
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]?"));
+	}
+
 	/**
 	 * Converts all given {@link Part}s into a string, validating that the
 	 * part’s classes match only the expected classes.
