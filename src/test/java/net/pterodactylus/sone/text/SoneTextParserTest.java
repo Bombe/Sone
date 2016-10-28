@@ -116,7 +116,7 @@ public class SoneTextParserTest {
 
 	@Test
 	public void nameOfFreenetLinkDoesNotContainUrlParameters() {
-	    Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt?max-size=12345", null);
+		Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt?max-size=12345", null);
 		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt?max-size=12345|gpl.txt|gpl.txt]"));
 	}
 
@@ -152,7 +152,7 @@ public class SoneTextParserTest {
 
 	@Test
 	public void httpLinksHaveTheirLastSlashRemoved() {
-	    Iterable<Part> parts = soneTextParser.parse("http://test.test/test/", null);
+		Iterable<Part> parts = soneTextParser.parse("http://test.test/test/", null);
 		assertThat("Part Text", convertText(parts), is("[http://test.test/test/|test.test/…|test.test/…]"));
 	}
 
