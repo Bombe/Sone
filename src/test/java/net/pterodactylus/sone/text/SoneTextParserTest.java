@@ -296,7 +296,6 @@ public class SoneTextParserTest {
 
 	@Test
 	public void punctuationIsIgnoredAtEndOfLinkBeforeWhitespace() {
-		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc. Nice!", null);
 		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]. Nice!"));
@@ -311,7 +310,6 @@ public class SoneTextParserTest {
 
 	@Test
 	public void commasAreIgnoredAtEndOfLinkBeforeWhitespace() {
-		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc, nice!", null);
 		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc], nice!"));
@@ -319,7 +317,6 @@ public class SoneTextParserTest {
 
 	@Test
 	public void exclamationMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
-		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc!", null);
 		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]!"));
@@ -327,7 +324,6 @@ public class SoneTextParserTest {
 
 	@Test
 	public void questionMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
-		SoneTextParser soneTextParser = new SoneTextParser(null, null);
 		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc?", null);
 		assertThat("Parts", parts, notNullValue());
 		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]?"));
