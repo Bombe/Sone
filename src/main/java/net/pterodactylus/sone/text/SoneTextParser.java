@@ -394,8 +394,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	}
 
 	private void renderHttpLink(PartContainer parts, String link, LinkType linkType) {
-		String name;
-		name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
+		String name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
 		int firstSlash = name.indexOf('/');
 		int lastSlash = name.lastIndexOf('/');
 		if ((lastSlash - firstSlash) > 3) {
