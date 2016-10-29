@@ -29,8 +29,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.text.FreemailPart;
 import net.pterodactylus.sone.text.FreenetLinkPart;
 import net.pterodactylus.sone.text.LinkPart;
 import net.pterodactylus.sone.text.Part;
@@ -44,6 +47,9 @@ import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.template.TemplateParser;
+
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
 
 /**
  * Filter that filters a given text through a {@link SoneTextParser}.
@@ -170,6 +176,8 @@ public class ParserFilter implements Filter {
 			render(writer, (SonePart) part);
 		} else if (part instanceof PostPart) {
 			render(writer, (PostPart) part);
+		} else if (part instanceof FreemailPart) {
+			render(writer, (FreemailPart) part);
 		} else if (part instanceof Iterable<?>) {
 			render(writer, (Iterable<Part>) part);
 		}
@@ -261,6 +269,22 @@ public class ParserFilter implements Filter {
 			}
 		}
 		renderLink(writer, "viewPost.html?post=" + postPart.getPost().getId(), excerpt.toString(), SoneAccessor.getNiceName(postPart.getPost().getSone()), "in-sone");
+	}
+
+	private void render(@Nonnull Writer writer, @Nonnull FreemailPart freemailPart) {
+		Optional<Sone> sone = core.getSone(freemailPart.getIdentityId());
+		String soneName = sone.transform(new Function<Sone, String>() {
+			@Nonnull
+			@Override
+			public String apply(Sone input) {
+				return SoneAccessor.getNiceName(input);
+			}
+		}).or(freemailPart.getIdentityId());
+		renderLink(writer,
+				"/Freemail/NewMessage?to=" + freemailPart.getIdentityId(),
+				String.format("%s@%s.freemail", freemailPart.getEmailLocalPart(), soneName),
+				String.format("%s", soneName),
+				"in-sone");
 	}
 
 	/**
