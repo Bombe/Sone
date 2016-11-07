@@ -65,7 +65,7 @@ public class ParserFilterTest {
 		assertThat(linkNode.attributes().asList(), containsInAnyOrder(
 				new Attribute("href", "/Freemail/NewMessage?to=" + SONE_IDENTITY),
 				new Attribute("class", "in-sone"),
-				new Attribute("title", "Sone")
+				new Attribute("title", "Sone\n" + SONE_FREEMAIL)
 		));
 		assertThat(linkNode.text(), is("sone@Sone.freemail"));
 	}

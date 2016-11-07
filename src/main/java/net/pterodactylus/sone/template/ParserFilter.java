@@ -283,7 +283,7 @@ public class ParserFilter implements Filter {
 		renderLink(writer,
 				"/Freemail/NewMessage?to=" + freemailPart.getIdentityId(),
 				String.format("%s@%s.freemail", freemailPart.getEmailLocalPart(), soneName),
-				String.format("%s", soneName),
+				String.format("%s\n%s@%s.freemail", soneName, freemailPart.getEmailLocalPart(), freemailPart.getFreemailId()),
 				"in-sone");
 	}
 
