@@ -145,43 +145,43 @@ public class SoneTextParserTest {
 	@Test
 	public void httpsLinkHasItsPathsShortened() {
 		Iterable<Part> parts = soneTextParser.parse("https://test.test/some-long-path/file.txt", null);
-		assertThat("Part Text", convertText(parts), is("[https://test.test/some-long-path/file.txt|test.test/…/file.txt|test.test/…/file.txt]"));
+		assertThat("Part Text", convertText(parts), is("[https://test.test/some-long-path/file.txt|https://test.test/some-long-path/file.txt|test.test/…/file.txt]"));
 	}
 
 	@Test
 	public void httpLinksHaveTheirLastSlashRemoved() {
 		Iterable<Part> parts = soneTextParser.parse("http://test.test/test/", null);
-		assertThat("Part Text", convertText(parts), is("[http://test.test/test/|test.test/…|test.test/…]"));
+		assertThat("Part Text", convertText(parts), is("[http://test.test/test/|http://test.test/test/|test.test/…]"));
 	}
 
 	@Test
 	public void wwwPrefixIsRemovedForHostnameWithTwoDotsAndNoPath() {
 		Iterable<Part> parts = soneTextParser.parse("http://www.test.test", null);
-		assertThat("Part Text", convertText(parts), is("[http://www.test.test|test.test|test.test]"));
+		assertThat("Part Text", convertText(parts), is("[http://www.test.test|http://www.test.test|test.test]"));
 	}
 
 	@Test
 	public void wwwPrefixIsRemovedForHostnameWithTwoDotsAndAPath() {
 		Iterable<Part> parts = soneTextParser.parse("http://www.test.test/test.html", null);
-		assertThat("Part Text", convertText(parts), is("[http://www.test.test/test.html|test.test/test.html|test.test/test.html]"));
+		assertThat("Part Text", convertText(parts), is("[http://www.test.test/test.html|http://www.test.test/test.html|test.test/test.html]"));
 	}
 
 	@Test
 	public void hostnameIsKeptIntactIfNotBeginningWithWww() {
 		Iterable<Part> parts = soneTextParser.parse("http://test.test.test/test.html", null);
-		assertThat("Part Text", convertText(parts), is("[http://test.test.test/test.html|test.test.test/test.html|test.test.test/test.html]"));
+		assertThat("Part Text", convertText(parts), is("[http://test.test.test/test.html|http://test.test.test/test.html|test.test.test/test.html]"));
 	}
 
 	@Test
 	public void hostnameWithOneDotButNoSlashIsKeptIntact() {
 		Iterable<Part> parts = soneTextParser.parse("http://test.test", null);
-		assertThat("Part Text", convertText(parts), is("[http://test.test|test.test|test.test]"));
+		assertThat("Part Text", convertText(parts), is("[http://test.test|http://test.test|test.test]"));
 	}
 
 	@Test
 	public void urlParametersAreRemovedForHttpLinks() {
 		Iterable<Part> parts = soneTextParser.parse("http://test.test?foo=bar", null);
-		assertThat("Part Text", convertText(parts), is("[http://test.test?foo=bar|test.test|test.test]"));
+		assertThat("Part Text", convertText(parts), is("[http://test.test?foo=bar|http://test.test?foo=bar|test.test]"));
 	}
 
 	@Test
@@ -269,7 +269,7 @@ public class SoneTextParserTest {
 	@Test
 	public void httpLinkWithoutParensEndsAtNextClosingParen() {
 		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc) – nice!", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text (and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]) – nice!"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text (and a link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]) – nice!"));
 	}
 
 	@Test
@@ -281,37 +281,37 @@ public class SoneTextParserTest {
 	@Test
 	public void httpLinkWithOpenedAndClosedParensEndsAtNextClosingParen() {
 		Iterable<Part> parts = soneTextParser.parse("Some text (and a link: http://example.sone/abc_(def)) – nice!", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text (and a link: [http://example.sone/abc_(def)|example.sone/abc_(def)|example.sone/abc_(def)]) – nice!"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text (and a link: [http://example.sone/abc_(def)|http://example.sone/abc_(def)|example.sone/abc_(def)]) – nice!"));
 	}
 
 	@Test
 	public void punctuationIsIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc. Nice!", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]. Nice!"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]. Nice!"));
 	}
 
 	@Test
 	public void multiplePunctuationCharactersAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc... Nice!", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc]... Nice!"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]... Nice!"));
 	}
 
 	@Test
 	public void commasAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("Some text and a link: http://example.sone/abc, nice!", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|example.sone/abc|example.sone/abc], nice!"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("Some text and a link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc], nice!"));
 	}
 
 	@Test
 	public void exclamationMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc!", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]!"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]!"));
 	}
 
 	@Test
 	public void questionMarksAreIgnoredAtEndOfLinkBeforeWhitespace() {
 		Iterable<Part> parts = soneTextParser.parse("A link: http://example.sone/abc?", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|example.sone/abc|example.sone/abc]?"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, LinkPart.class), is("A link: [http://example.sone/abc|http://example.sone/abc|example.sone/abc]?"));
 	}
 
 	@Test

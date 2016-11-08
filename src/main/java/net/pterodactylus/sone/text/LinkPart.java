@@ -35,7 +35,7 @@ public class LinkPart implements Part {
 	private final String title;
 
 	public LinkPart(@Nonnull String link, @Nonnull String text) {
-		this(link, text, text);
+		this(link, text, link);
 	}
 
 	public LinkPart(@Nonnull String link, @Nonnull String text, @Nonnull String title) {

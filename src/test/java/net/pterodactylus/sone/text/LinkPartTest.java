@@ -30,8 +30,8 @@ public class LinkPartTest {
 	}
 
 	@Test
-	public void textIsUsedAsTitleIfNoTitleIsGiven() {
-		assertThat(new LinkPart("link", "text").getTitle(), is("text"));
+	public void linkIsUsedAsTitleIfNoTitleIsGiven() {
+		assertThat(new LinkPart("link", "text").getTitle(), is("link"));
 	}
 
 	@Test(expected = NullPointerException.class)
