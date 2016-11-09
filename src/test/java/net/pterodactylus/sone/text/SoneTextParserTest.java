@@ -115,7 +115,7 @@ public class SoneTextParserTest {
 	@Test
 	public void nameOfFreenetLinkDoesNotContainUrlParameters() {
 		Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt?max-size=12345", null);
-		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt?max-size=12345|gpl.txt|gpl.txt]"));
+		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt?max-size=12345|KSK@gpl.txt|gpl.txt]"));
 	}
 
 	@Test

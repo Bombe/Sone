@@ -364,8 +364,9 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 
 	private void renderFreenetLink(PartContainer parts, String link, LinkType linkType, @Nullable SoneTextParserContext context) {
 		String name = link;
+		String linkWithoutParameters = link;
 		if (name.indexOf('?') > -1) {
-			name = name.substring(0, name.indexOf('?'));
+			linkWithoutParameters = name = name.substring(0, name.indexOf('?'));
 		}
 		if (name.endsWith("/")) {
 			name = name.substring(0, name.length() - 1);
@@ -380,7 +381,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 				name = link.substring(0, Math.min(9, link.length()));
 			}
 			boolean fromPostingSone = ((linkType == LinkType.SSK) || (linkType == LinkType.USK)) && (context != null) && (context.getPostingSone() != null) && link.substring(4, Math.min(link.length(), 47)).equals(context.getPostingSone().getId());
-			parts.add(new FreenetLinkPart(link, name, fromPostingSone));
+			parts.add(new FreenetLinkPart(link, name, linkWithoutParameters, fromPostingSone));
 		} catch (MalformedURLException mue1) {
 			/* not a valid link, insert as plain text. */
 			parts.add(new PlainTextPart(link));
