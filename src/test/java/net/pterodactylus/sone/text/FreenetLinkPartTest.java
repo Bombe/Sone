@@ -35,8 +35,8 @@ public class FreenetLinkPartTest {
 	}
 
 	@Test
-	public void textIsUsedAsTitleIfNoTextIsGiven() {
-		assertThat(new FreenetLinkPart("link", "text", true).getTitle(), is("text"));
+	public void linkIsUsedAsTitleIfNoTextIsGiven() {
+		assertThat(new FreenetLinkPart("link", "text", true).getTitle(), is("link"));
 	}
 
 	@Test(expected = NullPointerException.class)

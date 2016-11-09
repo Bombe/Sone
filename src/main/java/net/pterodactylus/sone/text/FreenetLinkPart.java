@@ -31,7 +31,7 @@ public class FreenetLinkPart extends LinkPart {
 	private final boolean trusted;
 
 	public FreenetLinkPart(@Nonnull String link, @Nonnull String text, boolean trusted) {
-		this(link, text, text, trusted);
+		this(link, text, link, trusted);
 	}
 
 	public FreenetLinkPart(@Nonnull String link, @Nonnull String text, @Nonnull String title, boolean trusted) {

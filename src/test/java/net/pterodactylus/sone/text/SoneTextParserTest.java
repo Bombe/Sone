@@ -70,13 +70,13 @@ public class SoneTextParserTest {
 	@Test
 	public void freenetLinksHaveTheFreenetPrefixRemoved() {
 		Iterable<Part> parts = soneTextParser.parse("freenet:KSK@gpl.txt", null);
-		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt|gpl.txt|gpl.txt]"));
+		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt|KSK@gpl.txt|gpl.txt]"));
 	}
 
 	@Test
 	public void onlyTheFirstItemInALineIsPrefixedWithALineBreak() {
 		Iterable<Part> parts = soneTextParser.parse("Text.\nKSK@gpl.txt and KSK@gpl.txt", null);
-		assertThat("Part Text", convertText(parts), is("Text.\n[KSK@gpl.txt|gpl.txt|gpl.txt] and [KSK@gpl.txt|gpl.txt|gpl.txt]"));
+		assertThat("Part Text", convertText(parts), is("Text.\n[KSK@gpl.txt|KSK@gpl.txt|gpl.txt] and [KSK@gpl.txt|KSK@gpl.txt|gpl.txt]"));
 	}
 
 	@Test
@@ -121,19 +121,19 @@ public class SoneTextParserTest {
 	@Test
 	public void trailingSlashInFreenetLinkIsRemovedForName() {
 		Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt/", null);
-		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt/|gpl.txt|gpl.txt]"));
+		assertThat("Part Text", convertText(parts), is("[KSK@gpl.txt/|KSK@gpl.txt/|gpl.txt]"));
 	}
 
 	@Test
 	public void lastMetaStringOfFreenetLinkIsUsedAsName() {
 		Iterable<Part> parts = soneTextParser.parse("CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/COPYING", null);
-		assertThat("Part Text", convertText(parts), is("[CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/COPYING|COPYING|COPYING]"));
+		assertThat("Part Text", convertText(parts), is("[CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/COPYING|CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/COPYING|COPYING]"));
 	}
 
 	@Test
 	public void freenetLinkWithoutMetaStringsAndDocNameGetsFirstNineCharactersOfKeyAsName() {
 		Iterable<Part> parts = soneTextParser.parse("CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8", null);
-		assertThat("Part Text", convertText(parts), is("[CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8|CHK@qM1nm|CHK@qM1nm]"));
+		assertThat("Part Text", convertText(parts), is("[CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8|CHK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8|CHK@qM1nm]"));
 	}
 
 	@Test
@@ -199,35 +199,35 @@ public class SoneTextParserTest {
 	@Test
 	public void sskLinkWithoutContextIsNotTrusted() {
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", null);
-		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test]"));
 	}
 
 	@Test
 	public void sskLinkWithContextWithoutSoneIsNotTrusted() {
 		SoneTextParserContext context = new SoneTextParserContext(null);
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
-		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test]"));
 	}
 
 	@Test
 	public void sskLinkWithContextWithDifferentSoneIsNotTrusted() {
 		SoneTextParserContext context = new SoneTextParserContext(new IdOnlySone("DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU"));
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
-		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test|test]"));
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test]"));
 	}
 
 	@Test
 	public void sskLinkWithContextWithCorrectSoneIsTrusted() {
 		SoneTextParserContext context = new SoneTextParserContext(new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", context);
-		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|trusted|test|test]"));
+		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|trusted|SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test]"));
 	}
 
 	@Test
 	public void uskLinkWithContextWithCorrectSoneIsTrusted() {
 		SoneTextParserContext context = new SoneTextParserContext(new IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"));
 		Iterable<Part> parts = soneTextParser.parse("USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0", context);
-		assertThat("Part Text", convertText(parts), is("[USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|trusted|test|test]"));
+		assertThat("Part Text", convertText(parts), is("[USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|trusted|USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test]"));
 	}
 
 	@SuppressWarnings("static-method")
@@ -235,15 +235,15 @@ public class SoneTextParserTest {
 	public void testKSKLinks() throws IOException {
 		/* check basic links. */
 		Iterable<Part> parts = soneTextParser.parse("KSK@gpl.txt", null);
-		assertThat("Part Text", convertText(parts, FreenetLinkPart.class), is("[KSK@gpl.txt|gpl.txt|gpl.txt]"));
+		assertThat("Part Text", convertText(parts, FreenetLinkPart.class), is("[KSK@gpl.txt|KSK@gpl.txt|gpl.txt]"));
 
 		/* check embedded links. */
 		parts = soneTextParser.parse("Link is KSK@gpl.txt\u200b.", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, FreenetLinkPart.class), is("Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\u200b."));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, FreenetLinkPart.class), is("Link is [KSK@gpl.txt|KSK@gpl.txt|gpl.txt]\u200b."));
 
 		/* check embedded links and line breaks. */
 		parts = soneTextParser.parse("Link is KSK@gpl.txt\nKSK@test.dat\n", null);
-		assertThat("Part Text", convertText(parts, PlainTextPart.class, FreenetLinkPart.class), is("Link is [KSK@gpl.txt|gpl.txt|gpl.txt]\n[KSK@test.dat|test.dat|test.dat]"));
+		assertThat("Part Text", convertText(parts, PlainTextPart.class, FreenetLinkPart.class), is("Link is [KSK@gpl.txt|KSK@gpl.txt|gpl.txt]\n[KSK@test.dat|KSK@test.dat|test.dat]"));
 	}
 
 	@SuppressWarnings({ "synthetic-access", "static-method" })
@@ -275,7 +275,7 @@ public class SoneTextParserTest {
 	@Test
 	public void uskLinkEndsAtFirstNonNumericNonSlashCharacterAfterVersionNumber() {
 		Iterable<Part> parts = soneTextParser.parse("Some link (USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0). Nice", null);
-		assertThat("Part Text", convertText(parts), is("Some link ([USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test|test]). Nice"));
+		assertThat("Part Text", convertText(parts), is("Some link ([USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test]). Nice"));
 	}
 
 	@Test
