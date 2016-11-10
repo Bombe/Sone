@@ -2,11 +2,15 @@ group = 'net.pterodactylus'
 version = '0.9.6'
 
 buildscript {
+    ext {
+        kotlinVersion = '1.0.5'
+    }
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.1.10'
+        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
     }
 }
 
@@ -24,6 +28,8 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
 
+apply plugin: 'kotlin'
+
 configurations {
     provided {
         dependencies.all { dep ->
@@ -38,12 +44,14 @@ dependencies {
     provided group: 'org.freenetproject', name: 'freenet-ext', version: '29'
     provided group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
 
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
     compile group: 'net.pterodactylus', name: 'utils', version: '0.12.4'
     compile group: 'com.google.inject', name: 'guice', version: '3.0'
     compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.1.2'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '2.0.1'
 
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test', version: kotlinVersion
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
     testCompile group: 'org.jsoup', name: 'jsoup', version: '1.7.1'
