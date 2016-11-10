@@ -54,51 +54,51 @@ class RenderFilterTest {
 	private val filter = RenderFilter(core, templateContextFactory)
 
 	@Test
-	fun plainTextIsRenderedCorrectly() {
+	fun `plain text part is rendered correctly`() {
 		assertThat(renderParts(PlainTextPart("plain text")), `is`("plain text"))
 	}
 
 	private fun renderParts(vararg part: Part) = filter.format(templateContext, listOf(*part), parameters) as String
 
 	@Test
-	fun plainTextPartIsShortenedIfLengthExceedsMaxLength() {
+	fun `plain text part is shortened if length exceeds maxl ength`() {
 		setLengthAndCutOffLength(15, 10)
 		assertThat(renderParts(PlainTextPart("This is a long text.")), `is`("This is a &hellip;"))
 	}
 
 	@Test
-	fun plainTextPartIsNotShortenedIfLengthDoesNotExceedMaxLength() {
+	fun `plain text part is not shortened if length does not exceed max length`() {
 		setLengthAndCutOffLength(20, 10)
 		assertThat(renderParts(PlainTextPart("This is a long text.")), `is`("This is a &hellip;"))
 	}
 
 	@Test
-	fun shortPartsAreNotShortened() {
+	fun `short parts are not shortened`() {
 		setLengthAndCutOffLength(15, 10)
 		assertThat(renderParts(PlainTextPart("This.")), `is`("This."))
 	}
 
 	@Test
-	fun multiplePlainTextPartsAreShortened() {
+	fun `multiple plain text parts are shortened`() {
 		setLengthAndCutOffLength(15, 10)
 		assertThat(renderParts(PlainTextPart("This "), PlainTextPart("is a long text.")), `is`("This is a &hellip;"))
 	}
 
 	@Test
-	fun partsAfterLengthHasBeenReachedAreIgnored() {
+	fun `parts after length has been reached are ignored`() {
 		setLengthAndCutOffLength(15, 10)
 		assertThat(renderParts(PlainTextPart("This is a long text."), PlainTextPart(" And even more.")), `is`("This is a &hellip;"))
 	}
 
 	@Test
-	fun linkPartsAreNotShortened() {
+	fun `link parts are not shortened`() {
 		setLengthAndCutOffLength(15, 10)
 		val linkNode = Jsoup.parseBodyFragment(renderParts(FreenetLinkPart("KSK@gpl.txt", "This is a long text.", false))).body().child(0)
 		verifyLink(linkNode, "/KSK@gpl.txt", "freenet", "KSK@gpl.txt", "This is a long text.")
 	}
 
 	@Test
-	fun additionalLinkPartsAreIgnored() {
+	fun `additional link parts are ignored`() {
 		setLengthAndCutOffLength(15, 10)
 		assertThat(renderParts(PlainTextPart("This is a long text."), FreenetLinkPart("KSK@gpl.txt", "This is a long text.", false)), `is`("This is a &hellip;"))
 	}
@@ -109,7 +109,7 @@ class RenderFilterTest {
 	}
 
 	@Test
-	fun sonePartsAreAddedButTheirLengthIsIgnored() {
+	fun `sone parts are added but their length is ignored`() {
 		setLengthAndCutOffLength(15, 10)
 		val body = Jsoup.parseBodyFragment(renderParts(SonePart(sone), PlainTextPart("This is a long text."))).body()
 		val linkNode = body.childNode(0) as Element
@@ -119,13 +119,13 @@ class RenderFilterTest {
 	}
 
 	@Test
-	fun additionalSonePartsAreIgnored() {
+	fun `additional sone parts are ignored`() {
 		setLengthAndCutOffLength(15, 10)
 		assertThat(renderParts(PlainTextPart("This is a long text."), SonePart(sone)), `is`("This is a &hellip;"))
 	}
 
 	@Test
-	fun freenetLinkIsRenderedCorrectly() {
+	fun `freenet link is rendered correctly`() {
 		val linkNode = renderParts(FreenetLinkPart("KSK@gpl.txt", "gpl.txt", false)).toLinkNode()
 		verifyLink(linkNode, "/KSK@gpl.txt", "freenet", "KSK@gpl.txt", "gpl.txt")
 	}
@@ -141,7 +141,7 @@ class RenderFilterTest {
 	}
 
 	@Test
-	fun trustedFreenetLinkIsRenderedWithCorrectCssClass() {
+	fun `trusted freenet link is rendered with correct css class`() {
 		val linkNode = renderParts(FreenetLinkPart("KSK@gpl.txt", "gpl.txt", true)).toLinkNode()
 		verifyLink(linkNode, "/KSK@gpl.txt", "freenet-trusted", "KSK@gpl.txt", "gpl.txt")
 	}
@@ -149,14 +149,14 @@ class RenderFilterTest {
 	private fun String.toLinkNode() = Jsoup.parseBodyFragment(this).body().child(0)
 
 	@Test
-	fun internetLinkIsRenderedCorrectly() {
+	fun `internet link is rendered correctly`() {
 		val linkNode = renderParts(LinkPart("http://test.com/test.html", "test.com/test.html")).toLinkNode()
 		verifyLink(linkNode, "/external-link/?_CHECKED_HTTP_=${URLEncoder.encode("http://test.com/test.html", "UTF-8")}", "internet",
 				"http://test.com/test.html", "test.com/test.html")
 	}
 
 	@Test
-	fun sonePartsAreRenderedCorrectly() {
+	fun `sone parts are rendered correctly`() {
 		val linkNode = renderParts(SonePart(sone)).toLinkNode()
 		verifyLink(linkNode, "viewSone.html?sone=" + SONE_IDENTITY, "in-sone", "First", "First")
 	}
@@ -172,14 +172,14 @@ class RenderFilterTest {
 	}
 
 	@Test
-	fun sonePartsWithUnknownSoneIsRenderedAsLinkToWebOfTrust() {
+	fun `sone part with unknown sone is rendered as link to web of trust`() {
 		val sone = setupSone(SONE_IDENTITY, null, "First")
 		val linkNode = renderParts(SonePart(sone)).toLinkNode()
 		verifyLink(linkNode, "/WebOfTrust/ShowIdentity?id=$SONE_IDENTITY", "in-sone", SONE_IDENTITY, SONE_IDENTITY)
 	}
 
 	@Test
-	fun postPartIsCutOffCorrectlyWhenThereAreSpaces() {
+	fun `post part is cut off correctly when there are spaces`() {
 		val post = setupPost(sone, "1234 678901 345 789012 45678 01.")
 		val linkNode = renderParts(PostPart(post)).toLinkNode()
 		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "1234 678901 345…")
@@ -194,21 +194,21 @@ class RenderFilterTest {
 	}
 
 	@Test
-	fun postPartIsCutOffCorrectlyWhenThereAreNoSpaces() {
+	fun `post part is cut off correctly when there are no spaces`() {
 		val post = setupPost(sone, "1234567890123456789012345678901.")
 		val linkNode = renderParts(PostPart(post)).toLinkNode()
 		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "12345678901234567890…")
 	}
 
 	@Test
-	fun postPartShorterThan21CharsIsNotCutOff() {
+	fun `post part shorter than 21 chars is not cut off`() {
 		val post = setupPost(sone, "12345678901234567890")
 		val linkNode = renderParts(PostPart(post)).toLinkNode()
 		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "12345678901234567890")
 	}
 
 	@Test
-	fun multiplePartsAreRenderedCorrectly() {
+	fun `multiple parts are rendered correctly`() {
 		val parts = PartContainer()
 		parts.add(PlainTextPart("te"))
 		parts.add(PlainTextPart("xt"))
@@ -216,7 +216,7 @@ class RenderFilterTest {
 	}
 
 	@Test
-	fun freemailAddressIsDisplayedCorrectly() {
+	fun `freemail address is displayed correctly`() {
 		val linkNode = renderParts(FreemailPart("sone", FREEMAIL_ID, SONE_IDENTITY)).toLinkNode()
 		verifyLink(linkNode, "/Freemail/NewMessage?to=$SONE_IDENTITY", "in-sone", "First\n$SONE_FREEMAIL", "sone@First.freemail")
 	}
