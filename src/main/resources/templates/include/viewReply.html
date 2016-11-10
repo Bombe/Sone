@@ -15,8 +15,8 @@
 		<div>
 			<div class="author profile-link"><a href="viewSone.html?sone=<% reply.sone.id|html>"><% reply.sone.niceName|html></a></div>
 			<% reply.text|html|store key==originalText text==true>
-			<% reply.text|parse sone=reply.sone|store key==parsedText text==true>
-			<% reply.text|parse sone=reply.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|store key==shortText text==true>
+			<% reply.text|parse sone=reply.sone|render|store key==parsedText text==true>
+			<% reply.text|parse sone=reply.sone length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|render|store key==shortText text==true>
 			<div class="reply-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="reply-text text<%if raw> hidden<%/if><%if !shortText|match key=parsedText> hidden<%/if>"><% parsedText></div>
 			<div class="reply-text short-text<%if raw> hidden<%/if><%if shortText|match key=parsedText> hidden<%/if>"><% shortText></div>

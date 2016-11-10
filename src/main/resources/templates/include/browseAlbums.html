@@ -14,7 +14,7 @@
 		</div>
 		<div class="show-data">
 			<div class="album-title"><% album.title|html> (<%= View.Sone.Stats.Images|l10n 0=album.images.size>)</div>
-			<div class="album-description"><% album.description|parse sone=album.sone></div>
+			<div class="album-description"><% album.description|parse sone=album.sone|render></div>
 		</div>
 		<%if album.sone.local>
 			<form class="edit-album" action="editAlbum.html" method="post">

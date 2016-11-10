@@ -87,6 +87,7 @@ import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ProfileAccessor;
+import net.pterodactylus.sone.template.RenderFilter;
 import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.ReplyGroupFilter;
 import net.pterodactylus.sone.template.RequestChangeFilter;
@@ -198,6 +199,7 @@ public class WebInterface {
 
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
+	private final RenderFilter renderFilter;
 
 	private final ListNotificationFilter listNotificationFilter;
 	private final PostVisibilityFilter postVisibilityFilter;
@@ -284,7 +286,8 @@ public class WebInterface {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), templateContextFactory, soneTextParser));
+		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), soneTextParser));
+		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), templateContextFactory));
 		templateContextFactory.addFilter("reparse", new ReparseFilter());
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
@@ -745,7 +748,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter, renderFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));

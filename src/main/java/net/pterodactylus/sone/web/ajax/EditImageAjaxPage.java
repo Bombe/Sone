@@ -19,6 +19,8 @@ package net.pterodactylus.sone.web.ajax;
 
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.template.ParserFilter;
+import net.pterodactylus.sone.template.RenderFilter;
+import net.pterodactylus.sone.text.Part;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -33,8 +35,8 @@ import com.google.common.collect.ImmutableMap;
  */
 public class EditImageAjaxPage extends JsonPage {
 
-	/** Parser for image descriptions. */
 	private final ParserFilter parserFilter;
+	private final RenderFilter renderFilter;
 
 	/**
 	 * Creates a new edit image AJAX page.
@@ -44,9 +46,10 @@ public class EditImageAjaxPage extends JsonPage {
 	 * @param parserFilter
 	 *            The parser filter for image descriptions
 	 */
-	public EditImageAjaxPage(WebInterface webInterface, ParserFilter parserFilter) {
+	public EditImageAjaxPage(WebInterface webInterface, ParserFilter parserFilter, RenderFilter renderFilter) {
 		super("editImage.ajax", webInterface);
 		this.parserFilter = parserFilter;
+		this.renderFilter = renderFilter;
 	}
 
 	//
@@ -83,7 +86,14 @@ public class EditImageAjaxPage extends JsonPage {
 		String description = request.getHttpRequest().getParam("description").trim();
 		image.modify().setTitle(title).setDescription(TextFilter.filter(request.getHttpRequest().getHeader("host"), description)).update();
 		webInterface.getCore().touchConfiguration();
-		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", (String) parserFilter.format(new TemplateContext(), image.getDescription(), ImmutableMap.<String, Object>builder().put("sone", image.getSone()).build()));
+		return createSuccessJsonObject().put("imageId", image.getId()).put("title", image.getTitle()).put("description", image.getDescription()).put("parsedDescription", renderImageDescription(image));
+	}
+
+	private String renderImageDescription(Image image) {
+		TemplateContext templateContext = new TemplateContext();
+		ImmutableMap<String, Object> parameters = ImmutableMap.<String, Object>builder().put("sone", image.getSone()).build();
+		Object parts = parserFilter.format(templateContext, image.getDescription(), parameters);
+		return (String) renderFilter.format(templateContext, parts, parameters);
 	}
 
 }

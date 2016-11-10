@@ -1,0 +1,65 @@
+package net.pterodactylus.sone.template
+
+import com.google.common.base.Optional.of
+import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.text.SoneTextParser
+import net.pterodactylus.sone.text.SoneTextParserContext
+import net.pterodactylus.util.template.TemplateContext
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.emptyIterable
+import org.junit.Test
+import org.mockito.ArgumentCaptor.forClass
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.eq
+import org.mockito.Mockito.verify
+
+/**
+ * Unit test for [ParserFilter].
+ */
+class ParserFilterTest {
+
+	companion object {
+		private const val SONE_IDENTITY = "nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"
+	}
+
+	private val core = mock<Core>()
+	private val sone = setupSone(SONE_IDENTITY)
+	private val soneTextParser = mock<SoneTextParser>()
+	private val templateContext = TemplateContext()
+	private val parameters = mutableMapOf<String, Any?>()
+	private val filter = ParserFilter(core, soneTextParser)
+
+	private fun setupSone(identity: String): Sone {
+		val sone = mock<Sone>()
+		`when`(sone.id).thenReturn(identity)
+		`when`(core.getSone(identity)).thenReturn(of(sone))
+		return sone
+	}
+
+	@Test
+	fun `parsing null returns an empty iterable`() {
+		assertThat(filter.format(templateContext, null, mutableMapOf()) as Iterable<*>, emptyIterable())
+	}
+
+	@Test
+	fun `given sone is used to create parser context`() {
+		setupSoneAndVerifyItIsUsedInContext(sone, sone)
+	}
+
+	@Test
+	fun `sone with given sone ID is used to create parser context`() {
+		setupSoneAndVerifyItIsUsedInContext(SONE_IDENTITY, sone)
+	}
+
+	private fun setupSoneAndVerifyItIsUsedInContext(soneOrSoneId: Any, sone: Sone) {
+		parameters.put("sone", soneOrSoneId)
+		filter.format(templateContext, "text", parameters)
+		val context = forClass(SoneTextParserContext::class.java)
+		verify(soneTextParser).parse(eq<String>("text"), context.capture())
+		assertThat(context.value.postingSone, `is`(sone))
+	}
+
+}

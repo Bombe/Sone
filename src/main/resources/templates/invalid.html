@@ -4,9 +4,9 @@
 
 	<%foreach messages message>
 		<%if message|substring start==0 length==1|match value=='!'>
-			<p class="error"><% message|substring start==1|parse></p>
+			<p class="error"><% message|substring start==1|parse|render></p>
 		<%else>
-			<p><% message|parse></p>
+			<p><% message|parse|render></p>
 		<%/if>
 	<%foreachelse>
 		<p><%= Page.Invalid.Text|l10n|html|replace needle=="{link}" replacement=='<a href="index.html">'|replace needle=="{/link}" replacement=='</a>'></p>

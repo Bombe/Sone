@@ -1,7 +1,7 @@
 <%if soneStatus|match value=="inserting">
-	<%= Notification.SoneIsInserting.Text|l10n 0=insertSone.id|parse>
+	<%= Notification.SoneIsInserting.Text|l10n 0=insertSone.id|parse|render>
 <%elseif soneStatus|match value=="inserted">
-	<%= Notification.SoneIsInserted.Text|l10n 0=insertSone.id 1=insertDuration|parse>
+	<%= Notification.SoneIsInserted.Text|l10n 0=insertSone.id 1=insertDuration|parse|render>
 <%elseif soneStatus|match value=="insert-aborted">
-	<%= Notification.SoneInsertAborted.Text|l10n 0=insertSone.id|parse>
+	<%= Notification.SoneInsertAborted.Text|l10n 0=insertSone.id|parse|render>
 <%/if>
