@@ -10,7 +10,6 @@ import net.pterodactylus.sone.text.FreemailPart
 import net.pterodactylus.sone.text.FreenetLinkPart
 import net.pterodactylus.sone.text.LinkPart
 import net.pterodactylus.sone.text.Part
-import net.pterodactylus.sone.text.PartContainer
 import net.pterodactylus.sone.text.PlainTextPart
 import net.pterodactylus.sone.text.PostPart
 import net.pterodactylus.sone.text.SonePart
@@ -209,10 +208,8 @@ class RenderFilterTest {
 
 	@Test
 	fun `multiple parts are rendered correctly`() {
-		val parts = PartContainer()
-		parts.add(PlainTextPart("te"))
-		parts.add(PlainTextPart("xt"))
-		assertThat(renderParts(parts), `is`("text"))
+		val parts = arrayOf(PlainTextPart("te"), PlainTextPart("xt"))
+		assertThat(renderParts(*parts), `is`("text"))
 	}
 
 	@Test

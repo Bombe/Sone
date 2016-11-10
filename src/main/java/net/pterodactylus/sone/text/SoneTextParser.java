@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -223,7 +225,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 	@Nonnull
 	@Override
 	public Iterable<Part> parse(@Nonnull String source, @Nullable SoneTextParserContext context) {
-		PartContainer parts = new PartContainer();
+		List<Part> parts = new ArrayList<>();
 		try (Reader sourceReader = new StringReader(source);
 				BufferedReader bufferedReader = new BufferedReader(sourceReader)) {
 			String line;
@@ -315,11 +317,11 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			throw new RuntimeException(ioe1);
 		}
 		for (int partIndex = parts.size() - 1; partIndex >= 0; --partIndex) {
-			Part part = parts.getPart(partIndex);
+			Part part = parts.get(partIndex);
 			if (!(part instanceof PlainTextPart) || !"\n".equals(part.getText())) {
 				break;
 			}
-			parts.removePart(partIndex);
+			parts.remove(partIndex);
 		}
 		return parts;
 	}
@@ -338,7 +340,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		return Optional.fromNullable(earliestNextLink);
 	}
 
-	private void renderSoneLink(PartContainer parts, String line) {
+	private void renderSoneLink(List<Part> parts, String line) {
 		if (line.length() >= (7 + 43)) {
 			String soneId = line.substring(7, 50);
 			Optional<Sone> sone = soneProvider.getSone(soneId);
@@ -348,7 +350,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		}
 	}
 
-	private void renderPostLink(PartContainer parts, String line) {
+	private void renderPostLink(List<Part> parts, String line) {
 		if (line.length() >= (7 + 36)) {
 			String postId = line.substring(7, 43);
 			Optional<Post> post = postProvider.getPost(postId);
@@ -362,7 +364,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		}
 	}
 
-	private void renderFreenetLink(PartContainer parts, String link, LinkType linkType, @Nullable SoneTextParserContext context) {
+	private void renderFreenetLink(List<Part> parts, String link, LinkType linkType, @Nullable SoneTextParserContext context) {
 		String name = link;
 		String linkWithoutParameters = link;
 		if (name.indexOf('?') > -1) {
@@ -394,7 +396,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		}
 	}
 
-	private void renderHttpLink(PartContainer parts, String link, LinkType linkType) {
+	private void renderHttpLink(List<Part> parts, String link, LinkType linkType) {
 		String name = link.substring(linkType == LinkType.HTTP ? 7 : 8);
 		int firstSlash = name.indexOf('/');
 		int lastSlash = name.lastIndexOf('/');
@@ -413,7 +415,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 		parts.add(new LinkPart(link, name));
 	}
 
-	private void renderFreemailLink(PartContainer parts, String line) {
+	private void renderFreemailLink(List<Part> parts, String line) {
 		int separator = line.indexOf('@');
 		String freemailId = line.substring(separator + 1, separator + 53);
 		String identityId = Base64.encode(Base32.decode(freemailId));
