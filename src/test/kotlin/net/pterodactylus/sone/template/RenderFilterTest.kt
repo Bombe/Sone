@@ -5,6 +5,7 @@ import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.text.FreemailPart
 import net.pterodactylus.sone.text.FreenetLinkPart
 import net.pterodactylus.sone.text.LinkPart
@@ -25,7 +26,6 @@ import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
 import org.junit.Test
 import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
 import java.net.URLEncoder
 
 /**
@@ -40,7 +40,7 @@ class RenderFilterTest {
 		private const val POST_ID = "37a06250-6775-4b94-86ff-257ba690953c"
 	}
 
-	private val core = mock(Core::class.java)
+	private val core = mock<Core>()
 	private val templateContextFactory = TemplateContextFactory()
 	private val templateContext: TemplateContext
 	private val sone = setupSone(SONE_IDENTITY, "Sone", "First")
@@ -162,7 +162,7 @@ class RenderFilterTest {
 	}
 
 	private fun setupSone(identity: String, name: String?, firstName: String): Sone {
-		val sone = mock<Sone>(Sone::class.java)
+		val sone = mock<Sone>()
 		`when`(sone.id).thenReturn(identity)
 		`when`(sone.profile).thenReturn(Profile(sone))
 		`when`(sone.name).thenReturn(name)
@@ -186,7 +186,7 @@ class RenderFilterTest {
 	}
 
 	private fun setupPost(sone: Sone, value: String): Post {
-		val post = mock<Post>(Post::class.java)
+		val post = mock<Post>()
 		`when`(post.id).thenReturn(POST_ID)
 		`when`(post.sone).thenReturn(sone)
 		`when`(post.text).thenReturn(value)
