@@ -1,0 +1,224 @@
+package net.pterodactylus.sone.template
+
+import com.google.common.base.Optional
+import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.Profile
+import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.text.FreemailPart
+import net.pterodactylus.sone.text.FreenetLinkPart
+import net.pterodactylus.sone.text.LinkPart
+import net.pterodactylus.sone.text.Part
+import net.pterodactylus.sone.text.PartContainer
+import net.pterodactylus.sone.text.PlainTextPart
+import net.pterodactylus.sone.text.PostPart
+import net.pterodactylus.sone.text.SonePart
+import net.pterodactylus.util.template.HtmlFilter
+import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.util.template.TemplateContextFactory
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Attribute
+import org.jsoup.nodes.Element
+import org.jsoup.nodes.TextNode
+import org.junit.Test
+import org.mockito.Mockito.`when`
+import org.mockito.Mockito.mock
+import java.net.URLEncoder
+
+/**
+ * Unit test for [RenderFilter].
+ */
+class RenderFilterTest {
+
+	companion object {
+		private const val FREEMAIL_ID = "t4dlzfdww3xvsnsc6j6gtliox6zaoak7ymkobbmcmdw527ubuqra"
+		private const val SONE_FREEMAIL = "sone@$FREEMAIL_ID.freemail"
+		private const val SONE_IDENTITY = "nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"
+		private const val POST_ID = "37a06250-6775-4b94-86ff-257ba690953c"
+	}
+
+	private val core = mock(Core::class.java)
+	private val templateContextFactory = TemplateContextFactory()
+	private val templateContext: TemplateContext
+	private val sone = setupSone(SONE_IDENTITY, "Sone", "First")
+	private val parameters = mutableMapOf<String, Any?>()
+
+	init {
+		templateContextFactory.addFilter("html", HtmlFilter())
+		templateContext = templateContextFactory.createTemplateContext()
+	}
+
+	private val filter = RenderFilter(core, templateContextFactory)
+
+	@Test
+	fun plainTextIsRenderedCorrectly() {
+		assertThat(renderParts(PlainTextPart("plain text")), `is`("plain text"))
+	}
+
+	private fun renderParts(vararg part: Part) = filter.format(templateContext, listOf(*part), parameters) as String
+
+	@Test
+	fun plainTextPartIsShortenedIfLengthExceedsMaxLength() {
+		setLengthAndCutOffLength(15, 10)
+		assertThat(renderParts(PlainTextPart("This is a long text.")), `is`("This is a &hellip;"))
+	}
+
+	@Test
+	fun plainTextPartIsNotShortenedIfLengthDoesNotExceedMaxLength() {
+		setLengthAndCutOffLength(20, 10)
+		assertThat(renderParts(PlainTextPart("This is a long text.")), `is`("This is a &hellip;"))
+	}
+
+	@Test
+	fun shortPartsAreNotShortened() {
+		setLengthAndCutOffLength(15, 10)
+		assertThat(renderParts(PlainTextPart("This.")), `is`("This."))
+	}
+
+	@Test
+	fun multiplePlainTextPartsAreShortened() {
+		setLengthAndCutOffLength(15, 10)
+		assertThat(renderParts(PlainTextPart("This "), PlainTextPart("is a long text.")), `is`("This is a &hellip;"))
+	}
+
+	@Test
+	fun partsAfterLengthHasBeenReachedAreIgnored() {
+		setLengthAndCutOffLength(15, 10)
+		assertThat(renderParts(PlainTextPart("This is a long text."), PlainTextPart(" And even more.")), `is`("This is a &hellip;"))
+	}
+
+	@Test
+	fun linkPartsAreNotShortened() {
+		setLengthAndCutOffLength(15, 10)
+		val linkNode = Jsoup.parseBodyFragment(renderParts(FreenetLinkPart("KSK@gpl.txt", "This is a long text.", false))).body().child(0)
+		verifyLink(linkNode, "/KSK@gpl.txt", "freenet", "KSK@gpl.txt", "This is a long text.")
+	}
+
+	@Test
+	fun additionalLinkPartsAreIgnored() {
+		setLengthAndCutOffLength(15, 10)
+		assertThat(renderParts(PlainTextPart("This is a long text."), FreenetLinkPart("KSK@gpl.txt", "This is a long text.", false)), `is`("This is a &hellip;"))
+	}
+
+	private fun setLengthAndCutOffLength(length: Int, cutOffLength: Int) {
+		parameters.put("length", length)
+		parameters.put("cut-off-length", cutOffLength)
+	}
+
+	@Test
+	fun sonePartsAreAddedButTheirLengthIsIgnored() {
+		setLengthAndCutOffLength(15, 10)
+		val body = Jsoup.parseBodyFragment(renderParts(SonePart(sone), PlainTextPart("This is a long text."))).body()
+		val linkNode = body.childNode(0) as Element
+		println(linkNode)
+		verifyLink(linkNode, "viewSone.html?sone=$SONE_IDENTITY", "in-sone", "First", "First")
+		assertThat((body.childNode(1) as TextNode).text(), `is`("This is a …"))
+	}
+
+	@Test
+	fun additionalSonePartsAreIgnored() {
+		setLengthAndCutOffLength(15, 10)
+		assertThat(renderParts(PlainTextPart("This is a long text."), SonePart(sone)), `is`("This is a &hellip;"))
+	}
+
+	@Test
+	fun freenetLinkIsRenderedCorrectly() {
+		val linkNode = renderParts(FreenetLinkPart("KSK@gpl.txt", "gpl.txt", false)).toLinkNode()
+		verifyLink(linkNode, "/KSK@gpl.txt", "freenet", "KSK@gpl.txt", "gpl.txt")
+	}
+
+	private fun verifyLink(linkNode: Element, url: String, cssClass: String, tooltip: String, text: String) {
+		assertThat(linkNode.nodeName(), `is`("a"))
+		assertThat<List<Attribute>>(linkNode.attributes().asList(), containsInAnyOrder(
+				Attribute("href", url),
+				Attribute("class", cssClass),
+				Attribute("title", tooltip)
+		))
+		assertThat(linkNode.text(), `is`(text))
+	}
+
+	@Test
+	fun trustedFreenetLinkIsRenderedWithCorrectCssClass() {
+		val linkNode = renderParts(FreenetLinkPart("KSK@gpl.txt", "gpl.txt", true)).toLinkNode()
+		verifyLink(linkNode, "/KSK@gpl.txt", "freenet-trusted", "KSK@gpl.txt", "gpl.txt")
+	}
+
+	private fun String.toLinkNode() = Jsoup.parseBodyFragment(this).body().child(0)
+
+	@Test
+	fun internetLinkIsRenderedCorrectly() {
+		val linkNode = renderParts(LinkPart("http://test.com/test.html", "test.com/test.html")).toLinkNode()
+		verifyLink(linkNode, "/external-link/?_CHECKED_HTTP_=${URLEncoder.encode("http://test.com/test.html", "UTF-8")}", "internet",
+				"http://test.com/test.html", "test.com/test.html")
+	}
+
+	@Test
+	fun sonePartsAreRenderedCorrectly() {
+		val linkNode = renderParts(SonePart(sone)).toLinkNode()
+		verifyLink(linkNode, "viewSone.html?sone=" + SONE_IDENTITY, "in-sone", "First", "First")
+	}
+
+	private fun setupSone(identity: String, name: String?, firstName: String): Sone {
+		val sone = mock<Sone>(Sone::class.java)
+		`when`(sone.id).thenReturn(identity)
+		`when`(sone.profile).thenReturn(Profile(sone))
+		`when`(sone.name).thenReturn(name)
+		sone.profile.firstName = firstName
+		`when`(core.getSone(identity)).thenReturn(Optional.of<Sone>(sone))
+		return sone
+	}
+
+	@Test
+	fun sonePartsWithUnknownSoneIsRenderedAsLinkToWebOfTrust() {
+		val sone = setupSone(SONE_IDENTITY, null, "First")
+		val linkNode = renderParts(SonePart(sone)).toLinkNode()
+		verifyLink(linkNode, "/WebOfTrust/ShowIdentity?id=$SONE_IDENTITY", "in-sone", SONE_IDENTITY, SONE_IDENTITY)
+	}
+
+	@Test
+	fun postPartIsCutOffCorrectlyWhenThereAreSpaces() {
+		val post = setupPost(sone, "1234 678901 345 789012 45678 01.")
+		val linkNode = renderParts(PostPart(post)).toLinkNode()
+		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "1234 678901 345…")
+	}
+
+	private fun setupPost(sone: Sone, value: String): Post {
+		val post = mock<Post>(Post::class.java)
+		`when`(post.id).thenReturn(POST_ID)
+		`when`(post.sone).thenReturn(sone)
+		`when`(post.text).thenReturn(value)
+		return post
+	}
+
+	@Test
+	fun postPartIsCutOffCorrectlyWhenThereAreNoSpaces() {
+		val post = setupPost(sone, "1234567890123456789012345678901.")
+		val linkNode = renderParts(PostPart(post)).toLinkNode()
+		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "12345678901234567890…")
+	}
+
+	@Test
+	fun postPartShorterThan21CharsIsNotCutOff() {
+		val post = setupPost(sone, "12345678901234567890")
+		val linkNode = renderParts(PostPart(post)).toLinkNode()
+		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "12345678901234567890")
+	}
+
+	@Test
+	fun multiplePartsAreRenderedCorrectly() {
+		val parts = PartContainer()
+		parts.add(PlainTextPart("te"))
+		parts.add(PlainTextPart("xt"))
+		assertThat(renderParts(parts), `is`("text"))
+	}
+
+	@Test
+	fun freemailAddressIsDisplayedCorrectly() {
+		val linkNode = renderParts(FreemailPart("sone", FREEMAIL_ID, SONE_IDENTITY)).toLinkNode()
+		verifyLink(linkNode, "/Freemail/NewMessage?to=$SONE_IDENTITY", "in-sone", "First\n$SONE_FREEMAIL", "sone@First.freemail")
+	}
+
+}
