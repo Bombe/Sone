@@ -246,7 +246,7 @@ public class FreenetInterfaceTest {
 	public void registeringAnActiveNonUskWillNotSubscribeToAUsk()
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
-	    freenetInterface.registerActiveUsk(freenetUri, null);
+		freenetInterface.registerActiveUsk(freenetUri, null);
 		verify(uskManager, never()).subscribe(any(USK.class),
 				any(USKCallback.class), anyBoolean(),
 				eq((RequestClient) highLevelSimpleClient));
@@ -256,7 +256,7 @@ public class FreenetInterfaceTest {
 	public void registeringAnInactiveNonUskWillNotSubscribeToAUsk()
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
-	    freenetInterface.registerPassiveUsk(freenetUri, null);
+		freenetInterface.registerPassiveUsk(freenetUri, null);
 		verify(uskManager, never()).subscribe(any(USK.class),
 				any(USKCallback.class), anyBoolean(),
 				eq((RequestClient) highLevelSimpleClient));
