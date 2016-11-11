@@ -23,12 +23,15 @@ import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.freenet.Key.routingKey;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
 
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
@@ -44,6 +47,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import freenet.client.ClientMetadata;
+import freenet.client.FetchContext;
 import freenet.client.FetchException;
 import freenet.client.FetchException.FetchExceptionMode;
 import freenet.client.FetchResult;
@@ -53,6 +57,8 @@ import freenet.client.InsertContext;
 import freenet.client.InsertException;
 import freenet.client.async.BaseClientPutter;
 import freenet.client.async.ClientContext;
+import freenet.client.async.ClientGetCallback;
+import freenet.client.async.ClientGetter;
 import freenet.client.async.ClientPutCallback;
 import freenet.client.async.ClientPutter;
 import freenet.client.async.USKCallback;
@@ -95,6 +101,7 @@ public class FreenetInterface {
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
 
 	private final RequestClient imageInserts = new RequestClientBuilder().realTime().build();
+	private final RequestClient imageLoader = new RequestClientBuilder().realTime().build();
 
 	/**
 	 * Creates a new Freenet interface.
@@ -137,6 +144,45 @@ public class FreenetInterface {
 				return null;
 			}
 		}
+	}
+
+	public void startFetch(final FreenetURI uri, final BackgroundFetchCallback backgroundFetchCallback) {
+		ClientGetCallback callback = new ClientGetCallback() {
+			@Override
+			public void onSuccess(FetchResult result, ClientGetter state) {
+				try {
+					backgroundFetchCallback.loaded(uri, result.getMimeType(), result.asByteArray());
+				} catch (IOException e) {
+					backgroundFetchCallback.failed(uri);
+				}
+			}
+
+			@Override
+			public void onFailure(FetchException e, ClientGetter state) {
+				backgroundFetchCallback.failed(uri);
+			}
+
+			@Override
+			public void onResume(ClientContext context) throws ResumeFailedException {
+				/* do nothing. */
+			}
+
+			@Override
+			public RequestClient getRequestClient() {
+				return imageLoader;
+			}
+		};
+		FetchContext fetchContext = client.getFetchContext();
+		try {
+			client.fetch(uri, 1048576, callback, fetchContext, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
+		} catch (FetchException fe) {
+			/* stupid exception that can not actually be thrown! */
+		}
+	}
+
+	public interface BackgroundFetchCallback {
+		void loaded(@Nonnull FreenetURI uri, @Nonnull String mimeType, @Nonnull byte[] data);
+		void failed(@Nonnull FreenetURI uri);
 	}
 
 	/**
