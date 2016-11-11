@@ -91,6 +91,7 @@ import net.pterodactylus.sone.template.RenderFilter;
 import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.ReplyGroupFilter;
 import net.pterodactylus.sone.template.RequestChangeFilter;
+import net.pterodactylus.sone.template.ShortenFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
@@ -199,6 +200,7 @@ public class WebInterface {
 
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
+	private final ShortenFilter shortenFilter;
 	private final RenderFilter renderFilter;
 
 	private final ListNotificationFilter listNotificationFilter;
@@ -287,6 +289,7 @@ public class WebInterface {
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
 		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), soneTextParser));
+		templateContextFactory.addFilter("shorten", shortenFilter = new ShortenFilter());
 		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), templateContextFactory));
 		templateContextFactory.addFilter("reparse", new ReparseFilter());
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
@@ -748,7 +751,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter, renderFilter)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter, shortenFilter, renderFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));

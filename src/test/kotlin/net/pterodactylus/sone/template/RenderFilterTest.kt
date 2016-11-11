@@ -22,7 +22,6 @@ import org.hamcrest.Matchers.containsInAnyOrder
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Attribute
 import org.jsoup.nodes.Element
-import org.jsoup.nodes.TextNode
 import org.junit.Test
 import org.mockito.Mockito.`when`
 import java.net.URLEncoder
@@ -58,70 +57,6 @@ class RenderFilterTest {
 	}
 
 	private fun renderParts(vararg part: Part) = filter.format(templateContext, listOf(*part), parameters) as String
-
-	@Test
-	fun `plain text part is shortened if length exceeds maxl ength`() {
-		setLengthAndCutOffLength(15, 10)
-		assertThat(renderParts(PlainTextPart("This is a long text.")), `is`("This is a &hellip;"))
-	}
-
-	@Test
-	fun `plain text part is not shortened if length does not exceed max length`() {
-		setLengthAndCutOffLength(20, 10)
-		assertThat(renderParts(PlainTextPart("This is a long text.")), `is`("This is a &hellip;"))
-	}
-
-	@Test
-	fun `short parts are not shortened`() {
-		setLengthAndCutOffLength(15, 10)
-		assertThat(renderParts(PlainTextPart("This.")), `is`("This."))
-	}
-
-	@Test
-	fun `multiple plain text parts are shortened`() {
-		setLengthAndCutOffLength(15, 10)
-		assertThat(renderParts(PlainTextPart("This "), PlainTextPart("is a long text.")), `is`("This is a &hellip;"))
-	}
-
-	@Test
-	fun `parts after length has been reached are ignored`() {
-		setLengthAndCutOffLength(15, 10)
-		assertThat(renderParts(PlainTextPart("This is a long text."), PlainTextPart(" And even more.")), `is`("This is a &hellip;"))
-	}
-
-	@Test
-	fun `link parts are not shortened`() {
-		setLengthAndCutOffLength(15, 10)
-		val linkNode = Jsoup.parseBodyFragment(renderParts(FreenetLinkPart("KSK@gpl.txt", "This is a long text.", false))).body().child(0)
-		verifyLink(linkNode, "/KSK@gpl.txt", "freenet", "KSK@gpl.txt", "This is a long text.")
-	}
-
-	@Test
-	fun `additional link parts are ignored`() {
-		setLengthAndCutOffLength(15, 10)
-		assertThat(renderParts(PlainTextPart("This is a long text."), FreenetLinkPart("KSK@gpl.txt", "This is a long text.", false)), `is`("This is a &hellip;"))
-	}
-
-	private fun setLengthAndCutOffLength(length: Int, cutOffLength: Int) {
-		parameters.put("length", length)
-		parameters.put("cut-off-length", cutOffLength)
-	}
-
-	@Test
-	fun `sone parts are added but their length is ignored`() {
-		setLengthAndCutOffLength(15, 10)
-		val body = Jsoup.parseBodyFragment(renderParts(SonePart(sone), PlainTextPart("This is a long text."))).body()
-		val linkNode = body.childNode(0) as Element
-		println(linkNode)
-		verifyLink(linkNode, "viewSone.html?sone=$SONE_IDENTITY", "in-sone", "First", "First")
-		assertThat((body.childNode(1) as TextNode).text(), `is`("This is a …"))
-	}
-
-	@Test
-	fun `additional sone parts are ignored`() {
-		setLengthAndCutOffLength(15, 10)
-		assertThat(renderParts(PlainTextPart("This is a long text."), SonePart(sone)), `is`("This is a &hellip;"))
-	}
 
 	@Test
 	fun `freenet link is rendered correctly`() {

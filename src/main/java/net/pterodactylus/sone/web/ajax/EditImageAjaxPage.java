@@ -17,16 +17,15 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import com.google.common.collect.ImmutableMap;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.RenderFilter;
-import net.pterodactylus.sone.text.Part;
+import net.pterodactylus.sone.template.ShortenFilter;
 import net.pterodactylus.sone.text.TextFilter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.TemplateContext;
-
-import com.google.common.collect.ImmutableMap;
 
 /**
  * Page that stores a user’s image modifications.
@@ -36,6 +35,7 @@ import com.google.common.collect.ImmutableMap;
 public class EditImageAjaxPage extends JsonPage {
 
 	private final ParserFilter parserFilter;
+	private final ShortenFilter shortenFilter;
 	private final RenderFilter renderFilter;
 
 	/**
@@ -46,9 +46,10 @@ public class EditImageAjaxPage extends JsonPage {
 	 * @param parserFilter
 	 *            The parser filter for image descriptions
 	 */
-	public EditImageAjaxPage(WebInterface webInterface, ParserFilter parserFilter, RenderFilter renderFilter) {
+	public EditImageAjaxPage(WebInterface webInterface, ParserFilter parserFilter, ShortenFilter shortenFilter, RenderFilter renderFilter) {
 		super("editImage.ajax", webInterface);
 		this.parserFilter = parserFilter;
+		this.shortenFilter = shortenFilter;
 		this.renderFilter = renderFilter;
 	}
 
@@ -93,7 +94,8 @@ public class EditImageAjaxPage extends JsonPage {
 		TemplateContext templateContext = new TemplateContext();
 		ImmutableMap<String, Object> parameters = ImmutableMap.<String, Object>builder().put("sone", image.getSone()).build();
 		Object parts = parserFilter.format(templateContext, image.getDescription(), parameters);
-		return (String) renderFilter.format(templateContext, parts, parameters);
+		Object shortenedParts = shortenFilter.format(templateContext, parts, parameters);
+		return (String) renderFilter.format(templateContext, shortenedParts, parameters);
 	}
 
 }

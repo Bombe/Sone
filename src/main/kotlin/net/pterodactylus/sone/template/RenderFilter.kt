@@ -18,7 +18,6 @@ import java.io.StringReader
 import java.io.StringWriter
 import java.io.Writer
 import java.net.URLEncoder
-import java.util.ArrayList
 
 /**
  * Renders a number of pre-parsed [Part] into a [String].
@@ -34,47 +33,10 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: MutableMap<String, Any?>?): Any? {
 		@Suppress("UNCHECKED_CAST")
-		val parts = getPartsToRender(parameters, data as? Iterable<Part> ?: return null)
+		val parts = data as? Iterable<Part> ?: return null
 		val parsedTextWriter = StringWriter()
 		render(parsedTextWriter, parts)
 		return parsedTextWriter.toString()
-	}
-
-	private fun Map<String, Any?>.parseInt(key: String) = this[key]?.toString()?.toInt()
-
-	private fun getPartsToRender(parameters: MutableMap<String, Any?>?, parts: Iterable<Part>): Iterable<Part> {
-		val length = parameters?.parseInt("length") ?: -1
-		val cutOffLength = parameters?.parseInt("cut-off-length") ?: length
-		if (length > -1) {
-			var allPartsLength = 0
-			val shortenedParts = ArrayList<Part>()
-			for (part in parts) {
-				if (part is PlainTextPart) {
-					val longText = part.text
-					if (allPartsLength < cutOffLength) {
-						if (allPartsLength + longText.length > cutOffLength) {
-							shortenedParts.add(PlainTextPart(longText.substring(0, cutOffLength - allPartsLength) + "…"))
-						} else {
-							shortenedParts.add(part)
-						}
-					}
-					allPartsLength += longText.length
-				} else if (part is LinkPart) {
-					if (allPartsLength < cutOffLength) {
-						shortenedParts.add(part)
-					}
-					allPartsLength += part.text.length
-				} else {
-					if (allPartsLength < cutOffLength) {
-						shortenedParts.add(part)
-					}
-				}
-			}
-			if (allPartsLength >= length) {
-				return shortenedParts
-			}
-		}
-		return parts
 	}
 
 	private fun render(writer: Writer, parts: Iterable<Part>) {
@@ -90,7 +52,6 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 			is SonePart -> render(writer, part)
 			is PostPart -> render(writer, part)
 			is FreemailPart -> render(writer, part)
-			is Iterable<*> -> render(writer, part as Iterable<Part>)
 		}
 	}
 
