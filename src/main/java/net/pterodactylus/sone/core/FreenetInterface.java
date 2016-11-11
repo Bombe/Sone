@@ -61,6 +61,7 @@ import freenet.keys.InsertableClientSSK;
 import freenet.keys.USK;
 import freenet.node.Node;
 import freenet.node.RequestClient;
+import freenet.node.RequestClientBuilder;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
 import freenet.support.api.RandomAccessBucket;
@@ -93,17 +94,7 @@ public class FreenetInterface {
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
 
-	private final RequestClient imageInserts = new RequestClient() {
-		@Override
-		public boolean persistent() {
-			return false;
-		}
-
-		@Override
-		public boolean realTimeFlag() {
-			return true;
-		}
-	};
+	private final RequestClient imageInserts = new RequestClientBuilder().realTime().build();
 
 	/**
 	 * Creates a new Freenet interface.
