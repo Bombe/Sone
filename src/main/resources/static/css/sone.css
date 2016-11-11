@@ -440,6 +440,21 @@ textarea {
 	color: green;
 }
 
+#sone .post .linked-images {
+	margin-top: 1ex;
+}
+
+#sone .post .linked-image {
+	display: inline-block;
+	border: solid 1px black;
+	width: 160px;
+	height: 120px;
+	background-size: cover;
+	background-position: center;
+	margin-right: 1ex;
+	margin-bottom: 1ex;
+}
+
 #sone .post .replies {
 	clear: both;
 	padding-top: 0.2ex;
@@ -494,6 +509,21 @@ textarea {
 	display: inline;
 	color: #666;
 	font-size: inherit;
+}
+
+#sone .post .reply .linked-images {
+	margin-top: 1ex;
+}
+
+#sone .post .reply .linked-image {
+	display: inline-block;
+	border: solid 1px black;
+	width: 120px;
+	height: 90px;
+	background-size: cover;
+	background-position: center;
+	margin-right: 1ex;
+	margin-bottom: 1ex;
 }
 
 #sone .post .show-reply-form {

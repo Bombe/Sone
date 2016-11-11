@@ -23,6 +23,18 @@
 			<div class="reply-text short-text<%if raw> hidden<%/if><%if shortText|match key=renderedText> hidden<%/if>"><% shortText></div>
 			<%if !shortText|match value=renderedText><%if !raw><a class="expand-reply-text" href="viewPost.html?post=<% reply.postId|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
 			<%if !shortText|match value=renderedText><%if !raw><a class="shrink-reply-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
+			<% parsedText|linked-images|store key==linkedImages>
+			<% foreach linkedImages linkedImage>
+				<% first>
+					<div class="linked-images">
+				<%/first>
+				<a href="/<% linkedImage.link|html>">
+					<span class="linked-image" title="<% linkedImage.link|html>" style="background-image: url('/<% linkedImage.link|html>')"/>
+				</a>
+				<% last>
+					</div>
+				<%/last>
+			<%/foreach>
 		</div>
 		<div class="reply-status-line status-line">
 			<div class="time"><% reply.time|date format=="MMM d, yyyy, HH:mm:ss"></div>
