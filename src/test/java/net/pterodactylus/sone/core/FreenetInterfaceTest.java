@@ -40,9 +40,9 @@ import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.impl.ImageImpl;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.data.impl.ImageImpl;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchContext;
