@@ -101,7 +101,7 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 	}
 
 	private fun render(writer: Writer, freenetLinkPart: FreenetLinkPart) {
-		renderLink(writer, "/${freenetLinkPart.link}", freenetLinkPart.text, freenetLinkPart.title, if (freenetLinkPart.isTrusted) "freenet-trusted" else "freenet")
+		renderLink(writer, "/${freenetLinkPart.link}", freenetLinkPart.text, freenetLinkPart.title, if (freenetLinkPart.trusted) "freenet-trusted" else "freenet")
 	}
 
 	private fun render(writer: Writer, linkPart: LinkPart) {

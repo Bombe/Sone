@@ -372,7 +372,7 @@ public class SoneTextParserTest {
 				text.append(((PlainTextPart) part).getText());
 			} else if (part instanceof FreenetLinkPart) {
 				FreenetLinkPart freenetLinkPart = (FreenetLinkPart) part;
-				text.append('[').append(freenetLinkPart.getLink()).append('|').append(freenetLinkPart.isTrusted() ? "trusted|" : "").append(freenetLinkPart.getTitle()).append('|').append(freenetLinkPart.getText()).append(']');
+				text.append('[').append(freenetLinkPart.getLink()).append('|').append(freenetLinkPart.getTrusted() ? "trusted|" : "").append(freenetLinkPart.getTitle()).append('|').append(freenetLinkPart.getText()).append(']');
 			} else if (part instanceof FreemailPart) {
 				FreemailPart freemailPart = (FreemailPart) part;
 				text.append(format("[Freemail|%s|%s|%s]", freemailPart.getEmailLocalPart(), freemailPart.getFreemailId(), freemailPart.getIdentityId()));
