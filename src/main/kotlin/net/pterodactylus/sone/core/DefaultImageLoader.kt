@@ -4,11 +4,12 @@ import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
 import java.io.ByteArrayInputStream
 import javax.imageio.ImageIO
+import javax.inject.Inject
 
 /**
  * [ImageLoader] implementation that uses a simple Guava [com.google.common.cache.Cache].
  */
-class DefaultImageLoader(private val freenetInterface: FreenetInterface) : ImageLoader {
+class DefaultImageLoader @Inject constructor(private val freenetInterface: FreenetInterface) : ImageLoader {
 
 	private val imageCache = CacheBuilder.newBuilder().build<String, LoadedImage>()
 	private val callback = object : FreenetInterface.BackgroundFetchCallback {
