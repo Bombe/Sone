@@ -40,7 +40,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.core.ImageLoader;
+import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
@@ -85,7 +85,8 @@ import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.ImageAccessor;
 import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
-import net.pterodactylus.sone.template.LinkedImagesFilter;
+import net.pterodactylus.sone.template.LinkedElementRenderFilter;
+import net.pterodactylus.sone.template.LinkedElementsFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ProfileAccessor;
@@ -258,7 +259,7 @@ public class WebInterface {
 	 *            The Sone plugin
 	 */
 	@Inject
-	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter, ImageLoader imageLoader) {
+	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter, ElementLoader elementLoader) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -293,7 +294,8 @@ public class WebInterface {
 		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), soneTextParser));
 		templateContextFactory.addFilter("shorten", shortenFilter = new ShortenFilter());
 		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), templateContextFactory));
-		templateContextFactory.addFilter("linked-images", new LinkedImagesFilter(imageLoader));
+		templateContextFactory.addFilter("linked-elements", new LinkedElementsFilter(elementLoader));
+		templateContextFactory.addFilter("render-linked-element", new LinkedElementRenderFilter(templateContextFactory));
 		templateContextFactory.addFilter("reparse", new ReparseFilter());
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());

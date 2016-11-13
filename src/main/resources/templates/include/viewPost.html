@@ -35,14 +35,12 @@
 			<div class="post-text short-text<%if raw> hidden<%/if><%if shortText|match key=renderedText> hidden<%/if>"><% shortText></div>
 			<%if !shortText|match value=renderedText><%if !raw><a class="expand-post-text" href="viewPost.html?post=<% post.id|html>&amp;raw=true"><%= View.Post.ShowMore|l10n|html></a><%/if><%/if>
 			<%if !shortText|match value=renderedText><%if !raw><a class="shrink-post-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
-			<% parsedText|linked-images|store key==linkedImages>
-			<% foreach linkedImages linkedImage>
+			<% parsedText|linked-elements|store key==linkedElements>
+			<% foreach linkedElements linkedElement>
 				<% first>
-					<div class="linked-images">
+					<div class="linked-elements">
 				<%/first>
-				<a href="/<% linkedImage.link|html>">
-					<span class="linked-image" title="<% linkedImage.link|html>" style="background-image: url('/<% linkedImage.link|html>')"/>
-				</a>
+				<% linkedElement|render-linked-element>
 				<% last>
 					</div>
 				<%/last>

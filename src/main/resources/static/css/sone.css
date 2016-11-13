@@ -440,11 +440,11 @@ textarea {
 	color: green;
 }
 
-#sone .post .linked-images {
+#sone .post .linked-elements {
 	margin-top: 1ex;
 }
 
-#sone .post .linked-image {
+#sone .post .linked-element {
 	display: inline-block;
 	border: solid 1px black;
 	width: 160px;
@@ -511,11 +511,11 @@ textarea {
 	font-size: inherit;
 }
 
-#sone .post .reply .linked-images {
+#sone .post .reply .linked-elements {
 	margin-top: 1ex;
 }
 
-#sone .post .reply .linked-image {
+#sone .post .reply .linked-element {
 	display: inline-block;
 	border: solid 1px black;
 	width: 120px;

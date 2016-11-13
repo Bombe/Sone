@@ -7,14 +7,14 @@ import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 
 /**
- * Unit test for [ImageLoader].
+ * Unit test for [ElementLoader].
  */
-class ImageLoaderTest {
+class ElementLoaderTest {
 
 	@Test
 	fun `default image loader can be loaded by guice`() {
 		val injector = createInjector(bindMock<FreenetInterface>())
-		assertThat(injector.getInstance(ImageLoader::class.java), notNullValue());
+		assertThat(injector.getInstance(ElementLoader::class.java), notNullValue());
 	}
 
 }
