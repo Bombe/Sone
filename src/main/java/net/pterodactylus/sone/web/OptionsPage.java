@@ -24,7 +24,7 @@ import java.util.List;
 
 import net.pterodactylus.sone.core.Preferences;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.SoneOptions.ShowCustomAvatars;
+import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
@@ -75,7 +75,7 @@ public class OptionsPage extends SoneTemplatePage {
 				boolean showNotificationNewReplies = request.getHttpRequest().isPartSet("show-notification-new-replies");
 				currentSone.getOptions().setShowNewReplyNotifications(showNotificationNewReplies);
 				String showCustomAvatars = request.getHttpRequest().getPartAsStringFailsafe("show-custom-avatars", 32);
-				currentSone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(showCustomAvatars));
+				currentSone.getOptions().setShowCustomAvatars(LoadExternalContent.valueOf(showCustomAvatars));
 				webInterface.getCore().touchConfiguration();
 			}
 			Integer insertionDelay = parseInt(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16), null);

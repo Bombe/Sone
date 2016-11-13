@@ -69,7 +69,7 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.sone.data.SoneOptions.ShowCustomAvatars;
+import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
@@ -1070,7 +1070,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.getOptions().setShowNewSoneNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(true));
 		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(true));
 		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(true));
-		sone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(ShowCustomAvatars.NEVER.name())));
+		sone.getOptions().setShowCustomAvatars(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(LoadExternalContent.NEVER.name())));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {

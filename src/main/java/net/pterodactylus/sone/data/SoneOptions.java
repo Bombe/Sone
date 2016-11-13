@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.data;
 
-import static net.pterodactylus.sone.data.SoneOptions.ShowCustomAvatars.NEVER;
+import static net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.NEVER;
 
 /**
  * All Sone-specific options.
@@ -24,15 +24,15 @@ public interface SoneOptions {
 	boolean isShowNewReplyNotifications();
 	void setShowNewReplyNotifications(boolean showNewReplyNotifications);
 
-	ShowCustomAvatars getShowCustomAvatars();
-	void setShowCustomAvatars(ShowCustomAvatars showCustomAvatars);
+	LoadExternalContent getShowCustomAvatars();
+	void setShowCustomAvatars(LoadExternalContent showCustomAvatars);
 
 	/**
-	 * The possible values for the “show custom avatars” option.
+	 * Possible values for all options that are related to loading external content.
 	 *
 	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
-	enum ShowCustomAvatars {
+	enum LoadExternalContent {
 
 		/** Never show custom avatars. */
 		NEVER,
@@ -63,7 +63,7 @@ public interface SoneOptions {
 		private boolean showNewSoneNotifications = true;
 		private boolean showNewPostNotifications = true;
 		private boolean showNewReplyNotifications = true;
-		private ShowCustomAvatars showCustomAvatars = NEVER;
+		private LoadExternalContent showCustomAvatars = NEVER;
 
 		@Override
 		public boolean isAutoFollow() {
@@ -116,12 +116,12 @@ public interface SoneOptions {
 		}
 
 		@Override
-		public ShowCustomAvatars getShowCustomAvatars() {
+		public LoadExternalContent getShowCustomAvatars() {
 			return showCustomAvatars;
 		}
 
 		@Override
-		public void setShowCustomAvatars(ShowCustomAvatars showCustomAvatars) {
+		public void setShowCustomAvatars(LoadExternalContent showCustomAvatars) {
 			this.showCustomAvatars = showCustomAvatars;
 		}
 
