@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.core
 
+import com.google.common.base.Ticker
 import com.google.common.io.ByteStreams
 import freenet.keys.FreenetURI
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
@@ -7,13 +8,14 @@ import net.pterodactylus.sone.test.capture
 import net.pterodactylus.sone.test.mock
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.instanceOf
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
+import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import java.io.ByteArrayOutputStream
+import java.util.concurrent.TimeUnit
 
 /**
  * Unit test for [DefaultElementLoaderTest].
@@ -26,9 +28,9 @@ class DefaultElementLoaderTest {
 	}
 
 	private val freenetInterface = mock<FreenetInterface>()
-	private val elementLoader = DefaultElementLoader(freenetInterface)
+	private val ticker = mock<Ticker>()
+	private val elementLoader = DefaultElementLoader(freenetInterface, ticker)
 	private val callback = capture<BackgroundFetchCallback>()
-
 
 	@Test
 	fun `image loader starts request for link that is not known`() {
@@ -82,17 +84,27 @@ class DefaultElementLoaderTest {
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		callback.value.loaded(freenetURI, "image/png", read("/static/images/unknown-image-0.png"))
 		val linkedElement = elementLoader.loadElement(IMAGE_ID)
-		assertThat(linkedElement.link, `is`(IMAGE_ID))
-		assertThat(linkedElement.loading, `is`(false))
-		assertThat(linkedElement, instanceOf(LinkedImage::class.java))
+		assertThat(linkedElement, `is`(LinkedElement(IMAGE_ID)))
 	}
 
 	@Test
-	fun `image can be loaded again after it failed`() {
+	fun `image is not loaded again after it failed`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		callback.value.failed(freenetURI)
+		assertThat(elementLoader.loadElement(IMAGE_ID).failed, `is`(true))
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+	}
+
+	@Test
+	fun `image is loaded again after failure cache is expired`() {
 		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		callback.value.failed(freenetURI)
+		`when`(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(31))
+		val linkedElement = elementLoader.loadElement(IMAGE_ID)
+		assertThat(linkedElement.failed, `is`(false))
+		assertThat(linkedElement.loading, `is`(true))
 		verify(freenetInterface, times(2)).startFetch(eq(freenetURI), callback.capture())
 	}
 

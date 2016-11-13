@@ -18,6 +18,7 @@ class LinkedElementsFilter(private val elementLoader: ElementLoader) : Filter {
 			(data as? Iterable<Part>)
 					?.filterIsInstance<FreenetLinkPart>()
 					?.map { elementLoader.loadElement(it.link) }
+					?.filter { !it.failed }
 					?: listOf<LinkedElement>()
 
 }

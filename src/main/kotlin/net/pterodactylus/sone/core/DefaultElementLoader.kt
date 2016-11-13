@@ -1,18 +1,21 @@
 package net.pterodactylus.sone.core
 
+import com.google.common.base.Ticker
 import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
 import java.io.ByteArrayInputStream
+import java.util.concurrent.TimeUnit.MINUTES
 import javax.imageio.ImageIO
 import javax.inject.Inject
 
 /**
  * [ElementLoader] implementation that uses a simple Guava [com.google.common.cache.Cache].
  */
-class DefaultElementLoader @Inject constructor(private val freenetInterface: FreenetInterface) : ElementLoader {
+class DefaultElementLoader @Inject constructor(private val freenetInterface: FreenetInterface, ticker: Ticker = Ticker.systemTicker()) : ElementLoader {
 
 	private val loadingLinks = CacheBuilder.newBuilder().build<String, Boolean>()
-	private val imageCache = CacheBuilder.newBuilder().build<String, LinkedImage>()
+	private val failureCache = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
+	private val imageCache = CacheBuilder.newBuilder().build<String, LinkedElement>()
 	private val callback = object : FreenetInterface.BackgroundFetchCallback {
 		override fun cancelForMimeType(uri: FreenetURI, mimeType: String): Boolean {
 			return !mimeType.startsWith("image/")
@@ -25,12 +28,13 @@ class DefaultElementLoader @Inject constructor(private val freenetInterface: Fre
 			ByteArrayInputStream(data).use {
 				ImageIO.read(it)
 			}?.let {
-				imageCache.get(uri.toString()) { LinkedImage(uri.toString()) }
+				imageCache.get(uri.toString()) { LinkedElement(uri.toString()) }
 			}
 			removeLoadingLink(uri)
 		}
 
 		override fun failed(uri: FreenetURI) {
+			failureCache.put(uri.toString(), true)
 			removeLoadingLink(uri)
 		}
 
@@ -46,15 +50,15 @@ class DefaultElementLoader @Inject constructor(private val freenetInterface: Fre
 			imageCache.getIfPresent(link)?.run {
 				return this
 			}
+			failureCache.getIfPresent(link)?.run {
+				return LinkedElement(link, failed = true)
+			}
 			if (loadingLinks.getIfPresent(link) == null) {
 				loadingLinks.put(link, true)
 				freenetInterface.startFetch(FreenetURI(link), callback)
 			}
 		}
-		return object : LinkedElement {
-			override val link = link
-			override val loading = true
-		}
+		return LinkedElement(link, loading = true)
 	}
 
 }

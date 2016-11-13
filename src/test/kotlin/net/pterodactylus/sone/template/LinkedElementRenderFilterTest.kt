@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.template
 
-import net.pterodactylus.sone.core.LinkedImage
+import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.util.template.HtmlFilter
 import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
@@ -23,7 +23,7 @@ class LinkedElementRenderFilterTest {
 
 	@Test
 	fun `filter can render linked images`() {
-		val html = filter.format(null, LinkedImage("KSK@gpl.png"), emptyMap<String, Any?>()) as String
+		val html = filter.format(null, LinkedElement("KSK@gpl.png"), emptyMap<String, Any?>()) as String
 		val linkNode = Jsoup.parseBodyFragment(html).body().child(0)
 		assertThat(linkNode.nodeName(), `is`("a"))
 		assertThat(linkNode.attr("href"), `is`("/KSK@gpl.png"))

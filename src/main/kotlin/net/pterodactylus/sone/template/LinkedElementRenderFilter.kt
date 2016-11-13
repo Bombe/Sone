@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.template
 
 import net.pterodactylus.sone.core.LinkedElement
-import net.pterodactylus.sone.core.LinkedImage
 import net.pterodactylus.util.template.Filter
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.template.TemplateContextFactory
@@ -24,14 +23,14 @@ class LinkedElementRenderFilter(private val templateContextFactory: TemplateCont
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
 			when {
 				data is LinkedElement && data.loading -> renderNotLoadedLinkedElement(data)
-				data is LinkedImage -> renderLinkedImage(data)
+				data is LinkedElement -> renderLinkedImage(data)
 				else -> null
 			}
 
-	private fun renderLinkedImage(linkedImage: LinkedImage) =
+	private fun renderLinkedImage(linkedElement: LinkedElement) =
 			StringWriter().use {
 				val templateContext = templateContextFactory.createTemplateContext()
-				templateContext["link"] = linkedImage.link
+				templateContext["link"] = linkedElement.link
 				loadedImageTemplate.render(templateContext, it)
 				it
 			}.toString()

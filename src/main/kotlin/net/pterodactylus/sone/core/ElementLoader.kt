@@ -12,11 +12,4 @@ interface ElementLoader {
 
 }
 
-interface LinkedElement {
-
-	val link: String
-	val loading: Boolean
-
-}
-
-data class LinkedImage(override val link: String, override val loading: Boolean = false) : LinkedElement
+data class LinkedElement(val link: String, val failed: Boolean = false, val loading: Boolean = false)
