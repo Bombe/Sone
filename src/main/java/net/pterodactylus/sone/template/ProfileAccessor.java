@@ -20,7 +20,7 @@ package net.pterodactylus.sone.template;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import net.pterodactylus.sone.data.SoneOptions.ShowCustomAvatars;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.template.Accessor;

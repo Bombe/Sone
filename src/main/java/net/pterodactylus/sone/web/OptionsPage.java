@@ -24,7 +24,7 @@ import java.util.List;
 
 import net.pterodactylus.sone.core.Preferences;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import net.pterodactylus.sone.data.SoneOptions.ShowCustomAvatars;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;

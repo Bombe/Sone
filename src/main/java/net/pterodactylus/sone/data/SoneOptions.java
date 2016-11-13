@@ -1,8 +1,6 @@
 package net.pterodactylus.sone.data;
 
-import static net.pterodactylus.sone.data.Sone.ShowCustomAvatars.NEVER;
-
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import static net.pterodactylus.sone.data.SoneOptions.ShowCustomAvatars.NEVER;
 
 /**
  * All Sone-specific options.
@@ -28,6 +26,30 @@ public interface SoneOptions {
 
 	ShowCustomAvatars getShowCustomAvatars();
 	void setShowCustomAvatars(ShowCustomAvatars showCustomAvatars);
+
+	/**
+	 * The possible values for the “show custom avatars” option.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	enum ShowCustomAvatars {
+
+		/** Never show custom avatars. */
+		NEVER,
+
+		/** Only show custom avatars of followed Sones. */
+		FOLLOWED,
+
+		/** Only show custom avatars of Sones you manually trust. */
+		MANUALLY_TRUSTED,
+
+		/** Only show custom avatars of automatically trusted Sones. */
+		TRUSTED,
+
+		/** Always show custom avatars. */
+		ALWAYS,
+
+	}
 
 	/**
 	 * {@link SoneOptions} implementation.
