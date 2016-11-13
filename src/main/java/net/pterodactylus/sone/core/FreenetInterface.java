@@ -178,7 +178,11 @@ public class FreenetInterface {
 			@Override
 			public boolean snoopMetadata(Metadata meta, ClientContext context) {
 				String mimeType = meta.getMIMEType();
-				return (mimeType == null) || backgroundFetchCallback.cancelForMimeType(uri, mimeType);
+				boolean cancel = (mimeType == null) || backgroundFetchCallback.cancelForMimeType(uri, mimeType);
+				if (cancel) {
+					backgroundFetchCallback.failed(uri);
+				}
+				return cancel;
 			}
 		};
 		FetchContext fetchContext = client.getFetchContext();

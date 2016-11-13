@@ -440,27 +440,32 @@ public class FreenetInterfaceTest {
 	@Test
 	public void requestIsNotCancelledForImageMimeType() {
 		verifySnoopCancelsRequestForMimeType("image/png", false);
+		verify(backgroundFetchCallback, never()).failed(uri);
 	}
 
 	@Test
 	public void requestIsCancelledForNullMimeType() {
 		verifySnoopCancelsRequestForMimeType(null, true);
 		verify(backgroundFetchCallback, never()).cancelForMimeType(eq(uri), ArgumentMatchers.<String>any());
+		verify(backgroundFetchCallback).failed(uri);
 	}
 
 	@Test
 	public void requestIsCancelledForVideoMimeType() {
 		verifySnoopCancelsRequestForMimeType("video/mkv", true);
+		verify(backgroundFetchCallback).failed(uri);
 	}
 
 	@Test
 	public void requestIsCancelledForAudioMimeType() {
 		verifySnoopCancelsRequestForMimeType("audio/mpeg", true);
+		verify(backgroundFetchCallback).failed(uri);
 	}
 
 	@Test
 	public void requestIsCancelledForTextMimeType() {
 		verifySnoopCancelsRequestForMimeType("text/plain", true);
+		verify(backgroundFetchCallback).failed(uri);
 	}
 
 	private void verifySnoopCancelsRequestForMimeType(String mimeType, boolean cancel) {
