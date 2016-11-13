@@ -11,7 +11,9 @@ import javax.inject.Inject
 /**
  * [ElementLoader] implementation that uses a simple Guava [com.google.common.cache.Cache].
  */
-class DefaultElementLoader @Inject constructor(private val freenetInterface: FreenetInterface, ticker: Ticker = Ticker.systemTicker()) : ElementLoader {
+class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticker: Ticker) : ElementLoader {
+
+	@Inject constructor(freenetInterface: FreenetInterface) : this(freenetInterface, Ticker.systemTicker())
 
 	private val loadingLinks = CacheBuilder.newBuilder().build<String, Boolean>()
 	private val failureCache = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
