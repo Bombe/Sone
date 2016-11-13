@@ -14,6 +14,10 @@ class DefaultElementLoader @Inject constructor(private val freenetInterface: Fre
 	private val loadingLinks = CacheBuilder.newBuilder().build<String, Boolean>()
 	private val imageCache = CacheBuilder.newBuilder().build<String, LinkedImage>()
 	private val callback = object : FreenetInterface.BackgroundFetchCallback {
+		override fun cancelForMimeType(uri: FreenetURI, mimeType: String): Boolean {
+			return !mimeType.startsWith("image/")
+		}
+
 		override fun loaded(uri: FreenetURI, mimeType: String, data: ByteArray) {
 			if (!mimeType.startsWith("image/")) {
 				return

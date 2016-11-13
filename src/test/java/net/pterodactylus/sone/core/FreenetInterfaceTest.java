@@ -54,9 +54,12 @@ import freenet.client.InsertBlock;
 import freenet.client.InsertContext;
 import freenet.client.InsertException;
 import freenet.client.InsertException.InsertExceptionMode;
+import freenet.client.Metadata;
+import freenet.client.async.ClientContext;
 import freenet.client.async.ClientGetCallback;
 import freenet.client.async.ClientGetter;
 import freenet.client.async.ClientPutter;
+import freenet.client.async.SnoopMetadata;
 import freenet.client.async.USKCallback;
 import freenet.client.async.USKManager;
 import freenet.crypt.DummyRandomSource;
@@ -101,13 +104,15 @@ public class FreenetInterfaceTest {
 	private final FreenetURI uri = new FreenetURI("KSK@pgl.png");
 	private final FetchResult fetchResult = mock(FetchResult.class);
 	private final BackgroundFetchCallback backgroundFetchCallback = mock(BackgroundFetchCallback.class);
+	private final ClientGetter clientGetter = mock(ClientGetter.class);
 
 	public FreenetInterfaceTest() throws MalformedURLException {
 	}
 
 	@Before
-	public void setupHighLevelSimpleClient() {
+	public void setupHighLevelSimpleClient() throws Exception {
 		when(highLevelSimpleClient.getFetchContext()).thenReturn(mock(FetchContext.class));
+		when(highLevelSimpleClient.fetch(eq(uri), anyLong(), any(ClientGetCallback.class), any(FetchContext.class), anyShort())).thenReturn( clientGetter);
 	}
 
 	@Before
@@ -116,6 +121,7 @@ public class FreenetInterfaceTest {
 		setFinalField(node, "clientCore", nodeClientCore);
 		setFinalField(node, "random", randomSource);
 		setFinalField(nodeClientCore, "uskManager", uskManager);
+		setFinalField(nodeClientCore, "clientContext", mock(ClientContext.class));
 		freenetInterface = new FreenetInterface(eventBus, node);
 		insertToken = freenetInterface.new InsertToken(image);
 		insertToken.setBucket(bucket);
@@ -422,6 +428,49 @@ public class FreenetInterfaceTest {
 	public void backgroundFetchCanBeStarted() throws Exception {
 		freenetInterface.startFetch(uri, backgroundFetchCallback);
 		verify(highLevelSimpleClient).fetch(eq(uri), anyLong(), any(ClientGetCallback.class), any(FetchContext.class), anyShort());
+	}
+
+	@Test
+	public void backgroundFetchRegistersSnoopAndRestartsTheRequest() throws Exception {
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		verify(clientGetter).setMetaSnoop(any(SnoopMetadata.class));
+		verify(clientGetter).restart(eq(uri), anyBoolean(), any(ClientContext.class));
+	}
+
+	@Test
+	public void requestIsNotCancelledForImageMimeType() {
+		verifySnoopCancelsRequestForMimeType("image/png", false);
+	}
+
+	@Test
+	public void requestIsCancelledForNullMimeType() {
+		verifySnoopCancelsRequestForMimeType(null, true);
+		verify(backgroundFetchCallback, never()).cancelForMimeType(eq(uri), ArgumentMatchers.<String>any());
+	}
+
+	@Test
+	public void requestIsCancelledForVideoMimeType() {
+		verifySnoopCancelsRequestForMimeType("video/mkv", true);
+	}
+
+	@Test
+	public void requestIsCancelledForAudioMimeType() {
+		verifySnoopCancelsRequestForMimeType("audio/mpeg", true);
+	}
+
+	@Test
+	public void requestIsCancelledForTextMimeType() {
+		verifySnoopCancelsRequestForMimeType("text/plain", true);
+	}
+
+	private void verifySnoopCancelsRequestForMimeType(String mimeType, boolean cancel) {
+		when(backgroundFetchCallback.cancelForMimeType(uri, mimeType)).thenReturn(cancel);
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		ArgumentCaptor<SnoopMetadata> snoopMetadata = forClass(SnoopMetadata.class);
+		verify(clientGetter).setMetaSnoop(snoopMetadata.capture());
+		Metadata metadata = mock(Metadata.class);
+		when(metadata.getMIMEType()).thenReturn(mimeType);
+		assertThat(snoopMetadata.getValue().snoopMetadata(metadata, mock(ClientContext.class)), is(cancel));
 	}
 
 	@Test

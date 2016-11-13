@@ -55,12 +55,14 @@ import freenet.client.HighLevelSimpleClient;
 import freenet.client.InsertBlock;
 import freenet.client.InsertContext;
 import freenet.client.InsertException;
+import freenet.client.Metadata;
 import freenet.client.async.BaseClientPutter;
 import freenet.client.async.ClientContext;
 import freenet.client.async.ClientGetCallback;
 import freenet.client.async.ClientGetter;
 import freenet.client.async.ClientPutCallback;
 import freenet.client.async.ClientPutter;
+import freenet.client.async.SnoopMetadata;
 import freenet.client.async.USKCallback;
 import freenet.keys.FreenetURI;
 import freenet.keys.InsertableClientSSK;
@@ -172,15 +174,25 @@ public class FreenetInterface {
 				return imageLoader;
 			}
 		};
+		SnoopMetadata snoop = new SnoopMetadata() {
+			@Override
+			public boolean snoopMetadata(Metadata meta, ClientContext context) {
+				String mimeType = meta.getMIMEType();
+				return (mimeType == null) || backgroundFetchCallback.cancelForMimeType(uri, mimeType);
+			}
+		};
 		FetchContext fetchContext = client.getFetchContext();
 		try {
-			client.fetch(uri, 1048576, callback, fetchContext, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
+			ClientGetter clientGetter = client.fetch(uri, 1048576, callback, fetchContext, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
+			clientGetter.setMetaSnoop(snoop);
+			clientGetter.restart(uri, fetchContext.filterData, node.clientCore.clientContext);
 		} catch (FetchException fe) {
 			/* stupid exception that can not actually be thrown! */
 		}
 	}
 
 	public interface BackgroundFetchCallback {
+		boolean cancelForMimeType(@Nonnull FreenetURI uri, @Nonnull String mimeType);
 		void loaded(@Nonnull FreenetURI uri, @Nonnull String mimeType, @Nonnull byte[] data);
 		void failed(@Nonnull FreenetURI uri);
 	}

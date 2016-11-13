@@ -1,17 +1,13 @@
 package net.pterodactylus.sone.core
 
 import com.google.common.io.ByteStreams
-import com.google.common.io.Files
 import freenet.keys.FreenetURI
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
 import net.pterodactylus.sone.test.capture
 import net.pterodactylus.sone.test.mock
-import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.instanceOf
-import org.hamcrest.Matchers.nullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -26,23 +22,25 @@ class DefaultElementLoaderTest {
 
 	companion object {
 		private const val IMAGE_ID = "KSK@gpl.png"
+		private val freenetURI = FreenetURI(IMAGE_ID)
 	}
 
 	private val freenetInterface = mock<FreenetInterface>()
 	private val elementLoader = DefaultElementLoader(freenetInterface)
 	private val callback = capture<BackgroundFetchCallback>()
 
+
 	@Test
 	fun `image loader starts request for link that is not known`() {
 		elementLoader.loadElement(IMAGE_ID)
-		verify(freenetInterface).startFetch(eq(FreenetURI(IMAGE_ID)), any<BackgroundFetchCallback>())
+		verify(freenetInterface).startFetch(eq(freenetURI), any<BackgroundFetchCallback>())
 	}
 
 	@Test
 	fun `element loader only starts request once`() {
 		elementLoader.loadElement(IMAGE_ID)
 		elementLoader.loadElement(IMAGE_ID)
-		verify(freenetInterface).startFetch(eq(FreenetURI(IMAGE_ID)), any<BackgroundFetchCallback>())
+		verify(freenetInterface).startFetch(eq(freenetURI), any<BackgroundFetchCallback>())
 	}
 
 	@Test
@@ -51,10 +49,38 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element loader does not cancel on image mime type`() {
+		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		assertThat(callback.value.cancelForMimeType(freenetURI, "image/png"), `is`(false))
+	}
+
+	@Test
+	fun `element loader does  cancel on audio mime type`() {
+		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		assertThat(callback.value.cancelForMimeType(freenetURI, "audio/mpeg"), `is`(true))
+	}
+
+	@Test
+	fun `element loader does not cancel on video mime type`() {
+		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		assertThat(callback.value.cancelForMimeType(freenetURI, "video/mkv"), `is`(true))
+	}
+
+	@Test
+	fun `element loader does not cancel on text mime type`() {
+		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		assertThat(callback.value.cancelForMimeType(freenetURI, "text/plain"), `is`(true))
+	}
+
+	@Test
 	fun `image loader can load image`() {
 		elementLoader.loadElement(IMAGE_ID)
-		verify(freenetInterface).startFetch(eq(FreenetURI(IMAGE_ID)), callback.capture())
-	    callback.value.loaded(FreenetURI(IMAGE_ID), "image/png", read("/static/images/unknown-image-0.png"))
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		callback.value.loaded(freenetURI, "image/png", read("/static/images/unknown-image-0.png"))
 		val linkedElement = elementLoader.loadElement(IMAGE_ID)
 		assertThat(linkedElement.link, `is`(IMAGE_ID))
 		assertThat(linkedElement.loading, `is`(false))
@@ -64,10 +90,10 @@ class DefaultElementLoaderTest {
 	@Test
 	fun `image can be loaded again after it failed`() {
 		elementLoader.loadElement(IMAGE_ID)
-		verify(freenetInterface).startFetch(eq(FreenetURI(IMAGE_ID)), callback.capture())
-		callback.value.failed(FreenetURI(IMAGE_ID))
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		callback.value.failed(freenetURI)
 		elementLoader.loadElement(IMAGE_ID)
-		verify(freenetInterface, times(2)).startFetch(eq(FreenetURI(IMAGE_ID)), callback.capture())
+		verify(freenetInterface, times(2)).startFetch(eq(freenetURI), callback.capture())
 	}
 
 	private fun read(resource: String): ByteArray =
