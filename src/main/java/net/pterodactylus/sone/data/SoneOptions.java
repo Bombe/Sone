@@ -2,6 +2,8 @@ package net.pterodactylus.sone.data;
 
 import static net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.NEVER;
 
+import javax.annotation.Nonnull;
+
 /**
  * All Sone-specific options.
  *
@@ -26,6 +28,9 @@ public interface SoneOptions {
 
 	LoadExternalContent getShowCustomAvatars();
 	void setShowCustomAvatars(LoadExternalContent showCustomAvatars);
+
+	@Nonnull LoadExternalContent getLoadLinkedImages();
+	void setLoadLinkedImages(@Nonnull LoadExternalContent loadLinkedImages);
 
 	/**
 	 * Possible values for all options that are related to loading external content.
@@ -64,6 +69,7 @@ public interface SoneOptions {
 		private boolean showNewPostNotifications = true;
 		private boolean showNewReplyNotifications = true;
 		private LoadExternalContent showCustomAvatars = NEVER;
+		private LoadExternalContent loadLinkedImages = NEVER;
 
 		@Override
 		public boolean isAutoFollow() {
@@ -123,6 +129,17 @@ public interface SoneOptions {
 		@Override
 		public void setShowCustomAvatars(LoadExternalContent showCustomAvatars) {
 			this.showCustomAvatars = showCustomAvatars;
+		}
+
+		@Nonnull
+		@Override
+		public LoadExternalContent getLoadLinkedImages() {
+			return loadLinkedImages;
+		}
+
+		@Override
+		public void setLoadLinkedImages(@Nonnull LoadExternalContent loadLinkedImages) {
+			this.loadLinkedImages = loadLinkedImages;
 		}
 
 	}

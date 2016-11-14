@@ -26,7 +26,7 @@ public class NewPageTest extends WebPageTest {
 
 	@Before
 	public void setupNumberOfPostsPerPage() {
-		when(webInterface.getCore().getPreferences().getPostsPerPage()).thenReturn(5);
+		webInterface.getCore().getPreferences().setPostsPerPage(5);
 	}
 
 	@Test

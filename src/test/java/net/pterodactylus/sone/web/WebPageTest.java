@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Set;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.Preferences;
 import net.pterodactylus.sone.core.UpdateChecker;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
@@ -30,6 +32,7 @@ import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
 import com.google.common.base.Optional;
+import com.google.common.eventbus.EventBus;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -48,6 +51,7 @@ public abstract class WebPageTest {
 
 	protected final Template template = new Template();
 	protected final WebInterface webInterface = mock(WebInterface.class, RETURNS_DEEP_STUBS);
+	protected final EventBus eventBus = mock(EventBus.class);
 	protected final Core core = webInterface.getCore();
 
 	protected final Sone currentSone = mock(Sone.class);
@@ -76,6 +80,7 @@ public abstract class WebPageTest {
 	public final void setupCore() {
 		UpdateChecker updateChecker = mock(UpdateChecker.class);
 		when(core.getUpdateChecker()).thenReturn(updateChecker);
+		when(core.getPreferences()).thenReturn(new Preferences(eventBus));
 		when(core.getLocalSone(anyString())).thenReturn(null);
 		when(core.getLocalSones()).thenReturn(localSones);
 		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
@@ -92,6 +97,11 @@ public abstract class WebPageTest {
 		when(webInterface.getCurrentSone(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone);
 		when(webInterface.getNotifications(currentSone)).thenReturn(new ArrayList<Notification>());
+	}
+
+	@Before
+	public void setupSone() {
+		when(currentSone.getOptions()).thenReturn(new DefaultSoneOptions());
 	}
 
 	protected void unsetCurrentSone() {

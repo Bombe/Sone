@@ -1071,6 +1071,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(true));
 		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(true));
 		sone.getOptions().setShowCustomAvatars(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(LoadExternalContent.NEVER.name())));
+		sone.getOptions().setLoadLinkedImages(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").getValue(LoadExternalContent.NEVER.name())));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
@@ -1548,6 +1549,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").setValue(sone.getOptions().isShowNewPostNotifications());
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").setValue(sone.getOptions().isShowNewReplyNotifications());
 			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().getShowCustomAvatars().name());
+			configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").setValue(sone.getOptions().getLoadLinkedImages().name());
 
 			configuration.save();
 

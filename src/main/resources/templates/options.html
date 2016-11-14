@@ -96,6 +96,33 @@
 			</li>
 		</ul>
 
+		<h2><%= Page.Options.Section.LoadLinkedImagesOptions.Title|l10n|html></h2>
+
+		<p><%= Page.Options.Option.LoadLinkedImages.Description|l10n|html></p>
+
+		<ul>
+			<li>
+				<input type="radio" name="load-linked-images" value="NEVER"<%if load-linked-images|match value==NEVER> checked="checked"<%/if>/>
+				<%=Page.Options.Option.LoadLinkedImages.Never.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="load-linked-images" value="FOLLOWED"<%if load-linked-images|match value==FOLLOWED> checked="checked"<%/if>/>
+				<%=Page.Options.Option.LoadLinkedImages.Followed.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="load-linked-images" value="MANUALLY_TRUSTED"<%if load-linked-images|match value==MANUALLY_TRUSTED> checked="checked"<%/if>/>
+				<%=Page.Options.Option.LoadLinkedImages.ManuallyTrusted.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="load-linked-images" value="TRUSTED"<%if load-linked-images|match value==TRUSTED> checked="checked"<%/if>/>
+				<%=Page.Options.Option.LoadLinkedImages.Trusted.Description|l10n|html>
+			</li>
+			<li>
+				<input type="radio" name="load-linked-images" value="ALWAYS"<%if load-linked-images|match value==ALWAYS> checked="checked"<%/if>/>
+				<%=Page.Options.Option.LoadLinkedImages.Always.Description|l10n|html>
+			</li>
+		</ul>
+
 		<h2><%= Page.Options.Section.RuntimeOptions.Title|l10n|html></h2>
 
 		<p><%= Page.Options.Option.InsertionDelay.Description|l10n|html></p>

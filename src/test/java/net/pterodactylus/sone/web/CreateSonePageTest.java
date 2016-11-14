@@ -132,14 +132,14 @@ public class CreateSonePageTest extends WebPageTest {
 
 	@Test
 	public void doNotShowCreateSoneInMenuIfFullAccessRequiredButClientHasNoFullAccess() {
-		when(core.getPreferences().isRequireFullAccess()).thenReturn(true);
+		core.getPreferences().setRequireFullAccess(true);
 		when(toadletContext.isAllowedFullAccess()).thenReturn(false);
 		assertThat(page.isEnabled(toadletContext), is(false));
 	}
 
 	@Test
 	public void showCreateSoneInMenuIfNotLoggedInAndClientHasFullAccess() {
-		when(core.getPreferences().isRequireFullAccess()).thenReturn(true);
+		core.getPreferences().setRequireFullAccess(true);
 		when(toadletContext.isAllowedFullAccess()).thenReturn(true);
 		unsetCurrentSone();
 		assertThat(page.isEnabled(toadletContext), is(true));

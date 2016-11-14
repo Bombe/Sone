@@ -76,6 +76,8 @@ public class OptionsPage extends SoneTemplatePage {
 				currentSone.getOptions().setShowNewReplyNotifications(showNotificationNewReplies);
 				String showCustomAvatars = request.getHttpRequest().getPartAsStringFailsafe("show-custom-avatars", 32);
 				currentSone.getOptions().setShowCustomAvatars(LoadExternalContent.valueOf(showCustomAvatars));
+				String loadLinkedImages = request.getHttpRequest().getPartAsStringFailsafe("load-linked-images", 32);
+				currentSone.getOptions().setLoadLinkedImages(LoadExternalContent.valueOf(loadLinkedImages));
 				webInterface.getCore().touchConfiguration();
 			}
 			Integer insertionDelay = parseInt(request.getHttpRequest().getPartAsStringFailsafe("insertion-delay", 16), null);
@@ -145,6 +147,7 @@ public class OptionsPage extends SoneTemplatePage {
 			templateContext.set("show-notification-new-posts", currentSone.getOptions().isShowNewPostNotifications());
 			templateContext.set("show-notification-new-replies", currentSone.getOptions().isShowNewReplyNotifications());
 			templateContext.set("show-custom-avatars", currentSone.getOptions().getShowCustomAvatars().name());
+			templateContext.set("load-linked-images", currentSone.getOptions().getLoadLinkedImages().name());
 		}
 		templateContext.set("insertion-delay", preferences.getInsertionDelay());
 		templateContext.set("posts-per-page", preferences.getPostsPerPage());

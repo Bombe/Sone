@@ -38,7 +38,7 @@ public class BookmarksPageTest extends WebPageTest {
 		Post post3 = createPost(true, 2000L);
 		Set<Post> bookmarkedPosts = createBookmarkedPosts(post1, post2, post3);
 		when(core.getBookmarkedPosts()).thenReturn(bookmarkedPosts);
-		when(core.getPreferences().getPostsPerPage()).thenReturn(5);
+		core.getPreferences().setPostsPerPage(5);
 		page.processTemplate(freenetRequest, templateContext);
 		assertThat((Collection<Post>) templateContext.get("posts"), contains(post1, post3, post2));
 		assertThat(((Pagination<Post>) templateContext.get("pagination")).getItems(), contains(post1, post3, post2));
@@ -61,7 +61,7 @@ public class BookmarksPageTest extends WebPageTest {
 		Post post3 = createPost(false, 2000L);
 		Set<Post> bookmarkedPosts = createBookmarkedPosts(post1, post2, post3);
 		when(core.getBookmarkedPosts()).thenReturn(bookmarkedPosts);
-		when(core.getPreferences().getPostsPerPage()).thenReturn(5);
+		core.getPreferences().setPostsPerPage(5);
 		page.processTemplate(freenetRequest, templateContext);
 		assertThat((Collection<Post>) templateContext.get("posts"), contains(post2, post1));
 		assertThat(((Pagination<Post>) templateContext.get("pagination")).getItems(), contains(post2, post1));
