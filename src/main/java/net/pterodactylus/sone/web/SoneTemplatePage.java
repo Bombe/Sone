@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -255,7 +257,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		handleRequest(request, templateContext);
 	}
 
-	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
+	protected void handleRequest(@Nonnull FreenetRequest request, @Nonnull TemplateContext templateContext) throws RedirectException {
 	}
 
 	/**
