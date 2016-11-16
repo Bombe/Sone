@@ -12,3 +12,5 @@ inline fun <reified T : Any> bind(implementation: T): Module =
 
 inline fun <reified T : Any> bindMock(): Module =
 		Module { it!!.bind(T::class.java).toInstance(mock<T>()) }
+
+inline fun <reified T: Any> whenever(methodCall: T) = Mockito.`when`(methodCall)
