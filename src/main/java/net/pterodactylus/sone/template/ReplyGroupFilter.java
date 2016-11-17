@@ -71,9 +71,6 @@ public class ReplyGroupFilter implements Filter {
 		}
 		Map<Post, Map<String, Set<?>>> result = new HashMap<>();
 		for (Entry<Post, Set<Sone>> postEntry : postSones.entrySet()) {
-			if (result.containsKey(postEntry.getKey())) {
-				continue;
-			}
 			Map<String, Set<?>> postResult = new HashMap<>();
 			postResult.put("sones", postEntry.getValue());
 			postResult.put("replies", postReplies.get(postEntry.getKey()));
