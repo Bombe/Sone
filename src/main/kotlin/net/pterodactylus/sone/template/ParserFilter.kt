@@ -21,7 +21,7 @@ class ParserFilter(private val core: Core, private val soneTextParser: SoneTextP
 			is Sone -> soneParameter
 			else -> null
 		}
-		val context = SoneTextParserContext(sone as? Sone)
+		val context = SoneTextParserContext(sone)
 		return soneTextParser.parse(text, context)
 	}
 
