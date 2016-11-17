@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.io.StreamCopier;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Request;
@@ -73,18 +72,11 @@ public class ReloadingPage<REQ extends Request> implements Page<REQ> {
 		String path = request.getUri().getPath();
 		int lastSlash = path.lastIndexOf('/');
 		String filename = path.substring(lastSlash + 1);
-		InputStream fileInputStream;
-		try {
-			fileInputStream = new FileInputStream(new File(filesystemPath, filename));
+		try (InputStream fileInputStream = new FileInputStream(new File(filesystemPath, filename));
+			OutputStream contentOutputStream = response.getContent()) {
+			StreamCopier.copy(fileInputStream, contentOutputStream);
 		} catch (FileNotFoundException fnfe1) {
 			return response.setStatusCode(404).setStatusText("Not found.");
-		}
-		OutputStream contentOutputStream = response.getContent();
-		try {
-			StreamCopier.copy(fileInputStream, contentOutputStream);
-		} finally {
-			Closer.close(fileInputStream);
-			Closer.close(contentOutputStream);
 		}
 		return response.setStatusCode(200).setStatusText("OK").setContentType(mimeType);
 	}
