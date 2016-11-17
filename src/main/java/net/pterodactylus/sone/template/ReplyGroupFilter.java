@@ -48,8 +48,8 @@ public class ReplyGroupFilter implements Filter {
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		@SuppressWarnings("unchecked")
 		List<PostReply> allReplies = (List<PostReply>) data;
-		Map<Post, Set<Sone>> postSones = new HashMap<Post, Set<Sone>>();
-		Map<Post, Set<PostReply>> postReplies = new HashMap<Post, Set<PostReply>>();
+		Map<Post, Set<Sone>> postSones = new HashMap<>();
+		Map<Post, Set<PostReply>> postReplies = new HashMap<>();
 		for (PostReply reply : allReplies) {
 			/*
 			 * All replies from a new-reply notification have posts,
@@ -58,23 +58,23 @@ public class ReplyGroupFilter implements Filter {
 			Optional<Post> post = reply.getPost();
 			Set<Sone> sones = postSones.get(post.get());
 			if (sones == null) {
-				sones = new HashSet<Sone>();
+				sones = new HashSet<>();
 				postSones.put(post.get(), sones);
 			}
 			sones.add(reply.getSone());
 			Set<PostReply> replies = postReplies.get(post.get());
 			if (replies == null) {
-				replies = new HashSet<PostReply>();
+				replies = new HashSet<>();
 				postReplies.put(post.get(), replies);
 			}
 			replies.add(reply);
 		}
-		Map<Post, Map<String, Set<?>>> result = new HashMap<Post, Map<String, Set<?>>>();
+		Map<Post, Map<String, Set<?>>> result = new HashMap<>();
 		for (Entry<Post, Set<Sone>> postEntry : postSones.entrySet()) {
 			if (result.containsKey(postEntry.getKey())) {
 				continue;
 			}
-			Map<String, Set<?>> postResult = new HashMap<String, Set<?>>();
+			Map<String, Set<?>> postResult = new HashMap<>();
 			postResult.put("sones", postEntry.getValue());
 			postResult.put("replies", postReplies.get(postEntry.getKey()));
 			result.put(postEntry.getKey(), postResult);
