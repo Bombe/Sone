@@ -30,8 +30,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
 
-import com.google.common.base.Optional;
-
 /**
  * {@link Filter} implementation that groups replies by the post the are in
  * reply to, returning a map with the post as key and the list of replies as
@@ -55,17 +53,17 @@ public class ReplyGroupFilter implements Filter {
 			 * All replies from a new-reply notification have posts,
 			 * ListNotificationFilters takes care of that.
 			 */
-			Optional<Post> post = reply.getPost();
-			Set<Sone> sones = postSones.get(post.get());
+			Post post = reply.getPost().get();
+			Set<Sone> sones = postSones.get(post);
 			if (sones == null) {
 				sones = new HashSet<>();
-				postSones.put(post.get(), sones);
+				postSones.put(post, sones);
 			}
 			sones.add(reply.getSone());
-			Set<PostReply> replies = postReplies.get(post.get());
+			Set<PostReply> replies = postReplies.get(post);
 			if (replies == null) {
 				replies = new HashSet<>();
-				postReplies.put(post.get(), replies);
+				postReplies.put(post, replies);
 			}
 			replies.add(reply);
 		}
