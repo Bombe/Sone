@@ -46,4 +46,16 @@ class L10nFilterTest {
 		assertThat(filter.format(templateContext, "data", mapOf("0" to 4.5, "1" to "data")), equalTo("translated 4.5 data"))
 	}
 
+	@Test
+	fun `filter processes l10n text without parameters correctly`() {
+		translations["data"] = "translated data"
+	    assertThat(filter.format(templateContext, L10nText("data"), emptyMap()), equalTo("translated data"))
+	}
+
+	@Test
+	fun `filter processes l10n text with parameters correctly`() {
+		translations["data"] = "translated {0,number} {1}"
+		assertThat(filter.format(templateContext, L10nText("data", listOf(4.5, "data")), emptyMap()), equalTo("translated 4.5 data"))
+	}
+
 }

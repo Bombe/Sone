@@ -53,6 +53,13 @@ public class L10nFilter implements Filter {
 	 */
 	@Override
 	public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
+		if (data instanceof L10nText) {
+			L10nText l10nText = (L10nText) data;
+			if (l10nText.getParameters().isEmpty()) {
+				return webInterface.getL10n().getString(l10nText.getText());
+			}
+			return new MessageFormat(webInterface.getL10n().getString(l10nText.getText()), new Locale(webInterface.getL10n().getSelectedLanguage().shortCode)).format(l10nText.getParameters().toArray());
+		}
 		if (parameters.isEmpty()) {
 			return webInterface.getL10n().getString(String.valueOf(data));
 		}
