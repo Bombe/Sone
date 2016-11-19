@@ -103,6 +103,7 @@ import net.pterodactylus.sone.template.UnknownDateFilter;
 import net.pterodactylus.sone.text.Part;
 import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
+import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
@@ -210,6 +211,9 @@ public class WebInterface {
 	private final PostVisibilityFilter postVisibilityFilter;
 	private final ReplyVisibilityFilter replyVisibilityFilter;
 
+	private final TimeTextConverter timeTextConverter = new TimeTextConverter();
+	private final L10nFilter l10nFilter = new L10nFilter(this);
+
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
 
@@ -271,7 +275,7 @@ public class WebInterface {
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
 		templateContextFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
+		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore(), new TimeTextConverter()));
 		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
@@ -740,14 +744,14 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, timeTextConverter, l10nFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));

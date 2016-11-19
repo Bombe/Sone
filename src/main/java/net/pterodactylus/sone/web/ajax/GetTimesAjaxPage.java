@@ -21,11 +21,15 @@ import static com.fasterxml.jackson.databind.node.JsonNodeFactory.instance;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.freenet.L10nFilter;
+import net.pterodactylus.sone.text.TimeText;
+import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 
@@ -41,6 +45,8 @@ public class GetTimesAjaxPage extends JsonPage {
 
 	/** Formatter for tooltips. */
 	private static final DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy, HH:mm:ss");
+	private final TimeTextConverter timeTextConverter;
+	private final L10nFilter l10nFilter;
 
 	/**
 	 * Creates a new get times AJAX page.
@@ -48,8 +54,10 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public GetTimesAjaxPage(WebInterface webInterface) {
+	public GetTimesAjaxPage(WebInterface webInterface, TimeTextConverter timeTextConverter, L10nFilter l10nFilter) {
 		super("getTimes.ajax", webInterface);
+		this.timeTextConverter = timeTextConverter;
+		this.l10nFilter = l10nFilter;
 	}
 
 	/**
@@ -126,79 +134,8 @@ public class GetTimesAjaxPage extends JsonPage {
 	 * @return The formatted age
 	 */
 	private Time getTime(long time) {
-		return getTime(webInterface, time);
-	}
-
-	//
-	// STATIC METHODS
-	//
-
-	/**
-	 * Returns the formatted relative time for a given time.
-	 *
-	 * @param webInterface
-	 *            The Sone web interface (for l10n access)
-	 * @param time
-	 *            The time to format the difference from (in milliseconds)
-	 * @return The formatted age
-	 */
-	public static Time getTime(WebInterface webInterface, long time) {
-		if (time == 0) {
-			return new Time(webInterface.getL10n().getString("View.Sone.Text.UnknownDate"), TimeUnit.HOURS.toMillis(12));
-		}
-		long age = System.currentTimeMillis() - time;
-		String text;
-		long refresh;
-		if (age < 0) {
-			text = webInterface.getL10n().getString("View.Time.InTheFuture");
-			refresh = TimeUnit.MINUTES.toMillis(5);
-		} else if (age < TimeUnit.SECONDS.toMillis(20)) {
-			text = webInterface.getL10n().getString("View.Time.AFewSecondsAgo");
-			refresh = TimeUnit.SECONDS.toMillis(10);
-		} else if (age < TimeUnit.SECONDS.toMillis(45)) {
-			text = webInterface.getL10n().getString("View.Time.HalfAMinuteAgo");
-			refresh = TimeUnit.SECONDS.toMillis(20);
-		} else if (age < TimeUnit.SECONDS.toMillis(90)) {
-			text = webInterface.getL10n().getString("View.Time.AMinuteAgo");
-			refresh = TimeUnit.MINUTES.toMillis(1);
-		} else if (age < TimeUnit.MINUTES.toMillis(30)) {
-			text = webInterface.getL10n().getString("View.Time.XMinutesAgo", "min", String.valueOf(TimeUnit.MILLISECONDS.toMinutes(age + TimeUnit.SECONDS.toMillis(30))));
-			refresh = TimeUnit.MINUTES.toMillis(1);
-		} else if (age < TimeUnit.MINUTES.toMillis(45)) {
-			text = webInterface.getL10n().getString("View.Time.HalfAnHourAgo");
-			refresh = TimeUnit.MINUTES.toMillis(10);
-		} else if (age < TimeUnit.MINUTES.toMillis(90)) {
-			text = webInterface.getL10n().getString("View.Time.AnHourAgo");
-			refresh = TimeUnit.HOURS.toMillis(1);
-		} else if (age < TimeUnit.HOURS.toMillis(21)) {
-			text = webInterface.getL10n().getString("View.Time.XHoursAgo", "hour", String.valueOf(TimeUnit.MILLISECONDS.toHours(age + TimeUnit.MINUTES.toMillis(30))));
-			refresh = TimeUnit.HOURS.toMillis(1);
-		} else if (age < TimeUnit.HOURS.toMillis(42)) {
-			text = webInterface.getL10n().getString("View.Time.ADayAgo");
-			refresh = TimeUnit.DAYS.toMillis(1);
-		} else if (age < TimeUnit.DAYS.toMillis(6)) {
-			text = webInterface.getL10n().getString("View.Time.XDaysAgo", "day", String.valueOf(TimeUnit.MILLISECONDS.toDays(age + TimeUnit.HOURS.toMillis(12))));
-			refresh = TimeUnit.DAYS.toMillis(1);
-		} else if (age < TimeUnit.DAYS.toMillis(11)) {
-			text = webInterface.getL10n().getString("View.Time.AWeekAgo");
-			refresh = TimeUnit.DAYS.toMillis(1);
-		} else if (age < TimeUnit.DAYS.toMillis(28)) {
-			text = webInterface.getL10n().getString("View.Time.XWeeksAgo", "week", String.valueOf((TimeUnit.MILLISECONDS.toHours(age) + 84) / (7 * 24)));
-			refresh = TimeUnit.DAYS.toMillis(1);
-		} else if (age < TimeUnit.DAYS.toMillis(42)) {
-			text = webInterface.getL10n().getString("View.Time.AMonthAgo");
-			refresh = TimeUnit.DAYS.toMillis(1);
-		} else if (age < TimeUnit.DAYS.toMillis(330)) {
-			text = webInterface.getL10n().getString("View.Time.XMonthsAgo", "month", String.valueOf((TimeUnit.MILLISECONDS.toDays(age) + 15) / 30));
-			refresh = TimeUnit.DAYS.toMillis(1);
-		} else if (age < TimeUnit.DAYS.toMillis(540)) {
-			text = webInterface.getL10n().getString("View.Time.AYearAgo");
-			refresh = TimeUnit.DAYS.toMillis(7);
-		} else {
-			text = webInterface.getL10n().getString("View.Time.XYearsAgo", "year", String.valueOf((long) ((TimeUnit.MILLISECONDS.toDays(age) + 182.64) / 365.28)));
-			refresh = TimeUnit.DAYS.toMillis(7);
-		}
-		return new Time(text, refresh);
+		TimeText timeText = timeTextConverter.getTimeText(time);
+		return new Time(l10nFilter.format(null, timeText.getL10nText(), Collections.<String, Object>emptyMap()), timeText.getRefreshTime());
 	}
 
 	/**

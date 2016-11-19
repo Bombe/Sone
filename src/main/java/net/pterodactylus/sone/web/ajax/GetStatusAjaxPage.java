@@ -32,9 +32,10 @@ import java.util.Set;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.notify.PostVisibilityFilter;
-import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
+import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.sone.text.TimeText;
+import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
@@ -53,6 +54,8 @@ public class GetStatusAjaxPage extends JsonPage {
 
 	/** Date formatter. */
 	private static final DateFormat dateFormat = new SimpleDateFormat("MMM d, yyyy, HH:mm:ss");
+	private final TimeTextConverter timeTextConverter;
+	private final L10nFilter l10nFilter;
 
 	/**
 	 * Creates a new “get status” AJAX handler.
@@ -60,8 +63,10 @@ public class GetStatusAjaxPage extends JsonPage {
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public GetStatusAjaxPage(WebInterface webInterface) {
+	public GetStatusAjaxPage(WebInterface webInterface, TimeTextConverter timeTextConverter, L10nFilter l10nFilter) {
 		super("getStatus.ajax", webInterface);
+		this.timeTextConverter = timeTextConverter;
+		this.l10nFilter = l10nFilter;
 	}
 
 	/**
@@ -156,7 +161,8 @@ public class GetStatusAjaxPage extends JsonPage {
 		synchronized (dateFormat) {
 			jsonSone.put("lastUpdated", dateFormat.format(new Date(sone.getTime())));
 		}
-		jsonSone.put("lastUpdatedText", GetTimesAjaxPage.getTime(webInterface, sone.getTime()).getText());
+		TimeText timeText = timeTextConverter.getTimeText(sone.getTime());
+		jsonSone.put("lastUpdatedText", l10nFilter.format(null, timeText.getL10nText(), Collections.<String, Object>emptyMap()));
 		return jsonSone;
 	}
 

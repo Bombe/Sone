@@ -10,11 +10,14 @@ import net.pterodactylus.sone.data.Sone.SoneStatus.downloading
 import net.pterodactylus.sone.data.Sone.SoneStatus.idle
 import net.pterodactylus.sone.data.Sone.SoneStatus.inserting
 import net.pterodactylus.sone.data.Sone.SoneStatus.unknown
+import net.pterodactylus.sone.freenet.L10nText
 import net.pterodactylus.sone.freenet.wot.Identity
 import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.freenet.wot.Trust
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.text.TimeText
+import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
@@ -29,7 +32,8 @@ import org.junit.Test
 class SoneAccessorTest {
 
 	private val core = mock<Core>()
-	private val accessor = SoneAccessor(core)
+	private val timeTextConverter = mock<TimeTextConverter>()
+	private val accessor = SoneAccessor(core, timeTextConverter)
 	private val templateContext = mock<TemplateContext>()
 	private val currentSone = mock<Sone>()
 	private val currentIdentity = mock<OwnIdentity>()
@@ -183,6 +187,13 @@ class SoneAccessorTest {
 	fun `accessor returns that the sone is locked if it is locked`() {
 		whenever(core.isLocked(sone)).thenReturn(true)
 		assertAccessorReturnValue("locked", true)
+	}
+
+	@Test
+	fun `accessor returns l10n text for last update time`() {
+		whenever(sone.time).thenReturn(12345)
+		whenever(timeTextConverter.getTimeText(12345L)).thenReturn(TimeText(L10nText("l10n.key", listOf(3L)), 23456))
+		assertAccessorReturnValue("lastUpdatedText", L10nText("l10n.key", listOf(3L)))
 	}
 
 	@Test
