@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.databind.node.TextNode
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.not
 import org.junit.Test
 
 /**
@@ -85,6 +86,66 @@ class JsonReturnObjectTest {
 			put("boolean", true)
 			put("object", objectNode)
 		}))
+	}
+
+	@Test
+	fun `successful object is not equal to unsuccessful object`() {
+		assertThat(JsonReturnObject(true), not(equalTo(JsonReturnObject(false))))
+	}
+
+	@Test
+	fun `objects with different content are not equal`() {
+		val firstObject = JsonReturnObject(true).apply {
+			put("text", "text")
+		}
+		val secondObject = JsonReturnObject(true).apply {
+			put("number", 123)
+		}
+		assertThat(firstObject, not(equalTo(secondObject)))
+	}
+
+	@Test
+	fun `object is not equal to null`() {
+	    assertThat(JsonReturnObject(true), not(equalTo<Any?>(null)))
+	}
+
+	@Test
+	fun `object is not equal to object of different class`() {
+	    assertThat(JsonReturnObject(true), not(equalTo<Any>("string")))
+	}
+
+	@Test
+	fun `equals is correctly implemented`() {
+		val firstObject = JsonReturnObject(true).apply {
+			put("text", "text")
+			put("int", 123)
+			put("boolean", true)
+			put("object", ObjectNode(JsonNodeFactory.instance))
+		}
+		val secondObject = JsonReturnObject(true).apply {
+			put("text", "text")
+			put("int", 123)
+			put("boolean", true)
+			put("object", ObjectNode(JsonNodeFactory.instance))
+		}
+		assertThat(firstObject, equalTo(secondObject))
+	}
+
+	@Test
+	fun `hash code of equal objects is equal`() {
+		val firstObject = JsonReturnObject(true).apply {
+			put("text", "text")
+			put("int", 123)
+			put("boolean", true)
+			put("object", ObjectNode(JsonNodeFactory.instance))
+		}
+		val secondObject = JsonReturnObject(true).apply {
+			put("text", "text")
+			put("int", 123)
+			put("boolean", true)
+			put("object", ObjectNode(JsonNodeFactory.instance))
+		}
+		assertThat(firstObject.hashCode(), equalTo(secondObject.hashCode()))
 	}
 
 }

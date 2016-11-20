@@ -133,4 +133,18 @@ public class JsonReturnObject {
 		return this;
 	}
 
+	@Override
+	public int hashCode() {
+		return Boolean.valueOf(success).hashCode() ^ content.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if ((object == null) || (object.getClass() != getClass())) {
+			return false;
+		}
+		JsonReturnObject other = (JsonReturnObject) object;
+		return (success == other.success) && content.equals(other.content);
+	}
+
 }
