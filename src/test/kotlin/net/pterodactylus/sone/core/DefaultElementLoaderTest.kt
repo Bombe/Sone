@@ -25,6 +25,8 @@ class DefaultElementLoaderTest {
 	companion object {
 		private const val IMAGE_ID = "KSK@gpl.png"
 		private val freenetURI = FreenetURI(IMAGE_ID)
+		private const val decomposedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/fru%CC%88hstu%CC%88ck.jpg"
+		private const val normalizedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/frühstück.jpg"
 	}
 
 	private val freenetInterface = mock<FreenetInterface>()
@@ -80,11 +82,11 @@ class DefaultElementLoaderTest {
 
 	@Test
 	fun `image loader can load image`() {
-		elementLoader.loadElement(IMAGE_ID)
-		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		callback.value.loaded(freenetURI, "image/png", read("/static/images/unknown-image-0.png"))
-		val linkedElement = elementLoader.loadElement(IMAGE_ID)
-		assertThat(linkedElement, `is`(LinkedElement(IMAGE_ID)))
+		elementLoader.loadElement(decomposedKey)
+		verify(freenetInterface).startFetch(eq(FreenetURI(decomposedKey)), callback.capture())
+		callback.value.loaded(FreenetURI(normalizedKey), "image/png", read("/static/images/unknown-image-0.png"))
+		val linkedElement = elementLoader.loadElement(decomposedKey)
+		assertThat(linkedElement, `is`(LinkedElement(normalizedKey)))
 	}
 
 	@Test

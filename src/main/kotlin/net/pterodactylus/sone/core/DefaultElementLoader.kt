@@ -4,6 +4,8 @@ import com.google.common.base.Ticker
 import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
 import java.io.ByteArrayInputStream
+import java.net.URLDecoder
+import java.text.Normalizer
 import java.util.concurrent.TimeUnit.MINUTES
 import javax.imageio.ImageIO
 import javax.inject.Inject
@@ -33,44 +35,48 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 				ImageIO.read(it)
 			}?.let {
 				println("Successfully parsed images from $uri.")
-				imageCache.get(uri.toString()) { LinkedElement(uri.toString()) }
+				imageCache.get(uri.toString().decode().normalize()) { LinkedElement(uri.toString()) }
 			}
 			removeLoadingLink(uri)
 		}
 
 		override fun failed(uri: FreenetURI) {
 			println("Failed to load $uri.")
-			failureCache.put(uri.toString(), true)
+			failureCache.put(uri.toString().decode().normalize(), true)
 			removeLoadingLink(uri)
 		}
 
 		private fun removeLoadingLink(uri: FreenetURI) {
 			println("Not loading anymore: $uri.")
 			synchronized(loadingLinks) {
-				loadingLinks.invalidate(uri.toString())
+				loadingLinks.invalidate(uri.toString().decode().normalize())
 			}
 		}
 	}
 
 	override fun loadElement(link: String): LinkedElement {
-		println("Checking for $link...")
+		val normalizedLink = link.decode().normalize()
+		println("Checking for $normalizedLink...")
 		synchronized(loadingLinks) {
-			imageCache.getIfPresent(link)?.run {
-				println("In the Image Cache: $link")
+			imageCache.getIfPresent(normalizedLink)?.run {
+				println("In the Image Cache: $normalizedLink")
 				return this
 			}
-			failureCache.getIfPresent(link)?.run {
-				println("In the Failure Cache: $link")
+			failureCache.getIfPresent(normalizedLink)?.run {
+				println("In the Failure Cache: $normalizedLink")
 				return LinkedElement(link, failed = true)
 			}
-			if (loadingLinks.getIfPresent(link) == null) {
-				println("Not loading: $link")
-				loadingLinks.put(link, true)
+			if (loadingLinks.getIfPresent(normalizedLink) == null) {
+				println("Not loading: $normalizedLink")
+				loadingLinks.put(normalizedLink, true)
 				freenetInterface.startFetch(FreenetURI(link), callback)
 			}
 		}
-		println("Returning loading element: $link")
+		println("Returning loading element: $normalizedLink")
 		return LinkedElement(link, loading = true)
 	}
+
+	private fun String.decode() = URLDecoder.decode(this, "UTF-8")
+	private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFC)
 
 }
