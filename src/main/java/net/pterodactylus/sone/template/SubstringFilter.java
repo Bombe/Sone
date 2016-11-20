@@ -48,7 +48,7 @@ public class SubstringFilter implements Filter {
 		}
 		String dataString = String.valueOf(data);
 		int dataLength = dataString.length();
-		int length = Integer.MAX_VALUE;
+		int length = dataLength;
 		try {
 			length = Integer.parseInt(lengthString);
 		} catch (NumberFormatException nfe1) {
