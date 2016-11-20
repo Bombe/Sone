@@ -5,6 +5,7 @@ import net.pterodactylus.util.template.HtmlFilter
 import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.nullValue
 import org.jsoup.Jsoup
 import org.junit.Test
 
@@ -20,6 +21,21 @@ class LinkedElementRenderFilterTest {
 	}
 
 	private val filter = LinkedElementRenderFilter(templateContextFactory)
+
+	@Test
+	fun `filter returns null for objects that are not linked elements`() {
+		assertThat(filter.format(null, Any(), null), nullValue())
+	}
+
+	@Test
+	fun `filter renders loading animation for not loaded elements`() {
+		val html = filter.format(null, LinkedElement("KSK@gpl.png", loading = true), emptyMap<String, Any?>()) as String
+		val spanNode = Jsoup.parseBodyFragment(html).body().child(0)
+		assertThat(spanNode.nodeName(), `is`("span"))
+		assertThat(spanNode.attr("class"), `is`("linked-element"))
+		assertThat(spanNode.attr("title"), `is`("KSK@gpl.png"))
+		assertThat(spanNode.attr("style"), `is`("background-image: url('images/loading-animation.gif')"))
+	}
 
 	@Test
 	fun `filter can render linked images`() {
