@@ -14,8 +14,8 @@ import java.io.StringWriter
 class LinkedElementRenderFilter(private val templateContextFactory: TemplateContextFactory) : Filter {
 
 	companion object {
-		private val loadedImageTemplate = """<a href="/<% link|html>"><span class="linked-element" title="<% link|html>" style="background-image: url('/<% link|html>')"></span></a>""".parse()
-		private val notLoadedImageTemplate = """<span class="linked-element" title="<% link|html>" style="background-image: url('images/loading-animation.gif')"></span>""".parse()
+		private val loadedImageTemplate = """<%include linked/image.html>""".parse()
+		private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".parse()
 
 		private fun String.parse() = StringReader(this).use { TemplateParser.parse(it) }
 	}

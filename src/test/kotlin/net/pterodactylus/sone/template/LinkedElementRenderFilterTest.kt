@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.template
 
 import net.pterodactylus.sone.core.LinkedElement
+import net.pterodactylus.util.template.ClassPathTemplateProvider
 import net.pterodactylus.util.template.HtmlFilter
 import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
@@ -18,6 +19,7 @@ class LinkedElementRenderFilterTest {
 
 	init {
 		templateContextFactory.addFilter("html", HtmlFilter())
+		templateContextFactory.addProvider(ClassPathTemplateProvider(LinkedElementRenderFilter::class.java, "/templates/"))
 	}
 
 	private val filter = LinkedElementRenderFilter(templateContextFactory)
