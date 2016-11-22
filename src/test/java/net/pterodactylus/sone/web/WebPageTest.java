@@ -18,6 +18,7 @@ import java.util.Set;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Preferences;
 import net.pterodactylus.sone.core.UpdateChecker;
+import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
@@ -74,6 +75,8 @@ public abstract class WebPageTest {
 				return "";
 			}
 		});
+		when(httpRequest.getParam(anyString())).thenReturn("");
+		when(httpRequest.getParam(anyString(), anyString())).thenReturn("");
 	}
 
 	@Before
@@ -85,6 +88,7 @@ public abstract class WebPageTest {
 		when(core.getLocalSones()).thenReturn(localSones);
 		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
 		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
+		when(core.getAlbum(anyString())).thenReturn(null);
 	}
 
 	@Before
@@ -126,6 +130,9 @@ public abstract class WebPageTest {
 				return value.substring(0, Math.min(maxLength, value.length()));
 			}
 		});
+		when(httpRequest.getParam(eq(name))).thenReturn(value);
+		when(httpRequest.getParam(eq(name), anyString())).thenReturn(value);
+		when(httpRequest.isPartSet(eq(name))).thenReturn(value != null && !value.isEmpty());
 	}
 
 	protected void addPost(String postId, Post post) {
@@ -143,6 +150,10 @@ public abstract class WebPageTest {
 
 	protected void addOwnIdentity(OwnIdentity ownIdentity) {
 		ownIdentities.add(ownIdentity);
+	}
+
+	protected void addAlbum(String albumId, Album album) {
+		when(core.getAlbum(eq(albumId))).thenReturn(album);
 	}
 
 }
