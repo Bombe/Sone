@@ -19,6 +19,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Preferences;
 import net.pterodactylus.sone.core.UpdateChecker;
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
@@ -89,6 +90,8 @@ public abstract class WebPageTest {
 		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
 		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
 		when(core.getAlbum(anyString())).thenReturn(null);
+		when(core.getImage(anyString())).thenReturn(null);
+		when(core.getImage(anyString(), anyBoolean())).thenReturn(null);
 	}
 
 	@Before
@@ -154,6 +157,11 @@ public abstract class WebPageTest {
 
 	protected void addAlbum(String albumId, Album album) {
 		when(core.getAlbum(eq(albumId))).thenReturn(album);
+	}
+
+	protected void addImage(String imageId, Image image) {
+		when(core.getImage(eq(imageId))).thenReturn(image);
+		when(core.getImage(eq(imageId), anyBoolean())).thenReturn(image);
 	}
 
 }
