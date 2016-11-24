@@ -75,7 +75,7 @@ public class DeletePostPage extends SoneTemplatePage {
 			} else if (request.getHttpRequest().isPartSet("abortDelete")) {
 				throw new RedirectException(returnPage);
 			}
-			templateContext.set("post", post);
+			templateContext.set("post", post.get());
 			templateContext.set("returnPage", returnPage);
 		}
 	}
