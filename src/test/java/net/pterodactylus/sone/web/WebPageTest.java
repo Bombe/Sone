@@ -103,6 +103,7 @@ public abstract class WebPageTest {
 	public final void setupWebInterface() {
 		when(webInterface.getCurrentSone(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone);
+		when(webInterface.getNotification(anyString())).thenReturn(Optional.<Notification>absent());
 		when(webInterface.getNotifications(currentSone)).thenReturn(new ArrayList<Notification>());
 	}
 
@@ -162,6 +163,10 @@ public abstract class WebPageTest {
 	protected void addImage(String imageId, Image image) {
 		when(core.getImage(eq(imageId))).thenReturn(image);
 		when(core.getImage(eq(imageId), anyBoolean())).thenReturn(image);
+	}
+
+	protected void addNotification(String notificationId, Notification notification) {
+		when(webInterface.getNotification(eq(notificationId))).thenReturn(Optional.of(notification));
 	}
 
 }
