@@ -66,11 +66,6 @@ public class DeleteProfileFieldPage extends SoneTemplatePage {
 		/* process POST request. */
 		if (request.getMethod() == Method.POST) {
 			if (request.getHttpRequest().getPartAsStringFailsafe("confirm", 4).equals("true")) {
-				fieldId = request.getHttpRequest().getParam("field");
-				field = profile.getFieldById(fieldId);
-				if (field == null) {
-					throw new RedirectException("invalid.html");
-				}
 				profile.removeField(field);
 				currentSone.setProfile(profile);
 			}
