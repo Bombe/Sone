@@ -11,9 +11,13 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.annotation.Nonnull;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Preferences;
@@ -60,6 +64,7 @@ public abstract class WebPageTest {
 
 	protected final TemplateContext templateContext = new TemplateContext();
 	protected final HTTPRequest httpRequest = mock(HTTPRequest.class);
+	protected final Map<String, String> requestHeaders = new HashMap<>();
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
 	protected final ToadletContext toadletContext = mock(ToadletContext.class);
 
@@ -78,6 +83,12 @@ public abstract class WebPageTest {
 		});
 		when(httpRequest.getParam(anyString())).thenReturn("");
 		when(httpRequest.getParam(anyString(), anyString())).thenReturn("");
+		when(httpRequest.getHeader(anyString())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				return requestHeaders.get(invocation.<String>getArgument(0).toLowerCase());
+			}
+		});
 	}
 
 	@Before
@@ -124,6 +135,10 @@ public abstract class WebPageTest {
 			throw new RuntimeException(e);
 		}
 		when(freenetRequest.getMethod()).thenReturn(method);
+	}
+
+	protected void addHttpRequestHeader(@Nonnull String name, String value) {
+		requestHeaders.put(name.toLowerCase(), value);
 	}
 
 	protected void addHttpRequestParameter(String name, final String value) {
