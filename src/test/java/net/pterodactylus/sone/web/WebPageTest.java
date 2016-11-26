@@ -8,6 +8,10 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -27,18 +31,21 @@ import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
+import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.web.Method;
+import net.pterodactylus.util.web.Response;
 
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
 import com.google.common.base.Optional;
 import com.google.common.eventbus.EventBus;
+import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -67,10 +74,21 @@ public abstract class WebPageTest {
 	protected final Map<String, String> requestParameters = new HashMap<>();
 	protected final Map<String, String> requestHeaders = new HashMap<>();
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
+	private final PipedOutputStream responseOutputStream = new PipedOutputStream();
+	private final PipedInputStream responseInputStream;
+	protected final Response response = new Response(responseOutputStream);
 	protected final ToadletContext toadletContext = mock(ToadletContext.class);
 
 	private final Set<OwnIdentity> ownIdentities = new HashSet<>();
 	private final List<Sone> localSones = new ArrayList<>();
+
+	protected WebPageTest() {
+		try {
+			responseInputStream = new PipedInputStream(responseOutputStream);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	@Before
 	public final void setupFreenetRequest() {
@@ -130,6 +148,7 @@ public abstract class WebPageTest {
 		when(core.getAlbum(anyString())).thenReturn(null);
 		when(core.getImage(anyString())).thenReturn(null);
 		when(core.getImage(anyString(), anyBoolean())).thenReturn(null);
+		when(core.getTemporaryImage(anyString())).thenReturn(null);
 	}
 
 	@Before
@@ -196,6 +215,18 @@ public abstract class WebPageTest {
 	protected void addImage(String imageId, Image image) {
 		when(core.getImage(eq(imageId))).thenReturn(image);
 		when(core.getImage(eq(imageId), anyBoolean())).thenReturn(image);
+	}
+
+	protected void addTemporaryImage(String imageId, TemporaryImage temporaryImage) {
+		when(core.getTemporaryImage(eq(imageId))).thenReturn(temporaryImage);
+	}
+
+	protected byte[] getResponseBytes() throws IOException {
+		response.getContent().close();
+		try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+			ByteStreams.copy(responseInputStream, outputStream);
+			return outputStream.toByteArray();
+		}
 	}
 
 	protected void addNotification(String notificationId, Notification notification) {
