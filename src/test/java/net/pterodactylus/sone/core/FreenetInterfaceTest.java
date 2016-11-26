@@ -446,7 +446,7 @@ public class FreenetInterfaceTest {
 	@Test
 	public void requestIsCancelledForNullMimeType() {
 		verifySnoopCancelsRequestForMimeType(null, true);
-		verify(backgroundFetchCallback, never()).cancelForMimeType(eq(uri), ArgumentMatchers.<String>any());
+		verify(backgroundFetchCallback, never()).shouldCancel(eq(uri), ArgumentMatchers.<String>any(), anyLong());
 		verify(backgroundFetchCallback).failed(uri);
 	}
 
@@ -469,7 +469,7 @@ public class FreenetInterfaceTest {
 	}
 
 	private void verifySnoopCancelsRequestForMimeType(String mimeType, boolean cancel) {
-		when(backgroundFetchCallback.cancelForMimeType(uri, mimeType)).thenReturn(cancel);
+		when(backgroundFetchCallback.shouldCancel(eq(uri), eq(mimeType), anyLong())).thenReturn(cancel);
 		freenetInterface.startFetch(uri, backgroundFetchCallback);
 		ArgumentCaptor<SnoopMetadata> snoopMetadata = forClass(SnoopMetadata.class);
 		verify(clientGetter).setMetaSnoop(snoopMetadata.capture());

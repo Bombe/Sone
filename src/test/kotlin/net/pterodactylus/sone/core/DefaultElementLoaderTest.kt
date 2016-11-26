@@ -27,6 +27,8 @@ class DefaultElementLoaderTest {
 		private val freenetURI = FreenetURI(IMAGE_ID)
 		private const val decomposedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/fru%CC%88hstu%CC%88ck.jpg"
 		private const val normalizedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/frühstück.jpg"
+		private val sizeOkay = 2097152L;
+		private val sizeNotOkay = sizeOkay + 1;
 	}
 
 	private val freenetInterface = mock<FreenetInterface>()
@@ -53,31 +55,38 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
-	fun `element loader does not cancel on image mime type`() {
+	fun `element loader does not cancel on image mime type with 2 mib size`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.cancelForMimeType(freenetURI, "image/png"), `is`(false))
+		assertThat(callback.value.shouldCancel(freenetURI, "image/png", sizeOkay), `is`(false))
+	}
+
+	@Test
+	fun `element loader does cancel on image mime type with more than 2 mib size`() {
+		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		assertThat(callback.value.shouldCancel(freenetURI, "image/png", sizeNotOkay), `is`(true))
 	}
 
 	@Test
 	fun `element loader does  cancel on audio mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.cancelForMimeType(freenetURI, "audio/mpeg"), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "audio/mpeg", sizeOkay), `is`(true))
 	}
 
 	@Test
 	fun `element loader does not cancel on video mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.cancelForMimeType(freenetURI, "video/mkv"), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "video/mkv", sizeOkay), `is`(true))
 	}
 
 	@Test
 	fun `element loader does not cancel on text mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.cancelForMimeType(freenetURI, "text/plain"), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "text/plain", sizeOkay), `is`(true))
 	}
 
 	@Test

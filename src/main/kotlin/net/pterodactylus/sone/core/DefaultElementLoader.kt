@@ -21,8 +21,8 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 	private val failureCache = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
 	private val imageCache = CacheBuilder.newBuilder().build<String, LinkedElement>()
 	private val callback = object : FreenetInterface.BackgroundFetchCallback {
-		override fun cancelForMimeType(uri: FreenetURI, mimeType: String): Boolean {
-			return !mimeType.startsWith("image/")
+		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
+			return !mimeType.startsWith("image/") || (size > 2097152)
 		}
 
 		override fun loaded(uri: FreenetURI, mimeType: String, data: ByteArray) {
