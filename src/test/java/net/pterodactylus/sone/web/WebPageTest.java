@@ -64,6 +64,7 @@ public abstract class WebPageTest {
 
 	protected final TemplateContext templateContext = new TemplateContext();
 	protected final HTTPRequest httpRequest = mock(HTTPRequest.class);
+	protected final Map<String, String> requestParameters = new HashMap<>();
 	protected final Map<String, String> requestHeaders = new HashMap<>();
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
 	protected final ToadletContext toadletContext = mock(ToadletContext.class);
@@ -78,11 +79,37 @@ public abstract class WebPageTest {
 		when(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
-				return "";
+				String parameter = invocation.getArgument(0);
+				int maxLength = invocation.getArgument(1);
+				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter).substring(0, Math.min(maxLength, requestParameters.get(parameter).length())) : "";
 			}
 		});
-		when(httpRequest.getParam(anyString())).thenReturn("");
-		when(httpRequest.getParam(anyString(), anyString())).thenReturn("");
+		when(httpRequest.getParam(anyString())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				String parameter = invocation.getArgument(0);
+				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter) : "";
+			}
+		});
+		when(httpRequest.getParam(anyString(), anyString())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				String parameter = invocation.getArgument(0);
+				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter) : invocation.<String>getArgument(1);
+			}
+		});
+		when(httpRequest.isPartSet(anyString())).thenAnswer(new Answer<Boolean>() {
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				return requestParameters.containsKey(invocation.<String>getArgument(0));
+			}
+		});
+		when(httpRequest.getParts()).thenAnswer(new Answer<String[]>() {
+			@Override
+			public String[] answer(InvocationOnMock invocation) throws Throwable {
+				return requestParameters.keySet().toArray(new String[requestParameters.size()]);
+			}
+		});
 		when(httpRequest.getHeader(anyString())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
@@ -142,16 +169,7 @@ public abstract class WebPageTest {
 	}
 
 	protected void addHttpRequestParameter(String name, final String value) {
-		when(httpRequest.getPartAsStringFailsafe(eq(name), anyInt())).thenAnswer(new Answer<String>() {
-			@Override
-			public String answer(InvocationOnMock invocation) throws Throwable {
-				int maxLength = invocation.getArgument(1);
-				return value.substring(0, Math.min(maxLength, value.length()));
-			}
-		});
-		when(httpRequest.getParam(eq(name))).thenReturn(value);
-		when(httpRequest.getParam(eq(name), anyString())).thenReturn(value);
-		when(httpRequest.isPartSet(eq(name))).thenReturn(value != null && !value.isEmpty());
+		requestParameters.put(name, value);
 	}
 
 	protected void addPost(String postId, Post post) {
