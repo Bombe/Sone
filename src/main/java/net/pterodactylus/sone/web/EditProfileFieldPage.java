@@ -75,12 +75,15 @@ public class EditProfileFieldPage extends SoneTemplatePage {
 			}
 			String name = request.getHttpRequest().getPartAsStringFailsafe("name", 256);
 			Field existingField = profile.getFieldByName(name);
-			if ((existingField == null) || (existingField.equals(field))) {
-				field.setName(name);
-				currentSone.setProfile(profile);
+			if ((existingField != null) && (!field.equals(existingField))) {
+				templateContext.set("duplicateFieldName", true);
+			} else {
+				if (!name.equals(field.getName())) {
+					field.setName(name);
+					currentSone.setProfile(profile);
+				}
 				throw new RedirectException("editProfile.html#profile-fields");
 			}
-			templateContext.set("duplicateFieldName", true);
 		}
 
 		/* store current values in template. */
