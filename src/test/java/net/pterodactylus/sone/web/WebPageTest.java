@@ -15,6 +15,7 @@ import java.io.PipedOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,6 +50,7 @@ import com.google.common.io.ByteStreams;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -80,6 +82,7 @@ public abstract class WebPageTest {
 	protected final ToadletContext toadletContext = mock(ToadletContext.class);
 
 	private final Set<OwnIdentity> ownIdentities = new HashSet<>();
+	private final Map<String, Sone> sones = new HashMap<>();
 	private final List<Sone> localSones = new ArrayList<>();
 
 	protected WebPageTest() {
@@ -109,7 +112,7 @@ public abstract class WebPageTest {
 				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter) : "";
 			}
 		});
-		when(httpRequest.getParam(anyString(), anyString())).thenAnswer(new Answer<String>() {
+		when(httpRequest.getParam(anyString(), ArgumentMatchers.<String>any())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String parameter = invocation.getArgument(0);
@@ -144,6 +147,18 @@ public abstract class WebPageTest {
 		when(core.getLocalSone(anyString())).thenReturn(null);
 		when(core.getLocalSones()).thenReturn(localSones);
 		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
+		when(core.getSones()).thenAnswer(new Answer<Collection<Sone>>() {
+			@Override
+			public Collection<Sone> answer(InvocationOnMock invocation) throws Throwable {
+				return sones.values();
+			}
+		});
+		when(core.getSone(anyString())).thenAnswer(new Answer<Optional<Sone>>() {
+			@Override
+			public Optional<Sone> answer(InvocationOnMock invocation) throws Throwable {
+				return Optional.fromNullable(sones.get(invocation.getArgument(0)));
+			}
+		});
 		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
 		when(core.getAlbum(anyString())).thenReturn(null);
 		when(core.getImage(anyString())).thenReturn(null);
@@ -196,7 +211,7 @@ public abstract class WebPageTest {
 	}
 
 	protected void addSone(String soneId, Sone sone) {
-		when(core.getSone(eq(soneId))).thenReturn(Optional.fromNullable(sone));
+		sones.put(soneId, sone);
 	}
 
 	protected void addLocalSone(String soneId, Sone sone) {
