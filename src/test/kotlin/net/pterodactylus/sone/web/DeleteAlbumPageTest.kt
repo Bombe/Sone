@@ -12,6 +12,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.Mockito.verify
 
 /**
  * Unit test for [DeleteAlbumPage].
@@ -86,7 +87,11 @@ class DeleteAlbumPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		expectedException.expect(redirectsTo("imageBrowser.html?sone=sone-id"))
-		page.handleRequest(freenetRequest, templateContext)
+		try {
+			page.handleRequest(freenetRequest, templateContext)
+		} finally {
+			verify(core).deleteAlbum(album)
+		}
 	}
 
 	@Test
@@ -96,7 +101,11 @@ class DeleteAlbumPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		expectedException.expect(redirectsTo("imageBrowser.html?album=parent-id"))
-		page.handleRequest(freenetRequest, templateContext)
+		try {
+			page.handleRequest(freenetRequest, templateContext)
+		} finally {
+			verify(core).deleteAlbum(album)
+		}
 	}
 
 }
