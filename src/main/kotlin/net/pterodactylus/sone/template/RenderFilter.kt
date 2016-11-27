@@ -69,7 +69,7 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 		renderLink(writer, "/external-link/?_CHECKED_HTTP_=${linkPart.link.urlEncode()}", linkPart.text, linkPart.title, "internet")
 	}
 
-	private fun String.urlEncode() = URLEncoder.encode(this, "UTF-8")!!
+	private fun String.urlEncode(): String = URLEncoder.encode(this, "UTF-8")
 
 	private fun render(writer: Writer, sonePart: SonePart) {
 		if (sonePart.sone.name != null) {
