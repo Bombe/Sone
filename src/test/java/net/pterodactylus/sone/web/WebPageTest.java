@@ -83,7 +83,7 @@ public abstract class WebPageTest {
 
 	private final Set<OwnIdentity> ownIdentities = new HashSet<>();
 	private final Map<String, Sone> sones = new HashMap<>();
-	private final List<Sone> localSones = new ArrayList<>();
+	protected final List<Sone> localSones = new ArrayList<>();
 
 	protected WebPageTest() {
 		try {

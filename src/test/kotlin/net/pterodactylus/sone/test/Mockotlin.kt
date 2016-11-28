@@ -3,6 +3,7 @@ package net.pterodactylus.sone.test
 import com.google.inject.Module
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito
+import org.mockito.stubbing.OngoingStubbing
 
 inline fun <reified T : Any> mock(): T = Mockito.mock<T>(T::class.java)!!
 inline fun <reified T : Any> mockBuilder(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_SELF)!!
@@ -16,3 +17,5 @@ inline fun <reified T : Any> bindMock(): Module =
 		Module { it!!.bind(T::class.java).toInstance(mock<T>()) }
 
 inline fun <reified T: Any> whenever(methodCall: T) = Mockito.`when`(methodCall)
+
+inline fun <reified T : Any> OngoingStubbing<T>.thenReturnMock(): OngoingStubbing<T> = this.thenReturn(mock<T>())
