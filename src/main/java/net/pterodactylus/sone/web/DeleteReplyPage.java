@@ -67,7 +67,7 @@ public class DeleteReplyPage extends SoneTemplatePage {
 				throw new RedirectException(returnPage);
 			}
 		}
-		templateContext.set("reply", reply);
+		templateContext.set("reply", replyId);
 		templateContext.set("returnPage", returnPage);
 	}
 

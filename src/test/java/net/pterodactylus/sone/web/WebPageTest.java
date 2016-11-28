@@ -30,6 +30,7 @@ import net.pterodactylus.sone.core.UpdateChecker;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.data.TemporaryImage;
@@ -208,6 +209,10 @@ public abstract class WebPageTest {
 
 	protected void addPost(String postId, Post post) {
 		when(core.getPost(postId)).thenReturn(Optional.fromNullable(post));
+	}
+
+	protected void addPostReply(String postReplyId, PostReply postReply) {
+		when(core.getPostReply(postReplyId)).thenReturn(Optional.fromNullable(postReply));
 	}
 
 	protected void addSone(String soneId, Sone sone) {
