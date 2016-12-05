@@ -123,7 +123,7 @@ public abstract class WebPageTest {
 		when(httpRequest.isPartSet(anyString())).thenAnswer(new Answer<Boolean>() {
 			@Override
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {
-				return requestParameters.containsKey(invocation.<String>getArgument(0));
+				return requestParameters.get(invocation.<String>getArgument(0)) != null;
 			}
 		});
 		when(httpRequest.getParts()).thenAnswer(new Answer<String[]>() {
