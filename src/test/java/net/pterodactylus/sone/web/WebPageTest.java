@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.web.WebTestUtils.redirectsTo;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,6 +38,7 @@ import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.web.page.FreenetRequest;
+import net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
@@ -185,6 +188,10 @@ public abstract class WebPageTest {
 		when(currentSone.getOptions()).thenReturn(new DefaultSoneOptions());
 	}
 
+	protected SoneTemplatePage getPage() {
+		return null;
+	}
+
 	protected void unsetCurrentSone() {
 		when(webInterface.getCurrentSone(toadletContext)).thenReturn(null);
 		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null);
@@ -251,6 +258,21 @@ public abstract class WebPageTest {
 
 	protected void addNotification(String notificationId, Notification notification) {
 		when(webInterface.getNotification(eq(notificationId))).thenReturn(Optional.of(notification));
+	}
+
+	protected void verifyRedirect(String target) throws RedirectException {
+		expectedException.expect(redirectsTo(target));
+		getPage().handleRequest(freenetRequest, templateContext);
+	}
+
+	protected void verifyRedirect(String target,  Runnable verification) throws RedirectException {
+		expectedException.expect(redirectsTo(target));
+		try {
+			getPage().handleRequest(freenetRequest, templateContext);
+			fail();
+		} finally {
+			verification.run();
+		}
 	}
 
 }
