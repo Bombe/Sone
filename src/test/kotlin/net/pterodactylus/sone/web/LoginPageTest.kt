@@ -57,6 +57,7 @@ class LoginPageTest : WebPageTest() {
 	}
 
 	@Test
+	@Suppress("UNCHECKED_CAST")
 	fun `post request with invalid sone sets sones and identities without sone in template context`() {
 		request("", POST)
 		page.handleRequest(freenetRequest, templateContext)
