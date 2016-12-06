@@ -14,13 +14,12 @@ class LockSonePageTest : WebPageTest() {
 
 	private val page = LockSonePage(template, webInterface)
 
+	override fun getPage() = page
+
 	@Test
 	fun `locking an invalid local sone redirects to return page`() {
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(WebTestUtils.redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core, never()).lockSone(any<Sone>())
 		}
 	}
@@ -31,10 +30,7 @@ class LockSonePageTest : WebPageTest() {
 		val sone = mock<Sone>()
 		addLocalSone("sone-id", sone)
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(WebTestUtils.redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).lockSone(sone)
 		}
 	}

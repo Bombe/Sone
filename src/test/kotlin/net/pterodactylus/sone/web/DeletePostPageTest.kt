@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
@@ -13,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
-import kotlin.test.fail
 
 /**
  * Unit test for [DeletePostPage].
@@ -25,6 +23,8 @@ class DeletePostPageTest : WebPageTest() {
 	private val post = mock<Post>()
 	private val sone = mock<Sone>()
 
+	override fun getPage() = page
+
 	@Before
 	fun setupPost() {
 		whenever(post.sone).thenReturn(sone)
@@ -34,8 +34,7 @@ class DeletePostPageTest : WebPageTest() {
 	@Test
 	fun `get request with invalid post redirects to no permission page`() {
 		request("", GET)
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -52,8 +51,7 @@ class DeletePostPageTest : WebPageTest() {
 	@Test
 	fun `post request with invalid post redirects to no permission page`() {
 		request("", POST)
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -63,8 +61,7 @@ class DeletePostPageTest : WebPageTest() {
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -74,13 +71,8 @@ class DeletePostPageTest : WebPageTest() {
 		addHttpRequestParameter("post", "post-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("confirmDelete", "true")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.processTemplate(freenetRequest, templateContext)
-			fail()
-		} catch (e: Exception) {
+		verifyRedirect("return.html") {
 			verify(core).deletePost(post)
-			throw e
 		}
 	}
 
@@ -91,13 +83,8 @@ class DeletePostPageTest : WebPageTest() {
 		addHttpRequestParameter("post", "post-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("abortDelete", "true")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.processTemplate(freenetRequest, templateContext)
-			fail()
-		} catch (e: Exception) {
+		verifyRedirect("return.html") {
 			verify(core, never()).deletePost(post)
-			throw e
 		}
 	}
 

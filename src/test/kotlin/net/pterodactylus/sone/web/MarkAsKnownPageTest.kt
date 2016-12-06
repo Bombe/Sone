@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -15,6 +14,8 @@ class MarkAsKnownPageTest : WebPageTest() {
 
 	private val page = MarkAsKnownPage(template, webInterface)
 
+	override fun getPage() = page
+
 	@Test
 	fun `posts can be marked as known`() {
 		addHttpRequestParameter("returnPage", "return.html")
@@ -23,10 +24,7 @@ class MarkAsKnownPageTest : WebPageTest() {
 		val posts = listOf(mock<Post>(), mock<Post>())
 		addPost("post1", posts[0])
 		addPost("post3", posts[1])
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).markPostKnown(posts[0])
 			verify(core).markPostKnown(posts[1])
 		}
@@ -40,10 +38,7 @@ class MarkAsKnownPageTest : WebPageTest() {
 		val replies = listOf(mock<PostReply>(), mock<PostReply>())
 		addPostReply("reply1", replies[0])
 		addPostReply("reply3", replies[1])
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).markReplyKnown(replies[0])
 			verify(core).markReplyKnown(replies[1])
 		}
@@ -57,10 +52,7 @@ class MarkAsKnownPageTest : WebPageTest() {
 		val sones = listOf(mock<Sone>(), mock<Sone>())
 		addSone("sone1", sones[0])
 		addSone("sone3", sones[1])
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).markSoneKnown(sones[0])
 			verify(core).markSoneKnown(sones[1])
 		}
@@ -69,8 +61,7 @@ class MarkAsKnownPageTest : WebPageTest() {
 	@Test
 	fun `different type redirects to invalid page`() {
 		addHttpRequestParameter("type", "foo")
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 }

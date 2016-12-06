@@ -5,7 +5,6 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
@@ -13,7 +12,6 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.verify
-import kotlin.test.fail
 
 /**
  * Unit test for [DeleteImagePage].
@@ -23,6 +21,8 @@ class DeleteImagePageTest : WebPageTest() {
 	private val page = DeleteImagePage(template, webInterface)
 	private val image = mock<Image>()
 	private val sone = mock<Sone>()
+
+	override fun getPage() = page
 
 	@Before
 	fun setupImage() {
@@ -37,8 +37,7 @@ class DeleteImagePageTest : WebPageTest() {
 	@Test
 	fun `get request with invalid image redirects to invalid page`() {
 		request("", GET)
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
@@ -47,8 +46,7 @@ class DeleteImagePageTest : WebPageTest() {
 		whenever(sone.isLocal).thenReturn(false)
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -66,8 +64,7 @@ class DeleteImagePageTest : WebPageTest() {
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
 		addHttpRequestParameter("abortDelete", "true")
-		expectedException.expect(redirectsTo("imageBrowser.html?image=image-id"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("imageBrowser.html?image=image-id")
 	}
 
 	@Test
@@ -75,13 +72,8 @@ class DeleteImagePageTest : WebPageTest() {
 		request("", POST)
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
-		expectedException.expect(redirectsTo("imageBrowser.html?album=album-id"))
-		try {
-			page.processTemplate(freenetRequest, templateContext)
-			fail()
-		} catch (e: Exception) {
+		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(webInterface.core).deleteImage(image)
-			throw e
 		}
 	}
 

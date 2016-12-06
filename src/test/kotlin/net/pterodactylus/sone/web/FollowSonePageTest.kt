@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Test
@@ -19,6 +18,8 @@ class FollowSonePageTest : WebPageTest() {
 
 	private val page = FollowSonePage(template, webInterface)
 
+	override fun getPage() = page
+
 	@Test
 	fun `get request does not redirect`() {
 		request("", GET)
@@ -32,10 +33,7 @@ class FollowSonePageTest : WebPageTest() {
 		addSone("sone-id", sone)
 		addHttpRequestParameter("sone", "sone-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).followSone(currentSone, "sone-id")
 			verify(core).markSoneKnown(sone)
 		}
@@ -50,10 +48,7 @@ class FollowSonePageTest : WebPageTest() {
 		addSone("sone-id2", secondSone)
 		addHttpRequestParameter("sone", "sone-id1,sone-id2")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).followSone(currentSone, "sone-id1")
 			verify(core).followSone(currentSone, "sone-id2")
 			verify(core).markSoneKnown(firstSone)
@@ -66,10 +61,7 @@ class FollowSonePageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("sone", "sone-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core, never()).followSone(ArgumentMatchers.eq(currentSone), anyString())
 			verify(core, never()).markSoneKnown(any<Sone>())
 		}

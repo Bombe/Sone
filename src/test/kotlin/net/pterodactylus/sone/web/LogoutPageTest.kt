@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -14,12 +13,11 @@ class LogoutPageTest : WebPageTest() {
 
 	private val page = LogoutPage(template, webInterface)
 
+	override fun getPage() = page
+
 	@Test
 	fun `page unsets current sone and redirects to index`() {
-		expectedException.expect(redirectsTo("index.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("index.html") {
 			verify(webInterface).setCurrentSone(toadletContext, null)
 		}
 	}

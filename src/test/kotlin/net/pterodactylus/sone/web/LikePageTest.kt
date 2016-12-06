@@ -13,6 +13,8 @@ class LikePageTest : WebPageTest() {
 
 	private val page = LikePage(template, webInterface)
 
+	override fun getPage() = page
+
 	@Test
 	fun `get request does not redirect`() {
 		request("", GET)
@@ -25,10 +27,7 @@ class LikePageTest : WebPageTest() {
 		addHttpRequestParameter("type", "post")
 		addHttpRequestParameter("post", "post-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(WebTestUtils.redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(currentSone).addLikedPostId("post-id")
 		}
 	}
@@ -39,10 +38,7 @@ class LikePageTest : WebPageTest() {
 		addHttpRequestParameter("type", "reply")
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(WebTestUtils.redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(currentSone).addLikedReplyId("reply-id")
 		}
 	}
@@ -52,10 +48,7 @@ class LikePageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("type", "foo")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(WebTestUtils.redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verifyNoMoreInteractions(currentSone)
 		}
 	}

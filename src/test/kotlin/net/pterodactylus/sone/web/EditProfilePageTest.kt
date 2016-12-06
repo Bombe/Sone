@@ -26,6 +26,8 @@ class EditProfilePageTest : WebPageTest() {
 	private val firstField = profile.addField("First Field")
 	private val secondField = profile.addField("Second Field")
 
+	override fun getPage() = page
+
 	@Before
 	fun setupProfile() {
 		val avatar = mock<Image>()
@@ -73,10 +75,7 @@ class EditProfilePageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("save-profile", "true")
 		addHttpRequestParameter(fieldName, newValue.toString())
-		expectedException.expect(WebTestUtils.redirectsTo("editProfile.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("editProfile.html") {
 			verify(core).touchConfiguration()
 			assertThat(fieldAccessor(), equalTo(expectedValue))
 		}
@@ -153,10 +152,7 @@ class EditProfilePageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("add-field", "true")
 		addHttpRequestParameter("field-name", "new-field")
-		expectedException.expect(WebTestUtils.redirectsTo("editProfile.html#profile-fields"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.getFieldByName("new-field"), notNullValue())
 			verify(currentSone).profile = profile
 			verify(core).touchConfiguration()
@@ -167,18 +163,14 @@ class EditProfilePageTest : WebPageTest() {
 	fun `deleting a field redirects to delete field page`() {
 		request("", POST)
 		addHttpRequestParameter("delete-field-${firstField.id}", "true")
-		expectedException.expect(WebTestUtils.redirectsTo("deleteProfileField.html?field=${firstField.id}"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("deleteProfileField.html?field=${firstField.id}")
 	}
 
 	@Test
 	fun `moving a field up moves the field up and redirects to the edit profile page`() {
 		request("", POST)
 		addHttpRequestParameter("move-up-field-${secondField.id}", "true")
-		expectedException.expect(WebTestUtils.redirectsTo("editProfile.html#profile-fields"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.fields, contains(secondField, firstField))
 			verify(currentSone).profile = profile
 		}
@@ -188,18 +180,14 @@ class EditProfilePageTest : WebPageTest() {
 	fun `moving an invalid field up redirects to the invalid page`() {
 		request("", POST)
 		addHttpRequestParameter("move-up-field-foo", "true")
-		expectedException.expect(WebTestUtils.redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `moving a field down moves the field down and redirects to the edit profile page`() {
 		request("", POST)
 		addHttpRequestParameter("move-down-field-${firstField.id}", "true")
-		expectedException.expect(WebTestUtils.redirectsTo("editProfile.html#profile-fields"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.fields, contains(secondField, firstField))
 			verify(currentSone).profile = profile
 		}
@@ -209,16 +197,14 @@ class EditProfilePageTest : WebPageTest() {
 	fun `moving an invalid field down redirects to the invalid page`() {
 		request("", POST)
 		addHttpRequestParameter("move-down-field-foo", "true")
-		expectedException.expect(WebTestUtils.redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `editing a field redirects to the edit profile page`() {
 		request("", POST)
 		addHttpRequestParameter("edit-field-${firstField.id}", "true")
-		expectedException.expect(WebTestUtils.redirectsTo("editProfileField.html?field=${firstField.id}"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("editProfileField.html?field=${firstField.id}")
 	}
 
 }

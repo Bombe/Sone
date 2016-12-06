@@ -2,13 +2,11 @@ package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.web.Method.GET
 import org.junit.Test
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
-import kotlin.test.fail
 
 /**
  * Unit test for [DismissNotificationPage].
@@ -18,12 +16,13 @@ class DismissNotificationPageTest : WebPageTest() {
 	private val page = DismissNotificationPage(template, webInterface)
 	private val notification = mock<Notification>()
 
+	override fun getPage() = page
+
 	@Test
 	fun `get request with invalid notification ID redirects to return page`() {
 		request("", GET)
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("return.html")
 	}
 
 	@Test
@@ -32,11 +31,7 @@ class DismissNotificationPageTest : WebPageTest() {
 		addNotification("notification-id", notification)
 		addHttpRequestParameter("notification", "notification-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-			fail()
-		} finally {
+		verifyRedirect("return.html") {
 			verify(notification, never()).dismiss()
 		}
 	}
@@ -48,11 +43,7 @@ class DismissNotificationPageTest : WebPageTest() {
 		addNotification("notification-id", notification)
 		addHttpRequestParameter("notification", "notification-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-			fail()
-		} finally {
+		verifyRedirect("return.html") {
 			verify(notification).dismiss()
 		}
 	}

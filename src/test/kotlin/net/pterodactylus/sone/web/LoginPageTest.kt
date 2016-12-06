@@ -6,7 +6,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.thenReturnMock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
@@ -26,6 +25,8 @@ class LoginPageTest : WebPageTest() {
 	private val page = LoginPage(template, webInterface)
 
 	private val sones = listOf(createSone("Sone", "Test"), createSone("Test"), createSone("Sone"))
+
+	override fun getPage() = page
 
 	private fun createSone(vararg contexts: String) = mock<Sone>().apply {
 		whenever(id).thenReturn(hashCode().toString())
@@ -69,10 +70,7 @@ class LoginPageTest : WebPageTest() {
 	fun `post request with valid sone and redirects to index page`() {
 		request("", POST)
 		addHttpRequestParameter("sone-id", "sone2")
-		expectedException.expect(redirectsTo("index.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("index.html") {
 			verify(webInterface).setCurrentSone(toadletContext, sones[1])
 		}
 	}
@@ -82,10 +80,7 @@ class LoginPageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("sone-id", "sone2")
 		addHttpRequestParameter("target", "foo.html")
-		expectedException.expect(redirectsTo("foo.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("foo.html") {
 			verify(webInterface).setCurrentSone(toadletContext, sones[1])
 		}
 	}

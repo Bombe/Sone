@@ -6,7 +6,6 @@ import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.TRUSTED
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
@@ -22,6 +21,8 @@ import org.junit.Test
 class OptionsPageTest : WebPageTest() {
 
 	private val page = OptionsPage(template, webInterface)
+
+	override fun getPage() = page
 
 	@Before
 	fun setupPreferences() {
@@ -94,10 +95,7 @@ class OptionsPageTest : WebPageTest() {
 		addHttpRequestParameter("show-custom-avatars", "ALWAYS")
 		addHttpRequestParameter("load-linked-images", "ALWAYS")
 		addHttpRequestParameter(option, setValue.toString())
-		expectedException.expect(redirectsTo("options.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}
 	}
@@ -149,10 +147,7 @@ class OptionsPageTest : WebPageTest() {
 		unsetCurrentSone()
 		request("", POST)
 		addHttpRequestParameter(name, setValue)
-		expectedException.expect(redirectsTo("options.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}
 	}

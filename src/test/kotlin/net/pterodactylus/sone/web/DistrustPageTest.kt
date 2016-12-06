@@ -2,12 +2,9 @@ package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
-import net.pterodactylus.util.web.Method
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.verify
 
 /**
@@ -16,6 +13,8 @@ import org.mockito.Mockito.verify
 class DistrustPageTest : WebPageTest() {
 
 	private val page = DistrustPage(template, webInterface)
+
+	override fun getPage() = page
 
 	@Test
 	fun `get request does not redirect`() {
@@ -27,8 +26,7 @@ class DistrustPageTest : WebPageTest() {
 	fun `post request with invalid sone redirects to return page`() {
 	    request("", POST)
 		addHttpRequestParameter("returnPage", "return.html")
-		expectedException.expect(redirectsTo("return.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("return.html")
 	}
 
 	@Test
@@ -38,10 +36,7 @@ class DistrustPageTest : WebPageTest() {
 		addSone("remote-sone-id", remoteSone)
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("sone", "remote-sone-id")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).distrustSone(currentSone, remoteSone)
 		}
 	}

@@ -6,7 +6,6 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Before
@@ -25,6 +24,8 @@ class EditImagePageTest : WebPageTest() {
 	private val modifier = mockBuilder<Image.Modifier>()
 	private val sone = mock<Sone>()
 	private val album = mock<Album>()
+
+	override fun getPage() = page
 
 	@Before
 	fun setupImage() {
@@ -45,8 +46,7 @@ class EditImagePageTest : WebPageTest() {
 	@Test
 	fun `post request with invalid image redirects to invalid page`() {
 		request("", POST)
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
@@ -55,8 +55,7 @@ class EditImagePageTest : WebPageTest() {
 		whenever(sone.isLocal).thenReturn(false)
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -66,10 +65,7 @@ class EditImagePageTest : WebPageTest() {
 		addHttpRequestParameter("image", "image-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("moveLeft", "true")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(album).moveImageUp(image)
 			verify(core).touchConfiguration()
 		}
@@ -82,10 +78,7 @@ class EditImagePageTest : WebPageTest() {
 		addHttpRequestParameter("image", "image-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("moveRight", "true")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(album).moveImageDown(image)
 			verify(core).touchConfiguration()
 		}
@@ -98,10 +91,7 @@ class EditImagePageTest : WebPageTest() {
 		addHttpRequestParameter("image", "image-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("title", "   ")
-		expectedException.expect(redirectsTo("emptyImageTitle.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("emptyImageTitle.html") {
 			verify(core, never()).touchConfiguration()
 		}
 	}
@@ -114,10 +104,7 @@ class EditImagePageTest : WebPageTest() {
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("title", "Title")
 		addHttpRequestParameter("description", "Description")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(modifier).setTitle("Title")
 			verify(modifier).setDescription("Description")
 			verify(modifier).update()
@@ -134,10 +121,7 @@ class EditImagePageTest : WebPageTest() {
 		addHttpRequestParameter("title", "Title")
 		addHttpRequestHeader("Host", "www.te.st")
 		addHttpRequestParameter("description", "Get http://www.te.st/KSK@GPL.txt")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(modifier).setTitle("Title")
 			verify(modifier).setDescription("Get KSK@GPL.txt")
 			verify(modifier).update()

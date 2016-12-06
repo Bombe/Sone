@@ -1,19 +1,11 @@
 package net.pterodactylus.sone.web
 
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
-import net.pterodactylus.util.web.Method.POST
-import org.mockito.ArgumentMatchers.anyInt
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.`when`
-
 import net.pterodactylus.sone.data.PostReply
-
-import com.google.common.base.Optional
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.util.web.Method.GET
-import org.hamcrest.MatcherAssert
+import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
@@ -30,6 +22,8 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	private val sone = mock<Sone>()
 	private val reply = mock<PostReply>()
+
+	override fun getPage() = page
 
 	@Before
 	fun setupReply() {
@@ -61,8 +55,7 @@ class DeleteReplyPageTest : WebPageTest() {
 	@Test
 	fun `trying to delete a reply with an invalid ID results in no permission page`() {
 		request("", POST)
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -71,8 +64,7 @@ class DeleteReplyPageTest : WebPageTest() {
 		addHttpRequestParameter("reply", "reply-id")
 		whenever(sone.isLocal).thenReturn(false)
 		addPostReply("reply-id", reply)
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.processTemplate(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -82,10 +74,7 @@ class DeleteReplyPageTest : WebPageTest() {
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("confirmDelete", "true")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.processTemplate(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core).deleteReply(reply)
 		}
 	}
@@ -97,10 +86,7 @@ class DeleteReplyPageTest : WebPageTest() {
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("abortDelete", "true")
-		expectedException.expect(redirectsTo("return.html"))
-		try {
-			page.processTemplate(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("return.html") {
 			verify(core, never()).deleteReply(reply)
 		}
 	}

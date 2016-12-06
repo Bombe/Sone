@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
@@ -25,6 +24,8 @@ class DeleteAlbumPageTest : WebPageTest() {
 	private val album = mock<Album>()
 	private val parentAlbum = mock<Album>()
 
+	override fun getPage() = page
+
 	@Before
 	fun setupAlbums() {
 		whenever(sone.id).thenReturn("sone-id")
@@ -40,8 +41,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 	fun `get request with invalid album ID results in redirect to invalid page`() {
 		request("", GET)
 		whenever(core.getAlbum(anyString())).thenReturn(null)
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
@@ -57,8 +57,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 	@Test
 	fun `post request redirects to invalid page if album is invalid`() {
 		request("", POST)
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
@@ -67,8 +66,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 		whenever(sone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -77,8 +75,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("abortDelete", "true")
-		expectedException.expect(redirectsTo("imageBrowser.html?album=album-id"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("imageBrowser.html?album=album-id")
 	}
 
 	@Test
@@ -86,10 +83,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 		request("", POST)
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
-		expectedException.expect(redirectsTo("imageBrowser.html?sone=sone-id"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("imageBrowser.html?sone=sone-id") {
 			verify(core).deleteAlbum(album)
 		}
 	}
@@ -100,10 +94,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 		whenever(sone.rootAlbum).thenReturn(mock<Album>())
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
-		expectedException.expect(redirectsTo("imageBrowser.html?album=parent-id"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(core).deleteAlbum(album)
 		}
 	}

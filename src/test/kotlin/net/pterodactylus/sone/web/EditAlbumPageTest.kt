@@ -6,7 +6,6 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Before
@@ -24,6 +23,8 @@ class EditAlbumPageTest : WebPageTest() {
 	private val parentAlbum = mock<Album>()
 	private val modifier = mockBuilder<Album.Modifier>()
 	private val sone = mock<Sone>()
+
+	override fun getPage() = page
 
 	@Before
 	fun setup() {
@@ -46,8 +47,7 @@ class EditAlbumPageTest : WebPageTest() {
 	@Test
 	fun `post request with invalid album redirects to invalid page`() {
 		request("", POST)
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
@@ -56,8 +56,7 @@ class EditAlbumPageTest : WebPageTest() {
 		whenever(sone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
-		expectedException.expect(redirectsTo("noPermission.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("noPermission.html")
 	}
 
 	@Test
@@ -66,10 +65,7 @@ class EditAlbumPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("moveLeft", "true")
-		expectedException.expect(redirectsTo("imageBrowser.html?album=parent-id"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(parentAlbum).moveAlbumUp(album)
 			verify(core).touchConfiguration()
 		}
@@ -81,10 +77,7 @@ class EditAlbumPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("moveRight", "true")
-		expectedException.expect(redirectsTo("imageBrowser.html?album=parent-id"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(parentAlbum).moveAlbumDown(album)
 			verify(core).touchConfiguration()
 		}
@@ -96,8 +89,7 @@ class EditAlbumPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		whenever(modifier.setTitle("")).thenThrow(AlbumTitleMustNotBeEmpty())
-		expectedException.expect(redirectsTo("emptyAlbumTitle.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("emptyAlbumTitle.html")
 	}
 
 	@Test
@@ -107,10 +99,7 @@ class EditAlbumPageTest : WebPageTest() {
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("title", "title")
 		addHttpRequestParameter("description", "description")
-		expectedException.expect(redirectsTo("imageBrowser.html?album=album-id"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(modifier).setTitle("title")
 			verify(modifier).setDescription("description")
 			verify(modifier).update()

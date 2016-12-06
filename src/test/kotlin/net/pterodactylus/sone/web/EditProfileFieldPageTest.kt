@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebTestUtils.redirectsTo
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
@@ -22,6 +21,8 @@ class EditProfileFieldPageTest : WebPageTest() {
 	private val profile = Profile(currentSone)
 	private val field = profile.addField("Name")
 
+	override fun getPage() = page
+
 	@Before
 	fun setupProfile() {
 		whenever(currentSone.profile).thenReturn(profile)
@@ -30,8 +31,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 	@Test
 	fun `get request with invalid field redirects to invalid page`() {
 		request("", GET)
-		expectedException.expect(redirectsTo("invalid.html"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("invalid.html")
 	}
 
 	@Test
@@ -47,8 +47,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("field", field.id)
 		addHttpRequestParameter("cancel", "true")
-		expectedException.expect(redirectsTo("editProfile.html#profile-fields"))
-		page.handleRequest(freenetRequest, templateContext)
+		verifyRedirect("editProfile.html#profile-fields")
 	}
 
 	@Test
@@ -56,10 +55,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("field", field.id)
 		addHttpRequestParameter("name", "New Name")
-		expectedException.expect(redirectsTo("editProfile.html#profile-fields"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(field.name, equalTo("New Name"))
 			verify(currentSone).profile = profile
 		}
@@ -70,10 +66,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 		request("", POST)
 		addHttpRequestParameter("field", field.id)
 		addHttpRequestParameter("name", "Name")
-		expectedException.expect(redirectsTo("editProfile.html#profile-fields"))
-		try {
-			page.handleRequest(freenetRequest, templateContext)
-		} finally {
+		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(field.name, equalTo("Name"))
 			verify(currentSone, never()).profile = profile
 		}
