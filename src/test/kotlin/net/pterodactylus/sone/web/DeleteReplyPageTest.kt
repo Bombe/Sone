@@ -30,10 +30,10 @@ class DeleteReplyPageTest : WebPageTest() {
 		whenever(sone.isLocal).thenReturn(true)
 		whenever(reply.sone).thenReturn(sone)
 	}
-	
+
 	@Test
 	fun `get request sets reply ID and return page in template context`() {
-	    request("", GET)
+		request("", GET)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		page.handleRequest(freenetRequest, templateContext)
@@ -43,7 +43,7 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `post request without any action sets reply ID and return page in template context`() {
-	    request("", POST)
+		request("", POST)
 		addPostReply("reply-id", reply)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
@@ -60,7 +60,7 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `trying to delete a reply from a non-local sone results in no permission page`() {
-	    request("", POST)
+		request("", POST)
 		addHttpRequestParameter("reply", "reply-id")
 		whenever(sone.isLocal).thenReturn(false)
 		addPostReply("reply-id", reply)
@@ -69,7 +69,7 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `confirming deletion of reply deletes the reply and redirects to return page`() {
-	    request("", POST)
+		request("", POST)
 		addPostReply("reply-id", reply)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
@@ -78,10 +78,10 @@ class DeleteReplyPageTest : WebPageTest() {
 			verify(core).deleteReply(reply)
 		}
 	}
-	
+
 	@Test
 	fun `aborting deletion of reply redirects to return page`() {
-	    request("", POST)
+		request("", POST)
 		addPostReply("reply-id", reply)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")

@@ -18,20 +18,20 @@ class DistrustPageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-	    request("", GET)
+		request("", GET)
 		page.handleRequest(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `post request with invalid sone redirects to return page`() {
-	    request("", POST)
+		request("", POST)
 		addHttpRequestParameter("returnPage", "return.html")
 		verifyRedirect("return.html")
 	}
 
 	@Test
 	fun `post request with valid sone distrusts sone and redirects to return page`() {
-	    request("", POST)
+		request("", POST)
 		val remoteSone = mock<Sone>()
 		addSone("remote-sone-id", remoteSone)
 		addHttpRequestParameter("returnPage", "return.html")

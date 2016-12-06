@@ -175,7 +175,7 @@ class EditProfilePageTest : WebPageTest() {
 			verify(currentSone).profile = profile
 		}
 	}
-	
+
 	@Test
 	fun `moving an invalid field up redirects to the invalid page`() {
 		request("", POST)
