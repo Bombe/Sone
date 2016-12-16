@@ -49,6 +49,8 @@ import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.ByteStreams;
 import org.junit.Before;
@@ -88,6 +90,7 @@ public abstract class WebPageTest {
 	private final Set<OwnIdentity> ownIdentities = new HashSet<>();
 	private final Map<String, Sone> sones = new HashMap<>();
 	protected final List<Sone> localSones = new ArrayList<>();
+	private final ListMultimap<String, PostReply> postReplies = ArrayListMultimap.create();
 
 	protected WebPageTest() {
 		try {
@@ -164,6 +167,12 @@ public abstract class WebPageTest {
 			}
 		});
 		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
+		when(core.getReplies(anyString())).thenAnswer(new Answer<List<PostReply>>() {
+			@Override
+			public List<PostReply> answer(InvocationOnMock invocation) throws Throwable {
+				return postReplies.get(invocation.<String>getArgument(0));
+			}
+		});
 		when(core.getAlbum(anyString())).thenReturn(null);
 		when(core.getImage(anyString())).thenReturn(null);
 		when(core.getImage(anyString(), anyBoolean())).thenReturn(null);
@@ -219,6 +228,9 @@ public abstract class WebPageTest {
 	}
 
 	protected void addPostReply(String postReplyId, PostReply postReply) {
+		if (postReply.getPostId() != null) {
+			postReplies.put(postReply.getPostId(), postReply);
+		}
 		when(core.getPostReply(postReplyId)).thenReturn(Optional.fromNullable(postReply));
 	}
 
