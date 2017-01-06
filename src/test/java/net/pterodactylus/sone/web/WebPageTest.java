@@ -46,11 +46,14 @@ import net.pterodactylus.util.web.Method;
 import net.pterodactylus.util.web.Response;
 
 import freenet.clients.http.ToadletContext;
+import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.ByteStreams;
 import org.junit.Before;
@@ -74,12 +77,13 @@ public abstract class WebPageTest {
 	protected final WebInterface webInterface = mock(WebInterface.class, RETURNS_DEEP_STUBS);
 	protected final EventBus eventBus = mock(EventBus.class);
 	protected final Core core = webInterface.getCore();
+	protected final BaseL10n l10n = webInterface.getL10n();
 
 	protected final Sone currentSone = mock(Sone.class);
 
 	protected final TemplateContext templateContext = new TemplateContext();
 	protected final HTTPRequest httpRequest = mock(HTTPRequest.class);
-	protected final Map<String, String> requestParameters = new HashMap<>();
+	protected final Multimap<String, String> requestParameters = HashMultimap.create();
 	protected final Map<String, String> requestHeaders = new HashMap<>();
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
 	private final PipedOutputStream responseOutputStream = new PipedOutputStream();
@@ -104,32 +108,52 @@ public abstract class WebPageTest {
 	public final void setupFreenetRequest() {
 		when(freenetRequest.getToadletContext()).thenReturn(toadletContext);
 		when(freenetRequest.getHttpRequest()).thenReturn(httpRequest);
+		when(httpRequest.getMultipleParam(anyString())).thenAnswer(new Answer<String[]>() {
+			@Override
+			public String[] answer(InvocationOnMock invocation) throws Throwable {
+				return requestParameters.get(invocation.<String>getArgument(0)).toArray(new String[0]);
+			}
+		});
 		when(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String parameter = invocation.getArgument(0);
 				int maxLength = invocation.getArgument(1);
-				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter).substring(0, Math.min(maxLength, requestParameters.get(parameter).length())) : "";
+				Collection<String> values = requestParameters.get(parameter);
+				return requestParameters.containsKey(parameter) ? values.iterator().next().substring(0, Math.min(maxLength, values.iterator().next().length())) : "";
+			}
+		});
+		when(httpRequest.hasParameters()).thenAnswer(new Answer<Boolean>() {
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				return !requestParameters.isEmpty();
+			}
+		});
+		when(httpRequest.getParameterNames()).thenAnswer(new Answer<Collection<String>>() {
+			@Override
+			public Collection<String> answer(InvocationOnMock invocation) throws Throwable {
+				return requestParameters.keySet();
 			}
 		});
 		when(httpRequest.getParam(anyString())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String parameter = invocation.getArgument(0);
-				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter) : "";
+				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter).iterator().next() : "";
 			}
 		});
 		when(httpRequest.getParam(anyString(), ArgumentMatchers.<String>any())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String parameter = invocation.getArgument(0);
-				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter) : invocation.<String>getArgument(1);
+				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter).iterator().next() : invocation.<String>getArgument(1);
 			}
 		});
 		when(httpRequest.isPartSet(anyString())).thenAnswer(new Answer<Boolean>() {
 			@Override
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {
-				return requestParameters.get(invocation.<String>getArgument(0)) != null;
+				return requestParameters.containsKey(invocation.<String>getArgument(0)) &&
+						requestParameters.get(invocation.<String>getArgument(0)).iterator().next() != null;
 			}
 		});
 		when(httpRequest.getParts()).thenAnswer(new Answer<String[]>() {
@@ -208,6 +232,7 @@ public abstract class WebPageTest {
 
 	protected void request(String uri, Method method) {
 		try {
+			when(httpRequest.getPath()).thenReturn(uri);
 			when(freenetRequest.getUri()).thenReturn(new URI(uri));
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);

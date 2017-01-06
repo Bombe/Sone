@@ -272,22 +272,27 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 				StringBuilder requestParameters = new StringBuilder();
 				for (String parameterName : httpRequest.getParameterNames()) {
 					if (requestParameters.length() > 0) {
-						requestParameters.append("%26");
+						requestParameters.append("&");
 					}
 					String[] parameterValues = httpRequest.getMultipleParam(parameterName);
 					for (String parameterValue : parameterValues) {
-						try {
-							requestParameters.append(URLEncoder.encode(parameterName, "UTF-8")).append("%3d").append(URLEncoder.encode(parameterValue, "UTF-8"));
-						} catch (UnsupportedEncodingException uee1) {
-							/* A JVM without UTF-8? I don’t think so. */
-						}
+						requestParameters.append(urlEncode(parameterName)).append("=").append(urlEncode(parameterValue));
 					}
 				}
 				originalUrl += "?" + requestParameters.toString();
 			}
-			return "login.html?target=" + originalUrl;
+			return "login.html?target=" + urlEncode(originalUrl);
 		}
 		return null;
+	}
+
+	private static String urlEncode(String value) {
+		try {
+			return URLEncoder.encode(value, "UTF-8");
+		} catch (UnsupportedEncodingException uee1) {
+							/* A JVM without UTF-8? I don’t think so. */
+			throw new RuntimeException(uee1);
+		}
 	}
 
 	/**
