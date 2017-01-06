@@ -105,7 +105,7 @@ public class IdentityChangeDetector {
 		return new Predicate<Identity>() {
 			@Override
 			public boolean apply(Identity identity) {
-				return (identity == null) ? false : identityHasChanged(oldIdentities.get(identity.getId()), identity);
+				return (identity != null) && identityHasChanged(oldIdentities.get(identity.getId()), identity);
 			}
 		};
 	}
@@ -151,7 +151,7 @@ public class IdentityChangeDetector {
 		return new Predicate<String>() {
 			@Override
 			public boolean apply(String context) {
-				return (identity == null) ? false : !identity.getContexts().contains(context);
+				return (identity != null) && !identity.getContexts().contains(context);
 			}
 		};
 	}
@@ -160,7 +160,7 @@ public class IdentityChangeDetector {
 		return new Predicate<Identity>() {
 			@Override
 			public boolean apply(Identity identity) {
-				return (identity == null) ? false : !newIdentities.contains(identity);
+				return (identity != null) && !newIdentities.contains(identity);
 			}
 		};
 	}
@@ -169,7 +169,7 @@ public class IdentityChangeDetector {
 		return new Predicate<Entry<String, String>>() {
 			@Override
 			public boolean apply(Entry<String, String> property) {
-				return (property == null) ? false : !identity.getProperties().containsKey(property.getKey());
+				return (property != null) && !identity.getProperties().containsKey(property.getKey());
 			}
 		};
 	}
@@ -178,7 +178,7 @@ public class IdentityChangeDetector {
 		return new Predicate<Entry<String, String>>() {
 			@Override
 			public boolean apply(Entry<String, String> property) {
-				return (property == null) ? false : !newIdentity.getProperty(property.getKey()).equals(property.getValue());
+				return (property != null) && !newIdentity.getProperty(property.getKey()).equals(property.getValue());
 			}
 		};
 	}
