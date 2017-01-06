@@ -70,11 +70,11 @@ public class NewPage extends SoneTemplatePage {
 		}
 
 		/* filter and sort them. */
-		List<Post> sortedPosts = new ArrayList(posts);
+		List<Post> sortedPosts = new ArrayList<>(posts);
 		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 
 		/* paginate them. */
-		Pagination<Post> pagination = new Pagination<Post>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}
