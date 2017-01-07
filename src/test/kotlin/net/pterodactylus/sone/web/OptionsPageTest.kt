@@ -92,9 +92,9 @@ class OptionsPageTest : WebPageTest() {
 
 	private fun <T> verifyThatOptionCanBeSet(option: String, setValue: Any?, expectedValue: T, getter: () -> T) {
 		request("", POST)
+		addHttpRequestParameter(option, setValue.toString())
 		addHttpRequestParameter("show-custom-avatars", "ALWAYS")
 		addHttpRequestParameter("load-linked-images", "ALWAYS")
-		addHttpRequestParameter(option, setValue.toString())
 		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}

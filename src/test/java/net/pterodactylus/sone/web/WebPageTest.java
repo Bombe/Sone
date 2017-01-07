@@ -83,7 +83,7 @@ public abstract class WebPageTest {
 
 	protected final TemplateContext templateContext = new TemplateContext();
 	protected final HTTPRequest httpRequest = mock(HTTPRequest.class);
-	protected final Multimap<String, String> requestParameters = HashMultimap.create();
+	protected final Multimap<String, String> requestParameters = ArrayListMultimap.create();
 	protected final Map<String, String> requestHeaders = new HashMap<>();
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
 	private final PipedOutputStream responseOutputStream = new PipedOutputStream();
