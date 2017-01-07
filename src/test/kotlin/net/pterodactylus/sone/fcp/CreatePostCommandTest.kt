@@ -1,80 +1,54 @@
 package net.pterodactylus.sone.fcp
 
+import com.google.common.base.Optional
 import com.google.common.base.Optional.absent
 import com.google.common.base.Optional.of
-import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
-import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
-import org.mockito.ArgumentMatchers.anyString
 
 /**
  * Unit test for [CreatePostCommand].
  */
-class CreatePostCommandTest {
+class CreatePostCommandTest : SoneCommandTest() {
 
-	@Rule @JvmField val expectedException = ExpectedException.none()
-	private val core = mock<Core>()
-	private val command = CreatePostCommand(core)
-
-	private val parameters = SimpleFieldSet(true)
-	private val localSone = mock<Sone>().apply {
-		whenever(isLocal).thenReturn(true)
-	}
-	private val remoteSone = mock<Sone>()
-
-	@Before
-	fun setupCore() {
-		whenever(core.getSone(anyString())).thenReturn(absent())
-	}
+	override fun createCommand(core: Core) = CreatePostCommand(core)
 
 	@Test
 	fun `command requires write access`() {
-	    assertThat(command.requiresWriteAccess(), equalTo(true))
+		assertThat(command.requiresWriteAccess(), equalTo(true))
 	}
 
 	@Test
 	fun `request without any parameters results in fcp exception`() {
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		requestWithoutAnyParameterResultsInFcpException()
 	}
 
 	@Test
-	fun `request with empty sone parameter results in fcp exception`() {
-		parameters.putSingle("Sone", null)
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+	fun `request with empty Sone parameter results in fcp exception`() {
+	    requestWithEmptySoneParameterResultsInFcpException()
 	}
 
 	@Test
 	fun `request with invalid Sone parameter results in fcp exception`() {
-		parameters.putSingle("Sone", "InvalidSoneId")
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		requestWithInvalidSoneParameterResultsInFcpException()
 	}
 
 	@Test
 	fun `request with valid remote Sone parameter results in fcp exception`() {
-		parameters.putSingle("Sone", "RemoteSoneId")
-		whenever(core.getSone("RemoteSoneId")).thenReturn(of(remoteSone))
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		requestWithValidRemoteSoneParameterResultsInFcpException()
 	}
 
 	@Test
 	fun `request without text results in fcp exception`() {
 		parameters.putSingle("Sone", "LocalSoneId")
-		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(Optional.of(localSone))
 		expectedException.expect(FcpException::class.java)
 		command.execute(parameters, null, null)
 	}
