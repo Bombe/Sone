@@ -51,6 +51,7 @@ public class DeleteReplyCommand extends AbstractSoneCommand {
 		if (!reply.getSone().isLocal()) {
 			return new ErrorResponse(401, "Not allowed.");
 		}
+		getCore().deleteReply(reply);
 		return new Response("ReplyDeleted", new SimpleFieldSetBuilder().get());
 	}
 
