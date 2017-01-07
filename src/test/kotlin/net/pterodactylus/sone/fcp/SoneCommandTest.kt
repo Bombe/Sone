@@ -37,6 +37,7 @@ abstract class SoneCommandTest {
 	@Before
 	fun setupCore() {
 		whenever(core.getSone(anyString())).thenReturn(absent())
+		whenever(core.getPost(anyString())).thenReturn(absent())
 	}
 
 	protected fun requestWithoutAnyParameterResultsInFcpException() {
