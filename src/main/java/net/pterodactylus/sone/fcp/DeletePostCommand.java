@@ -51,6 +51,7 @@ public class DeletePostCommand extends AbstractSoneCommand {
 		if (!post.getSone().isLocal()) {
 			return new ErrorResponse(401, "Not allowed.");
 		}
+		getCore().deletePost(post);
 		return new Response("PostDeleted", new SimpleFieldSetBuilder().get());
 	}
 
