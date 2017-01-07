@@ -5,7 +5,6 @@ import com.google.common.base.Optional.absent
 import com.google.common.base.Optional.of
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
@@ -49,8 +48,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 	fun `request without text results in fcp exception`() {
 		parameters.putSingle("Sone", "LocalSoneId")
 		whenever(core.getSone("LocalSoneId")).thenReturn(Optional.of(localSone))
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	@Test
@@ -71,8 +69,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 		parameters.putSingle("Text", "Test")
 		parameters.putSingle("Recipient", "InvalidSoneId")
 		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	@Test

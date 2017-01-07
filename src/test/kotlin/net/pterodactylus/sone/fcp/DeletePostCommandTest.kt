@@ -3,13 +3,11 @@ package net.pterodactylus.sone.fcp
 import com.google.common.base.Optional.of
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.verify
 
 /**
@@ -34,8 +32,7 @@ class DeletePostCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with invalid post parameter results in fcp exception`() {
 		parameters.putSingle("Post", "InvalidPostId")
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	@Test

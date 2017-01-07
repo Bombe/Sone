@@ -4,7 +4,6 @@ import com.google.common.base.Optional.of
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
@@ -53,16 +52,14 @@ class CreateReplyCommandTest : SoneCommandTest() {
 	@Test
 	fun `request without post parameter results in fcp exception`() {
 		addValidLocalSoneParameter()
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	@Test
 	fun `request with invalid post parameter results in fcp exception`() {
 		addValidLocalSoneParameter()
 		parameters.putSingle("Post", "InvalidPostId")
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	private fun addValidPostParameter() {
@@ -74,8 +71,7 @@ class CreateReplyCommandTest : SoneCommandTest() {
 	fun `request without text results in fcp exception`() {
 		addValidLocalSoneParameter()
 		addValidPostParameter()
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	@Test

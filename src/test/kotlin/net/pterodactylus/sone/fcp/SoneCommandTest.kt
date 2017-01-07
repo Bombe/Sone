@@ -5,19 +5,16 @@ import com.google.common.base.Optional.absent
 import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.freenet.fcp.Command
 import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Test
 import org.junit.rules.ExpectedException
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.anyString
 
 /**
- * TODO
+ * Base class for Sone FCP command tests.
  */
 abstract class SoneCommandTest {
 
@@ -38,6 +35,12 @@ abstract class SoneCommandTest {
 	fun setupCore() {
 		whenever(core.getSone(anyString())).thenReturn(absent())
 		whenever(core.getPost(anyString())).thenReturn(absent())
+		whenever(core.getPostReply(anyString())).thenReturn(absent())
+	}
+
+	protected fun executeCommandAndExpectFcpException() {
+		expectedException.expect(FcpException::class.java)
+		command.execute(parameters, null, null)
 	}
 
 	protected fun requestWithoutAnyParameterResultsInFcpException() {
@@ -47,21 +50,18 @@ abstract class SoneCommandTest {
 
 	protected fun requestWithEmptySoneParameterResultsInFcpException() {
 		parameters.putSingle("Sone", null)
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	protected fun requestWithInvalidSoneParameterResultsInFcpException() {
 		parameters.putSingle("Sone", "InvalidSoneId")
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 	fun requestWithValidRemoteSoneParameterResultsInFcpException() {
 		parameters.putSingle("Sone", "RemoteSoneId")
 		whenever(core.getSone("RemoteSoneId")).thenReturn(Optional.of(remoteSone))
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		executeCommandAndExpectFcpException()
 	}
 
 }
