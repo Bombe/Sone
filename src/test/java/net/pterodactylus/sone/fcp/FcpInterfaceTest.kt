@@ -7,6 +7,7 @@ import freenet.pluginmanager.PluginNotFoundException
 import freenet.pluginmanager.PluginReplySender
 import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.fcp.FcpInterface.AccessAuthorizer
 import net.pterodactylus.sone.fcp.FcpInterface.CommandSupplier
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
@@ -15,6 +16,7 @@ import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
 import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
+import net.pterodactylus.sone.freenet.fcp.Command.AccessType
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType.FULL_FCP
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType.RESTRICTED_FCP
 import net.pterodactylus.sone.freenet.fcp.Command.Response
@@ -29,6 +31,7 @@ import org.hamcrest.Matchers.sameInstance
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mockito.any
+import org.mockito.Mockito.anyBoolean
 import org.mockito.Mockito.verify
 
 /**
@@ -53,7 +56,8 @@ class FcpInterfaceTest {
 			)
 		}
 	}
-	private val fcpInterface = FcpInterface(core, commandSupplier)
+	private val accessAuthorizer = mock<AccessAuthorizer>()
+	private val fcpInterface = FcpInterface(core, commandSupplier, accessAuthorizer)
 	private val pluginReplySender = mock<PluginReplySender>()
 	private val parameters = SimpleFieldSet(true)
 	private val replyParameters = capture<SimpleFieldSet>()
@@ -113,8 +117,9 @@ class FcpInterfaceTest {
 	}
 
 	@Test
-	fun `sending command over restricted fcp connection results in 401 error reply`() {
+	fun `sending command over non-authorized connection results in 401 error reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		parameters.putSingle("Message", "Working")
 		fcpInterface.handle(pluginReplySender, parameters, null, RESTRICTED_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
 		assertThat(replyParameters.value["Message"], equalTo("Error"))
@@ -122,9 +127,9 @@ class FcpInterfaceTest {
 	}
 
 	@Test
-	fun `sending unknown command over full access connection results in 404 error reply`() {
+	fun `sending unknown command results in 404 error reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
-		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
+		fcpInterface.handle(pluginReplySender, parameters, null, RESTRICTED_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
 		assertThat(replyParameters.value["Message"], equalTo("Error"))
 		assertThat(replyParameters.value["ErrorCode"], equalTo("404"))
@@ -133,6 +138,7 @@ class FcpInterfaceTest {
 	@Test
 	fun `sending working command without identifier results in 400 error code`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		whenever(accessAuthorizer.authorized(any(), any(), anyBoolean())).thenReturn(true)
 		parameters.putSingle("Message", "Working")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
@@ -143,6 +149,7 @@ class FcpInterfaceTest {
 	@Test
 	fun `sending working command with empty identifier results in 400 error code`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		whenever(accessAuthorizer.authorized(any(), any(), anyBoolean())).thenReturn(true)
 		parameters.putSingle("Message", "Working")
 		parameters.putSingle("Identifier", "")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
@@ -154,6 +161,7 @@ class FcpInterfaceTest {
 	@Test
 	fun `sending working command with identifier results in working reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		whenever(accessAuthorizer.authorized(any(), any(), anyBoolean())).thenReturn(true)
 		parameters.putSingle("Message", "Working")
 		parameters.putSingle("Identifier", "Test")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
@@ -165,6 +173,7 @@ class FcpInterfaceTest {
 	@Test
 	fun `sending broken  command with identifier results in 500 error reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		whenever(accessAuthorizer.authorized(any(), any(), anyBoolean())).thenReturn(true)
 		parameters.putSingle("Message", "Broken")
 		parameters.putSingle("Identifier", "Test")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
@@ -206,6 +215,33 @@ class CommandSupplierTest {
 	fun `command supplier is instantiated as singleton`() {
 		val injector = Guice.createInjector()
 		assertThat(injector.getInstance(CommandSupplier::class.java), sameInstance(injector.getInstance(CommandSupplier::class.java)))
+	}
+
+}
+
+class AccessAuthorizerTest {
+
+	private val accessAuthorizer = AccessAuthorizer()
+
+	@Test
+	fun `access authorizer is instantiated as singleton`() {
+		val injector = Guice.createInjector()
+		assertThat(injector.getInstance(AccessAuthorizer::class.java), sameInstance(injector.getInstance(AccessAuthorizer::class.java)))
+	}
+
+	@Test
+	fun `access authorizer makes correct decisions`() {
+		AccessType.values().forEach { accessType ->
+			FullAccessRequired.values().forEach { fullAccessRequired ->
+				listOf(false, true).forEach { commandRequiresWriteAccess ->
+					assertThat("$accessType, $fullAccessRequired, $commandRequiresWriteAccess", accessAuthorizer.authorized(accessType, fullAccessRequired, commandRequiresWriteAccess), equalTo(
+							accessType != RESTRICTED_FCP ||
+									fullAccessRequired == NO ||
+									(fullAccessRequired == WRITING && !commandRequiresWriteAccess)
+					))
+				}
+			}
+		}
 	}
 
 }

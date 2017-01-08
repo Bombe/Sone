@@ -19,6 +19,9 @@ package net.pterodactylus.sone.fcp;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING;
+import static net.pterodactylus.sone.freenet.fcp.Command.AccessType.RESTRICTED_FCP;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
@@ -85,6 +89,7 @@ public class FcpInterface {
 
 	/** All available FCP commands. */
 	private final Map<String, AbstractSoneCommand> commands;
+	private final AccessAuthorizer accessAuthorizer;
 
 	/**
 	 * Creates a new FCP interface.
@@ -93,8 +98,9 @@ public class FcpInterface {
 	 *            The core
 	 */
 	@Inject
-	public FcpInterface(Core core, CommandSupplier commandSupplier) {
+	public FcpInterface(Core core, CommandSupplier commandSupplier, AccessAuthorizer accessAuthorizer) {
 		commands = commandSupplier.supplyCommands(core);
+		this.accessAuthorizer = accessAuthorizer;
 	}
 
 	//
@@ -143,12 +149,12 @@ public class FcpInterface {
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
-		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired.get() == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired.get() == FullAccessRequired.ALWAYS))) {
-			sendErrorReply(pluginReplySender, null, 401, "Not authorized");
-			return;
-		}
 		if (command == null) {
 			sendErrorReply(pluginReplySender, null, 404, "Unrecognized Message: " + parameters.get("Message"));
+			return;
+		}
+		if (!accessAuthorizer.authorized(AccessType.values()[accessType], fullAccessRequired.get(), command.requiresWriteAccess())) {
+			sendErrorReply(pluginReplySender, null, 401, "Not authorized");
 			return;
 		}
 		String identifier = parameters.get("Identifier");
@@ -239,6 +245,15 @@ public class FcpInterface {
 			commands.put("DeletePost", new DeletePostCommand(core));
 			commands.put("DeleteReply", new DeleteReplyCommand(core));
 			return commands;
+		}
+
+	}
+
+	@Singleton
+	public static class AccessAuthorizer {
+
+		public boolean authorized(@Nonnull AccessType accessType, @Nonnull FullAccessRequired fullAccessRequired, boolean commandRequiresWriteAccess) {
+			return (accessType != RESTRICTED_FCP) || (fullAccessRequired == NO) || ((fullAccessRequired == WRITING) && !commandRequiresWriteAccess);
 		}
 
 	}
