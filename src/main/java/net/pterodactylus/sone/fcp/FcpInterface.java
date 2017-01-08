@@ -20,13 +20,14 @@ package net.pterodactylus.sone.fcp;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.logging.Logger.getLogger;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
@@ -45,7 +46,6 @@ import freenet.support.api.Bucket;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * Implementation of an FCP interface for other clients or plugins to
@@ -84,7 +84,7 @@ public class FcpInterface {
 	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<FullAccessRequired>(FullAccessRequired.ALWAYS);
 
 	/** All available FCP commands. */
-	private final Map<String, AbstractSoneCommand> commands = Collections.synchronizedMap(new HashMap<String, AbstractSoneCommand>());
+	private final Map<String, AbstractSoneCommand> commands;
 
 	/**
 	 * Creates a new FCP interface.
@@ -93,22 +93,8 @@ public class FcpInterface {
 	 *            The core
 	 */
 	@Inject
-	public FcpInterface(Core core) {
-		commands.put("Version", new VersionCommand(core));
-		commands.put("GetLocalSones", new GetLocalSonesCommand(core));
-		commands.put("GetSones", new GetSonesCommand(core));
-		commands.put("GetSone", new GetSoneCommand(core));
-		commands.put("GetPost", new GetPostCommand(core));
-		commands.put("GetPosts", new GetPostsCommand(core));
-		commands.put("GetPostFeed", new GetPostFeedCommand(core));
-		commands.put("LockSone", new LockSoneCommand(core));
-		commands.put("UnlockSone", new UnlockSoneCommand(core));
-		commands.put("LikePost", new LikePostCommand(core));
-		commands.put("LikeReply", new LikeReplyCommand(core));
-		commands.put("CreatePost", new CreatePostCommand(core));
-		commands.put("CreateReply", new CreateReplyCommand(core));
-		commands.put("DeletePost", new DeletePostCommand(core));
-		commands.put("DeleteReply", new DeleteReplyCommand(core));
+	public FcpInterface(Core core, CommandSupplier commandSupplier) {
+		commands = commandSupplier.supplyCommands(core);
 	}
 
 	//
@@ -230,6 +216,31 @@ public class FcpInterface {
 	@Subscribe
 	public void fullAccessRequiredChanged(FullAccessRequiredChanged fullAccessRequiredChanged) {
 		setFullAccessRequired(fullAccessRequiredChanged.getFullAccessRequired());
+	}
+
+	@Singleton
+	public static class CommandSupplier {
+
+		public Map<String, AbstractSoneCommand> supplyCommands(Core core) {
+			Map<String, AbstractSoneCommand> commands = new HashMap<>();
+			commands.put("Version", new VersionCommand(core));
+			commands.put("GetLocalSones", new GetLocalSonesCommand(core));
+			commands.put("GetSones", new GetSonesCommand(core));
+			commands.put("GetSone", new GetSoneCommand(core));
+			commands.put("GetPost", new GetPostCommand(core));
+			commands.put("GetPosts", new GetPostsCommand(core));
+			commands.put("GetPostFeed", new GetPostFeedCommand(core));
+			commands.put("LockSone", new LockSoneCommand(core));
+			commands.put("UnlockSone", new UnlockSoneCommand(core));
+			commands.put("LikePost", new LikePostCommand(core));
+			commands.put("LikeReply", new LikeReplyCommand(core));
+			commands.put("CreatePost", new CreatePostCommand(core));
+			commands.put("CreateReply", new CreateReplyCommand(core));
+			commands.put("DeletePost", new DeletePostCommand(core));
+			commands.put("DeleteReply", new DeleteReplyCommand(core));
+			return commands;
+		}
+
 	}
 
 }

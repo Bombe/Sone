@@ -2,10 +2,12 @@
 
 package net.pterodactylus.sone.fcp
 
+import com.google.inject.Guice
 import freenet.pluginmanager.PluginNotFoundException
 import freenet.pluginmanager.PluginReplySender
 import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.fcp.FcpInterface.CommandSupplier
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
@@ -15,14 +17,18 @@ import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType.FULL_FCP
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType.RESTRICTED_FCP
-import net.pterodactylus.sone.main.SonePlugin
+import net.pterodactylus.sone.freenet.fcp.Command.Response
+import net.pterodactylus.sone.test.bindAs
 import net.pterodactylus.sone.test.capture
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.sameInstance
 import org.junit.Test
 import org.mockito.ArgumentMatchers
+import org.mockito.Mockito.any
 import org.mockito.Mockito.verify
 
 /**
@@ -31,10 +37,32 @@ import org.mockito.Mockito.verify
 class FcpInterfaceTest {
 
 	private val core = mock<Core>()
-	private val fcpInterface = FcpInterface(core)
+	private val workingCommand = mock<AbstractSoneCommand>().apply {
+		whenever(execute(any(), any(), any())).thenReturn(Response("Working", SimpleFieldSet(true).apply {
+			putSingle("ReallyWorking", "true")
+		}))
+	}
+	private val brokenCommand = mock<AbstractSoneCommand>().apply {
+		whenever(execute(any(), any(), any())).thenThrow(RuntimeException::class.java)
+	}
+	private val commandSupplier = object : CommandSupplier() {
+		override fun supplyCommands(core: Core): Map<String, AbstractSoneCommand> {
+			return mapOf(
+					"Working" to workingCommand,
+					"Broken" to brokenCommand
+			)
+		}
+	}
+	private val fcpInterface = FcpInterface(core, commandSupplier)
 	private val pluginReplySender = mock<PluginReplySender>()
 	private val parameters = SimpleFieldSet(true)
 	private val replyParameters = capture<SimpleFieldSet>()
+
+	@Test
+	fun `fcp interface is instantiated as singleton`() {
+		val injector = Guice.createInjector(core.bindAs(Core::class))
+		assertThat(injector.getInstance(FcpInterface::class.java), sameInstance(injector.getInstance(FcpInterface::class.java)))
+	}
 
 	@Test
 	fun `fcp interface can be activated`() {
@@ -103,9 +131,9 @@ class FcpInterfaceTest {
 	}
 
 	@Test
-	fun `sending version command without identifier results in 400 error code`() {
+	fun `sending working command without identifier results in 400 error code`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
-		parameters.putSingle("Message", "Version")
+		parameters.putSingle("Message", "Working")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
 		assertThat(replyParameters.value["Message"], equalTo("Error"))
@@ -113,9 +141,9 @@ class FcpInterfaceTest {
 	}
 
 	@Test
-	fun `sending version command with empty identifier results in 400 error code`() {
+	fun `sending working command with empty identifier results in 400 error code`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
-		parameters.putSingle("Message", "Version")
+		parameters.putSingle("Message", "Working")
 		parameters.putSingle("Identifier", "")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
@@ -124,15 +152,60 @@ class FcpInterfaceTest {
 	}
 
 	@Test
-	fun `sending version command with identifier results in version reply`() {
+	fun `sending working command with identifier results in working reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
-		parameters.putSingle("Message", "Version")
+		parameters.putSingle("Message", "Working")
 		parameters.putSingle("Identifier", "Test")
 		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
-		assertThat(replyParameters.value["Message"], equalTo("Version"))
-		assertThat(replyParameters.value["Version"], equalTo(SonePlugin.getPluginVersion()))
-		assertThat(replyParameters.value["ProtocolVersion"], equalTo("1"))
+		assertThat(replyParameters.value["Message"], equalTo("Working"))
+		assertThat(replyParameters.value["ReallyWorking"], equalTo("true"))
+	}
+
+	@Test
+	fun `sending broken  command with identifier results in 500 error reply`() {
+		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		parameters.putSingle("Message", "Broken")
+		parameters.putSingle("Identifier", "Test")
+		fcpInterface.handle(pluginReplySender, parameters, null, FULL_FCP.ordinal)
+		verify(pluginReplySender).send(replyParameters.capture())
+		assertThat(replyParameters.value["Message"], equalTo("Error"))
+		assertThat(replyParameters.value["ErrorCode"], equalTo("500"))
+	}
+
+}
+
+class CommandSupplierTest {
+
+	private val core = mock<Core>()
+	private val commandSupplier = CommandSupplier()
+
+	@Test
+	fun `command supplier supplies all commands`() {
+		val commands = commandSupplier.supplyCommands(core)
+		assertThat(commands.keys, containsInAnyOrder(
+				"CreatePost",
+				"CreateReply",
+				"DeletePost",
+				"DeleteReply",
+				"GetLocalSones",
+				"GetPost",
+				"GetPostFeed",
+				"GetPosts",
+				"GetSone",
+				"GetSones",
+				"LikePost",
+				"LikeReply",
+				"LockSone",
+				"UnlockSone",
+				"Version"
+		))
+	}
+
+	@Test
+	fun `command supplier is instantiated as singleton`() {
+		val injector = Guice.createInjector()
+		assertThat(injector.getInstance(CommandSupplier::class.java), sameInstance(injector.getInstance(CommandSupplier::class.java)))
 	}
 
 }
