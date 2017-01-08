@@ -54,7 +54,7 @@ public class LockSoneCommandTest {
 		SimpleFieldSet fields = new SimpleFieldSetBuilder().put("Sone", "LocalSone").get();
 
 		LockSoneCommand lockSoneCommand = new LockSoneCommand(core);
-		Response response = lockSoneCommand.execute(fields, null, null);
+		Response response = lockSoneCommand.execute(fields);
 
 		verify(core).lockSone(eq(localSone));
 		assertThat(response, notNullValue());
@@ -71,7 +71,7 @@ public class LockSoneCommandTest {
 		SimpleFieldSet fields = new SimpleFieldSetBuilder().put("Sone", "RemoteSone").get();
 
 		LockSoneCommand lockSoneCommand = new LockSoneCommand(core);
-		lockSoneCommand.execute(fields, null, null);
+		lockSoneCommand.execute(fields);
 	}
 
 	@Test(expected = FcpException.class)
@@ -80,7 +80,7 @@ public class LockSoneCommandTest {
 		SimpleFieldSet fields = new SimpleFieldSetBuilder().get();
 
 		LockSoneCommand lockSoneCommand = new LockSoneCommand(core);
-		lockSoneCommand.execute(fields, null, null);
+		lockSoneCommand.execute(fields);
 	}
 
 }

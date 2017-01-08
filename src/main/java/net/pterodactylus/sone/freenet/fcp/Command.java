@@ -19,7 +19,6 @@ package net.pterodactylus.sone.freenet.fcp;
 
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implementation of an FCP interface for other clients or plugins to
@@ -35,15 +34,11 @@ public interface Command {
 	 *
 	 * @param parameters
 	 *            The parameters of the comand
-	 * @param data
-	 *            The data of the command (may be {@code null})
-	 * @param accessType
-	 *            The access type
 	 * @return A reply to send back to the plugin
 	 * @throws FcpException
 	 *             if an error processing the parameters occurs
 	 */
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException;
+	public Response execute(SimpleFieldSet parameters) throws FcpException;
 
 	/**
 	 * The access type of the request.

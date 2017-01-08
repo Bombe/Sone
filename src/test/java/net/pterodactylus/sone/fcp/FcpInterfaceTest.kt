@@ -41,12 +41,12 @@ class FcpInterfaceTest {
 
 	private val core = mock<Core>()
 	private val workingCommand = mock<AbstractSoneCommand>().apply {
-		whenever(execute(any(), any(), any())).thenReturn(Response("Working", SimpleFieldSet(true).apply {
+		whenever(execute(any())).thenReturn(Response("Working", SimpleFieldSet(true).apply {
 			putSingle("ReallyWorking", "true")
 		}))
 	}
 	private val brokenCommand = mock<AbstractSoneCommand>().apply {
-		whenever(execute(any(), any(), any())).thenThrow(RuntimeException::class.java)
+		whenever(execute(any())).thenThrow(RuntimeException::class.java)
 	}
 	private val commandSupplier = object : CommandSupplier() {
 		override fun supplyCommands(core: Core): Map<String, AbstractSoneCommand> {

@@ -23,7 +23,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implements the “LikeReply” FCP command which allows the user to like a reply.
@@ -46,7 +45,7 @@ public class LikeReplyCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		PostReply reply = getReply(parameters, "Reply");
 		Sone sone = getSone(parameters, "Sone", true);
 		sone.addLikedReplyId(reply.getId());

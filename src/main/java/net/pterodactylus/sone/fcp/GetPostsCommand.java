@@ -25,7 +25,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implements the “GetPosts” FCP command that returns the list of posts a Sone
@@ -49,7 +48,7 @@ public class GetPostsCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Sone sone = getSone(parameters, "Sone", false);
 		int startPost = getInt(parameters, "StartPost", 0);
 		int maxPosts = getInt(parameters, "MaxPosts", -1);

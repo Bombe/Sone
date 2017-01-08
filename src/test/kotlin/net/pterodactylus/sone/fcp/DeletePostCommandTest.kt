@@ -39,7 +39,7 @@ class DeletePostCommandTest : SoneCommandTest() {
 	fun `request with post from remote sone returns error response`() {
 		parameters.putSingle("Post", "RemotePostId")
 		whenever(core.getPost("RemotePostId")).thenReturn(of(postFromRemoteSone))
-		val response = command.execute(parameters, null, null)
+		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("Error"))
 		assertThat(response.replyParameters["ErrorCode"], equalTo("401"))
 	}
@@ -48,7 +48,7 @@ class DeletePostCommandTest : SoneCommandTest() {
 	fun `request with post from local sone deletes posts`() {
 		parameters.putSingle("Post", "LocalPostId")
 		whenever(core.getPost("LocalPostId")).thenReturn(of(postFromLocalSone))
-		val response = command.execute(parameters, null, null)
+		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("PostDeleted"))
 		verify(core).deletePost(postFromLocalSone)
 	}

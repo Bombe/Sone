@@ -163,7 +163,7 @@ public class FcpInterface {
 			return;
 		}
 		try {
-			Response response = command.execute(parameters, data, AccessType.values()[accessType]);
+			Response response = command.execute(parameters);
 			sendReply(pluginReplySender, identifier, response);
 		} catch (Exception e1) {
 			logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);

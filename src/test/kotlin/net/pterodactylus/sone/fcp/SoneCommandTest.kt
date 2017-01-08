@@ -40,12 +40,12 @@ abstract class SoneCommandTest {
 
 	protected fun executeCommandAndExpectFcpException() {
 		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		command.execute(parameters)
 	}
 
 	protected fun requestWithoutAnyParameterResultsInFcpException() {
 		expectedException.expect(FcpException::class.java)
-		command.execute(parameters, null, null)
+		command.execute(parameters)
 	}
 
 	protected fun requestWithEmptySoneParameterResultsInFcpException() {

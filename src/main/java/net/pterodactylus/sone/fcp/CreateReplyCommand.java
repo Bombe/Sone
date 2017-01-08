@@ -25,7 +25,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * FCP command that creates a new {@link Reply}.
@@ -49,7 +48,7 @@ public class CreateReplyCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Sone sone = getSone(parameters, "Sone", true);
 		Post post = getPost(parameters, "Post");
 		String text = getString(parameters, "Text");

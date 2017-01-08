@@ -81,7 +81,7 @@ class CreateReplyCommandTest : SoneCommandTest() {
 		parameters.putSingle("Text", "Test")
 		val postReply = mock<PostReply>().apply { whenever(id).thenReturn("ReplyId") }
 		whenever(core.createReply(localSone, post, "Test")).thenReturn(postReply)
-		val response = command.execute(parameters, null, null)
+		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("ReplyCreated"))
 		assertThat(response.replyParameters["Reply"], equalTo("ReplyId"))
 	}
