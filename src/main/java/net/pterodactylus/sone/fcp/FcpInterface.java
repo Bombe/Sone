@@ -200,13 +200,7 @@ public class FcpInterface {
 		if (identifier != null) {
 			replyParameters.putOverwrite("Identifier", identifier);
 		}
-		if (response.hasData()) {
-			pluginReplySender.send(replyParameters, response.getData());
-		} else if (response.hasBucket()) {
-			pluginReplySender.send(replyParameters, response.getBucket());
-		} else {
-			pluginReplySender.send(replyParameters);
-		}
+		pluginReplySender.send(replyParameters);
 	}
 
 	@Subscribe

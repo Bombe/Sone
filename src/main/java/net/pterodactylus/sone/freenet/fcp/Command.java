@@ -76,12 +76,6 @@ public interface Command {
 		/** The reply parameters. */
 		private final SimpleFieldSet replyParameters;
 
-		/** The reply data, may be {@code null}. */
-		private final byte[] data;
-
-		/** The data bucket, may be {@code null}. */
-		private final Bucket bucket;
-
 		/**
 		 * Creates a new reply with the given parameters.
 		 *
@@ -91,54 +85,8 @@ public interface Command {
 		 *            The reply parameters
 		 */
 		public Response(String messageName, SimpleFieldSet replyParameters) {
-			this(messageName, replyParameters, null, null);
-		}
-
-		/**
-		 * Creates a new reply with the given parameters.
-		 *
-		 * @param messageName
-		 *            The message name
-		 * @param replyParameters
-		 *            The reply parameters
-		 * @param data
-		 *            The data of the reply (may be {@code null})
-		 */
-		public Response(String messageName, SimpleFieldSet replyParameters, byte[] data) {
-			this(messageName, replyParameters, data, null);
-		}
-
-		/**
-		 * Creates a new reply with the given parameters.
-		 *
-		 * @param messageName
-		 *            The message name
-		 * @param replyParameters
-		 *            The reply parameters
-		 * @param bucket
-		 *            The bucket of the reply (may be {@code null})
-		 */
-		public Response(String messageName, SimpleFieldSet replyParameters, Bucket bucket) {
-			this(messageName, replyParameters, null, bucket);
-		}
-
-		/**
-		 * Creates a new reply with the given parameters.
-		 *
-		 * @param messageName
-		 *            The message name
-		 * @param replyParameters
-		 *            The reply parameters
-		 * @param data
-		 *            The data of the reply (may be {@code null})
-		 * @param bucket
-		 *            The bucket of the reply (may be {@code null})
-		 */
-		private Response(String messageName, SimpleFieldSet replyParameters, byte[] data, Bucket bucket) {
 			this.messageName = messageName;
 			this.replyParameters = replyParameters;
-			this.data = data;
-			this.bucket = bucket;
 		}
 
 		/**
@@ -148,45 +96,6 @@ public interface Command {
 		 */
 		public SimpleFieldSet getReplyParameters() {
 			return new SimpleFieldSetBuilder(replyParameters).put("Message", messageName).get();
-		}
-
-		/**
-		 * Returns whether the reply has reply data.
-		 *
-		 * @see #getData()
-		 * @return {@code true} if this reply has data, {@code false} otherwise
-		 */
-		public boolean hasData() {
-			return data != null;
-		}
-
-		/**
-		 * Returns the data of the reply.
-		 *
-		 * @return The data of the reply
-		 */
-		public byte[] getData() {
-			return data;
-		}
-
-		/**
-		 * Returns whether the reply has a data bucket.
-		 *
-		 * @see #getBucket()
-		 * @return {@code true} if the reply has a data bucket, {@code false}
-		 *         otherwise
-		 */
-		public boolean hasBucket() {
-			return bucket != null;
-		}
-
-		/**
-		 * Returns the data bucket of the reply.
-		 *
-		 * @return The data bucket of the reply
-		 */
-		public Bucket getBucket() {
-			return bucket;
 		}
 
 	}
