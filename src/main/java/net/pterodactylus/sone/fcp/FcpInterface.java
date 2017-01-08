@@ -153,41 +153,37 @@ public class FcpInterface {
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
 		if (!active.get()) {
-			try {
-				sendReply(pluginReplySender, null, new ErrorResponse(400, "FCP Interface deactivated"));
-			} catch (PluginNotFoundException pnfe1) {
-				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
-			}
+			sendErrorReply(pluginReplySender, null, 503, "FCP Interface deactivated");
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
 		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired.get() == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired.get() == FullAccessRequired.ALWAYS))) {
-			try {
-				sendReply(pluginReplySender, null, new ErrorResponse(401, "Not authorized"));
-			} catch (PluginNotFoundException pnfe1) {
-				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
-			}
+			sendErrorReply(pluginReplySender, null, 401, "Not authorized");
+			return;
+		}
+		if (command == null) {
+			sendErrorReply(pluginReplySender, null, 404, "Unrecognized Message: " + parameters.get("Message"));
+			return;
+		}
+		String identifier = parameters.get("Identifier");
+		if ((identifier == null) || (identifier.length() == 0)) {
+			sendErrorReply(pluginReplySender, null, 400, "Missing Identifier.");
 			return;
 		}
 		try {
-			if (command == null) {
-				sendReply(pluginReplySender, null, new ErrorResponse("Unrecognized Message: " + parameters.get("Message")));
-				return;
-			}
-			String identifier = parameters.get("Identifier");
-			if ((identifier == null) || (identifier.length() == 0)) {
-				sendReply(pluginReplySender, null, new ErrorResponse("Missing Identifier."));
-				return;
-			}
-			try {
-				Response response = command.execute(parameters, data, AccessType.values()[accessType]);
-				sendReply(pluginReplySender, identifier, response);
-			} catch (Exception e1) {
-				logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);
-				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + e1.getMessage()));
-			}
+			Response response = command.execute(parameters, data, AccessType.values()[accessType]);
+			sendReply(pluginReplySender, identifier, response);
+		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);
+			sendErrorReply(pluginReplySender, identifier, 500, "Error executing command: " + e1.getMessage());
+		}
+	}
+
+	private void sendErrorReply(PluginReplySender pluginReplySender, String identifier, int errorCode, String message) {
+		try {
+			sendReply(pluginReplySender, identifier, new ErrorResponse(errorCode, message));
 		} catch (PluginNotFoundException pnfe1) {
-			logger.log(Level.WARNING, "Could not find destination plugin: " + pluginReplySender);
+			logger.log(Level.FINE, "Could not send error to plugin.", pnfe1);
 		}
 	}
 
