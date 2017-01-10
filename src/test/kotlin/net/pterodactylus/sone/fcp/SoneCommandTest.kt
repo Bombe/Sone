@@ -4,6 +4,7 @@ import com.google.common.base.Optional
 import com.google.common.base.Optional.absent
 import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.test.mock
@@ -36,6 +37,16 @@ abstract class SoneCommandTest {
 		whenever(core.getSone(anyString())).thenReturn(absent())
 		whenever(core.getPost(anyString())).thenReturn(absent())
 		whenever(core.getPostReply(anyString())).thenReturn(absent())
+	}
+
+	protected fun createSone(id: String, name: String, firstName: String, lastName: String, time: Long) = mock<Sone>().apply {
+		whenever(this.id).thenReturn(id)
+		whenever(this.name).thenReturn(name)
+		whenever(profile).thenReturn(Profile(this).apply {
+			this.firstName = firstName
+			this.lastName = lastName
+		})
+		whenever(this.time).thenReturn(time)
 	}
 
 	protected fun executeCommandAndExpectFcpException() {

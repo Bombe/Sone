@@ -1,9 +1,6 @@
 package net.pterodactylus.sone.fcp
 
 import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -19,16 +16,6 @@ class GetLocalSonesCommandTest : SoneCommandTest() {
 	@Test
 	fun `command does not require write access`() {
 		assertThat(command.requiresWriteAccess(), equalTo(false))
-	}
-
-	private fun createSone(id: String, name: String, firstName: String, lastName: String, time: Long) = mock<Sone>().apply {
-		whenever(this.id).thenReturn(id)
-		whenever(this.name).thenReturn(name)
-		whenever(profile).thenReturn(Profile(this).apply {
-			this.firstName = firstName
-			this.lastName = lastName
-		})
-		whenever(this.time).thenReturn(time)
 	}
 
 	@Test
