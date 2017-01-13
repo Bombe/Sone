@@ -162,7 +162,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.");
 		}
 		Optional<Sone> sone = core.getSone(soneId);
-		if ((mandatory && !sone.isPresent()) || (mandatory && sone.isPresent() && (localOnly && !sone.get().isLocal()))) {
+		if ((mandatory && !sone.isPresent()) || (sone.isPresent() && localOnly && !sone.get().isLocal())) {
 			throw new FcpException("Could not load Sone from “" + soneId + "”.");
 		}
 		return sone;

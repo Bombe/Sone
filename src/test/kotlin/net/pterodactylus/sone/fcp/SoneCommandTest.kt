@@ -10,6 +10,7 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
+import net.pterodactylus.sone.template.SoneAccessor
 import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
@@ -98,6 +99,10 @@ abstract class SoneCommandTest {
 	protected operator fun SimpleFieldSet.plusAssign(keyValue: Pair<String, String?>) = putSingle(keyValue.first, keyValue.second)
 	protected fun SimpleFieldSet.parsePost(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Recipient", "Time", "Text")
 	protected fun SimpleFieldSet.parseReply(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Time", "Text")
+	protected fun SimpleFieldSet.parseSone(prefix: String) = parseFromSimpleFieldSet(prefix, "Name", "NiceName", "LastUpdated", "Followed") +
+			(0 until this["${prefix}Field.Count"].toInt()).map {
+				("Field." + this["${prefix}Field.$it.Name"]) to this["${prefix}Field.$it.Value"]
+			}
 
 	private fun SimpleFieldSet.parseFromSimpleFieldSet(prefix: String, vararg fields: String) = listOf(*fields)
 			.map { it to (get(prefix + it) as String?) }
@@ -116,6 +121,15 @@ abstract class SoneCommandTest {
 		expect("Sone", reply.sone.id) { it["Sone"] }
 		expect("time", reply.time.toString()) { it["Time"] }
 		expect("text", reply.text.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")) { it["Text"] }
+	}
+
+	protected fun matchesSone(sone: Sone) = OneByOneMatcher<Map<String, String?>>().apply {
+		expect("name", sone.name) { it["Name"] }
+		expect("last updated", sone.time.toString()) { it["LastUpdated"] }
+		expect("nice name", SoneAccessor.getNiceName(sone)) { it["NiceName"] }
+		sone.profile.fields.forEach { field ->
+			expect("field: ${field.name}", field.value) { it["Field.${field.name}"] }
+		}
 	}
 
 }
