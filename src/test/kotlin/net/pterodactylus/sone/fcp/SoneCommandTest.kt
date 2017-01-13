@@ -107,14 +107,14 @@ abstract class SoneCommandTest {
 		expect("Sone", post.sone.id) { it["Sone"] }
 		expect("recipient", post.recipientId.orNull()) { it["Recipient"] }
 		expect("time", post.time.toString()) { it["Time"] }
-		expect("text", post.text) { it["Text"] }
+		expect("text", post.text.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")) { it["Text"] }
 	}
 
 	protected fun matchesReply(reply: PostReply) = OneByOneMatcher<Map<String, String?>>().apply {
 		expect("ID", reply.id) { it["ID"] }
 		expect("Sone", reply.sone.id) { it["Sone"] }
 		expect("time", reply.time.toString()) { it["Time"] }
-		expect("text", reply.text) { it["Text"] }
+		expect("text", reply.text.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n")) { it["Text"] }
 	}
 
 }
