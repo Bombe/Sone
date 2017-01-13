@@ -46,15 +46,15 @@ class CreatePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request without text results in fcp exception`() {
-		parameters.putSingle("Sone", "LocalSoneId")
+		parameters += "Sone" to "LocalSoneId"
 		whenever(core.getSone("LocalSoneId")).thenReturn(Optional.of(localSone))
 		executeCommandAndExpectFcpException()
 	}
 
 	@Test
 	fun `request with text creates post`() {
-		parameters.putSingle("Sone", "LocalSoneId")
-		parameters.putSingle("Text", "Test")
+		parameters += "Sone" to "LocalSoneId"
+		parameters += "Text" to "Test"
 		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
 		val post = mock<Post>().apply { whenever(id).thenReturn("PostId") }
 		whenever(core.createPost(localSone, absent(), "Test")).thenReturn(post)
@@ -65,18 +65,18 @@ class CreatePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with invalid recipient results in fcp exception`() {
-		parameters.putSingle("Sone", "LocalSoneId")
-		parameters.putSingle("Text", "Test")
-		parameters.putSingle("Recipient", "InvalidSoneId")
+		parameters += "Sone" to "LocalSoneId"
+		parameters += "Text" to "Test"
+		parameters += "Recipient" to "InvalidSoneId"
 		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
 		executeCommandAndExpectFcpException()
 	}
 
 	@Test
 	fun `request with recipient the same as the sender returns an error response`() {
-		parameters.putSingle("Sone", "LocalSoneId")
-		parameters.putSingle("Text", "Test")
-		parameters.putSingle("Recipient", "LocalSoneId")
+		parameters += "Sone" to "LocalSoneId"
+		parameters += "Text" to "Test"
+		parameters += "Recipient" to "LocalSoneId"
 		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("Error"))
@@ -85,9 +85,9 @@ class CreatePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with text and recipient creates post`() {
-		parameters.putSingle("Sone", "LocalSoneId")
-		parameters.putSingle("Text", "Test")
-		parameters.putSingle("Recipient", "RemoteSoneId")
+		parameters += "Sone" to "LocalSoneId"
+		parameters += "Text" to "Test"
+		parameters += "Recipient" to "RemoteSoneId"
 		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
 		whenever(core.getSone("RemoteSoneId")).thenReturn(of(remoteSone))
 		val post = mock<Post>().apply { whenever(id).thenReturn("PostId") }

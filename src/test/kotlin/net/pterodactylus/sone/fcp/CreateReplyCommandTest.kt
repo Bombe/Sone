@@ -45,7 +45,7 @@ class CreateReplyCommandTest : SoneCommandTest() {
 	}
 
 	private fun addValidLocalSoneParameter() {
-		parameters.putSingle("Sone", "LocalSoneId")
+		parameters += "Sone" to "LocalSoneId"
 		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
 	}
 
@@ -58,12 +58,12 @@ class CreateReplyCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with invalid post parameter results in fcp exception`() {
 		addValidLocalSoneParameter()
-		parameters.putSingle("Post", "InvalidPostId")
+		parameters += "Post" to "InvalidPostId"
 		executeCommandAndExpectFcpException()
 	}
 
 	private fun addValidPostParameter() {
-		parameters.putSingle("Post", "ValidPostId")
+		parameters += "Post" to "ValidPostId"
 		whenever(core.getPost("ValidPostId")).thenReturn(of(post))
 	}
 
@@ -78,7 +78,7 @@ class CreateReplyCommandTest : SoneCommandTest() {
 	fun `complete request creates reply`() {
 		addValidLocalSoneParameter()
 		addValidPostParameter()
-		parameters.putSingle("Text", "Test")
+		parameters += "Text" to "Test"
 		val postReply = mock<PostReply>().apply { whenever(id).thenReturn("ReplyId") }
 		whenever(core.createReply(localSone, post, "Test")).thenReturn(postReply)
 		val response = command.execute(parameters)

@@ -31,13 +31,13 @@ class DeletePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with invalid post parameter results in fcp exception`() {
-		parameters.putSingle("Post", "InvalidPostId")
+		parameters += "Post" to "InvalidPostId"
 		executeCommandAndExpectFcpException()
 	}
 
 	@Test
 	fun `request with post from remote sone returns error response`() {
-		parameters.putSingle("Post", "RemotePostId")
+		parameters += "Post" to "RemotePostId"
 		whenever(core.getPost("RemotePostId")).thenReturn(of(postFromRemoteSone))
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("Error"))
@@ -46,7 +46,7 @@ class DeletePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with post from local sone deletes posts`() {
-		parameters.putSingle("Post", "LocalPostId")
+		parameters += "Post" to "LocalPostId"
 		whenever(core.getPost("LocalPostId")).thenReturn(of(postFromLocalSone))
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("PostDeleted"))

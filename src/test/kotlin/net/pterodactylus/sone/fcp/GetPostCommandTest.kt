@@ -49,7 +49,7 @@ class GetPostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with invalid post parameter results in fcp exception`() {
-		parameters.putSingle("Post", "InvalidPostId")
+		parameters += "Post" to "InvalidPostId"
 		executeCommandAndExpectFcpException()
 	}
 
@@ -68,7 +68,7 @@ class GetPostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with valid post parameter returns post response`() {
-		parameters.putSingle("Post", "ValidPostId")
+		parameters += "Post" to "ValidPostId"
 		val replyParameters = command.execute(parameters).replyParameters
 		verifyPostWithLikes(replyParameters)
 		assertThat(replyParameters["Post.Recipient"], nullValue())
@@ -77,8 +77,8 @@ class GetPostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with valid post parameter without replies returns post response without replies`() {
-		parameters.putSingle("Post", "ValidPostId")
-		parameters.putSingle("IncludeReplies", "false")
+		parameters += "Post" to "ValidPostId"
+		parameters += "IncludeReplies" to "false"
 		val replyParameters = command.execute(parameters).replyParameters
 		verifyPostWithLikes(replyParameters)
 		assertThat(replyParameters["Post.Recipient"], nullValue())
@@ -87,7 +87,7 @@ class GetPostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with valid post parameter returns post response with recipient`() {
-		parameters.putSingle("Post", "ValidPostId")
+		parameters += "Post" to "ValidPostId"
 		whenever(post.recipientId).thenReturn("Sone2".asOptional())
 		val replyParameters = command.execute(parameters).replyParameters
 		verifyPostWithLikes(replyParameters)
@@ -97,8 +97,8 @@ class GetPostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with valid post parameter without replies returns post response without replies but with recipient`() {
-		parameters.putSingle("Post", "ValidPostId")
-		parameters.putSingle("IncludeReplies", "false")
+		parameters += "Post" to "ValidPostId"
+		parameters += "IncludeReplies" to "false"
 		whenever(post.recipientId).thenReturn("Sone2".asOptional())
 		val replyParameters = command.execute(parameters).replyParameters
 		verifyPostWithLikes(replyParameters)

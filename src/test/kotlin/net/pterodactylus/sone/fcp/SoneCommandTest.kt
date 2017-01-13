@@ -80,22 +80,22 @@ abstract class SoneCommandTest {
 	}
 
 	protected fun requestWithEmptySoneParameterResultsInFcpException() {
-		parameters.putSingle("Sone", null)
+		parameters += "Sone" to null
 		executeCommandAndExpectFcpException()
 	}
 
 	protected fun requestWithInvalidSoneParameterResultsInFcpException() {
-		parameters.putSingle("Sone", "InvalidSoneId")
+		parameters += "Sone" to "InvalidSoneId"
 		executeCommandAndExpectFcpException()
 	}
 
 	fun requestWithValidRemoteSoneParameterResultsInFcpException() {
-		parameters.putSingle("Sone", "RemoteSoneId")
+		parameters += "Sone" to "RemoteSoneId"
 		whenever(core.getSone("RemoteSoneId")).thenReturn(Optional.of(remoteSone))
 		executeCommandAndExpectFcpException()
 	}
 
-	protected operator fun SimpleFieldSet.plusAssign(keyValue: Pair<String, String>) = putSingle(keyValue.first, keyValue.second)
+	protected operator fun SimpleFieldSet.plusAssign(keyValue: Pair<String, String?>) = putSingle(keyValue.first, keyValue.second)
 	protected fun SimpleFieldSet.parsePost(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Recipient", "Time", "Text")
 	protected fun SimpleFieldSet.parseReply(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Time", "Text")
 

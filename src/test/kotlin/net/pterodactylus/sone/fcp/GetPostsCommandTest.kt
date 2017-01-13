@@ -52,7 +52,7 @@ class GetPostsCommandTest : SoneCommandTest() {
 		whenever(core.getSone("LocalSone")).thenReturn(localSone.asOptional())
 		whenever(core.getSone("ValidSoneId")).thenReturn(remoteSone.asOptional())
 		whenever(remoteSone.posts).thenReturn(listOf(post2, post1))
-		parameters.putSingle("Sone", "ValidSoneId")
+		parameters += "Sone" to "ValidSoneId"
 	}
 
 	private fun verifyFirstPost(replyParameters: SimpleFieldSet, index: Int = 0) {

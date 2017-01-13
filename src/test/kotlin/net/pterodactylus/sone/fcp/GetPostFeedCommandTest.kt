@@ -56,7 +56,7 @@ class GetPostFeedCommandTest : SoneCommandTest() {
 	}
 
 	private fun setupAllPostsAndReplies() {
-		parameters.putSingle("Sone", "ValidSoneId")
+		parameters += "Sone" to "ValidSoneId"
 		whenever(localSone.id).thenReturn("ValidSoneId")
 		whenever(core.getSone("ValidSoneId")).thenReturn(localSone.asOptional())
 		whenever(core.getSone("Friend1")).thenReturn(friend1.asOptional())
@@ -133,7 +133,7 @@ class GetPostFeedCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with larger start than number of posts returns empty feed`() {
 		setupAllPostsAndReplies()
-		parameters.putSingle("StartPost", "20")
+		parameters += "StartPost" to "20"
 		val replyParameters = command.execute(parameters).replyParameters
 		assertThat(replyParameters["Message"], equalTo("PostFeed"))
 		assertThat(replyParameters["Posts.Count"], equalTo("0"))
@@ -142,7 +142,7 @@ class GetPostFeedCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with max posts of 2 returns the first two posts`() {
 		setupAllPostsAndReplies()
-		parameters.putSingle("MaxPosts", "2")
+		parameters += "MaxPosts" to "2"
 		val replyParameters = command.execute(parameters).replyParameters
 		assertThat(replyParameters["Message"], equalTo("PostFeed"))
 		assertThat(replyParameters["Posts.Count"], equalTo("2"))
@@ -154,8 +154,8 @@ class GetPostFeedCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with max posts of 2 and start post of 1 returns the center two posts`() {
 		setupAllPostsAndReplies()
-		parameters.putSingle("StartPost", "1")
-		parameters.putSingle("MaxPosts", "2")
+		parameters += "StartPost" to "1"
+		parameters += "MaxPosts" to "2"
 		val replyParameters = command.execute(parameters).replyParameters
 		assertThat(replyParameters["Message"], equalTo("PostFeed"))
 		assertThat(replyParameters["Posts.Count"], equalTo("2"))
@@ -167,8 +167,8 @@ class GetPostFeedCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with max posts of 2 and start post of 3 returns the last post`() {
 		setupAllPostsAndReplies()
-		parameters.putSingle("StartPost", "3")
-		parameters.putSingle("MaxPosts", "2")
+		parameters += "StartPost" to "3"
+		parameters += "MaxPosts" to "2"
 		val replyParameters = command.execute(parameters).replyParameters
 		assertThat(replyParameters["Message"], equalTo("PostFeed"))
 		assertThat(replyParameters["Posts.Count"], equalTo("1"))

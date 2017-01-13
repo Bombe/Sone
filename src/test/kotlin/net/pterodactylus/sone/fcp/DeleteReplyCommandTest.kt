@@ -32,13 +32,13 @@ class DeleteReplyCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with invalid post reply parameter results in fcp exception`() {
-		parameters.putSingle("Reply", "InvalidReplyId")
+		parameters += "Reply" to "InvalidReplyId"
 		executeCommandAndExpectFcpException()
 	}
 
 	@Test
 	fun `request with remote post reply parameter results in error response`() {
-	    parameters.putSingle("Reply", "RemoteReplyId")
+	    parameters += "Reply" to "RemoteReplyId"
 		whenever(core.getPostReply("RemoteReplyId")).thenReturn(of(remotePostReply))
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("Error"))
@@ -47,7 +47,7 @@ class DeleteReplyCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with local post reply parameter deletes reply`() {
-	    parameters.putSingle("Reply", "RemoteReplyId")
+	    parameters += "Reply" to "RemoteReplyId"
 		whenever(core.getPostReply("RemoteReplyId")).thenReturn(of(localPostReply))
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("ReplyDeleted"))
