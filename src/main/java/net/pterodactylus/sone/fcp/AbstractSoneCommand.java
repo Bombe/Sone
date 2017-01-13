@@ -25,7 +25,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
@@ -33,11 +32,10 @@ import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
-
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
+
+import com.google.common.base.Optional;
 
 /**
  * Abstract base implementation of a {@link Command} with Sone-related helper
@@ -337,9 +335,6 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		for (Post post : posts) {
 			String postPrefix = prefix + postIndex++;
 			postBuilder.put(encodePost(post, postPrefix + ".", includeReplies));
-			if (includeReplies) {
-				postBuilder.put(encodeReplies(Collections2.filter(core.getReplies(post.getId()), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
-			}
 		}
 
 		return postBuilder.get();
