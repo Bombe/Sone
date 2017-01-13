@@ -355,7 +355,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the replies
 	 */
-	protected static SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
+	protected SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
 		SimpleFieldSetBuilder replyBuilder = new SimpleFieldSetBuilder();
 
 		int replyIndex = 0;
@@ -366,6 +366,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			replyBuilder.put(replyPrefix + "Sone", reply.getSone().getId());
 			replyBuilder.put(replyPrefix + "Time", reply.getTime());
 			replyBuilder.put(replyPrefix + "Text", encodeString(reply.getText()));
+			replyBuilder.put(encodeLikes(core.getLikes(reply), replyPrefix + "Likes."));
 		}
 
 		return replyBuilder.get();

@@ -3,10 +3,14 @@ package net.pterodactylus.sone.fcp
 import com.google.common.base.Optional
 import com.google.common.base.Optional.absent
 import freenet.support.SimpleFieldSet
+import net.pterodactylus.sone.OneByOneMatcher
 import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
+import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.junit.Before
@@ -49,6 +53,22 @@ abstract class SoneCommandTest {
 		whenever(this.time).thenReturn(time)
 	}
 
+	protected fun createPost(id: String, sone: Sone, recipientId: String?, time: Long, text: String) = mock<Post>().apply {
+		whenever(this.id).thenReturn(id)
+		whenever(this.sone).thenReturn(sone)
+		whenever(this.recipientId).thenReturn(recipientId.asOptional())
+		whenever(this.time).thenReturn(time)
+		whenever(this.text).thenReturn(text)
+	}
+
+	protected fun createReply(id: String, sone: Sone, post: Post, time: Long, text: String) = mock<PostReply>().apply {
+		whenever(this.id).thenReturn(id)
+		whenever(this.sone).thenReturn(sone)
+		whenever(this.post).thenReturn(post.asOptional())
+		whenever(this.time).thenReturn(time)
+		whenever(this.text).thenReturn(text)
+	}
+
 	protected fun executeCommandAndExpectFcpException() {
 		expectedException.expect(FcpException::class.java)
 		command.execute(parameters)
@@ -73,6 +93,28 @@ abstract class SoneCommandTest {
 		parameters.putSingle("Sone", "RemoteSoneId")
 		whenever(core.getSone("RemoteSoneId")).thenReturn(Optional.of(remoteSone))
 		executeCommandAndExpectFcpException()
+	}
+
+	protected fun SimpleFieldSet.parsePost(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Recipient", "Time", "Text")
+	protected fun SimpleFieldSet.parseReply(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Time", "Text")
+
+	private fun SimpleFieldSet.parseFromSimpleFieldSet(prefix: String, vararg fields: String) = listOf(*fields)
+			.map { it to (get(prefix + it) as String?) }
+			.toMap()
+
+	protected fun matchesPost(post: Post) = OneByOneMatcher<Map<String, String?>>().apply {
+		expect("ID", post.id) { it["ID"] }
+		expect("Sone", post.sone.id) { it["Sone"] }
+		expect("recipient", post.recipientId.orNull()) { it["Recipient"] }
+		expect("time", post.time.toString()) { it["Time"] }
+		expect("text", post.text) { it["Text"] }
+	}
+
+	protected fun matchesReply(reply: PostReply) = OneByOneMatcher<Map<String, String?>>().apply {
+		expect("ID", reply.id) { it["ID"] }
+		expect("Sone", reply.sone.id) { it["Sone"] }
+		expect("time", reply.time.toString()) { it["Time"] }
+		expect("text", reply.text) { it["Text"] }
 	}
 
 }
