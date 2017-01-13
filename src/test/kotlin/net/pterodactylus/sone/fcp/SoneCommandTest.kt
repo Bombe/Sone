@@ -95,6 +95,7 @@ abstract class SoneCommandTest {
 		executeCommandAndExpectFcpException()
 	}
 
+	protected operator fun SimpleFieldSet.plusAssign(keyValue: Pair<String, String>) = putSingle(keyValue.first, keyValue.second)
 	protected fun SimpleFieldSet.parsePost(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Recipient", "Time", "Text")
 	protected fun SimpleFieldSet.parseReply(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Time", "Text")
 
