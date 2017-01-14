@@ -51,10 +51,10 @@ public class GetSonesCommand extends AbstractSoneCommand {
 		int maxSones = getInt(parameters, "MaxSones", -1);
 		List<Sone> sones = new ArrayList<Sone>(getCore().getSones());
 		if (sones.size() < startSone) {
-			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), ""));
+			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), "Sones."));
 		}
 		Collections.sort(sones, Sone.NICE_NAME_COMPARATOR);
-		return new Response("Sones", encodeSones(sones.subList(startSone, (maxSones == -1) ? sones.size() : Math.min(startSone + maxSones, sones.size())), ""));
+		return new Response("Sones", encodeSones(sones.subList(startSone, (maxSones == -1) ? sones.size() : Math.min(startSone + maxSones, sones.size())), "Sones."));
 	}
 
 }

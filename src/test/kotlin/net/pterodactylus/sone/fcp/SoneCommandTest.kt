@@ -99,7 +99,7 @@ abstract class SoneCommandTest {
 	protected operator fun SimpleFieldSet.plusAssign(keyValue: Pair<String, String?>) = putSingle(keyValue.first, keyValue.second)
 	protected fun SimpleFieldSet.parsePost(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Recipient", "Time", "Text")
 	protected fun SimpleFieldSet.parseReply(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Sone", "Time", "Text")
-	protected fun SimpleFieldSet.parseSone(prefix: String) = parseFromSimpleFieldSet(prefix, "Name", "NiceName", "LastUpdated", "Followed") +
+	protected fun SimpleFieldSet.parseSone(prefix: String) = parseFromSimpleFieldSet(prefix, "ID", "Name", "NiceName", "LastUpdated", "Followed") +
 			(0 until this["${prefix}Field.Count"].toInt()).map {
 				("Field." + this["${prefix}Field.$it.Name"]) to this["${prefix}Field.$it.Value"]
 			}
@@ -124,6 +124,7 @@ abstract class SoneCommandTest {
 	}
 
 	protected fun matchesSone(sone: Sone) = OneByOneMatcher<Map<String, String?>>().apply {
+		expect("ID", sone.id) { it["ID"] }
 		expect("name", sone.name) { it["Name"] }
 		expect("last updated", sone.time.toString()) { it["LastUpdated"] }
 		expect("nice name", SoneAccessor.getNiceName(sone)) { it["NiceName"] }

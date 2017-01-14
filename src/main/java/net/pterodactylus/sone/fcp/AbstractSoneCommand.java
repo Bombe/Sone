@@ -237,6 +237,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected static SimpleFieldSet encodeSone(Sone sone, String prefix, Optional<Sone> localSone) {
 		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
 
+		soneBuilder.put(prefix + "ID", sone.getId());
 		soneBuilder.put(prefix + "Name", sone.getName());
 		soneBuilder.put(prefix + "NiceName", SoneAccessor.getNiceName(sone));
 		soneBuilder.put(prefix + "LastUpdated", sone.getTime());
@@ -272,10 +273,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		soneBuilder.put(prefix + "Count", sones.size());
 		for (Sone sone : sones) {
 			String sonePrefix = prefix + soneIndex++ + ".";
-			soneBuilder.put(sonePrefix + "ID", sone.getId());
-			soneBuilder.put(sonePrefix + "Name", sone.getName());
-			soneBuilder.put(sonePrefix + "NiceName", SoneAccessor.getNiceName(sone));
-			soneBuilder.put(sonePrefix + "Time", sone.getTime());
+			soneBuilder.put(encodeSone(sone, sonePrefix, Optional.<Sone>absent()));
 		}
 
 		return soneBuilder.get();

@@ -11,6 +11,9 @@ import org.junit.Test
  */
 class GetLocalSonesCommandTest : SoneCommandTest() {
 
+	private val sone1 = createSone("Id1", "Name1", "First1", "Last1", 1000L)
+	private val sone2 = createSone("Id2", "Name2", "First2", "Last2", 2000L)
+
 	override fun createCommand(core: Core) = GetLocalSonesCommand(core)
 
 	@Test
@@ -20,23 +23,14 @@ class GetLocalSonesCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `command returns local sones`() {
-		val localSones = setOf(
-				createSone("Id1", "Name1", "First1", "Last1", 1000L),
-				createSone("Id2", "Name2", "First2", "Last2", 2000L)
-		)
+		val localSones = setOf(sone1, sone2)
 		whenever(core.localSones).thenReturn(localSones)
 		val response = command.execute(null)
 		val replyParameters = response.replyParameters
 		assertThat(replyParameters["Message"], equalTo("ListLocalSones"))
 		assertThat(replyParameters["LocalSones.Count"], equalTo("2"))
-		assertThat(replyParameters["LocalSones.0.ID"], equalTo("Id1"))
-		assertThat(replyParameters["LocalSones.0.Name"], equalTo("Name1"))
-		assertThat(replyParameters["LocalSones.0.NiceName"], equalTo("First1 Last1"))
-		assertThat(replyParameters["LocalSones.0.Time"], equalTo("1000"))
-		assertThat(replyParameters["LocalSones.1.ID"], equalTo("Id2"))
-		assertThat(replyParameters["LocalSones.1.Name"], equalTo("Name2"))
-		assertThat(replyParameters["LocalSones.1.NiceName"], equalTo("First2 Last2"))
-		assertThat(replyParameters["LocalSones.1.Time"], equalTo("2000"))
+		assertThat(replyParameters.parseSone("LocalSones.0."), matchesSone(sone1))
+		assertThat(replyParameters.parseSone("LocalSones.1."), matchesSone(sone2))
 	}
 
 }
