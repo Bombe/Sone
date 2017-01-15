@@ -30,7 +30,7 @@ class GetSonesCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request without parameters lists all sones`() {
-	    val replyParameters = command.execute(parameters).replyParameters
+		val replyParameters = command.execute(parameters).replyParameters
 
 		assertThat(replyParameters["Message"], equalTo("Sones"))
 		assertThat(replyParameters["Sones.Count"], equalTo("3"))
@@ -42,7 +42,7 @@ class GetSonesCommandTest : SoneCommandTest() {
 	@Test
 	fun `skipping the first sone lists the last two sones`() {
 		parameters += "StartSone" to "1"
-	    val replyParameters = command.execute(parameters).replyParameters
+		val replyParameters = command.execute(parameters).replyParameters
 
 		assertThat(replyParameters["Message"], equalTo("Sones"))
 		assertThat(replyParameters["Sones.Count"], equalTo("2"))
@@ -53,7 +53,7 @@ class GetSonesCommandTest : SoneCommandTest() {
 	@Test
 	fun `requesting only two sones lists the first two sones`() {
 		parameters += "MaxSones" to "2"
-	    val replyParameters = command.execute(parameters).replyParameters
+		val replyParameters = command.execute(parameters).replyParameters
 
 		assertThat(replyParameters["Message"], equalTo("Sones"))
 		assertThat(replyParameters["Sones.Count"], equalTo("2"))
@@ -64,7 +64,7 @@ class GetSonesCommandTest : SoneCommandTest() {
 	@Test
 	fun `skipping more sones than there are lists no sones`() {
 		parameters += "StartSone" to "20"
-	    val replyParameters = command.execute(parameters).replyParameters
+		val replyParameters = command.execute(parameters).replyParameters
 
 		assertThat(replyParameters["Message"], equalTo("Sones"))
 		assertThat(replyParameters["Sones.Count"], equalTo("0"))

@@ -17,7 +17,7 @@ import org.mockito.Mockito.verify
  */
 class LikePostCommandTest : SoneCommandTest() {
 
-	private val post = createPost("PostId", mock<Sone>(),  null, 1000, "Text")
+	private val post = createPost("PostId", mock<Sone>(), null, 1000, "Text")
 
 	override fun createCommand(core: Core) = LikePostCommand(core)
 
@@ -35,7 +35,7 @@ class LikePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request without parameters results in FCP exception`() {
-	    requestWithoutAnyParameterResultsInFcpException()
+		requestWithoutAnyParameterResultsInFcpException()
 	}
 
 	@Test
@@ -47,7 +47,7 @@ class LikePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with missing local sone results in FCP exception`() {
-	    parameters += "Post" to "PostId"
+		parameters += "Post" to "PostId"
 		expectedException.expect(FcpException::class.java)
 		command.execute(parameters)
 	}
