@@ -24,6 +24,11 @@ class GetSonesCommandTest : SoneCommandTest() {
 	}
 
 	@Test
+	fun `command does not require write access`() {
+		assertThat(command.requiresWriteAccess(), equalTo(false))
+	}
+
+	@Test
 	fun `request without parameters lists all sones`() {
 	    val replyParameters = command.execute(parameters).replyParameters
 

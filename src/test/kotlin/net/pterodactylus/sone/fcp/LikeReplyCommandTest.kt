@@ -30,6 +30,11 @@ class LikeReplyCommandTest : SoneCommandTest() {
 	}
 
 	@Test
+	fun `command requires write access`() {
+		assertThat(command.requiresWriteAccess(), equalTo(true))
+	}
+
+	@Test
 	fun `request without parameters results in FCP exception`() {
 		requestWithoutAnyParameterResultsInFcpException()
 	}
