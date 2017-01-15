@@ -3,13 +3,10 @@ package net.pterodactylus.sone.fcp
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 import org.mockito.Mockito.verify
 
 /**
