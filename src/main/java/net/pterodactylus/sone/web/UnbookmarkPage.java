@@ -66,7 +66,7 @@ public class UnbookmarkPage extends SoneTemplatePage {
 		if (id.equals("allNotLoaded")) {
 			Set<Post> posts = webInterface.getCore().getBookmarkedPosts();
 			for (Post post : posts) {
-				if (post.isLoaded()) {
+				if (!post.isLoaded()) {
 					webInterface.getCore().unbookmarkPost(post);
 				}
 			}
