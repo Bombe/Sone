@@ -7,6 +7,7 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
@@ -123,13 +124,14 @@ class SearchPageTest : WebPageTest() {
 		whenever(this.text).thenReturn(text)
 	}
 
-	private fun createSoneWithPost(post: Post) = mock<Sone>().apply {
+	private fun createSoneWithPost(post: Post, sone: Sone? = null) = sone?.apply {
+		whenever(posts).thenReturn(listOf(post))
+	} ?: mock<Sone>().apply {
 		whenever(posts).thenReturn(listOf(post))
 		whenever(profile).thenReturn(Profile(this))
 	}
 
 	@Test
-	@Suppress("UNCHECKED_CAST")
 	fun `searching for a single word finds the post`() {
 		val postWithMatch = createPost("post-with-match", "the word here")
 		val postWithoutMatch = createPost("post-without-match", "no match here")
@@ -139,11 +141,10 @@ class SearchPageTest : WebPageTest() {
 		addSone("sone-without-match", soneWithoutMatch)
 		addHttpRequestParameter("query", "word")
 		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["postHits"] as Collection<Post>, contains<Post>(postWithMatch))
+		assertThat(this["postHits"], contains<Post>(postWithMatch))
 	}
 
 	@Test
-	@Suppress("UNCHECKED_CAST")
 	fun `searching for a single word locates word in reply`() {
 		val postWithMatch = createPost("post-with-match", "no match here")
 		val postWithoutMatch = createPost("post-without-match", "no match here")
@@ -157,42 +158,99 @@ class SearchPageTest : WebPageTest() {
 		addSone("sone-without-match", soneWithoutMatch)
 		addHttpRequestParameter("query", "word")
 		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["postHits"] as Collection<Post>, contains<Post>(postWithMatch))
+		assertThat(this["postHits"], contains<Post>(postWithMatch))
 	}
 
-	private fun createSoneWithPost(idPostfix: String, text: String) =
-			createPost("post-$idPostfix", text).apply {
-				addSone("sone-$idPostfix", createSoneWithPost(this))
+	private fun createSoneWithPost(idPostfix: String, text: String, recipient: Sone? = null, sender: Sone? = null) =
+			createPost("post-$idPostfix", text, recipient).apply {
+				addSone("sone-$idPostfix", createSoneWithPost(this, sender))
 			}
 
 	@Test
-	@Suppress("UNCHECKED_CAST")
 	fun `earlier matches score higher than later matches`() {
 		val postWithEarlyMatch = createSoneWithPost("with-early-match", "optional match")
 		val postWithLaterMatch = createSoneWithPost("with-later-match", "match that is optional")
 		addHttpRequestParameter("query", "optional ")
 		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["postHits"] as Collection<Post>, contains<Post>(postWithEarlyMatch, postWithLaterMatch))
+		assertThat(this["postHits"], contains<Post>(postWithEarlyMatch, postWithLaterMatch))
 	}
 
 	@Test
-	@Suppress("UNCHECKED_CAST")
 	fun `searching for required word does not return posts without that word`() {
 		val postWithRequiredMatch = createSoneWithPost("with-required-match", "required match")
 		createPost("without-required-match", "not a match")
 		addHttpRequestParameter("query", "+required ")
 		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["postHits"] as Collection<Post>, contains<Post>(postWithRequiredMatch))
+		assertThat(this["postHits"], contains<Post>(postWithRequiredMatch))
 	}
 
 	@Test
-	@Suppress("UNCHECKED_CAST")
 	fun `searching for forbidden word does not return posts with that word`() {
 		createSoneWithPost("with-forbidden-match", "forbidden match")
 		val postWithoutForbiddenMatch = createSoneWithPost("without-forbidden-match", "not a match")
 		addHttpRequestParameter("query", "match -forbidden")
 		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["postHits"] as Collection<Post>, contains<Post>(postWithoutForbiddenMatch))
+		assertThat(this["postHits"], contains<Post>(postWithoutForbiddenMatch))
 	}
+
+	@Test
+	fun `searching for a plus sign searches for optional plus sign`() {
+		val postWithMatch = createSoneWithPost("with-match", "with + match")
+		createSoneWithPost("without-match", "without match")
+		addHttpRequestParameter("query", "+")
+		page.handleRequest(freenetRequest, templateContext)
+		assertThat(this["postHits"], contains<Post>(postWithMatch))
+	}
+
+	@Test
+	fun `searching for a minus sign searches for optional minus sign`() {
+		val postWithMatch = createSoneWithPost("with-match", "with - match")
+		createSoneWithPost("without-match", "without match")
+		addHttpRequestParameter("query", "-")
+		page.handleRequest(freenetRequest, templateContext)
+		assertThat(this["postHits"], contains<Post>(postWithMatch))
+	}
+
+	private fun createPost(id: String, text: String, recipient: Sone?) = mock<Post>().apply {
+		whenever(this.id).thenReturn(id)
+		val recipientId = recipient?.id
+		whenever(this.recipientId).thenReturn(recipientId.asOptional())
+		whenever(this.recipient).thenReturn(recipient.asOptional())
+		whenever(this.text).thenReturn(text)
+	}
+
+	private fun createSone(id: String, firstName: String, middleName: String, lastName: String) = mock<Sone>().apply {
+		whenever(this.id).thenReturn(id)
+		whenever(this.name).thenReturn(id)
+		whenever(this.profile).thenReturn(Profile(this).apply {
+			this.firstName = firstName
+			this.middleName = middleName
+			this.lastName = lastName
+		})
+	}
+
+	@Test
+	fun `searching for a recipient finds the correct post`() {
+		val recipient = createSone("recipient", "reci", "pi", "ent")
+		val postWithMatch = createSoneWithPost("with-match", "test", recipient)
+		createSoneWithPost("without-match", "no match")
+		addHttpRequestParameter("query", "recipient")
+		page.handleRequest(freenetRequest, templateContext)
+		assertThat(this["postHits"], contains<Post>(postWithMatch))
+	}
+
+	@Test
+	fun `searching for a field value finds the correct sone`() {
+		val soneWithProfileField = createSone("sone", "s", "o", "ne")
+		soneWithProfileField.profile.addField("field").value = "value"
+		createSoneWithPost("with-match", "test", sender = soneWithProfileField)
+		createSoneWithPost("without-match", "no match")
+		addHttpRequestParameter("query", "value")
+		page.handleRequest(freenetRequest, templateContext)
+		assertThat(this["soneHits"], contains(soneWithProfileField))
+	}
+
+	@Suppress("UNCHECKED_CAST")
+	private operator fun <T> get(key: String): T? = templateContext[key] as? T
 
 }
