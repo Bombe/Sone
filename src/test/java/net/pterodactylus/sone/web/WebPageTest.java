@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.net.URI;
@@ -47,11 +48,14 @@ import net.pterodactylus.util.web.Response;
 
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
+import freenet.support.SimpleReadOnlyArrayBucket;
+import freenet.support.api.Bucket;
 import freenet.support.api.HTTPRequest;
+import freenet.support.api.HTTPUploadedFile;
+import freenet.support.io.NullBucket;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
@@ -85,6 +89,9 @@ public abstract class WebPageTest {
 	protected final HTTPRequest httpRequest = mock(HTTPRequest.class);
 	protected final Multimap<String, String> requestParameters = ArrayListMultimap.create();
 	protected final Map<String, String> requestHeaders = new HashMap<>();
+	private final Map<String, String> uploadedFilesNames = new HashMap<>();
+	private final Map<String, String> uploadedFilesContentTypes = new HashMap<>();
+	private final Map<String, String> uploadedFilesSources = new HashMap<>();
 	protected final FreenetRequest freenetRequest = mock(FreenetRequest.class);
 	private final PipedOutputStream responseOutputStream = new PipedOutputStream();
 	private final PipedInputStream responseInputStream;
@@ -168,6 +175,36 @@ public abstract class WebPageTest {
 				return requestHeaders.get(invocation.<String>getArgument(0).toLowerCase());
 			}
 		});
+		when(httpRequest.getUploadedFile(anyString())).thenAnswer(new Answer<HTTPUploadedFile>() {
+			@Override
+			public HTTPUploadedFile answer(InvocationOnMock invocation) throws Throwable {
+				final String name = invocation.getArgument(0);
+				if (!uploadedFilesSources.containsKey(name)) {
+					return null;
+				}
+				return new HTTPUploadedFile() {
+					@Override
+					public String getContentType() {
+						return uploadedFilesContentTypes.get(name);
+					}
+
+					@Override
+					public Bucket getData() {
+						try (InputStream inputStream = getClass().getResourceAsStream(uploadedFilesSources.get(name))) {
+							byte[] bytes = ByteStreams.toByteArray(inputStream);
+							return new SimpleReadOnlyArrayBucket(bytes, 0, bytes.length);
+						} catch (IOException ioe1) {
+							return new NullBucket();
+						}
+					}
+
+					@Override
+					public String getFilename() {
+						return uploadedFilesNames.get(name);
+					}
+				};
+			}
+		});
 	}
 
 	@Before
@@ -201,6 +238,16 @@ public abstract class WebPageTest {
 		when(core.getImage(anyString())).thenReturn(null);
 		when(core.getImage(anyString(), anyBoolean())).thenReturn(null);
 		when(core.getTemporaryImage(anyString())).thenReturn(null);
+	}
+
+	@Before
+	public void setupL10n() {
+		when(l10n.getString(anyString())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				return invocation.getArgument(0);
+			}
+		});
 	}
 
 	@Before
@@ -283,6 +330,12 @@ public abstract class WebPageTest {
 
 	protected void addTemporaryImage(String imageId, TemporaryImage temporaryImage) {
 		when(core.getTemporaryImage(eq(imageId))).thenReturn(temporaryImage);
+	}
+
+	protected void addUploadedFile(@Nonnull String name, @Nonnull String filename, @Nonnull String contentType, @Nonnull String resource) {
+		uploadedFilesNames.put(name, filename);
+		uploadedFilesContentTypes.put(name, contentType);
+		uploadedFilesSources.put(name, resource);
 	}
 
 	protected byte[] getResponseBytes() throws IOException {
