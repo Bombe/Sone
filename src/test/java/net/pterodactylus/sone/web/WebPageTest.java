@@ -355,7 +355,7 @@ public abstract class WebPageTest {
 		getPage().handleRequest(freenetRequest, templateContext);
 	}
 
-	protected void verifyRedirect(String target,  Runnable verification) throws RedirectException {
+	protected void verifyRedirect(String target, Runnable verification) throws RedirectException {
 		expectedException.expect(redirectsTo(target));
 		try {
 			getPage().handleRequest(freenetRequest, templateContext);
