@@ -381,7 +381,7 @@ public class WebInterface {
 	 * @return The current session, or {@code null} if there is no current
 	 *         session
 	 */
-	public Session getCurrentSession(ToadletContext toadletContenxt) {
+	private Session getCurrentSession(ToadletContext toadletContenxt) {
 		return getCurrentSession(toadletContenxt, true);
 	}
 
@@ -397,7 +397,7 @@ public class WebInterface {
 	 * @return The current session, or {@code null} if there is no current
 	 *         session
 	 */
-	public Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
+	private Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
 		Session session = getSessionManager().useSession(toadletContenxt);
 		if (create && (session == null)) {
 			session = getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);

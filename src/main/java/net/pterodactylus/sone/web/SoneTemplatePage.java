@@ -118,35 +118,6 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	//
 
 	/**
-	 * Returns the current session, creating a new session if there is no
-	 * current session.
-	 *
-	 * @param toadletContenxt
-	 *            The toadlet context
-	 * @return The current session, or {@code null} if there is no current
-	 *         session
-	 */
-	protected Session getCurrentSession(ToadletContext toadletContenxt) {
-		return webInterface.getCurrentSession(toadletContenxt);
-	}
-
-	/**
-	 * Returns the current session, creating a new session if there is no
-	 * current session and {@code create} is {@code true}.
-	 *
-	 * @param toadletContenxt
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if there is no current
-	 *            session, {@code false} otherwise
-	 * @return The current session, or {@code null} if there is no current
-	 *         session
-	 */
-	protected Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
-		return webInterface.getCurrentSession(toadletContenxt, create);
-	}
-
-	/**
 	 * Returns the currently logged in Sone.
 	 *
 	 * @param toadletContext
