@@ -14,11 +14,10 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.IdentityManager;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.test.GuiceKt;
 
-import com.google.inject.Binder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Module;
 import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
@@ -87,12 +86,7 @@ public class IdentityAccessorTest {
 	@Test
 	public void accessorCanBeCreatedByGuice() {
 		Injector injector = Guice.createInjector(
-				new Module() {
-					@Override
-					public void configure(Binder binder) {
-						binder.bind(Core.class).toInstance(mock(Core.class));
-					}
-				}
+				GuiceKt.supply(Core.class).byInstance(mock(Core.class))
 		);
 		assertThat(injector.getInstance(IdentityAccessor.class), notNullValue());
 	}
@@ -100,12 +94,7 @@ public class IdentityAccessorTest {
 	@Test
 	public void accessorIsCreatedAsSingleton() {
 		Injector injector = Guice.createInjector(
-				new Module() {
-					@Override
-					public void configure(Binder binder) {
-						binder.bind(Core.class).toInstance(mock(Core.class));
-					}
-				}
+				GuiceKt.supply(Core.class).byInstance(mock(Core.class))
 		);
 		IdentityAccessor firstAccessor = injector.getInstance(IdentityAccessor.class);
 		IdentityAccessor secondAccessor = injector.getInstance(IdentityAccessor.class);
