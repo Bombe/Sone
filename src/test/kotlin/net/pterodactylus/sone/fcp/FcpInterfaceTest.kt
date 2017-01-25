@@ -20,8 +20,8 @@ import net.pterodactylus.sone.freenet.fcp.Command.AccessType
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType.FULL_FCP
 import net.pterodactylus.sone.freenet.fcp.Command.AccessType.RESTRICTED_FCP
 import net.pterodactylus.sone.freenet.fcp.Command.Response
-import net.pterodactylus.sone.test.bindAs
 import net.pterodactylus.sone.test.capture
+import net.pterodactylus.sone.test.isProvidedBy
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
@@ -64,7 +64,7 @@ class FcpInterfaceTest {
 
 	@Test
 	fun `fcp interface is instantiated as singleton`() {
-		val injector = Guice.createInjector(core.bindAs(Core::class))
+		val injector = Guice.createInjector(Core::class.isProvidedBy(core))
 		assertThat(injector.getInstance(FcpInterface::class.java), sameInstance(injector.getInstance(FcpInterface::class.java)))
 	}
 
