@@ -1,8 +1,11 @@
 package net.pterodactylus.sone.template
 
 import com.google.common.base.Optional.of
+import com.google.inject.Guice
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.text.SoneTextParser
 import net.pterodactylus.sone.text.SoneTextParserContext
@@ -10,6 +13,8 @@ import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.emptyIterable
+import org.hamcrest.Matchers.notNullValue
+import org.hamcrest.Matchers.sameInstance
 import org.junit.Test
 import org.mockito.ArgumentCaptor.forClass
 import org.mockito.Mockito.`when`
@@ -60,6 +65,27 @@ class ParserFilterTest {
 		val context = forClass(SoneTextParserContext::class.java)
 		verify(soneTextParser).parse(eq<String>("text"), context.capture())
 		assertThat(context.value.postingSone, `is`(sone))
+	}
+
+	@Test
+	fun `parser filter can be created by guice`() {
+	    val injector = Guice.createInjector(
+			    Core::class.isProvidedByMock(),
+			    SoneTextParser::class.isProvidedByMock()
+	    )
+		assertThat(injector.getInstance<ParserFilter>(), notNullValue())
+	}
+
+	@Test
+	fun `parser filter is created as singleton`() {
+		val injector = Guice.createInjector(
+				Core::class.isProvidedByMock(),
+				SoneTextParser::class.isProvidedByMock()
+		)
+		val firstInstance = injector.getInstance<ParserFilter>()
+		val secondInstance = injector.getInstance<ParserFilter>()
+		assertThat(firstInstance, sameInstance(secondInstance))
+
 	}
 
 }

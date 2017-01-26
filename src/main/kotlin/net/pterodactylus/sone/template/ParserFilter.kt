@@ -7,11 +7,14 @@ import net.pterodactylus.sone.text.SoneTextParser
 import net.pterodactylus.sone.text.SoneTextParserContext
 import net.pterodactylus.util.template.Filter
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Parses a [String] into a number of [Part]s.
  */
-class ParserFilter(private val core: Core, private val soneTextParser: SoneTextParser) : Filter {
+@Singleton
+class ParserFilter @Inject constructor(private val core: Core, private val soneTextParser: SoneTextParser) : Filter {
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: MutableMap<String, Any?>?): Any? {
 		val text = data?.toString() ?: return listOf<Part>()
