@@ -259,6 +259,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
 				bind(Version.class).toInstance(VERSION);
+				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
+				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
+				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
 				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
 					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
 					if (path != null) {
@@ -410,6 +413,48 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	@Override
 	public String getVersion() {
 		return VERSION.toString();
+	}
+
+	public static class PluginVersion {
+
+		private final String version;
+
+		public PluginVersion(String version) {
+			this.version = version;
+		}
+
+		public String getVersion() {
+			return version;
+		}
+
+	}
+
+	public static class PluginYear {
+
+		private final int year;
+
+		public PluginYear(int year) {
+			this.year = year;
+		}
+
+		public int getYear() {
+			return year;
+		}
+
+	}
+
+	public static class PluginHomepage {
+
+		private final String homepage;
+
+		public PluginHomepage(String homepage) {
+			this.homepage = homepage;
+		}
+
+		public String getHomepage() {
+			return homepage;
+		}
+
 	}
 
 }
