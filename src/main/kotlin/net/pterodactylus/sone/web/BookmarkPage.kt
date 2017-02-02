@@ -4,11 +4,14 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.web.Method.POST
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * Page that lets the user bookmark a post.
  */
-class BookmarkPage(template: Template, webInterface: WebInterface)
+@Singleton
+class BookmarkPage @Inject constructor(template: Template, webInterface: WebInterface)
 	: SoneTemplatePage("bookmark.html", template, "Page.Bookmark.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
