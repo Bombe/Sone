@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web;
 
+import static net.pterodactylus.sone.test.GuiceKt.supply;
 import static net.pterodactylus.sone.web.WebTestUtils.redirectsTo;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -60,6 +61,8 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.io.ByteStreams;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
@@ -102,6 +105,11 @@ public abstract class WebPageTest {
 	private final Map<String, Sone> sones = new HashMap<>();
 	protected final List<Sone> localSones = new ArrayList<>();
 	private final ListMultimap<String, PostReply> postReplies = ArrayListMultimap.create();
+
+	protected final Injector injector = Guice.createInjector(
+			supply(WebInterface.class).byInstance(webInterface),
+			supply(Template.class).byInstance(template)
+	);
 
 	protected WebPageTest() {
 		try {

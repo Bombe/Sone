@@ -1,12 +1,10 @@
 package net.pterodactylus.sone.web
 
-import com.google.inject.Guice
 import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
 import net.pterodactylus.sone.main.SonePlugin.PluginVersion
 import net.pterodactylus.sone.main.SonePlugin.PluginYear
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
-import net.pterodactylus.util.template.Template
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -22,9 +20,7 @@ class AboutPageTest : WebPageTest() {
 	private val year = 1234
 	private val homepage = "home://page"
 	private val page = AboutPage(template, webInterface, PluginVersion(version), PluginYear(year), PluginHomepage(homepage))
-	private val injector = Guice.createInjector(
-			Template::class.isProvidedByMock(),
-			WebInterface::class.isProvidedByMock(),
+	private val childInjector = injector.createChildInjector(
 			PluginVersion::class.isProvidedByMock(),
 			PluginYear::class.isProvidedByMock(),
 			PluginHomepage::class.isProvidedByMock()
@@ -60,13 +56,13 @@ class AboutPageTest : WebPageTest() {
 
 	@Test
 	fun `page can be created by guice`() {
-		assertThat(injector.getInstance<AboutPage>(), notNullValue())
+		assertThat(childInjector.getInstance<AboutPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is created as singleton`() {
-	    val firstInstance = injector.getInstance<AboutPage>()
-		val secondInstance = injector.getInstance<AboutPage>()
+	    val firstInstance = childInjector.getInstance<AboutPage>()
+		val secondInstance = childInjector.getInstance<AboutPage>()
 		assertThat(firstInstance, sameInstance(secondInstance))
 	}
 
