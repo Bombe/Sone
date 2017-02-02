@@ -25,7 +25,7 @@ class BookmarkPageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not bookmark anything and does not redirect`() {
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		verify(core, never()).bookmarkPost(any())
 	}
 
