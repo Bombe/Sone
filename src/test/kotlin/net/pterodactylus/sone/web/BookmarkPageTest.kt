@@ -1,14 +1,10 @@
 package net.pterodactylus.sone.web
 
-import com.google.inject.Guice
 import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.hamcrest.Matchers.sameInstance
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
@@ -55,18 +51,6 @@ class BookmarkPageTest : WebPageTest() {
 		verifyRedirect("return-page.html") {
 			verify(core, never()).bookmarkPost(any())
 		}
-	}
-
-	@Test
-	fun `bookmark page can be created by guice`() {
-		assertThat(injector.getInstance<BookmarkPage>(), notNullValue())
-	}
-
-	@Test
-	fun `bookmark page is created as singleton`() {
-		val firstInstance = injector.getInstance<BookmarkPage>()
-		val secondInstance = injector.getInstance<BookmarkPage>()
-		assertThat(firstInstance, sameInstance(secondInstance))
 	}
 
 }

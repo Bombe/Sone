@@ -10,8 +10,7 @@ import javax.inject.Singleton
 /**
  * Page that lets the user bookmark a post.
  */
-@Singleton
-class BookmarkPage @Inject constructor(template: Template, webInterface: WebInterface)
+class BookmarkPage(template: Template, webInterface: WebInterface)
 	: SoneTemplatePage("bookmark.html", template, "Page.Bookmark.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
