@@ -126,22 +126,11 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 *         currently logged in
 	 */
 	protected Sone getCurrentSone(ToadletContext toadletContext) {
-		return webInterface.getCurrentSone(toadletContext);
+		return webInterface.getCurrentSoneCreatingSession(toadletContext);
 	}
 
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if no session exists,
-	 *            {@code false} to not create a new session
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	protected Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
-		return webInterface.getCurrentSone(toadletContext, create);
+	protected Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
+		return webInterface.getCurrentSoneWithoutCreatingSession(toadletContext);
 	}
 
 	/**
@@ -211,7 +200,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	@Override
 	protected final void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
 		templateContext.set("core", webInterface.getCore());
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
@@ -236,7 +225,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(FreenetRequest request) {
-		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
+		if (requiresLogin() && (getCurrentSoneWithoutCreatingSession(request.getToadletContext()) == null)) {
 			HTTPRequest httpRequest = request.getHttpRequest();
 			String originalUrl = httpRequest.getPath();
 			if (httpRequest.hasParameters()) {
@@ -283,7 +272,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 			return false;
 		}
 		if (requiresLogin()) {
-			return getCurrentSone(toadletContext, false) != null;
+			return getCurrentSoneWithoutCreatingSession(toadletContext) != null;
 		}
 		return true;
 	}

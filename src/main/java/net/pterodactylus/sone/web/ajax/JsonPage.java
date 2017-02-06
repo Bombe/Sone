@@ -85,22 +85,11 @@ public abstract class JsonPage implements FreenetPage {
 	 *         currently logged in
 	 */
 	protected Sone getCurrentSone(ToadletContext toadletContext) {
-		return webInterface.getCurrentSone(toadletContext);
+		return webInterface.getCurrentSoneCreatingSession(toadletContext);
 	}
 
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if no session exists,
-	 *            {@code false} to not create a new session
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	protected Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
-		return webInterface.getCurrentSone(toadletContext, create);
+	protected Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
+		return webInterface.getCurrentSoneWithoutCreatingSession(toadletContext);
 	}
 
 	//
@@ -199,7 +188,7 @@ public abstract class JsonPage implements FreenetPage {
 			}
 		}
 		if (requiresLogin()) {
-			if (getCurrentSone(request.getToadletContext(), false) == null) {
+			if (getCurrentSoneWithoutCreatingSession(request.getToadletContext()) == null) {
 				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(objectMapper.writeValueAsString(new JsonErrorReturnObject("auth-required")));
 			}
 		}

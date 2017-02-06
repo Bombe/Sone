@@ -375,68 +375,32 @@ public class WebInterface {
 		return templateContextFactory;
 	}
 
-	/**
-	 * Returns the current session, creating a new session if there is no
-	 * current session.
-	 *
-	 * @param toadletContenxt
-	 *            The toadlet context
-	 * @return The current session, or {@code null} if there is no current
-	 *         session
-	 */
-	private Session getCurrentSession(ToadletContext toadletContenxt) {
-		return getCurrentSession(toadletContenxt, true);
+	private Session getCurrentSessionWithoutCreation(ToadletContext toadletContenxt) {
+		return getSessionManager().useSession(toadletContenxt);
 	}
 
-	/**
-	 * Returns the current session, creating a new session if there is no
-	 * current session and {@code create} is {@code true}.
-	 *
-	 * @param toadletContenxt
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if there is no current
-	 *            session, {@code false} otherwise
-	 * @return The current session, or {@code null} if there is no current
-	 *         session
-	 */
-	private Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
-		Session session = getSessionManager().useSession(toadletContenxt);
-		if (create && (session == null)) {
+	private Session getOrCreateCurrentSession(ToadletContext toadletContenxt) {
+		Session session = getCurrentSessionWithoutCreation(toadletContenxt);
+		if (session == null) {
 			session = getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
 		}
 		return session;
 	}
 
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	public Sone getCurrentSone(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext, true);
-	}
-
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if no session exists,
-	 *            {@code false} to not create a new session
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+	public Sone getCurrentSoneCreatingSession(ToadletContext toadletContext) {
 		Collection<Sone> localSones = getCore().getLocalSones();
 		if (localSones.size() == 1) {
 			return localSones.iterator().next();
 		}
-		return getCurrentSone(getCurrentSession(toadletContext, create));
+		return getCurrentSone(getOrCreateCurrentSession(toadletContext));
+	}
+
+	public Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
+		Collection<Sone> localSones = getCore().getLocalSones();
+		if (localSones.size() == 1) {
+			return localSones.iterator().next();
+		}
+		return getCurrentSone(getCurrentSessionWithoutCreation(toadletContext));
 	}
 
 	/**
@@ -447,7 +411,7 @@ public class WebInterface {
 	 * @return The currently logged in Sone, or {@code null} if no Sone is
 	 *         currently logged in
 	 */
-	public Sone getCurrentSone(Session session) {
+	private Sone getCurrentSone(Session session) {
 		if (session == null) {
 			return null;
 		}
@@ -467,7 +431,7 @@ public class WebInterface {
 	 *            The Sone to set as currently logged in
 	 */
 	public void setCurrentSone(ToadletContext toadletContext, Sone sone) {
-		Session session = getCurrentSession(toadletContext);
+		Session session = getOrCreateCurrentSession(toadletContext);
 		if (sone == null) {
 			session.removeAttribute("Sone.CurrentSone");
 		} else {

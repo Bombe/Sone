@@ -79,7 +79,7 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
-		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
 		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications(currentSone));
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		ArrayNode jsonNotifications = new ArrayNode(instance);
@@ -110,7 +110,7 @@ public class GetNotificationsAjaxPage extends JsonPage {
 			if (notification instanceof TemplateNotification) {
 				TemplateContext templateContext = webInterface.getTemplateContextFactory().createTemplateContext().mergeContext(((TemplateNotification) notification).getTemplateContext());
 				templateContext.set("core", webInterface.getCore());
-				templateContext.set("currentSone", webInterface.getCurrentSone(request.getToadletContext(), false));
+				templateContext.set("currentSone", webInterface.getCurrentSoneWithoutCreatingSession(request.getToadletContext()));
 				templateContext.set("localSones", webInterface.getCore().getLocalSones());
 				templateContext.set("request", request);
 				templateContext.set("currentVersion", SonePlugin.getPluginVersion());

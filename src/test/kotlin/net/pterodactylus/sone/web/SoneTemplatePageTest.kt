@@ -33,18 +33,10 @@ class SoneTemplatePageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `retrieving current sone with creation is forwarded to web interface`() {
-		mock<Sone>().let {
-			whenever(webInterface.getCurrentSone(toadletContext, true)).thenReturn(it)
-			assertThat(page.getCurrentSone(toadletContext, true), equalTo(it))
-		}
-	}
-
-	@Test
 	fun `retrieving current sone without creation is forwarded to web interface`() {
 		mock<Sone>().let {
-			whenever(webInterface.getCurrentSone(toadletContext, false)).thenReturn(it)
-			assertThat(page.getCurrentSone(toadletContext, false), equalTo(it))
+			whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(it)
+			assertThat(page.getCurrentSoneWithoutCreatingSession(toadletContext), equalTo(it))
 		}
 	}
 

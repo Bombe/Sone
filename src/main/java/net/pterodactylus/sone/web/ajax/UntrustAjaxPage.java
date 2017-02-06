@@ -47,7 +47,7 @@ public class UntrustAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
-		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
 		if (currentSone == null) {
 			return createErrorJsonObject("auth-required");
 		}

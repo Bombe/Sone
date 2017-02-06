@@ -60,7 +60,7 @@ public class OptionsPage extends SoneTemplatePage {
 	@Override
 	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		Preferences preferences = webInterface.getCore().getPreferences();
-		Sone currentSone = webInterface.getCurrentSone(request.getToadletContext(), false);
+		Sone currentSone = webInterface.getCurrentSoneWithoutCreatingSession(request.getToadletContext());
 		if (request.getMethod() == Method.POST) {
 			List<String> fieldErrors = new ArrayList<String>();
 			if (currentSone != null) {

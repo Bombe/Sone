@@ -89,7 +89,7 @@ public class LoginPage extends SoneTemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(FreenetRequest request) {
-		if (getCurrentSone(request.getToadletContext(), false) != null) {
+		if (getCurrentSoneWithoutCreatingSession(request.getToadletContext()) != null) {
 			return "index.html";
 		}
 		return null;
@@ -107,7 +107,7 @@ public class LoginPage extends SoneTemplatePage {
 		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
 			return false;
 		}
-		return getCurrentSone(toadletContext, false) == null;
+		return getCurrentSoneWithoutCreatingSession(toadletContext) == null;
 	}
 
 }

@@ -265,8 +265,8 @@ public abstract class WebPageTest {
 
 	@Before
 	public final void setupWebInterface() {
-		when(webInterface.getCurrentSone(toadletContext)).thenReturn(currentSone);
-		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone);
+		when(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone);
+		when(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getNotification(anyString())).thenReturn(Optional.<Notification>absent());
 		when(webInterface.getNotifications(currentSone)).thenReturn(new ArrayList<Notification>());
 	}
@@ -281,8 +281,8 @@ public abstract class WebPageTest {
 	}
 
 	protected void unsetCurrentSone() {
-		when(webInterface.getCurrentSone(toadletContext)).thenReturn(null);
-		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null);
+		when(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(null);
+		when(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(null);
 	}
 
 	protected void request(String uri, Method method) {

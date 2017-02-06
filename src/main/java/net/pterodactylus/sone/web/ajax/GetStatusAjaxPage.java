@@ -74,9 +74,9 @@ public class GetStatusAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
-		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
+		final Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
 		/* load Sones. always return the status of the current Sone. */
-		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSone(request.getToadletContext(), false)));
+		Set<Sone> sones = new HashSet<Sone>(Collections.singleton(getCurrentSoneWithoutCreatingSession(request.getToadletContext())));
 		String loadSoneIds = request.getHttpRequest().getParam("soneIds");
 		if (loadSoneIds.length() > 0) {
 			String[] soneIds = loadSoneIds.split(",");
@@ -96,7 +96,7 @@ public class GetStatusAjaxPage extends JsonPage {
 		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications(currentSone));
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		/* load new posts. */
-		Collection<Post> newPosts = webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false));
+		Collection<Post> newPosts = webInterface.getNewPosts(getCurrentSoneWithoutCreatingSession(request.getToadletContext()));
 
 		ArrayNode jsonPosts = new ArrayNode(instance);
 		for (Post post : newPosts) {
@@ -108,7 +108,7 @@ public class GetStatusAjaxPage extends JsonPage {
 			jsonPosts.add(jsonPost);
 		}
 		/* load new replies. */
-		Collection<PostReply> newReplies = webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false));
+		Collection<PostReply> newReplies = webInterface.getNewReplies(getCurrentSoneWithoutCreatingSession(request.getToadletContext()));
 
 		ArrayNode jsonReplies = new ArrayNode(instance);
 		for (PostReply reply : newReplies) {
