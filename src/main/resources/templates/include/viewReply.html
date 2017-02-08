@@ -17,7 +17,7 @@
 			<% reply.text|html|store key==originalText text==true>
 			<% reply.text|parse sone=reply.sone|store key==parsedText>
 			<% parsedText|render|store key==renderedText text==true>
-			<% parsedText|shorten length=core.preferences.charactersPerPost cut-off-length=core.preferences.postCutOffLength|render|store key==shortText text==true>
+			<% parsedText|shorten length=preferences.charactersPerPost cut-off-length=preferences.postCutOffLength|render|store key==shortText text==true>
 			<div class="reply-text raw-text<%if !raw> hidden<%/if>"><% originalText></div>
 			<div class="reply-text text<%if raw> hidden<%/if><%if !shortText|match key=renderedText> hidden<%/if>"><% renderedText></div>
 			<div class="reply-text short-text<%if raw> hidden<%/if><%if shortText|match key=renderedText> hidden<%/if>"><% shortText></div>

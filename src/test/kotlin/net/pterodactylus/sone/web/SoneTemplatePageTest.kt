@@ -24,7 +24,7 @@ import org.mockito.Mockito.verify
  */
 class SoneTemplatePageTest : WebPageTest() {
 
-	//	@get:JvmName("getPage1")
+	private val preferences by lazy { core.preferences!! }
 	private val page = object : SoneTemplatePage("path.html", template, webInterface, true) {}
 
 	@Test
@@ -107,8 +107,8 @@ class SoneTemplatePageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `core is set in template context`() {
-		verifyVariableIsSet("core", core)
+	fun `preferences are set in template context`() {
+	    verifyVariableIsSet("preferences", preferences)
 	}
 
 	@Test
