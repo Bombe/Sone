@@ -54,7 +54,6 @@ import com.google.inject.spi.TypeListener;
 import freenet.client.async.PersistenceDisabledException;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
-import freenet.node.Node;
 import freenet.pluginmanager.FredPlugin;
 import freenet.pluginmanager.FredPluginBaseL10n;
 import freenet.pluginmanager.FredPluginFCP;
@@ -238,15 +237,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		final EventBus eventBus = new EventBus();
 
 		/* Freenet injector configuration. */
-		AbstractModule freenetModule = new AbstractModule() {
+		FreenetModule freenetModule =  new FreenetModule(pluginRespirator);
 
-			@Override
-			@SuppressWarnings("synthetic-access")
-			protected void configure() {
-				bind(PluginRespirator.class).toInstance(SonePlugin.this.pluginRespirator);
-				bind(Node.class).toInstance(SonePlugin.this.pluginRespirator.getNode());
-			}
-		};
 		/* Sone injector configuration. */
 		AbstractModule soneModule = new AbstractModule() {
 
