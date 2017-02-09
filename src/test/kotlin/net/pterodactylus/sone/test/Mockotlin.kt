@@ -8,6 +8,7 @@ import org.mockito.stubbing.OngoingStubbing
 inline fun <reified T : Any> mock(): T = Mockito.mock<T>(T::class.java)!!
 inline fun <reified T : Any> mockBuilder(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_SELF)!!
 inline fun <reified T : Any> deepMock(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_DEEP_STUBS)!!
+inline fun <reified T : Any> selfMock(): T = Mockito.mock<T>(T::class.java, Mockito.RETURNS_SELF)!!
 inline fun <reified T : Any> capture(): ArgumentCaptor<T> = ArgumentCaptor.forClass(T::class.java)
 
 inline fun <reified T : Any> bind(implementation: T): Module =
