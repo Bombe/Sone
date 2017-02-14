@@ -1,0 +1,29 @@
+package net.pterodactylus.sone.web
+
+import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.util.template.Template
+import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.util.web.Method.POST
+
+/**
+ * Page that lets the user delete an {@link Image}.
+ */
+class DeleteImagePage(template: Template, webInterface: WebInterface):
+		SoneTemplatePage("deleteImage.html", template, "Page.DeleteImage.Title", webInterface, true) {
+
+	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+		val image = webInterface.core.getImage(request.httpRequest.getPartAsStringFailsafe("image", 36)) ?: throw RedirectException("invalid.html")
+		if (!image.sone.isLocal) {
+			throw RedirectException("noPermission.html")
+		}
+		if (request.method == POST) {
+			if (request.httpRequest.isPartSet("abortDelete")) {
+				throw RedirectException("imageBrowser.html?image=${image.id}")
+			}
+			webInterface.core.deleteImage(image)
+			throw RedirectException("imageBrowser.html?album=${image.album.id}")
+		}
+		templateContext["image"] = image
+	}
+
+}

@@ -16,7 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteImagePage].
  */
-class DeleteImagePageTest : WebPageTest() {
+class DeleteImagePageTest: WebPageTest() {
 
 	private val page = DeleteImagePage(template, webInterface)
 	private val image = mock<Image>()
@@ -32,6 +32,16 @@ class DeleteImagePageTest : WebPageTest() {
 		whenever(image.sone).thenReturn(sone)
 		whenever(image.album).thenReturn(album)
 		whenever(sone.isLocal).thenReturn(true)
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("deleteImage.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
