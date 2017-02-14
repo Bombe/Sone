@@ -49,11 +49,28 @@ class LoginPageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("login.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+	    assertThat(page.requiresLogin(), equalTo(false))
+	}
+
+	@Test
 	@Suppress("UNCHECKED_CAST")
-	fun `get request stores sone and identities without sones in template context`() {
+	fun `get request stores sones in template context`() {
 		request("", GET)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["sones"] as Iterable<Sone>, containsInAnyOrder(sones[0], sones[1], sones[2]))
+	}
+
+	@Test
+	@Suppress("UNCHECKED_CAST")
+	fun `get request stores identities without sones in template context`() {
+		request("", GET)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["identitiesWithoutSone"] as Iterable<Identity>, contains(sones[1].identity))
 	}
 
@@ -61,13 +78,13 @@ class LoginPageTest : WebPageTest() {
 	@Suppress("UNCHECKED_CAST")
 	fun `post request with invalid sone sets sones and identities without sone in template context`() {
 		request("", POST)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["sones"] as Iterable<Sone>, containsInAnyOrder(sones[0], sones[1], sones[2]))
 		assertThat(templateContext["identitiesWithoutSone"] as Iterable<Identity>, contains(sones[1].identity))
 	}
 
 	@Test
-	fun `post request with valid sone and redirects to index page`() {
+	fun `post request with valid sone logs in the sone and redirects to index page`() {
 		request("", POST)
 		addHttpRequestParameter("sone-id", "sone2")
 		verifyRedirect("index.html") {

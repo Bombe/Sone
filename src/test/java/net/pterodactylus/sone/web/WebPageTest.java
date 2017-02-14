@@ -164,6 +164,13 @@ public abstract class WebPageTest {
 				return requestParameters.containsKey(parameter) ? requestParameters.get(parameter).iterator().next() : invocation.<String>getArgument(1);
 			}
 		});
+		when(httpRequest.isParameterSet(anyString())).thenAnswer(new Answer<Boolean>() {
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				return requestParameters.containsKey(invocation.<String>getArgument(0)) &&
+						requestParameters.get(invocation.<String>getArgument(0)).iterator().next() != null;
+			}
+		});
 		when(httpRequest.isPartSet(anyString())).thenAnswer(new Answer<Boolean>() {
 			@Override
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {
