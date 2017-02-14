@@ -16,7 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteAlbumPage].
  */
-class DeleteAlbumPageTest : WebPageTest() {
+class DeleteAlbumPageTest: WebPageTest() {
 
 	private val page = DeleteAlbumPage(template, webInterface)
 
@@ -31,10 +31,21 @@ class DeleteAlbumPageTest : WebPageTest() {
 		whenever(sone.id).thenReturn("sone-id")
 		whenever(sone.isLocal).thenReturn(true)
 		whenever(parentAlbum.id).thenReturn("parent-id")
+		whenever(parentAlbum.isRoot).thenReturn(true)
 		whenever(album.id).thenReturn("album-id")
 		whenever(album.sone).thenReturn(sone)
 		whenever(album.parent).thenReturn(parentAlbum)
 		whenever(sone.rootAlbum).thenReturn(parentAlbum)
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("deleteAlbum.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
@@ -50,7 +61,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 		val album = mock<Album>()
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["album"], equalTo<Any>(album))
 	}
 
@@ -91,6 +102,7 @@ class DeleteAlbumPageTest : WebPageTest() {
 	@Test
 	fun `album is deleted and page redirects to album if parent album is not root album`() {
 		request("", POST)
+		whenever(parentAlbum.isRoot).thenReturn(false)
 		whenever(sone.rootAlbum).thenReturn(mock<Album>())
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
