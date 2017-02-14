@@ -32,6 +32,16 @@ class DeletePostPageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("deletePost.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
 	fun `get request with invalid post redirects to no permission page`() {
 		request("", GET)
 		verifyRedirect("noPermission.html")
