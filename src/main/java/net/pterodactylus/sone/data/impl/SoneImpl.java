@@ -31,6 +31,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
@@ -134,6 +137,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The identity of this Sone
 	 */
+	@Nonnull
 	public String getId() {
 		return id;
 	}
@@ -143,6 +147,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The identity of this Sone
 	 */
+	@Nonnull
 	public Identity getIdentity() {
 		return identity;
 	}
@@ -152,6 +157,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The name of this Sone
 	 */
+	@Nonnull
 	public String getName() {
 		return (identity != null) ? identity.getNickname() : null;
 	}
@@ -170,6 +176,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The request URI of this Sone
 	 */
+	@Nonnull
 	public FreenetURI getRequestUri() {
 		try {
 			return new FreenetURI(getIdentity().getRequestUri())
@@ -189,6 +196,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The insert URI of this Sone
 	 */
+	@Nullable
 	public FreenetURI getInsertUri() {
 		if (!isLocal()) {
 			return null;
@@ -244,6 +252,7 @@ public class SoneImpl implements Sone {
 	 * 		The time of the update (in milliseconds since Jan 1, 1970 UTC)
 	 * @return This Sone (for method chaining)
 	 */
+	@Nonnull
 	public Sone setTime(long time) {
 		this.time = time;
 		return this;
@@ -254,6 +263,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The status of this Sone
 	 */
+	@Nonnull
 	public SoneStatus getStatus() {
 		return status;
 	}
@@ -267,7 +277,8 @@ public class SoneImpl implements Sone {
 	 * @throws IllegalArgumentException
 	 * 		if {@code status} is {@code null}
 	 */
-	public Sone setStatus(SoneStatus status) {
+	@Nonnull
+	public Sone setStatus(@Nonnull SoneStatus status) {
 		this.status = checkNotNull(status, "status must not be null");
 		return this;
 	}
@@ -279,6 +290,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return A copy of the profile
 	 */
+	@Nonnull
 	public Profile getProfile() {
 		return new Profile(profile);
 	}
@@ -291,7 +303,7 @@ public class SoneImpl implements Sone {
 	 * @param profile
 	 * 		The profile to set
 	 */
-	public void setProfile(Profile profile) {
+	public void setProfile(@Nonnull Profile profile) {
 		this.profile = new Profile(profile);
 	}
 
@@ -300,6 +312,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The client used by this Sone, or {@code null}
 	 */
+	@Nullable
 	public Client getClient() {
 		return client;
 	}
@@ -311,7 +324,8 @@ public class SoneImpl implements Sone {
 	 * 		The client used by this Sone, or {@code null}
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone setClient(Client client) {
+	@Nonnull
+	public Sone setClient(@Nullable Client client) {
 		this.client = client;
 		return this;
 	}
@@ -332,6 +346,7 @@ public class SoneImpl implements Sone {
 	 * 		{@code true} if this Sone is known, {@code false} otherwise
 	 * @return This Sone
 	 */
+	@Nonnull
 	public Sone setKnown(boolean known) {
 		this.known = known;
 		return this;
@@ -342,6 +357,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
+	@Nonnull
 	public Collection<String> getFriends() {
 		return database.getFriends(this);
 	}
@@ -354,7 +370,7 @@ public class SoneImpl implements Sone {
 	 * @return {@code true} if this Sone has the given Sone as a friend, {@code
 	 *         false} otherwise
 	 */
-	public boolean hasFriend(String friendSoneId) {
+	public boolean hasFriend(@Nonnull String friendSoneId) {
 		return database.isFriend(this, friendSoneId);
 	}
 
@@ -363,6 +379,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return All posts of this Sone
 	 */
+	@Nonnull
 	public List<Post> getPosts() {
 		List<Post> sortedPosts;
 		synchronized (this) {
@@ -379,7 +396,8 @@ public class SoneImpl implements Sone {
 	 * 		The new (and only) posts of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone setPosts(Collection<Post> posts) {
+	@Nonnull
+	public Sone setPosts(@Nonnull Collection<Post> posts) {
 		synchronized (this) {
 			this.posts.clear();
 			this.posts.addAll(posts);
@@ -394,7 +412,7 @@ public class SoneImpl implements Sone {
 	 * @param post
 	 * 		The post to add
 	 */
-	public void addPost(Post post) {
+	public void addPost(@Nonnull Post post) {
 		if (post.getSone().equals(this) && posts.add(post)) {
 			logger.log(Level.FINEST, String.format("Adding %s to “%s”.", post, getName()));
 		}
@@ -406,7 +424,7 @@ public class SoneImpl implements Sone {
 	 * @param post
 	 * 		The post to remove
 	 */
-	public void removePost(Post post) {
+	public void removePost(@Nonnull Post post) {
 		if (post.getSone().equals(this)) {
 			posts.remove(post);
 		}
@@ -417,6 +435,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return All replies this Sone made
 	 */
+	@Nonnull
 	public Set<PostReply> getReplies() {
 		return Collections.unmodifiableSet(replies);
 	}
@@ -428,7 +447,8 @@ public class SoneImpl implements Sone {
 	 * 		The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone setReplies(Collection<PostReply> replies) {
+	@Nonnull
+	public Sone setReplies(@Nonnull Collection<PostReply> replies) {
 		this.replies.clear();
 		this.replies.addAll(replies);
 		return this;
@@ -441,7 +461,7 @@ public class SoneImpl implements Sone {
 	 * @param reply
 	 * 		The reply to add
 	 */
-	public void addReply(PostReply reply) {
+	public void addReply(@Nonnull PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.add(reply);
 		}
@@ -453,7 +473,7 @@ public class SoneImpl implements Sone {
 	 * @param reply
 	 * 		The reply to remove
 	 */
-	public void removeReply(PostReply reply) {
+	public void removeReply(@Nonnull PostReply reply) {
 		if (reply.getSone().equals(this)) {
 			replies.remove(reply);
 		}
@@ -464,6 +484,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return All liked posts’ IDs
 	 */
+	@Nonnull
 	public Set<String> getLikedPostIds() {
 		return Collections.unmodifiableSet(likedPostIds);
 	}
@@ -475,7 +496,8 @@ public class SoneImpl implements Sone {
 	 * 		All liked posts’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone setLikePostIds(Set<String> likedPostIds) {
+	@Nonnull
+	public Sone setLikePostIds(@Nonnull Set<String> likedPostIds) {
 		this.likedPostIds.clear();
 		this.likedPostIds.addAll(likedPostIds);
 		return this;
@@ -489,7 +511,7 @@ public class SoneImpl implements Sone {
 	 * @return {@code true} if this Sone likes the given post, {@code false}
 	 *         otherwise
 	 */
-	public boolean isLikedPostId(String postId) {
+	public boolean isLikedPostId(@Nonnull String postId) {
 		return likedPostIds.contains(postId);
 	}
 
@@ -500,7 +522,8 @@ public class SoneImpl implements Sone {
 	 * 		The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone addLikedPostId(String postId) {
+	@Nonnull
+	public Sone addLikedPostId(@Nonnull String postId) {
 		likedPostIds.add(postId);
 		return this;
 	}
@@ -512,7 +535,8 @@ public class SoneImpl implements Sone {
 	 * 		The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone removeLikedPostId(String postId) {
+	@Nonnull
+	public Sone removeLikedPostId(@Nonnull String postId) {
 		likedPostIds.remove(postId);
 		return this;
 	}
@@ -522,6 +546,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return All liked replies’ IDs
 	 */
+	@Nonnull
 	public Set<String> getLikedReplyIds() {
 		return Collections.unmodifiableSet(likedReplyIds);
 	}
@@ -533,7 +558,8 @@ public class SoneImpl implements Sone {
 	 * 		All liked replies’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone setLikeReplyIds(Set<String> likedReplyIds) {
+	@Nonnull
+	public Sone setLikeReplyIds(@Nonnull Set<String> likedReplyIds) {
 		this.likedReplyIds.clear();
 		this.likedReplyIds.addAll(likedReplyIds);
 		return this;
@@ -547,7 +573,7 @@ public class SoneImpl implements Sone {
 	 * @return {@code true} if this Sone likes the given reply, {@code false}
 	 *         otherwise
 	 */
-	public boolean isLikedReplyId(String replyId) {
+	public boolean isLikedReplyId(@Nonnull String replyId) {
 		return likedReplyIds.contains(replyId);
 	}
 
@@ -558,7 +584,8 @@ public class SoneImpl implements Sone {
 	 * 		The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone addLikedReplyId(String replyId) {
+	@Nonnull
+	public Sone addLikedReplyId(@Nonnull String replyId) {
 		likedReplyIds.add(replyId);
 		return this;
 	}
@@ -570,7 +597,8 @@ public class SoneImpl implements Sone {
 	 * 		The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	public Sone removeLikedReplyId(String replyId) {
+	@Nonnull
+	public Sone removeLikedReplyId(@Nonnull String replyId) {
 		likedReplyIds.remove(replyId);
 		return this;
 	}
@@ -580,6 +608,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The root album of this Sone
 	 */
+	@Nonnull
 	public Album getRootAlbum() {
 		return rootAlbum;
 	}
@@ -589,6 +618,7 @@ public class SoneImpl implements Sone {
 	 *
 	 * @return The options of this Sone
 	 */
+	@Nonnull
 	public SoneOptions getOptions() {
 		return options;
 	}
@@ -600,7 +630,7 @@ public class SoneImpl implements Sone {
 	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
-	public void setOptions(SoneOptions options) {
+	public void setOptions(@Nonnull SoneOptions options) {
 		this.options = options;
 	}
 

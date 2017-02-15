@@ -124,7 +124,7 @@ class EditProfilePageTest : WebPageTest() {
 	fun `post request with field value saves profile and redirects back to profile edit page`() {
 		val field = profile.addField("name")
 		field.value = "old"
-		verifySingleFieldCanBeChanged("field-${field.id}", "new") { profile.getFieldByName("name").value }
+		verifySingleFieldCanBeChanged("field-${field.id}", "new") { profile.getFieldByName("name")!!.value }
 	}
 
 	@Test
@@ -132,7 +132,7 @@ class EditProfilePageTest : WebPageTest() {
 		val field = profile.addField("name")
 		field.value = "old"
 		addHttpRequestHeader("Host", "www.te.st")
-		verifySingleFieldCanBeChanged("field-${field.id}", "http://www.te.st/KSK@GPL.txt", "KSK@GPL.txt") { profile.getFieldByName("name").value }
+		verifySingleFieldCanBeChanged("field-${field.id}", "http://www.te.st/KSK@GPL.txt", "KSK@GPL.txt") { profile.getFieldByName("name")!!.value }
 	}
 
 	@Test
