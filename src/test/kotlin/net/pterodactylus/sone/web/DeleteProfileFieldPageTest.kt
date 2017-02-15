@@ -9,12 +9,14 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.Before
 import org.junit.Test
+import org.mockito.Mockito.any
+import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 
 /**
  * Unit test for [DeleteProfileFieldPage].
  */
-class DeleteProfileFieldPageTest : WebPageTest() {
+class DeleteProfileFieldPageTest: WebPageTest() {
 
 	private val page = DeleteProfileFieldPage(template, webInterface)
 
@@ -27,6 +29,16 @@ class DeleteProfileFieldPageTest : WebPageTest() {
 	fun setupProfile() {
 		whenever(currentSone.profile).thenReturn(profile)
 		field.value = "value"
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("deleteProfileField.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
@@ -46,7 +58,7 @@ class DeleteProfileFieldPageTest : WebPageTest() {
 	fun `get request with valid field name sets field in template context`() {
 		request("", GET)
 		addHttpRequestParameter("field", field.id)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["field"], equalTo<Any>(field))
 	}
 
@@ -54,7 +66,9 @@ class DeleteProfileFieldPageTest : WebPageTest() {
 	fun `post request without confirm redirects to edit profile page`() {
 		request("", POST)
 		addHttpRequestParameter("field", field.id)
-		verifyRedirect("editProfile.html#profile-fields")
+		verifyRedirect("editProfile.html#profile-fields") {
+			verify(currentSone, never()).profile = any()
+		}
 	}
 
 	@Test
