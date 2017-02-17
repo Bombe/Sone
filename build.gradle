@@ -100,3 +100,21 @@ findbugs {
 }
 
 apply plugin: 'idea'
+
+task countLinesMain(type: Exec) {
+    executable = 'cloc'
+    args = ['--by-file', '--xml', '--report-file=build/reports/cloc/main.xml', 'src/main']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+task countLinesTest(type: Exec) {
+    executable = 'cloc'
+    args = ['--by-file', '--xml', '--report-file=build/reports/cloc/test.xml', 'src/test']
+    standardOutput = new ByteArrayOutputStream()
+}
+
+task countLines {
+    new File(buildDir, "reports/cloc").mkdirs()
+    dependsOn tasks.countLinesMain
+    dependsOn tasks.countLinesTest
+}
