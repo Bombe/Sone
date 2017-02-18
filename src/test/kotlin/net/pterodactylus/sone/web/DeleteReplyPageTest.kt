@@ -32,11 +32,21 @@ class DeleteReplyPageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("deleteReply.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
 	fun `get request sets reply ID and return page in template context`() {
 		request("", GET)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["reply"], equalTo<Any>("reply-id"))
 		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))
 	}
@@ -47,7 +57,7 @@ class DeleteReplyPageTest : WebPageTest() {
 		addPostReply("reply-id", reply)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["reply"], equalTo<Any>("reply-id"))
 		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))
 	}

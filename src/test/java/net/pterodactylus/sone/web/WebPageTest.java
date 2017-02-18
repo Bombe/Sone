@@ -243,6 +243,7 @@ public abstract class WebPageTest {
 			}
 		});
 		when(core.getPost(anyString())).thenReturn(Optional.<Post>absent());
+		when(core.getPostReply(anyString())).thenReturn(Optional.<PostReply>absent());
 		when(core.getReplies(anyString())).thenAnswer(new Answer<List<PostReply>>() {
 			@Override
 			public List<PostReply> answer(InvocationOnMock invocation) throws Throwable {
