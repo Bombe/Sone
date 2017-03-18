@@ -2,6 +2,14 @@
 
 Sone aims to provide social network functionality for [Freenet](https://freenetproject.org/) (also here [on GitHub](https://github.com/freenet/)).
 
+## Compiling
+
+Sone’s build process is handled by [Gradle](https://gradle.org/). Just use the Gradle wrapper that comes with Sone:
+
+    # ./gradlew clean build fatJar
+
+This will resolve Sone’s dependencies, compile Sone, run all the tests, and put the file `sone-jar-with-dependencies.jar` into the `build/libs` directory. This is the file that you can load from Freenet’s plugin manager to run Sone.
+
 ## Installing
 
 ### Prerequisites
