@@ -20,7 +20,13 @@ You will also need a web of trust identity to use Sone. If you do not already ha
 
 ### Loading/Installing
 
-For Sone to work you will need a running Freenet node and the WebOfTrust plugin. Loading Sone happens from Freenet’s web interface using the “Add an Unofficial Plugin from Freenet” section from the node’s plugin manager at *Configuration → Plugins*, at the bottom of the page. Enter the key of the plugin (starting with “USK@”) into the text field and press the “Load” button. The plugin should then be downloaded from Freenet and started once it’s ready.
+#### From Freenet
+
+If you just want to run the latest version of Sone you first have to obtain the plugin key from [Sone’s homepage in Freenet](USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/75/). Now head over to your node’s plugin manager which you can reach from the menu at *Configuration → Plugins*. At the bottom of the page there’s a section called “Add an Unofficial Plugin from Freenet.” Enter the key of the plugin into the text field and press the “Load” button. The plugin should then be downloaded from Freenet and started once it’s ready.
+
+#### From Disk
+
+If you have compiled Sone yourself, there’s a different section on the plugin manager page, called “Add an Unofficial Plugin.” Enter the full path name of the JAR file created by Gradle and press the “Load” button. Sone should then be ready instantly.
 
 The node will remember which plugins you loaded so that you don’t need to do that again after your node restarts (e.g. for updates).
 
