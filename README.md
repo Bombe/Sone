@@ -16,9 +16,7 @@ This will resolve Sone’s dependencies, compile Sone, run all the tests, and pu
 
 For Sone to work you will need a running Freenet node, of course. You will also need the Web of Trust plugin from the official plugins listed on your node’s plugin manager page (*Configuration → Plugins* in the menu).
 
-If you already have a web of trust identity, you can skip the next section.
-
-You will also need to create an identity in the web of trust. Select *Community* from the menu, choose “Generate” and follow the instructions on-screen until your identity has been created.
+You will also need a web of trust identity to use Sone. If you do not already have a web of trust identity, select *Community* from the menu, choose “Generate” and follow the instructions on-screen until your identity has been created.
 
 ### Loading/Installing
 
