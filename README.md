@@ -60,6 +60,6 @@ Now, a social network wouldn’t be much fun if you couldn’t talk with other p
 
 When displaying posts and replies, Sone first parses the text. Special elements, such as Freenet URIs and Sone elements with a special syntax, are replaced with formatting that allow your browser to navigate the elements. Sone recognizes the following elements:
 
-* Links to Freenet URIs are linked to as-is. Make sure to separate the URI from surrounding text by whitespace, such as space or line breaks.
+* Links to Freenet URIs are linked to as-is. Make sure to separate the URI from surrounding text by whitespace, such as space or line breaks, or interpunction, such as commas and periods.
 * Links to other Sone’s profiles are added by the prefix “sone://” followed by the ID of the Sone. It is also possible to get the link for a Sone from a post or reply by that Sone; just copy the URL behind the “[link author]” link.
 * Links to other posts are added by the prefix “post://” followed by the ID of the post. You can also find the post ID behind the “[link post]” link below a post.
