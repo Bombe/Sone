@@ -38,7 +38,7 @@ class DistrustPageTest: WebPageTest() {
 	@Test
 	fun `get request does not redirect`() {
 		request("", GET)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
