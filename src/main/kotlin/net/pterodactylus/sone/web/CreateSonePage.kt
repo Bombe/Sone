@@ -2,10 +2,10 @@ package net.pterodactylus.sone.web
 
 import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 import java.util.logging.Level
 import java.util.logging.Logger
 
@@ -20,7 +20,7 @@ class CreateSonePage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["sones"] = webInterface.core.localSones.sortedWith(Sone.NICE_NAME_COMPARATOR)
 		templateContext["identitiesWithoutSone"] = webInterface.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}".toLowerCase() }
-		if (request.method == POST) {
+		if (request.isPOST) {
 			val identity = request.httpRequest.getPartAsStringFailsafe("identity", 43)
 			webInterface.core.identityManager.allOwnIdentities.firstOrNull { it.id == identity }?.let { ownIdentity ->
 				val sone = webInterface.core.createSone(ownIdentity)

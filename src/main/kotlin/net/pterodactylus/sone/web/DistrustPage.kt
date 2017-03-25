@@ -1,9 +1,9 @@
 package net.pterodactylus.sone.web
 
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * Page that lets the user distrust another Sone. This will assign a
@@ -15,7 +15,7 @@ class DistrustPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("distrust.html", template, "Page.Distrust.Title", webInterface, true) {
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.method == POST) {
+		if (request.isPOST) {
 			val sone = webInterface.core.getSone(request.httpRequest.getPartAsStringFailsafe("sone", 44)).orNull()
 			sone?.run { webInterface.core.distrustSone(getCurrentSone(request.toadletContext), this) }
 			throw RedirectException(request.httpRequest.getPartAsStringFailsafe("returnPage", 256))

@@ -2,10 +2,10 @@ package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
 import net.pterodactylus.sone.text.TextFilter
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * Page that lets the user create a new album.
@@ -14,7 +14,7 @@ class CreateAlbumPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("createAlbum.html", template, "Page.CreateAlbum.Title", webInterface, true) {
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.method == POST) {
+		if (request.isPOST) {
 			val name = request.httpRequest.getPartAsStringFailsafe("name", 64).trim()
 			if (name.isEmpty()) {
 				templateContext["nameMissing"] = true

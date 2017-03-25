@@ -1,9 +1,9 @@
 package net.pterodactylus.sone.web
 
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * Lets the user delete a post they made.
@@ -14,7 +14,7 @@ class DeletePostPage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
 		val post = webInterface.core.getPost(request.httpRequest.getPartAsStringFailsafe("post", 36)).orNull() ?: throw RedirectException("noPermission.html")
 		val returnPage = request.httpRequest.getPartAsStringFailsafe("returnPage", 256)
-		if (request.method == POST) {
+		if (request.isPOST) {
 			if (!post.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}

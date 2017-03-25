@@ -1,10 +1,10 @@
 package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.text.TextFilter
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * This page lets the user create a new [Post].
@@ -15,7 +15,7 @@ class CreatePostPage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
 		val returnPage = request.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 		templateContext["returnPage"] = returnPage
-		if (request.method == POST) {
+		if (request.isPOST) {
 			val text = request.httpRequest.getPartAsStringFailsafe("text", 65536).trim()
 			if (text == "") {
 				templateContext["errorTextEmpty"] = true

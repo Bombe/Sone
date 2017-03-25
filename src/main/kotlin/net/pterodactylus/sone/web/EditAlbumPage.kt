@@ -1,10 +1,10 @@
 package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * Page that lets the user edit the name and description of an album.
@@ -13,7 +13,7 @@ class EditAlbumPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface, true) {
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.method == POST) {
+		if (request.isPOST) {
 			val album = webInterface.core.getAlbum(request.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
 			album.takeUnless { it.sone.isLocal }?.run { throw RedirectException("noPermission.html") }
 			if (request.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {

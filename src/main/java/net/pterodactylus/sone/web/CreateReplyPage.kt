@@ -1,10 +1,10 @@
 package net.pterodactylus.sone.web
 
 import net.pterodactylus.sone.text.TextFilter
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * This page lets the user post a reply to a post.
@@ -16,7 +16,7 @@ class CreateReplyPage(template: Template, webInterface: WebInterface):
 		val postId = request.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }
 		val text = request.httpRequest.getPartAsStringFailsafe("text", 65536).trim().apply { templateContext["text"] = this }
 		val returnPage = request.httpRequest.getPartAsStringFailsafe("returnPage", 256).apply { templateContext["returnPage"] = this }
-		if (request.method == POST) {
+		if (request.isPOST) {
 			if (text == "") {
 				templateContext["errorTextEmpty"] = true
 				return

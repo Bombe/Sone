@@ -2,10 +2,10 @@ package net.pterodactylus.sone.web
 
 import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * The login page lets the user log in.
@@ -14,7 +14,7 @@ class LoginPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("login.html", template, "Page.Login.Title", webInterface) {
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.method == POST) {
+		if (request.isPOST) {
 			val soneId = request.httpRequest.getPartAsStringFailsafe("sone-id", 43)
 			webInterface.core.getLocalSone(soneId)?.let { sone ->
 				setCurrentSone(request.toadletContext, sone)

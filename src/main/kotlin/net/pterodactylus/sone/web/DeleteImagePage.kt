@@ -1,9 +1,9 @@
 package net.pterodactylus.sone.web
 
+import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.web.Method.POST
 
 /**
  * Page that lets the user delete an {@link Image}.
@@ -16,7 +16,7 @@ class DeleteImagePage(template: Template, webInterface: WebInterface):
 		if (!image.sone.isLocal) {
 			throw RedirectException("noPermission.html")
 		}
-		if (request.method == POST) {
+		if (request.isPOST) {
 			if (request.httpRequest.isPartSet("abortDelete")) {
 				throw RedirectException("imageBrowser.html?image=${image.id}")
 			}
