@@ -40,6 +40,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
@@ -534,7 +537,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The album with the given ID, or {@code null} if no album with the
 	 *         given ID exists
 	 */
-	public Album getAlbum(String albumId) {
+	@Nullable
+	public Album getAlbum(@Nonnull String albumId) {
 		return database.getAlbum(albumId).orNull();
 	}
 
