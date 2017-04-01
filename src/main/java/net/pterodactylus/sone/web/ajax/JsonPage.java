@@ -27,6 +27,8 @@ import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetPage;
@@ -138,6 +140,7 @@ public abstract class JsonPage implements FreenetPage {
 	 *
 	 * @return A reply signaling success
 	 */
+	@Nonnull
 	protected static JsonReturnObject createSuccessJsonObject() {
 		return new JsonReturnObject(true);
 	}
@@ -149,6 +152,7 @@ public abstract class JsonPage implements FreenetPage {
 	 *            The error that has occured
 	 * @return The JSON object, signalling failure and the error code
 	 */
+	@Nonnull
 	protected static JsonReturnObject createErrorJsonObject(String error) {
 		return new JsonErrorReturnObject(error);
 	}
