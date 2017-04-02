@@ -3,6 +3,8 @@ package net.pterodactylus.sone.web.ajax
 import freenet.clients.http.ToadletContext
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.core.ElementLoader
+import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
@@ -25,6 +27,7 @@ open class JsonPageTest {
 
 	protected val webInterface = mock<WebInterface>()
 	protected val core = mock<Core>()
+	protected val elementLoader = mock<ElementLoader>()
 	protected open lateinit var page: JsonPage
 	protected val json by lazy { page.createJsonObject(freenetRequest)!! }
 
@@ -38,6 +41,7 @@ open class JsonPageTest {
 	private val remoteSones = mutableMapOf<String, Sone>()
 	private val newPosts = mutableMapOf<String, Post>()
 	private val newReplies = mutableMapOf<String, PostReply>()
+	private val loadedElements = mutableMapOf<String, LinkedElement>()
 	private val notifications = mutableListOf<Notification>()
 
 	@Before
@@ -56,6 +60,13 @@ open class JsonPageTest {
 	}
 
 	@Before
+	fun setupElementLoader() {
+		whenever(elementLoader.loadElement(anyString())).thenAnswer {
+			loadedElements[it.getArgument(0)] ?: LinkedElement(it.getArgument(0), loading = true)
+		}
+	}
+
+	@Before
 	fun setupCurrentSone() {
 		currentSone.mock("soneId", "Sone_Id", true, 1000, idle)
 	}
@@ -69,6 +80,7 @@ open class JsonPageTest {
 	@Before
 	fun setupHttpRequest() {
 		whenever(httpRequest.getParam(anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: "" }
+		whenever(httpRequest.getParam(anyString(), anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: it.getArgument(1) }
 	}
 
 	protected fun Sone.mock(id: String, name: String, local: Boolean = false, time: Long, status: SoneStatus = idle) = apply {
@@ -118,6 +130,10 @@ open class JsonPageTest {
 			whenever(this.post).thenReturn(post.asOptional())
 			whenever(this.postId).thenReturn(postId)
 		}
+	}
+
+	protected fun addLoadedElement(link: String, loading: Boolean, failed: Boolean) {
+		loadedElements[link] = LinkedElement(link, failed, loading)
 	}
 
 }

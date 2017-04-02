@@ -11,6 +11,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.text.TimeText
 import net.pterodactylus.sone.text.TimeTextConverter
+import net.pterodactylus.sone.utils.jsonArray
 import net.pterodactylus.util.notify.Notification
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.allOf
@@ -30,7 +31,7 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
-	override var page: JsonPage = GetStatusAjaxPage(webInterface, timeTextConverter, l10nFilter)
+	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, timeTextConverter, l10nFilter)
 
 	@Before
 	fun setupTimeTextConverter() {
@@ -131,6 +132,19 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 		assertThat(json.get("newReplies").elements().asSequence().map { it.toMap() }.toList(), containsInAnyOrder(
 				mapOf<String, String?>("id" to "reply1", "sone" to "sone1", "post" to "post1", "postSone" to "sone11"),
 				mapOf("id" to "reply2", "sone" to "sone2", "post" to "post2", "postSone" to "sone22")
+		))
+	}
+
+	@Test
+	fun `page returns information about loaded elements`() {
+	    addLoadedElement("KSK@test.png", loading = false, failed = false)
+		addLoadedElement("KSK@test.html", loading = true, failed = false)
+		addLoadedElement("KSK@test.jpeg", loading = false, failed = true)
+		addRequestParameter("elements", jsonArray("KSK@test.png", "KSK@test.html", "KSK@test.jpeg").toString())
+		assertThat(json.get("loadedElements").elements().asSequence().map { it.toMap() }.toList(), containsInAnyOrder(
+				mapOf<String, String?>("link" to "KSK@test.png", "loading" to "false", "failed" to "false"),
+				mapOf("link" to "KSK@test.html", "loading" to "true", "failed" to "false"),
+				mapOf("link" to "KSK@test.jpeg", "loading" to "false", "failed" to "true")
 		))
 	}
 

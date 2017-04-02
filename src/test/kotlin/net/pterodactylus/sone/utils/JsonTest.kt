@@ -31,4 +31,10 @@ class JsonTest {
 		assertThat(arrayNode.toString(), equalTo("[{\"foo\":\"bar\"},{\"baz\":\"quo\"}]"))
 	}
 
+	@Test
+	fun `array is created correctly for strings`() {
+	    val arrayNode = jsonArray("foo", "bar", "baz")
+		assertThat(arrayNode.toString(), equalTo("[\"foo\",\"bar\",\"baz\"]"))
+	}
+
 }

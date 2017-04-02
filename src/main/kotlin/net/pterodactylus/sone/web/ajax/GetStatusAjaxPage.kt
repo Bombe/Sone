@@ -1,6 +1,9 @@
 package net.pterodactylus.sone.web.ajax
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.ObjectMapper
+import net.pterodactylus.sone.core.ElementLoader
+import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
@@ -18,7 +21,7 @@ import java.text.SimpleDateFormat
  * The “get status” AJAX handler returns all information that is necessary to
  * update the web interface in real-time.
  */
-class GetStatusAjaxPage(webInterface: WebInterface, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter):
+class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter):
 		JsonPage("getStatus.ajax", webInterface) {
 
 	private val dateFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss")
@@ -32,12 +35,15 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val timeTextConverte
 					this["sones"] = request.httpRequest.getParam("soneIds").split(',').map { webInterface.core.getSone(it).orNull() }.plus(currentSone).filterNotNull().toJsonSones()
 					this["newPosts"] = webInterface.getNewPosts(currentSone).toJsonPosts()
 					this["newReplies"] = webInterface.getNewReplies(currentSone).toJsonReplies()
+					this["loadedElements"] = request.httpRequest.getParam("elements", "[]").asJson().map(JsonNode::asText).map(elementLoader::loadElement).toJsonElements()
 				}
 			}
 
 	private operator fun JsonReturnObject.set(key: String, value: JsonNode) = put(key, value)
 	private operator fun JsonReturnObject.set(key: String, value: Int) = put(key, value)
 	private operator fun JsonReturnObject.set(key: String, value: Boolean) = put(key, value)
+
+	private fun String.asJson() = ObjectMapper().readTree(this).asIterable()
 
 	override fun needsFormPassword() = false
 	override fun requiresLogin() = false
@@ -79,6 +85,14 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val timeTextConverte
 			put("sone", reply.sone.id)
 			put("post", reply.postId)
 			put("postSone", reply.post.get().sone.id)
+		}
+	}.toArray()
+
+	private fun Iterable<LinkedElement>.toJsonElements() = map { (link, failed, loading) ->
+		jsonObject {
+			put("link", link)
+			put("loading", loading)
+			put("failed", failed)
 		}
 	}.toArray()
 

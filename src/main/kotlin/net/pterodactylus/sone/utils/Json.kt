@@ -5,5 +5,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory.instance
 import com.fasterxml.jackson.databind.node.ObjectNode
 
 fun jsonObject(block: ObjectNode.() -> Unit): ObjectNode = ObjectNode(instance).apply(block)
+fun jsonArray(vararg objects: String?): ArrayNode = objects.fold(ArrayNode(instance), ArrayNode::add)
 
 fun Iterable<ObjectNode>.toArray(): ArrayNode = fold(ArrayNode(instance), ArrayNode::add)

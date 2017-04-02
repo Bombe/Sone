@@ -214,6 +214,7 @@ public class WebInterface {
 	private final PostVisibilityFilter postVisibilityFilter;
 	private final ReplyVisibilityFilter replyVisibilityFilter;
 
+	private final ElementLoader elementLoader;
 	private final TimeTextConverter timeTextConverter = new TimeTextConverter();
 	private final L10nFilter l10nFilter = new L10nFilter(this);
 
@@ -272,6 +273,7 @@ public class WebInterface {
 		this.listNotificationFilter = listNotificationFilter;
 		this.postVisibilityFilter = postVisibilityFilter;
 		this.replyVisibilityFilter = replyVisibilityFilter;
+		this.elementLoader = elementLoader;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 
@@ -711,7 +713,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, timeTextConverter, l10nFilter)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
