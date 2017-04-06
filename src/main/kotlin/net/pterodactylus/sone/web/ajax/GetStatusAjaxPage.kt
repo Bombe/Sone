@@ -35,7 +35,7 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 					this["sones"] = request.httpRequest.getParam("soneIds").split(',').map { webInterface.core.getSone(it).orNull() }.plus(currentSone).filterNotNull().toJsonSones()
 					this["newPosts"] = webInterface.getNewPosts(currentSone).toJsonPosts()
 					this["newReplies"] = webInterface.getNewReplies(currentSone).toJsonReplies()
-					this["loadedElements"] = request.httpRequest.getParam("elements", "[]").asJson().map(JsonNode::asText).map(elementLoader::loadElement).toJsonElements()
+					this["linkedElements"] = request.httpRequest.getParam("elements", "[]").asJson().map(JsonNode::asText).map(elementLoader::loadElement).toJsonElements()
 				}
 			}
 
