@@ -1,11 +1,15 @@
 package net.pterodactylus.sone.template
 
+import com.google.inject.Guice
 import net.pterodactylus.sone.core.LinkedElement
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.util.template.ClassPathTemplateProvider
 import net.pterodactylus.util.template.HtmlFilter
 import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.jsoup.Jsoup
 import org.junit.Test
@@ -50,6 +54,12 @@ class LinkedElementRenderFilterTest {
 		assertThat(spanNode.attr("class"), `is`("linked-element"))
 		assertThat(spanNode.attr("title"), `is`("KSK@gpl.png"))
 		assertThat(spanNode.attr("style"), `is`("background-image: url('/KSK@gpl.png')"))
+	}
+
+	@Test
+	fun `render filter can be created by guice`() {
+	    val injector = Guice.createInjector(TemplateContextFactory::class.isProvidedByMock())
+		assertThat(injector.getInstance<LinkedElementRenderFilter>(), notNullValue())
 	}
 
 }

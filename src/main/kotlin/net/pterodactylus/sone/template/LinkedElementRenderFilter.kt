@@ -7,11 +7,12 @@ import net.pterodactylus.util.template.TemplateContextFactory
 import net.pterodactylus.util.template.TemplateParser
 import java.io.StringReader
 import java.io.StringWriter
+import javax.inject.Inject
 
 /**
  * Renders all kinds of [LinkedElement]s.
  */
-class LinkedElementRenderFilter(private val templateContextFactory: TemplateContextFactory) : Filter {
+class LinkedElementRenderFilter @Inject constructor(private val templateContextFactory: TemplateContextFactory): Filter {
 
 	companion object {
 		private val loadedImageTemplate = """<%include linked/image.html>""".parse()
