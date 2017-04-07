@@ -17,7 +17,7 @@ class LinkedElementRenderFilter(private val templateContextFactory: TemplateCont
 		private val loadedImageTemplate = """<%include linked/image.html>""".parse()
 		private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".parse()
 
-		private fun String.parse() = StringReader(this).use { TemplateParser.parse(it) }
+		private fun String.parse() = StringReader(this).use { TemplateParser.parse(it) }!!
 	}
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
