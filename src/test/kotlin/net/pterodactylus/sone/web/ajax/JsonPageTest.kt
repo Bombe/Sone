@@ -41,7 +41,7 @@ open class JsonPageTest {
 	private val remoteSones = mutableMapOf<String, Sone>()
 	private val newPosts = mutableMapOf<String, Post>()
 	private val newReplies = mutableMapOf<String, PostReply>()
-	private val loadedElements = mutableMapOf<String, LinkedElement>()
+	private val linkedElements = mutableMapOf<String, LinkedElement>()
 	private val notifications = mutableListOf<Notification>()
 
 	@Before
@@ -62,7 +62,7 @@ open class JsonPageTest {
 	@Before
 	fun setupElementLoader() {
 		whenever(elementLoader.loadElement(anyString())).thenAnswer {
-			loadedElements[it.getArgument(0)] ?: LinkedElement(it.getArgument(0), loading = true)
+			linkedElements[it.getArgument(0)] ?: LinkedElement(it.getArgument(0), loading = true)
 		}
 	}
 
@@ -132,8 +132,8 @@ open class JsonPageTest {
 		}
 	}
 
-	protected fun addLoadedElement(link: String, loading: Boolean, failed: Boolean) {
-		loadedElements[link] = LinkedElement(link, failed, loading)
+	protected fun addLinkedElement(link: String, loading: Boolean, failed: Boolean) {
+		linkedElements[link] = LinkedElement(link, failed, loading)
 	}
 
 }

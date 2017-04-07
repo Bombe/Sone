@@ -137,9 +137,9 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 
 	@Test
 	fun `page returns information about loaded elements`() {
-	    addLoadedElement("KSK@test.png", loading = false, failed = false)
-		addLoadedElement("KSK@test.html", loading = true, failed = false)
-		addLoadedElement("KSK@test.jpeg", loading = false, failed = true)
+		addLinkedElement("KSK@test.png", loading = false, failed = false)
+		addLinkedElement("KSK@test.html", loading = true, failed = false)
+		addLinkedElement("KSK@test.jpeg", loading = false, failed = true)
 		addRequestParameter("elements", jsonArray("KSK@test.png", "KSK@test.html", "KSK@test.jpeg").toString())
 		assertThat(json.get("linkedElements").elements().asSequence().map { it.toMap() }.toList(), containsInAnyOrder(
 				mapOf<String, String?>("link" to "KSK@test.png", "loading" to "false", "failed" to "false"),
