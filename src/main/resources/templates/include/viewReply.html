@@ -25,16 +25,14 @@
 			<%if !shortText|match value=renderedText><%if !raw><a class="shrink-reply-text hidden"><%= View.Post.ShowLess|l10n|html></a><%/if><%/if>
 			<% parsedText|linked-elements sone=reply.sone|store key==linkedElements>
 			<% foreach linkedElements linkedElement>
-				<%if !linkedElement.loading>
-					<%if !linkedElement.failed>
-						<% first>
-							<div class="linked-elements">
-						<%/first>
-						<% linkedElement|render-linked-element>
-						<% last>
-							</div>
-						<%/last>
-					<%/if>
+				<%if !linkedElement.failed>
+					<% first>
+						<div class="linked-elements">
+					<%/first>
+					<% linkedElement|render-linked-element>
+					<% last>
+						</div>
+					<%/last>
 				<%/if>
 			<%/foreach>
 		</div>
