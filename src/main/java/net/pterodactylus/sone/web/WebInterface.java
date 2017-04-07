@@ -120,6 +120,7 @@ import net.pterodactylus.sone.web.ajax.EditImageAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetLinkedElementAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetNotificationsAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
@@ -215,6 +216,7 @@ public class WebInterface {
 	private final ReplyVisibilityFilter replyVisibilityFilter;
 
 	private final ElementLoader elementLoader;
+	private final LinkedElementRenderFilter linkedElementRenderFilter;
 	private final TimeTextConverter timeTextConverter = new TimeTextConverter();
 	private final L10nFilter l10nFilter = new L10nFilter(this);
 
@@ -304,7 +306,7 @@ public class WebInterface {
 		templateContextFactory.addFilter("shorten", shortenFilter = new ShortenFilter());
 		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), templateContextFactory));
 		templateContextFactory.addFilter("linked-elements", new LinkedElementsFilter(elementLoader));
-		templateContextFactory.addFilter("render-linked-element", new LinkedElementRenderFilter(templateContextFactory));
+		templateContextFactory.addFilter("render-linked-element", linkedElementRenderFilter = new LinkedElementRenderFilter(templateContextFactory));
 		templateContextFactory.addFilter("reparse", new ReparseFilter());
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
@@ -720,6 +722,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
