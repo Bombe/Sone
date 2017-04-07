@@ -444,7 +444,7 @@ textarea {
 	margin-top: 1ex;
 }
 
-#sone .post .linked-element {
+#sone .post .linked-element.loaded .image {
 	display: inline-block;
 	border: solid 1px black;
 	width: 160px;
@@ -515,7 +515,7 @@ textarea {
 	margin-top: 1ex;
 }
 
-#sone .post .reply .linked-element {
+#sone .post .reply .linked-element.loaded .image {
 	display: inline-block;
 	border: solid 1px black;
 	width: 120px;

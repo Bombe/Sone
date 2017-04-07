@@ -1194,7 +1194,13 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 }
 
 function getStatus() {
-	ajaxGet("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {}, function(data, textStatus) {
+	var parameters = isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {};
+	$.extend(parameters, {
+		"elements": JSON.stringify($(".linked-element.not-loaded").map(function () {
+			return $(this).attr("title");
+		}).toArray())
+	});
+	ajaxGet("getStatus.ajax", parameters, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
@@ -1215,6 +1221,9 @@ function getStatus() {
 				$.each(data.newReplies, function(index, value) {
 					loadNewReply(value.id, value.sone, value.post, value.postSone);
 				});
+			}
+			if (data.linkedElements) {
+				loadLinkedElements(data.linkedElements)
 			}
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
@@ -1518,6 +1527,37 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 			});
 		}
 	});
+}
+
+function loadLinkedElements(links) {
+	var failedElements = links.filter(function(element) {
+		return element.failed;
+	});
+	if (failedElements.length > 0) {
+		failedElements.forEach(function(element) {
+			$(getLinkedElement(element.link)).remove()
+		});
+	}
+	var loadedElements = links.filter(function(element) {
+		return !element.loading && !element.failed;
+	});
+	if (loadedElements.length > 0) {
+		ajaxGet("getLinkedElement.ajax", {
+			"elements": JSON.stringify(loadedElements.map(function(element) {
+				return element.link;
+			}))
+		}, function (data, textStatus) {
+			if ((data != null) && (data.success)) {
+				data.linkedElements.forEach(function (linkedElement) {
+					$(getLinkedElement(linkedElement.link)).replaceWith(linkedElement.html);
+				});
+			}
+		});
+	}
+}
+
+function getLinkedElement(link) {
+	return $(".linked-element[title='" + link + "']")[0]
 }
 
 /**

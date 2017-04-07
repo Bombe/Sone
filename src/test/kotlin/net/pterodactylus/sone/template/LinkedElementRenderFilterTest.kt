@@ -34,26 +34,28 @@ class LinkedElementRenderFilterTest {
 	}
 
 	@Test
-	fun `filter renders loading animation for not loaded elements`() {
+	fun `filter renders empty span for not loaded elements`() {
 		val html = filter.format(null, LinkedElement("KSK@gpl.png", loading = true), emptyMap<String, Any?>()) as String
 		val spanNode = Jsoup.parseBodyFragment(html).body().child(0)
 		assertThat(spanNode.nodeName(), `is`("span"))
-		assertThat(spanNode.attr("class"), `is`("linked-element"))
+		assertThat(spanNode.attr("class"), `is`("linked-element not-loaded"))
 		assertThat(spanNode.attr("title"), `is`("KSK@gpl.png"))
-		assertThat(spanNode.attr("style"), `is`("background-image: url('images/loading-animation.gif')"))
+		assertThat(spanNode.hasAttr("style"), `is`(false))
+		assertThat(spanNode.children().isEmpty(), `is`(true))
 	}
 
 	@Test
 	fun `filter can render linked images`() {
 		val html = filter.format(null, LinkedElement("KSK@gpl.png"), emptyMap<String, Any?>()) as String
-		val linkNode = Jsoup.parseBodyFragment(html).body().child(0)
+		val outerSpanNode = Jsoup.parseBodyFragment(html).body().child(0)
+		assertThat(outerSpanNode.nodeName(), `is`("span"))
+		assertThat(outerSpanNode.attr("class"), `is`("linked-element loaded"))
+		assertThat(outerSpanNode.attr("title"), `is`("KSK@gpl.png"))
+		val linkNode = outerSpanNode.child(0)
 		assertThat(linkNode.nodeName(), `is`("a"))
 		assertThat(linkNode.attr("href"), `is`("/KSK@gpl.png"))
-		val spanNode = linkNode.child(0)
-		assertThat(spanNode.nodeName(), `is`("span"))
-		assertThat(spanNode.attr("class"), `is`("linked-element"))
-		assertThat(spanNode.attr("title"), `is`("KSK@gpl.png"))
-		assertThat(spanNode.attr("style"), `is`("background-image: url('/KSK@gpl.png')"))
+		val innerSpanNode = linkNode.child(0)
+		assertThat(innerSpanNode.attr("style"), `is`("background-image: url('/KSK@gpl.png')"))
 	}
 
 	@Test
