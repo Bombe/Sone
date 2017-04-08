@@ -46,6 +46,22 @@ class EditProfilePageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("editProfile.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+	    whenever(l10n.getString("Page.EditProfile.Title")).thenReturn("edit profile page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("edit profile page title"))
+	}
+
+	@Test
 	fun `get request stores fields of current sone’s profile in template context`() {
 		request("", GET)
 		page.handleRequest(freenetRequest, templateContext)
