@@ -110,6 +110,7 @@ public class ListNotificationTest {
 		ListNotification secondNotification = new ListNotification(listNotification);
 		listNotification.add("a");
 		secondNotification.add("a");
+		listNotification.setLastUpdateTime(secondNotification.getLastUpdatedTime());
 		assertThat(listNotification.hashCode(), is(secondNotification.hashCode()));
 	}
 
