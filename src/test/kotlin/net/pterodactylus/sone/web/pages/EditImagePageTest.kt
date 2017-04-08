@@ -3,7 +3,9 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Image.Modifier
+import net.pterodactylus.sone.data.Image.Modifier.ImageTitleMustNotBeEmpty
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.doThrow
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
@@ -59,7 +61,7 @@ class EditImagePageTest : WebPageTest() {
 	@Test
 	fun `get request does not redirect`() {
 		request("", GET)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
@@ -110,6 +112,7 @@ class EditImagePageTest : WebPageTest() {
 		addHttpRequestParameter("image", "image-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		addHttpRequestParameter("title", "   ")
+		whenever(modifier.update()).doThrow<ImageTitleMustNotBeEmpty>()
 		verifyRedirect("emptyImageTitle.html") {
 			verify(core, never()).touchConfiguration()
 		}
@@ -132,7 +135,7 @@ class EditImagePageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `post request with image title and description modifies image with filtered description and redirects to reutrn page`() {
+	fun `post request with image title and description modifies image with filtered description and redirects to return page`() {
 		request("", POST)
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
