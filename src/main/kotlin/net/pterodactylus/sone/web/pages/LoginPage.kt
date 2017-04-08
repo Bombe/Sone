@@ -33,7 +33,7 @@ class LoginPage(template: Template, webInterface: WebInterface):
 
 	override fun isEnabled(toadletContext: ToadletContext) = when {
 		webInterface.core.preferences.isRequireFullAccess && !toadletContext.isAllowedFullAccess -> false
-		else -> getCurrentSoneWithoutCreatingSession(toadletContext) == null
+		else -> getCurrentSone(toadletContext, false) == null
 	}
 
 }

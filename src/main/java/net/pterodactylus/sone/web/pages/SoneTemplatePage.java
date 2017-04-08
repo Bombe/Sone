@@ -27,9 +27,11 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.web.SessionProvider;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.FreenetTemplatePage;
@@ -37,7 +39,6 @@ import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
-import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
@@ -53,6 +54,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 
 	/** The Sone core. */
 	protected final WebInterface webInterface;
+	protected final SessionProvider sessionProvider;
 
 	/** The page title l10n key. */
 	private final String pageTitleKey;
@@ -111,6 +113,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 		super(path, webInterface.getTemplateContextFactory(), template, "noPermission.html");
 		this.pageTitleKey = pageTitleKey;
 		this.webInterface = webInterface;
+		this.sessionProvider = webInterface;
 		this.requireLogin = requireLogin;
 	}
 
@@ -118,32 +121,18 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	// PROTECTED METHODS
 	//
 
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	protected Sone getCurrentSone(ToadletContext toadletContext) {
-		return webInterface.getCurrentSoneCreatingSession(toadletContext);
+	@Nullable
+	protected Sone getCurrentSone(@Nonnull ToadletContext toadletContext) {
+		return getCurrentSone(toadletContext, true);
 	}
 
-	protected Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
-		return webInterface.getCurrentSoneWithoutCreatingSession(toadletContext);
+	@Nullable
+	protected Sone getCurrentSone(@Nonnull ToadletContext toadletContext, boolean createSession) {
+		return sessionProvider.getCurrentSone(toadletContext, createSession);
 	}
 
-	/**
-	 * Sets the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @param sone
-	 *            The Sone to set as currently logged in
-	 */
-	protected void setCurrentSone(ToadletContext toadletContext, Sone sone) {
-		webInterface.setCurrentSone(toadletContext, sone);
+	protected void setCurrentSone(@Nonnull ToadletContext toadletContext, @Nullable Sone sone) {
+		sessionProvider.setCurrentSone(toadletContext, sone);
 	}
 
 	//
@@ -201,7 +190,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	@Override
 	protected final void processTemplate(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		super.processTemplate(request, templateContext);
-		Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		templateContext.set("preferences", webInterface.getCore().getPreferences());
 		templateContext.set("currentSone", currentSone);
 		templateContext.set("localSones", webInterface.getCore().getLocalSones());
@@ -226,7 +215,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 	 */
 	@Override
 	protected String getRedirectTarget(FreenetRequest request) {
-		if (requiresLogin() && (getCurrentSoneWithoutCreatingSession(request.getToadletContext()) == null)) {
+		if (requiresLogin() && (getCurrentSone(request.getToadletContext(), false) == null)) {
 			HTTPRequest httpRequest = request.getHttpRequest();
 			String originalUrl = httpRequest.getPath();
 			if (httpRequest.hasParameters()) {
@@ -273,7 +262,7 @@ public class SoneTemplatePage extends FreenetTemplatePage {
 			return false;
 		}
 		if (requiresLogin()) {
-			return getCurrentSoneWithoutCreatingSession(toadletContext) != null;
+			return getCurrentSone(toadletContext, false) != null;
 		}
 		return true;
 	}

@@ -102,7 +102,7 @@ public class ImageBrowserPage extends SoneTemplatePage {
 			templateContext.set("albums", albumPagination.getItems());
 			return;
 		}
-		Sone sone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
+		Sone sone = getCurrentSone(request.getToadletContext(), false);
 		templateContext.set("soneRequested", true);
 		templateContext.set("sone", sone);
 	}

@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.main.SonePlugin
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.SoneTemplatePage
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.TemplateContext
@@ -36,8 +35,8 @@ class SoneTemplatePageTest : WebPageTest() {
 	@Test
 	fun `retrieving current sone without creation is forwarded to web interface`() {
 		mock<Sone>().let {
-			whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(it)
-			assertThat(page.getCurrentSoneWithoutCreatingSession(toadletContext), equalTo(it))
+			whenever(webInterface.getCurrentSone(toadletContext, false)).thenReturn(it)
+			assertThat(page.getCurrentSone(toadletContext, false), equalTo(it))
 		}
 	}
 

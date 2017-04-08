@@ -73,7 +73,7 @@ public class KnownSonesPage extends SoneTemplatePage {
 		templateContext.set("sort", sortField);
 		templateContext.set("order", sortOrder);
 		templateContext.set("filter", filter);
-		final Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
+		final Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		Collection<Sone> knownSones = Collections2.filter(webInterface.getCore().getSones(), Sone.EMPTY_SONE_FILTER);
 		if ((currentSone != null) && "followed".equals(filter)) {
 			knownSones = Collections2.filter(knownSones, new Predicate<Sone>() {

@@ -14,7 +14,7 @@ class DeleteProfileFieldPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("deleteProfileField.html", template, "Page.DeleteProfileField.Title", webInterface, true) {
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		val currentSone = getCurrentSone(request.toadletContext)
+		val currentSone = getCurrentSone(request.toadletContext)!!
 		val field = currentSone.profile.getFieldById(request.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
 		templateContext["field"] = field
 		if (request.isPOST) {

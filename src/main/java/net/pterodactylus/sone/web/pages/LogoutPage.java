@@ -61,7 +61,7 @@ public class LogoutPage extends SoneTemplatePage {
 		if (webInterface.getCore().getPreferences().isRequireFullAccess() && !toadletContext.isAllowedFullAccess()) {
 			return false;
 		}
-		return (getCurrentSoneWithoutCreatingSession(toadletContext) != null) && (webInterface.getCore().getLocalSones().size() != 1);
+		return (getCurrentSone(toadletContext, false) != null) && (webInterface.getCore().getLocalSones().size() != 1);
 	}
 
 }

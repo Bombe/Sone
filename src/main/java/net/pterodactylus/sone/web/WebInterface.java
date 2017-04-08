@@ -223,7 +223,7 @@ import com.google.inject.Inject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebInterface {
+public class WebInterface implements SessionProvider {
 
 	/** The logger. */
 	private static final Logger logger = getLogger(WebInterface.class.getName());
@@ -469,6 +469,12 @@ public class WebInterface {
 		return getCore().getLocalSone(soneId);
 	}
 
+	@Override
+	@Nullable
+	public Sone getCurrentSone(@Nonnull ToadletContext toadletContext, boolean createSession) {
+		return createSession ? getCurrentSoneCreatingSession(toadletContext) : getCurrentSoneWithoutCreatingSession(toadletContext);
+	}
+
 	/**
 	 * Sets the currently logged in Sone.
 	 *
@@ -477,7 +483,8 @@ public class WebInterface {
 	 * @param sone
 	 *            The Sone to set as currently logged in
 	 */
-	public void setCurrentSone(ToadletContext toadletContext, Sone sone) {
+	@Override
+	public void setCurrentSone(@Nonnull ToadletContext toadletContext, @Nullable Sone sone) {
 		Session session = getOrCreateCurrentSession(toadletContext);
 		if (sone == null) {
 			session.removeAttribute("Sone.CurrentSone");

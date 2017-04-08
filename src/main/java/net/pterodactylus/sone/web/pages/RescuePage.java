@@ -56,7 +56,7 @@ public class RescuePage extends SoneTemplatePage {
 	 */
 	@Override
 	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
-		Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		SoneRescuer soneRescuer = webInterface.getCore().getSoneRescuer(currentSone);
 		if (request.getMethod() == Method.POST) {
 			if ("true".equals(request.getHttpRequest().getPartAsStringFailsafe("fetch", 4))) {

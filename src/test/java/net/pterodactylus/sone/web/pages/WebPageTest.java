@@ -274,6 +274,7 @@ public abstract class WebPageTest {
 
 	@Before
 	public final void setupWebInterface() {
+		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone);
 		when(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getNotification(anyString())).thenReturn(Optional.<Notification>absent());
@@ -290,6 +291,7 @@ public abstract class WebPageTest {
 	}
 
 	protected void unsetCurrentSone() {
+		when(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null);
 		when(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(null);
 		when(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(null);
 	}

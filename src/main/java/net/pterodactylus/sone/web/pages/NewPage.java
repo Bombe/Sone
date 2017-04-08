@@ -65,8 +65,8 @@ public class NewPage extends SoneTemplatePage {
 	@Override
 	protected void handleRequest(FreenetRequest request, TemplateContext templateContext) throws RedirectException {
 		/* collect new elements from notifications. */
-		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts(getCurrentSoneWithoutCreatingSession(request.getToadletContext())));
-		for (PostReply reply : webInterface.getNewReplies(getCurrentSoneWithoutCreatingSession(request.getToadletContext()))) {
+		Set<Post> posts = new HashSet<Post>(webInterface.getNewPosts(getCurrentSone(request.getToadletContext(), false)));
+		for (PostReply reply : webInterface.getNewReplies(getCurrentSone(request.getToadletContext(), false))) {
 			posts.add(reply.getPost().get());
 		}
 
