@@ -31,6 +31,22 @@ class EditProfileFieldPageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("editProfileField.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		whenever(l10n.getString("Page.EditProfileField.Title")).thenReturn("edit profile field title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("edit profile field title"))
+	}
+
+	@Test
 	fun `get request with invalid field redirects to invalid page`() {
 		request("", GET)
 		verifyRedirect("invalid.html")
