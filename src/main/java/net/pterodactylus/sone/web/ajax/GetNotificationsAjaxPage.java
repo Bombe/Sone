@@ -79,7 +79,7 @@ public class GetNotificationsAjaxPage extends JsonPage {
 	 */
 	@Override
 	protected JsonReturnObject createJsonObject(FreenetRequest request) {
-		Sone currentSone = getCurrentSoneWithoutCreatingSession(request.getToadletContext());
+		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
 		List<Notification> notifications = new ArrayList<Notification>(webInterface.getNotifications(currentSone));
 		Collections.sort(notifications, Notification.CREATED_TIME_SORTER);
 		ArrayNode jsonNotifications = new ArrayNode(instance);

@@ -30,6 +30,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.web.SessionProvider;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
@@ -38,7 +39,6 @@ import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 
 /**
@@ -60,6 +60,7 @@ public abstract class JsonPage implements FreenetPage {
 
 	/** The Sone web interface. */
 	protected final WebInterface webInterface;
+	private final SessionProvider sessionProvider;
 
 	/**
 	 * Creates a new JSON page at the given path.
@@ -72,26 +73,19 @@ public abstract class JsonPage implements FreenetPage {
 	public JsonPage(String path, WebInterface webInterface) {
 		this.path = path;
 		this.webInterface = webInterface;
+		this.sessionProvider = webInterface;
 	}
 
 	//
 	// ACCESSORS
 	//
 
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
 	protected Sone getCurrentSone(ToadletContext toadletContext) {
-		return webInterface.getCurrentSoneCreatingSession(toadletContext);
+		return sessionProvider.getCurrentSone(toadletContext, true);
 	}
 
-	protected Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
-		return webInterface.getCurrentSoneWithoutCreatingSession(toadletContext);
+	protected Sone getCurrentSone(ToadletContext toadletContext, boolean createSession) {
+		return sessionProvider.getCurrentSone(toadletContext, createSession);
 	}
 
 	//
@@ -192,7 +186,7 @@ public abstract class JsonPage implements FreenetPage {
 			}
 		}
 		if (requiresLogin()) {
-			if (getCurrentSoneWithoutCreatingSession(request.getToadletContext()) == null) {
+			if (getCurrentSone(request.getToadletContext(), false) == null) {
 				return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(objectMapper.writeValueAsString(new JsonErrorReturnObject("auth-required")));
 			}
 		}
