@@ -56,7 +56,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 	fun `get request with valid field stores field in template context`() {
 		request("", GET)
 		addHttpRequestParameter("field", field.id)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["field"], equalTo<Any>(field))
 	}
 
@@ -96,7 +96,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 		profile.addField("New Name")
 		addHttpRequestParameter("field", field.id)
 		addHttpRequestParameter("name", "New Name")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(field.name, equalTo("Name"))
 		verify(currentSone, never()).profile = profile
 		assertThat(templateContext["duplicateFieldName"], equalTo<Any>(true))
