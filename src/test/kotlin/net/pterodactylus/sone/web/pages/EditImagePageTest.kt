@@ -7,10 +7,10 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.EditImagePage
-import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.never
@@ -38,6 +38,22 @@ class EditImagePageTest : WebPageTest() {
 		whenever(image.sone).thenReturn(sone)
 		whenever(image.album).thenReturn(album)
 		whenever(image.modify()).thenReturn(modifier)
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("editImage.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		whenever(l10n.getString("Page.EditImage.Title")).thenReturn("edit image page title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("edit image page title"))
 	}
 
 	@Test
