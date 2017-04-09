@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.core
 
 import com.google.common.base.Ticker
+import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
 import java.io.ByteArrayInputStream
@@ -17,9 +18,9 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 
 	@Inject constructor(freenetInterface: FreenetInterface) : this(freenetInterface, Ticker.systemTicker())
 
-	private val loadingLinks = CacheBuilder.newBuilder().build<String, Boolean>()
-	private val failureCache = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
-	private val imageCache = CacheBuilder.newBuilder().build<String, LinkedElement>()
+	private val loadingLinks: Cache<String, Boolean> = CacheBuilder.newBuilder().build<String, Boolean>()
+	private val failureCache: Cache<String, Boolean> = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
+	private val imageCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build<String, LinkedElement>()
 	private val callback = object : FreenetInterface.BackgroundFetchCallback {
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
 			return !mimeType.startsWith("image/") || (size > 2097152)
@@ -66,7 +67,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		return LinkedElement(link, loading = true)
 	}
 
-	private fun String.decode() = URLDecoder.decode(this, "UTF-8")
-	private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFC)
+	private fun String.decode() = URLDecoder.decode(this, "UTF-8")!!
+	private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFC)!!
 
 }

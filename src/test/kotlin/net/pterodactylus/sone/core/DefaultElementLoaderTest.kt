@@ -27,8 +27,8 @@ class DefaultElementLoaderTest {
 		private val freenetURI = FreenetURI(IMAGE_ID)
 		private const val decomposedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/fru%CC%88hstu%CC%88ck.jpg"
 		private const val normalizedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/frühstück.jpg"
-		private val sizeOkay = 2097152L;
-		private val sizeNotOkay = sizeOkay + 1;
+		private val sizeOkay = 2097152L
+		private val sizeNotOkay = sizeOkay + 1
 	}
 
 	private val freenetInterface = mock<FreenetInterface>()
