@@ -19,7 +19,7 @@ package net.pterodactylus.sone.freenet.wot;
 
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
-import static net.pterodactylus.sone.Matchers.matchesRegex;
+import static net.pterodactylus.sone.test.Matchers.matchesRegex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;

@@ -1,4 +1,4 @@
-package net.pterodactylus.sone;
+package net.pterodactylus.sone.test;
 
 import java.util.concurrent.atomic.AtomicReference;
 

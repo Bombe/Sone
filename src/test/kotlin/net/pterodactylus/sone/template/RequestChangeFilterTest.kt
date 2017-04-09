@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.template
 
 import freenet.support.api.HTTPRequest
-import net.pterodactylus.sone.Matchers.matchesRegex
+import net.pterodactylus.sone.test.Matchers.matchesRegex
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.page.FreenetRequest

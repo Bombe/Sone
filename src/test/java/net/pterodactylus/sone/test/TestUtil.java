@@ -1,4 +1,4 @@
-package net.pterodactylus.sone;
+package net.pterodactylus.sone.test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

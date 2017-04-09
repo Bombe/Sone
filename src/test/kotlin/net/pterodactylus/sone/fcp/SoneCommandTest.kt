@@ -3,7 +3,6 @@ package net.pterodactylus.sone.fcp
 import com.google.common.base.Optional
 import com.google.common.base.Optional.absent
 import freenet.support.SimpleFieldSet
-import net.pterodactylus.sone.OneByOneMatcher
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
@@ -11,6 +10,7 @@ import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.template.SoneAccessor
+import net.pterodactylus.sone.test.OneByOneMatcher
 import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever

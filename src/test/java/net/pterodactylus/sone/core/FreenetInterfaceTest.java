@@ -4,8 +4,8 @@ import static freenet.client.FetchException.FetchExceptionMode.ALL_DATA_NOT_FOUN
 import static freenet.keys.InsertableClientSSK.createRandom;
 import static freenet.node.RequestStarter.INTERACTIVE_PRIORITY_CLASS;
 import static freenet.node.RequestStarter.PREFETCH_PRIORITY_CLASS;
-import static net.pterodactylus.sone.Matchers.delivers;
-import static net.pterodactylus.sone.TestUtil.setFinalField;
+import static net.pterodactylus.sone.test.Matchers.delivers;
+import static net.pterodactylus.sone.test.TestUtil.setFinalField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 
-import net.pterodactylus.sone.TestUtil;
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
@@ -43,6 +42,7 @@ import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.data.impl.ImageImpl;
+import net.pterodactylus.sone.test.TestUtil;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchContext;

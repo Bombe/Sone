@@ -1,4 +1,4 @@
-package net.pterodactylus.sone;
+package net.pterodactylus.sone.test;
 
 import static java.lang.System.currentTimeMillis;
 import static java.util.UUID.randomUUID;

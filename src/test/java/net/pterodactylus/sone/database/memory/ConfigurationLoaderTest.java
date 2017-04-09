@@ -10,7 +10,7 @@ import static org.mockito.Mockito.when;
 import java.util.HashSet;
 import java.util.Set;
 
-import net.pterodactylus.sone.TestValue;
+import net.pterodactylus.sone.test.TestValue;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.Value;

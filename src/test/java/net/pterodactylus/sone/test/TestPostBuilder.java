@@ -1,4 +1,4 @@
-package net.pterodactylus.sone;
+package net.pterodactylus.sone.test;
 
 import static com.google.common.base.Optional.fromNullable;
 import static java.lang.System.currentTimeMillis;

@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import net.pterodactylus.sone.TestValue;
+import net.pterodactylus.sone.test.TestValue;
 import net.pterodactylus.util.config.Configuration;
 
 import com.google.common.eventbus.EventBus;

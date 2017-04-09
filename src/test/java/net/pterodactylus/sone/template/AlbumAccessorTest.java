@@ -14,11 +14,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.pterodactylus.sone.TestUtil;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.test.TestUtil;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;

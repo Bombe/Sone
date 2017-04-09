@@ -1,10 +1,10 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.base.Optional.of;
-import static net.pterodactylus.sone.Matchers.isAlbum;
-import static net.pterodactylus.sone.Matchers.isImage;
-import static net.pterodactylus.sone.Matchers.isPost;
-import static net.pterodactylus.sone.Matchers.isPostReply;
+import static net.pterodactylus.sone.test.Matchers.isAlbum;
+import static net.pterodactylus.sone.test.Matchers.isImage;
+import static net.pterodactylus.sone.test.Matchers.isPost;
+import static net.pterodactylus.sone.test.Matchers.isPostReply;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
@@ -23,11 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.pterodactylus.sone.TestAlbumBuilder;
-import net.pterodactylus.sone.TestImageBuilder;
-import net.pterodactylus.sone.TestPostBuilder;
-import net.pterodactylus.sone.TestPostReplyBuilder;
-import net.pterodactylus.sone.TestValue;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
@@ -47,6 +42,11 @@ import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostBuilderFactory;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilderFactory;
+import net.pterodactylus.sone.test.TestAlbumBuilder;
+import net.pterodactylus.sone.test.TestImageBuilder;
+import net.pterodactylus.sone.test.TestPostBuilder;
+import net.pterodactylus.sone.test.TestPostReplyBuilder;
+import net.pterodactylus.sone.test.TestValue;
 import net.pterodactylus.util.config.Configuration;
 
 import com.google.common.base.Optional;

@@ -4,7 +4,7 @@ import static net.pterodactylus.sone.utils.IntegerRangePredicate.range;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-import net.pterodactylus.sone.TestUtil;
+import net.pterodactylus.sone.test.TestUtil;
 
 import org.junit.Test;
 
