@@ -12,4 +12,4 @@ interface ElementLoader {
 
 }
 
-data class LinkedElement(val link: String, val failed: Boolean = false, val loading: Boolean = false)
+data class LinkedElement(val link: String, val failed: Boolean = false, val loading: Boolean = false, val properties: Map<String, Any?> = emptyMap())

@@ -33,9 +33,18 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			ByteArrayInputStream(data).use {
 				ImageIO.read(it)
 			}?.let {
-				imageCache.get(uri.toString().decode().normalize()) { LinkedElement(uri.toString()) }
+				imageCache.get(uri.toString().decode().normalize()) {
+					LinkedElement(uri.toString(), properties = mapOf("size" to data.size, "sizeHuman" to data.size.human))
+				}
 			}
 			removeLoadingLink(uri)
+		}
+
+		private val Int.human get() = when (this) {
+			in 0..1023 -> "$this B"
+			in 1024..1048575 -> "${this / 1024} KiB"
+			in 1048576..1073741823 -> "${this / 1048576} MiB"
+			else -> "${this / 1073741824} GiB"
 		}
 
 		override fun failed(uri: FreenetURI) {

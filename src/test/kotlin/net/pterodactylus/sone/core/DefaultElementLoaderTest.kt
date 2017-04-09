@@ -95,7 +95,7 @@ class DefaultElementLoaderTest {
 		verify(freenetInterface).startFetch(eq(FreenetURI(decomposedKey)), callback.capture())
 		callback.value.loaded(FreenetURI(normalizedKey), "image/png", read("/static/images/unknown-image-0.png"))
 		val linkedElement = elementLoader.loadElement(decomposedKey)
-		assertThat(linkedElement, `is`(LinkedElement(normalizedKey)))
+		assertThat(linkedElement, `is`(LinkedElement(normalizedKey, properties = mapOf("size" to 2451, "sizeHuman" to "2 KiB"))))
 	}
 
 	@Test
