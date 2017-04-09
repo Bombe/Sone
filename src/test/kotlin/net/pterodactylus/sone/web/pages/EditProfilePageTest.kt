@@ -64,7 +64,7 @@ class EditProfilePageTest : WebPageTest() {
 	@Test
 	fun `get request stores fields of current sone’s profile in template context`() {
 		request("", GET)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["firstName"], equalTo<Any>("First"))
 		assertThat(templateContext["middleName"], equalTo<Any>("Middle"))
 		assertThat(templateContext["lastName"], equalTo<Any>("Last"))
@@ -78,7 +78,7 @@ class EditProfilePageTest : WebPageTest() {
 	@Test
 	fun `post request without any command stores fields of current sone’s profile in template context`() {
 		request("", POST)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["firstName"], equalTo<Any>("First"))
 		assertThat(templateContext["middleName"], equalTo<Any>("Middle"))
 		assertThat(templateContext["lastName"], equalTo<Any>("Last"))
@@ -159,7 +159,7 @@ class EditProfilePageTest : WebPageTest() {
 		profile.addField("new-field")
 		addHttpRequestParameter("add-field", "true")
 		addHttpRequestParameter("field-name", "new-field")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["fieldName"], equalTo<Any>("new-field"))
 		assertThat(templateContext["duplicateFieldName"], equalTo<Any>(true))
 		verify(core, never()).touchConfiguration()
@@ -195,10 +195,10 @@ class EditProfilePageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `moving an invalid field up redirects to the invalid page`() {
+	fun `moving an invalid field up does not redirect`() {
 		request("", POST)
 		addHttpRequestParameter("move-up-field-foo", "true")
-		verifyRedirect("invalid.html")
+		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
@@ -212,10 +212,10 @@ class EditProfilePageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `moving an invalid field down redirects to the invalid page`() {
+	fun `moving an invalid field down does not redirect`() {
 		request("", POST)
 		addHttpRequestParameter("move-down-field-foo", "true")
-		verifyRedirect("invalid.html")
+		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
