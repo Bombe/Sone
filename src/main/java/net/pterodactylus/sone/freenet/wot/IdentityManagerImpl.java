@@ -141,8 +141,8 @@ public class IdentityManagerImpl extends AbstractService implements IdentityMana
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1);
 			}
 
-			/* wait a minute before checking again. */
-			sleep(60 * 1000);
+			/* wait 15 minutes before checking again. */
+			sleep(15 * 60 * 1000);
 		}
 	}
 
