@@ -92,6 +92,13 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element loader does not cancel on text html mime type`() {
+		elementLoader.loadElement(IMAGE_ID)
+		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
+		assertThat(callback.value.shouldCancel(freenetURI, "text/html", sizeOkay), `is`(false))
+	}
+
+	@Test
 	fun `image loader can load image`() {
 		elementLoader.loadElement(decomposedKey)
 		verify(freenetInterface).startFetch(eq(FreenetURI(decomposedKey)), callback.capture())
