@@ -4,10 +4,15 @@ import com.google.common.base.Ticker
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.TextNode
 import java.io.ByteArrayInputStream
 import java.net.URLDecoder
+import java.nio.charset.Charset
 import java.text.Normalizer
 import java.util.concurrent.TimeUnit.MINUTES
+import javax.activation.MimeType
 import javax.imageio.ImageIO
 import javax.inject.Inject
 
@@ -20,25 +25,54 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 
 	private val loadingLinks: Cache<String, Boolean> = CacheBuilder.newBuilder().build<String, Boolean>()
 	private val failureCache: Cache<String, Boolean> = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
-	private val imageCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build<String, LinkedElement>()
+	private val elementCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build<String, LinkedElement>()
 	private val callback = object : FreenetInterface.BackgroundFetchCallback {
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
-			return !mimeType.startsWith("image/") || (size > 2097152)
+			return (size > 2097152) || (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html"))
 		}
 
 		override fun loaded(uri: FreenetURI, mimeType: String, data: ByteArray) {
-			if (!mimeType.startsWith("image/")) {
-				return
-			}
-			ByteArrayInputStream(data).use {
-				ImageIO.read(it)
-			}?.let {
-				imageCache.get(uri.toString().decode().normalize()) {
-					LinkedElement(uri.toString(), properties = mapOf("size" to data.size, "sizeHuman" to data.size.human))
+			MimeType(mimeType).also { mimeType ->
+				when {
+					mimeType.primaryType == "image" -> {
+						ByteArrayInputStream(data).use {
+							ImageIO.read(it)
+						}?.let {
+							elementCache.get(uri.toString().decode().normalize()) {
+								LinkedElement(uri.toString(), properties = mapOf("size" to data.size, "sizeHuman" to data.size.human))
+							}
+						}
+					}
+					mimeType.baseType == "text/html" -> {
+						val document = Jsoup.parse(data.toString(Charset.forName(mimeType.getParameter("charset") ?: "UTF-8")))
+						elementCache.get(uri.toString().decode().normalize()) {
+							LinkedElement(uri.toString(), properties = mapOf(
+									"size" to data.size, "sizeHuman" to data.size.human,
+									"title" to document.title().emptyToNull,
+									"description" to (document.metaDescription ?: document.firstNonHeadingParagraph)
+							))
+						}
+					}
 				}
+				removeLoadingLink(uri)
 			}
-			removeLoadingLink(uri)
 		}
+
+		private val String?.emptyToNull get() = if (this == "") null else this
+
+		private val Document.metaDescription: String?
+			get() = head().getElementsByTag("meta")
+					.map { it.attr("name") to it.attr("content") }
+					.firstOrNull { it.first == "description" }
+					?.second
+
+		private val Document.firstNonHeadingParagraph: String?
+			get() = body().children()
+					.filter { it.children().all { it is TextNode } }
+					.map { it to it.text() }
+					.filterNot { it.second == "" }
+					.firstOrNull { !it.first.tagName().startsWith("h", ignoreCase = true) }
+					?.second
 
 		private val Int.human get() = when (this) {
 			in 0..1023 -> "$this B"
@@ -62,7 +96,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 	override fun loadElement(link: String): LinkedElement {
 		val normalizedLink = link.decode().normalize()
 		synchronized(loadingLinks) {
-			imageCache.getIfPresent(normalizedLink)?.run {
+			elementCache.getIfPresent(normalizedLink)?.run {
 				return this
 			}
 			failureCache.getIfPresent(normalizedLink)?.run {
