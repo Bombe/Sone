@@ -19,14 +19,14 @@ import javax.inject.Inject
 /**
  * [ElementLoader] implementation that uses a simple Guava [com.google.common.cache.Cache].
  */
-class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticker: Ticker) : ElementLoader {
+class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticker: Ticker): ElementLoader {
 
-	@Inject constructor(freenetInterface: FreenetInterface) : this(freenetInterface, Ticker.systemTicker())
+	@Inject constructor(freenetInterface: FreenetInterface): this(freenetInterface, Ticker.systemTicker())
 
 	private val loadingLinks: Cache<String, Boolean> = CacheBuilder.newBuilder().build<String, Boolean>()
 	private val failureCache: Cache<String, Boolean> = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
 	private val elementCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build<String, LinkedElement>()
-	private val callback = object : FreenetInterface.BackgroundFetchCallback {
+	private val callback = object: FreenetInterface.BackgroundFetchCallback {
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
 			return (size > 2097152) || (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html"))
 		}
