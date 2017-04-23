@@ -444,7 +444,7 @@ textarea {
 	margin-top: 1ex;
 }
 
-#sone .post .linked-element.loaded .image {
+#sone .linked-element.loaded .image {
 	display: inline-block;
 	border: solid 1px black;
 	width: 160px;
@@ -453,6 +453,31 @@ textarea {
 	background-position: center;
 	margin-right: 1ex;
 	margin-bottom: 1ex;
+}
+
+#sone .linked-element.loaded .html-page {
+	display: inline-block;
+	width: 160px;
+	max-height: 120px;
+	overflow: hidden;
+	vertical-align: top;
+}
+
+#sone .reply .linked-element.loaded .html-page {
+	width: 120px;
+	max-height: 90px;
+}
+
+#sone .linked-element.loaded .html-page .heading {
+	font-size: 125%;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+#sone .linked-element.loaded .html-page {
+	display: inline-block;
 }
 
 #sone .post .replies {

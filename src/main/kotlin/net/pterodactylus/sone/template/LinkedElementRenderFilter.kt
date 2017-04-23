@@ -16,6 +16,7 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 
 	companion object {
 		private val loadedImageTemplate = """<%include linked/image.html>""".parse()
+		private val loadedHtmlPageTemplate = """<%include linked/html-page.html>""".parse()
 		private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".parse()
 
 		private fun String.parse() = StringReader(this).use { TemplateParser.parse(it) }!!
@@ -24,7 +25,8 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
 			when {
 				data is LinkedElement && data.loading -> renderNotLoadedLinkedElement(data)
-				data is LinkedElement -> renderLinkedImage(data)
+				data is LinkedElement && data.properties["type"] == "image" -> renderLinkedImage(data)
+				data is LinkedElement && data.properties["type"] == "html" -> renderHtmlPage(data)
 				else -> null
 			}
 
@@ -34,6 +36,15 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 				templateContext["link"] = linkedElement.link
 				loadedImageTemplate.render(templateContext, it)
 				it
+			}.toString()
+
+	private fun renderHtmlPage(linkedElement: LinkedElement) =
+			StringWriter().use {
+				val templateContext = templateContextFactory.createTemplateContext()
+				templateContext["link"] = linkedElement.link
+				templateContext["title"] = linkedElement.properties["title"] ?: "No title"
+				templateContext["description"] = linkedElement.properties["description"] ?: "No description"
+				it.also { loadedHtmlPageTemplate.render(templateContext, it) }
 			}.toString()
 
 	private fun renderNotLoadedLinkedElement(linkedElement: LinkedElement) =

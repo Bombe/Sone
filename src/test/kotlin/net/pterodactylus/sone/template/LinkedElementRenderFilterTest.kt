@@ -9,9 +9,12 @@ import net.pterodactylus.util.template.HtmlFilter
 import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.junit.Test
 
 /**
@@ -46,7 +49,7 @@ class LinkedElementRenderFilterTest {
 
 	@Test
 	fun `filter can render linked images`() {
-		val html = filter.format(null, LinkedElement("KSK@gpl.png"), emptyMap<String, Any?>()) as String
+		val html = filter.format(null, LinkedElement("KSK@gpl.png", properties = mapOf("type" to "image")), emptyMap<String, Any?>()) as String
 		val outerSpanNode = Jsoup.parseBodyFragment(html).body().child(0)
 		assertThat(outerSpanNode.nodeName(), `is`("span"))
 		assertThat(outerSpanNode.attr("class"), `is`("linked-element loaded"))
@@ -59,8 +62,24 @@ class LinkedElementRenderFilterTest {
 	}
 
 	@Test
+	fun `filter can render HTML pages`() {
+		val html = filter.format(null, LinkedElement("KSK@gpl.html", properties = mapOf("type" to "html", "title" to "Page Title", "description" to "This is the description.")), emptyMap<String, Any?>()) as String
+		val outerSpanNode = Jsoup.parseBodyFragment(html).body().child(0)
+		assertThat(outerSpanNode.nodeName(), equalTo("span"))
+		assertThat(outerSpanNode.attr("class"), `is`("linked-element loaded"))
+		assertThat(outerSpanNode.attr("title"), `is`("KSK@gpl.html"))
+		val linkNode = outerSpanNode.child(0)
+		assertThat(linkNode.nodeName(), equalTo("a"))
+		assertThat(linkNode.attr("href"), equalTo("/KSK@gpl.html"))
+		val divNodes = linkNode.children()
+		assertThat(divNodes.map(Element::nodeName), contains("div", "div"))
+		assertThat(divNodes.map { it.attr("class") }, contains("heading", "description"))
+		assertThat(divNodes.map(Element::text), contains("Page Title", "This is the description."))
+	}
+
+	@Test
 	fun `render filter can be created by guice`() {
-	    val injector = Guice.createInjector(TemplateContextFactory::class.isProvidedByMock())
+		val injector = Guice.createInjector(TemplateContextFactory::class.isProvidedByMock())
 		assertThat(injector.getInstance<LinkedElementRenderFilter>(), notNullValue())
 	}
 

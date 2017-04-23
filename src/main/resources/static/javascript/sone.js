@@ -1535,7 +1535,9 @@ function loadLinkedElements(links) {
 	});
 	if (failedElements.length > 0) {
 		failedElements.forEach(function(element) {
-			$(getLinkedElement(element.link)).remove()
+			getLinkedElements(element.link).each(function() {
+				$(this).remove()
+			});
 		});
 	}
 	var loadedElements = links.filter(function(element) {
@@ -1549,15 +1551,17 @@ function loadLinkedElements(links) {
 		}, function (data, textStatus) {
 			if ((data != null) && (data.success)) {
 				data.linkedElements.forEach(function (linkedElement) {
-					$(getLinkedElement(linkedElement.link)).replaceWith(linkedElement.html);
+					getLinkedElements(linkedElement.link).each(function() {
+						$(this).replaceWith(linkedElement.html);
+					});
 				});
 			}
 		});
 	}
 }
 
-function getLinkedElement(link) {
-	return $(".linked-element[title='" + link + "']")[0]
+function getLinkedElements(link) {
+	return $(".linked-element[title='" + link + "']")
 }
 
 /**
