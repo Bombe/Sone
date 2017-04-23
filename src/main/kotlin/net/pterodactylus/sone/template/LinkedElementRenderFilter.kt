@@ -34,8 +34,7 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 			StringWriter().use {
 				val templateContext = templateContextFactory.createTemplateContext()
 				templateContext["link"] = linkedElement.link
-				loadedImageTemplate.render(templateContext, it)
-				it
+				it.also { loadedImageTemplate.render(templateContext, it) }
 			}.toString()
 
 	private fun renderHtmlPage(linkedElement: LinkedElement) =
@@ -51,8 +50,7 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 			StringWriter().use {
 				val templateContext = templateContextFactory.createTemplateContext()
 				templateContext["link"] = linkedElement.link
-				notLoadedImageTemplate.render(templateContext, it)
-				it
+				it.also { notLoadedImageTemplate.render(templateContext, it) }
 			}.toString()
 
 }
