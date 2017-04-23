@@ -71,21 +71,21 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
-	fun `element loader does  cancel on audio mime type`() {
+	fun `element loader does cancel on audio mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		assertThat(callback.value.shouldCancel(freenetURI, "audio/mpeg", sizeOkay), `is`(true))
 	}
 
 	@Test
-	fun `element loader does not cancel on video mime type`() {
+	fun `element loader does cancel on video mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		assertThat(callback.value.shouldCancel(freenetURI, "video/mkv", sizeOkay), `is`(true))
 	}
 
 	@Test
-	fun `element loader does not cancel on text mime type`() {
+	fun `element loader does cancel on text mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		assertThat(callback.value.shouldCancel(freenetURI, "text/plain", sizeOkay), `is`(true))
