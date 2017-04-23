@@ -39,7 +39,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 							ImageIO.read(it)
 						}?.let {
 							elementCache.get(uri.toString().decode().normalize()) {
-								LinkedElement(uri.toString(), properties = mapOf("size" to data.size, "sizeHuman" to data.size.human))
+								LinkedElement(uri.toString(), properties = mapOf("type" to "image", "size" to data.size, "sizeHuman" to data.size.human))
 							}
 						}
 					}
@@ -47,7 +47,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 						val document = Jsoup.parse(data.toString(Charset.forName(mimeType.getParameter("charset") ?: "UTF-8")))
 						elementCache.get(uri.toString().decode().normalize()) {
 							LinkedElement(uri.toString(), properties = mapOf(
-									"size" to data.size, "sizeHuman" to data.size.human,
+									"type" to "html", "size" to data.size, "sizeHuman" to data.size.human,
 									"title" to document.title().emptyToNull,
 									"description" to (document.metaDescription ?: document.firstNonHeadingParagraph)
 							))

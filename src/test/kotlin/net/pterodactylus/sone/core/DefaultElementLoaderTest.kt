@@ -104,7 +104,9 @@ class DefaultElementLoaderTest {
 		verify(freenetInterface).startFetch(eq(FreenetURI(decomposedKey)), callback.capture())
 		callback.value.loaded(FreenetURI(normalizedKey), "image/png", read("/static/images/unknown-image-0.png"))
 		val linkedElement = elementLoader.loadElement(decomposedKey)
-		assertThat(linkedElement, `is`(LinkedElement(normalizedKey, properties = mapOf("size" to 2451, "sizeHuman" to "2 KiB"))))
+		assertThat(linkedElement, `is`(LinkedElement(normalizedKey, properties = mapOf(
+				"type" to "image", "size" to 2451, "sizeHuman" to "2 KiB"
+		))))
 	}
 
 	@Test
@@ -114,6 +116,7 @@ class DefaultElementLoaderTest {
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
 		assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = mapOf(
+				"type" to "html",
 				"size" to 266,
 				"sizeHuman" to "266 B",
 				"title" to "Some Nice Page Title",
@@ -128,6 +131,7 @@ class DefaultElementLoaderTest {
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader2.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
 		assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = mapOf(
+				"type" to "html",
 				"size" to 185,
 				"sizeHuman" to "185 B",
 				"title" to "Some Nice Page Title",
@@ -142,6 +146,7 @@ class DefaultElementLoaderTest {
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader3.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
 		assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = mapOf(
+				"type" to "html",
 				"size" to 204,
 				"sizeHuman" to "204 B",
 				"title" to "Some Nice Page Title",
@@ -156,6 +161,7 @@ class DefaultElementLoaderTest {
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader4.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
 		assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = mapOf(
+				"type" to "html",
 				"size" to 229,
 				"sizeHuman" to "229 B",
 				"title" to null,
