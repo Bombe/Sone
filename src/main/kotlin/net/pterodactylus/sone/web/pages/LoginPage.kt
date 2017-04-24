@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.pages.SoneTemplatePage
 import net.pterodactylus.sone.web.WebInterface
@@ -20,7 +21,7 @@ class LoginPage(template: Template, webInterface: WebInterface):
 			val soneId = request.httpRequest.getPartAsStringFailsafe("sone-id", 43)
 			webInterface.core.getLocalSone(soneId)?.let { sone ->
 				setCurrentSone(request.toadletContext, sone)
-				val target = if (request.httpRequest.isParameterSet("target")) request.httpRequest.getPartAsStringFailsafe("target", 256) else "index.html"
+				val target = request.httpRequest.getParam("target").emptyToNull ?: "index.html"
 				throw RedirectException(target)
 			}
 		}
