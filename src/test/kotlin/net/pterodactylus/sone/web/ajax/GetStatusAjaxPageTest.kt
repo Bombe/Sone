@@ -23,6 +23,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
+import java.util.TimeZone
 
 /**
  * Unit test for [GetStatusAjaxPage].
@@ -31,7 +32,7 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
-	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, timeTextConverter, l10nFilter)
+	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, timeTextConverter, l10nFilter, TimeZone.getTimeZone("UTC"))
 
 	@Before
 	fun setupTimeTextConverter() {
@@ -89,7 +90,7 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 	@Test
 	fun `page returns a sones object with the current sone if not other sones parameter is given`() {
 		assertThat(json.get("sones").elements().asSequence().map { it.toMap() }.toList(), containsInAnyOrder(
-				mapOf<String, String?>("id" to "soneId", "name" to "Sone_Id", "local" to "true", "status" to "idle", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 01:00:01", "lastUpdatedText" to "1000")
+				mapOf<String, String?>("id" to "soneId", "name" to "Sone_Id", "local" to "true", "status" to "idle", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 00:00:01", "lastUpdatedText" to "1000")
 		))
 	}
 
@@ -99,9 +100,9 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 		addSone(deepMock<Sone>().mock("sone3", "Sone 3", true, 3000, inserting))
 		addRequestParameter("soneIds", "sone1,sone2,sone3")
 		assertThat(json.get("sones").elements().asSequence().map { it.toMap() }.toList(), containsInAnyOrder(
-				mapOf<String, String?>("id" to "soneId", "name" to "Sone_Id", "local" to "true", "status" to "idle", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 01:00:01", "lastUpdatedText" to "1000"),
-				mapOf("id" to "sone1", "name" to "Sone 1", "local" to "false", "status" to "downloading", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 01:00:02", "lastUpdatedText" to "2000"),
-				mapOf("id" to "sone3", "name" to "Sone 3", "local" to "true", "status" to "inserting", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 01:00:03", "lastUpdatedText" to "3000")
+				mapOf<String, String?>("id" to "soneId", "name" to "Sone_Id", "local" to "true", "status" to "idle", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 00:00:01", "lastUpdatedText" to "1000"),
+				mapOf("id" to "sone1", "name" to "Sone 1", "local" to "false", "status" to "downloading", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 00:00:02", "lastUpdatedText" to "2000"),
+				mapOf("id" to "sone3", "name" to "Sone 3", "local" to "true", "status" to "inserting", "modified" to "false", "locked" to "false", "lastUpdatedUnknown" to "false", "lastUpdated" to "Jan 1, 1970, 00:00:03", "lastUpdatedText" to "3000")
 		))
 	}
 

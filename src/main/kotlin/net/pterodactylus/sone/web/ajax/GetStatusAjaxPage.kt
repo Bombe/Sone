@@ -16,15 +16,18 @@ import net.pterodactylus.sone.utils.toArray
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to
  * update the web interface in real-time.
  */
-class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter):
+class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter, timeZone: TimeZone = TimeZone.getDefault()):
 		JsonPage("getStatus.ajax", webInterface) {
 
-	private val dateFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss")
+	private val dateFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
+		this.timeZone = timeZone
+	}
 
 	override fun createJsonObject(request: FreenetRequest) =
 			(webInterface.getCurrentSoneWithoutCreatingSession(request.toadletContext) as Sone?).let { currentSone ->
