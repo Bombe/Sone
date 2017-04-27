@@ -46,7 +46,7 @@ class RescuePageTest : WebPageTest() {
 	@Test
 	fun `post request with fetch and invalid edition starts next fetch`() {
 		request("", POST)
-		addHttpRequestParameter("fetch", "true")
+		addHttpRequestPart("fetch", "true")
 		verifyRedirect("rescue.html") {
 			verify(soneRescuer, never()).setEdition(anyLong())
 			verify(soneRescuer).startNextFetch()
@@ -56,8 +56,8 @@ class RescuePageTest : WebPageTest() {
 	@Test
 	fun `post request with fetch and valid edition sets edition and starts next fetch`() {
 		request("", POST)
-		addHttpRequestParameter("fetch", "true")
-		addHttpRequestParameter("edition", "123")
+		addHttpRequestPart("fetch", "true")
+		addHttpRequestPart("edition", "123")
 		verifyRedirect("rescue.html") {
 			verify(soneRescuer).setEdition(123L)
 			verify(soneRescuer).startNextFetch()

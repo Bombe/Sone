@@ -32,9 +32,9 @@ class CreateReplyPageTest: WebPageTest() {
 	@Test
 	fun `reply is created correctly`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("text", "new text")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("text", "new text")
 		val post = mock<Post>().apply { addPost("post-id", this) }
 		verifyRedirect("return.html") {
 			verify(core).createReply(currentSone, post, "new text")
@@ -44,9 +44,9 @@ class CreateReplyPageTest: WebPageTest() {
 	@Test
 	fun `reply is filtered`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("text", "new http://localhost:12345/KSK@foo text")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("text", "new http://localhost:12345/KSK@foo text")
 		addHttpRequestHeader("Host", "localhost:12345")
 		val post = mock<Post>().apply { addPost("post-id", this) }
 		verifyRedirect("return.html") {
@@ -57,10 +57,10 @@ class CreateReplyPageTest: WebPageTest() {
 	@Test
 	fun `reply is created with correct sender`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("text", "new text")
-		addHttpRequestParameter("sender", "sender-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("text", "new text")
+		addHttpRequestPart("sender", "sender-id")
 		val sender = mock<Sone>().apply { addLocalSone("sender-id", this) }
 		val post = mock<Post>().apply { addPost("post-id", this) }
 		verifyRedirect("return.html") {
@@ -71,9 +71,9 @@ class CreateReplyPageTest: WebPageTest() {
 	@Test
 	fun `empty text sets parameters in template contexty`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("text", "  ")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("text", "  ")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["errorTextEmpty"], equalTo<Any>(true))
 		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))
@@ -84,21 +84,10 @@ class CreateReplyPageTest: WebPageTest() {
 	@Test
 	fun `user is redirected to no permissions page if post does not exist`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("text", "new text")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("text", "new text")
 		verifyRedirect("noPermission.html")
-	}
-
-	@Test
-	fun `get request stores parameters in template context`() {
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("text", "new text")
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))
-		assertThat(templateContext["postId"], equalTo<Any>("post-id"))
-		assertThat(templateContext["text"], equalTo<Any>("new text"))
 	}
 
 }

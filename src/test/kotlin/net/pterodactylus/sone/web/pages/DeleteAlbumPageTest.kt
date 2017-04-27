@@ -78,7 +78,7 @@ class DeleteAlbumPageTest: WebPageTest() {
 		request("", POST)
 		whenever(sone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
+		addHttpRequestPart("album", "album-id")
 		verifyRedirect("noPermission.html")
 	}
 
@@ -86,8 +86,8 @@ class DeleteAlbumPageTest: WebPageTest() {
 	fun `post request with abort delete parameter set redirects to album browser`() {
 		request("", POST)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
-		addHttpRequestParameter("abortDelete", "true")
+		addHttpRequestPart("album", "album-id")
+		addHttpRequestPart("abortDelete", "true")
 		verifyRedirect("imageBrowser.html?album=album-id")
 	}
 
@@ -95,7 +95,7 @@ class DeleteAlbumPageTest: WebPageTest() {
 	fun `album is deleted and page redirects to sone if parent album is root album`() {
 		request("", POST)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
+		addHttpRequestPart("album", "album-id")
 		verifyRedirect("imageBrowser.html?sone=sone-id") {
 			verify(core).deleteAlbum(album)
 		}
@@ -107,7 +107,7 @@ class DeleteAlbumPageTest: WebPageTest() {
 		whenever(parentAlbum.isRoot).thenReturn(false)
 		whenever(sone.rootAlbum).thenReturn(mock<Album>())
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
+		addHttpRequestPart("album", "album-id")
 		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(core).deleteAlbum(album)
 		}

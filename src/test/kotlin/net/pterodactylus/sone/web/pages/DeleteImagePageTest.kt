@@ -74,8 +74,8 @@ class DeleteImagePageTest: WebPageTest() {
 	fun `post request with abort delete flag set redirects to image browser`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
-		addHttpRequestParameter("abortDelete", "true")
+		addHttpRequestPart("image", "image-id")
+		addHttpRequestPart("abortDelete", "true")
 		verifyRedirect("imageBrowser.html?image=image-id")
 	}
 
@@ -83,7 +83,7 @@ class DeleteImagePageTest: WebPageTest() {
 	fun `post request deletes image and redirects to image browser`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
+		addHttpRequestPart("image", "image-id")
 		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(webInterface.core).deleteImage(image)
 		}

@@ -20,7 +20,7 @@ class LockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `locking an invalid local sone redirects to return page`() {
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core, never()).lockSone(any<Sone>())
 		}
@@ -28,10 +28,10 @@ class LockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `locking an valid local sone locks the sone and redirects to return page`() {
-		addHttpRequestParameter("sone", "sone-id")
+		addHttpRequestPart("sone", "sone-id")
 		val sone = mock<Sone>()
 		addLocalSone("sone-id", sone)
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core).lockSone(sone)
 		}

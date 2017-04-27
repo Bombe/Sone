@@ -75,7 +75,7 @@ class EditImagePageTest : WebPageTest() {
 		request("", POST)
 		whenever(sone.isLocal).thenReturn(false)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
+		addHttpRequestPart("image", "image-id")
 		verifyRedirect("noPermission.html")
 	}
 
@@ -83,9 +83,9 @@ class EditImagePageTest : WebPageTest() {
 	fun `post request with valid image and move left requested moves image left and redirects to return page`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("moveLeft", "true")
+		addHttpRequestPart("image", "image-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("moveLeft", "true")
 		verifyRedirect("return.html") {
 			verify(album).moveImageUp(image)
 			verify(core).touchConfiguration()
@@ -96,9 +96,9 @@ class EditImagePageTest : WebPageTest() {
 	fun `post request with valid image and move right requested moves image right and redirects to return page`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("moveRight", "true")
+		addHttpRequestPart("image", "image-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("moveRight", "true")
 		verifyRedirect("return.html") {
 			verify(album).moveImageDown(image)
 			verify(core).touchConfiguration()
@@ -109,9 +109,9 @@ class EditImagePageTest : WebPageTest() {
 	fun `post request with valid image but only whitespace in the title redirects to empty image title page`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("title", "   ")
+		addHttpRequestPart("image", "image-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("title", "   ")
 		whenever(modifier.update()).doThrow<ImageTitleMustNotBeEmpty>()
 		verifyRedirect("emptyImageTitle.html") {
 			verify(core, never()).touchConfiguration()
@@ -122,10 +122,10 @@ class EditImagePageTest : WebPageTest() {
 	fun `post request with valid image title and description modifies image and redirects to reutrn page`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("title", "Title")
-		addHttpRequestParameter("description", "Description")
+		addHttpRequestPart("image", "image-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("title", "Title")
+		addHttpRequestPart("description", "Description")
 		verifyRedirect("return.html") {
 			verify(modifier).setTitle("Title")
 			verify(modifier).setDescription("Description")
@@ -138,11 +138,11 @@ class EditImagePageTest : WebPageTest() {
 	fun `post request with image title and description modifies image with filtered description and redirects to return page`() {
 		request("", POST)
 		addImage("image-id", image)
-		addHttpRequestParameter("image", "image-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("title", "Title")
+		addHttpRequestPart("image", "image-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("title", "Title")
 		addHttpRequestHeader("Host", "www.te.st")
-		addHttpRequestParameter("description", "Get http://www.te.st/KSK@GPL.txt")
+		addHttpRequestPart("description", "Get http://www.te.st/KSK@GPL.txt")
 		verifyRedirect("return.html") {
 			verify(modifier).setTitle("Title")
 			verify(modifier).setDescription("Get KSK@GPL.txt")

@@ -24,9 +24,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import javax.annotation.Nonnull;
+import javax.naming.SizeLimitExceededException;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.Preferences;
@@ -92,6 +94,7 @@ public abstract class WebPageTest {
 	protected final TemplateContext templateContext = new TemplateContext();
 	protected final HTTPRequest httpRequest = mock(HTTPRequest.class);
 	protected final Multimap<String, String> requestParameters = ArrayListMultimap.create();
+	protected final Map<String, String> requestParts = new HashMap<>();
 	protected final Map<String, String> requestHeaders = new HashMap<>();
 	private final Map<String, String> uploadedFilesNames = new HashMap<>();
 	private final Map<String, String> uploadedFilesContentTypes = new HashMap<>();
@@ -121,7 +124,7 @@ public abstract class WebPageTest {
 	}
 
 	@Before
-	public final void setupFreenetRequest() {
+	public final void setupFreenetRequest() throws SizeLimitExceededException {
 		when(freenetRequest.getToadletContext()).thenReturn(toadletContext);
 		when(freenetRequest.getHttpRequest()).thenReturn(httpRequest);
 		when(httpRequest.getMultipleParam(anyString())).thenAnswer(new Answer<String[]>() {
@@ -130,13 +133,35 @@ public abstract class WebPageTest {
 				return requestParameters.get(invocation.<String>getArgument(0)).toArray(new String[0]);
 			}
 		});
+		when(httpRequest.isPartSet(anyString())).thenAnswer(new Answer<Boolean>() {
+			@Override
+			public Boolean answer(InvocationOnMock invocation) throws Throwable {
+				return requestParts.get(invocation.<String>getArgument(0)) != null;
+			}
+		});
+		when(httpRequest.getParts()).thenAnswer(new Answer<String[]>() {
+			@Override
+			public String[] answer(InvocationOnMock invocation) throws Throwable {
+				return requestParts.keySet().toArray(new String[requestParts.size()]);
+			}
+		});
 		when(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).thenAnswer(new Answer<String>() {
 			@Override
 			public String answer(InvocationOnMock invocation) throws Throwable {
 				String parameter = invocation.getArgument(0);
 				int maxLength = invocation.getArgument(1);
-				Collection<String> values = requestParameters.get(parameter);
-				return requestParameters.containsKey(parameter) ? values.iterator().next().substring(0, Math.min(maxLength, values.iterator().next().length())) : "";
+				String value = requestParts.get(parameter);
+				return requestParts.containsKey(parameter) ? value.substring(0, Math.min(maxLength, value.length())) : "";
+			}
+		});
+		when(httpRequest.getPartAsStringThrowing(anyString(), anyInt())).thenAnswer(new Answer<String>() {
+			@Override
+			public String answer(InvocationOnMock invocation) throws Throwable {
+				String partName = invocation.getArgument(0);
+				if (!requestParts.containsKey(partName)) throw new NoSuchElementException();
+				String partValue = requestParts.get(partName);
+				if (partValue.length() > invocation.<Integer>getArgument(1)) throw new SizeLimitExceededException();
+				return partValue;
 			}
 		});
 		when(httpRequest.hasParameters()).thenAnswer(new Answer<Boolean>() {
@@ -170,19 +195,6 @@ public abstract class WebPageTest {
 			public Boolean answer(InvocationOnMock invocation) throws Throwable {
 				return requestParameters.containsKey(invocation.<String>getArgument(0)) &&
 						requestParameters.get(invocation.<String>getArgument(0)).iterator().next() != null;
-			}
-		});
-		when(httpRequest.isPartSet(anyString())).thenAnswer(new Answer<Boolean>() {
-			@Override
-			public Boolean answer(InvocationOnMock invocation) throws Throwable {
-				return requestParameters.containsKey(invocation.<String>getArgument(0)) &&
-						requestParameters.get(invocation.<String>getArgument(0)).iterator().next() != null;
-			}
-		});
-		when(httpRequest.getParts()).thenAnswer(new Answer<String[]>() {
-			@Override
-			public String[] answer(InvocationOnMock invocation) throws Throwable {
-				return requestParameters.keySet().toArray(new String[requestParameters.size()]);
 			}
 		});
 		when(httpRequest.getHeader(anyString())).thenAnswer(new Answer<String>() {
@@ -312,6 +324,10 @@ public abstract class WebPageTest {
 
 	protected void addHttpRequestParameter(String name, final String value) {
 		requestParameters.put(name, value);
+	}
+
+	protected void addHttpRequestPart(String name, String value) {
+		requestParts.put(name, value);
 	}
 
 	protected void addPost(String postId, Post post) {

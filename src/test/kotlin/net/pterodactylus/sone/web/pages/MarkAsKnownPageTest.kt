@@ -20,9 +20,9 @@ class MarkAsKnownPageTest : WebPageTest() {
 
 	@Test
 	fun `posts can be marked as known`() {
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("type", "post")
-		addHttpRequestParameter("id", "post1 post2 post3")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("type", "post")
+		addHttpRequestPart("id", "post1 post2 post3")
 		val posts = listOf(mock<Post>(), mock<Post>())
 		addPost("post1", posts[0])
 		addPost("post3", posts[1])
@@ -34,9 +34,9 @@ class MarkAsKnownPageTest : WebPageTest() {
 
 	@Test
 	fun `replies can be marked as known`() {
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("type", "reply")
-		addHttpRequestParameter("id", "reply1 reply2 reply3")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("type", "reply")
+		addHttpRequestPart("id", "reply1 reply2 reply3")
 		val replies = listOf(mock<PostReply>(), mock<PostReply>())
 		addPostReply("reply1", replies[0])
 		addPostReply("reply3", replies[1])
@@ -48,9 +48,9 @@ class MarkAsKnownPageTest : WebPageTest() {
 
 	@Test
 	fun `sones can be marked as known`() {
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("type", "sone")
-		addHttpRequestParameter("id", "sone1 sone2 sone3")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("type", "sone")
+		addHttpRequestPart("id", "sone1 sone2 sone3")
 		val sones = listOf(mock<Sone>(), mock<Sone>())
 		addSone("sone1", sones[0])
 		addSone("sone3", sones[1])
@@ -62,7 +62,7 @@ class MarkAsKnownPageTest : WebPageTest() {
 
 	@Test
 	fun `different type redirects to invalid page`() {
-		addHttpRequestParameter("type", "foo")
+		addHttpRequestPart("type", "foo")
 		verifyRedirect("invalid.html")
 	}
 

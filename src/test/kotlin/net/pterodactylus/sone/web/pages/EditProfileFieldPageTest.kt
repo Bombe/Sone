@@ -63,16 +63,16 @@ class EditProfileFieldPageTest : WebPageTest() {
 	@Test
 	fun `post request with cancel set redirects to profile edit page`() {
 		request("", POST)
-		addHttpRequestParameter("field", field.id)
-		addHttpRequestParameter("cancel", "true")
+		addHttpRequestPart("field", field.id)
+		addHttpRequestPart("cancel", "true")
 		verifyRedirect("editProfile.html#profile-fields")
 	}
 
 	@Test
 	fun `post request with new name renames field and redirects to profile edit page`() {
 		request("", POST)
-		addHttpRequestParameter("field", field.id)
-		addHttpRequestParameter("name", "New Name")
+		addHttpRequestPart("field", field.id)
+		addHttpRequestPart("name", "New Name")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(field.name, equalTo("New Name"))
 			verify(currentSone).profile = profile
@@ -82,8 +82,8 @@ class EditProfileFieldPageTest : WebPageTest() {
 	@Test
 	fun `post request with same name does not modify field and redirects to profile edit page`() {
 		request("", POST)
-		addHttpRequestParameter("field", field.id)
-		addHttpRequestParameter("name", "Name")
+		addHttpRequestPart("field", field.id)
+		addHttpRequestPart("name", "Name")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(field.name, equalTo("Name"))
 			verify(currentSone, never()).profile = profile
@@ -94,8 +94,8 @@ class EditProfileFieldPageTest : WebPageTest() {
 	fun `post request with same name as different field sets error condition in template`() {
 		request("", POST)
 		profile.addField("New Name")
-		addHttpRequestParameter("field", field.id)
-		addHttpRequestParameter("name", "New Name")
+		addHttpRequestPart("field", field.id)
+		addHttpRequestPart("name", "New Name")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(field.name, equalTo("Name"))
 		verify(currentSone, never()).profile = profile

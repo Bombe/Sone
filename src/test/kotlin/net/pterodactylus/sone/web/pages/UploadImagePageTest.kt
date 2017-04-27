@@ -46,7 +46,7 @@ class UploadImagePageTest : WebPageTest() {
 	@Test
 	fun `post request with parent that is not the current sone results in no permission error page`() {
 		request("", POST)
-		addHttpRequestParameter("parent", "parent-id")
+		addHttpRequestPart("parent", "parent-id")
 		whenever(parentAlbum.sone).thenReturn(mock<Sone>())
 		addAlbum("parent-id", parentAlbum)
 		verifyRedirect("noPermission.html")
@@ -56,8 +56,8 @@ class UploadImagePageTest : WebPageTest() {
 	fun `post request with empty name redirects to error page`() {
 		request("", POST)
 		addAlbum("parent-id", parentAlbum)
-		addHttpRequestParameter("parent", "parent-id")
-		addHttpRequestParameter("title", " ")
+		addHttpRequestPart("parent", "parent-id")
+		addHttpRequestPart("title", " ")
 		verifyRedirect("emptyImageTitle.html")
 	}
 
@@ -65,8 +65,8 @@ class UploadImagePageTest : WebPageTest() {
 	fun `uploading an invalid image results in no redirect and message set in template context`() {
 		request("", POST)
 		addAlbum("parent-id", parentAlbum)
-		addHttpRequestParameter("parent", "parent-id")
-		addHttpRequestParameter("title", "title")
+		addHttpRequestPart("parent", "parent-id")
+		addHttpRequestPart("title", "title")
 		addUploadedFile("image", "image.png", "image/png", "no-image.png")
 		page.handleRequest(freenetRequest, templateContext)
 		verify(core, never()).createTemporaryImage(any(), any())
@@ -77,9 +77,9 @@ class UploadImagePageTest : WebPageTest() {
 	fun `uploading a valid image uploads image and redirects to album browser`() {
 		request("", POST)
 		addAlbum("parent-id", parentAlbum)
-		addHttpRequestParameter("parent", "parent-id")
-		addHttpRequestParameter("title", "Title")
-		addHttpRequestParameter("description", "Description")
+		addHttpRequestPart("parent", "parent-id")
+		addHttpRequestPart("title", "Title")
+		addHttpRequestPart("description", "Description")
 		addUploadedFile("image", "image.png", "image/png", "image.png")
 		val temporaryImage = TemporaryImage("temp-image")
 		val imageModifier = mockBuilder<Modifier>()

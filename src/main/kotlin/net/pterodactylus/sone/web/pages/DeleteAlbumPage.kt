@@ -14,9 +14,8 @@ class DeleteAlbumPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface, true) {
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		val album = webInterface.core.getAlbum(request.httpRequest.getPartAsStringFailsafe("album", 36))
-		templateContext["album"] = album ?: throw RedirectException("invalid.html")
 		if (request.isPOST) {
+			val album = webInterface.core.getAlbum(request.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
 			if (!album.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}
@@ -26,6 +25,8 @@ class DeleteAlbumPage(template: Template, webInterface: WebInterface):
 			webInterface.core.deleteAlbum(album)
 			throw RedirectException(if (album.parent.isRoot) "imageBrowser.html?sone=${album.sone.id}" else "imageBrowser.html?album=${album.parent.id}")
 		}
+		val album = webInterface.core.getAlbum(request.httpRequest.getParam("album"))
+		templateContext["album"] = album ?: throw RedirectException("invalid.html")
 	}
 
 }

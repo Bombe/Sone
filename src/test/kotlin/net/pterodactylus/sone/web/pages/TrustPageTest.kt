@@ -27,8 +27,8 @@ class TrustPageTest : WebPageTest() {
 	@Test
 	fun `post request with missing sone redirects to return page`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("sone", "sone-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("sone", "sone-id")
 		verifyRedirect("return.html") {
 			verify(core, never()).trustSone(eq(currentSone), any())
 		}
@@ -37,8 +37,8 @@ class TrustPageTest : WebPageTest() {
 	@Test
 	fun `post request with existing sone trusts the identity and redirects to return page`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("sone", "sone-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("sone", "sone-id")
 		val sone = mock<Sone>()
 		addSone("sone-id", sone)
 		verifyRedirect("return.html") {

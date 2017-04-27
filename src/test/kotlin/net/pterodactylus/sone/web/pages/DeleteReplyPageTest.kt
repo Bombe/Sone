@@ -57,8 +57,8 @@ class DeleteReplyPageTest : WebPageTest() {
 	fun `post request without any action sets reply ID and return page in template context`() {
 		request("", POST)
 		addPostReply("reply-id", reply)
-		addHttpRequestParameter("reply", "reply-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("reply", "reply-id")
+		addHttpRequestPart("returnPage", "return.html")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["reply"], equalTo<Any>("reply-id"))
 		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))
@@ -73,7 +73,7 @@ class DeleteReplyPageTest : WebPageTest() {
 	@Test
 	fun `trying to delete a reply from a non-local sone results in no permission page`() {
 		request("", POST)
-		addHttpRequestParameter("reply", "reply-id")
+		addHttpRequestPart("reply", "reply-id")
 		whenever(sone.isLocal).thenReturn(false)
 		addPostReply("reply-id", reply)
 		verifyRedirect("noPermission.html")
@@ -83,9 +83,9 @@ class DeleteReplyPageTest : WebPageTest() {
 	fun `confirming deletion of reply deletes the reply and redirects to return page`() {
 		request("", POST)
 		addPostReply("reply-id", reply)
-		addHttpRequestParameter("reply", "reply-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("confirmDelete", "true")
+		addHttpRequestPart("reply", "reply-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("confirmDelete", "true")
 		verifyRedirect("return.html") {
 			verify(core).deleteReply(reply)
 		}
@@ -95,9 +95,9 @@ class DeleteReplyPageTest : WebPageTest() {
 	fun `aborting deletion of reply redirects to return page`() {
 		request("", POST)
 		addPostReply("reply-id", reply)
-		addHttpRequestParameter("reply", "reply-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("abortDelete", "true")
+		addHttpRequestPart("reply", "reply-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("abortDelete", "true")
 		verifyRedirect("return.html") {
 			verify(core, never()).deleteReply(reply)
 		}

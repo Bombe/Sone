@@ -15,14 +15,15 @@ class DeleteProfileFieldPage(template: Template, webInterface: WebInterface):
 
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
 		val currentSone = getCurrentSone(request.toadletContext)!!
-		val field = currentSone.profile.getFieldById(request.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
-		templateContext["field"] = field
 		if (request.isPOST) {
+			val field = currentSone.profile.getFieldById(request.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
 			if (request.httpRequest.getPartAsStringFailsafe("confirm", 4) == "true") {
 				currentSone.profile = currentSone.profile.apply { removeField(field) }
 			}
 			throw RedirectException("editProfile.html#profile-fields")
 		}
+		val field = currentSone.profile.getFieldById(request.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
+		templateContext["field"] = field
 	}
 
 }

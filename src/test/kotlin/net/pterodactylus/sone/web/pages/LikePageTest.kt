@@ -26,9 +26,9 @@ class LikePageTest : WebPageTest() {
 	@Test
 	fun `post request with post id likes post and redirects to return page`() {
 		request("", POST)
-		addHttpRequestParameter("type", "post")
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("type", "post")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(currentSone).addLikedPostId("post-id")
 		}
@@ -37,9 +37,9 @@ class LikePageTest : WebPageTest() {
 	@Test
 	fun `post request with reply id likes post and redirects to return page`() {
 		request("", POST)
-		addHttpRequestParameter("type", "reply")
-		addHttpRequestParameter("reply", "reply-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("type", "reply")
+		addHttpRequestPart("reply", "reply-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(currentSone).addLikedReplyId("reply-id")
 		}
@@ -48,8 +48,8 @@ class LikePageTest : WebPageTest() {
 	@Test
 	fun `post request with invalid likes redirects to return page`() {
 		request("", POST)
-		addHttpRequestParameter("type", "foo")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("type", "foo")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verifyNoMoreInteractions(currentSone)
 		}

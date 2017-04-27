@@ -91,8 +91,8 @@ class EditProfilePageTest : WebPageTest() {
 
 	private fun <T> verifySingleFieldCanBeChanged(fieldName: String, newValue: T, expectedValue: T = newValue, fieldAccessor: () -> T) {
 		request("", POST)
-		addHttpRequestParameter("save-profile", "true")
-		addHttpRequestParameter(fieldName, newValue.toString())
+		addHttpRequestPart("save-profile", "true")
+		addHttpRequestPart(fieldName, newValue.toString())
 		verifyRedirect("editProfile.html") {
 			verify(core).touchConfiguration()
 			assertThat(fieldAccessor(), equalTo(expectedValue))
@@ -157,8 +157,8 @@ class EditProfilePageTest : WebPageTest() {
 	fun `adding a field with a duplicate name sets error in template context`() {
 		request("", POST)
 		profile.addField("new-field")
-		addHttpRequestParameter("add-field", "true")
-		addHttpRequestParameter("field-name", "new-field")
+		addHttpRequestPart("add-field", "true")
+		addHttpRequestPart("field-name", "new-field")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["fieldName"], equalTo<Any>("new-field"))
 		assertThat(templateContext["duplicateFieldName"], equalTo<Any>(true))
@@ -168,8 +168,8 @@ class EditProfilePageTest : WebPageTest() {
 	@Test
 	fun `adding a field with a new name sets adds field to profile and redirects to profile edit page`() {
 		request("", POST)
-		addHttpRequestParameter("add-field", "true")
-		addHttpRequestParameter("field-name", "new-field")
+		addHttpRequestPart("add-field", "true")
+		addHttpRequestPart("field-name", "new-field")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.getFieldByName("new-field"), notNullValue())
 			verify(currentSone).profile = profile
@@ -180,14 +180,14 @@ class EditProfilePageTest : WebPageTest() {
 	@Test
 	fun `deleting a field redirects to delete field page`() {
 		request("", POST)
-		addHttpRequestParameter("delete-field-${firstField.id}", "true")
+		addHttpRequestPart("delete-field-${firstField.id}", "true")
 		verifyRedirect("deleteProfileField.html?field=${firstField.id}")
 	}
 
 	@Test
 	fun `moving a field up moves the field up and redirects to the edit profile page`() {
 		request("", POST)
-		addHttpRequestParameter("move-up-field-${secondField.id}", "true")
+		addHttpRequestPart("move-up-field-${secondField.id}", "true")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.fields, contains(secondField, firstField))
 			verify(currentSone).profile = profile
@@ -197,14 +197,14 @@ class EditProfilePageTest : WebPageTest() {
 	@Test
 	fun `moving an invalid field up does not redirect`() {
 		request("", POST)
-		addHttpRequestParameter("move-up-field-foo", "true")
+		addHttpRequestPart("move-up-field-foo", "true")
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `moving a field down moves the field down and redirects to the edit profile page`() {
 		request("", POST)
-		addHttpRequestParameter("move-down-field-${firstField.id}", "true")
+		addHttpRequestPart("move-down-field-${firstField.id}", "true")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.fields, contains(secondField, firstField))
 			verify(currentSone).profile = profile
@@ -214,14 +214,14 @@ class EditProfilePageTest : WebPageTest() {
 	@Test
 	fun `moving an invalid field down does not redirect`() {
 		request("", POST)
-		addHttpRequestParameter("move-down-field-foo", "true")
+		addHttpRequestPart("move-down-field-foo", "true")
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `editing a field redirects to the edit profile page`() {
 		request("", POST)
-		addHttpRequestParameter("edit-field-${firstField.id}", "true")
+		addHttpRequestPart("edit-field-${firstField.id}", "true")
 		verifyRedirect("editProfileField.html?field=${firstField.id}")
 	}
 

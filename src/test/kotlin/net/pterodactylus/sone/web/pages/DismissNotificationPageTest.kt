@@ -6,6 +6,7 @@ import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DismissNotificationPage
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.web.Method.GET
+import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -40,29 +41,29 @@ class DismissNotificationPageTest: WebPageTest() {
 
 	@Test
 	fun `get request with invalid notification ID redirects to return page`() {
-		request("", GET)
-		addHttpRequestParameter("returnPage", "return.html")
+		request("", POST)
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html")
 	}
 
 	@Test
 	fun `get request with non-dismissible notification never dismisses the notification but redirects to return page`() {
-		request("", GET)
+		request("", POST)
 		addNotification("notification-id", notification)
-		addHttpRequestParameter("notification", "notification-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("notification", "notification-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(notification, never()).dismiss()
 		}
 	}
 
 	@Test
-	fun `get request with dismissible notification dismisses the notification and redirects to return page`() {
-		request("", GET)
+	fun `post request with dismissible notification dismisses the notification and redirects to return page`() {
+		request("", POST)
 		whenever(notification.isDismissable).thenReturn(true)
 		addNotification("notification-id", notification)
-		addHttpRequestParameter("notification", "notification-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("notification", "notification-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(notification).dismiss()
 		}

@@ -86,7 +86,7 @@ class CreateSonePageTest: WebPageTest() {
 	fun `sone is created and logged in`() {
 		addExistingOwnIdentities()
 		request("", POST)
-		addHttpRequestParameter("identity", "own-id-3")
+		addHttpRequestPart("identity", "own-id-3")
 		val newSone = mock<Sone>()
 		whenever(core.createSone(ownIdentities_[2])).thenReturn(newSone)
 		verifyRedirect("index.html") {
@@ -106,7 +106,7 @@ class CreateSonePageTest: WebPageTest() {
 	fun `if sone is not created user is still redirected to index`() {
 		addExistingOwnIdentities()
 		request("", POST)
-		addHttpRequestParameter("identity", "own-id-3")
+		addHttpRequestPart("identity", "own-id-3")
 		whenever(core.createSone(ownIdentities_[2])).thenReturn(null)
 		verifyRedirect("index.html") {
 			verify(core).createSone(ownIdentities_[2])

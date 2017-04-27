@@ -95,9 +95,9 @@ class OptionsPageTest : WebPageTest() {
 
 	private fun <T> verifyThatOptionCanBeSet(option: String, setValue: Any?, expectedValue: T, getter: () -> T) {
 		request("", POST)
-		addHttpRequestParameter(option, setValue.toString())
-		addHttpRequestParameter("show-custom-avatars", "ALWAYS")
-		addHttpRequestParameter("load-linked-images", "ALWAYS")
+		addHttpRequestPart("show-custom-avatars", "ALWAYS")
+		addHttpRequestPart("load-linked-images", "ALWAYS")
+		addHttpRequestPart(option, setValue.toString())
 		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}
@@ -141,7 +141,7 @@ class OptionsPageTest : WebPageTest() {
 	private fun verifyThatWrongValueForPreferenceIsDetected(name: String, value: String) {
 		unsetCurrentSone()
 		request("", POST)
-		addHttpRequestParameter(name, value)
+		addHttpRequestPart(name, value)
 		page.handleRequest(freenetRequest, templateContext)
 		assertThat(templateContext["fieldErrors"] as Iterable<*>, hasItem(name))
 	}
@@ -149,7 +149,7 @@ class OptionsPageTest : WebPageTest() {
 	private fun <T> verifyThatPreferencesCanBeSet(name: String, setValue: String?, expectedValue: T, getter: () -> T) {
 		unsetCurrentSone()
 		request("", POST)
-		addHttpRequestParameter(name, setValue)
+		addHttpRequestPart(name, setValue)
 		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}

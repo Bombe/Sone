@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.ajax
 
 import freenet.clients.http.ToadletContext
+import freenet.support.SimpleReadOnlyArrayBucket
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.ElementLoader
@@ -18,7 +19,11 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
 import org.junit.Before
+import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
+import java.util.NoSuchElementException
+import javax.naming.SizeLimitExceededException
+import kotlin.coroutines.experimental.EmptyCoroutineContext.plus
 
 /**
  * Base class for tests for any [JsonPage] implementations.
@@ -37,6 +42,7 @@ open class JsonPageTest {
 	protected val currentSone = deepMock<Sone>()
 
 	private val requestParameters = mutableMapOf<String, String>()
+	private val requestParts = mutableMapOf<String, String>()
 	private val localSones = mutableMapOf<String, Sone>()
 	private val remoteSones = mutableMapOf<String, Sone>()
 	private val newPosts = mutableMapOf<String, Post>()
@@ -81,6 +87,13 @@ open class JsonPageTest {
 	fun setupHttpRequest() {
 		whenever(httpRequest.getParam(anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: "" }
 		whenever(httpRequest.getParam(anyString(), anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: it.getArgument(1) }
+		whenever(httpRequest.getPart(anyString())).thenAnswer { requestParts[it.getArgument(0)]?.let { SimpleReadOnlyArrayBucket(it.toByteArray()) } }
+		whenever(httpRequest.getPartAsBytesFailsafe(anyString(), anyInt())).thenAnswer { requestParts[it.getArgument(0)]?.toByteArray()?.copyOf(it.getArgument(1)) ?: ByteArray(0) }
+		whenever(httpRequest.getPartAsBytesThrowing(anyString(), anyInt())).thenAnswer { invocation -> requestParts[invocation.getArgument(0)]?.let { it.toByteArray().let { if (it.size > invocation.getArgument<Int>(1)) throw SizeLimitExceededException() else it } } ?: throw NoSuchElementException() }
+		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).thenAnswer { requestParts[it.getArgument(0)]?.substring(0, it.getArgument(1)) ?: "" }
+		whenever(httpRequest.getPartAsStringThrowing(anyString(), anyInt())).thenAnswer { invocation -> requestParts[invocation.getArgument(0)]?.let { if (it.length > invocation.getArgument<Int>(1)) throw SizeLimitExceededException() else it } ?: throw NoSuchElementException() }
+		whenever(httpRequest.getIntPart(anyString(), anyInt())).thenAnswer { invocation -> requestParts[invocation.getArgument(0)]?.toIntOrNull() ?: invocation.getArgument(1) }
+		whenever(httpRequest.isPartSet(anyString())).thenAnswer { it.getArgument(0) in requestParts }
 	}
 
 	protected fun Sone.mock(id: String, name: String, local: Boolean = false, time: Long, status: SoneStatus = idle) = apply {
@@ -98,6 +111,10 @@ open class JsonPageTest {
 
 	protected fun addRequestParameter(key: String, value: String) {
 		requestParameters += key to value
+	}
+
+	protected fun addRequestPart(key: String, value: String) {
+		requestParts += key to value
 	}
 
 	protected fun addNotification(vararg notifications: Notification) {

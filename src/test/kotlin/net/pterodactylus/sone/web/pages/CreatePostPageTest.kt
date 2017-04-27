@@ -33,7 +33,7 @@ class CreatePostPageTest: WebPageTest() {
 
 	@Test
 	fun `return page is set in template context`() {
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("returnPage", "return.html")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))
 	}
@@ -41,8 +41,8 @@ class CreatePostPageTest: WebPageTest() {
 	@Test
 	fun `post is created correctly`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("text", "post text")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("text", "post text")
 		verifyRedirect("return.html") {
 			verify(core).createPost(currentSone, absent(), "post text")
 		}
@@ -51,8 +51,8 @@ class CreatePostPageTest: WebPageTest() {
 	@Test
 	fun `creating an empty post is denied`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("text", "  ")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("text", "  ")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["errorTextEmpty"], equalTo<Any>(true))
 	}
@@ -60,9 +60,9 @@ class CreatePostPageTest: WebPageTest() {
 	@Test
 	fun `a sender can be selected`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("text", "post text")
-		addHttpRequestParameter("sender", "sender-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("text", "post text")
+		addHttpRequestPart("sender", "sender-id")
 		val sender = mock<Sone>()
 		addLocalSone("sender-id", sender)
 		verifyRedirect("return.html") {
@@ -73,9 +73,9 @@ class CreatePostPageTest: WebPageTest() {
 	@Test
 	fun `a recipient can be selected`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("text", "post text")
-		addHttpRequestParameter("recipient", "recipient-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("text", "post text")
+		addHttpRequestPart("recipient", "recipient-id")
 		val recipient = mock<Sone>()
 		addSone("recipient-id", recipient)
 		verifyRedirect("return.html") {
@@ -86,8 +86,8 @@ class CreatePostPageTest: WebPageTest() {
 	@Test
 	fun `text is filtered correctly`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("text", "post http://localhost:12345/KSK@foo text")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("text", "post http://localhost:12345/KSK@foo text")
 		addHttpRequestHeader("Host", "localhost:12345")
 		verifyRedirect("return.html") {
 			verify(core).createPost(currentSone, absent(), "post KSK@foo text")

@@ -15,11 +15,11 @@ class EditProfileFieldPage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
 		sessionProvider.getCurrentSone(request.toadletContext)!!.let { currentSone ->
 			currentSone.profile.let { profile ->
-				val field = profile.getFieldById(request.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
 				if (request.isPOST) {
 					if (request.httpRequest.getPartAsStringFailsafe("cancel", 4) == "true") {
 						throw RedirectException("editProfile.html#profile-fields")
 					}
+					val field = profile.getFieldById(request.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
 					request.httpRequest.getPartAsStringFailsafe("name", 256).let { name ->
 						try {
 							if (name != field.name) {
@@ -29,10 +29,11 @@ class EditProfileFieldPage(template: Template, webInterface: WebInterface):
 							throw RedirectException("editProfile.html#profile-fields")
 						} catch (e: IllegalArgumentException) {
 							templateContext["duplicateFieldName"] = true
+							return
 						}
 					}
 				}
-				templateContext["field"] = field
+				templateContext["field"] = profile.getFieldById(request.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
 			}
 		}
 	}

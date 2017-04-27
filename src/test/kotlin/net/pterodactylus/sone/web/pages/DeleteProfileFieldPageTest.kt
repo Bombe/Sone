@@ -52,7 +52,7 @@ class DeleteProfileFieldPageTest: WebPageTest() {
 	@Test
 	fun `post request with invalid field name redirects to invalid page`() {
 		request("", POST)
-		addHttpRequestParameter("field", "wrong-id")
+		addHttpRequestPart("field", "wrong-id")
 		verifyRedirect("invalid.html")
 	}
 
@@ -67,7 +67,7 @@ class DeleteProfileFieldPageTest: WebPageTest() {
 	@Test
 	fun `post request without confirm redirects to edit profile page`() {
 		request("", POST)
-		addHttpRequestParameter("field", field.id)
+		addHttpRequestPart("field", field.id)
 		verifyRedirect("editProfile.html#profile-fields") {
 			verify(currentSone, never()).profile = any()
 		}
@@ -76,8 +76,8 @@ class DeleteProfileFieldPageTest: WebPageTest() {
 	@Test
 	fun `post request with confirm removes field and redirects to edit profile page`() {
 		request("", POST)
-		addHttpRequestParameter("field", field.id)
-		addHttpRequestParameter("confirm", "true")
+		addHttpRequestPart("field", field.id)
+		addHttpRequestPart("confirm", "true")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.getFieldById(field.id), nullValue())
 			verify(currentSone).profile = profile

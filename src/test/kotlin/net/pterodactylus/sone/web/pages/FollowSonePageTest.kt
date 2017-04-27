@@ -50,8 +50,8 @@ class FollowSonePageTest : WebPageTest() {
 		request("", POST)
 		val sone = mock<Sone>()
 		addSone("sone-id", sone)
-		addHttpRequestParameter("sone", "sone-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("sone", "sone-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core).followSone(currentSone, "sone-id")
 			verify(core).markSoneKnown(sone)
@@ -65,8 +65,8 @@ class FollowSonePageTest : WebPageTest() {
 		addSone("sone-id1", firstSone)
 		val secondSone = mock<Sone>()
 		addSone("sone-id2", secondSone)
-		addHttpRequestParameter("sone", "sone-id1,sone-id2")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("sone", "sone-id1,sone-id2")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core).followSone(currentSone, "sone-id1")
 			verify(core).followSone(currentSone, "sone-id2")
@@ -78,8 +78,8 @@ class FollowSonePageTest : WebPageTest() {
 	@Test
 	fun `a non-existing sone is not followed`() {
 		request("", POST)
-		addHttpRequestParameter("sone", "sone-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("sone", "sone-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core, never()).followSone(ArgumentMatchers.eq(currentSone), anyString())
 			verify(core, never()).markSoneKnown(any<Sone>())

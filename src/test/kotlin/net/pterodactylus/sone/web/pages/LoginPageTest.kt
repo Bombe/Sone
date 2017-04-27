@@ -88,7 +88,7 @@ class LoginPageTest : WebPageTest() {
 	@Test
 	fun `post request with valid sone logs in the sone and redirects to index page`() {
 		request("", POST)
-		addHttpRequestParameter("sone-id", "sone2")
+		addHttpRequestPart("sone-id", "sone2")
 		verifyRedirect("index.html") {
 			verify(webInterface).setCurrentSone(toadletContext, sones[1])
 		}
@@ -97,7 +97,7 @@ class LoginPageTest : WebPageTest() {
 	@Test
 	fun `post request with valid sone and target redirects to target page`() {
 		request("", POST)
-		addHttpRequestParameter("sone-id", "sone2")
+		addHttpRequestPart("sone-id", "sone2")
 		addHttpRequestParameter("target", "foo.html")
 		verifyRedirect("foo.html") {
 			verify(webInterface).setCurrentSone(toadletContext, sones[1])

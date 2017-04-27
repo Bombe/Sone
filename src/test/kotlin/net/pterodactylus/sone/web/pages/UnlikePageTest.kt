@@ -27,7 +27,7 @@ class UnlikePageTest : WebPageTest() {
 	@Test
 	fun `post request does not remove any likes but redirects`() {
 	    request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(currentSone, never()).removeLikedPostId(any())
 			verify(currentSone, never()).removeLikedReplyId(any())
@@ -37,9 +37,9 @@ class UnlikePageTest : WebPageTest() {
 	@Test
 	fun `post request removes post like and redirects`() {
 	    request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("type", "post")
-		addHttpRequestParameter("id", "post-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("type", "post")
+		addHttpRequestPart("id", "post-id")
 		verifyRedirect("return.html") {
 			verify(currentSone, never()).removeLikedPostId("post-id")
 			verify(currentSone, never()).removeLikedReplyId(any())
@@ -49,9 +49,9 @@ class UnlikePageTest : WebPageTest() {
 	@Test
 	fun `post request removes reply like and redirects`() {
 	    request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("type", "reply")
-		addHttpRequestParameter("id", "reply-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("type", "reply")
+		addHttpRequestPart("id", "reply-id")
 		verifyRedirect("return.html") {
 			verify(currentSone, never()).removeLikedPostId(any())
 			verify(currentSone, never()).removeLikedReplyId("reply-id")

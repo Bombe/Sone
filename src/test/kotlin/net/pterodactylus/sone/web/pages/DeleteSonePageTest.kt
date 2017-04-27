@@ -56,7 +56,7 @@ class DeleteSonePageTest : WebPageTest() {
 	@Test
 	fun `post request with delete confirmation deletes sone and redirects to index`() {
 		request("", POST)
-		addHttpRequestParameter("deleteSone", "true")
+		addHttpRequestPart("deleteSone", "true")
 		verifyRedirect("index.html") {
 			verify(core).deleteSone(currentSone)
 		}

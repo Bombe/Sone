@@ -71,8 +71,8 @@ class DeletePostPageTest : WebPageTest() {
 		request("", POST)
 		whenever(sone.isLocal).thenReturn(false)
 		addPost("post-id", post)
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("noPermission.html")
 	}
 
@@ -80,9 +80,9 @@ class DeletePostPageTest : WebPageTest() {
 	fun `post request with confirmation deletes post and redirects to return page`() {
 		request("", POST)
 		addPost("post-id", post)
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("confirmDelete", "true")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("confirmDelete", "true")
 		verifyRedirect("return.html") {
 			verify(core).deletePost(post)
 		}
@@ -92,9 +92,9 @@ class DeletePostPageTest : WebPageTest() {
 	fun `post request with abort delete does not delete post and redirects to return page`() {
 		request("", POST)
 		addPost("post-id", post)
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("abortDelete", "true")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("abortDelete", "true")
 		verifyRedirect("return.html") {
 			verify(core, never()).deletePost(post)
 		}
@@ -104,8 +104,8 @@ class DeletePostPageTest : WebPageTest() {
 	fun `post request without delete or abort sets post in template context`() {
 		request("", POST)
 		addPost("post-id", post)
-		addHttpRequestParameter("post", "post-id")
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("post", "post-id")
+		addHttpRequestPart("returnPage", "return.html")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["post"], equalTo<Any>(post))
 		assertThat(templateContext["returnPage"], equalTo<Any>("return.html"))

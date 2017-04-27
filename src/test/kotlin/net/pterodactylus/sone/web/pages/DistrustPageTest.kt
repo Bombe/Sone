@@ -46,7 +46,7 @@ class DistrustPageTest: WebPageTest() {
 	@Test
 	fun `post request with invalid sone redirects to return page`() {
 		request("", POST)
-		addHttpRequestParameter("returnPage", "return.html")
+		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html")
 	}
 
@@ -55,8 +55,8 @@ class DistrustPageTest: WebPageTest() {
 		request("", POST)
 		val remoteSone = mock<Sone>()
 		addSone("remote-sone-id", remoteSone)
-		addHttpRequestParameter("returnPage", "return.html")
-		addHttpRequestParameter("sone", "remote-sone-id")
+		addHttpRequestPart("returnPage", "return.html")
+		addHttpRequestPart("sone", "remote-sone-id")
 		verifyRedirect("return.html") {
 			verify(core).distrustSone(currentSone, remoteSone)
 		}

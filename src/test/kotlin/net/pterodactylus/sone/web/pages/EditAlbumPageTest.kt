@@ -76,7 +76,7 @@ class EditAlbumPageTest: WebPageTest() {
 		request("", POST)
 		whenever(sone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
+		addHttpRequestPart("album", "album-id")
 		verifyRedirect("noPermission.html")
 	}
 
@@ -84,8 +84,8 @@ class EditAlbumPageTest: WebPageTest() {
 	fun `post request with move left requested moves album to the left and redirects to album browser`() {
 		request("", POST)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
-		addHttpRequestParameter("moveLeft", "true")
+		addHttpRequestPart("album", "album-id")
+		addHttpRequestPart("moveLeft", "true")
 		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(parentAlbum).moveAlbumUp(album)
 			verify(core).touchConfiguration()
@@ -96,8 +96,8 @@ class EditAlbumPageTest: WebPageTest() {
 	fun `post request with move right requested moves album to the left and redirects to album browser`() {
 		request("", POST)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
-		addHttpRequestParameter("moveRight", "true")
+		addHttpRequestPart("album", "album-id")
+		addHttpRequestPart("moveRight", "true")
 		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(parentAlbum).moveAlbumDown(album)
 			verify(core).touchConfiguration()
@@ -108,7 +108,7 @@ class EditAlbumPageTest: WebPageTest() {
 	fun `post request with empty album title redirects to empty album title page`() {
 		request("", POST)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
+		addHttpRequestPart("album", "album-id")
 		whenever(modifier.setTitle("")).thenThrow(AlbumTitleMustNotBeEmpty())
 		verifyRedirect("emptyAlbumTitle.html")
 	}
@@ -117,9 +117,9 @@ class EditAlbumPageTest: WebPageTest() {
 	fun `post request with non-empty album title and description redirects to album browser`() {
 		request("", POST)
 		addAlbum("album-id", album)
-		addHttpRequestParameter("album", "album-id")
-		addHttpRequestParameter("title", "title")
-		addHttpRequestParameter("description", "description")
+		addHttpRequestPart("album", "album-id")
+		addHttpRequestPart("title", "title")
+		addHttpRequestPart("description", "description")
 		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(modifier).setTitle("title")
 			verify(modifier).setDescription("description")
