@@ -1,9 +1,8 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.TemporaryImage
-import net.pterodactylus.sone.web.pages.GetImagePage
-import net.pterodactylus.sone.web.pages.WebPageTest
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 
@@ -33,6 +32,8 @@ class GetImagePageTest : WebPageTest() {
 	fun `invalid image returns 404 response`() {
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(404))
+		assertThat(response.statusText, equalTo("Not found."))
+		assertThat(response.contentType, equalTo("text/html; charset=utf-8"))
 		assertThat(responseBytes, equalTo(ByteArray(0)))
 	}
 
@@ -48,6 +49,10 @@ class GetImagePageTest : WebPageTest() {
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.contentType, equalTo("image/test"))
 		assertThat(responseBytes, equalTo(ByteArray(5, Int::toByte)))
+		println(response.headers.map { it.name to it.iterator().asSequence().toList() })
+		assertThat(response.headers.map { it.name to it.iterator().asSequence().toList() }, contains(
+				"Content-Disposition" to listOf("attachment; filename=temp-id.test")
+		))
 	}
 
 }
