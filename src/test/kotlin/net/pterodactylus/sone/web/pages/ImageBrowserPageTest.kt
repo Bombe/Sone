@@ -21,6 +21,22 @@ class ImageBrowserPageTest : WebPageTest() {
 	private val page = ImageBrowserPage(template, webInterface)
 
 	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("imageBrowser.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		whenever(l10n.getString("Page.ImageBrowser.Title")).thenReturn("image browser page title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("image browser page title"))
+	}
+
+	@Test
 	fun `get request with album sets album and page in template context`() {
 		request("", GET)
 		val album = mock<Album>()
