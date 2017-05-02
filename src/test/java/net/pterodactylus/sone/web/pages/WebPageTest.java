@@ -316,6 +316,7 @@ public abstract class WebPageTest {
 			throw new RuntimeException(e);
 		}
 		when(freenetRequest.getMethod()).thenReturn(method);
+		when(httpRequest.getMethod()).thenReturn(method.name());
 	}
 
 	protected void addHttpRequestHeader(@Nonnull String name, String value) {

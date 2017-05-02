@@ -5,8 +5,6 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.ImageBrowserPage
-import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
@@ -43,7 +41,7 @@ class ImageBrowserPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("page", "5")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["albumRequested"], equalTo<Any>(true))
 		assertThat(templateContext["album"], equalTo<Any>(album))
 		assertThat(templateContext["page"], equalTo<Any>("5"))
@@ -55,7 +53,7 @@ class ImageBrowserPageTest : WebPageTest() {
 		val image = mock<Image>()
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["imageRequested"], equalTo<Any>(true))
 		assertThat(templateContext["image"], equalTo<Any>(image))
 	}
@@ -66,7 +64,7 @@ class ImageBrowserPageTest : WebPageTest() {
 		val sone = mock<Sone>()
 		addSone("sone-id", sone)
 		addHttpRequestParameter("sone", "sone-id")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["soneRequested"], equalTo<Any>(true))
 		assertThat(templateContext["sone"], equalTo<Any>(sone))
 	}
@@ -79,7 +77,7 @@ class ImageBrowserPageTest : WebPageTest() {
 		val secondSone = createSone("third album", "fourth album")
 		addSone("sone2", secondSone)
 		addHttpRequestParameter("mode", "gallery")
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["galleryRequested"], equalTo<Any>(true))
 		@Suppress("UNCHECKED_CAST")
 		assertThat(templateContext["albums"] as Iterable<Album>, contains(
@@ -109,7 +107,7 @@ class ImageBrowserPageTest : WebPageTest() {
 	@Test
 	fun `requesting nothing will show the albums of the current sone`() {
 		request("", GET)
-		page.handleRequest(freenetRequest, templateContext)
+		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["soneRequested"], equalTo<Any>(true))
 		assertThat(templateContext["sone"], equalTo<Any>(currentSone))
 	}
