@@ -12,6 +12,7 @@ import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
@@ -23,6 +24,22 @@ class IndexPageTest : WebPageTest() {
 
 	private val postVisibilityFilter = mock<PostVisibilityFilter>()
 	private val page = IndexPage(template, webInterface, postVisibilityFilter)
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("index.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		whenever(l10n.getString("Page.Index.Title")).thenReturn("index page title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("index page title"))
+	}
 
 	@Before
 	fun setupPostVisibilityFilter() {
