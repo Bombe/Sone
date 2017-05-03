@@ -2,15 +2,12 @@ group = 'net.pterodactylus'
 version = '0.9.6'
 
 buildscript {
-    ext {
-        kotlinVersion = '1.1.2'
-    }
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.1.10'
-        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
+        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: '1.1.2'
     }
 }
 
@@ -44,7 +41,7 @@ dependencies {
     provided group: 'org.freenetproject', name: 'freenet-ext', version: '29'
     provided group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib'
     compile group: 'net.pterodactylus', name: 'utils', version: '0.12.4'
     compile group: 'com.google.inject', name: 'guice', version: '3.0'
     compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
@@ -52,7 +49,7 @@ dependencies {
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '2.0.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
 
-    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test', version: kotlinVersion
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test'
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.1.0'
     testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
