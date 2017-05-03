@@ -26,9 +26,7 @@ class IndexPageTest : WebPageTest() {
 
 	@Before
 	fun setupPostVisibilityFilter() {
-		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn(object : Predicate<Post> {
-			override fun apply(input: Post?) = true
-		})
+		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn(Predicate<Post> { true })
 	}
 
 	private fun createPost(time: Long, directed: Boolean = false) = mock<Post>().apply {
