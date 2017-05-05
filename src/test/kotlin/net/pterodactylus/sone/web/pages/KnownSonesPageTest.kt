@@ -14,6 +14,7 @@ import net.pterodactylus.sone.web.pages.KnownSonesPage
 import net.pterodactylus.sone.web.pages.WebPageTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 
@@ -61,6 +62,22 @@ class KnownSonesPageTest : WebPageTest() {
 		assertThat(templateContext["knownSones"] as Iterable<Sone>, contains(
 				*indices.map { sones[it] }.toTypedArray()
 		))
+	}
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("knownSones.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+	    assertThat(page.requiresLogin(), equalTo(false))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		whenever(l10n.getString("Page.KnownSones.Title")).thenReturn("known sones page title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("known sones page title"))
 	}
 
 	@Test
