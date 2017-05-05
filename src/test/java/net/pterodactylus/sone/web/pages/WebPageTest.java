@@ -309,6 +309,11 @@ public abstract class WebPageTest {
 		when(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(null);
 	}
 
+	protected void setMethod(Method method) {
+		when(freenetRequest.getMethod()).thenReturn(method);
+		when(httpRequest.getMethod()).thenReturn(method.name());
+	}
+
 	protected void request(String uri, Method method) {
 		try {
 			when(httpRequest.getPath()).thenReturn(uri);
