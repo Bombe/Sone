@@ -29,9 +29,9 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.notify.PostVisibilityFilter;
+import net.pterodactylus.sone.utils.Pagination;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -75,7 +75,8 @@ public class NewPage extends SoneTemplatePage {
 		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 
 		/* paginate them. */
-		Pagination<Post> pagination = new Pagination<>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
+		Pagination<Post> pagination = new Pagination<>(sortedPosts, webInterface.getCore().getPreferences().getPostsPerPage());
+		pagination.setPage(parseInt(request.getHttpRequest().getParam("page"), 0));
 		templateContext.set("pagination", pagination);
 		templateContext.set("posts", pagination.getItems());
 	}

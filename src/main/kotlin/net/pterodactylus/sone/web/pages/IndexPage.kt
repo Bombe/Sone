@@ -1,10 +1,10 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.notify.PostVisibilityFilter
+import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.collection.Pagination
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 
@@ -28,8 +28,9 @@ class IndexPage(template: Template, webInterface: WebInterface, private val post
 					.filter { postVisibilityFilter.isVisible(currentSone).apply(it) }
 					.sortedByDescending { it.time }
 					.let { posts ->
-						Pagination(posts, webInterface.core.preferences.postsPerPage)
-								.setPage(request.parameters["page"]?.toIntOrNull() ?: 0).let { pagination ->
+						Pagination(posts, webInterface.core.preferences.postsPerPage).apply {
+							page = request.parameters["page"]?.toIntOrNull() ?: 0
+						}.let { pagination ->
 							templateContext["pagination"] = pagination
 							templateContext["posts"] = pagination.items
 						}

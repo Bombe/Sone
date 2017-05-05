@@ -2,10 +2,10 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.collection.Pagination
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.net.URI
@@ -34,7 +34,7 @@ class ImageBrowserPage(template: Template, webInterface: WebInterface):
 					.sortedBy(Album::getTitle)
 					.also { albums ->
 						templateContext["albums"] = albums
-						templateContext["albumPagination"] = Pagination(albums, 12).setPage(request.parameters["page"]?.toIntOrNull() ?: 0)
+						templateContext["albumPagination"] = Pagination(albums, 12).apply { page = request.parameters["page"]?.toIntOrNull() ?: 0 }
 					}
 		} else {
 			templateContext["soneRequested"] = true

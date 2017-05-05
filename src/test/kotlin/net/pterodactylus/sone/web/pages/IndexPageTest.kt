@@ -7,7 +7,7 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.notify.PostVisibilityFilter
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.collection.Pagination
+import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains

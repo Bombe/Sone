@@ -32,9 +32,9 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.template.SoneAccessor;
+import net.pterodactylus.sone.utils.Pagination;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 
@@ -92,7 +92,8 @@ public class ViewSonePage extends SoneTemplatePage {
 		List<Post> sonePosts = sone.get().getPosts();
 		sonePosts.addAll(webInterface.getCore().getDirectedPosts(sone.get().getId()));
 		Collections.sort(sonePosts, Post.NEWEST_FIRST);
-		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("postPage"), 0));
+		Pagination<Post> postPagination = new Pagination<Post>(sonePosts, webInterface.getCore().getPreferences().getPostsPerPage());
+		postPagination.setPage(parseInt(request.getHttpRequest().getParam("postPage"), 0));
 		templateContext.set("postPagination", postPagination);
 		templateContext.set("posts", postPagination.getItems());
 		Set<PostReply> replies = sone.get().getReplies();
@@ -114,7 +115,8 @@ public class ViewSonePage extends SoneTemplatePage {
 
 		});
 
-		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(parseInt(request.getHttpRequest().getParam("repliedPostPage"), 0));
+		Pagination<Post> repliedPostPagination = new Pagination<Post>(posts, webInterface.getCore().getPreferences().getPostsPerPage());
+		repliedPostPagination.setPage(parseInt(request.getHttpRequest().getParam("repliedPostPage"), 0));
 		templateContext.set("repliedPostPagination", repliedPostPagination);
 		templateContext.set("repliedPosts", repliedPostPagination.getItems());
 	}

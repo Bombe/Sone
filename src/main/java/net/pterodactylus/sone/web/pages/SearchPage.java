@@ -38,9 +38,9 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.utils.Pagination;
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.util.collection.Pagination;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.text.StringEscaper;
@@ -151,8 +151,10 @@ public class SearchPage extends SoneTemplatePage {
 		List<Post> resultPosts = FluentIterable.from(sortedPostHits).transform(new HitMapper<Post>()).toList();
 
 		/* pagination. */
-		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(fromNullable(tryParse(request.getHttpRequest().getParam("sonePage"))).or(0));
-		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage()).setPage(fromNullable(tryParse(request.getHttpRequest().getParam("postPage"))).or(0));
+		Pagination<Sone> sonePagination = new Pagination<Sone>(resultSones, webInterface.getCore().getPreferences().getPostsPerPage());
+		sonePagination.setPage(fromNullable(tryParse(request.getHttpRequest().getParam("sonePage"))).or(0));
+		Pagination<Post> postPagination = new Pagination<Post>(resultPosts, webInterface.getCore().getPreferences().getPostsPerPage());
+		postPagination.setPage(fromNullable(tryParse(request.getHttpRequest().getParam("postPage"))).or(0));
 
 		templateContext.set("sonePagination", sonePagination);
 		templateContext.set("soneHits", sonePagination.getItems());
