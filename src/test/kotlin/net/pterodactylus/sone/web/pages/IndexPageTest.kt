@@ -11,6 +11,7 @@ import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.emptyIterable
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
@@ -144,6 +145,17 @@ class IndexPageTest : WebPageTest() {
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		assertThat((templateContext["pagination"] as Pagination<Post>).page, equalTo(2))
+	}
+
+	@Test
+	fun `index page without posts sets correct pagination`() {
+		request("", GET)
+		core.preferences.postsPerPage = 1
+		page.processTemplate(freenetRequest, templateContext)
+		@Suppress("UNCHECKED_CAST")
+		(templateContext["pagination"] as Pagination<Post>).let { pagination ->
+			assertThat(pagination.items, emptyIterable())
+		}
 	}
 
 }
