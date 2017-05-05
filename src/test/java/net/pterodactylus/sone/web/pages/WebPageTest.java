@@ -70,6 +70,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
@@ -290,7 +291,7 @@ public abstract class WebPageTest {
 		when(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone);
 		when(webInterface.getNotification(anyString())).thenReturn(Optional.<Notification>absent());
-		when(webInterface.getNotifications(currentSone)).thenReturn(new ArrayList<Notification>());
+		when(webInterface.getNotifications(Mockito.<Sone>any())).thenReturn(new ArrayList<Notification>());
 	}
 
 	@Before
