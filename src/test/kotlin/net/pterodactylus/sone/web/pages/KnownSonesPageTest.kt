@@ -21,7 +21,7 @@ import org.junit.Test
 /**
  * Unit test for [KnownSonesPage].
  */
-class KnownSonesPageTest : WebPageTest() {
+class KnownSonesPageTest: WebPageTest() {
 
 	private val page = KnownSonesPage(template, webInterface)
 
