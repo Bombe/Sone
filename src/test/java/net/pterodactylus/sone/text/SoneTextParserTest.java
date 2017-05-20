@@ -93,6 +93,13 @@ public class SoneTextParserTest {
 	}
 
 	@Test
+	public void soneAndPostCanBeParsedFromTheSameText() {
+		SoneTextParser parser = new SoneTextParser(new TestSoneProvider(), new TestPostProvider());
+		Iterable<Part> parts = parser.parse("Text sone://DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU more text post://f3757817-b45a-497a-803f-9c5aafc10dc6 even more text", null);
+		assertThat("Part Text", convertText(parts), is("Text [Sone|DAxKQzS48mtaQc7sUVHIgx3fnWZPQBz0EueBreUVWrU] more text [Post|f3757817-b45a-497a-803f-9c5aafc10dc6|text] even more text"));
+	}
+
+	@Test
 	public void postLinkIsRenderedAsPlainTextIfPostIdIsTooShort() {
 		Iterable<Part> parts = soneTextParser.parse("post://too-short", null);
 		assertThat("Part Text", convertText(parts), is("post://too-short"));

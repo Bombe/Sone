@@ -334,6 +334,7 @@ public class SoneTextParser implements Parser<SoneTextParserContext> {
 			if (nextLink.isPresent()) {
 				if (nextLink.get().getPosition() < earliestLinkPosition) {
 					earliestNextLink = nextLink.get();
+					earliestLinkPosition = earliestNextLink.getPosition();
 				}
 			}
 		}
