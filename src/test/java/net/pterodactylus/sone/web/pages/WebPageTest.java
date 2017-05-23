@@ -407,6 +407,11 @@ public abstract class WebPageTest {
 		}
 	}
 
+	protected void verifyNoRedirect(Runnable verification) throws RedirectException {
+		getPage().handleRequest(freenetRequest, templateContext);
+		verification.run();
+	}
+
 	protected void addTranslation(@Nonnull String key, @Nonnull String value) {
 		when(l10n.getString(key)).thenReturn(value);
 	}

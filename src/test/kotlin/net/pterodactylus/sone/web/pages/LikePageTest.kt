@@ -36,7 +36,7 @@ class LikePageTest : WebPageTest() {
 	@Test
 	fun `get request does not redirect`() {
 		request("", GET)
-		page.handleRequest(freenetRequest, templateContext)
+		verifyNoRedirect {}
 	}
 
 	@Test
