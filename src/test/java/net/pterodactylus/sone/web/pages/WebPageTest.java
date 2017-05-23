@@ -407,4 +407,8 @@ public abstract class WebPageTest {
 		}
 	}
 
+	protected void addTranslation(@Nonnull String key, @Nonnull String value) {
+		when(l10n.getString(key)).thenReturn(value);
+	}
+
 }

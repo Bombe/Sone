@@ -1,9 +1,9 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.pages.LikePage
-import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.Mockito.verify
 import org.mockito.Mockito.verifyNoMoreInteractions
@@ -16,6 +16,22 @@ class LikePageTest : WebPageTest() {
 	private val page = LikePage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("like.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+	    addTranslation("Page.Like.Title", "like page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("like page title"))
+	}
 
 	@Test
 	fun `get request does not redirect`() {
