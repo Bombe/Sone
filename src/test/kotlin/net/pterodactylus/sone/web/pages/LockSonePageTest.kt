@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -36,6 +37,7 @@ class LockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `locking an invalid local sone redirects to return page`() {
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core, never()).lockSone(any<Sone>())
@@ -44,6 +46,7 @@ class LockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `locking an valid local sone locks the sone and redirects to return page`() {
+		setMethod(POST)
 		addHttpRequestPart("sone", "sone-id")
 		val sone = mock<Sone>()
 		addLocalSone("sone-id", sone)
