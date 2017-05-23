@@ -1,8 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.LogoutPage
-import net.pterodactylus.sone.web.pages.WebPageTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -11,11 +9,27 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LogoutPage].
  */
-class LogoutPageTest : WebPageTest() {
+class LogoutPageTest: WebPageTest() {
 
 	private val page = LogoutPage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("logout.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+		assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		addTranslation("Page.Logout.Title", "logout page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("logout page title"))
+	}
 
 	@Test
 	fun `page unsets current sone and redirects to index`() {
