@@ -7,6 +7,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import java.util.Arrays.asList
@@ -23,6 +24,22 @@ class NewPageTest: WebPageTest() {
 	@Before
 	fun setupNumberOfPostsPerPage() {
 		webInterface.core.preferences.postsPerPage = 5
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("new.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+		assertThat(page.requiresLogin(), equalTo(false))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		addTranslation("Page.New.Title", "new page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("new page title"))
 	}
 
 	@Test
