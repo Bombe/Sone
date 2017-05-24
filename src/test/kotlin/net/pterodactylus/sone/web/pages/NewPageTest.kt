@@ -5,7 +5,10 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
@@ -44,8 +47,9 @@ class NewPageTest: WebPageTest() {
 
 	@Test
 	fun `posts are not duplicated when they come from both new posts and new replies notifications`() {
-		val extraPost = mock<Post>()
-		val posts = asList(mock<Post>(), mock<Post>())
+		setMethod(GET)
+		val extraPost = mock<Post>().withTime(2000)
+		val posts = asList(mock<Post>().withTime(1000), mock<Post>().withTime(3000))
 		val postReplies = asList(mock<PostReply>(), mock<PostReply>())
 		whenever(postReplies[0].post).thenReturn(posts[0].asOptional())
 		whenever(postReplies[1].post).thenReturn(extraPost.asOptional())
@@ -54,7 +58,34 @@ class NewPageTest: WebPageTest() {
 
 		verifyNoRedirect {
 			val renderedPosts = templateContext.get<List<Post>>("posts", List::class.java)
-			assertThat(renderedPosts, containsInAnyOrder(posts[0], posts[1], extraPost))
+			assertThat(renderedPosts, containsInAnyOrder(posts[1], extraPost, posts[0]))
+		}
+	}
+
+	private fun Post.withTime(time: Long) = apply { whenever(this.time).thenReturn(time) }
+
+	@Test
+	@Suppress("UNCHECKED_CAST")
+	fun `posts are paginated properly`() {
+		setMethod(GET)
+		webInterface.core.preferences.postsPerPage = 2
+		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
+		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
+		verifyNoRedirect {
+			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(posts[1], posts[0]))
+		}
+	}
+
+	@Test
+	@Suppress("UNCHECKED_CAST")
+	fun `posts are paginated properly on second page`() {
+		setMethod(GET)
+		webInterface.core.preferences.postsPerPage = 2
+		addHttpRequestParameter("page", "1")
+		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
+		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
+		verifyNoRedirect {
+			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(posts[2]))
 		}
 	}
 
