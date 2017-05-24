@@ -4,8 +4,6 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.EditProfilePage
-import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains

@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
 import net.pterodactylus.sone.main.SonePlugin.PluginVersion
 import net.pterodactylus.sone.main.SonePlugin.PluginYear
-import net.pterodactylus.sone.web.pages.SoneTemplatePage
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template

@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.ViewPostPage
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue

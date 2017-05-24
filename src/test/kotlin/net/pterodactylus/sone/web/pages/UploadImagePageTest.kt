@@ -8,7 +8,6 @@ import net.pterodactylus.sone.data.TemporaryImage
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.UploadImagePage
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

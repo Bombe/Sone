@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.pages.ReloadingPage
 import net.pterodactylus.sone.web.page.FreenetRequest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

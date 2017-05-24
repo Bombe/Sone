@@ -4,7 +4,6 @@ import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.pages.SoneTemplatePage
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template

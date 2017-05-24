@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.UnbookmarkPage
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Test
 import org.mockito.Mockito.any

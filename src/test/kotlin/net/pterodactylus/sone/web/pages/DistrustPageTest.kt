@@ -3,8 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.WebPageTest
-import net.pterodactylus.sone.web.pages.DistrustPage
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

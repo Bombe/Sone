@@ -1,12 +1,8 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.pages.UnlikePage
-import net.pterodactylus.util.web.Method
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Test
-import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 

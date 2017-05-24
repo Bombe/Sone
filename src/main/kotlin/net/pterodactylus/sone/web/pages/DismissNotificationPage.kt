@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.pages.SoneTemplatePage
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template

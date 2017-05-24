@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.web.pages.UntrustPage
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any

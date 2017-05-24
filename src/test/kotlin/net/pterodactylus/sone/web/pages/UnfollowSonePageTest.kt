@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.pages.UnfollowSonePage
 import net.pterodactylus.util.web.Method.POST
 import org.junit.Test
 import org.mockito.Mockito.verify

@@ -2,10 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.WebPageTest
-import net.pterodactylus.sone.web.pages.DismissNotificationPage
 import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

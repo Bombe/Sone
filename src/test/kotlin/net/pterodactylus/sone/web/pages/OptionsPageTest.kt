@@ -3,12 +3,10 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
 import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.FOLLOWED
 import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.TRUSTED
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.pages.OptionsPage
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

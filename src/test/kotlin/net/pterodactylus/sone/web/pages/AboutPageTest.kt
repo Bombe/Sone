@@ -3,8 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
 import net.pterodactylus.sone.main.SonePlugin.PluginVersion
 import net.pterodactylus.sone.main.SonePlugin.PluginYear
-import net.pterodactylus.sone.web.pages.WebPageTest
-import net.pterodactylus.sone.web.pages.AboutPage
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
