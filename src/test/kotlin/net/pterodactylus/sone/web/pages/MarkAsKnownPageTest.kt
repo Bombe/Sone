@@ -4,6 +4,7 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -36,6 +37,7 @@ class MarkAsKnownPageTest: WebPageTest() {
 
 	@Test
 	fun `posts can be marked as known`() {
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "post")
 		addHttpRequestPart("id", "post1 post2 post3")
@@ -50,6 +52,7 @@ class MarkAsKnownPageTest: WebPageTest() {
 
 	@Test
 	fun `replies can be marked as known`() {
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "reply")
 		addHttpRequestPart("id", "reply1 reply2 reply3")
@@ -64,6 +67,7 @@ class MarkAsKnownPageTest: WebPageTest() {
 
 	@Test
 	fun `sones can be marked as known`() {
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "sone")
 		addHttpRequestPart("id", "sone1 sone2 sone3")
@@ -78,6 +82,7 @@ class MarkAsKnownPageTest: WebPageTest() {
 
 	@Test
 	fun `different type redirects to invalid page`() {
+		setMethod(POST)
 		addHttpRequestPart("type", "foo")
 		verifyRedirect("invalid.html")
 	}
