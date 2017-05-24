@@ -31,9 +31,10 @@ class UploadImagePageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not redirect or upload anything`() {
-		page.handleRequest(freenetRequest, templateContext)
-		verify(core, never()).createTemporaryImage(any(), any())
-		verify(core, never()).createImage(any(), any(), any())
+		verifyNoRedirect {
+			verify(core, never()).createTemporaryImage(any(), any())
+			verify(core, never()).createImage(any(), any(), any())
+		}
 	}
 
 	@Test
@@ -67,9 +68,10 @@ class UploadImagePageTest : WebPageTest() {
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "title")
 		addUploadedFile("image", "image.png", "image/png", "no-image.png")
-		page.handleRequest(freenetRequest, templateContext)
-		verify(core, never()).createTemporaryImage(any(), any())
-		assertThat(templateContext["messages"] as String?, equalTo<String>("Page.UploadImage.Error.InvalidImage"))
+		verifyNoRedirect {
+			verify(core, never()).createTemporaryImage(any(), any())
+			assertThat(templateContext["messages"] as String?, equalTo<String>("Page.UploadImage.Error.InvalidImage"))
+		}
 	}
 
 	@Test

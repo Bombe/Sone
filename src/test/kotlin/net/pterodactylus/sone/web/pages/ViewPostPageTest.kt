@@ -26,26 +26,29 @@ class ViewPostPageTest : WebPageTest() {
 
 	@Test
 	fun `get request without parameters stores null in template context`() {
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["post"], nullValue())
-		assertThat(templateContext["raw"] as? Boolean, equalTo(false))
+		verifyNoRedirect {
+			assertThat(templateContext["post"], nullValue())
+			assertThat(templateContext["raw"] as? Boolean, equalTo(false))
+		}
 	}
 
 	@Test
 	fun `get request with invalid post id stores null in template context`() {
 		addHttpRequestParameter("post", "invalid-post-id")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["post"], nullValue())
-		assertThat(templateContext["raw"] as? Boolean, equalTo(false))
+		verifyNoRedirect {
+			assertThat(templateContext["post"], nullValue())
+			assertThat(templateContext["raw"] as? Boolean, equalTo(false))
+		}
 	}
 
 	@Test
 	fun `get request with valid post id stores post in template context`() {
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["post"], equalTo<Any>(post))
-		assertThat(templateContext["raw"] as? Boolean, equalTo(false))
+		verifyNoRedirect {
+			assertThat(templateContext["post"], equalTo<Any>(post))
+			assertThat(templateContext["raw"] as? Boolean, equalTo(false))
+		}
 	}
 
 	@Test
@@ -53,9 +56,10 @@ class ViewPostPageTest : WebPageTest() {
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
 		addHttpRequestParameter("raw", "true")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["post"], equalTo<Any>(post))
-		assertThat(templateContext["raw"] as? Boolean, equalTo(true))
+		verifyNoRedirect {
+			assertThat(templateContext["post"], equalTo<Any>(post))
+			assertThat(templateContext["raw"] as? Boolean, equalTo(true))
+		}
 	}
 
 	@Test

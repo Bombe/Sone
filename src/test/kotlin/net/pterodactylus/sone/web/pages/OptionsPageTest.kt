@@ -54,38 +54,40 @@ class OptionsPageTest : WebPageTest() {
 
 	@Test
 	fun `get request stores all preferences in the template context`() {
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["auto-follow"], equalTo<Any>(true))
-		assertThat(templateContext["show-notification-new-sones"], equalTo<Any>(true))
-		assertThat(templateContext["show-notification-new-posts"], equalTo<Any>(true))
-		assertThat(templateContext["show-notification-new-replies"], equalTo<Any>(true))
-		assertThat(templateContext["enable-sone-insert-notifications"], equalTo<Any>(true))
-		assertThat(templateContext["load-linked-images"], equalTo<Any>("FOLLOWED"))
-		assertThat(templateContext["show-custom-avatars"], equalTo<Any>("FOLLOWED"))
-		assertThat(templateContext["insertion-delay"], equalTo<Any>(1))
-		assertThat(templateContext["characters-per-post"], equalTo<Any>(50))
-		assertThat(templateContext["fcp-full-access-required"], equalTo<Any>(1))
-		assertThat(templateContext["images-per-page"], equalTo<Any>(4))
-		assertThat(templateContext["fcp-interface-active"], equalTo<Any>(true))
-		assertThat(templateContext["require-full-access"], equalTo<Any>(true))
-		assertThat(templateContext["negative-trust"], equalTo<Any>(7))
-		assertThat(templateContext["positive-trust"], equalTo<Any>(8))
-		assertThat(templateContext["post-cut-off-length"], equalTo<Any>(51))
-		assertThat(templateContext["posts-per-page"], equalTo<Any>(10))
-		assertThat(templateContext["trust-comment"], equalTo<Any>("11"))
+		verifyNoRedirect {
+			assertThat(templateContext["auto-follow"], equalTo<Any>(true))
+			assertThat(templateContext["show-notification-new-sones"], equalTo<Any>(true))
+			assertThat(templateContext["show-notification-new-posts"], equalTo<Any>(true))
+			assertThat(templateContext["show-notification-new-replies"], equalTo<Any>(true))
+			assertThat(templateContext["enable-sone-insert-notifications"], equalTo<Any>(true))
+			assertThat(templateContext["load-linked-images"], equalTo<Any>("FOLLOWED"))
+			assertThat(templateContext["show-custom-avatars"], equalTo<Any>("FOLLOWED"))
+			assertThat(templateContext["insertion-delay"], equalTo<Any>(1))
+			assertThat(templateContext["characters-per-post"], equalTo<Any>(50))
+			assertThat(templateContext["fcp-full-access-required"], equalTo<Any>(1))
+			assertThat(templateContext["images-per-page"], equalTo<Any>(4))
+			assertThat(templateContext["fcp-interface-active"], equalTo<Any>(true))
+			assertThat(templateContext["require-full-access"], equalTo<Any>(true))
+			assertThat(templateContext["negative-trust"], equalTo<Any>(7))
+			assertThat(templateContext["positive-trust"], equalTo<Any>(8))
+			assertThat(templateContext["post-cut-off-length"], equalTo<Any>(51))
+			assertThat(templateContext["posts-per-page"], equalTo<Any>(10))
+			assertThat(templateContext["trust-comment"], equalTo<Any>("11"))
+		}
 	}
 
 	@Test
 	fun `get request without sone does not store sone-specific preferences in the template context`() {
 		unsetCurrentSone()
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["auto-follow"], nullValue())
-		assertThat(templateContext["show-notification-new-sones"], nullValue())
-		assertThat(templateContext["show-notification-new-posts"], nullValue())
-		assertThat(templateContext["show-notification-new-replies"], nullValue())
-		assertThat(templateContext["enable-sone-insert-notifications"], nullValue())
-		assertThat(templateContext["load-linked-images"], nullValue())
-		assertThat(templateContext["show-custom-avatars"], nullValue())
+		verifyNoRedirect {
+			assertThat(templateContext["auto-follow"], nullValue())
+			assertThat(templateContext["show-notification-new-sones"], nullValue())
+			assertThat(templateContext["show-notification-new-posts"], nullValue())
+			assertThat(templateContext["show-notification-new-replies"], nullValue())
+			assertThat(templateContext["enable-sone-insert-notifications"], nullValue())
+			assertThat(templateContext["load-linked-images"], nullValue())
+			assertThat(templateContext["show-custom-avatars"], nullValue())
+		}
 	}
 
 	private fun <T> verifyThatOptionCanBeSet(option: String, setValue: Any?, expectedValue: T, getter: () -> T) {
@@ -137,8 +139,9 @@ class OptionsPageTest : WebPageTest() {
 		unsetCurrentSone()
 		setMethod(POST)
 		addHttpRequestPart(name, value)
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["fieldErrors"] as Iterable<*>, hasItem(name))
+		verifyNoRedirect {
+			assertThat(templateContext["fieldErrors"] as Iterable<*>, hasItem(name))
+		}
 	}
 
 	private fun <T> verifyThatPreferencesCanBeSet(name: String, setValue: String?, expectedValue: T, getter: () -> T) {

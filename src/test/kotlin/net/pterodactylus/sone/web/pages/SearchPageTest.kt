@@ -140,8 +140,9 @@ class SearchPageTest : WebPageTest() {
 		addSone("sone-with-match", soneWithMatch)
 		addSone("sone-without-match", soneWithoutMatch)
 		addHttpRequestParameter("query", "word")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithMatch))
+		}
 	}
 
 	@Test
@@ -157,8 +158,9 @@ class SearchPageTest : WebPageTest() {
 		addSone("sone-with-match", soneWithMatch)
 		addSone("sone-without-match", soneWithoutMatch)
 		addHttpRequestParameter("query", "word")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithMatch))
+		}
 	}
 
 	private fun createSoneWithPost(idPostfix: String, text: String, recipient: Sone? = null, sender: Sone? = null) =
@@ -171,8 +173,9 @@ class SearchPageTest : WebPageTest() {
 		val postWithEarlyMatch = createSoneWithPost("with-early-match", "optional match")
 		val postWithLaterMatch = createSoneWithPost("with-later-match", "match that is optional")
 		addHttpRequestParameter("query", "optional ")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithEarlyMatch, postWithLaterMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithEarlyMatch, postWithLaterMatch))
+		}
 	}
 
 	@Test
@@ -180,8 +183,9 @@ class SearchPageTest : WebPageTest() {
 		val postWithRequiredMatch = createSoneWithPost("with-required-match", "required match")
 		createPost("without-required-match", "not a match")
 		addHttpRequestParameter("query", "+required ")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithRequiredMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithRequiredMatch))
+		}
 	}
 
 	@Test
@@ -189,8 +193,9 @@ class SearchPageTest : WebPageTest() {
 		createSoneWithPost("with-forbidden-match", "forbidden match")
 		val postWithoutForbiddenMatch = createSoneWithPost("without-forbidden-match", "not a match")
 		addHttpRequestParameter("query", "match -forbidden")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithoutForbiddenMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithoutForbiddenMatch))
+		}
 	}
 
 	@Test
@@ -198,8 +203,9 @@ class SearchPageTest : WebPageTest() {
 		val postWithMatch = createSoneWithPost("with-match", "with + match")
 		createSoneWithPost("without-match", "without match")
 		addHttpRequestParameter("query", "+")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithMatch))
+		}
 	}
 
 	@Test
@@ -207,8 +213,9 @@ class SearchPageTest : WebPageTest() {
 		val postWithMatch = createSoneWithPost("with-match", "with - match")
 		createSoneWithPost("without-match", "without match")
 		addHttpRequestParameter("query", "-")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithMatch))
+		}
 	}
 
 	private fun createPost(id: String, text: String, recipient: Sone?) = mock<Post>().apply {
@@ -235,8 +242,9 @@ class SearchPageTest : WebPageTest() {
 		val postWithMatch = createSoneWithPost("with-match", "test", recipient)
 		createSoneWithPost("without-match", "no match")
 		addHttpRequestParameter("query", "recipient")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["postHits"], contains<Post>(postWithMatch))
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains<Post>(postWithMatch))
+		}
 	}
 
 	@Test
@@ -246,8 +254,9 @@ class SearchPageTest : WebPageTest() {
 		createSoneWithPost("with-match", "test", sender = soneWithProfileField)
 		createSoneWithPost("without-match", "no match")
 		addHttpRequestParameter("query", "value")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(this["soneHits"], contains(soneWithProfileField))
+		verifyNoRedirect {
+			assertThat(this["soneHits"], contains(soneWithProfileField))
+		}
 	}
 
 	@Suppress("UNCHECKED_CAST")

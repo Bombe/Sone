@@ -20,7 +20,7 @@ class TrustPageTest : WebPageTest() {
 
 	@Test
 	fun `get method does not redirect`() {
-		page.handleRequest(freenetRequest, templateContext)
+		verifyNoRedirect { }
 	}
 
 	@Test

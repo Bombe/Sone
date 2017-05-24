@@ -30,8 +30,9 @@ class RescuePageTest : WebPageTest() {
 
 	@Test
 	fun `get request sets rescuer in template context`() {
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["soneRescuer"], equalTo<Any>(soneRescuer))
+		verifyNoRedirect {
+			assertThat(templateContext["soneRescuer"], equalTo<Any>(soneRescuer))
+		}
 	}
 
 	@Test

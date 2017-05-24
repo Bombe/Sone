@@ -20,8 +20,9 @@ class UntrustPageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-		page.handleRequest(freenetRequest, templateContext)
-		verify(core, never()).untrustSone(eq(currentSone), any())
+		verifyNoRedirect {
+			verify(core, never()).untrustSone(eq(currentSone), any())
+		}
 	}
 
 	@Test

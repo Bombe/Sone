@@ -42,17 +42,19 @@ class ViewSonePageTest : WebPageTest() {
 
 	@Test
 	fun `get request without sone parameter stores null in template context`() {
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["sone"], nullValue())
-		assertThat(templateContext["soneId"], equalTo<Any>(""))
+		verifyNoRedirect {
+			assertThat(templateContext["sone"], nullValue())
+			assertThat(templateContext["soneId"], equalTo<Any>(""))
+		}
 	}
 
 	@Test
 	fun `get request with invalid sone parameter stores null in template context`() {
 		addHttpRequestParameter("sone", "invalid-sone-id")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["sone"], nullValue())
-		assertThat(templateContext["soneId"], equalTo<Any>("invalid-sone-id"))
+		verifyNoRedirect {
+			assertThat(templateContext["sone"], nullValue())
+			assertThat(templateContext["soneId"], equalTo<Any>("invalid-sone-id"))
+		}
 	}
 
 	@Test
@@ -61,9 +63,10 @@ class ViewSonePageTest : WebPageTest() {
 		whenever(core.getDirectedPosts("sone-id")).thenReturn(emptyList())
 		addHttpRequestParameter("sone", "sone-id")
 		addSone("sone-id", currentSone)
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["sone"], equalTo<Any>(currentSone))
-		assertThat(templateContext["soneId"], equalTo<Any>("sone-id"))
+		verifyNoRedirect {
+			assertThat(templateContext["sone"], equalTo<Any>(currentSone))
+			assertThat(templateContext["soneId"], equalTo<Any>("sone-id"))
+		}
 	}
 
 	private fun createPost(id: String, text: String, time: Long, sender: Sone? = null, recipient: Sone? = null) = mock<Post>().apply {
@@ -81,8 +84,9 @@ class ViewSonePageTest : WebPageTest() {
 	fun `request with valid sone stores posts and directed posts in template context`() {
 		addSone("sone-id", currentSone)
 		addHttpRequestParameter("sone", "sone-id")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["posts"] as Iterable<Post>, contains(directed2, post2))
+		verifyNoRedirect {
+			assertThat(templateContext["posts"] as Iterable<Post>, contains(directed2, post2))
+		}
 	}
 
 	@Test
@@ -91,8 +95,9 @@ class ViewSonePageTest : WebPageTest() {
 		addSone("sone-id", currentSone)
 		addHttpRequestParameter("sone", "sone-id")
 		addHttpRequestParameter("postPage", "1")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["posts"] as Iterable<Post>, contains(directed1, post1))
+		verifyNoRedirect {
+			assertThat(templateContext["posts"] as Iterable<Post>, contains(directed1, post1))
+		}
 	}
 
 	private fun createReply(text: String, time: Long, post: Post?) = mock<PostReply>().apply {
@@ -120,8 +125,9 @@ class ViewSonePageTest : WebPageTest() {
 		whenever(core.getReplies("post3")).thenReturn(listOf(reply6))
 		addSone("sone-id", currentSone)
 		addHttpRequestParameter("sone", "sone-id")
-		page.handleRequest(freenetRequest, templateContext)
-		assertThat(templateContext["repliedPosts"] as Iterable<Post>, contains(foreignPost2,  foreignPost1))
+		verifyNoRedirect {
+			assertThat(templateContext["repliedPosts"] as Iterable<Post>, contains(foreignPost2,  foreignPost1))
+		}
 	}
 
 	@Test

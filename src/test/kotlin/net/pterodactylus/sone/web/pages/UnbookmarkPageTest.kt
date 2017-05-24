@@ -20,7 +20,7 @@ class UnbookmarkPageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-		page.handleRequest(freenetRequest, templateContext)
+		verifyNoRedirect { }
 	}
 
 	@Test
