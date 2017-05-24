@@ -32,7 +32,7 @@ class BookmarkPageTest : WebPageTest() {
 	}
 
 	private fun setupBookmarkRequest() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return-page.html")
 		addHttpRequestPart("post", "post-id")
 	}

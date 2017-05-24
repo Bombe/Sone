@@ -5,7 +5,6 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DistrustPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -39,20 +38,19 @@ class DistrustPageTest: WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `post request with invalid sone redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html")
 	}
 
 	@Test
 	fun `post request with valid sone distrusts sone and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		val remoteSone = mock<Sone>()
 		addSone("remote-sone-id", remoteSone)
 		addHttpRequestPart("returnPage", "return.html")

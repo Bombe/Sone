@@ -8,7 +8,6 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.version.Version
-import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.anyOf
@@ -207,14 +206,14 @@ class SoneTemplatePageTest : WebPageTest() {
 	@Test
 	fun `redirect does happen if sone is not logged in`() {
 		unsetCurrentSone()
-		request("index.html", GET)
+		request("index.html")
 		assertThat(page.getRedirectTarget(freenetRequest), equalTo("login.html?target=index.html"))
 	}
 
 	@Test
 	fun `redirect does happen with parameters encoded correctly if sone is not logged in`() {
 		unsetCurrentSone()
-		request("index.html", GET)
+		request("index.html")
 		addHttpRequestParameter("foo", "b=r")
 		addHttpRequestParameter("baz", "q&o")
 		assertThat(page.getRedirectTarget(freenetRequest), anyOf(

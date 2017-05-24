@@ -41,14 +41,14 @@ class DismissNotificationPageTest: WebPageTest() {
 
 	@Test
 	fun `get request with invalid notification ID redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html")
 	}
 
 	@Test
 	fun `get request with non-dismissible notification never dismisses the notification but redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addNotification("notification-id", notification)
 		addHttpRequestPart("notification", "notification-id")
 		addHttpRequestPart("returnPage", "return.html")
@@ -59,7 +59,7 @@ class DismissNotificationPageTest: WebPageTest() {
 
 	@Test
 	fun `post request with dismissible notification dismisses the notification and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		whenever(notification.isDismissable).thenReturn(true)
 		addNotification("notification-id", notification)
 		addHttpRequestPart("notification", "notification-id")

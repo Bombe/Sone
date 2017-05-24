@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -41,13 +40,12 @@ class FollowSonePageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `a single sone can be followed`() {
-		request("", POST)
+		setMethod(POST)
 		val sone = mock<Sone>()
 		addSone("sone-id", sone)
 		addHttpRequestPart("sone", "sone-id")
@@ -60,7 +58,7 @@ class FollowSonePageTest : WebPageTest() {
 
 	@Test
 	fun `multiple sones can be followed`() {
-		request("", POST)
+		setMethod(POST)
 		val firstSone = mock<Sone>()
 		addSone("sone-id1", firstSone)
 		val secondSone = mock<Sone>()
@@ -77,7 +75,7 @@ class FollowSonePageTest : WebPageTest() {
 
 	@Test
 	fun `a non-existing sone is not followed`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("sone", "sone-id")
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {

@@ -6,7 +6,6 @@ import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder
@@ -47,7 +46,6 @@ class NewPageTest: WebPageTest() {
 
 	@Test
 	fun `posts are not duplicated when they come from both new posts and new replies notifications`() {
-		setMethod(GET)
 		val extraPost = mock<Post>().withTime(2000)
 		val posts = asList(mock<Post>().withTime(1000), mock<Post>().withTime(3000))
 		val postReplies = asList(mock<PostReply>(), mock<PostReply>())
@@ -67,7 +65,6 @@ class NewPageTest: WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `posts are paginated properly`() {
-		setMethod(GET)
 		webInterface.core.preferences.postsPerPage = 2
 		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
 		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
@@ -79,7 +76,6 @@ class NewPageTest: WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `posts are paginated properly on second page`() {
-		setMethod(GET)
 		webInterface.core.preferences.postsPerPage = 2
 		addHttpRequestParameter("page", "1")
 		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))

@@ -6,7 +6,6 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DeletePostPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -45,13 +44,11 @@ class DeletePostPageTest : WebPageTest() {
 
 	@Test
 	fun `get request with invalid post redirects to no permission page`() {
-		request("", GET)
 		verifyRedirect("noPermission.html")
 	}
 
 	@Test
 	fun `get request with valid post sets post and return page in template context`() {
-		request("", GET)
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
 		addHttpRequestParameter("returnPage", "return.html")
@@ -62,13 +59,13 @@ class DeletePostPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with invalid post redirects to no permission page`() {
-		request("", POST)
+		setMethod(POST)
 		verifyRedirect("noPermission.html")
 	}
 
 	@Test
 	fun `post request with post from non-local sone redirects to no permission page`() {
-		request("", POST)
+		setMethod(POST)
 		whenever(sone.isLocal).thenReturn(false)
 		addPost("post-id", post)
 		addHttpRequestPart("post", "post-id")
@@ -78,7 +75,7 @@ class DeletePostPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with confirmation deletes post and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addPost("post-id", post)
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("returnPage", "return.html")
@@ -90,7 +87,7 @@ class DeletePostPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with abort delete does not delete post and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addPost("post-id", post)
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("returnPage", "return.html")
@@ -102,7 +99,7 @@ class DeletePostPageTest : WebPageTest() {
 
 	@Test
 	fun `post request without delete or abort sets post in template context`() {
-		request("", POST)
+		setMethod(POST)
 		addPost("post-id", post)
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("returnPage", "return.html")

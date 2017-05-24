@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.EditProfileFieldPage
 import net.pterodactylus.sone.web.pages.WebPageTest
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -48,13 +47,11 @@ class EditProfileFieldPageTest : WebPageTest() {
 
 	@Test
 	fun `get request with invalid field redirects to invalid page`() {
-		request("", GET)
 		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `get request with valid field stores field in template context`() {
-		request("", GET)
 		addHttpRequestParameter("field", field.id)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["field"], equalTo<Any>(field))
@@ -62,7 +59,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with cancel set redirects to profile edit page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("field", field.id)
 		addHttpRequestPart("cancel", "true")
 		verifyRedirect("editProfile.html#profile-fields")
@@ -70,7 +67,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with new name renames field and redirects to profile edit page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("field", field.id)
 		addHttpRequestPart("name", "New Name")
 		verifyRedirect("editProfile.html#profile-fields") {
@@ -81,7 +78,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with same name does not modify field and redirects to profile edit page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("field", field.id)
 		addHttpRequestPart("name", "Name")
 		verifyRedirect("editProfile.html#profile-fields") {
@@ -92,7 +89,7 @@ class EditProfileFieldPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with same name as different field sets error condition in template`() {
-		request("", POST)
+		setMethod(POST)
 		profile.addField("New Name")
 		addHttpRequestPart("field", field.id)
 		addHttpRequestPart("name", "New Name")

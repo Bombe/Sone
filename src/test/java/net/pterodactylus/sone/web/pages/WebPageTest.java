@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages;
 
 import static net.pterodactylus.sone.test.GuiceKt.supply;
 import static net.pterodactylus.sone.web.WebTestUtils.redirectsTo;
+import static net.pterodactylus.util.web.Method.GET;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -126,6 +127,7 @@ public abstract class WebPageTest {
 
 	@Before
 	public final void setupFreenetRequest() throws SizeLimitExceededException {
+		setMethod(GET);
 		when(freenetRequest.getToadletContext()).thenReturn(toadletContext);
 		when(freenetRequest.getHttpRequest()).thenReturn(httpRequest);
 		when(httpRequest.getMultipleParam(anyString())).thenAnswer(new Answer<String[]>() {
@@ -314,15 +316,13 @@ public abstract class WebPageTest {
 		when(httpRequest.getMethod()).thenReturn(method.name());
 	}
 
-	protected void request(String uri, Method method) {
+	protected void request(String uri) {
 		try {
 			when(httpRequest.getPath()).thenReturn(uri);
 			when(freenetRequest.getUri()).thenReturn(new URI(uri));
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
-		when(freenetRequest.getMethod()).thenReturn(method);
-		when(httpRequest.getMethod()).thenReturn(method.name());
 	}
 
 	protected void addHttpRequestHeader(@Nonnull String name, String value) {

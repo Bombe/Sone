@@ -11,7 +11,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
@@ -38,11 +37,6 @@ class KnownSonesPageTest: WebPageTest() {
 		addSone("sone2", sones[1])
 		addSone("sone3", sones[2])
 		addSone("sone4", sones[3])
-	}
-
-	@Before
-	fun setupGetRequests() {
-		setMethod(GET)
 	}
 
 	private fun createSone(time: Long, posts: Int, replies: Int, images: Int, name: String, local: Boolean, new: Boolean) = mock<Sone>().apply {

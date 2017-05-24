@@ -8,7 +8,6 @@ import net.pterodactylus.sone.test.thenReturnMock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.LoginPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
@@ -63,7 +62,6 @@ class LoginPageTest : WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `get request stores sones in template context`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["sones"] as Iterable<Sone>, containsInAnyOrder(sones[0], sones[1], sones[2]))
 	}
@@ -71,7 +69,6 @@ class LoginPageTest : WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `get request stores identities without sones in template context`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["identitiesWithoutSone"] as Iterable<Identity>, contains(sones[1].identity))
 	}
@@ -79,7 +76,7 @@ class LoginPageTest : WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `post request with invalid sone sets sones and identities without sone in template context`() {
-		request("", POST)
+		setMethod(POST)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["sones"] as Iterable<Sone>, containsInAnyOrder(sones[0], sones[1], sones[2]))
 		assertThat(templateContext["identitiesWithoutSone"] as Iterable<Identity>, contains(sones[1].identity))
@@ -87,7 +84,7 @@ class LoginPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with valid sone logs in the sone and redirects to index page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("sone-id", "sone2")
 		verifyRedirect("index.html") {
 			verify(webInterface).setCurrentSone(toadletContext, sones[1])
@@ -96,7 +93,7 @@ class LoginPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with valid sone and target redirects to target page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("sone-id", "sone2")
 		addHttpRequestParameter("target", "foo.html")
 		verifyRedirect("foo.html") {

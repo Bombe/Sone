@@ -40,7 +40,7 @@ class CreatePostPageTest: WebPageTest() {
 
 	@Test
 	fun `post is created correctly`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("text", "post text")
 		verifyRedirect("return.html") {
@@ -50,7 +50,7 @@ class CreatePostPageTest: WebPageTest() {
 
 	@Test
 	fun `creating an empty post is denied`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("text", "  ")
 		page.processTemplate(freenetRequest, templateContext)
@@ -59,7 +59,7 @@ class CreatePostPageTest: WebPageTest() {
 
 	@Test
 	fun `a sender can be selected`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("text", "post text")
 		addHttpRequestPart("sender", "sender-id")
@@ -72,7 +72,7 @@ class CreatePostPageTest: WebPageTest() {
 
 	@Test
 	fun `a recipient can be selected`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("text", "post text")
 		addHttpRequestPart("recipient", "recipient-id")
@@ -85,7 +85,7 @@ class CreatePostPageTest: WebPageTest() {
 
 	@Test
 	fun `text is filtered correctly`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("text", "post http://localhost:12345/KSK@foo text")
 		addHttpRequestHeader("Host", "localhost:12345")

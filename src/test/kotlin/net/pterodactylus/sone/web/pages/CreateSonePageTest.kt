@@ -85,7 +85,7 @@ class CreateSonePageTest: WebPageTest() {
 	@Test
 	fun `sone is created and logged in`() {
 		addExistingOwnIdentities()
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("identity", "own-id-3")
 		val newSone = mock<Sone>()
 		whenever(core.createSone(ownIdentities_[2])).thenReturn(newSone)
@@ -96,7 +96,7 @@ class CreateSonePageTest: WebPageTest() {
 
 	@Test
 	fun `on invalid identity id a flag is set in the template context`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestParameter("identity", "own-id-3")
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["errorNoIdentity"], equalTo<Any>(true))
@@ -105,7 +105,7 @@ class CreateSonePageTest: WebPageTest() {
 	@Test
 	fun `if sone is not created user is still redirected to index`() {
 		addExistingOwnIdentities()
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("identity", "own-id-3")
 		whenever(core.createSone(ownIdentities_[2])).thenReturn(null)
 		verifyRedirect("index.html") {

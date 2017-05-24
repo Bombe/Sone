@@ -5,7 +5,6 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
@@ -36,7 +35,6 @@ class ImageBrowserPageTest : WebPageTest() {
 
 	@Test
 	fun `get request with album sets album and page in template context`() {
-		request("", GET)
 		val album = mock<Album>()
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
@@ -49,7 +47,6 @@ class ImageBrowserPageTest : WebPageTest() {
 
 	@Test
 	fun `get request with image sets image in template context`() {
-		request("", GET)
 		val image = mock<Image>()
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
@@ -60,7 +57,6 @@ class ImageBrowserPageTest : WebPageTest() {
 
 	@Test
 	fun `get request with sone sets sone in template context`() {
-		request("", GET)
 		val sone = mock<Sone>()
 		addSone("sone-id", sone)
 		addHttpRequestParameter("sone", "sone-id")
@@ -71,7 +67,6 @@ class ImageBrowserPageTest : WebPageTest() {
 
 	@Test
 	fun `get request with mode of gallery sets albums and page in template context`() {
-		request("", GET)
 		val firstSone = createSone("first album", "second album")
 		addSone("sone1", firstSone)
 		val secondSone = createSone("third album", "fourth album")
@@ -106,7 +101,6 @@ class ImageBrowserPageTest : WebPageTest() {
 
 	@Test
 	fun `requesting nothing will show the albums of the current sone`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["soneRequested"], equalTo<Any>(true))
 		assertThat(templateContext["sone"], equalTo<Any>(currentSone))

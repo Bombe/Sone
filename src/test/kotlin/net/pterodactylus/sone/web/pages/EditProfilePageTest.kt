@@ -6,7 +6,6 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.EditProfilePage
 import net.pterodactylus.sone.web.pages.WebPageTest
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
@@ -63,7 +62,6 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `get request stores fields of current sone’s profile in template context`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["firstName"], equalTo<Any>("First"))
 		assertThat(templateContext["middleName"], equalTo<Any>("Middle"))
@@ -77,7 +75,7 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `post request without any command stores fields of current sone’s profile in template context`() {
-		request("", POST)
+		setMethod(POST)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["firstName"], equalTo<Any>("First"))
 		assertThat(templateContext["middleName"], equalTo<Any>("Middle"))
@@ -90,7 +88,7 @@ class EditProfilePageTest : WebPageTest() {
 	}
 
 	private fun <T> verifySingleFieldCanBeChanged(fieldName: String, newValue: T, expectedValue: T = newValue, fieldAccessor: () -> T) {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("save-profile", "true")
 		addHttpRequestPart(fieldName, newValue.toString())
 		verifyRedirect("editProfile.html") {
@@ -155,7 +153,7 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `adding a field with a duplicate name sets error in template context`() {
-		request("", POST)
+		setMethod(POST)
 		profile.addField("new-field")
 		addHttpRequestPart("add-field", "true")
 		addHttpRequestPart("field-name", "new-field")
@@ -167,7 +165,7 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `adding a field with a new name sets adds field to profile and redirects to profile edit page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("add-field", "true")
 		addHttpRequestPart("field-name", "new-field")
 		verifyRedirect("editProfile.html#profile-fields") {
@@ -179,14 +177,14 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `deleting a field redirects to delete field page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("delete-field-${firstField.id}", "true")
 		verifyRedirect("deleteProfileField.html?field=${firstField.id}")
 	}
 
 	@Test
 	fun `moving a field up moves the field up and redirects to the edit profile page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("move-up-field-${secondField.id}", "true")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.fields, contains(secondField, firstField))
@@ -196,14 +194,14 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `moving an invalid field up does not redirect`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("move-up-field-foo", "true")
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `moving a field down moves the field down and redirects to the edit profile page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("move-down-field-${firstField.id}", "true")
 		verifyRedirect("editProfile.html#profile-fields") {
 			assertThat(profile.fields, contains(secondField, firstField))
@@ -213,14 +211,14 @@ class EditProfilePageTest : WebPageTest() {
 
 	@Test
 	fun `moving an invalid field down does not redirect`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("move-down-field-foo", "true")
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `editing a field redirects to the edit profile page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("edit-field-${firstField.id}", "true")
 		verifyRedirect("editProfileField.html?field=${firstField.id}")
 	}

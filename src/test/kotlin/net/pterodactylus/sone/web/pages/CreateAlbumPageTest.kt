@@ -45,7 +45,7 @@ class CreateAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `missing name results in attribute being set in template context`() {
-		request("", POST)
+		setMethod(POST)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["nameMissing"], equalTo<Any>(true))
 	}
@@ -60,7 +60,7 @@ class CreateAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `title and description are set correctly on the album`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("parent-id", parentAlbum)
 		addHttpRequestPart("name", "new name")
 		addHttpRequestPart("description", "new description")
@@ -76,7 +76,7 @@ class CreateAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `root album is used if no parent is specified`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("name", "new name")
 		addHttpRequestPart("description", "new description")
 		verifyRedirect("imageBrowser.html?album=album-id")
@@ -84,7 +84,7 @@ class CreateAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `empty album title redirects to error page`() {
-		request("", POST)
+		setMethod(POST)
 		whenever(newAlbum.modify().update()).thenThrow(AlbumTitleMustNotBeEmpty::class.java)
 		addHttpRequestPart("name", "new name")
 		addHttpRequestPart("description", "new description")
@@ -93,7 +93,7 @@ class CreateAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `album description is filtered`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("name", "new name")
 		addHttpRequestPart("description", "new http://localhost:12345/KSK@foo description")
 		addHttpRequestHeader("Host", "localhost:12345")

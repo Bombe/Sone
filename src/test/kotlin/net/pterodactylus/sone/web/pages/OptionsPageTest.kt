@@ -9,7 +9,6 @@ import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.OptionsPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -57,7 +56,6 @@ class OptionsPageTest : WebPageTest() {
 
 	@Test
 	fun `get request stores all preferences in the template context`() {
-		request("", GET)
 		page.handleRequest(freenetRequest, templateContext)
 		assertThat(templateContext["auto-follow"], equalTo<Any>(true))
 		assertThat(templateContext["show-notification-new-sones"], equalTo<Any>(true))
@@ -81,7 +79,6 @@ class OptionsPageTest : WebPageTest() {
 
 	@Test
 	fun `get request without sone does not store sone-specific preferences in the template context`() {
-		request("", GET)
 		unsetCurrentSone()
 		page.handleRequest(freenetRequest, templateContext)
 		assertThat(templateContext["auto-follow"], nullValue())
@@ -94,7 +91,7 @@ class OptionsPageTest : WebPageTest() {
 	}
 
 	private fun <T> verifyThatOptionCanBeSet(option: String, setValue: Any?, expectedValue: T, getter: () -> T) {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("show-custom-avatars", "ALWAYS")
 		addHttpRequestPart("load-linked-images", "ALWAYS")
 		addHttpRequestPart(option, setValue.toString())
@@ -140,7 +137,7 @@ class OptionsPageTest : WebPageTest() {
 
 	private fun verifyThatWrongValueForPreferenceIsDetected(name: String, value: String) {
 		unsetCurrentSone()
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart(name, value)
 		page.handleRequest(freenetRequest, templateContext)
 		assertThat(templateContext["fieldErrors"] as Iterable<*>, hasItem(name))
@@ -148,7 +145,7 @@ class OptionsPageTest : WebPageTest() {
 
 	private fun <T> verifyThatPreferencesCanBeSet(name: String, setValue: String?, expectedValue: T, getter: () -> T) {
 		unsetCurrentSone()
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart(name, setValue)
 		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))

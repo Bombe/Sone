@@ -8,7 +8,6 @@ import net.pterodactylus.sone.notify.PostVisibilityFilter
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.emptyIterable
@@ -65,7 +64,6 @@ class IndexPageTest : WebPageTest() {
 	fun `index page shows all posts of current sone`() {
 		val posts = listOf(createPost(3000), createPost(2000), createPost(1000))
 		whenever(currentSone.posts).thenReturn(posts)
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		assertThat(templateContext["posts"] as Iterable<Post>, contains(*posts.toTypedArray()))
@@ -79,7 +77,6 @@ class IndexPageTest : WebPageTest() {
 		val notFollowedPosts = listOf(createPost(2500, true), createPost(1500))
 		whenever(notFollowedSone.posts).thenReturn(notFollowedPosts)
 		addSone("notfollowed1", notFollowedSone)
-		request("", GET)
 		whenever(core.getDirectedPosts("current")).thenReturn(listOf(notFollowedPosts[0]))
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
@@ -97,7 +94,6 @@ class IndexPageTest : WebPageTest() {
 		whenever(followedSone.posts).thenReturn(followedPosts)
 		whenever(currentSone.friends).thenReturn(listOf("followed1", "followed2"))
 		addSone("followed1", followedSone)
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		assertThat(templateContext["posts"] as Iterable<Post>, contains(
@@ -115,7 +111,6 @@ class IndexPageTest : WebPageTest() {
 		whenever(currentSone.friends).thenReturn(listOf("followed1", "followed2"))
 		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn(Predicate<Post> { (it?.time ?: 10000) < 2500 })
 		addSone("followed1", followedSone)
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		assertThat(templateContext["posts"] as Iterable<Post>, contains(
@@ -127,7 +122,6 @@ class IndexPageTest : WebPageTest() {
 	fun `index page sets pagination correctly`() {
 		val posts = listOf(createPost(3000), createPost(2000), createPost(1000))
 		whenever(currentSone.posts).thenReturn(posts)
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(
@@ -139,7 +133,6 @@ class IndexPageTest : WebPageTest() {
 	fun `index page sets page correctly`() {
 		val posts = listOf(createPost(3000), createPost(2000), createPost(1000))
 		whenever(currentSone.posts).thenReturn(posts)
-		request("", GET)
 		core.preferences.postsPerPage = 1
 		addHttpRequestParameter("page", "2")
 		page.processTemplate(freenetRequest, templateContext)
@@ -149,7 +142,6 @@ class IndexPageTest : WebPageTest() {
 
 	@Test
 	fun `index page without posts sets correct pagination`() {
-		request("", GET)
 		core.preferences.postsPerPage = 1
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")

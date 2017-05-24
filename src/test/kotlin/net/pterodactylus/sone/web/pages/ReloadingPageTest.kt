@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.web.pages.ReloadingPage
 import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Rule
@@ -33,7 +32,7 @@ class ReloadingPageTest : WebPageTest() {
 
 	@Test
 	fun `requesting invalid file results in 404`() {
-		request("/prefix/path/file.txt", GET)
+		request("/prefix/path/file.txt")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(404))
 	}
@@ -41,7 +40,7 @@ class ReloadingPageTest : WebPageTest() {
 	@Test
 	fun `requesting valid file results in 200 and delivers file`() {
 		Files.write(Paths.get(folder.path, "file.txt"), listOf("Hello", "World"), UTF_8)
-		request("/prefix/path/file.txt", GET)
+		request("/prefix/path/file.txt")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.contentType, equalTo("text/plain"))

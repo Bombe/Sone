@@ -27,7 +27,7 @@ class UntrustPageTest : WebPageTest() {
 
 	@Test
 	fun `post request without sone parameter does not untrust but redirects`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core, never()).untrustSone(eq(currentSone), any())
@@ -36,7 +36,7 @@ class UntrustPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with invalid sone parameter does not untrust but redirects`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "no-sone")
 		verifyRedirect("return.html") {
@@ -46,7 +46,7 @@ class UntrustPageTest : WebPageTest() {
 
 	@Test
 	fun `post request with valid sone parameter untrusts and redirects`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "sone-id")
 		val sone = mock<Sone>()

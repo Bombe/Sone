@@ -6,7 +6,6 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DeleteReplyPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -45,7 +44,6 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `get request sets reply ID and return page in template context`() {
-		request("", GET)
 		addHttpRequestParameter("reply", "reply-id")
 		addHttpRequestParameter("returnPage", "return.html")
 		page.processTemplate(freenetRequest, templateContext)
@@ -55,7 +53,7 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `post request without any action sets reply ID and return page in template context`() {
-		request("", POST)
+		setMethod(POST)
 		addPostReply("reply-id", reply)
 		addHttpRequestPart("reply", "reply-id")
 		addHttpRequestPart("returnPage", "return.html")
@@ -66,13 +64,13 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `trying to delete a reply with an invalid ID results in no permission page`() {
-		request("", POST)
+		setMethod(POST)
 		verifyRedirect("noPermission.html")
 	}
 
 	@Test
 	fun `trying to delete a reply from a non-local sone results in no permission page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("reply", "reply-id")
 		whenever(sone.isLocal).thenReturn(false)
 		addPostReply("reply-id", reply)
@@ -81,7 +79,7 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `confirming deletion of reply deletes the reply and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addPostReply("reply-id", reply)
 		addHttpRequestPart("reply", "reply-id")
 		addHttpRequestPart("returnPage", "return.html")
@@ -93,7 +91,7 @@ class DeleteReplyPageTest : WebPageTest() {
 
 	@Test
 	fun `aborting deletion of reply redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addPostReply("reply-id", reply)
 		addHttpRequestPart("reply", "reply-id")
 		addHttpRequestPart("returnPage", "return.html")

@@ -9,7 +9,6 @@ import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.EditAlbumPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -61,19 +60,18 @@ class EditAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `post request with invalid album redirects to invalid page`() {
-		request("", POST)
+		setMethod(POST)
 		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `post request with album of non-local sone redirects to no permissions page`() {
-		request("", POST)
+		setMethod(POST)
 		whenever(sone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
@@ -82,7 +80,7 @@ class EditAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `post request with move left requested moves album to the left and redirects to album browser`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		addHttpRequestPart("moveLeft", "true")
@@ -94,7 +92,7 @@ class EditAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `post request with move right requested moves album to the left and redirects to album browser`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		addHttpRequestPart("moveRight", "true")
@@ -106,7 +104,7 @@ class EditAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `post request with empty album title redirects to empty album title page`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		whenever(modifier.setTitle("")).thenThrow(AlbumTitleMustNotBeEmpty())
@@ -115,7 +113,7 @@ class EditAlbumPageTest: WebPageTest() {
 
 	@Test
 	fun `post request with non-empty album title and description redirects to album browser`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		addHttpRequestPart("title", "title")

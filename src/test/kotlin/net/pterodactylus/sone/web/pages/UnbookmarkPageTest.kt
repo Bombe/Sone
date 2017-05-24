@@ -42,7 +42,7 @@ class UnbookmarkPageTest : WebPageTest() {
 
 	@Test
 	fun `post request does not unbookmark not-present post but redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
@@ -52,7 +52,7 @@ class UnbookmarkPageTest : WebPageTest() {
 
 	@Test
 	fun `post request unbookmarks present post and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("returnPage", "return.html")
 		val post = mock<Post>().apply { whenever(isLoaded).thenReturn(true) }

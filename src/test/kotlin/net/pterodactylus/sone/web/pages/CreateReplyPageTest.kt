@@ -31,7 +31,7 @@ class CreateReplyPageTest: WebPageTest() {
 
 	@Test
 	fun `reply is created correctly`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("text", "new text")
@@ -43,7 +43,7 @@ class CreateReplyPageTest: WebPageTest() {
 
 	@Test
 	fun `reply is filtered`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("text", "new http://localhost:12345/KSK@foo text")
@@ -56,7 +56,7 @@ class CreateReplyPageTest: WebPageTest() {
 
 	@Test
 	fun `reply is created with correct sender`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("text", "new text")
@@ -70,7 +70,7 @@ class CreateReplyPageTest: WebPageTest() {
 
 	@Test
 	fun `empty text sets parameters in template contexty`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("text", "  ")
@@ -83,7 +83,7 @@ class CreateReplyPageTest: WebPageTest() {
 
 	@Test
 	fun `user is redirected to no permissions page if post does not exist`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("post", "post-id")
 		addHttpRequestPart("text", "new text")

@@ -21,7 +21,7 @@ class UnfollowSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request unfollows a single sone and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "sone-id")
 		verifyRedirect("return.html") {
@@ -31,7 +31,7 @@ class UnfollowSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request unfollows two sones and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "sone-id1, sone-id2")
 		verifyRedirect("return.html") {

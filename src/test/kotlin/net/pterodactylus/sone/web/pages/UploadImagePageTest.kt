@@ -39,13 +39,13 @@ class UploadImagePageTest : WebPageTest() {
 
 	@Test
 	fun `post request without parent results in no permission error page`() {
-		request("", POST)
+		setMethod(POST)
 		verifyRedirect("noPermission.html")
 	}
 
 	@Test
 	fun `post request with parent that is not the current sone results in no permission error page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("parent", "parent-id")
 		whenever(parentAlbum.sone).thenReturn(mock<Sone>())
 		addAlbum("parent-id", parentAlbum)
@@ -54,7 +54,7 @@ class UploadImagePageTest : WebPageTest() {
 
 	@Test
 	fun `post request with empty name redirects to error page`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("parent-id", parentAlbum)
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", " ")
@@ -63,7 +63,7 @@ class UploadImagePageTest : WebPageTest() {
 
 	@Test
 	fun `uploading an invalid image results in no redirect and message set in template context`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("parent-id", parentAlbum)
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "title")
@@ -75,7 +75,7 @@ class UploadImagePageTest : WebPageTest() {
 
 	@Test
 	fun `uploading a valid image uploads image and redirects to album browser`() {
-		request("", POST)
+		setMethod(POST)
 		addAlbum("parent-id", parentAlbum)
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "Title")

@@ -4,7 +4,6 @@ import net.pterodactylus.sone.core.SoneRescuer
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.RescuePage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -32,20 +31,19 @@ class RescuePageTest : WebPageTest() {
 
 	@Test
 	fun `get request sets rescuer in template context`() {
-		request("", GET)
 		page.handleRequest(freenetRequest, templateContext)
 		assertThat(templateContext["soneRescuer"], equalTo<Any>(soneRescuer))
 	}
 
 	@Test
 	fun `post request redirects to rescue page`() {
-		request("", POST)
+		setMethod(POST)
 		verifyRedirect("rescue.html")
 	}
 
 	@Test
 	fun `post request with fetch and invalid edition starts next fetch`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("fetch", "true")
 		verifyRedirect("rescue.html") {
 			verify(soneRescuer, never()).setEdition(anyLong())
@@ -55,7 +53,7 @@ class RescuePageTest : WebPageTest() {
 
 	@Test
 	fun `post request with fetch and valid edition sets edition and starts next fetch`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("fetch", "true")
 		addHttpRequestPart("edition", "123")
 		verifyRedirect("rescue.html") {

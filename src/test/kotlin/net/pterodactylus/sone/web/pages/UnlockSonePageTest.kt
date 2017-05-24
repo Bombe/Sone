@@ -21,7 +21,7 @@ class UnlockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request without sone redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		verifyRedirect("return.html") {
 			verify(core, never()).unlockSone(any())
@@ -30,7 +30,7 @@ class UnlockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request without invalid local sone does not unlock any sone and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "invalid-sone")
 		verifyRedirect("return.html") {
@@ -40,7 +40,7 @@ class UnlockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request without remote sone does not unlock any sone and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "remote-sone")
 		addSone("remote-sone", mock<Sone>())
@@ -51,7 +51,7 @@ class UnlockSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request with local sone unlocks sone and redirects to return page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "local-sone")
 		val sone = mock<Sone>().apply { whenever(isLocal).thenReturn(true) }

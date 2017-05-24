@@ -7,7 +7,6 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DeleteImagePage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -48,13 +47,11 @@ class DeleteImagePageTest: WebPageTest() {
 
 	@Test
 	fun `get request with invalid image redirects to invalid page`() {
-		request("", GET)
 		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `get request with image from non-local sone redirects to no permissions page`() {
-		request("", GET)
 		whenever(sone.isLocal).thenReturn(false)
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
@@ -63,7 +60,6 @@ class DeleteImagePageTest: WebPageTest() {
 
 	@Test
 	fun `get request with image from local sone sets image in template context`() {
-		request("", GET)
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
 		page.processTemplate(freenetRequest, templateContext)
@@ -72,7 +68,7 @@ class DeleteImagePageTest: WebPageTest() {
 
 	@Test
 	fun `post request with abort delete flag set redirects to image browser`() {
-		request("", POST)
+		setMethod(POST)
 		addImage("image-id", image)
 		addHttpRequestPart("image", "image-id")
 		addHttpRequestPart("abortDelete", "true")
@@ -81,7 +77,7 @@ class DeleteImagePageTest: WebPageTest() {
 
 	@Test
 	fun `post request deletes image and redirects to image browser`() {
-		request("", POST)
+		setMethod(POST)
 		addImage("image-id", image)
 		addHttpRequestPart("image", "image-id")
 		verifyRedirect("imageBrowser.html?album=album-id") {

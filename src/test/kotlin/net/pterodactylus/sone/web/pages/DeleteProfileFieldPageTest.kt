@@ -4,7 +4,6 @@ import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DeleteProfileFieldPage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -45,20 +44,18 @@ class DeleteProfileFieldPageTest: WebPageTest() {
 
 	@Test
 	fun `get request with invalid field name redirects to invalid page`() {
-		request("", GET)
 		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `post request with invalid field name redirects to invalid page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("field", "wrong-id")
 		verifyRedirect("invalid.html")
 	}
 
 	@Test
 	fun `get request with valid field name sets field in template context`() {
-		request("", GET)
 		addHttpRequestParameter("field", field.id)
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["field"], equalTo<Any>(field))
@@ -66,7 +63,7 @@ class DeleteProfileFieldPageTest: WebPageTest() {
 
 	@Test
 	fun `post request without confirm redirects to edit profile page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("field", field.id)
 		verifyRedirect("editProfile.html#profile-fields") {
 			verify(currentSone, never()).profile = any()
@@ -75,7 +72,7 @@ class DeleteProfileFieldPageTest: WebPageTest() {
 
 	@Test
 	fun `post request with confirm removes field and redirects to edit profile page`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("field", field.id)
 		addHttpRequestPart("confirm", "true")
 		verifyRedirect("editProfile.html#profile-fields") {

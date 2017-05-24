@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.pages.WebPageTest
 import net.pterodactylus.sone.web.pages.DeleteSonePage
-import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -41,13 +40,12 @@ class DeleteSonePageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not redirect`() {
-		request("", GET)
 		page.processTemplate(freenetRequest, templateContext)
 	}
 
 	@Test
 	fun `post request without delete confirmation redirects to index`() {
-		request("", POST)
+		setMethod(POST)
 		verifyRedirect("index.html") {
 			verify(core, never()).deleteSone(any())
 		}
@@ -55,7 +53,7 @@ class DeleteSonePageTest : WebPageTest() {
 
 	@Test
 	fun `post request with delete confirmation deletes sone and redirects to index`() {
-		request("", POST)
+		setMethod(POST)
 		addHttpRequestPart("deleteSone", "true")
 		verifyRedirect("index.html") {
 			verify(core).deleteSone(currentSone)
