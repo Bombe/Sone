@@ -25,7 +25,7 @@ class LockSonePageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `page requires login`() {
+	fun `page does not require login`() {
 	    assertThat(page.requiresLogin(), equalTo(false))
 	}
 
