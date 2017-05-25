@@ -110,7 +110,7 @@ class OptionsPageTest: WebPageTest() {
 		setMethod(POST)
 		addHttpRequestPart("show-custom-avatars", "ALWAYS")
 		addHttpRequestPart("load-linked-images", "ALWAYS")
-		addHttpRequestPart(option, setValue.toString())
+		setValue?.also { addHttpRequestPart(option, it.toString()) }
 		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}
@@ -122,8 +122,19 @@ class OptionsPageTest: WebPageTest() {
 	}
 
 	@Test
+	fun `auto-follow option can be unset`() {
+		verifyThatOptionCanBeSet("auto-follow", null, false) { currentSone.options.isAutoFollow }
+	}
+
+	@Test
 	fun `show new sone notification option can be set`() {
 		verifyThatOptionCanBeSet("show-notification-new-sones", "checked", true) { currentSone.options.isShowNewSoneNotifications }
+	}
+
+	@Test
+	fun `show new sone notification option can be unset`() {
+		verifyThatOptionCanBeSet("" +
+				"", null, false) { currentSone.options.isShowNewSoneNotifications }
 	}
 
 	@Test
@@ -132,13 +143,28 @@ class OptionsPageTest: WebPageTest() {
 	}
 
 	@Test
+	fun `show new post notification option can be unset`() {
+		verifyThatOptionCanBeSet("show-notification-new-posts", null, false) { currentSone.options.isShowNewPostNotifications }
+	}
+
+	@Test
 	fun `show new reply notification option can be set`() {
 		verifyThatOptionCanBeSet("show-notification-new-replies", "checked", true) { currentSone.options.isShowNewReplyNotifications }
 	}
 
 	@Test
+	fun `show new reply notification option can be unset`() {
+		verifyThatOptionCanBeSet("show-notification-new-replies", null, false) { currentSone.options.isShowNewReplyNotifications }
+	}
+
+	@Test
 	fun `enable sone insert notifications option can be set`() {
 		verifyThatOptionCanBeSet("enable-sone-insert-notifications", "checked", true) { currentSone.options.isSoneInsertNotificationEnabled }
+	}
+
+	@Test
+	fun `enable sone insert notifications option can be unset`() {
+		verifyThatOptionCanBeSet("enable-sone-insert-notifications", null, false) { currentSone.options.isSoneInsertNotificationEnabled }
 	}
 
 	@Test
