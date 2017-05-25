@@ -16,7 +16,7 @@ import kotlin.text.Charsets.UTF_8
 class ReloadingPageTest : WebPageTest() {
 
 	@Rule @JvmField val tempFolder = TemporaryFolder()
-	private val folder by lazy { tempFolder.newFolder() }
+	private val folder by lazy { tempFolder.newFolder()!! }
 	private val page by lazy { ReloadingPage<FreenetRequest>("/prefix/", folder.path, "text/plain") }
 
 	@Test
@@ -34,6 +34,7 @@ class ReloadingPageTest : WebPageTest() {
 		request("/prefix/path/file.txt")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(404))
+		assertThat(response.statusText, equalTo("Not found"))
 	}
 
 	@Test
@@ -42,6 +43,7 @@ class ReloadingPageTest : WebPageTest() {
 		request("/prefix/path/file.txt")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(200))
+		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("text/plain"))
 		assertThat(responseBytes, equalTo("Hello\nWorld\n".toByteArray()))
 	}
