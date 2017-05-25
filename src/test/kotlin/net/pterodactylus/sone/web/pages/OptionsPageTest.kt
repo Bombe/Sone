@@ -18,7 +18,7 @@ import org.junit.Test
 /**
  * Unit test for [OptionsPage].
  */
-class OptionsPageTest : WebPageTest() {
+class OptionsPageTest: WebPageTest() {
 
 	private val page = OptionsPage(template, webInterface)
 
@@ -54,7 +54,7 @@ class OptionsPageTest : WebPageTest() {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("options.html"))
+		assertThat(page.path, equalTo("options.html"))
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class OptionsPageTest : WebPageTest() {
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.Options.Title", "options page title")
+		addTranslation("Page.Options.Title", "options page title")
 		assertThat(page.getPageTitle(freenetRequest), equalTo("options page title"))
 	}
 
