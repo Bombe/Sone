@@ -29,6 +29,22 @@ class RescuePageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("rescue.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+		assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		addTranslation("Page.Rescue.Title", "rescue page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("rescue page title"))
+	}
+
+	@Test
 	fun `get request sets rescuer in template context`() {
 		verifyNoRedirect {
 			assertThat(templateContext["soneRescuer"], equalTo<Any>(soneRescuer))
@@ -61,5 +77,17 @@ class RescuePageTest : WebPageTest() {
 			verify(soneRescuer).startNextFetch()
 		}
 	}
+
+	@Test
+	fun `post request with negative edition will not set edition`() {
+		setMethod(POST)
+		addHttpRequestPart("fetch", "true")
+		addHttpRequestPart("edition", "-123")
+		verifyRedirect("rescue.html") {
+			verify(soneRescuer, never()).setEdition(anyLong())
+			verify(soneRescuer).startNextFetch()
+		}
+	}
+
 
 }
