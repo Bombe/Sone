@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [RescuePage].
  */
-class RescuePageTest : WebPageTest() {
+class RescuePageTest: WebPageTest() {
 
 	private val page = RescuePage(template, webInterface)
 
