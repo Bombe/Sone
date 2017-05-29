@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.utils
 
+import net.pterodactylus.sone.test.hasPages
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
@@ -12,6 +13,12 @@ class PaginationTest {
 
 	private val items = listOf(1, 2, 3, 4, 5)
 	private val pagination = Pagination<Int>(items, 2)
+
+	@Test
+	fun `pagination can be created from iterable`() {
+		val pagination = listOf(1, 2, 3, 4, 5).asIterable().paginate(2)
+		assertThat(pagination, hasPages(3).isOnPage(0))
+	}
 
 	@Test
 	fun `new pagination is at page 0`() {
