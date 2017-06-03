@@ -1,14 +1,17 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.test.capture
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.Mockito.any
 import org.mockito.Mockito.never
+import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 
 /**
@@ -50,10 +53,9 @@ class UnbookmarkPageTest: WebPageTest() {
 		val notLoadedPost2 = mock<Post>()
 		whenever(core.bookmarkedPosts).thenReturn(setOf(loadedPost1, loadedPost2, notLoadedPost1, notLoadedPost2))
 		verifyRedirect("bookmarks.html") {
-			verify(core).unbookmarkPost(notLoadedPost1)
-			verify(core).unbookmarkPost(notLoadedPost2)
-			verify(core, never()).unbookmarkPost(loadedPost1)
-			verify(core, never()).unbookmarkPost(loadedPost2)
+			val postCaptor = capture<Post>()
+			verify(core, times(2)).unbookmarkPost(postCaptor.capture())
+			assertThat(postCaptor.allValues, contains(notLoadedPost1, notLoadedPost2))
 		}
 	}
 
