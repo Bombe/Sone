@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import com.google.common.base.Optional.absent
+import com.google.common.base.Ticker
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
@@ -11,19 +12,20 @@ import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.isOnPage
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Unit test for [SearchPage].
  */
 class SearchPageTest : WebPageTest() {
 
-	private val page = SearchPage(template, webInterface)
+	private val ticker = mock<Ticker>()
+	private val page = SearchPage(template, webInterface, ticker)
 
 	override fun getPage() = page
 
@@ -324,6 +326,39 @@ class SearchPageTest : WebPageTest() {
 		verifyNoRedirect {
 			assertThat(this["postPagination"], isOnPage(1).hasPages(2))
 			assertThat(this["postHits"], contains(sones[3]))
+		}
+	}
+
+	@Test
+	fun `post search results are cached`() {
+		val post = createPost("with-match", "text")
+		val callCounter = AtomicInteger()
+		whenever(post.text).thenAnswer { callCounter.incrementAndGet(); "text" }
+	    val sone = createSoneWithPost(post)
+		addSone("sone", sone)
+		addHttpRequestParameter("query", "text")
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains(post))
+		}
+		verifyNoRedirect {
+			assertThat(callCounter.get(), equalTo(1))
+		}
+	}
+
+	@Test
+	fun `post search results are cached for five minutes`() {
+		val post = createPost("with-match", "text")
+		val callCounter = AtomicInteger()
+		whenever(post.text).thenAnswer { callCounter.incrementAndGet(); "text" }
+	    val sone = createSoneWithPost(post)
+		addSone("sone", sone)
+		addHttpRequestParameter("query", "text")
+		verifyNoRedirect {
+			assertThat(this["postHits"], contains(post))
+		}
+		whenever(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(5) + 1  )
+		verifyNoRedirect {
+			assertThat(callCounter.get(), equalTo(2))
 		}
 	}
 
