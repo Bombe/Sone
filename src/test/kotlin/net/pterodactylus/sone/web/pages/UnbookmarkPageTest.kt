@@ -4,6 +4,8 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.util.web.Method.POST
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.Mockito.any
 import org.mockito.Mockito.never
@@ -12,11 +14,27 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnbookmarkPage].
  */
-class UnbookmarkPageTest : WebPageTest() {
+class UnbookmarkPageTest: WebPageTest() {
 
 	private val page = UnbookmarkPage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("unbookmark.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+		assertThat(page.requiresLogin(), equalTo(false))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		addTranslation("Page.Unbookmark.Title", "unbookmark page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("unbookmark page title"))
+	}
 
 	@Test
 	fun `get request does not redirect`() {
