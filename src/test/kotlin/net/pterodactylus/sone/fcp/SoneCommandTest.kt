@@ -11,9 +11,9 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
 import net.pterodactylus.sone.template.SoneAccessor
 import net.pterodactylus.sone.test.OneByOneMatcher
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.asOptional
 import org.junit.Before
 import org.junit.Rule
 import org.junit.rules.ExpectedException

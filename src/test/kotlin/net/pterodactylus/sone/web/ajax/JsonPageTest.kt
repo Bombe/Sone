@@ -11,10 +11,10 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.Sone.SoneStatus
 import net.pterodactylus.sone.data.Sone.SoneStatus.idle
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification

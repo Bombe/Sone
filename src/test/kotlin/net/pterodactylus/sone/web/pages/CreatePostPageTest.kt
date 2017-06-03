@@ -2,8 +2,8 @@ package net.pterodactylus.sone.web.pages
 
 import com.google.common.base.Optional.absent
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo

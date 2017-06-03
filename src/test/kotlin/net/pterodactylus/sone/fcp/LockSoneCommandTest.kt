@@ -1,8 +1,8 @@
 package net.pterodactylus.sone.fcp
 
 import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.asOptional
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before

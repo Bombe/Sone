@@ -4,9 +4,9 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.asOptional
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo

@@ -2,10 +2,10 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.sone.utils.asOptional
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder

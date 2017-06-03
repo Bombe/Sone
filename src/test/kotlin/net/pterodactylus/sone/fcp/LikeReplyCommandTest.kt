@@ -4,9 +4,9 @@ import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.fcp.FcpException
-import net.pterodactylus.sone.test.asOptional
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.asOptional
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
