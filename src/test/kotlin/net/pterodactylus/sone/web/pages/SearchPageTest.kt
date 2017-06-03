@@ -8,10 +8,14 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.asOptional
+import net.pterodactylus.sone.test.isOnPage
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 
 /**
@@ -22,6 +26,22 @@ class SearchPageTest : WebPageTest() {
 	private val page = SearchPage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("search.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+	    assertThat(page.requiresLogin(), equalTo(false))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+	    addTranslation("Page.Search.Title", "search page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("search page title"))
+	}
 
 	@Test
 	fun `empty query redirects to index page`() {
@@ -226,7 +246,7 @@ class SearchPageTest : WebPageTest() {
 		whenever(this.text).thenReturn(text)
 	}
 
-	private fun createSone(id: String, firstName: String, middleName: String, lastName: String) = mock<Sone>().apply {
+	private fun createSone(id: String, firstName: String? = null, middleName: String? = null, lastName: String? = null) = mock<Sone>().apply {
 		whenever(this.id).thenReturn(id)
 		whenever(this.name).thenReturn(id)
 		whenever(this.profile).thenReturn(Profile(this).apply {
@@ -256,6 +276,54 @@ class SearchPageTest : WebPageTest() {
 		addHttpRequestParameter("query", "value")
 		verifyNoRedirect {
 			assertThat(this["soneHits"], contains(soneWithProfileField))
+		}
+	}
+
+	@Test
+	fun `sone hits are paginated correctly`() {
+		core.preferences.postsPerPage = 2
+		val sones = listOf(createSone("1Sone"), createSone("Other1"), createSone("22Sone"), createSone("333Sone"), createSone("Other2"))
+				.onEach { addSone(it.id, it) }
+		addHttpRequestParameter("query", "sone")
+		verifyNoRedirect {
+			assertThat(this["sonePagination"], isOnPage(0).hasPages(2))
+			assertThat(this["soneHits"], contains(sones[0], sones[2]))
+		}
+	}
+
+	@Test
+	fun `sone hits page 2 is shown correctly`() {
+		core.preferences.postsPerPage = 2
+		val sones = listOf(createSone("1Sone"), createSone("Other1"), createSone("22Sone"), createSone("333Sone"), createSone("Other2"))
+				.onEach { addSone(it.id, it) }
+		addHttpRequestParameter("query", "sone")
+		addHttpRequestParameter("sonePage", "1")
+		verifyNoRedirect {
+			assertThat(this["sonePagination"], isOnPage(1).hasPages(2))
+			assertThat(this["soneHits"], contains(sones[3]))
+		}
+	}
+
+	@Test
+	fun `post hits are paginated correctly`() {
+		core.preferences.postsPerPage = 2
+		val sones = listOf(createSoneWithPost("match1", "1Sone"), createSoneWithPost("no-match1", "Other1"), createSoneWithPost("match2", "22Sone"), createSoneWithPost("match3", "333Sone"), createSoneWithPost("no-match2", "Other2"))
+		addHttpRequestParameter("query", "sone")
+		verifyNoRedirect {
+			assertThat(this["postPagination"], isOnPage(0).hasPages(2))
+			assertThat(this["postHits"], contains(sones[0], sones[2]))
+		}
+	}
+
+	@Test
+	fun `post hits page 2 is shown correctly`() {
+		core.preferences.postsPerPage = 2
+		val sones = listOf(createSoneWithPost("match1", "1Sone"), createSoneWithPost("no-match1", "Other1"), createSoneWithPost("match2", "22Sone"), createSoneWithPost("match3", "333Sone"), createSoneWithPost("no-match2", "Other2"))
+		addHttpRequestParameter("query", "sone")
+		addHttpRequestParameter("postPage", "1")
+		verifyNoRedirect {
+			assertThat(this["postPagination"], isOnPage(1).hasPages(2))
+			assertThat(this["postHits"], contains(sones[3]))
 		}
 	}
 
