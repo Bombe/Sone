@@ -119,14 +119,14 @@ class ViewSonePageTest: WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `replies are shown correctly`() {
-	    val reply1 = createReply("First Reply", 1500, foreignPost1)
+		val reply1 = createReply("First Reply", 1500, foreignPost1)
 		val reply2 = createReply("Second Reply", 2500, foreignPost2)
 		val reply3 = createReply("Third Reply", 1750, post1)
 		val reply4 = createReply("Fourth Reply", 2250, post2)
-	    val reply5 = createReply("Fifth Reply", 1600, post1)
-	    val reply6 = createReply("Sixth Reply", 2100, directed1)
-	    val reply7 = createReply("Seventh Reply", 2200, null)
-	    val reply8 = createReply("Eigth Reply", 2300, foreignPost1)
+		val reply5 = createReply("Fifth Reply", 1600, post1)
+		val reply6 = createReply("Sixth Reply", 2100, directed1)
+		val reply7 = createReply("Seventh Reply", 2200, null)
+		val reply8 = createReply("Eigth Reply", 2300, foreignPost1)
 		whenever(currentSone.replies).thenReturn(setOf(reply1, reply2, reply3, reply4, reply5, reply6, reply7, reply8))
 		whenever(core.getReplies("post1")).thenReturn(listOf(reply3, reply5))
 		whenever(core.getReplies("post2")).thenReturn(listOf(reply4))
@@ -136,7 +136,7 @@ class ViewSonePageTest: WebPageTest() {
 		addSone("sone-id", currentSone)
 		addHttpRequestParameter("sone", "sone-id")
 		verifyNoRedirect {
-			assertThat(templateContext["repliedPosts"] as Iterable<Post>, contains(foreignPost2,  foreignPost1))
+			assertThat(templateContext["repliedPosts"] as Iterable<Post>, contains(foreignPost2, foreignPost1))
 		}
 	}
 
@@ -168,7 +168,7 @@ class ViewSonePageTest: WebPageTest() {
 
 	@Test
 	fun `page is link-excepted`() {
-	    assertThat(page.isLinkExcepted(null), equalTo(true))
+		assertThat(page.isLinkExcepted(null), equalTo(true))
 	}
 
 }
