@@ -17,7 +17,7 @@ import org.junit.Test
 /**
  * Unit test for [ViewSonePage].
  */
-class ViewSonePageTest : WebPageTest() {
+class ViewSonePageTest: WebPageTest() {
 
 	init {
 		whenever(currentSone.id).thenReturn("sone-id")
@@ -38,6 +38,16 @@ class ViewSonePageTest : WebPageTest() {
 		whenever(currentSone.posts).thenReturn(mutableListOf(post2, post1))
 		whenever(core.getDirectedPosts("sone-id")).thenReturn(setOf(directed1, directed2))
 		core.preferences.postsPerPage = 2
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("viewSone.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test
@@ -132,13 +142,15 @@ class ViewSonePageTest : WebPageTest() {
 
 	@Test
 	fun `page title is default for request without parameters`() {
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("Page.ViewSone.Page.TitleWithoutSone"))
+		addTranslation("Page.ViewSone.Page.TitleWithoutSone", "view sone page without sone")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("view sone page without sone"))
 	}
 
 	@Test
 	fun `page title is default for request with invalid sone parameters`() {
 		addHttpRequestParameter("sone", "invalid-sone-id")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("Page.ViewSone.Page.TitleWithoutSone"))
+		addTranslation("Page.ViewSone.Page.TitleWithoutSone", "view sone page without sone")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("view sone page without sone"))
 	}
 
 	@Test
@@ -150,7 +162,8 @@ class ViewSonePageTest : WebPageTest() {
 			middleName = "M."
 			lastName = "Last"
 		})
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("First M. Last - Page.ViewSone.Title"))
+		addTranslation("Page.ViewSone.Title", "view sone page")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("First M. Last - view sone page"))
 	}
 
 	@Test
