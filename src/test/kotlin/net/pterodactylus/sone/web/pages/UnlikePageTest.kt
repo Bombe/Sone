@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.util.web.Method.POST
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
@@ -14,6 +16,22 @@ class UnlikePageTest : WebPageTest() {
 	private val page = UnlikePage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("unlike.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		addTranslation("Page.Unlike.Title", "unlike page title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("unlike page title"))
+	}
 
 	@Test
 	fun `get request does not redirect`() {
@@ -35,9 +53,9 @@ class UnlikePageTest : WebPageTest() {
 		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "post")
-		addHttpRequestPart("id", "post-id")
+		addHttpRequestPart("post", "post-id")
 		verifyRedirect("return.html") {
-			verify(currentSone, never()).removeLikedPostId("post-id")
+			verify(currentSone).removeLikedPostId("post-id")
 			verify(currentSone, never()).removeLikedReplyId(any())
 		}
 	}
@@ -47,10 +65,10 @@ class UnlikePageTest : WebPageTest() {
 		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "reply")
-		addHttpRequestPart("id", "reply-id")
+		addHttpRequestPart("reply", "reply-id")
 		verifyRedirect("return.html") {
 			verify(currentSone, never()).removeLikedPostId(any())
-			verify(currentSone, never()).removeLikedReplyId("reply-id")
+			verify(currentSone).removeLikedReplyId("reply-id")
 		}
 	}
 
