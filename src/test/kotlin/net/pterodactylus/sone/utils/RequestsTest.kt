@@ -84,4 +84,38 @@ class RequestsTest {
 		assertThat("test-param" in request.parameters, equalTo(false))
 	}
 
+	@Test
+	fun `http header of freenet request can be retrieved`() {
+		whenever(httpGetRequest.getHeader("foo")).thenReturn("bar")
+		assertThat(freenetGetRequest.headers["foo"], equalTo("bar"))
+	}
+
+	@Test
+	fun `http header of freenet request is case-insensitive`() {
+		whenever(httpGetRequest.getHeader("foo")).thenReturn("bar")
+		assertThat(freenetGetRequest.headers["FOO"], equalTo("bar"))
+	}
+
+	@Test
+	fun `value of non-existant http header of freenet request is null`() {
+		assertThat(freenetGetRequest.headers["Foo"], nullValue())
+	}
+
+	@Test
+	fun `http header of http request can be retrieved`() {
+		whenever(httpGetRequest.getHeader("foo")).thenReturn("bar")
+		assertThat(httpGetRequest.headers["foo"], equalTo("bar"))
+	}
+
+	@Test
+	fun `http header of http request is case-insensitive`() {
+		whenever(httpGetRequest.getHeader("foo")).thenReturn("bar")
+		assertThat(httpGetRequest.headers["FOO"], equalTo("bar"))
+	}
+
+	@Test
+	fun `value of non-existant http header of http request is null`() {
+		assertThat(httpGetRequest.headers["Foo"], nullValue())
+	}
+
 }
