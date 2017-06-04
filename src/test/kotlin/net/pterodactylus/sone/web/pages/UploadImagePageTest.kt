@@ -26,8 +26,25 @@ class UploadImagePageTest : WebPageTest() {
 		whenever(id).thenReturn("parent-id")
 		whenever(sone).thenReturn(currentSone)
 	}
+	private val page = UploadImagePage(template, webInterface)
 
-	override fun getPage() = UploadImagePage(template, webInterface)
+	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("uploadImage.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+	    addTranslation("Page.UploadImage.Title", "upload image page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("upload image page title"))
+	}
 
 	@Test
 	fun `get request does not redirect or upload anything`() {
@@ -68,9 +85,10 @@ class UploadImagePageTest : WebPageTest() {
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "title")
 		addUploadedFile("image", "image.png", "image/png", "upload-image-invalid-image.png")
+		addTranslation("Page.UploadImage.Error.InvalidImage", "upload error - invalid image")
 		verifyNoRedirect {
 			verify(core, never()).createTemporaryImage(any(), any())
-			assertThat(templateContext["messages"] as String?, equalTo<String>("Page.UploadImage.Error.InvalidImage"))
+			assertThat(templateContext["messages"] as String, equalTo("upload error - invalid image"))
 		}
 	}
 
@@ -80,7 +98,8 @@ class UploadImagePageTest : WebPageTest() {
 		addAlbum("parent-id", parentAlbum)
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "Title")
-		addHttpRequestPart("description", "Description")
+		addHttpRequestPart("description", "Description @ http://localhost:8888/KSK@foo")
+		addHttpRequestHeader("Host", "localhost:8888")
 		addUploadedFile("image", "upload-image-value-image.png", "image/png", "upload-image-value-image.png")
 		val temporaryImage = TemporaryImage("temp-image")
 		val imageModifier = mockBuilder<Modifier>()
@@ -94,7 +113,7 @@ class UploadImagePageTest : WebPageTest() {
 			verify(imageModifier).setWidth(2)
 			verify(imageModifier).setHeight(1)
 			verify(imageModifier).setTitle("Title")
-			verify(imageModifier).setDescription("Description")
+			verify(imageModifier).setDescription("Description @ KSK@foo")
 			verify(imageModifier).update()
 		}
 	}
