@@ -12,12 +12,22 @@ import org.junit.Test
 /**
  * Unit test for [ViewPostPage].
  */
-class ViewPostPageTest : WebPageTest() {
+class ViewPostPageTest: WebPageTest() {
 
 	private val page = ViewPostPage(template, webInterface)
 	private val post = mock<Post>()
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo("viewPost.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+		assertThat(page.requiresLogin(), equalTo(false))
+	}
 
 	@Test
 	fun `the view post page is link-excepted`() {
@@ -64,13 +74,15 @@ class ViewPostPageTest : WebPageTest() {
 
 	@Test
 	fun `page title for request without parameters is default title`() {
-		assertThat(page.getPageTitle(freenetRequest), equalTo("Page.ViewPost.Title"))
+		addTranslation("Page.ViewPost.Title", "view post title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("view post title"))
 	}
 
 	@Test
 	fun `page title for request with invalid post is default title`() {
 		addHttpRequestParameter("post", "invalid-post-id")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("Page.ViewPost.Title"))
+		addTranslation("Page.ViewPost.Title", "view post title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("view post title"))
 	}
 
 	@Test
@@ -84,7 +96,8 @@ class ViewPostPageTest : WebPageTest() {
 		whenever(post.text).thenReturn("This is a text that is longer than twenty characters.")
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("This is a text that … - First M. Last - Page.ViewPost.Title"))
+		addTranslation("Page.ViewPost.Title", "view post title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("This is a text that … - First M. Last - view post title"))
 	}
 
 }
