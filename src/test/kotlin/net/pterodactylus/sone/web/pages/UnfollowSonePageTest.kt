@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.util.web.Method.POST
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -12,6 +14,22 @@ class UnfollowSonePageTest : WebPageTest() {
 	private val page = UnfollowSonePage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("unfollowSone.html"))
+	}
+
+	@Test
+	fun `page requires login`() {
+	    assertThat(page.requiresLogin(), equalTo(true))
+	}
+
+	@Test
+	fun `page returns correct page title`() {
+	    addTranslation("Page.UnfollowSone.Title", "unfollow page title")
+		assertThat(page.getPageTitle(freenetRequest), equalTo("unfollow page title"))
+	}
 
 	@Test
 	fun `get request does not redirect`() {
