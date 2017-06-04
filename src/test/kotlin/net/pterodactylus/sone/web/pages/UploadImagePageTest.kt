@@ -67,7 +67,7 @@ class UploadImagePageTest : WebPageTest() {
 		addAlbum("parent-id", parentAlbum)
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "title")
-		addUploadedFile("image", "image.png", "image/png", "no-image.png")
+		addUploadedFile("image", "image.png", "image/png", "upload-image-invalid-image.png")
 		verifyNoRedirect {
 			verify(core, never()).createTemporaryImage(any(), any())
 			assertThat(templateContext["messages"] as String?, equalTo<String>("Page.UploadImage.Error.InvalidImage"))
@@ -81,7 +81,7 @@ class UploadImagePageTest : WebPageTest() {
 		addHttpRequestPart("parent", "parent-id")
 		addHttpRequestPart("title", "Title")
 		addHttpRequestPart("description", "Description")
-		addUploadedFile("image", "image.png", "image/png", "image.png")
+		addUploadedFile("image", "upload-image-value-image.png", "image/png", "upload-image-value-image.png")
 		val temporaryImage = TemporaryImage("temp-image")
 		val imageModifier = mockBuilder<Modifier>()
 		val image = mock<Image>().apply {
