@@ -4,6 +4,8 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.util.web.Method.POST
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
@@ -17,6 +19,22 @@ class UnlockSonePageTest : WebPageTest() {
 	private val page = UnlockSonePage(template, webInterface)
 
 	override fun getPage() = page
+
+	@Test
+	fun `page returns correct path`() {
+	    assertThat(page.path, equalTo("unlockSone.html"))
+	}
+
+	@Test
+	fun `page does not require login`() {
+	    assertThat(page.requiresLogin(), equalTo(false))
+	}
+
+	@Test
+	fun `page returns correct title`() {
+		addTranslation("Page.UnlockSone.Title", "unlock page title")
+	    assertThat(page.getPageTitle(freenetRequest), equalTo("unlock page title"))
+	}
 
 	@Test
 	fun `post request without sone redirects to return page`() {
