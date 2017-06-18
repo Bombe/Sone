@@ -25,6 +25,7 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.ArgumentMatchers.eq
+import java.net.URI
 import java.nio.charset.Charset
 import kotlin.text.Charsets.UTF_8
 
@@ -34,19 +35,20 @@ import kotlin.text.Charsets.UTF_8
 abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePage) {
 
 	protected val currentSone = mock<Sone>()
-	private val template = mock<Template>()
-	private val webInterface = deepMock<WebInterface>()
+	protected val template = mock<Template>()
+	protected val webInterface = deepMock<WebInterface>()
 	protected val core = webInterface.core!!
 	private val eventBus = mock<EventBus>()
-	private val preferences = Preferences(eventBus)
-	private val l10n = webInterface.l10n!!
+	protected val preferences = Preferences(eventBus)
+	protected val l10n = webInterface.l10n!!
 
 	protected val page by lazy { pageSupplier(template, webInterface) }
 	private val httpRequest = mock<HTTPRequest>()
 	protected val freenetRequest = mock<FreenetRequest>()
 	protected val templateContext = TemplateContext()
 
-	private val toadletContext = deepMock<ToadletContext>()
+	protected val toadletContext = deepMock<ToadletContext>()
+	private val requestHeaders = mutableMapOf<String, String>()
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
 	private val postRequestParameters = mutableMapOf<String, ByteArray>()
 	private val allSones = mutableMapOf<String, Sone>()
@@ -69,11 +71,13 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
+		whenever(webInterface.getNotifications(currentSone)).thenReturn(emptyList())
 	}
 
 	@Before
 	fun setupHttpRequest() {
 		whenever(httpRequest.method).thenReturn("GET")
+		whenever(httpRequest.getHeader(anyString())).then { requestHeaders[it.get<String>(0).toLowerCase()] }
 		whenever(httpRequest.hasParameters()).then { getRequestParameters.isNotEmpty() }
 		whenever(httpRequest.parameterNames).then { getRequestParameters.keys }
 		whenever(httpRequest.isParameterSet(anyString())).then { it[0] in getRequestParameters }
@@ -106,12 +110,27 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(freenetRequest.method).thenReturn(method)
 	}
 
+	fun request(uri: String) {
+		whenever(httpRequest.path).thenReturn(uri)
+		whenever(freenetRequest.uri).thenReturn(URI(uri))
+	}
+
+	fun addHttpRequestHeader(name: String, value: String) {
+		requestHeaders[name.toLowerCase()] = value
+	}
+
 	fun addHttpRequestParameter(name: String, value: String) {
 		getRequestParameters[name] = getRequestParameters.getOrElse(name) { mutableListOf<String>() }.apply { add(value) }
 	}
 
 	fun addHttpRequestPart(name: String, value: String) {
 		postRequestParameters[name] = value.toByteArray(UTF_8)
+	}
+
+	fun unsetCurrentSone() {
+		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(null)
+		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null)
+		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(null)
 	}
 
 	fun addSone(id: String, sone: Sone) {
