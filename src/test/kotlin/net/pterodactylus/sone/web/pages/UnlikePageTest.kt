@@ -11,11 +11,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnlikePage].
  */
-class UnlikePageTest : WebPageTest() {
-
-	private val page = UnlikePage(template, webInterface)
-
-	override fun getPage() = page
+class UnlikePageTest: WebPageTest2(::UnlikePage) {
 
 	@Test
 	fun `page returns correct path`() {
