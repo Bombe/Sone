@@ -19,13 +19,12 @@ import org.junit.Test
 /**
  * Unit test for [ViewSonePage].
  */
-class ViewSonePageTest: WebPageTest() {
+class ViewSonePageTest: WebPageTest2(::ViewSonePage) {
 
 	init {
 		whenever(currentSone.id).thenReturn("sone-id")
 	}
 
-	private val page = ViewSonePage(template, webInterface)
 	private val post1 = createPost("post1", "First Post.", 1000, currentSone)
 	private val post2 = createPost("post2", "Second Post.", 2000, currentSone)
 	private val foreignPost1 = createPost("foreign-post1", "First Foreign Post.", 1000, mock<Sone>())
@@ -33,8 +32,6 @@ class ViewSonePageTest: WebPageTest() {
 	private val foreignPost3 = createPost("foreign-post3", "Third Foreign Post.", 3000, mock<Sone>())
 	private val directed1 = createPost("post3", "First directed.", 1500, mock<Sone>(), recipient = currentSone)
 	private val directed2 = createPost("post4", "Second directed.", 2500, mock<Sone>(), recipient = currentSone)
-
-	override fun getPage() = page
 
 	@Before
 	fun setup() {
