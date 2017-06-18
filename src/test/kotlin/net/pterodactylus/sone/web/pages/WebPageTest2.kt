@@ -13,13 +13,20 @@ import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.util.web.Method
 import net.pterodactylus.util.web.Method.GET
+import org.junit.Assert.fail
 import org.junit.Before
+import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.eq
+import java.nio.charset.Charset
+import kotlin.text.Charsets.UTF_8
 
 /**
  * Base class for web page tests.
@@ -41,6 +48,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 
 	private val toadletContext = deepMock<ToadletContext>()
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
+	private val postRequestParameters = mutableMapOf<String, ByteArray>()
 	private val allSones = mutableMapOf<String, Sone>()
 	private val allPosts = mutableMapOf<String, Post>()
 	private val translations = mutableMapOf<String, String>()
@@ -51,6 +59,13 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(core.sones).then { allSones.values }
 		whenever(core.getSone(anyString())).then { allSones[it[0]].asOptional() }
 		whenever(core.getPost(anyString())).then { allPosts[it[0]].asOptional() }
+	}
+
+	@Before
+	fun setupWebInterface() {
+		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
+		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
+		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 	}
 
 	@Before
@@ -66,7 +81,10 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(httpRequest.getLongParam(anyString(), anyLong())).then { getRequestParameters[it[0]]?.first()?.toLongOrNull() ?: it[1] }
 		whenever(httpRequest.getMultipleParam(anyString())).then { getRequestParameters[it[0]]?.toTypedArray() ?: emptyArray<String>() }
 		whenever(httpRequest.getMultipleIntParam(anyString())).then { getRequestParameters[it[0]]?.map { it.toIntOrNull() ?: 0 } ?: emptyArray<Int>() }
+		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).then { postRequestParameters[it[0]]?.decode() }
 	}
+
+	private fun ByteArray.decode(charset: Charset = UTF_8) = String(this, charset)
 
 	@Before
 	fun setupFreenetRequest() {
@@ -80,8 +98,17 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(l10n.getString(anyString())).then { translations[it[0]] ?: it[0] }
 	}
 
+	fun setMethod(method: Method) {
+		whenever(httpRequest.method).thenReturn(method.name)
+		whenever(freenetRequest.method).thenReturn(method)
+	}
+
 	fun addHttpRequestParameter(name: String, value: String) {
 		getRequestParameters[name] = getRequestParameters.getOrElse(name) { mutableListOf<String>() }.apply { add(value) }
+	}
+
+	fun addHttpRequestPart(name: String, value: String) {
+		postRequestParameters[name] = value.toByteArray(UTF_8)
 	}
 
 	fun addSone(id: String, sone: Sone) {
@@ -104,6 +131,20 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 			caughtException = e
 		}
 		caughtException?.run { throw this } ?: assertions()
+	}
+
+	fun verifyRedirect(target: String, assertions: () -> Unit) {
+		try {
+			page.handleRequest(freenetRequest, templateContext)
+			fail()
+		} catch (re: RedirectException) {
+			if (re.target != target) {
+				throw re
+			}
+			assertions()
+		} catch (e: Exception) {
+			throw e
+		}
 	}
 
 }

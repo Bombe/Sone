@@ -14,11 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UntrustPage].
  */
-class UntrustPageTest : WebPageTest() {
-
-	private val page = UntrustPage(template, webInterface)
-
-	override fun getPage() = page
+class UntrustPageTest: WebPageTest2(::UntrustPage) {
 
 	@Test
 	fun `page returns correct path`() {
