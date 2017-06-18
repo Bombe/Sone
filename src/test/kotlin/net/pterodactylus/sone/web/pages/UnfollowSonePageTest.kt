@@ -9,11 +9,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnfollowSonePage].
  */
-class UnfollowSonePageTest : WebPageTest() {
-
-	private val page = UnfollowSonePage(template, webInterface)
-
-	override fun getPage() = page
+class UnfollowSonePageTest: WebPageTest2(::UnfollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
