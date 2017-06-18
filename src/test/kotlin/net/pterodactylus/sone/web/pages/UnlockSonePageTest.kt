@@ -14,11 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnlockSonePage].
  */
-class UnlockSonePageTest : WebPageTest() {
-
-	private val page = UnlockSonePage(template, webInterface)
-
-	override fun getPage() = page
+class UnlockSonePageTest: WebPageTest2(::UnlockSonePage) {
 
 	@Test
 	fun `page returns correct path`() {

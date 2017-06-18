@@ -50,6 +50,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
 	private val postRequestParameters = mutableMapOf<String, ByteArray>()
 	private val allSones = mutableMapOf<String, Sone>()
+	private val localSones = mutableMapOf<String, Sone>()
 	private val allPosts = mutableMapOf<String, Post>()
 	private val translations = mutableMapOf<String, String>()
 
@@ -58,6 +59,8 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(core.preferences).thenReturn(preferences)
 		whenever(core.sones).then { allSones.values }
 		whenever(core.getSone(anyString())).then { allSones[it[0]].asOptional() }
+		whenever(core.localSones).then { localSones.values }
+		whenever(core.getLocalSone(anyString())).then { localSones[it[0]] }
 		whenever(core.getPost(anyString())).then { allPosts[it[0]].asOptional() }
 	}
 
@@ -81,7 +84,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(httpRequest.getLongParam(anyString(), anyLong())).then { getRequestParameters[it[0]]?.first()?.toLongOrNull() ?: it[1] }
 		whenever(httpRequest.getMultipleParam(anyString())).then { getRequestParameters[it[0]]?.toTypedArray() ?: emptyArray<String>() }
 		whenever(httpRequest.getMultipleIntParam(anyString())).then { getRequestParameters[it[0]]?.map { it.toIntOrNull() ?: 0 } ?: emptyArray<Int>() }
-		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).then { postRequestParameters[it[0]]?.decode() }
+		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).then { postRequestParameters[it[0]]?.decode()?.take(it[1]) ?: "" }
 	}
 
 	private fun ByteArray.decode(charset: Charset = UTF_8) = String(this, charset)
@@ -113,6 +116,10 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 
 	fun addSone(id: String, sone: Sone) {
 		allSones[id] = sone
+	}
+
+	fun addLocalSone(id: String, localSone: Sone) {
+		localSones[id] = localSone
 	}
 
 	fun addPost(id: String, post: Post) {
