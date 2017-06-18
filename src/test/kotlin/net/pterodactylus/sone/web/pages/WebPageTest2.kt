@@ -4,6 +4,7 @@ import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.get
@@ -41,6 +42,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 	private val toadletContext = deepMock<ToadletContext>()
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
 	private val allSones = mutableMapOf<String, Sone>()
+	private val allPosts = mutableMapOf<String, Post>()
 	private val translations = mutableMapOf<String, String>()
 
 	@Before
@@ -48,6 +50,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(core.preferences).thenReturn(preferences)
 		whenever(core.sones).then { allSones.values }
 		whenever(core.getSone(anyString())).then { allSones[it[0]].asOptional() }
+		whenever(core.getPost(anyString())).then { allPosts[it[0]].asOptional() }
 	}
 
 	@Before
@@ -83,6 +86,10 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 
 	fun addSone(id: String, sone: Sone) {
 		allSones[id] = sone
+	}
+
+	fun addPost(id: String, post: Post) {
+		allPosts[id] = post
 	}
 
 	fun addTranslation(key: String, value: String) {

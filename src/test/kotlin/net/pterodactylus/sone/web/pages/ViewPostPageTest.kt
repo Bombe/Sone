@@ -12,12 +12,9 @@ import org.junit.Test
 /**
  * Unit test for [ViewPostPage].
  */
-class ViewPostPageTest: WebPageTest() {
+class ViewPostPageTest: WebPageTest2(::ViewPostPage) {
 
-	private val page = ViewPostPage(template, webInterface)
 	private val post = mock<Post>()
-
-	override fun getPage() = page
 
 	@Test
 	fun `page returns correct path`() {
