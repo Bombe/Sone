@@ -17,11 +17,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnbookmarkPage].
  */
-class UnbookmarkPageTest: WebPageTest() {
-
-	private val page = UnbookmarkPage(template, webInterface)
-
-	override fun getPage() = page
+class UnbookmarkPageTest: WebPageTest2(::UnbookmarkPage) {
 
 	@Test
 	fun `page returns correct path`() {
