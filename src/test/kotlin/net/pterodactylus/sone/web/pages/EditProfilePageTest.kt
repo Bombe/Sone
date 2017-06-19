@@ -17,15 +17,11 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditProfilePage].
  */
-class EditProfilePageTest : WebPageTest() {
-
-	private val page = EditProfilePage(template, webInterface)
+class EditProfilePageTest: WebPageTest2(::EditProfilePage) {
 
 	private val profile = Profile(currentSone)
 	private val firstField = profile.addField("First Field")
 	private val secondField = profile.addField("Second Field")
-
-	override fun getPage() = page
 
 	@Before
 	fun setupProfile() {
