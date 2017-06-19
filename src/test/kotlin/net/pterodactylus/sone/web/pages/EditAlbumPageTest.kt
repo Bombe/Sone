@@ -17,16 +17,12 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditAlbumPage].
  */
-class EditAlbumPageTest: WebPageTest() {
-
-	private val page = EditAlbumPage(template, webInterface)
+class EditAlbumPageTest: WebPageTest2(::EditAlbumPage) {
 
 	private val album = mock<Album>()
 	private val parentAlbum = mock<Album>()
 	private val modifier = mockBuilder<Modifier>()
 	private val sone = mock<Sone>()
-
-	override fun getPage() = page
 
 	@Before
 	fun setup() {
