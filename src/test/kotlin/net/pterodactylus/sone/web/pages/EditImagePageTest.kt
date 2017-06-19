@@ -20,16 +20,12 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditImagePage].
  */
-class EditImagePageTest : WebPageTest() {
-
-	private val page = EditImagePage(template, webInterface)
+class EditImagePageTest: WebPageTest2(::EditImagePage) {
 
 	private val image = mock<Image>()
 	private val modifier = mockBuilder<Modifier>()
 	private val sone = mock<Sone>()
 	private val album = mock<Album>()
-
-	override fun getPage() = page
 
 	@Before
 	fun setupImage() {
