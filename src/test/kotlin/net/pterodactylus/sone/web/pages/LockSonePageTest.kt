@@ -13,11 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LockSonePage].
  */
-class LockSonePageTest : WebPageTest() {
-
-	private val page = LockSonePage(template, webInterface)
-
-	override fun getPage() = page
+class LockSonePageTest: WebPageTest2(::LockSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
