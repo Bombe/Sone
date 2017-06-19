@@ -10,11 +10,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 /**
  * Unit test for [LikePage].
  */
-class LikePageTest : WebPageTest() {
-
-	private val page = LikePage(template, webInterface)
-
-	override fun getPage() = page
+class LikePageTest: WebPageTest2(::LikePage) {
 
 	@Test
 	fun `page returns correct path`() {
