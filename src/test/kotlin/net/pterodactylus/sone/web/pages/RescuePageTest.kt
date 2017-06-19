@@ -15,13 +15,9 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [RescuePage].
  */
-class RescuePageTest: WebPageTest() {
-
-	private val page = RescuePage(template, webInterface)
+class RescuePageTest: WebPageTest2(::RescuePage) {
 
 	private val soneRescuer = mock<SoneRescuer>()
-
-	override fun getPage() = page
 
 	@Before
 	fun setupSoneRescuer() {
