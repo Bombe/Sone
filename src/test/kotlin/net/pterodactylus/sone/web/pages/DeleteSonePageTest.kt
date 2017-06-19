@@ -12,11 +12,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteSonePage].
  */
-class DeleteSonePageTest : WebPageTest() {
-
-	private val page = DeleteSonePage(template, webInterface)
-
-	override fun getPage() = page
+class DeleteSonePageTest: WebPageTest2(::DeleteSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
