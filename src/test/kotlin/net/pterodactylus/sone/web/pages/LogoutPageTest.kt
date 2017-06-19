@@ -9,11 +9,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LogoutPage].
  */
-class LogoutPageTest: WebPageTest() {
-
-	private val page = LogoutPage(template, webInterface)
-
-	override fun getPage() = page
+class LogoutPageTest: WebPageTest2(::LogoutPage) {
 
 	@Test
 	fun `page returns correct path`() {
