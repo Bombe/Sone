@@ -12,11 +12,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DistrustPage].
  */
-class DistrustPageTest: WebPageTest() {
-
-	private val page = DistrustPage(template, webInterface)
-
-	override fun getPage() = page
+class DistrustPageTest: WebPageTest2(::DistrustPage) {
 
 	@Test
 	fun `page returns correct path`() {
