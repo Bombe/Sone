@@ -6,3 +6,6 @@ fun <T, R> Optional<T>.let(block: (T) -> R): R? = if (isPresent) block(get()) el
 fun <T> Optional<T>.also(block: (T) -> Unit) = if (isPresent) block(get()) else Unit
 
 fun <T> T?.asOptional(): Optional<T> = this?.let { Optional.of(it) } ?: Optional.absent<T>()
+
+fun <T, R> Iterable<T>.mapPresent(transform: (T) -> Optional<R>): List<R> =
+		map(transform).filter { it.isPresent }.map { it.get() }

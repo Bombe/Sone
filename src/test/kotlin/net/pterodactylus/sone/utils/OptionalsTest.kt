@@ -1,7 +1,9 @@
 package net.pterodactylus.sone.utils
 
 import com.google.common.base.Optional
+import com.google.common.base.Optional.fromNullable
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.Test
@@ -48,6 +50,12 @@ class OptionalsTest {
 	fun `null as optional is asent optional`() {
 		val optional = null.asOptional()
 		assertThat(optional.isPresent, equalTo(false))
+	}
+
+	@Test
+	fun testMapPresent() {
+		val originalList = listOf(1, 2, null, 3, null)
+		assertThat(originalList.mapPresent { fromNullable(it) }, contains(1, 2, 3))
 	}
 
 }
