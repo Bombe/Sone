@@ -13,11 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [MarkAsKnownPage].
  */
-class MarkAsKnownPageTest: WebPageTest() {
-
-	private val page = MarkAsKnownPage(template, webInterface)
-
-	override fun getPage() = page
+class MarkAsKnownPageTest: WebPageTest2(::MarkAsKnownPage) {
 
 	@Test
 	fun `page returns correct path`() {
