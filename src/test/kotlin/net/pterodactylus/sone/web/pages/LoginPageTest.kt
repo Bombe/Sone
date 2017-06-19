@@ -19,13 +19,9 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LoginPage].
  */
-class LoginPageTest : WebPageTest() {
-
-	private val page = LoginPage(template, webInterface)
+class LoginPageTest: WebPageTest2(::LoginPage) {
 
 	private val sones = listOf(createSone("Sone", "Test"), createSone("Test"), createSone("Sone"))
-
-	override fun getPage() = page
 
 	private fun createSone(vararg contexts: String) = mock<Sone>().apply {
 		whenever(id).thenReturn(hashCode().toString())

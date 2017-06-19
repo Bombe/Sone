@@ -9,6 +9,7 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.get
 import net.pterodactylus.sone.test.mock
@@ -55,6 +56,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 	private val requestHeaders = mutableMapOf<String, String>()
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
 	private val postRequestParameters = mutableMapOf<String, ByteArray>()
+	private val ownIdentities = mutableSetOf<OwnIdentity>()
 	private val allSones = mutableMapOf<String, Sone>()
 	private val localSones = mutableMapOf<String, Sone>()
 	private val allPosts = mutableMapOf<String, Post>()
@@ -67,6 +69,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 	@Before
 	fun setupCore() {
 		whenever(core.preferences).thenReturn(preferences)
+		whenever(core.identityManager.allOwnIdentities).then { ownIdentities }
 		whenever(core.sones).then { allSones.values }
 		whenever(core.getSone(anyString())).then { allSones[it[0]].asOptional() }
 		whenever(core.localSones).then { localSones.values }
@@ -145,6 +148,10 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(null)
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(null)
+	}
+
+	fun addOwnIdentity(ownIdentity: OwnIdentity) {
+		ownIdentities += ownIdentity
 	}
 
 	fun addSone(id: String, sone: Sone) {
