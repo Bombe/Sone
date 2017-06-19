@@ -30,17 +30,17 @@ class SearchPageTest: WebPageTest2({ template, webInterface -> SearchPage(templa
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("search.html"))
+		assertThat(page.path, equalTo("search.html"))
 	}
 
 	@Test
 	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
+		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.Search.Title", "search page title")
+		addTranslation("Page.Search.Title", "search page title")
 		assertThat(page.getPageTitle(freenetRequest), equalTo("search page title"))
 	}
 
@@ -333,7 +333,7 @@ class SearchPageTest: WebPageTest2({ template, webInterface -> SearchPage(templa
 		val post = createPost("with-match", "text")
 		val callCounter = AtomicInteger()
 		whenever(post.text).thenAnswer { callCounter.incrementAndGet(); "text" }
-	    val sone = createSoneWithPost(post)
+		val sone = createSoneWithPost(post)
 		addSone("sone", sone)
 		addHttpRequestParameter("query", "text")
 		verifyNoRedirect {
@@ -349,13 +349,13 @@ class SearchPageTest: WebPageTest2({ template, webInterface -> SearchPage(templa
 		val post = createPost("with-match", "text")
 		val callCounter = AtomicInteger()
 		whenever(post.text).thenAnswer { callCounter.incrementAndGet(); "text" }
-	    val sone = createSoneWithPost(post)
+		val sone = createSoneWithPost(post)
 		addSone("sone", sone)
 		addHttpRequestParameter("query", "text")
 		verifyNoRedirect {
 			assertThat(this["postHits"], contains(post))
 		}
-		whenever(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(5) + 1  )
+		whenever(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(5) + 1)
 		verifyNoRedirect {
 			assertThat(callCounter.get(), equalTo(2))
 		}
