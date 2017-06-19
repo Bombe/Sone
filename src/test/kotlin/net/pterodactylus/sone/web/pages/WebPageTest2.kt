@@ -101,6 +101,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(httpRequest.getLongParam(anyString(), anyLong())).then { getRequestParameters[it[0]]?.first()?.toLongOrNull() ?: it[1] }
 		whenever(httpRequest.getMultipleParam(anyString())).then { getRequestParameters[it[0]]?.toTypedArray() ?: emptyArray<String>() }
 		whenever(httpRequest.getMultipleIntParam(anyString())).then { getRequestParameters[it[0]]?.map { it.toIntOrNull() ?: 0 } ?: emptyArray<Int>() }
+		whenever(httpRequest.isPartSet(anyString())).then { it[0] in postRequestParameters }
 		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).then { postRequestParameters[it[0]]?.decode()?.take(it[1]) ?: "" }
 	}
 

@@ -18,11 +18,7 @@ import org.junit.Test
 /**
  * Unit test for [OptionsPage].
  */
-class OptionsPageTest: WebPageTest() {
-
-	private val page = OptionsPage(template, webInterface)
-
-	override fun getPage() = page
+class OptionsPageTest: WebPageTest2(::OptionsPage) {
 
 	@Before
 	fun setupPreferences() {
@@ -189,7 +185,7 @@ class OptionsPageTest: WebPageTest() {
 	private fun <T> verifyThatPreferencesCanBeSet(name: String, setValue: String?, expectedValue: T, getter: () -> T) {
 		unsetCurrentSone()
 		setMethod(POST)
-		addHttpRequestPart(name, setValue)
+		setValue?.also { addHttpRequestPart(name, it) }
 		verifyRedirect("options.html") {
 			assertThat(getter(), equalTo(expectedValue))
 		}
