@@ -9,9 +9,13 @@ import org.junit.Test
 /**
  * Unit test for [GetImagePage].
  */
-class GetImagePageTest : WebPageTest() {
+class GetImagePageTest {
 
-	private val page = GetImagePage(webInterface)
+	private val scaffolding = WebPageTest2()
+	private val page = GetImagePage(scaffolding.webInterface)
+	private val freenetRequest = scaffolding.freenetRequest
+	private val response = scaffolding.response
+	private val responseContent = scaffolding.responseContent
 
 	@Test
 	fun `page returns correct path`() {
@@ -34,7 +38,7 @@ class GetImagePageTest : WebPageTest() {
 		assertThat(response.statusCode, equalTo(404))
 		assertThat(response.statusText, equalTo("Not found."))
 		assertThat(response.contentType, equalTo("text/html; charset=utf-8"))
-		assertThat(responseBytes, equalTo(ByteArray(0)))
+		assertThat(responseContent.toByteArray(), equalTo(ByteArray(0)))
 	}
 
 	@Test
@@ -43,12 +47,12 @@ class GetImagePageTest : WebPageTest() {
 			mimeType = "image/test"
 			imageData = ByteArray(5, Int::toByte)
 		}
-		addHttpRequestParameter("image", "temp-id")
-		addTemporaryImage("temp-id", image)
+		scaffolding.addHttpRequestParameter("image", "temp-id")
+		scaffolding.addTemporaryImage("temp-id", image)
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.contentType, equalTo("image/test"))
-		assertThat(responseBytes, equalTo(ByteArray(5, Int::toByte)))
+		assertThat(responseContent.toByteArray(), equalTo(ByteArray(5, Int::toByte)))
 		println(response.headers.map { it.name to it.iterator().asSequence().toList() })
 		assertThat(response.headers.map { it.name to it.iterator().asSequence().toList() }, contains(
 				"Content-Disposition" to listOf("attachment; filename=temp-id.test")

@@ -9,6 +9,7 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.TemporaryImage
 import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.get
@@ -91,6 +92,7 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 		whenever(core.getAlbum(anyString())).then { allAlbums[it[0]] }
 		whenever(core.getImage(anyString())).then { allImages[it[0]]}
 		whenever(core.getImage(anyString(), anyBoolean())).then { allImages[it[0]]}
+		whenever(core.getTemporaryImage(anyString())).thenReturn(null)
 	}
 
 	private fun setupWebInterface() {
@@ -188,6 +190,10 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 
 	fun addTranslation(key: String, value: String) {
 		translations[key] = value
+	}
+
+	fun addTemporaryImage(id: String, temporaryImage: TemporaryImage) {
+		whenever(core.getTemporaryImage(id)).thenReturn(temporaryImage)
 	}
 
 	fun verifyNoRedirect(assertions: () -> Unit) {
