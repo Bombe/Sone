@@ -17,11 +17,7 @@ import java.util.Arrays.asList
 /**
  * Unit test for [NewPage].
  */
-class NewPageTest: WebPageTest() {
-
-	private val page = NewPage(template, webInterface)
-
-	override fun getPage() = page
+class NewPageTest: WebPageTest2(::NewPage) {
 
 	@Before
 	fun setupNumberOfPostsPerPage() {
