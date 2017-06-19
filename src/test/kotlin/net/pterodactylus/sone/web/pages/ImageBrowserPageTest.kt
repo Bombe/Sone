@@ -13,9 +13,7 @@ import org.junit.Test
 /**
  * Unit test for [ImageBrowserPage].
  */
-class ImageBrowserPageTest : WebPageTest() {
-
-	private val page = ImageBrowserPage(template, webInterface)
+class ImageBrowserPageTest: WebPageTest2(::ImageBrowserPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -39,10 +37,11 @@ class ImageBrowserPageTest : WebPageTest() {
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("page", "5")
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["albumRequested"], equalTo<Any>(true))
-		assertThat(templateContext["album"], equalTo<Any>(album))
-		assertThat(templateContext["page"], equalTo<Any>("5"))
+		verifyNoRedirect {
+			assertThat(templateContext["albumRequested"], equalTo<Any>(true))
+			assertThat(templateContext["album"], equalTo<Any>(album))
+			assertThat(templateContext["page"], equalTo<Any>("5"))
+		}
 	}
 
 	@Test
@@ -50,9 +49,10 @@ class ImageBrowserPageTest : WebPageTest() {
 		val image = mock<Image>()
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["imageRequested"], equalTo<Any>(true))
-		assertThat(templateContext["image"], equalTo<Any>(image))
+		verifyNoRedirect {
+			assertThat(templateContext["imageRequested"], equalTo<Any>(true))
+			assertThat(templateContext["image"], equalTo<Any>(image))
+		}
 	}
 
 	@Test
@@ -60,9 +60,10 @@ class ImageBrowserPageTest : WebPageTest() {
 		val sone = mock<Sone>()
 		addSone("sone-id", sone)
 		addHttpRequestParameter("sone", "sone-id")
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["soneRequested"], equalTo<Any>(true))
-		assertThat(templateContext["sone"], equalTo<Any>(sone))
+		verifyNoRedirect {
+			assertThat(templateContext["soneRequested"], equalTo<Any>(true))
+			assertThat(templateContext["sone"], equalTo<Any>(sone))
+		}
 	}
 
 	@Test
@@ -72,15 +73,16 @@ class ImageBrowserPageTest : WebPageTest() {
 		val secondSone = createSone("third album", "fourth album")
 		addSone("sone2", secondSone)
 		addHttpRequestParameter("mode", "gallery")
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["galleryRequested"], equalTo<Any>(true))
-		@Suppress("UNCHECKED_CAST")
-		assertThat(templateContext["albums"] as Iterable<Album>, contains(
-				firstSone.rootAlbum.albums[0],
-				secondSone.rootAlbum.albums[1],
-				firstSone.rootAlbum.albums[1],
-				secondSone.rootAlbum.albums[0]
-		))
+		verifyNoRedirect {
+			assertThat(templateContext["galleryRequested"], equalTo<Any>(true))
+			@Suppress("UNCHECKED_CAST")
+			assertThat(templateContext["albums"] as Iterable<Album>, contains(
+					firstSone.rootAlbum.albums[0],
+					secondSone.rootAlbum.albums[1],
+					firstSone.rootAlbum.albums[1],
+					secondSone.rootAlbum.albums[0]
+			))
+		}
 	}
 
 	private fun createSone(firstAlbumTitle: String, secondAlbumTitle: String): Sone {
@@ -101,9 +103,10 @@ class ImageBrowserPageTest : WebPageTest() {
 
 	@Test
 	fun `requesting nothing will show the albums of the current sone`() {
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["soneRequested"], equalTo<Any>(true))
-		assertThat(templateContext["sone"], equalTo<Any>(currentSone))
+		verifyNoRedirect {
+			assertThat(templateContext["soneRequested"], equalTo<Any>(true))
+			assertThat(templateContext["sone"], equalTo<Any>(currentSone))
+		}
 	}
 
 	@Test
