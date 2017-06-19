@@ -20,9 +20,7 @@ import org.junit.Test
 /**
  * Unit test for [KnownSonesPage].
  */
-class KnownSonesPageTest: WebPageTest() {
-
-	private val page = KnownSonesPage(template, webInterface)
+class KnownSonesPageTest: WebPageTest2(::KnownSonesPage) {
 
 	private val sones = listOf(
 			createSone(1000, 4, 7, 2, "sone2", true, true),
@@ -88,143 +86,160 @@ class KnownSonesPageTest: WebPageTest() {
 
 	@Test
 	fun `default known sones are sorted newest first`() {
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 2, 1, 0)
-		verifyStoredFields("activity", "desc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 2, 1, 0)
+			verifyStoredFields("activity", "desc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by oldest first`() {
 		addHttpRequestParameter("order", "asc")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(0, 1, 2, 3)
-		verifyStoredFields("activity", "asc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(0, 1, 2, 3)
+			verifyStoredFields("activity", "asc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by posts, most posts first`() {
 		addHttpRequestParameter("sort", "posts")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(0, 2, 1, 3)
-		verifyStoredFields("posts", "desc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(0, 2, 1, 3)
+			verifyStoredFields("posts", "desc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by posts, least posts first`() {
 		addHttpRequestParameter("sort", "posts")
 		addHttpRequestParameter("order", "asc")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 1, 2, 0)
-		verifyStoredFields("posts", "asc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 1, 2, 0)
+			verifyStoredFields("posts", "asc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by images, most images first`() {
 		addHttpRequestParameter("sort", "images")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(1, 0, 2, 3)
-		verifyStoredFields("images", "desc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(1, 0, 2, 3)
+			verifyStoredFields("images", "desc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by images, least images first`() {
 		addHttpRequestParameter("sort", "images")
 		addHttpRequestParameter("order", "asc")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 2, 0, 1)
-		verifyStoredFields("images", "asc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 2, 0, 1)
+			verifyStoredFields("images", "asc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by nice name, ascending`() {
 		addHttpRequestParameter("sort", "name")
 		addHttpRequestParameter("order", "asc")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 1, 0, 2)
-		verifyStoredFields("name", "asc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 1, 0, 2)
+			verifyStoredFields("name", "asc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be sorted by nice name, descending`() {
 		addHttpRequestParameter("sort", "name")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(2, 0, 1, 3)
-		verifyStoredFields("name", "desc", "")
+		verifyNoRedirect {
+			verifySonesAreInOrder(2, 0, 1, 3)
+			verifyStoredFields("name", "desc", "")
+		}
 	}
 
 	@Test
 	fun `known sones can be filtered by local sones`() {
 		addHttpRequestParameter("filter", "own")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(2, 0)
-		verifyStoredFields("activity", "desc", "own")
+		verifyNoRedirect {
+			verifySonesAreInOrder(2, 0)
+			verifyStoredFields("activity", "desc", "own")
+		}
 	}
 
 	@Test
 	fun `known sones can be filtered by non-local sones`() {
 		addHttpRequestParameter("filter", "not-own")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 1)
-		verifyStoredFields("activity", "desc", "not-own")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 1)
+			verifyStoredFields("activity", "desc", "not-own")
+		}
 	}
 
 	@Test
 	fun `known sones can be filtered by new sones`() {
 		addHttpRequestParameter("filter", "new")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(1, 0)
-		verifyStoredFields("activity", "desc", "new")
+		verifyNoRedirect {
+			verifySonesAreInOrder(1, 0)
+			verifyStoredFields("activity", "desc", "new")
+		}
 	}
 
 	@Test
 	fun `known sones can be filtered by known sones`() {
 		addHttpRequestParameter("filter", "not-new")
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 2)
-		verifyStoredFields("activity", "desc", "not-new")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 2)
+			verifyStoredFields("activity", "desc", "not-new")
+		}
 	}
 
 	@Test
 	fun `known sones can be filtered by followed sones`() {
 		addHttpRequestParameter("filter", "followed")
 		listOf("sone1", "sone3").forEach { whenever(currentSone.hasFriend(it)).thenReturn(true) }
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(2, 1)
-		verifyStoredFields("activity", "desc", "followed")
+		verifyNoRedirect {
+			verifySonesAreInOrder(2, 1)
+			verifyStoredFields("activity", "desc", "followed")
+		}
 	}
 
 	@Test
 	fun `known sones can be filtered by not-followed sones`() {
 		addHttpRequestParameter("filter", "not-followed")
 		listOf("sone1", "sone3").forEach { whenever(currentSone.hasFriend(it)).thenReturn(true) }
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 0)
-		verifyStoredFields("activity", "desc", "not-followed")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 0)
+			verifyStoredFields("activity", "desc", "not-followed")
+		}
 	}
 
 	@Test
 	fun `known sones can not be filtered by followed sones if there is no current sone`() {
 		addHttpRequestParameter("filter", "followed")
 		unsetCurrentSone()
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 2, 1, 0)
-		verifyStoredFields("activity", "desc", "followed")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 2, 1, 0)
+			verifyStoredFields("activity", "desc", "followed")
+		}
 	}
 
 	@Test
 	fun `known sones can not be filtered by not-followed sones if there is no current sone`() {
 		addHttpRequestParameter("filter", "not-followed")
 		unsetCurrentSone()
-		page.processTemplate(freenetRequest, templateContext)
-		verifySonesAreInOrder(3, 2, 1, 0)
-		verifyStoredFields("activity", "desc", "not-followed")
+		verifyNoRedirect {
+			verifySonesAreInOrder(3, 2, 1, 0)
+			verifyStoredFields("activity", "desc", "not-followed")
+		}
 	}
 
 	@Test
 	fun `pagination is set in template context`() {
-		page.processTemplate(freenetRequest, templateContext)
-		@Suppress("UNCHECKED_CAST")
-		assertThat((templateContext["pagination"] as Pagination<Sone>).items, contains(*listOf(3, 2, 1, 0).map { sones[it] }.toTypedArray()))
+		verifyNoRedirect {
+			@Suppress("UNCHECKED_CAST")
+			assertThat((templateContext["pagination"] as Pagination<Sone>).items, contains(*listOf(3, 2, 1, 0).map { sones[it] }.toTypedArray()))
+		}
 	}
 
 }
