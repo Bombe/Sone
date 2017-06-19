@@ -19,10 +19,11 @@ import org.mockito.ArgumentMatchers
 /**
  * Unit test for [IndexPage].
  */
-class IndexPageTest : WebPageTest() {
+class IndexPageTest: WebPageTest2({ template, webInterface -> IndexPage(template, webInterface, postVisibilityFilter) }) {
 
-	private val postVisibilityFilter = mock<PostVisibilityFilter>()
-	private val page = IndexPage(template, webInterface, postVisibilityFilter)
+	companion object {
+		private val postVisibilityFilter = mock<PostVisibilityFilter>()
+	}
 
 	@Test
 	fun `page returns correct path`() {
