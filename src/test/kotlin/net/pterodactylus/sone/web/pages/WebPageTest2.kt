@@ -20,6 +20,7 @@ import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException
+import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.web.Method
@@ -69,6 +70,7 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 	private val perPostReplies = mutableMapOf<String, PostReply>()
 	private val allAlbums = mutableMapOf<String, Album>()
 	private val allImages = mutableMapOf<String, Image>()
+	private val notifications = mutableMapOf<String, Notification>()
 	private val translations = mutableMapOf<String, String>()
 
 	init {
@@ -99,7 +101,8 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
-		whenever(webInterface.getNotifications(currentSone)).thenReturn(emptyList())
+		whenever(webInterface.getNotifications(currentSone)).then { notifications.values }
+		whenever(webInterface.getNotification(anyString())).then { notifications[it[0]].asOptional() }
 	}
 
 	private fun setupHttpRequest() {
@@ -190,6 +193,10 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 
 	fun addTranslation(key: String, value: String) {
 		translations[key] = value
+	}
+
+	fun addNotification(id: String, notification: Notification) {
+		notifications[id] = notification
 	}
 
 	fun addTemporaryImage(id: String, temporaryImage: TemporaryImage) {

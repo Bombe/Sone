@@ -13,12 +13,9 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DismissNotificationPage].
  */
-class DismissNotificationPageTest: WebPageTest() {
+class DismissNotificationPageTest: WebPageTest2(::DismissNotificationPage) {
 
-	private val page = DismissNotificationPage(template, webInterface)
 	private val notification = mock<Notification>()
-
-	override fun getPage() = page
 
 	@Test
 	fun `page returns correct path`() {
