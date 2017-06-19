@@ -85,5 +85,4 @@ class RescuePageTest: WebPageTest2(::RescuePage) {
 		}
 	}
 
-
 }
