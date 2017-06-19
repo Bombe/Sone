@@ -4,12 +4,16 @@ import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.data.Album
+import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.get
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.utils.asList
 import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -54,6 +58,10 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 	private val allSones = mutableMapOf<String, Sone>()
 	private val localSones = mutableMapOf<String, Sone>()
 	private val allPosts = mutableMapOf<String, Post>()
+	private val allPostReplies = mutableMapOf<String, PostReply>()
+	private val perPostReplies = mutableMapOf<String, PostReply>()
+	private val allAlbums = mutableMapOf<String, Album>()
+	private val allImages = mutableMapOf<String, Image>()
 	private val translations = mutableMapOf<String, String>()
 
 	@Before
@@ -64,6 +72,11 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(core.localSones).then { localSones.values }
 		whenever(core.getLocalSone(anyString())).then { localSones[it[0]] }
 		whenever(core.getPost(anyString())).then { allPosts[it[0]].asOptional() }
+		whenever(core.getPostReply(anyString())).then { allPostReplies[it[0]].asOptional() }
+		whenever(core.getReplies(anyString())).then { perPostReplies[it[0]].asList() }
+		whenever(core.getAlbum(anyString())).then { allAlbums[it[0]] }
+		whenever(core.getImage(anyString())).then { allImages[it[0]]}
+		whenever(core.getImage(anyString(), anyBoolean())).then { allImages[it[0]]}
 	}
 
 	@Before
@@ -145,6 +158,19 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		allPosts[id] = post
 	}
 
+	fun addPostReply(id: String, postReply: PostReply) {
+		allPostReplies[id] = postReply
+		postReply.postId?.also { perPostReplies[it] = postReply }
+	}
+
+	fun addAlbum(id: String, album: Album) {
+		allAlbums[id] = album
+	}
+
+	fun addImage(id: String, image: Image) {
+		allImages[id] = image
+	}
+
 	fun addTranslation(key: String, value: String) {
 		translations[key] = value
 	}
@@ -159,7 +185,7 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		caughtException?.run { throw this } ?: assertions()
 	}
 
-	fun verifyRedirect(target: String, assertions: () -> Unit) {
+	fun verifyRedirect(target: String, assertions: () -> Unit = {}) {
 		try {
 			page.handleRequest(freenetRequest, templateContext)
 			fail()

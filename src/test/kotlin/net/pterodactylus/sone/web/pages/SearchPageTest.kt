@@ -22,12 +22,11 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Unit test for [SearchPage].
  */
-class SearchPageTest : WebPageTest() {
+class SearchPageTest: WebPageTest2({ template, webInterface -> SearchPage(template, webInterface, ticker) }) {
 
-	private val ticker = mock<Ticker>()
-	private val page = SearchPage(template, webInterface, ticker)
-
-	override fun getPage() = page
+	companion object {
+		val ticker = mock<Ticker>()
+	}
 
 	@Test
 	fun `page returns correct path`() {
