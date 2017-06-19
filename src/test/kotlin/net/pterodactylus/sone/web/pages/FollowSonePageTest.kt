@@ -16,11 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [FollowSonePage].
  */
-class FollowSonePageTest : WebPageTest() {
-
-	private val page = FollowSonePage(template, webInterface)
-
-	override fun getPage() = page
+class FollowSonePageTest: WebPageTest2(::FollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
