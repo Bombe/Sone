@@ -23,6 +23,7 @@ import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.web.Method
 import net.pterodactylus.util.web.Method.GET
+import net.pterodactylus.util.web.Response
 import org.junit.Assert.fail
 import org.junit.Before
 import org.mockito.ArgumentMatchers.anyBoolean
@@ -30,6 +31,7 @@ import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.ArgumentMatchers.eq
+import java.io.ByteArrayOutputStream
 import java.net.URI
 import java.nio.charset.Charset
 import kotlin.text.Charsets.UTF_8
@@ -37,22 +39,24 @@ import kotlin.text.Charsets.UTF_8
 /**
  * Base class for web page tests.
  */
-abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePage) {
+open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePage = { _, _ -> mock<SoneTemplatePage>() }) {
 
-	protected val currentSone = mock<Sone>()
-	protected val template = mock<Template>()
-	protected val webInterface = deepMock<WebInterface>()
-	protected val core = webInterface.core!!
-	private val eventBus = mock<EventBus>()
-	protected val preferences = Preferences(eventBus)
-	protected val l10n = webInterface.l10n!!
+	val currentSone = mock<Sone>()
+	val template = mock<Template>()
+	val webInterface = deepMock<WebInterface>()
+	val core = webInterface.core!!
+	val eventBus = mock<EventBus>()
+	val preferences = Preferences(eventBus)
+	val l10n = webInterface.l10n!!
 
-	protected val page by lazy { pageSupplier(template, webInterface) }
-	private val httpRequest = mock<HTTPRequest>()
-	protected val freenetRequest = mock<FreenetRequest>()
-	protected val templateContext = TemplateContext()
+	val page by lazy { pageSupplier(template, webInterface) }
+	val httpRequest = mock<HTTPRequest>()
+	val freenetRequest = mock<FreenetRequest>()
+	val templateContext = TemplateContext()
+	val toadletContext = deepMock<ToadletContext>()
+	val responseContent = ByteArrayOutputStream()
+	val response = Response(responseContent)
 
-	protected val toadletContext = deepMock<ToadletContext>()
 	private val requestHeaders = mutableMapOf<String, String>()
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
 	private val postRequestParameters = mutableMapOf<String, ByteArray>()
@@ -66,8 +70,15 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 	private val allImages = mutableMapOf<String, Image>()
 	private val translations = mutableMapOf<String, String>()
 
-	@Before
-	fun setupCore() {
+	init {
+		setupCore()
+		setupWebInterface()
+		setupHttpRequest()
+		setupFreenetRequest()
+		setupTranslations()
+	}
+
+	private fun setupCore() {
 		whenever(core.preferences).thenReturn(preferences)
 		whenever(core.identityManager.allOwnIdentities).then { ownIdentities }
 		whenever(core.sones).then { allSones.values }
@@ -82,16 +93,14 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 		whenever(core.getImage(anyString(), anyBoolean())).then { allImages[it[0]]}
 	}
 
-	@Before
-	fun setupWebInterface() {
+	private fun setupWebInterface() {
 		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getNotifications(currentSone)).thenReturn(emptyList())
 	}
 
-	@Before
-	fun setupHttpRequest() {
+	private fun setupHttpRequest() {
 		whenever(httpRequest.method).thenReturn("GET")
 		whenever(httpRequest.getHeader(anyString())).then { requestHeaders[it.get<String>(0).toLowerCase()] }
 		whenever(httpRequest.hasParameters()).then { getRequestParameters.isNotEmpty() }
@@ -110,15 +119,13 @@ abstract class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTempla
 
 	private fun ByteArray.decode(charset: Charset = UTF_8) = String(this, charset)
 
-	@Before
-	fun setupFreenetRequest() {
+	private fun setupFreenetRequest() {
 		whenever(freenetRequest.method).thenReturn(GET)
 		whenever(freenetRequest.httpRequest).thenReturn(httpRequest)
 		whenever(freenetRequest.toadletContext).thenReturn(toadletContext)
 	}
 
-	@Before
-	fun setupTranslations() {
+	private fun setupTranslations() {
 		whenever(l10n.getString(anyString())).then { translations[it[0]] ?: it[0] }
 	}
 
