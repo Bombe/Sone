@@ -16,10 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreateSonePage].
  */
-class CreateSonePageTest: WebPageTest() {
-
-	private val page = CreateSonePage(template, webInterface)
-	override fun getPage() = page
+class CreateSonePageTest: WebPageTest2(::CreateSonePage) {
 
 	private val localSones_ = listOf(
 			createSone("local-sone1"),
