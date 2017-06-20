@@ -15,14 +15,10 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeletePostPage].
  */
-class DeletePostPageTest : WebPageTest() {
-
-	private val page = DeletePostPage(template, webInterface)
+class DeletePostPageTest: WebPageTest2(::DeletePostPage) {
 
 	private val post = mock<Post>()
 	private val sone = mock<Sone>()
-
-	override fun getPage() = page
 
 	@Before
 	fun setupPost() {
