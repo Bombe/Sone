@@ -13,11 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreatePostPage].
  */
-class CreatePostPageTest: WebPageTest() {
-
-	private val page = CreatePostPage(template, webInterface)
-
-	override fun getPage() = page
+class CreatePostPageTest: WebPageTest2(::CreatePostPage) {
 
 	@Test
 	fun `page returns correct path`() {
