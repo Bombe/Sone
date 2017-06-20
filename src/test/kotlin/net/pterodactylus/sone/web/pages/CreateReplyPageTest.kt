@@ -12,10 +12,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreateReplyPage].
  */
-class CreateReplyPageTest: WebPageTest() {
-
-	private val page = CreateReplyPage(template, webInterface)
-	override fun getPage() = page
+class CreateReplyPageTest: WebPageTest2(::CreateReplyPage) {
 
 	@Test
 	fun `page returns correct path`() {
