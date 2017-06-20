@@ -15,15 +15,11 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteAlbumPage].
  */
-class DeleteAlbumPageTest: WebPageTest() {
-
-	private val page = DeleteAlbumPage(template, webInterface)
+class DeleteAlbumPageTest: WebPageTest2(::DeleteAlbumPage) {
 
 	private val sone = mock<Sone>()
 	private val album = mock<Album>()
 	private val parentAlbum = mock<Album>()
-
-	override fun getPage() = page
 
 	@Before
 	fun setupAlbums() {
