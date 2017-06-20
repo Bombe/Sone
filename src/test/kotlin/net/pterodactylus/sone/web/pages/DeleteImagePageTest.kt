@@ -15,13 +15,10 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteImagePage].
  */
-class DeleteImagePageTest: WebPageTest() {
+class DeleteImagePageTest: WebPageTest2(::DeleteImagePage) {
 
-	private val page = DeleteImagePage(template, webInterface)
 	private val image = mock<Image>()
 	private val sone = mock<Sone>()
-
-	override fun getPage() = page
 
 	@Before
 	fun setupImage() {
