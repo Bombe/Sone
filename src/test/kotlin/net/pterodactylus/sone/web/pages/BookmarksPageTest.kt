@@ -13,9 +13,8 @@ import org.junit.Test
 /**
  * Unit test for [BookmarksPage].
  */
-class BookmarksPageTest: WebPageTest() {
+class BookmarksPageTest: WebPageTest2(::BookmarksPage) {
 
-	private val page = BookmarksPage(template, webInterface)
 	private val post1 = createLoadedPost(1000)
 	private val post2 = createLoadedPost(3000)
 	private val post3 = createLoadedPost(2000)
@@ -39,20 +38,22 @@ class BookmarksPageTest: WebPageTest() {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `page sets correct posts in template context`() {
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["posts"] as Collection<Post>, contains(post2, post3, post1))
-		assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(post2, post3, post1))
-		assertThat(templateContext["postsNotLoaded"], equalTo<Any>(false))
+		verifyNoRedirect {
+			assertThat(templateContext["posts"] as Collection<Post>, contains(post2, post3, post1))
+			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(post2, post3, post1))
+			assertThat(templateContext["postsNotLoaded"], equalTo<Any>(false))
+		}
 	}
 
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `page does not put unloaded posts in template context but sets a flag`() {
 		whenever(post3.isLoaded).thenReturn(false)
-		page.processTemplate(freenetRequest, templateContext)
-		assertThat(templateContext["posts"] as Collection<Post>, contains(post2, post1))
-		assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(post2, post1))
-		assertThat(templateContext["postsNotLoaded"], equalTo<Any>(true))
+		verifyNoRedirect {
+			assertThat(templateContext["posts"] as Collection<Post>, contains(post2, post1))
+			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(post2, post1))
+			assertThat(templateContext["postsNotLoaded"], equalTo<Any>(true))
+		}
 	}
 
 }
