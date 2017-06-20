@@ -15,14 +15,10 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteProfileFieldPage].
  */
-class DeleteProfileFieldPageTest: WebPageTest() {
-
-	private val page = DeleteProfileFieldPage(template, webInterface)
+class DeleteProfileFieldPageTest: WebPageTest2(::DeleteProfileFieldPage) {
 
 	private val profile = Profile(currentSone)
 	private val field = profile.addField("name")
-
-	override fun getPage() = page
 
 	@Before
 	fun setupProfile() {
