@@ -13,10 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [BookmarkPage].
  */
-class BookmarkPageTest : WebPageTest() {
-
-	private val page = BookmarkPage(template, webInterface)
-	override fun getPage() = page
+class BookmarkPageTest: WebPageTest2(::BookmarkPage) {
 
 	@Test
 	fun `path is set correctly`() {
@@ -25,8 +22,9 @@ class BookmarkPageTest : WebPageTest() {
 
 	@Test
 	fun `get request does not bookmark anything and does not redirect`() {
-		page.processTemplate(freenetRequest, templateContext)
-		verify(core, never()).bookmarkPost(any())
+		verifyNoRedirect {
+			verify(core, never()).bookmarkPost(any())
+		}
 	}
 
 	private fun setupBookmarkRequest() {
