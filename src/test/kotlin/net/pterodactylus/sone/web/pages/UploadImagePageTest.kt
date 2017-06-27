@@ -20,7 +20,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UploadImagePage].
  */
-class UploadImagePageTest: WebPageTest2(::UploadImagePage) {
+class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 
 	private val parentAlbum = mock<Album>().apply {
 		whenever(id).thenReturn("parent-id")

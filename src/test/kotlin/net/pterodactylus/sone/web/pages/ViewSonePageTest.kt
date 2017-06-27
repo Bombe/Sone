@@ -19,7 +19,7 @@ import org.junit.Test
 /**
  * Unit test for [ViewSonePage].
  */
-class ViewSonePageTest: WebPageTest2(::ViewSonePage) {
+class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 
 	init {
 		whenever(currentSone.id).thenReturn("sone-id")

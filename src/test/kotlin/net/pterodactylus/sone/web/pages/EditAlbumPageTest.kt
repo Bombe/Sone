@@ -17,7 +17,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditAlbumPage].
  */
-class EditAlbumPageTest: WebPageTest2(::EditAlbumPage) {
+class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
 
 	private val album = mock<Album>()
 	private val parentAlbum = mock<Album>()

@@ -42,7 +42,7 @@ import kotlin.text.Charsets.UTF_8
 /**
  * Base class for web page tests.
  */
-open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePage = { _, _ -> mock<SoneTemplatePage>() }) {
+open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePage = { _, _ -> mock<SoneTemplatePage>() }) {
 
 	val currentSone = mock<Sone>()
 	val template = mock<Template>()

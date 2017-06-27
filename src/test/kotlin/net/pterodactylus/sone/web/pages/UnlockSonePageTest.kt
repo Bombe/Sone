@@ -14,7 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnlockSonePage].
  */
-class UnlockSonePageTest: WebPageTest2(::UnlockSonePage) {
+class UnlockSonePageTest: WebPageTest(::UnlockSonePage) {
 
 	@Test
 	fun `page returns correct path`() {

@@ -13,7 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LockSonePage].
  */
-class LockSonePageTest: WebPageTest2(::LockSonePage) {
+class LockSonePageTest: WebPageTest(::LockSonePage) {
 
 	@Test
 	fun `page returns correct path`() {

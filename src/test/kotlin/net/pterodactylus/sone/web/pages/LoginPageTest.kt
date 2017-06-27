@@ -19,7 +19,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LoginPage].
  */
-class LoginPageTest: WebPageTest2(::LoginPage) {
+class LoginPageTest: WebPageTest(::LoginPage) {
 
 	private val sones = listOf(createSone("Sone", "Test"), createSone("Test"), createSone("Sone"))
 

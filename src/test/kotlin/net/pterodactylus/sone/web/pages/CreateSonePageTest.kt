@@ -16,7 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreateSonePage].
  */
-class CreateSonePageTest: WebPageTest2(::CreateSonePage) {
+class CreateSonePageTest: WebPageTest(::CreateSonePage) {
 
 	private val localSones_ = listOf(
 			createSone("local-sone1"),

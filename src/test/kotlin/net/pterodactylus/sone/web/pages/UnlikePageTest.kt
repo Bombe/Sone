@@ -11,7 +11,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnlikePage].
  */
-class UnlikePageTest: WebPageTest2(::UnlikePage) {
+class UnlikePageTest: WebPageTest(::UnlikePage) {
 
 	@Test
 	fun `page returns correct path`() {

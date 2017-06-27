@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteImagePage].
  */
-class DeleteImagePageTest: WebPageTest2(::DeleteImagePage) {
+class DeleteImagePageTest: WebPageTest(::DeleteImagePage) {
 
 	private val image = mock<Image>()
 	private val sone = mock<Sone>()

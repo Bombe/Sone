@@ -13,7 +13,7 @@ import org.junit.Test
 /**
  * Unit test for [BookmarksPage].
  */
-class BookmarksPageTest: WebPageTest2(::BookmarksPage) {
+class BookmarksPageTest: WebPageTest(::BookmarksPage) {
 
 	private val post1 = createLoadedPost(1000)
 	private val post2 = createLoadedPost(3000)

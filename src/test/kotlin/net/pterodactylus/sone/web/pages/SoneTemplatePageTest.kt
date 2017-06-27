@@ -21,7 +21,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [SoneTemplatePage].
  */
-class SoneTemplatePageTest: WebPageTest2({ template, webInterface -> object : SoneTemplatePage("path.html", template, webInterface, true) {}}) {
+class SoneTemplatePageTest: WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", template, webInterface, true) {}}) {
 
 	@Test
 	fun `current sone is retrieved from web interface`() {

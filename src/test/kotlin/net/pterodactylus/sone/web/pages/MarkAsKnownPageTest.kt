@@ -13,7 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [MarkAsKnownPage].
  */
-class MarkAsKnownPageTest: WebPageTest2(::MarkAsKnownPage) {
+class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 
 	@Test
 	fun `page returns correct path`() {

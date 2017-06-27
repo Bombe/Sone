@@ -17,7 +17,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditProfilePage].
  */
-class EditProfilePageTest: WebPageTest2(::EditProfilePage) {
+class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 
 	private val profile = Profile(currentSone)
 	private val firstField = profile.addField("First Field")

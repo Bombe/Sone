@@ -12,7 +12,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreateReplyPage].
  */
-class CreateReplyPageTest: WebPageTest2(::CreateReplyPage) {
+class CreateReplyPageTest: WebPageTest(::CreateReplyPage) {
 
 	@Test
 	fun `page returns correct path`() {

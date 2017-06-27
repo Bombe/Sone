@@ -9,7 +9,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnfollowSonePage].
  */
-class UnfollowSonePageTest: WebPageTest2(::UnfollowSonePage) {
+class UnfollowSonePageTest: WebPageTest(::UnfollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {

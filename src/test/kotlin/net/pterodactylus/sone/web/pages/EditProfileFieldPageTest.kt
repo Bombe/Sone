@@ -13,7 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditProfileFieldPage].
  */
-class EditProfileFieldPageTest: WebPageTest2(::EditProfileFieldPage) {
+class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
 
 	private val profile = Profile(currentSone)
 	private val field = profile.addField("Name")

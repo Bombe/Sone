@@ -12,7 +12,7 @@ import org.junit.Test
 /**
  * Unit test for [ViewPostPage].
  */
-class ViewPostPageTest: WebPageTest2(::ViewPostPage) {
+class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 
 	private val post = mock<Post>()
 

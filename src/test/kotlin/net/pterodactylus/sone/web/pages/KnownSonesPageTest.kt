@@ -20,7 +20,7 @@ import org.junit.Test
 /**
  * Unit test for [KnownSonesPage].
  */
-class KnownSonesPageTest: WebPageTest2(::KnownSonesPage) {
+class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 
 	private val sones = listOf(
 			createSone(1000, 4, 7, 2, "sone2", true, true),

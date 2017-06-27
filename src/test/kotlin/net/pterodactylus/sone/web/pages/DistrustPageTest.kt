@@ -12,7 +12,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DistrustPage].
  */
-class DistrustPageTest: WebPageTest2(::DistrustPage) {
+class DistrustPageTest: WebPageTest(::DistrustPage) {
 
 	@Test
 	fun `page returns correct path`() {

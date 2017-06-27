@@ -20,7 +20,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [EditImagePage].
  */
-class EditImagePageTest: WebPageTest2(::EditImagePage) {
+class EditImagePageTest: WebPageTest(::EditImagePage) {
 
 	private val image = mock<Image>()
 	private val modifier = mockBuilder<Modifier>()

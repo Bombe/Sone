@@ -14,7 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [TrustPage].
  */
-class TrustPageTest: WebPageTest2(::TrustPage) {
+class TrustPageTest: WebPageTest(::TrustPage) {
 
 	@Test
 	fun `page returns correct path`() {

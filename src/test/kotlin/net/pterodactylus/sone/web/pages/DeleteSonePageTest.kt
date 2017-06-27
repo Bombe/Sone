@@ -12,7 +12,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteSonePage].
  */
-class DeleteSonePageTest: WebPageTest2(::DeleteSonePage) {
+class DeleteSonePageTest: WebPageTest(::DeleteSonePage) {
 
 	@Test
 	fun `page returns correct path`() {

@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Unit test for [SearchPage].
  */
-class SearchPageTest: WebPageTest2({ template, webInterface -> SearchPage(template, webInterface, ticker) }) {
+class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(template, webInterface, ticker) }) {
 
 	companion object {
 		val ticker = mock<Ticker>()

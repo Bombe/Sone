@@ -11,7 +11,7 @@ import org.junit.Test
  */
 class GetImagePageTest {
 
-	private val scaffolding = WebPageTest2()
+	private val scaffolding = WebPageTest()
 	private val page = GetImagePage(scaffolding.webInterface)
 	private val freenetRequest = scaffolding.freenetRequest
 	private val response = scaffolding.response

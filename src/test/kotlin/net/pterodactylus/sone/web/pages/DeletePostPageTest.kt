@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeletePostPage].
  */
-class DeletePostPageTest: WebPageTest2(::DeletePostPage) {
+class DeletePostPageTest: WebPageTest(::DeletePostPage) {
 
 	private val post = mock<Post>()
 	private val sone = mock<Sone>()

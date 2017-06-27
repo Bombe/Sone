@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteAlbumPage].
  */
-class DeleteAlbumPageTest: WebPageTest2(::DeleteAlbumPage) {
+class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
 
 	private val sone = mock<Sone>()
 	private val album = mock<Album>()

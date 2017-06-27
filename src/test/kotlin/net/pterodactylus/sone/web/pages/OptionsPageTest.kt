@@ -18,7 +18,7 @@ import org.junit.Test
 /**
  * Unit test for [OptionsPage].
  */
-class OptionsPageTest: WebPageTest2(::OptionsPage) {
+class OptionsPageTest: WebPageTest(::OptionsPage) {
 
 	@Before
 	fun setupPreferences() {

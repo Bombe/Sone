@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [RescuePage].
  */
-class RescuePageTest: WebPageTest2(::RescuePage) {
+class RescuePageTest: WebPageTest(::RescuePage) {
 
 	private val soneRescuer = mock<SoneRescuer>()
 

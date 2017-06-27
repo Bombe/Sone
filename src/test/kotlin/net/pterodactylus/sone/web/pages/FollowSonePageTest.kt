@@ -16,7 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [FollowSonePage].
  */
-class FollowSonePageTest: WebPageTest2(::FollowSonePage) {
+class FollowSonePageTest: WebPageTest(::FollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {

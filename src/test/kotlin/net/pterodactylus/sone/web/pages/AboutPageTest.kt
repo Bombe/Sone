@@ -10,12 +10,13 @@ import org.junit.Test
 /**
  * Unit test for [AboutPage].
  */
-class AboutPageTest: WebPageTest() {
+class AboutPageTest: WebPageTest({ template, webInterface -> AboutPage(template, webInterface, PluginVersion(version), PluginYear(year), PluginHomepage(homepage)) }) {
 
-	private val version = "0.1.2"
-	private val year = 1234
-	private val homepage = "home://page"
-	private val page = AboutPage(template, webInterface, PluginVersion(version), PluginYear(year), PluginHomepage(homepage))
+	companion object {
+		private const val version = "0.1.2"
+		private const val year = 1234
+		private const val homepage = "home://page"
+	}
 
 	@Test
 	fun `page returns correct path`() {

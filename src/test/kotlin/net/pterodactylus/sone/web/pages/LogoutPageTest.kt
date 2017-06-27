@@ -9,7 +9,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LogoutPage].
  */
-class LogoutPageTest: WebPageTest2(::LogoutPage) {
+class LogoutPageTest: WebPageTest(::LogoutPage) {
 
 	@Test
 	fun `page returns correct path`() {

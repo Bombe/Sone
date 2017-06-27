@@ -17,7 +17,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnbookmarkPage].
  */
-class UnbookmarkPageTest: WebPageTest2(::UnbookmarkPage) {
+class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
 
 	@Test
 	fun `page returns correct path`() {

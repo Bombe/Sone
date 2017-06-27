@@ -10,7 +10,7 @@ import org.mockito.Mockito.verifyNoMoreInteractions
 /**
  * Unit test for [LikePage].
  */
-class LikePageTest: WebPageTest2(::LikePage) {
+class LikePageTest: WebPageTest(::LikePage) {
 
 	@Test
 	fun `page returns correct path`() {

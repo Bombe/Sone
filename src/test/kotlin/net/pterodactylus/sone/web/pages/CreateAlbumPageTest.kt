@@ -16,7 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreateAlbumPage].
  */
-class CreateAlbumPageTest: WebPageTest2(::CreateAlbumPage) {
+class CreateAlbumPageTest: WebPageTest(::CreateAlbumPage) {
 
 	private val parentAlbum = createAlbum("parent-id")
 	private val newAlbum = createAlbum("album-id")

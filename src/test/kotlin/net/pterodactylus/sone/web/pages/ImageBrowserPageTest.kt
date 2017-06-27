@@ -13,7 +13,7 @@ import org.junit.Test
 /**
  * Unit test for [ImageBrowserPage].
  */
-class ImageBrowserPageTest: WebPageTest2(::ImageBrowserPage) {
+class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page returns correct path`() {

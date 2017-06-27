@@ -13,7 +13,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [CreatePostPage].
  */
-class CreatePostPageTest: WebPageTest2(::CreatePostPage) {
+class CreatePostPageTest: WebPageTest(::CreatePostPage) {
 
 	@Test
 	fun `page returns correct path`() {
