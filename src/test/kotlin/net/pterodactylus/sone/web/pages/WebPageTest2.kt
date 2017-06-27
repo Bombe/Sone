@@ -2,7 +2,9 @@ package net.pterodactylus.sone.web.pages
 
 import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
+import freenet.support.SimpleReadOnlyArrayBucket
 import freenet.support.api.HTTPRequest
+import freenet.support.api.HTTPUploadedFile
 import net.pterodactylus.sone.core.Preferences
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
@@ -27,7 +29,6 @@ import net.pterodactylus.util.web.Method
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Response
 import org.junit.Assert.fail
-import org.junit.Before
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyLong
@@ -62,6 +63,9 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 	private val requestHeaders = mutableMapOf<String, String>()
 	private val getRequestParameters = mutableMapOf<String, MutableList<String>>()
 	private val postRequestParameters = mutableMapOf<String, ByteArray>()
+	private val uploadedFileNames = mutableMapOf<String, String>()
+	private val uploadedFileContentTypes = mutableMapOf<String, String>()
+	private val uploadedFileResources = mutableMapOf<String, String>()
 	private val ownIdentities = mutableSetOf<OwnIdentity>()
 	private val allSones = mutableMapOf<String, Sone>()
 	private val localSones = mutableMapOf<String, Sone>()
@@ -120,6 +124,17 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 		whenever(httpRequest.getMultipleIntParam(anyString())).then { getRequestParameters[it[0]]?.map { it.toIntOrNull() ?: 0 } ?: emptyArray<Int>() }
 		whenever(httpRequest.isPartSet(anyString())).then { it[0] in postRequestParameters }
 		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).then { postRequestParameters[it[0]]?.decode()?.take(it[1]) ?: "" }
+		whenever(httpRequest.getUploadedFile(anyString())).then {
+			it.get<String>(0).takeIf { it in uploadedFileNames }
+					?.let { name -> UploadedFile(uploadedFileNames[name]!!, uploadedFileContentTypes[name]!!, uploadedFileResources[name]!!)
+			}
+		}
+	}
+
+	private class UploadedFile(private val filename: String, private val contentType: String, private val resourceName: String): HTTPUploadedFile {
+		override fun getFilename() = filename
+		override fun getContentType() = contentType
+		override fun getData() = javaClass.getResourceAsStream(resourceName).readBytes().let(::SimpleReadOnlyArrayBucket)
 	}
 
 	private fun ByteArray.decode(charset: Charset = UTF_8) = String(this, charset)
@@ -201,6 +216,12 @@ open class WebPageTest2(pageSupplier: (Template, WebInterface) -> SoneTemplatePa
 
 	fun addTemporaryImage(id: String, temporaryImage: TemporaryImage) {
 		whenever(core.getTemporaryImage(id)).thenReturn(temporaryImage)
+	}
+
+	fun addUploadedFile(name: String, filename: String, contentType: String, resource: String) {
+		uploadedFileNames[name] = filename
+		uploadedFileContentTypes[name] = contentType
+		uploadedFileResources[name] = resource
 	}
 
 	fun verifyNoRedirect(assertions: () -> Unit) {

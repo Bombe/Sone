@@ -20,15 +20,12 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UploadImagePage].
  */
-class UploadImagePageTest : WebPageTest() {
+class UploadImagePageTest: WebPageTest2(::UploadImagePage) {
 
 	private val parentAlbum = mock<Album>().apply {
 		whenever(id).thenReturn("parent-id")
 		whenever(sone).thenReturn(currentSone)
 	}
-	private val page = UploadImagePage(template, webInterface)
-
-	override fun getPage() = page
 
 	@Test
 	fun `page returns correct path`() {
