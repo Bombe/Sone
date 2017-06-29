@@ -19,6 +19,7 @@ import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
+import net.pterodactylus.util.web.Method.GET
 import org.junit.Before
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
@@ -82,11 +83,13 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 	@Before
 	fun setupFreenetRequest() {
 		whenever(freenetRequest.toadletContext).thenReturn(toadletContext)
+		whenever(freenetRequest.method).thenReturn(GET)
 		whenever(freenetRequest.httpRequest).thenReturn(httpRequest)
 	}
 
 	@Before
 	fun setupHttpRequest() {
+		whenever(httpRequest.method).thenReturn("GET")
 		whenever(httpRequest.getParam(anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: "" }
 		whenever(httpRequest.getParam(anyString(), anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: it.getArgument(1) }
 		whenever(httpRequest.getParam(anyString(), isNull())).thenAnswer { requestParameters[it.getArgument(0)] }
