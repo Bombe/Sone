@@ -21,8 +21,10 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.web.Method.GET
 import org.junit.Before
+import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
+import org.mockito.ArgumentMatchers.eq
 import org.mockito.ArgumentMatchers.isNull
 import java.util.NoSuchElementException
 import javax.naming.SizeLimitExceededException
@@ -43,6 +45,7 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 	protected val httpRequest = mock<HTTPRequest>()
 	protected val currentSone = deepMock<Sone>()
 
+	private val requestHeaders = mutableMapOf<String, String>()
 	private val requestParameters = mutableMapOf<String, String>()
 	private val requestParts = mutableMapOf<String, String>()
 	private val localSones = mutableMapOf<String, Sone>()
@@ -54,6 +57,7 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 
 	@Before
 	fun setupWebInterface() {
+		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.core).thenReturn(core)
@@ -90,6 +94,7 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 	@Before
 	fun setupHttpRequest() {
 		whenever(httpRequest.method).thenReturn("GET")
+		whenever(httpRequest.getHeader(anyString())).thenAnswer { requestHeaders[it.get<String>(0).toLowerCase()] }
 		whenever(httpRequest.getParam(anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: "" }
 		whenever(httpRequest.getParam(anyString(), anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: it.getArgument(1) }
 		whenever(httpRequest.getParam(anyString(), isNull())).thenAnswer { requestParameters[it.getArgument(0)] }
@@ -102,6 +107,8 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 		whenever(httpRequest.isPartSet(anyString())).thenAnswer { it.getArgument(0) in requestParts }
 	}
 
+	protected val JsonReturnObject.error get() = if (this is JsonErrorReturnObject) this.error else null
+
 	protected fun Sone.mock(id: String, name: String, local: Boolean = false, time: Long, status: SoneStatus = idle) = apply {
 		whenever(this.id).thenReturn(id)
 		whenever(this.name).thenReturn(name)
@@ -111,8 +118,13 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 	}
 
 	protected fun unsetCurrentSone() {
+		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(null)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(null)
 		whenever(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(null)
+	}
+
+	protected fun addRequestHeader(key: String, value: String) {
+		requestHeaders += key.toLowerCase() to value
 	}
 
 	protected fun addRequestParameter(key: String, value: String) {
