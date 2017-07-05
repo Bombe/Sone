@@ -116,7 +116,7 @@ public class JsonReturnObject {
 	 * @return This JSON return object
 	 */
 	public JsonReturnObject put(String key, String value) {
-		return put(key, new TextNode(value));
+		return put(key, TextNode.valueOf(value));
 	}
 
 	/**
