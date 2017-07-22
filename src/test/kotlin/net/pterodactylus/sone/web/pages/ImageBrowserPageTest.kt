@@ -85,6 +85,25 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 		}
 	}
 
+	@Test
+	fun `get request for gallery can show second page`() {
+		core.preferences.imagesPerPage = 2
+		val firstSone = createSone("first album", "second album")
+		addSone("sone1", firstSone)
+		val secondSone = createSone("third album", "fourth album")
+		addSone("sone2", secondSone)
+		addHttpRequestParameter("mode", "gallery")
+		addHttpRequestParameter("page", "1")
+		verifyNoRedirect {
+			assertThat(templateContext["galleryRequested"], equalTo<Any>(true))
+			@Suppress("UNCHECKED_CAST")
+			assertThat(templateContext["albums"] as Iterable<Album>, contains(
+					firstSone.rootAlbum.albums[1],
+					secondSone.rootAlbum.albums[0]
+			))
+		}
+	}
+
 	private fun createSone(firstAlbumTitle: String, secondAlbumTitle: String): Sone {
 		return mock<Sone>().apply {
 			val rootAlbum = mock<Album>()

@@ -33,8 +33,10 @@ class ImageBrowserPage(template: Template, webInterface: WebInterface):
 					.filterNot(Album::isEmpty)
 					.sortedBy(Album::getTitle)
 					.also { albums ->
-						templateContext["albums"] = albums
-						templateContext["albumPagination"] = Pagination(albums, 12).apply { page = request.parameters["page"]?.toIntOrNull() ?: 0 }
+						Pagination(albums, webInterface.core.preferences.imagesPerPage).apply { page = request.parameters["page"]?.toIntOrNull() ?: 0 }.also { pagination ->
+							templateContext["albumPagination"] = pagination
+							templateContext["albums"] = pagination.items
+						}
 					}
 		} else {
 			templateContext["soneRequested"] = true
