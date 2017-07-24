@@ -50,6 +50,7 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 	private val requestParts = mutableMapOf<String, String>()
 	private val localSones = mutableMapOf<String, Sone>()
 	private val remoteSones = mutableMapOf<String, Sone>()
+	private val posts = mutableMapOf<String, Post>()
 	private val newPosts = mutableMapOf<String, Post>()
 	private val newReplies = mutableMapOf<String, PostReply>()
 	private val linkedElements = mutableMapOf<String, LinkedElement>()
@@ -69,7 +70,8 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 	@Before
 	fun setupCore() {
 		whenever(core.getSone(anyString())).thenAnswer { (localSones + remoteSones)[it.getArgument(0)].asOptional() }
-		whenever(core.getPost(anyString())).thenAnswer { newPosts[it[0]].asOptional() }
+		whenever(core.getLocalSone(anyString())).thenAnswer { localSones[it[0]] }
+		whenever(core.getPost(anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
 	}
 
 	@Before
@@ -141,6 +143,14 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 
 	protected fun addSone(sone: Sone) {
 		remoteSones += sone.id to sone
+	}
+
+	protected fun addLocalSone(id: String, sone: Sone) {
+		localSones += id to sone
+	}
+
+	protected fun addPost(id: String, post: Post) {
+		posts[id] = post
 	}
 
 	protected fun addNewPost(id: String, soneId: String, time: Long, recipientId: String? = null) =
