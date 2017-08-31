@@ -16,14 +16,14 @@ class BookmarkAjaxPageTest : JsonPageTest("bookmark.ajax", requiresLogin = false
 	@Test
 	fun `missing post ID results in invalid id response`() {
 		assertThat(json.isSuccess, equalTo(false))
-		assertThat((json as JsonErrorReturnObject).error, equalTo("invalid-post-id"))
+		assertThat(json.error, equalTo("invalid-post-id"))
 	}
 
 	@Test
 	fun `empty post ID results in invalid id response`() {
 		addRequestParameter("post", "")
 		assertThat(json.isSuccess, equalTo(false))
-		assertThat((json as JsonErrorReturnObject).error, equalTo("invalid-post-id"))
+		assertThat(json.error, equalTo("invalid-post-id"))
 	}
 
 	@Test
