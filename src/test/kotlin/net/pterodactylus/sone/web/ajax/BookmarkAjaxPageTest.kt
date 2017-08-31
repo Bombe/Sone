@@ -11,17 +11,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [BookmarkAjaxPage].
  */
-class BookmarkAjaxPageTest : JsonPageTest(::BookmarkAjaxPage) {
-
-	@Test
-	fun `page returns correct path`() {
-		assertThat(page.path, equalTo("bookmark.ajax"))
-	}
-
-	@Test
-	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
-	}
+class BookmarkAjaxPageTest : JsonPageTest("bookmark.ajax", requiresLogin = false, pageSupplier = ::BookmarkAjaxPage) {
 
 	@Test
 	fun `missing post ID results in invalid id response`() {

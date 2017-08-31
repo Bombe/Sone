@@ -12,22 +12,7 @@ import org.junit.Test
 /**
  * Unit test for [CreateReplyAjaxPage].
  */
-class CreateReplyAjaxPageTest : JsonPageTest(::CreateReplyAjaxPage) {
-
-	@Test
-	fun `page returns correct path`() {
-		assertThat(page.path, equalTo("createReply.ajax"))
-	}
-
-	@Test
-	fun `page needs form password`() {
-		assertThat(page.needsFormPassword(), equalTo(true))
-	}
-
-	@Test
-	fun `page requires login`() {
-		assertThat(page.requiresLogin(), equalTo(true))
-	}
+class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = ::CreateReplyAjaxPage) {
 
 	@Test
 	fun `invalid post ID results in error message`() {

@@ -20,7 +20,10 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.web.Method.GET
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
 import org.junit.Before
+import org.junit.Test
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
@@ -32,7 +35,11 @@ import javax.naming.SizeLimitExceededException
 /**
  * Base class for tests for any [JsonPage] implementations.
  */
-open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<JsonPage>() }) {
+abstract class JsonPageTest(
+		private val expectedPath: String,
+		private val requiresLogin: Boolean = true,
+		private val needsFormPassword: Boolean = true,
+		pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<JsonPage>() }) {
 
 	protected val webInterface = mock<WebInterface>()
 	protected val core = mock<Core>()
@@ -178,6 +185,21 @@ open class JsonPageTest(pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<J
 
 	protected fun addLinkedElement(link: String, loading: Boolean, failed: Boolean) {
 		linkedElements[link] = LinkedElement(link, failed, loading)
+	}
+
+	@Test
+	fun `page returns correct path`() {
+		assertThat(page.path, equalTo(expectedPath))
+	}
+
+	@Test
+	fun `page needs form password`() {
+		assertThat(page.needsFormPassword(), equalTo(needsFormPassword))
+	}
+
+	@Test
+	fun `page requires login`() {
+		assertThat(page.requiresLogin(), equalTo(requiresLogin))
 	}
 
 }

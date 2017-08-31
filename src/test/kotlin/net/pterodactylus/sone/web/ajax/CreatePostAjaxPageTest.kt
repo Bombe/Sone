@@ -14,22 +14,7 @@ import org.junit.Test
 /**
  * Unit test for [CreatePostAjaxPage].
  */
-class CreatePostAjaxPageTest : JsonPageTest(::CreatePostAjaxPage) {
-
-	@Test
-	fun `page returns correct path`() {
-		assertThat(page.path, equalTo("createPost.ajax"))
-	}
-
-	@Test
-	fun `page needs form password`() {
-		assertThat(page.needsFormPassword(), equalTo(true))
-	}
-
-	@Test
-	fun `page requires login`() {
-		assertThat(page.requiresLogin(), equalTo(true))
-	}
+class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::CreatePostAjaxPage) {
 
 	@Test
 	fun `page requires a current sone`() {

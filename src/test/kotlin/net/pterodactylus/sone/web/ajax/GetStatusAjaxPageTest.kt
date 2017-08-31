@@ -28,7 +28,7 @@ import java.util.TimeZone
 /**
  * Unit test for [GetStatusAjaxPage].
  */
-class GetStatusAjaxPageTest: JsonPageTest() {
+class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = false, needsFormPassword = false) {
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
@@ -38,21 +38,6 @@ class GetStatusAjaxPageTest: JsonPageTest() {
 	fun setupTimeTextConverter() {
 		whenever(timeTextConverter.getTimeText(anyLong())).thenAnswer { TimeText(L10nText(it.getArgument<Long>(0).toString()), it.getArgument(0)) }
 		whenever(l10nFilter.format(any(), any(), any())).thenAnswer { it.getArgument<L10nText>(1).text }
-	}
-
-	@Test
-	fun `page returns correct path`() {
-		assertThat(page.path, equalTo("getStatus.ajax"))
-	}
-
-	@Test
-	fun `page does not require form password`() {
-		assertThat(page.needsFormPassword(), equalTo(false))
-	}
-
-	@Test
-	fun `page does not require login`() {
-		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test

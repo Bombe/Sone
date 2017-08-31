@@ -16,25 +16,10 @@ import org.mockito.ArgumentMatchers
 /**
  * Unit test for [GetLinkedElementAjaxPage].
  */
-class GetLinkedElementAjaxPageTest: JsonPageTest() {
+class GetLinkedElementAjaxPageTest: JsonPageTest("getLinkedElement.ajax", requiresLogin = false, needsFormPassword = false) {
 
 	private val linkedElementRenderFilter = mock<LinkedElementRenderFilter>()
 	override var page: JsonPage = GetLinkedElementAjaxPage(webInterface, elementLoader, linkedElementRenderFilter)
-
-	@Test
-	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("getLinkedElement.ajax"))
-	}
-
-	@Test
-	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
-	}
-
-	@Test
-	fun `page does not require form password`() {
-	    assertThat(page.needsFormPassword(), equalTo(false))
-	}
 
 	@Test
 	fun `only loaded linked elements are returned`() {
