@@ -8,6 +8,7 @@ import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.Sone.SoneStatus
 import net.pterodactylus.sone.data.Sone.SoneStatus.idle
@@ -51,6 +52,7 @@ abstract class JsonPageTest(
 	protected val freenetRequest = mock<FreenetRequest>()
 	protected val httpRequest = mock<HTTPRequest>()
 	protected val currentSone = deepMock<Sone>()
+	protected val profile = Profile(currentSone)
 
 	private val requestHeaders = mutableMapOf<String, String>()
 	private val requestParameters = mutableMapOf<String, String>()
@@ -114,6 +116,11 @@ abstract class JsonPageTest(
 		whenever(httpRequest.getPartAsStringThrowing(anyString(), anyInt())).thenAnswer { invocation -> requestParts[invocation.getArgument(0)]?.let { if (it.length > invocation.getArgument<Int>(1)) throw SizeLimitExceededException() else it } ?: throw NoSuchElementException() }
 		whenever(httpRequest.getIntPart(anyString(), anyInt())).thenAnswer { invocation -> requestParts[invocation.getArgument(0)]?.toIntOrNull() ?: invocation.getArgument(1) }
 		whenever(httpRequest.isPartSet(anyString())).thenAnswer { it.getArgument(0) in requestParts }
+	}
+
+	@Before
+	fun setupProfile() {
+		whenever(currentSone.profile).thenReturn(profile)
 	}
 
 	protected val JsonReturnObject.error get() = if (this is JsonErrorReturnObject) this.error else null
