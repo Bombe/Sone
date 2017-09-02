@@ -61,6 +61,7 @@ abstract class JsonPageTest(
 	private val remoteSones = mutableMapOf<String, Sone>()
 	private val posts = mutableMapOf<String, Post>()
 	private val newPosts = mutableMapOf<String, Post>()
+	private val replies = mutableMapOf<String, PostReply>()
 	private val newReplies = mutableMapOf<String, PostReply>()
 	private val linkedElements = mutableMapOf<String, LinkedElement>()
 	private val notifications = mutableListOf<Notification>()
@@ -81,6 +82,7 @@ abstract class JsonPageTest(
 		whenever(core.getSone(anyString())).thenAnswer { (localSones + remoteSones)[it.getArgument(0)].asOptional() }
 		whenever(core.getLocalSone(anyString())).thenAnswer { localSones[it[0]] }
 		whenever(core.getPost(anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
+		whenever(core.getPostReply(anyString())).then { replies[it[0]].asOptional() }
 	}
 
 	@Before
@@ -175,6 +177,10 @@ abstract class JsonPageTest(
 				whenever(this.time).thenReturn(time)
 				whenever(this.recipientId).thenReturn(recipientId.asOptional())
 			}.also { newPosts[id] = it }
+
+	protected fun addReply(id: String, reply: PostReply) {
+		replies[id] = reply
+	}
 
 	protected fun addNewReply(id: String, soneId: String, postId: String, postSoneId: String) {
 		newReplies[id] = mock<PostReply>().apply {
