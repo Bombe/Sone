@@ -100,7 +100,8 @@ public abstract class JsonPage implements FreenetPage {
 	 *            The request to handle
 	 * @return The created JSON object
 	 */
-	protected abstract JsonReturnObject createJsonObject(FreenetRequest request);
+	@Nonnull
+	protected abstract JsonReturnObject createJsonObject(@Nonnull FreenetRequest request);
 
 	/**
 	 * Returns whether this command needs the form password for authentication
