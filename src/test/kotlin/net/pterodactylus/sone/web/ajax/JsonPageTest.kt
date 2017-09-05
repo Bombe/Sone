@@ -64,7 +64,7 @@ abstract class JsonPageTest(
 	private val replies = mutableMapOf<String, PostReply>()
 	private val newReplies = mutableMapOf<String, PostReply>()
 	private val linkedElements = mutableMapOf<String, LinkedElement>()
-	private val notifications = mutableListOf<Notification>()
+	private val notifications = mutableMapOf<String, Notification>()
 
 	@Before
 	fun setupWebInterface() {
@@ -72,7 +72,8 @@ abstract class JsonPageTest(
 		whenever(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.core).thenReturn(core)
-		whenever(webInterface.getNotifications(currentSone)).thenAnswer { notifications }
+		whenever(webInterface.getNotifications(currentSone)).thenAnswer { notifications.values }
+		whenever(webInterface.getNotification(anyString())).then { notifications[it[0]].asOptional() }
 		whenever(webInterface.getNewPosts(currentSone)).thenAnswer { newPosts.values }
 		whenever(webInterface.getNewReplies(currentSone)).thenAnswer { newReplies.values }
 	}
@@ -153,8 +154,8 @@ abstract class JsonPageTest(
 		requestParts += key to value
 	}
 
-	protected fun addNotification(vararg notifications: Notification) {
-		this.notifications += notifications
+	protected fun addNotification(notification: Notification, notificationId: String? = null) {
+		notifications[notificationId ?: notification.id] = notification
 	}
 
 	protected fun addSone(sone: Sone) {

@@ -97,7 +97,7 @@ class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = fals
 				mock<Notification>().apply { whenever(this.createdTime).thenReturn(2000) },
 				mock<Notification>().apply { whenever(this.createdTime).thenReturn(1000) }
 		)
-		addNotification(*notifications.toTypedArray())
+		notifications.forEachIndexed { index, notification -> addNotification(notification, "notification$index")}
 		assertThat(json.get("notificationHash").asInt(), equalTo(notifications.sortedBy { it.createdTime }.hashCode()))
 	}
 
