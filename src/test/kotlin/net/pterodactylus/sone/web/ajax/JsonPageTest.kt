@@ -1,11 +1,13 @@
 package net.pterodactylus.sone.web.ajax
 
+import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
 import freenet.support.SimpleReadOnlyArrayBucket
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
+import net.pterodactylus.sone.core.Preferences
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
@@ -44,6 +46,8 @@ abstract class JsonPageTest(
 
 	protected val webInterface = mock<WebInterface>()
 	protected val core = mock<Core>()
+	protected val eventBus = mock<EventBus>()
+	protected val preferences = Preferences(eventBus)
 	protected val elementLoader = mock<ElementLoader>()
 	protected open val page: JsonPage by lazy { pageSupplier(webInterface) }
 	protected val json by lazy { page.createJsonObject(freenetRequest)!! }
@@ -80,6 +84,7 @@ abstract class JsonPageTest(
 
 	@Before
 	fun setupCore() {
+		whenever(core.preferences).thenReturn(preferences)
 		whenever(core.getSone(anyString())).thenAnswer { (localSones + remoteSones)[it.getArgument(0)].asOptional() }
 		whenever(core.getLocalSone(anyString())).thenAnswer { localSones[it[0]] }
 		whenever(core.getPost(anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
@@ -158,8 +163,8 @@ abstract class JsonPageTest(
 		notifications[notificationId ?: notification.id] = notification
 	}
 
-	protected fun addSone(sone: Sone) {
-		remoteSones += sone.id to sone
+	protected fun addSone(sone: Sone, soneId: String? = null) {
+		remoteSones += (soneId ?: sone.id) to sone
 	}
 
 	protected fun addLocalSone(id: String, sone: Sone) {
