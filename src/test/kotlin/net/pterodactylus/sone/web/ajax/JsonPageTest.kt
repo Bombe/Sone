@@ -8,6 +8,7 @@ import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
@@ -69,6 +70,7 @@ abstract class JsonPageTest(
 	private val newReplies = mutableMapOf<String, PostReply>()
 	private val linkedElements = mutableMapOf<String, LinkedElement>()
 	private val notifications = mutableMapOf<String, Notification>()
+	private val albums = mutableMapOf<String, Album>()
 
 	@Before
 	fun setupWebInterface() {
@@ -89,6 +91,7 @@ abstract class JsonPageTest(
 		whenever(core.getLocalSone(anyString())).thenAnswer { localSones[it[0]] }
 		whenever(core.getPost(anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
 		whenever(core.getPostReply(anyString())).then { replies[it[0]].asOptional() }
+		whenever(core.getAlbum(anyString())).then { albums[it[0]] }
 	}
 
 	@Before
@@ -204,6 +207,10 @@ abstract class JsonPageTest(
 
 	protected fun addLinkedElement(link: String, loading: Boolean, failed: Boolean) {
 		linkedElements[link] = LinkedElement(link, failed, loading)
+	}
+
+	protected fun addAlbum(album: Album, albumId: String? = null) {
+		albums[albumId ?: album.id] = album
 	}
 
 	@Test
