@@ -25,3 +25,5 @@ inline fun <reified T: Any?> whenever(methodCall: T) = Mockito.`when`(methodCall
 inline fun <reified T : Any> OngoingStubbing<T>.thenReturnMock(): OngoingStubbing<T> = this.thenReturn(mock<T>())
 
 operator fun <T> InvocationOnMock.get(index: Int): T = getArgument(index)
+
+inline fun <reified T> argumentCaptor(): ArgumentCaptor<T> = ArgumentCaptor.forClass<T, T>(T::class.java)!!
