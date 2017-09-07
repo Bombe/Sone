@@ -31,8 +31,8 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			return (size > 2097152) || (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html"))
 		}
 
-		override fun loaded(uri: FreenetURI, mimeType: String, data: ByteArray) {
-			MimeType(mimeType).also { mimeType ->
+		override fun loaded(uri: FreenetURI, mimeTypeText: String, data: ByteArray) {
+			MimeType(mimeTypeText).also { mimeType ->
 				when {
 					mimeType.primaryType == "image" -> {
 						ByteArrayInputStream(data).use {

@@ -104,9 +104,8 @@ abstract class SoneCommandTest {
 				("Field." + this["${prefix}Field.$it.Name"]) to this["${prefix}Field.$it.Value"]
 			}
 
-	private fun SimpleFieldSet.parseFromSimpleFieldSet(prefix: String, vararg fields: String) = listOf(*fields)
-			.map { it to (get(prefix + it) as String?) }
-			.toMap()
+	private fun SimpleFieldSet.parseFromSimpleFieldSet(prefix: String, vararg fields: String): Map<String, String?> = fields
+			.associate { it to get(prefix + it) }
 
 	protected fun matchesPost(post: Post) = OneByOneMatcher<Map<String, String?>>().apply {
 		expect("ID", post.id) { it["ID"] }

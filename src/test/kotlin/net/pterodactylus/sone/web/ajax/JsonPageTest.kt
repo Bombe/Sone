@@ -52,7 +52,7 @@ abstract class JsonPageTest(
 	protected val preferences = Preferences(eventBus)
 	protected val elementLoader = mock<ElementLoader>()
 	protected open val page: JsonPage by lazy { pageSupplier(webInterface) }
-	protected val json by lazy { page.createJsonObject(freenetRequest)!! }
+	protected val json by lazy { page.createJsonObject(freenetRequest) }
 
 	protected val toadletContext = mock<ToadletContext>()
 	protected val freenetRequest = mock<FreenetRequest>()

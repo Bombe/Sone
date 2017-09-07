@@ -58,6 +58,7 @@ class SoneAccessorTest {
 		assertThat(accessor.get(templateContext, sone, member), equalTo(expected))
 	}
 
+	@Suppress("UNCHECKED_CAST")
 	private fun <T : Any> assertAccessorReturnValueMatches(member: String, matcher: Matcher<in T>) {
 		assertThat(accessor.get(templateContext, sone, member) as T, matcher)
 	}
