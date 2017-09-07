@@ -554,6 +554,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The ID of the image
 	 * @return The image with the given ID
 	 */
+	@Nullable
 	public Image getImage(String imageId) {
 		return getImage(imageId, true);
 	}
@@ -570,6 +571,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The image with the given ID, or {@code null} if none exists and
 	 *         none was created
 	 */
+	@Nullable
 	public Image getImage(String imageId, boolean create) {
 		Optional<Image> image = database.getImage(imageId);
 		if (image.isPresent()) {
