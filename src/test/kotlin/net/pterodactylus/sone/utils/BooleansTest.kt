@@ -20,4 +20,14 @@ class BooleansTest {
 		assertThat(false.ifTrue { true }, nullValue())
 	}
 
+	@Test
+	fun `ifFalse is executed if boolean is false`() {
+		assertThat(false.ifFalse { true }, equalTo(true))
+	}
+
+	@Test
+	fun `ifFalse is not executed if boolean is true`() {
+		assertThat(true.ifFalse { true }, nullValue())
+	}
+
 }
