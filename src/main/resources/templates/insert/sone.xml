@@ -72,6 +72,7 @@
 			<%/if>
 			<title><%album.title|xml></title>
 			<description><%album.description|xml></description>
+			<!-- album-image is ignored, a random image is shown as album image. -->
 			<album-image><%album.albumImage.id|xml></album-image>
 			<%foreach album.images image>
 			<%first>
