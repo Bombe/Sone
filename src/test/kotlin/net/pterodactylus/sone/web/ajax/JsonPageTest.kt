@@ -29,6 +29,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
+import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyBoolean
 import org.mockito.ArgumentMatchers.anyInt
 import org.mockito.ArgumentMatchers.anyString
@@ -66,8 +67,10 @@ abstract class JsonPageTest(
 	private val localSones = mutableMapOf<String, Sone>()
 	private val remoteSones = mutableMapOf<String, Sone>()
 	private val posts = mutableMapOf<String, Post>()
+	private val postLikes = mutableMapOf<Post, Set<Sone>>()
 	private val newPosts = mutableMapOf<String, Post>()
 	private val replies = mutableMapOf<String, PostReply>()
+	private val replyLikes = mutableMapOf<PostReply, Set<Sone>>()
 	private val newReplies = mutableMapOf<String, PostReply>()
 	private val linkedElements = mutableMapOf<String, LinkedElement>()
 	private val notifications = mutableMapOf<String, Notification>()
@@ -92,6 +95,8 @@ abstract class JsonPageTest(
 		whenever(core.getSone(anyString())).thenAnswer { (localSones + remoteSones)[it.getArgument(0)].asOptional() }
 		whenever(core.getLocalSone(anyString())).thenAnswer { localSones[it[0]] }
 		whenever(core.getPost(anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
+		whenever(core.getLikes(any<Post>())).then { postLikes[it[0]] ?: emptySet<Sone>() }
+		whenever(core.getLikes(any<PostReply>())).then { replyLikes[it[0]] ?: emptySet<Sone>() }
 		whenever(core.getPostReply(anyString())).then { replies[it[0]].asOptional() }
 		whenever(core.getAlbum(anyString())).then { albums[it[0]] }
 		whenever(core.getImage(anyString())).then { images[it[0]] }
@@ -180,6 +185,14 @@ abstract class JsonPageTest(
 
 	protected fun addPost(post: Post, id: String? = null) {
 		posts[id ?: post.id] = post
+	}
+
+	protected fun addLikes(post: Post, vararg sones: Sone) {
+		postLikes[post] = setOf(*sones)
+	}
+
+	protected fun addLikes(reply: PostReply, vararg sones: Sone) {
+		replyLikes[reply] = setOf(*sones)
 	}
 
 	protected fun addNewPost(id: String, soneId: String, time: Long, recipientId: String? = null) =
