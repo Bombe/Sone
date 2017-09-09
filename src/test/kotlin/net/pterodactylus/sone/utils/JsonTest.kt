@@ -22,6 +22,12 @@ class JsonTest {
 	}
 
 	@Test
+	fun `object node is created with properties`() {
+	    val objectNode = jsonObject("foo" to "bar", "baz" to "quo")
+		assertThat(objectNode.toString(), equalTo("{\"foo\":\"bar\",\"baz\":\"quo\"}"))
+	}
+
+	@Test
 	fun `array node is created correctly`() {
 		val arrayNode = listOf(
 				jsonObject { put("foo", "bar") },
