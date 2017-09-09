@@ -191,8 +191,8 @@ abstract class JsonPageTest(
 				whenever(this.recipientId).thenReturn(recipientId.asOptional())
 			}.also { newPosts[id] = it }
 
-	protected fun addReply(id: String, reply: PostReply) {
-		replies[id] = reply
+	protected fun addReply(reply: PostReply, id: String? = null) {
+		replies[id ?: reply.id] = reply
 	}
 
 	protected fun addNewReply(id: String, soneId: String, postId: String, postSoneId: String) {
