@@ -25,7 +25,7 @@ class DeletePostAjaxPageTest : JsonPageTest("deletePost.ajax", pageSupplier = ::
 		val post = mock<Post>()
 		val sone = mock<Sone>()
 		whenever(post.sone).thenReturn(sone)
-		addPost("post-id", post)
+		addPost(post, "post-id")
 		addRequestParameter("post", "post-id")
 		assertThat(json.isSuccess, equalTo(false))
 		assertThat(json.error, equalTo("not-authorized"))
@@ -36,7 +36,7 @@ class DeletePostAjaxPageTest : JsonPageTest("deletePost.ajax", pageSupplier = ::
 		val post = mock<Post>()
 		val sone = mock<Sone>().apply { whenever(isLocal).thenReturn(true) }
 		whenever(post.sone).thenReturn(sone)
-		addPost("post-id", post)
+		addPost(post, "post-id")
 		addRequestParameter("post", "post-id")
 		assertThat(json.isSuccess, equalTo(true))
 		verify(core).deletePost(post)

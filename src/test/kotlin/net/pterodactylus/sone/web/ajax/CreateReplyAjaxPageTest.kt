@@ -23,7 +23,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 	@Test
 	fun `valid post ID results in created reply`() {
 		val post = mock<Post>()
-		addPost("post-id", post)
+		addPost(post, "post-id")
 		val reply = mock<PostReply>().apply { whenever(id).thenReturn("reply-id") }
 		whenever(core.createReply(currentSone, post, "")).thenReturn(reply)
 	    addRequestParameter("post", "post-id")
@@ -35,7 +35,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 	@Test
 	fun `text is filtered when creating reply`() {
 		val post = mock<Post>()
-		addPost("post-id", post)
+		addPost(post, "post-id")
 		val reply = mock<PostReply>().apply { whenever(id).thenReturn("reply-id") }
 		whenever(core.createReply(currentSone, post, "Text with KSK@foo.bar link")).thenReturn(reply)
 		addRequestParameter("post", "post-id")
@@ -51,7 +51,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 	    val sone = mock<Sone>().apply { whenever(id).thenReturn("local-sone") }
 		addLocalSone("local-sone", sone)
 		val post = mock<Post>()
-		addPost("post-id", post)
+		addPost(post, "post-id")
 		val reply = mock<PostReply>().apply { whenever(id).thenReturn("reply-id") }
 		whenever(core.createReply(sone, post, "Text")).thenReturn(reply)
 		addRequestParameter("post", "post-id")

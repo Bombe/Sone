@@ -178,8 +178,8 @@ abstract class JsonPageTest(
 		localSones += id to sone
 	}
 
-	protected fun addPost(id: String, post: Post) {
-		posts[id] = post
+	protected fun addPost(post: Post, id: String? = null) {
+		posts[id ?: post.id] = post
 	}
 
 	protected fun addNewPost(id: String, soneId: String, time: Long, recipientId: String? = null) =
