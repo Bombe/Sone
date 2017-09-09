@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.WebInterface;
@@ -27,7 +29,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class UnlikeAjaxPage extends JsonPage {
+public class UnlikeAjaxPage extends LoggedInJsonPage {
 
 	/**
 	 * Creates a new “unlike post” AJAX page.
@@ -42,16 +44,13 @@ public class UnlikeAjaxPage extends JsonPage {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nonnull
 	@Override
-	protected JsonReturnObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(@Nonnull Sone currentSone, @Nonnull FreenetRequest request) {
 		String type = request.getHttpRequest().getParam("type", null);
 		String id = request.getHttpRequest().getParam(type, null);
 		if ((id == null) || (id.length() == 0)) {
 			return createErrorJsonObject("invalid-" + type + "-id");
-		}
-		Sone currentSone = getCurrentSone(request.getToadletContext());
-		if (currentSone == null) {
-			return createErrorJsonObject("auth-required");
 		}
 		if ("post".equals(type)) {
 			currentSone.removeLikedPostId(id);

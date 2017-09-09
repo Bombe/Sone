@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.core.Core;
@@ -30,7 +32,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  * @see Core#trustSone(Sone, Sone)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class TrustAjaxPage extends JsonPage {
+public class TrustAjaxPage extends LoggedInJsonPage {
 
 	/**
 	 * Creates a new “trust Sone” AJAX handler.
@@ -45,12 +47,9 @@ public class TrustAjaxPage extends JsonPage {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nonnull
 	@Override
-	protected JsonReturnObject createJsonObject(FreenetRequest request) {
-		Sone currentSone = getCurrentSone(request.getToadletContext(), false);
-		if (currentSone == null) {
-			return createErrorJsonObject("auth-required");
-		}
+	protected JsonReturnObject createJsonObject(@Nonnull Sone currentSone, @Nonnull FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
 		if (!sone.isPresent()) {

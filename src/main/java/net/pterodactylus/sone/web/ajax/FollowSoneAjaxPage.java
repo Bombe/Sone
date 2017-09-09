@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.base.Optional;
 
 import net.pterodactylus.sone.data.Sone;
@@ -28,7 +30,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class FollowSoneAjaxPage extends JsonPage {
+public class FollowSoneAjaxPage extends LoggedInJsonPage {
 
 	/**
 	 * Creates a new “follow Sone” AJAX page.
@@ -43,16 +45,13 @@ public class FollowSoneAjaxPage extends JsonPage {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nonnull
 	@Override
-	protected JsonReturnObject createJsonObject(FreenetRequest request) {
+	protected JsonReturnObject createJsonObject(@Nonnull Sone currentSone, @Nonnull FreenetRequest request) {
 		String soneId = request.getHttpRequest().getParam("sone");
 		Optional<Sone> sone = webInterface.getCore().getSone(soneId);
 		if (!sone.isPresent()) {
 			return createErrorJsonObject("invalid-sone-id");
-		}
-		Sone currentSone = getCurrentSone(request.getToadletContext());
-		if (currentSone == null) {
-			return createErrorJsonObject("auth-required");
 		}
 		webInterface.getCore().followSone(currentSone, soneId);
 		webInterface.getCore().markSoneKnown(sone.get());

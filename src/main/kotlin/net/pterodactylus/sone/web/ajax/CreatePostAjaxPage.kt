@@ -12,23 +12,21 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 /**
  * AJAX handler that creates a new post.
  */
-class CreatePostAjaxPage(webInterface: WebInterface) : JsonPage("createPost.ajax", webInterface) {
+class CreatePostAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("createPost.ajax", webInterface) {
 
-	override fun createJsonObject(request: FreenetRequest) =
-			getCurrentSone(request.toadletContext)?.let { sone ->
-				request.parameters["text"].emptyToNull
-						?.let { TextFilter.filter(request.headers["Host"], it) }
-						?.let { text ->
-							val sender = request.parameters["sender"].emptyToNull?.let(webInterface.core::getSone)?.orNull() ?: sone
-							val recipient = request.parameters["recipient"].let(webInterface.core::getSone)
-							webInterface.core.createPost(sender, recipient, text).let { post ->
-								createSuccessJsonObject().apply {
-									put("postId", post.id)
-									put("sone", sender.id)
-									put("recipient", recipient.let(Sone::getId))
-								}
+	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
+			request.parameters["text"].emptyToNull
+					?.let { TextFilter.filter(request.headers["Host"], it) }
+					?.let { text ->
+						val sender = request.parameters["sender"].emptyToNull?.let(webInterface.core::getSone)?.orNull() ?: currentSone
+						val recipient = request.parameters["recipient"].let(webInterface.core::getSone)
+						webInterface.core.createPost(sender, recipient, text).let { post ->
+							createSuccessJsonObject().apply {
+								put("postId", post.id)
+								put("sone", sender.id)
+								put("recipient", recipient.let(Sone::getId))
 							}
-						} ?: createErrorJsonObject("text-required")
-			} ?: createErrorJsonObject("auth-required")
+						}
+					} ?: createErrorJsonObject("text-required")
 
 }

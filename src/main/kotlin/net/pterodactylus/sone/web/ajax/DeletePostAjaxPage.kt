@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.ajax
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.ifTrue
 import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
@@ -9,9 +10,9 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 /**
  * This AJAX page deletes a post.
  */
-class DeletePostAjaxPage(webInterface: WebInterface) : JsonPage("deletePost.ajax", webInterface) {
+class DeletePostAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("deletePost.ajax", webInterface) {
 
-	override fun createJsonObject(request: FreenetRequest) =
+	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]
 					.let(webInterface.core::getPost)
 					?.let { post ->

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.ajax;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Sone;
@@ -30,7 +32,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  * @see Profile#moveFieldDown(Field)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class MoveProfileFieldAjaxPage extends JsonPage {
+public class MoveProfileFieldAjaxPage extends LoggedInJsonPage {
 
 	/**
 	 * Creates a new “move profile field” AJAX page.
@@ -49,9 +51,9 @@ public class MoveProfileFieldAjaxPage extends JsonPage {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nonnull
 	@Override
-	protected JsonReturnObject createJsonObject(FreenetRequest request) {
-		Sone currentSone = getCurrentSone(request.getToadletContext());
+	protected JsonReturnObject createJsonObject(@Nonnull Sone currentSone, @Nonnull FreenetRequest request) {
 		Profile profile = currentSone.getProfile();
 		String fieldId = request.getHttpRequest().getParam("field");
 		Field field = profile.getFieldById(fieldId);

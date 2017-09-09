@@ -17,13 +17,6 @@ import org.junit.Test
 class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::CreatePostAjaxPage) {
 
 	@Test
-	fun `page requires a current sone`() {
-		unsetCurrentSone()
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("auth-required"))
-	}
-
-	@Test
 	fun `missing text parameter returns error`() {
 		assertThat(json.isSuccess, equalTo(false))
 		assertThat(json.error, equalTo("text-required"))
