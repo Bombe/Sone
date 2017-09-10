@@ -8,6 +8,7 @@ import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.core.UpdateChecker
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
@@ -16,6 +17,7 @@ import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.Sone.SoneStatus
 import net.pterodactylus.sone.data.Sone.SoneStatus.idle
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.get
 import net.pterodactylus.sone.test.mock
@@ -51,6 +53,7 @@ abstract class JsonPageTest(
 	protected val core = mock<Core>()
 	protected val eventBus = mock<EventBus>()
 	protected val preferences = Preferences(eventBus)
+	protected val updateChecker = mock<UpdateChecker>()
 	protected val elementLoader = mock<ElementLoader>()
 	protected open val page: JsonPage by lazy { pageSupplier(webInterface) }
 	protected val json by lazy { page.createJsonObject(freenetRequest) }
@@ -92,6 +95,7 @@ abstract class JsonPageTest(
 	@Before
 	fun setupCore() {
 		whenever(core.preferences).thenReturn(preferences)
+		whenever(core.updateChecker).thenReturn(updateChecker)
 		whenever(core.getSone(anyString())).thenAnswer { (localSones + remoteSones)[it.getArgument(0)].asOptional() }
 		whenever(core.getLocalSone(anyString())).thenAnswer { localSones[it[0]] }
 		whenever(core.getPost(anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
@@ -112,6 +116,7 @@ abstract class JsonPageTest(
 
 	@Before
 	fun setupCurrentSone() {
+		whenever(currentSone.options).thenReturn(DefaultSoneOptions())
 		currentSone.mock("soneId", "Sone_Id", true, 1000, idle)
 	}
 

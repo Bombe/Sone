@@ -54,9 +54,9 @@ class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = fals
 	@Test
 	fun `page returns options for sone if sone is logged in`() {
 		assertThat(json.get("options").toMap(), allOf(
-				hasEntry("ShowNotification/NewSones", "false"),
-				hasEntry("ShowNotification/NewPosts", "false"),
-				hasEntry("ShowNotification/NewReplies", "false")
+				hasEntry("ShowNotification/NewSones", "true"),
+				hasEntry("ShowNotification/NewPosts", "true"),
+				hasEntry("ShowNotification/NewReplies", "true")
 		))
 	}
 
