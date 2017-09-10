@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 
 fun jsonObject(block: ObjectNode.() -> Unit): ObjectNode = ObjectNode(instance).apply(block)
 
-fun jsonObject(vararg properties: Pair<String, Any>) = jsonObject {
+fun jsonObject(vararg properties: Pair<String, Any?>) = jsonObject {
 	properties.forEach {
 		it.second.let { value ->
 			when (value) {
