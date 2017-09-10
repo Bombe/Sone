@@ -26,6 +26,7 @@ import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
+import net.pterodactylus.util.template.TemplateContextFactory
 import net.pterodactylus.util.web.Method.GET
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -82,6 +83,7 @@ abstract class JsonPageTest(
 
 	@Before
 	fun setupWebInterface() {
+		whenever(webInterface.templateContextFactory).thenReturn(TemplateContextFactory())
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone)

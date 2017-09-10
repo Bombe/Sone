@@ -10,11 +10,10 @@ import net.pterodactylus.sone.text.PostPart
 import net.pterodactylus.sone.text.SonePart
 import net.pterodactylus.sone.text.SoneTextParser
 import net.pterodactylus.sone.text.SoneTextParserContext
+import net.pterodactylus.sone.utils.asTemplate
 import net.pterodactylus.util.template.Filter
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.template.TemplateContextFactory
-import net.pterodactylus.util.template.TemplateParser
-import java.io.StringReader
 import java.io.StringWriter
 import java.io.Writer
 import java.net.URLEncoder
@@ -27,8 +26,8 @@ import java.net.URLEncoder
 class RenderFilter(private val core: Core, private val templateContextFactory: TemplateContextFactory) : Filter {
 
 	companion object {
-		private val plainTextTemplate = TemplateParser.parse(StringReader("<%text|html>"))
-		private val linkTemplate = TemplateParser.parse(StringReader("<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>"))
+		private val plainTextTemplate = "<%text|html>".asTemplate()
+		private val linkTemplate = "<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>".asTemplate()
 	}
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: MutableMap<String, Any?>?): Any? {
