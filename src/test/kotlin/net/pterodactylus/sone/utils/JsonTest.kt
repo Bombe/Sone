@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.nullValue
 import org.junit.Test
 
 /**
@@ -22,9 +23,17 @@ class JsonTest {
 	}
 
 	@Test
-	fun `object node is created with properties`() {
-	    val objectNode = jsonObject("foo" to "bar", "baz" to "quo")
-		assertThat(objectNode.toString(), equalTo("{\"foo\":\"bar\",\"baz\":\"quo\"}"))
+	fun `object node is created with correctly-typed properties`() {
+	    val objectNode = jsonObject("string" to "foo", "int" to 1, "long" to 2L, "boolean" to true, "other" to Any())
+		assertThat(objectNode["string"].isTextual, equalTo(true))
+		assertThat(objectNode["string"].asText(), equalTo("foo"))
+		assertThat(objectNode["int"].isInt, equalTo(true))
+		assertThat(objectNode["int"].asInt(), equalTo(1))
+		assertThat(objectNode["long"].isLong, equalTo(true))
+		assertThat(objectNode["long"].asLong(), equalTo(2L))
+		assertThat(objectNode["boolean"].isBoolean, equalTo(true))
+		assertThat(objectNode["boolean"].asBoolean(), equalTo(true))
+		assertThat(objectNode["other"], nullValue())
 	}
 
 	@Test
