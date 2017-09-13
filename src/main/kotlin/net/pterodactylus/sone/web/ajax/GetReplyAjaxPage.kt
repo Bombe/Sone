@@ -1,0 +1,46 @@
+package net.pterodactylus.sone.web.ajax
+
+import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.utils.jsonObject
+import net.pterodactylus.sone.utils.let
+import net.pterodactylus.sone.utils.parameters
+import net.pterodactylus.sone.utils.render
+import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.util.template.Template
+
+/**
+ * This AJAX page returns the details of a reply.
+ */
+class GetReplyAjaxPage(webInterface: WebInterface, private val template: Template) : LoggedInJsonPage("getReply.ajax", webInterface) {
+
+	override fun needsFormPassword() = false
+
+	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
+			request.parameters["reply"]
+					.let(webInterface.core::getPostReply)
+					?.let { it.toJson(currentSone, request) }
+					?.let { replyJson ->
+						createSuccessJsonObject().apply {
+							put("reply", replyJson)
+						}
+					} ?: createErrorJsonObject("invalid-reply-id")
+
+	private fun PostReply.toJson(currentSone: Sone, request: FreenetRequest) = jsonObject(*mapOf(
+			"id" to id,
+			"soneId" to sone.id,
+			"postId" to postId,
+			"time" to time,
+			"html" to render(currentSone, request)
+	).toList().toTypedArray())
+
+	private fun PostReply.render(currentSone: Sone, request: FreenetRequest) =
+			webInterface.templateContextFactory.createTemplateContext().apply {
+				set("core", webInterface.core)
+				set("request", request)
+				set("reply", this@render)
+				set("currentSone", currentSone)
+			}.let { template.render(it) }
+
+}
