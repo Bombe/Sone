@@ -5,11 +5,10 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
+import net.pterodactylus.sone.utils.render
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
-import java.io.StringWriter
 
 /**
  * This AJAX handler retrieves information and rendered representation of a [Post].
@@ -42,5 +41,3 @@ class GetPostAjaxPage(webInterface: WebInterface, private val postTemplate: Temp
 			}.let { postTemplate.render(it) }
 
 }
-
-private fun Template.render(templateContext: TemplateContext) = StringWriter().use { it.also { render(templateContext, it) } }.toString()
