@@ -1646,13 +1646,15 @@ function updatePostTime(postId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updatePostTimes(postIds) {
-	ajaxGet("getTimes.ajax", { "posts" : postIds }, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			$.each(data.postTimes, function(index, value) {
-				updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
-			});
-		}
-	});
+	if (postIds != "") {
+        ajaxGet("getTimes.ajax", {"posts": postIds}, function (data, textStatus) {
+            if ((data != null) && data.success) {
+                $.each(data.postTimes, function (index, value) {
+                    updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
+                });
+            }
+        });
+    }
 }
 
 /**
@@ -1683,13 +1685,15 @@ function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updateReplyTimes(replyIds) {
-	ajaxGet("getTimes.ajax", { "replies" : replyIds }, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			$.each(data.replyTimes, function(index, value) {
-				updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
-			});
-		}
-	});
+	if (replyIds != "") {
+        ajaxGet("getTimes.ajax", {"replies": replyIds}, function (data, textStatus) {
+            if ((data != null) && data.success) {
+                $.each(data.replyTimes, function (index, value) {
+                    updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
+                });
+            }
+        });
+    }
 }
 
 function resetActivity() {
