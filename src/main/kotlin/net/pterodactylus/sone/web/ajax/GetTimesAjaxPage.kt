@@ -8,15 +8,19 @@ import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
  */
 class GetTimesAjaxPage(webInterface: WebInterface,
 		private val timeTextConverter: TimeTextConverter,
-		private val l10nFilter: L10nFilter) : JsonPage("getTimes.ajax", webInterface) {
+		private val l10nFilter: L10nFilter,
+		timeZone: TimeZone) : JsonPage("getTimes.ajax", webInterface) {
 
-	private val dateTimeFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss")
+	private val dateTimeFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
+		this.timeZone = timeZone
+	}
 
 	override fun needsFormPassword() = false
 	override fun requiresLogin() = false
@@ -36,7 +40,9 @@ class GetTimesAjaxPage(webInterface: WebInterface,
 			id to jsonObject(
 					"timeText" to l10nFilter.format(null, timeText.l10nText, emptyMap()),
 					"refreshTime" to timeText.refreshTime / 1000,
-					"tooltip" to dateTimeFormatter.format(time))
+					"tooltip" to synchronized(dateTimeFormatter) {
+						dateTimeFormatter.format(time)
+					})
 		}.forEach { this@jsonObject.put(it.first, it.second) }
 	}
 

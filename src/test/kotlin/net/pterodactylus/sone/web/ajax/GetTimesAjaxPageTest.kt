@@ -19,6 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
+import java.util.TimeZone.getTimeZone
 
 /**
  * Unit test for [GetTimesAjaxPage].
@@ -27,7 +28,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
-	override val page: JsonPage by lazy { GetTimesAjaxPage(webInterface, timeTextConverter, l10nFilter) }
+	override val page: JsonPage by lazy { GetTimesAjaxPage(webInterface, timeTextConverter, l10nFilter, getTimeZone("UTC")) }
 	private val posts = listOf(createPost(1), createPost(2))
 	private val replies = listOf(createReply(1), createReply(2))
 
@@ -64,7 +65,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 		addRequestParameter("posts", "post1")
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
-				"post1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 01:00:01")
+				"post1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01")
 		))
 		assertThat(json["replyTimes"].toList(), emptyIterable())
 	}
@@ -76,7 +77,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].toList(), emptyIterable())
 		assertThat(json["replyTimes"].fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
-				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 01:00:01")
+				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01")
 		))
 	}
 
@@ -87,8 +88,8 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 		addRequestParameter("posts", "post1,post2,post3")
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
-				"post1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 01:00:01"),
-				"post2" to jsonObject("timeText" to "2000", "refreshTime" to 4L, "tooltip" to "Jan 1, 1970, 01:00:02")
+				"post1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01"),
+				"post2" to jsonObject("timeText" to "2000", "refreshTime" to 4L, "tooltip" to "Jan 1, 1970, 00:00:02")
 		))
 		assertThat(json["replyTimes"].toList(), emptyIterable())
 	}
@@ -101,8 +102,8 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].toList(), emptyIterable())
 		assertThat(json["replyTimes"].fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
-				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 01:00:01"),
-				"reply2" to jsonObject("timeText" to "2000", "refreshTime" to 4L, "tooltip" to "Jan 1, 1970, 01:00:02")
+				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01"),
+				"reply2" to jsonObject("timeText" to "2000", "refreshTime" to 4L, "tooltip" to "Jan 1, 1970, 00:00:02")
 		))
 	}
 

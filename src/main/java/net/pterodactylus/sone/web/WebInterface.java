@@ -774,7 +774,7 @@ public class WebInterface implements SessionProvider {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter, TimeZone.getDefault())));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
