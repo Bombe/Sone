@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.ajax
 
 import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
+import freenet.l10n.BaseL10n
 import freenet.support.SimpleReadOnlyArrayBucket
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
@@ -51,6 +52,7 @@ abstract class JsonPageTest(
 		pageSupplier: (WebInterface) -> JsonPage = { _ -> mock<JsonPage>() }) {
 
 	protected val webInterface = mock<WebInterface>()
+	protected val l10n = mock<BaseL10n>()
 	protected val core = mock<Core>()
 	protected val eventBus = mock<EventBus>()
 	protected val preferences = Preferences(eventBus)
@@ -80,6 +82,7 @@ abstract class JsonPageTest(
 	private val notifications = mutableMapOf<String, Notification>()
 	private val albums = mutableMapOf<String, Album>()
 	private val images = mutableMapOf<String, Image>()
+	private val translations = mutableMapOf<String, String>()
 
 	@Before
 	fun setupWebInterface() {
@@ -92,6 +95,12 @@ abstract class JsonPageTest(
 		whenever(webInterface.getNotification(anyString())).then { notifications[it[0]].asOptional() }
 		whenever(webInterface.getNewPosts(currentSone)).thenAnswer { newPosts.values }
 		whenever(webInterface.getNewReplies(currentSone)).thenAnswer { newReplies.values }
+		whenever(webInterface.l10n).thenReturn(l10n)
+	}
+
+	@Before
+	fun setupTranslations() {
+		whenever(l10n.getString(anyString())).then { translations[it[0]] }
 	}
 
 	@Before
@@ -239,6 +248,10 @@ abstract class JsonPageTest(
 
 	protected fun addImage(image: Image, imageId: String? = null) {
 		images[imageId ?: image.id] = image
+	}
+
+	protected fun addTranslation(key: String, value: String) {
+		translations[key] = value
 	}
 
 	@Test
