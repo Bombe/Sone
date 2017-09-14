@@ -127,7 +127,7 @@ import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
-import net.pterodactylus.sone.web.ajax.GetTranslationPage;
+import net.pterodactylus.sone.web.ajax.GetTranslationAjaxPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.MarkAsKnownAjaxPage;
@@ -765,7 +765,7 @@ public class WebInterface implements SessionProvider {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault())));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));

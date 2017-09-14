@@ -25,7 +25,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class GetTranslationPage extends JsonPage {
+public class GetTranslationAjaxPage extends JsonPage {
 
 	/**
 	 * Creates a new translation page.
@@ -33,7 +33,7 @@ public class GetTranslationPage extends JsonPage {
 	 * @param webInterface
 	 *            The Sone web interface
 	 */
-	public GetTranslationPage(WebInterface webInterface) {
+	public GetTranslationAjaxPage(WebInterface webInterface) {
 		super("getTranslation.ajax", webInterface);
 	}
 

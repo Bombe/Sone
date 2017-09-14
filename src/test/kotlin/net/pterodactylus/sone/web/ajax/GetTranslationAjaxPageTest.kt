@@ -5,9 +5,9 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 
 /**
- * Unit test for [GetTranslationPage].
+ * Unit test for [GetTranslationAjaxPage].
  */
-class GetTranslationPageTest : JsonPageTest("getTranslation.ajax", requiresLogin = false, needsFormPassword = false, pageSupplier = ::GetTranslationPage) {
+class GetTranslationAjaxPageTest : JsonPageTest("getTranslation.ajax", requiresLogin = false, needsFormPassword = false, pageSupplier = ::GetTranslationAjaxPage) {
 
 	@Test
 	fun `translation is returned correctly`() {
