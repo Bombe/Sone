@@ -144,22 +144,22 @@ public class FcpInterface {
 	 *            {@link FredPluginFCP#ACCESS_FCP_RESTRICTED}
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
+		String identifier = parameters.get("Identifier");
+		if ((identifier == null) || (identifier.length() == 0)) {
+			sendErrorReply(pluginReplySender, null, 400, "Missing Identifier.");
+			return;
+		}
 		if (!active.get()) {
-			sendErrorReply(pluginReplySender, null, 503, "FCP Interface deactivated");
+			sendErrorReply(pluginReplySender, identifier, 503, "FCP Interface deactivated");
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
 		if (command == null) {
-			sendErrorReply(pluginReplySender, null, 404, "Unrecognized Message: " + parameters.get("Message"));
+			sendErrorReply(pluginReplySender, identifier, 404, "Unrecognized Message: " + parameters.get("Message"));
 			return;
 		}
 		if (!accessAuthorizer.authorized(AccessType.values()[accessType], fullAccessRequired.get(), command.requiresWriteAccess())) {
-			sendErrorReply(pluginReplySender, null, 401, "Not authorized");
-			return;
-		}
-		String identifier = parameters.get("Identifier");
-		if ((identifier == null) || (identifier.length() == 0)) {
-			sendErrorReply(pluginReplySender, null, 400, "Missing Identifier.");
+			sendErrorReply(pluginReplySender, identifier, 401, "Not authorized");
 			return;
 		}
 		try {

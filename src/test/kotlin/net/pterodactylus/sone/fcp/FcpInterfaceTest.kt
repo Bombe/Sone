@@ -101,8 +101,9 @@ class FcpInterfaceTest {
 	}
 
 	@Test
-	fun `sending command to inactive fcp interface results in 400 error reply`() {
+	fun `sending command to inactive fcp interface results in 503 error reply`() {
 		fcpInterface.fcpInterfaceDeactivated(FcpInterfaceDeactivatedEvent())
+		parameters.putSingle("Identifier", "Test")
 		fcpInterface.handle(pluginReplySender, parameters, null, 0)
 		verify(pluginReplySender).send(replyParameters.capture())
 		assertThat(replyParameters.value["Message"], equalTo("Error"))
@@ -119,6 +120,7 @@ class FcpInterfaceTest {
 	@Test
 	fun `sending command over non-authorized connection results in 401 error reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		parameters.putSingle("Identifier", "Test")
 		parameters.putSingle("Message", "Working")
 		fcpInterface.handle(pluginReplySender, parameters, null, RESTRICTED_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
@@ -129,6 +131,7 @@ class FcpInterfaceTest {
 	@Test
 	fun `sending unknown command results in 404 error reply`() {
 		fcpInterface.fcpInterfaceActivated(FcpInterfaceActivatedEvent())
+		parameters.putSingle("Identifier", "Test")
 		fcpInterface.handle(pluginReplySender, parameters, null, RESTRICTED_FCP.ordinal)
 		verify(pluginReplySender).send(replyParameters.capture())
 		assertThat(replyParameters.value["Message"], equalTo("Error"))
