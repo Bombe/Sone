@@ -26,7 +26,7 @@ class MarkAsKnownAjaxPageTest : JsonPageTest("markAsKnown.ajax", requiresLogin =
 	@Test
 	fun `request with unknown sone returns successfully`() {
 		addRequestParameter("type", "sone")
-		addRequestParameter("sone", "invalid")
+		addRequestParameter("id", "invalid")
 		assertThat(json.isSuccess, equalTo(true))
 		verify(core, never()).markSoneKnown(any())
 	}
