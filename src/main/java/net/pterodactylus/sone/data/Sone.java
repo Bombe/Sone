@@ -443,10 +443,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @param postId
 	 * 		The ID of the post
-	 * @return This Sone (for method chaining)
 	 */
-	@Nonnull
-	Sone removeLikedPostId(@Nonnull String postId);
+	void removeLikedPostId(@Nonnull String postId);
 
 	/**
 	 * Returns the IDs of all liked replies.
@@ -491,10 +489,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @param replyId
 	 * 		The ID of the reply
-	 * @return This Sone (for method chaining)
 	 */
-	@Nonnull
-	Sone removeLikedReplyId(@Nonnull String replyId);
+	void removeLikedReplyId(@Nonnull String replyId);
 
 	/**
 	 * Returns the root album that contains all visible albums of this Sone.

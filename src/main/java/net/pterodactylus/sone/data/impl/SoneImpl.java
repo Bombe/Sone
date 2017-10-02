@@ -533,12 +533,9 @@ public class SoneImpl implements Sone {
 	 *
 	 * @param postId
 	 * 		The ID of the post
-	 * @return This Sone (for method chaining)
 	 */
-	@Nonnull
-	public Sone removeLikedPostId(@Nonnull String postId) {
+	public void removeLikedPostId(@Nonnull String postId) {
 		likedPostIds.remove(postId);
-		return this;
 	}
 
 	/**
@@ -595,12 +592,9 @@ public class SoneImpl implements Sone {
 	 *
 	 * @param replyId
 	 * 		The ID of the reply
-	 * @return This Sone (for method chaining)
 	 */
-	@Nonnull
-	public Sone removeLikedReplyId(@Nonnull String replyId) {
+	public void removeLikedReplyId(@Nonnull String replyId) {
 		likedReplyIds.remove(replyId);
-		return this;
 	}
 
 	/**

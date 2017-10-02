@@ -184,8 +184,7 @@ public class IdOnlySone implements Sone {
 	}
 
 	@Override
-	public Sone removeLikedPostId(String postId) {
-		return this;
+	public void removeLikedPostId(String postId) {
 	}
 
 	@Override
@@ -209,8 +208,7 @@ public class IdOnlySone implements Sone {
 	}
 
 	@Override
-	public Sone removeLikedReplyId(String replyId) {
-		return this;
+	public void removeLikedReplyId(String replyId) {
 	}
 
 	@Override
