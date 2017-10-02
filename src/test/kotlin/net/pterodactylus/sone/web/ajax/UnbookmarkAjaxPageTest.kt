@@ -29,9 +29,9 @@ class UnbookmarkAjaxPageTest : JsonPageTest("unbookmark.ajax", requiresLogin = f
 	}
 
 	@Test
-	fun `request with invalid post id does not unbookmark anything but succeeds`() {
+	fun `request with invalid post id does not unbookmark anything and fails`() {
 		addRequestParameter("post", "invalid")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThat(json.isSuccess, equalTo(false))
 		verify(core, never()).unbookmarkPost(any())
 	}
 
