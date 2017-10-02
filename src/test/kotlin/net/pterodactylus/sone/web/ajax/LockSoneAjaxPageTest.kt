@@ -21,7 +21,7 @@ class LockSoneAjaxPageTest : JsonPageTest("lockSone.ajax", requiresLogin = false
 	@Test
 	fun `request with valid sone id results in locked sone`() {
 		val sone = mock<Sone>()
-		addLocalSone("sone-id", sone)
+		addLocalSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
 		assertThat(json.isSuccess, equalTo(true))
 		verify(core).lockSone(sone)

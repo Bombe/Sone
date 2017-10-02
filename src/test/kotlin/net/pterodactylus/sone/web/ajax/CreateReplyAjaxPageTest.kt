@@ -49,7 +49,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 	@Test
 	fun `sender can be chosen from local sones`() {
 	    val sone = mock<Sone>().apply { whenever(id).thenReturn("local-sone") }
-		addLocalSone("local-sone", sone)
+		addLocalSone(sone)
 		val post = mock<Post>()
 		addPost(post, "post-id")
 		val reply = mock<PostReply>().apply { whenever(id).thenReturn("reply-id") }

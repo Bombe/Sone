@@ -195,8 +195,8 @@ abstract class JsonPageTest(
 		remoteSones += (soneId ?: sone.id) to sone
 	}
 
-	protected fun addLocalSone(id: String, sone: Sone) {
-		localSones += id to sone
+	protected fun addLocalSone(sone: Sone, id: String? = null) {
+		localSones[id ?: sone.id] = sone
 	}
 
 	protected fun addPost(post: Post, id: String? = null) {
