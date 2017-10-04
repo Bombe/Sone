@@ -228,7 +228,7 @@ public abstract class JsonPage implements FreenetPage {
 			writer = new OutputStreamWriter(byteArrayOutputStream, "UTF-8");
 			printWriter = new PrintWriter(writer);
 			t.printStackTrace(printWriter);
-			byteArrayOutputStream.flush();
+			printWriter.flush();
 			return byteArrayOutputStream.toByteArray();
 		} catch (IOException ioe1) {
 			/* quite not possible. */
