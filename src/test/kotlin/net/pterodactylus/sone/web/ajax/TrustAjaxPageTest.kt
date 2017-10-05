@@ -34,7 +34,7 @@ class TrustAjaxPageTest : JsonPageTest("trustSone.ajax", requiresLogin = true, n
 		addRequestParameter("sone", "sone-id")
 		core.preferences.positiveTrust = 31
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["trustValue"].asInt(), equalTo(31))
+		assertThat(json["trustValue"]?.asInt(), equalTo(31))
 	}
 
 }

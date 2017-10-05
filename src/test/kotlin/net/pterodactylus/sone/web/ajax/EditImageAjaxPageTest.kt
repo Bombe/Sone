@@ -57,8 +57,8 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		addRequestParameter("image", "image-id")
 		addRequestParameter("moveLeft", "true")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["sourceImageId"].asText(), equalTo("image-id"))
-		assertThat(json["destinationImageId"].asText(), equalTo("swapped"))
+		assertThat(json["sourceImageId"]?.asText(), equalTo("image-id"))
+		assertThat(json["destinationImageId"]?.asText(), equalTo("swapped"))
 		verify(core).touchConfiguration()
 	}
 
@@ -75,8 +75,8 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		addRequestParameter("image", "image-id")
 		addRequestParameter("moveRight", "true")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["sourceImageId"].asText(), equalTo("image-id"))
-		assertThat(json["destinationImageId"].asText(), equalTo("swapped"))
+		assertThat(json["sourceImageId"]?.asText(), equalTo("image-id"))
+		assertThat(json["destinationImageId"]?.asText(), equalTo("swapped"))
 		verify(core).touchConfiguration()
 	}
 
@@ -107,9 +107,9 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		addRequestParameter("description", "some http://127.0.0.1:8888/KSK@foo link")
 		addRequestHeader("Host", "127.0.0.1:8888")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["title"].asText(), equalTo("some title"))
-		assertThat(json["description"].asText(), equalTo("some KSK@foo link"))
-		assertThat(json["parsedDescription"].asText(), equalTo("rendered description"))
+		assertThat(json["title"]?.asText(), equalTo("some title"))
+		assertThat(json["description"]?.asText(), equalTo("some KSK@foo link"))
+		assertThat(json["parsedDescription"]?.asText(), equalTo("rendered description"))
 		verify(core).touchConfiguration()
 		val parameterCaptor = argumentCaptor<MutableMap<String, Any?>>()
 		verify(parserFilter).format(any(), any(), parameterCaptor.capture())

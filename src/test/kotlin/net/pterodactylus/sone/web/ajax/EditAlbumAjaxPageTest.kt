@@ -46,8 +46,8 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		addRequestParameter("album", "album-id")
 		addRequestParameter("moveLeft", "true")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["sourceAlbumId"].asText(), equalTo("album-id"))
-		assertThat(json["destinationAlbumId"].asText(), equalTo("swapped"))
+		assertThat(json["sourceAlbumId"]?.asText(), equalTo("album-id"))
+		assertThat(json["destinationAlbumId"]?.asText(), equalTo("swapped"))
 	}
 
 	@Test
@@ -61,8 +61,8 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		addRequestParameter("album", "album-id")
 		addRequestParameter("moveRight", "true")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["sourceAlbumId"].asText(), equalTo("album-id"))
-		assertThat(json["destinationAlbumId"].asText(), equalTo("swapped"))
+		assertThat(json["sourceAlbumId"]?.asText(), equalTo("album-id"))
+		assertThat(json["destinationAlbumId"]?.asText(), equalTo("swapped"))
 	}
 
 	@Test
@@ -85,9 +85,9 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		addRequestParameter("description", "foo http://127.0.0.1:8888/KSK@foo.html link")
 		addRequestHeader("Host", "127.0.0.1:8888")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["albumId"].asText(), equalTo("album-id"))
-		assertThat(json["title"].asText(), equalTo("new title"))
-		assertThat(json["description"].asText(), equalTo("foo KSK@foo.html link"))
+		assertThat(json["albumId"]?.asText(), equalTo("album-id"))
+		assertThat(json["title"]?.asText(), equalTo("new title"))
+		assertThat(json["description"]?.asText(), equalTo("foo KSK@foo.html link"))
 	}
 
 }

@@ -41,7 +41,7 @@ class DistrustAjaxPageTest : JsonPageTest("distrustSone.ajax", pageSupplier = ::
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["trustValue"].asInt(), equalTo(-33))
+		assertThat(json["trustValue"]?.asInt(), equalTo(-33))
 	}
 
 }

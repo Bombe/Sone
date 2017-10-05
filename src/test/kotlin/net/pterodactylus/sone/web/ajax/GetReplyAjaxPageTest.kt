@@ -38,11 +38,11 @@ class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = f
 		addReply(reply)
 		addRequestParameter("reply", "reply-id")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["reply"]["id"].asText(), equalTo("reply-id"))
-		assertThat(json["reply"]["soneId"].asText(), equalTo("sone-id"))
-		assertThat(json["reply"]["postId"].asText(), equalTo("post-id"))
-		assertThat(json["reply"]["time"].asLong(), equalTo(1000L))
-		assertThat(json["reply"]["html"].asText(), equalTo(listOf(
+		assertThat(json["reply"]!!["id"].asText(), equalTo("reply-id"))
+		assertThat(json["reply"]!!["soneId"].asText(), equalTo("sone-id"))
+		assertThat(json["reply"]!!["postId"].asText(), equalTo("post-id"))
+		assertThat(json["reply"]!!["time"].asLong(), equalTo(1000L))
+		assertThat(json["reply"]!!["html"].asText(), equalTo(listOf(
 				core.toString(),
 				freenetRequest.toString(),
 				"reply text",

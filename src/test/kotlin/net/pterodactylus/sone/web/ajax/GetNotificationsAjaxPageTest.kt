@@ -44,15 +44,15 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 	fun `notification hash is calculated correctly`() {
 		testNotifications.forEach { addNotification(it) }
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["notificationHash"].asInt(), equalTo(listOf(1, 0, 2).map(testNotifications::get).hashCode()))
+		assertThat(json["notificationHash"]?.asInt(), equalTo(listOf(1, 0, 2).map(testNotifications::get).hashCode()))
 	}
 
 	@Test
 	fun `options are included correctly`() {
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["options"]["ShowNotification/NewSones"].asBoolean(), equalTo(true))
-		assertThat(json["options"]["ShowNotification/NewPosts"].asBoolean(), equalTo(true))
-		assertThat(json["options"]["ShowNotification/NewReplies"].asBoolean(), equalTo(true))
+		assertThat(json["options"]!!["ShowNotification/NewSones"].asBoolean(), equalTo(true))
+		assertThat(json["options"]!!["ShowNotification/NewPosts"].asBoolean(), equalTo(true))
+		assertThat(json["options"]!!["ShowNotification/NewReplies"].asBoolean(), equalTo(true))
 	}
 
 	@Test
@@ -61,23 +61,23 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 		currentSone.options.isShowNewPostNotifications = false
 		currentSone.options.isShowNewReplyNotifications = false
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["options"]["ShowNotification/NewSones"].asBoolean(), equalTo(false))
-		assertThat(json["options"]["ShowNotification/NewPosts"].asBoolean(), equalTo(false))
-		assertThat(json["options"]["ShowNotification/NewReplies"].asBoolean(), equalTo(false))
+		assertThat(json["options"]!!["ShowNotification/NewSones"].asBoolean(), equalTo(false))
+		assertThat(json["options"]!!["ShowNotification/NewPosts"].asBoolean(), equalTo(false))
+		assertThat(json["options"]!!["ShowNotification/NewReplies"].asBoolean(), equalTo(false))
 	}
 
 	@Test
 	fun `options are not included if user is not logged in`() {
 		unsetCurrentSone()
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["options"].toList(), empty())
+		assertThat(json["options"]?.toList(), empty())
 	}
 
 	@Test
 	fun `notifications are rendered correctly`() {
 		testNotifications.forEach { addNotification(it) }
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["notifications"].toList().map { node -> listOf("id", "text", "createdTime", "lastUpdatedTime", "dismissable").map { it to node.get(it).asText() }.toMap() }, containsInAnyOrder(
+		assertThat(json["notifications"]!!.toList().map { node -> listOf("id", "text", "createdTime", "lastUpdatedTime", "dismissable").map { it to node.get(it).asText() }.toMap() }, containsInAnyOrder(
 				mapOf("id" to "n1", "createdTime" to "2000", "lastUpdatedTime" to "5000", "dismissable" to "true", "text" to "t1"),
 				mapOf("id" to "n2", "createdTime" to "1000", "lastUpdatedTime" to "6000", "dismissable" to "false", "text" to "t2"),
 				mapOf("id" to "n3", "createdTime" to "3000", "lastUpdatedTime" to "7000", "dismissable" to "true", "text" to "t3")
@@ -100,7 +100,7 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 		testNotifications.forEach { addNotification(it) }
 		addNotification(templateNotification)
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["notifications"].last()["text"].asText(), equalTo("t4"))
+		assertThat(json["notifications"]!!.last()["text"].asText(), equalTo("t4"))
 		val templateContext = argumentCaptor<TemplateContext>()
 		verify(templateNotification).render(templateContext.capture(), any())
 		assertThat(templateContext.value["core"], equalTo<Any>(core))

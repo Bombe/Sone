@@ -42,8 +42,8 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		val post = createPost()
 		whenever(core.createPost(currentSone, Optional.absent(), "test")).thenReturn(post)
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["postId"].asText(), equalTo("id"))
-		assertThat(json["sone"].asText(), equalTo(currentSone.id))
+		assertThat(json["postId"]?.asText(), equalTo("id"))
+		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"], nullValue())
 	}
 
@@ -54,8 +54,8 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		val post = createPost()
 		whenever(core.createPost(currentSone, Optional.absent(), "test")).thenReturn(post)
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["postId"].asText(), equalTo("id"))
-		assertThat(json["sone"].asText(), equalTo(currentSone.id))
+		assertThat(json["postId"]?.asText(), equalTo("id"))
+		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"], nullValue())
 	}
 
@@ -68,9 +68,9 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		val post = createPost("valid")
 		whenever(core.createPost(currentSone, Optional.of(recipient), "test")).thenReturn(post)
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["postId"].asText(), equalTo("id"))
-		assertThat(json["sone"].asText(), equalTo(currentSone.id))
-		assertThat(json["recipient"].asText(), equalTo("valid"))
+		assertThat(json["postId"]?.asText(), equalTo("id"))
+		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
+		assertThat(json["recipient"]?.asText(), equalTo("valid"))
 	}
 
 	@Test
@@ -80,8 +80,8 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		val post = createPost()
 		whenever(core.createPost(currentSone, Optional.absent(), "Link KSK@foo is filtered")).thenReturn(post)
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["postId"].asText(), equalTo("id"))
-		assertThat(json["sone"].asText(), equalTo(currentSone.id))
+		assertThat(json["postId"]?.asText(), equalTo("id"))
+		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"], nullValue())
 	}
 

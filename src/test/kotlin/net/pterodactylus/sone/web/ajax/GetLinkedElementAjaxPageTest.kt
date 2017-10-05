@@ -34,7 +34,7 @@ class GetLinkedElementAjaxPageTest: JsonPageTest("getLinkedElement.ajax", requir
 				else -> null
 			}
 		}
-		assertThat(json.get("linkedElements").elements().asSequence().map { it.toMap() }.toList(), Matchers.containsInAnyOrder(
+		assertThat(json.get("linkedElements")!!.elements().asSequence().map { it.toMap() }.toList(), Matchers.containsInAnyOrder(
 				mapOf<String, String?>("link" to "KSK@foo.jpg", "html" to "jpeg-image"),
 				mapOf("link" to "KSK@foo.html", "html" to "html-page")
 		))

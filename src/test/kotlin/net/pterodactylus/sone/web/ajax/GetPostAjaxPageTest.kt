@@ -39,11 +39,11 @@ class GetPostAjaxPageTest : JsonPageTest("getPost.ajax", needsFormPassword = fal
 		addPost(post)
 		addRequestParameter("post", "post-id")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["post"]["id"].asText(), equalTo("post-id"))
-		assertThat(json["post"]["time"].asLong(), equalTo(1000L))
-		assertThat(json["post"]["sone"].asText(), equalTo("sone-id"))
-		assertThat(json["post"]["recipient"].asText(), equalTo("recipient-id"))
-		assertThat(json["post"]["html"].asText(), equalTo(listOf(
+		assertThat(json["post"]!!["id"].asText(), equalTo("post-id"))
+		assertThat(json["post"]!!["time"].asLong(), equalTo(1000L))
+		assertThat(json["post"]!!["sone"].asText(), equalTo("sone-id"))
+		assertThat(json["post"]!!["recipient"].asText(), equalTo("recipient-id"))
+		assertThat(json["post"]!!["html"].asText(), equalTo(listOf(
 				core.toString(),
 				freenetRequest.toString(),
 				"post text",

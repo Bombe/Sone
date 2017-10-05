@@ -28,8 +28,8 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		whenever(core.createReply(currentSone, post, "")).thenReturn(reply)
 	    addRequestParameter("post", "post-id")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["reply"].asText(), equalTo("reply-id"))
-		assertThat(json["sone"].asText(), equalTo("soneId"))
+		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
+		assertThat(json["sone"]?.asText(), equalTo("soneId"))
 	}
 
 	@Test
@@ -42,8 +42,8 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		addRequestParameter("text", "Text with http://127.0.0.1:8888/KSK@foo.bar link")
 		addRequestHeader("Host", "127.0.0.1:8888")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["reply"].asText(), equalTo("reply-id"))
-		assertThat(json["sone"].asText(), equalTo("soneId"))
+		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
+		assertThat(json["sone"]?.asText(), equalTo("soneId"))
 	}
 
 	@Test
@@ -58,8 +58,8 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		addRequestParameter("text", "Text")
 		addRequestParameter("sender", "local-sone")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["reply"].asText(), equalTo("reply-id"))
-		assertThat(json["sone"].asText(), equalTo("local-sone"))
+		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
+		assertThat(json["sone"]?.asText(), equalTo("local-sone"))
 	}
 
 }

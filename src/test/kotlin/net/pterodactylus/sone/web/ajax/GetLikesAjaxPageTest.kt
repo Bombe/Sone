@@ -44,8 +44,8 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 		addRequestParameter("type", "post")
 		addRequestParameter("post", "post-id")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["likes"].asInt(), equalTo(3))
-		assertThat(json["sones"].toList().map { it["id"].asText() to it["name"].asText() }, contains(
+		assertThat(json["likes"]?.asInt(), equalTo(3))
+		assertThat(json["sones"]!!.toList().map { it["id"].asText() to it["name"].asText() }, contains(
 				"S1" to "F1 M1 L1",
 				"S2" to "F2 M2 L2",
 				"S3" to "F3 M3 L3"
@@ -75,8 +75,8 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 		addRequestParameter("type", "reply")
 		addRequestParameter("reply", "reply-id")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["likes"].asInt(), equalTo(3))
-		assertThat(json["sones"].toList().map { it["id"].asText() to it["name"].asText() }, contains(
+		assertThat(json["likes"]?.asInt(), equalTo(3))
+		assertThat(json["sones"]!!.toList().map { it["id"].asText() to it["name"].asText() }, contains(
 				"S1" to "F1 M1 L1",
 				"S2" to "F2 M2 L2",
 				"S3" to "F3 M3 L3"

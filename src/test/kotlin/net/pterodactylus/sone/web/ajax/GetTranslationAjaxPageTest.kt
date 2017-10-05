@@ -14,7 +14,7 @@ class GetTranslationAjaxPageTest : JsonPageTest("getTranslation.ajax", requiresL
 		addTranslation("foo", "bar")
 		addRequestParameter("key", "foo")
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["value"].asText(), equalTo("bar"))
+		assertThat(json["value"]?.asText(), equalTo("bar"))
 	}
 
 }
