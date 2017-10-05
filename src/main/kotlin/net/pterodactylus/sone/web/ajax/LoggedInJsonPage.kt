@@ -14,7 +14,7 @@ open class LoggedInJsonPage(path: String, webInterface: WebInterface) : JsonPage
 	final override fun createJsonObject(request: FreenetRequest) =
 			createJsonObject(getCurrentSone(request.toadletContext)!!, request)
 
-	open protected fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
+	open protected fun createJsonObject(currentSone: Sone, request: FreenetRequest): JsonReturnObject =
 			createErrorJsonObject("not-implemented")
 
 }
