@@ -12,6 +12,7 @@ import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.template.SoneAccessor
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
+import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.toArray
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -35,7 +36,7 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 					this["loggedIn"] = currentSone != null
 					this["options"] = currentSone?.options?.toJsonOptions() ?: jsonObject {}
 					this["notificationHash"] = webInterface.getNotifications(currentSone).sortedBy { it.createdTime }.hashCode()
-					this["sones"] = request.httpRequest.getParam("soneIds").split(',').map { webInterface.core.getSone(it).orNull() }.plus(currentSone).filterNotNull().toJsonSones()
+					this["sones"] = request.httpRequest.getParam("soneIds").split(',').mapPresent(core::getSone).plus(currentSone).filterNotNull().toJsonSones()
 					this["newPosts"] = webInterface.getNewPosts(currentSone).toJsonPosts()
 					this["newReplies"] = webInterface.getNewReplies(currentSone).toJsonReplies()
 					this["linkedElements"] = request.httpRequest.getParam("elements", "[]").asJson().map(JsonNode::asText).map(elementLoader::loadElement).toJsonElements()
