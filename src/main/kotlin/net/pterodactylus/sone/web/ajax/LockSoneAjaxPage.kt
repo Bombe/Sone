@@ -9,7 +9,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
  */
 class LockSoneAjaxPage(webInterface: WebInterface) : JsonPage("lockSone.ajax", webInterface) {
 
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["sone"]

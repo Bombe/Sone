@@ -17,6 +17,7 @@ class GetLinkedElementAjaxPage(webInterface: WebInterface, private val elementLo
 		JsonPage("getLinkedElement.ajax", webInterface) {
 
 	override val needsFormPassword = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest): JsonReturnObject =
 			request.httpRequest.getParam("elements", "[]").asJson()
@@ -38,8 +39,6 @@ class GetLinkedElementAjaxPage(webInterface: WebInterface, private val elementLo
 					put("linkedElements", linkedElements)
 				}
 			}
-
-	override fun requiresLogin() = false
 
 	private fun String.asJson() = ObjectMapper().readTree(this).asIterable()
 

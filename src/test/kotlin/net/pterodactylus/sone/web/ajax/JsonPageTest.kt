@@ -34,7 +34,7 @@ abstract class JsonPageTest(
 
 	@Test
 	fun `page requires login`() {
-		assertThat(page.requiresLogin(), equalTo(requiresLogin))
+		assertThat(page.requiresLogin, equalTo(requiresLogin))
 	}
 
 }

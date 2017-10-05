@@ -23,7 +23,7 @@ class GetTimesAjaxPage(webInterface: WebInterface,
 	}
 
 	override val needsFormPassword = false
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) =
 			createSuccessJsonObject().apply {

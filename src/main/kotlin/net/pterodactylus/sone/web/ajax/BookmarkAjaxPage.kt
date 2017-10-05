@@ -11,7 +11,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
  */
 class BookmarkAjaxPage(webInterface: WebInterface) : JsonPage("bookmark.ajax", webInterface) {
 
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["post"].emptyToNull

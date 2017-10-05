@@ -50,7 +50,7 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 	private fun String.asJson() = ObjectMapper().readTree(this).asIterable()
 
 	override val needsFormPassword = false
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	private fun SoneOptions.toJsonOptions() = jsonObject {
 		put("ShowNotification/NewSones", isShowNewSoneNotifications)

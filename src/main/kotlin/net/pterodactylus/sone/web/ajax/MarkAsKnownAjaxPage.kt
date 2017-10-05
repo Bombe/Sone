@@ -12,7 +12,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
  */
 class MarkAsKnownAjaxPage(webInterface: WebInterface) : JsonPage("markAsKnown.ajax", webInterface) {
 
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) = when (request.parameters["type"]) {
 		"sone" -> processIds(request, core::getSone, core::markSoneKnown)

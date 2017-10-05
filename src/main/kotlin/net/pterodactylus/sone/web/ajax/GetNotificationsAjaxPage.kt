@@ -17,7 +17,7 @@ import java.io.StringWriter
 class GetNotificationsAjaxPage(webInterface: WebInterface) : JsonPage("getNotifications.ajax", webInterface) {
 
 	override val needsFormPassword = false
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) =
 			getCurrentSone(request.toadletContext, false).let { currentSone ->

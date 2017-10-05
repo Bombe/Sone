@@ -11,7 +11,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
  */
 class DismissNotificationAjaxPage(webInterface: WebInterface) : JsonPage("dismissNotification.ajax", webInterface) {
 
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest): JsonReturnObject =
 			request.parameters["notification"]!!

@@ -10,7 +10,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 class GetTranslationAjaxPage(webInterface: WebInterface) : JsonPage("getTranslation.ajax", webInterface) {
 
 	override val needsFormPassword = false
-	override fun requiresLogin() = false
+	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) =
 			createSuccessJsonObject()

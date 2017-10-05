@@ -9,7 +9,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
  */
 open class LoggedInJsonPage(path: String, webInterface: WebInterface) : JsonPage(path, webInterface) {
 
-	final override fun requiresLogin() = true
+	final override val requiresLogin = true
 
 	final override fun createJsonObject(request: FreenetRequest) =
 			createJsonObject(getCurrentSone(request.toadletContext)!!, request)
