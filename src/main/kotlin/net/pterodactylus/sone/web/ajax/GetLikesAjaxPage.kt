@@ -15,7 +15,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
  */
 class GetLikesAjaxPage(webInterface: WebInterface) : JsonPage("getLikes.ajax", webInterface) {
 
-	override fun needsFormPassword() = false
+	override val needsFormPassword = false
 
 	override fun createJsonObject(request: FreenetRequest) =
 			when (request.parameters["type"]) {

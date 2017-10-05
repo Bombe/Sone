@@ -15,7 +15,7 @@ import net.pterodactylus.util.template.Template
  */
 class GetPostAjaxPage(webInterface: WebInterface, private val postTemplate: Template) : LoggedInJsonPage("getPost.ajax", webInterface) {
 
-	override fun needsFormPassword() = false
+	override val needsFormPassword = false
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]

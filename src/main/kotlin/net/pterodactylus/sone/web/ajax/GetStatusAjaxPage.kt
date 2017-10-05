@@ -49,7 +49,7 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 
 	private fun String.asJson() = ObjectMapper().readTree(this).asIterable()
 
-	override fun needsFormPassword() = false
+	override val needsFormPassword = false
 	override fun requiresLogin() = false
 
 	private fun SoneOptions.toJsonOptions() = jsonObject {

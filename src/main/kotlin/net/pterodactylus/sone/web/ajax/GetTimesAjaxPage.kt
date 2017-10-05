@@ -22,7 +22,7 @@ class GetTimesAjaxPage(webInterface: WebInterface,
 		this.timeZone = timeZone
 	}
 
-	override fun needsFormPassword() = false
+	override val needsFormPassword = false
 	override fun requiresLogin() = false
 
 	override fun createJsonObject(request: FreenetRequest) =

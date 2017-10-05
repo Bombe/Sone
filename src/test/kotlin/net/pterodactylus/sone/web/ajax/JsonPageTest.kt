@@ -29,7 +29,7 @@ abstract class JsonPageTest(
 
 	@Test
 	fun `page needs form password`() {
-		assertThat(page.needsFormPassword(), equalTo(needsFormPassword))
+		assertThat(page.needsFormPassword, equalTo(needsFormPassword))
 	}
 
 	@Test

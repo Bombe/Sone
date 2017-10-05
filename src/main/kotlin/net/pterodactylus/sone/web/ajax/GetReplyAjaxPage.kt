@@ -15,7 +15,7 @@ import net.pterodactylus.util.template.Template
  */
 class GetReplyAjaxPage(webInterface: WebInterface, private val template: Template) : LoggedInJsonPage("getReply.ajax", webInterface) {
 
-	override fun needsFormPassword() = false
+	override val needsFormPassword = false
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["reply"]

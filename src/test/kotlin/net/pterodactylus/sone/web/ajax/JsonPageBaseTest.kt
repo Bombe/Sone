@@ -25,7 +25,7 @@ class JsonPageBaseTest : TestObjects() {
 
 	private val page = object : JsonPage("path.html", webInterface) {
 
-		override fun needsFormPassword() = this@JsonPageBaseTest.needsFormPassword
+		override val needsFormPassword get() = this@JsonPageBaseTest.needsFormPassword
 
 		override fun createJsonObject(request: FreenetRequest) =
 				pageResponse().also { pageCallCounter.incrementAndGet() }

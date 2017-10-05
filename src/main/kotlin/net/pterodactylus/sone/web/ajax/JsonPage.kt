@@ -24,7 +24,7 @@ abstract class JsonPage(private val path: String, protected val webInterface: We
 	override fun getPath() = path
 	override fun isPrefixPage() = false
 
-	open fun needsFormPassword() = true
+	open val needsFormPassword = true
 	open fun requiresLogin() = true
 
 	protected fun createSuccessJsonObject() = JsonReturnObject(true)
@@ -38,7 +38,7 @@ abstract class JsonPage(private val path: String, protected val webInterface: We
 		if (core.preferences.isRequireFullAccess && !request.toadletContext.isAllowedFullAccess) {
 			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(createErrorJsonObject("auth-required").asJsonString())
 		}
-		if (needsFormPassword() && request.parameters["formPassword"] != webInterface.formPassword) {
+		if (needsFormPassword && request.parameters["formPassword"] != webInterface.formPassword) {
 			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(createErrorJsonObject("auth-required").asJsonString())
 		}
 		if (requiresLogin() && (sessionProvider.getCurrentSone(request.toadletContext, false) == null)) {

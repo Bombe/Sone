@@ -16,6 +16,8 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 class GetLinkedElementAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val linkedElementRenderFilter: LinkedElementRenderFilter):
 		JsonPage("getLinkedElement.ajax", webInterface) {
 
+	override val needsFormPassword = false
+
 	override fun createJsonObject(request: FreenetRequest): JsonReturnObject =
 			request.httpRequest.getParam("elements", "[]").asJson()
 					.map(JsonNode::asText)
@@ -37,7 +39,6 @@ class GetLinkedElementAjaxPage(webInterface: WebInterface, private val elementLo
 				}
 			}
 
-	override fun needsFormPassword() = false
 	override fun requiresLogin() = false
 
 	private fun String.asJson() = ObjectMapper().readTree(this).asIterable()
