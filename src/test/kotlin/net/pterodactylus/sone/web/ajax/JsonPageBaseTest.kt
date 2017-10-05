@@ -19,7 +19,7 @@ class JsonPageBaseTest : TestObjects() {
 
 	private var needsFormPassword = false
 	private val pageCallCounter = AtomicInteger()
-	private var pageResponse = { JsonReturnObject(true) }
+	private var pageResponse = { JsonReturnObject(true).put("foo", "bar") }
 	private val outputStream = ByteArrayOutputStream()
 	private val response = Response(outputStream)
 
@@ -52,6 +52,9 @@ class JsonPageBaseTest : TestObjects() {
 		core.preferences.isRequireFullAccess = true
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(403))
+		assertThat(response.statusText, equalTo("Forbidden"))
+		assertThat(response.contentType, equalTo("application/json"))
+		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
 	}
 
 	@Test
@@ -59,6 +62,9 @@ class JsonPageBaseTest : TestObjects() {
 		needsFormPassword = true
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(403))
+		assertThat(response.statusText, equalTo("Forbidden"))
+		assertThat(response.contentType, equalTo("application/json"))
+		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
 	}
 
 	@Test
@@ -67,6 +73,9 @@ class JsonPageBaseTest : TestObjects() {
 		addRequestParameter("formPassword", formPassword + "_false")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(403))
+		assertThat(response.statusText, equalTo("Forbidden"))
+		assertThat(response.contentType, equalTo("application/json"))
+		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
 	}
 
 	@Test
@@ -75,6 +84,9 @@ class JsonPageBaseTest : TestObjects() {
 		addRequestParameter("formPassword", formPassword)
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(200))
+		assertThat(response.statusText, equalTo("OK"))
+		assertThat(response.contentType, equalTo("application/json"))
+		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":true,\"foo\":\"bar\"}"))
 	}
 
 	@Test
@@ -82,20 +94,28 @@ class JsonPageBaseTest : TestObjects() {
 		unsetCurrentSone()
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(403))
+		assertThat(response.statusText, equalTo("Forbidden"))
+		assertThat(response.contentType, equalTo("application/json"))
+		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
 	}
 
 	@Test
 	fun `page returns content if login is required and current Sone is set`() {
 		page.handleRequest(freenetRequest, response)
-		assertThat(response.statusCode, equalTo(200))
 		assertThat(pageCallCounter.get(), equalTo(1))
+		assertThat(response.statusCode, equalTo(200))
+		assertThat(response.statusText, equalTo("OK"))
+		assertThat(response.contentType, equalTo("application/json"))
+		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":true,\"foo\":\"bar\"}"))
 	}
 
 	@Test
 	fun `page returns 500 if execution throws exception`() {
-		pageResponse = { throw IllegalStateException() }
+		pageResponse = { throw IllegalStateException("some error occured") }
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(500))
+		assertThat(response.statusText, equalTo("some error occured"))
+		assertThat(response.contentType, equalTo("text/plain"))
 	}
 
 	@Test
