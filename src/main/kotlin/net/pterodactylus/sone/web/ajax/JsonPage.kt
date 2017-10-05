@@ -19,6 +19,7 @@ abstract class JsonPage(private val path: String, protected val webInterface: We
 
 	private val objectMapper = ObjectMapper()
 	private val sessionProvider: SessionProvider = webInterface
+	protected val core = webInterface.core
 
 	override fun getPath() = path
 	override fun isPrefixPage() = false
@@ -34,7 +35,7 @@ abstract class JsonPage(private val path: String, protected val webInterface: We
 			sessionProvider.getCurrentSone(toadletContext, createSession)
 
 	override fun handleRequest(request: FreenetRequest, response: Response): Response {
-		if (webInterface.core.preferences.isRequireFullAccess && !request.toadletContext.isAllowedFullAccess) {
+		if (core.preferences.isRequireFullAccess && !request.toadletContext.isAllowedFullAccess) {
 			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(createErrorJsonObject("auth-required").asJsonString())
 		}
 		if (needsFormPassword() && request.parameters["formPassword"] != webInterface.formPassword) {

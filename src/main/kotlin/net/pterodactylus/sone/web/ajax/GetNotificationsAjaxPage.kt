@@ -48,15 +48,15 @@ class GetNotificationsAjaxPage(webInterface: WebInterface) : JsonPage("getNotifi
 		val mergedTemplateContext = webInterface.templateContextFactory.createTemplateContext()
 				.mergeContext(templateContext)
 				.apply {
-					this["core"] = webInterface.core
+					this["core"] = core
 					this["currentSone"] = currentSone
-					this["localSones"] = webInterface.core.localSones
+					this["localSones"] = core.localSones
 					this["request"] = freenetRequest
 					this["currentVersion"] = SonePlugin.getPluginVersion()
-					this["hasLatestVersion"] = webInterface.core.updateChecker.hasLatestVersion()
-					this["latestEdition"] = webInterface.core.updateChecker.latestEdition
-					this["latestVersion"] = webInterface.core.updateChecker.latestVersion
-					this["latestVersionTime"] = webInterface.core.updateChecker.latestVersionDate
+					this["hasLatestVersion"] = core.updateChecker.hasLatestVersion()
+					this["latestEdition"] = core.updateChecker.latestEdition
+					this["latestVersion"] = core.updateChecker.latestVersion
+					this["latestVersionTime"] = core.updateChecker.latestVersionDate
 					this["notification"] = this@render
 				}
 		it.also { render(mergedTemplateContext, it) }

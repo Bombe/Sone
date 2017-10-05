@@ -20,7 +20,7 @@ class UnlikeAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("unlike.ajax
 	private fun FreenetRequest.processEntity(entity: String, likeRemover: (String) -> Unit) =
 			parameters[entity].emptyToNull
 					?.also(likeRemover)
-					?.also { webInterface.core.touchConfiguration() }
+					?.also { core.touchConfiguration() }
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-$entity-id")
 

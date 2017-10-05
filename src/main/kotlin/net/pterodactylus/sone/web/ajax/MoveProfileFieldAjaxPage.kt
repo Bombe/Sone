@@ -31,7 +31,7 @@ class MoveProfileFieldAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("m
 					else -> null
 				}?.let {
 					currentSone.profile = profile
-					webInterface.core.touchConfiguration()
+					core.touchConfiguration()
 					createSuccessJsonObject()
 				} ?: createErrorJsonObject("invalid-direction")
 			} catch (e: IllegalArgumentException) {

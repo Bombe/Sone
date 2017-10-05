@@ -16,12 +16,12 @@ class DistrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("distrustS
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
-					.let(webInterface.core::getSone)
+					.let(core::getSone)
 					?.let { sone ->
 						createSuccessJsonObject()
-								.put("trustValue", webInterface.core.preferences.negativeTrust)
+								.put("trustValue", core.preferences.negativeTrust)
 								.also {
-									webInterface.core.distrustSone(currentSone, sone)
+									core.distrustSone(currentSone, sone)
 								}
 					} ?: createErrorJsonObject("invalid-sone-id")
 

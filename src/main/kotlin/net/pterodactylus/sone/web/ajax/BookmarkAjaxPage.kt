@@ -15,8 +15,8 @@ class BookmarkAjaxPage(webInterface: WebInterface) : JsonPage("bookmark.ajax", w
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["post"].emptyToNull
-					?.let(webInterface.core::getPost)
-					?.also(webInterface.core::bookmarkPost)
+					?.let(core::getPost)
+					?.also(core::bookmarkPost)
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-post-id")
 

@@ -14,11 +14,11 @@ class DeleteReplyAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("delete
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["reply"]
-					.let(webInterface.core::getPostReply)
+					.let(core::getPostReply)
 					?.let { reply ->
 						reply.sone.isLocal.ifTrue {
 							createSuccessJsonObject().also {
-								webInterface.core.deleteReply(reply)
+								core.deleteReply(reply)
 							}
 						} ?: createErrorJsonObject("not-authorized")
 					} ?: createErrorJsonObject("invalid-reply-id")

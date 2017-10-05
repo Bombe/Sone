@@ -19,7 +19,7 @@ class GetPostAjaxPage(webInterface: WebInterface, private val postTemplate: Temp
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]
-					.let(webInterface.core::getPost)
+					.let(core::getPost)
 					.let { post ->
 						createSuccessJsonObject().
 								put("post", jsonObject(
@@ -33,11 +33,11 @@ class GetPostAjaxPage(webInterface: WebInterface, private val postTemplate: Temp
 
 	private fun Post.render(currentSone: Sone, request: FreenetRequest) =
 			webInterface.templateContextFactory.createTemplateContext().apply {
-				set("core", webInterface.core)
+				set("core", core)
 				set("request", request)
 				set("post", this@render)
 				set("currentSone", currentSone)
-				set("localSones", webInterface.core.localSones)
+				set("localSones", core.localSones)
 			}.let { postTemplate.render(it) }
 
 }

@@ -15,9 +15,9 @@ class MarkAsKnownAjaxPage(webInterface: WebInterface) : JsonPage("markAsKnown.aj
 	override fun requiresLogin() = false
 
 	override fun createJsonObject(request: FreenetRequest) = when (request.parameters["type"]) {
-		"sone" -> processIds(request, webInterface.core::getSone, webInterface.core::markSoneKnown)
-		"post" -> processIds(request, webInterface.core::getPost, webInterface.core::markPostKnown)
-		"reply" -> processIds(request, webInterface.core::getPostReply, webInterface.core::markReplyKnown)
+		"sone" -> processIds(request, core::getSone, core::markSoneKnown)
+		"post" -> processIds(request, core::getPost, core::markPostKnown)
+		"reply" -> processIds(request, core::getPostReply, core::markReplyKnown)
 		else -> createErrorJsonObject("invalid-type")
 	}
 

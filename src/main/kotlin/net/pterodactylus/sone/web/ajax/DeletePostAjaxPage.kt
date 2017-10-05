@@ -14,11 +14,11 @@ class DeletePostAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("deleteP
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]
-					.let(webInterface.core::getPost)
+					.let(core::getPost)
 					?.let { post ->
 						post.sone.isLocal.ifTrue {
 							createSuccessJsonObject().also {
-								webInterface.core.deletePost(post)
+								core.deletePost(post)
 							}
 						} ?: createErrorJsonObject("not-authorized")
 					} ?: createErrorJsonObject("invalid-post-id")

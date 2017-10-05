@@ -18,7 +18,7 @@ class DeleteProfileFieldAjaxPage(webInterface: WebInterface) : LoggedInJsonPage(
 							createSuccessJsonObject().also {
 								profile.removeField(field)
 								currentSone.profile = profile
-								webInterface.core.touchConfiguration()
+								core.touchConfiguration()
 							}
 						} ?: createErrorJsonObject("invalid-field-id")
 			}

@@ -14,15 +14,15 @@ class LikeAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("like.ajax", w
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			when (request.parameters["type"]) {
 				"post" -> request.parameters["post"]
-						.let(webInterface.core::getPost)
+						.let(core::getPost)
 						?.let { currentSone.addLikedPostId(it.id) }
-						?.also { webInterface.core.touchConfiguration() }
+						?.also { core.touchConfiguration() }
 						?.let { createSuccessJsonObject() }
 						?: createErrorJsonObject("invalid-post-id")
 				"reply" -> request.parameters["reply"]
-						.let(webInterface.core::getPostReply)
+						.let(core::getPostReply)
 						?.let { currentSone.addLikedReplyId(it.id) }
-						?.also { webInterface.core.touchConfiguration() }
+						?.also { core.touchConfiguration() }
 						?.let { createSuccessJsonObject() }
 						?: createErrorJsonObject("invalid-reply-id")
 				else -> createErrorJsonObject("invalid-type")

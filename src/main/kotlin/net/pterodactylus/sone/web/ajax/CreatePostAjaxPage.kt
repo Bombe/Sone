@@ -18,9 +18,9 @@ class CreatePostAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("createP
 			request.parameters["text"].emptyToNull
 					?.let { TextFilter.filter(request.headers["Host"], it) }
 					?.let { text ->
-						val sender = request.parameters["sender"].emptyToNull?.let(webInterface.core::getSone)?.orNull() ?: currentSone
-						val recipient = request.parameters["recipient"].let(webInterface.core::getSone)
-						webInterface.core.createPost(sender, recipient, text).let { post ->
+						val sender = request.parameters["sender"].emptyToNull?.let(core::getSone)?.orNull() ?: currentSone
+						val recipient = request.parameters["recipient"].let(core::getSone)
+						core.createPost(sender, recipient, text).let { post ->
 							createSuccessJsonObject().apply {
 								put("postId", post.id)
 								put("sone", sender.id)

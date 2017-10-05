@@ -64,8 +64,8 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 			put("name", SoneAccessor.getNiceName(sone))
 			put("local", sone.isLocal)
 			put("status", sone.status.name)
-			put("modified", webInterface.core.isModifiedSone(sone))
-			put("locked", webInterface.core.isLocked(sone))
+			put("modified", core.isModifiedSone(sone))
+			put("locked", core.isLocked(sone))
 			put("lastUpdatedUnknown", sone.time == 0L)
 			synchronized(dateFormatter) {
 				put("lastUpdated", dateFormatter.format(sone.time))

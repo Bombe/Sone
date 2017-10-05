@@ -14,8 +14,8 @@ class UntrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("untrustSon
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
-					?.let(webInterface.core::getSone)
-					?.also { webInterface.core.untrustSone(currentSone, it) }
+					?.let(core::getSone)
+					?.also { core.untrustSone(currentSone, it) }
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-sone-id")
 

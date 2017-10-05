@@ -16,11 +16,11 @@ class CreateReplyAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("create
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest): JsonReturnObject =
 			request.parameters["post"].emptyToNull
-					?.let(webInterface.core::getPost)
+					?.let(core::getPost)
 					?.let { post ->
 						val text = TextFilter.filter(request.headers["Host"], request.parameters["text"])
-						val sender = request.parameters["sender"].let(webInterface.core::getLocalSone) ?: currentSone
-						val reply = webInterface.core.createReply(sender, post, text)
+						val sender = request.parameters["sender"].let(core::getLocalSone) ?: currentSone
+						val reply = core.createReply(sender, post, text)
 						createSuccessJsonObject().apply {
 							put("reply", reply.id)
 							put("sone", sender.id)

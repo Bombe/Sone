@@ -15,8 +15,8 @@ class UnbookmarkAjaxPage(webInterface: WebInterface) : JsonPage("unbookmark.ajax
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["post"]
-					?.let(webInterface.core::getPost)
-					?.also(webInterface.core::unbookmarkPost)
+					?.let(core::getPost)
+					?.also(core::unbookmarkPost)
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-post-id")
 

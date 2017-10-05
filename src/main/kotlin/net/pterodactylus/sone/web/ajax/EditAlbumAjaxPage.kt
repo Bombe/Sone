@@ -14,7 +14,7 @@ class EditAlbumAjaxPage(webInterface: WebInterface) : JsonPage("editAlbum.ajax",
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["album"]!!
-					.let(webInterface.core::getAlbum)
+					.let(core::getAlbum)
 					?.let { album ->
 						album.sone.isLocal.ifTrue {
 							when {

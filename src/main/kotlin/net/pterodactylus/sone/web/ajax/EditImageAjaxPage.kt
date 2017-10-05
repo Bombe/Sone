@@ -21,19 +21,19 @@ class EditImageAjaxPage(webInterface: WebInterface,
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["image"]
-					.let(webInterface.core::getImage)
+					.let(core::getImage)
 					?.let { image ->
 						image.sone.isLocal.ifTrue {
 							when {
 								request.parameters["moveLeft"] == "true" -> createSuccessJsonObject().apply {
 									put("sourceImageId", image.id)
 									put("destinationImageId", image.album.moveImageUp(image).id)
-									webInterface.core.touchConfiguration()
+									core.touchConfiguration()
 								}
 								request.parameters["moveRight"] == "true" -> createSuccessJsonObject().apply {
 									put("sourceImageId", image.id)
 									put("destinationImageId", image.album.moveImageDown(image).id)
-									webInterface.core.touchConfiguration()
+									core.touchConfiguration()
 								}
 								else -> request.parameters["title"]!!.let { title ->
 									title.trim().isNotBlank().ifTrue {
@@ -52,7 +52,7 @@ class EditImageAjaxPage(webInterface: WebInterface,
 															}
 														}
 													})
-													webInterface.core.touchConfiguration()
+													core.touchConfiguration()
 												}
 											}
 										}

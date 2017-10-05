@@ -27,8 +27,8 @@ class GetTimesAjaxPage(webInterface: WebInterface,
 
 	override fun createJsonObject(request: FreenetRequest) =
 			createSuccessJsonObject().apply {
-				put("postTimes", request.parameters["posts"]!!.idsToJson { webInterface.core.getPost(it)?.let { it.id to it.time } })
-				put("replyTimes", request.parameters["replies"]!!.idsToJson { webInterface.core.getPostReply(it)?.let { it.id to it.time } })
+				put("postTimes", request.parameters["posts"]!!.idsToJson { core.getPost(it)?.let { it.id to it.time } })
+				put("replyTimes", request.parameters["replies"]!!.idsToJson { core.getPostReply(it)?.let { it.id to it.time } })
 			}
 
 	private fun String.idsToJson(transform: (String) -> Pair<String, Long>?) =

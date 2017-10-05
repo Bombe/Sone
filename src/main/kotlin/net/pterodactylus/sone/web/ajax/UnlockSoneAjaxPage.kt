@@ -13,9 +13,9 @@ class UnlockSoneAjaxPage(webInterface: WebInterface) : JsonPage("unlockSone.ajax
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["sone"]
-					?.let(webInterface.core::getLocalSone)
-					?.also(webInterface.core::unlockSone)
-					?.also { webInterface.core.touchConfiguration() }
+					?.let(core::getLocalSone)
+					?.also(core::unlockSone)
+					?.also { core.touchConfiguration() }
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-sone-id")
 

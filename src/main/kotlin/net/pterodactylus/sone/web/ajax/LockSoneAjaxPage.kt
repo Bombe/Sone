@@ -13,8 +13,8 @@ class LockSoneAjaxPage(webInterface: WebInterface) : JsonPage("lockSone.ajax", w
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["sone"]
-					.let(webInterface.core::getLocalSone)
-					?.let(webInterface.core::lockSone)
+					.let(core::getLocalSone)
+					?.let(core::lockSone)
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-sone-id")
 
