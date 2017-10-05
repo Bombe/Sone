@@ -11,7 +11,7 @@ import java.net.URI
  */
 class GetImagePage(webInterface: WebInterface): FreenetPage {
 
-	private val core = webInterface.core!!
+	private val core = webInterface.core
 
 	override fun getPath(): String {
 		return "getImage.html"

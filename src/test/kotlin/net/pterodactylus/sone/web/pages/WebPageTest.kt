@@ -47,7 +47,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 	val currentSone = mock<Sone>()
 	val template = mock<Template>()
 	val webInterface = deepMock<WebInterface>()
-	val core = webInterface.core!!
+	val core = webInterface.core
 	val eventBus = mock<EventBus>()
 	val preferences = Preferences(eventBus)
 	val l10n = webInterface.l10n!!

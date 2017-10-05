@@ -410,6 +410,7 @@ public class WebInterface implements SessionProvider {
 	 *
 	 * @return The Sone core
 	 */
+	@Nonnull
 	public Core getCore() {
 		return sonePlugin.core();
 	}
