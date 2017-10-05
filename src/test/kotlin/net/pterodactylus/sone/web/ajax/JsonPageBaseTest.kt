@@ -54,7 +54,7 @@ class JsonPageBaseTest : TestObjects() {
 		assertThat(response.statusCode, equalTo(403))
 		assertThat(response.statusText, equalTo("Forbidden"))
 		assertThat(response.contentType, equalTo("application/json"))
-		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
+		assertThat(outputStream.toString("UTF-8").asJson(), equalTo(mapOf("success" to false, "error" to "auth-required")))
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class JsonPageBaseTest : TestObjects() {
 		assertThat(response.statusCode, equalTo(403))
 		assertThat(response.statusText, equalTo("Forbidden"))
 		assertThat(response.contentType, equalTo("application/json"))
-		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
+		assertThat(outputStream.toString("UTF-8").asJson(), equalTo(mapOf("success" to false, "error" to "auth-required")))
 	}
 
 	@Test
@@ -75,7 +75,7 @@ class JsonPageBaseTest : TestObjects() {
 		assertThat(response.statusCode, equalTo(403))
 		assertThat(response.statusText, equalTo("Forbidden"))
 		assertThat(response.contentType, equalTo("application/json"))
-		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
+		assertThat(outputStream.toString("UTF-8").asJson(), equalTo(mapOf("success" to false, "error" to "auth-required")))
 	}
 
 	@Test
@@ -86,7 +86,7 @@ class JsonPageBaseTest : TestObjects() {
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("application/json"))
-		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":true,\"foo\":\"bar\"}"))
+		assertThat(outputStream.toString("UTF-8").asJson(), equalTo(mapOf("success" to true, "foo" to "bar")))
 	}
 
 	@Test
@@ -96,7 +96,7 @@ class JsonPageBaseTest : TestObjects() {
 		assertThat(response.statusCode, equalTo(403))
 		assertThat(response.statusText, equalTo("Forbidden"))
 		assertThat(response.contentType, equalTo("application/json"))
-		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":false,\"error\":\"auth-required\"}"))
+		assertThat(outputStream.toString("UTF-8").asJson(), equalTo(mapOf("success" to false, "error" to "auth-required")))
 	}
 
 	@Test
@@ -106,7 +106,7 @@ class JsonPageBaseTest : TestObjects() {
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("application/json"))
-		assertThat(outputStream.toString("UTF-8"), equalTo("{\"success\":true,\"foo\":\"bar\"}"))
+		assertThat(outputStream.toString("UTF-8").asJson(), equalTo(mapOf("success" to true, "foo" to "bar")))
 	}
 
 	@Test
@@ -129,5 +129,7 @@ class JsonPageBaseTest : TestObjects() {
 	fun `json page is not a prefix page`() {
 	    assertThat(page.isPrefixPage, equalTo(false))
 	}
+
+	private fun String.asJson() = objectMapper.readValue(this, Map::class.java) as Map<String, Any>
 
 }

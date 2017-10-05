@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.ajax
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
 import freenet.l10n.BaseL10n
@@ -38,6 +39,8 @@ import javax.naming.SizeLimitExceededException
  * Base class for tests that supplies commonly used objects.
  */
 open class TestObjects {
+
+	val objectMapper = ObjectMapper()
 
 	val webInterface = mock<WebInterface>()
 	var formPassword = "form-password"
