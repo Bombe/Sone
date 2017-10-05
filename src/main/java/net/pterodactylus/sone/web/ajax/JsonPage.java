@@ -23,7 +23,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,7 +31,6 @@ import javax.annotation.Nonnull;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.web.SessionProvider;
 import net.pterodactylus.sone.web.WebInterface;
-import net.pterodactylus.sone.web.page.FreenetPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.web.Page;
@@ -47,7 +45,7 @@ import freenet.clients.http.ToadletContext;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public abstract class JsonPage implements FreenetPage {
+public abstract class JsonPage implements Page<FreenetRequest> {
 
 	/** The logger. */
 	private static final Logger logger = getLogger(JsonPage.class.getName());
@@ -198,14 +196,6 @@ public abstract class JsonPage implements FreenetPage {
 			logger.log(Level.WARNING, "Error executing JSON page!", e1);
 			return response.setStatusCode(500).setStatusText(e1.getMessage()).setContentType("text/plain").write(dumpStackTrace(e1));
 		}
-	}
-
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public boolean isLinkExcepted(URI link) {
-		return false;
 	}
 
 	//
