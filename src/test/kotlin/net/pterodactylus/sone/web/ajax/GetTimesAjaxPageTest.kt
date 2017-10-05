@@ -29,8 +29,8 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
 	override val page: JsonPage by lazy { GetTimesAjaxPage(webInterface, timeTextConverter, l10nFilter, getTimeZone("UTC")) }
-	private val posts = listOf(createPost(1), createPost(2))
-	private val replies = listOf(createReply(1), createReply(2))
+	private val testPosts = listOf(createPost(1), createPost(2))
+	private val testReplies = listOf(createReply(1), createReply(2))
 
 	private fun createPost(index: Int): Post {
 		return mock<Post>().apply {
@@ -61,7 +61,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 
 	@Test
 	fun `request with single post parameter responds with post times and empty reply times`() {
-		addPost(posts[0])
+		addPost(testPosts[0])
 		addRequestParameter("posts", "post1")
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
@@ -72,7 +72,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 
 	@Test
 	fun `request with single reply parameter responds with reply times and empty post times`() {
-		addReply(replies[0])
+		addReply(testReplies[0])
 		addRequestParameter("replies", "reply1")
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].toList(), emptyIterable())
@@ -83,8 +83,8 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 
 	@Test
 	fun `request with multiple post parameter responds with post times and empty reply times`() {
-		addPost(posts[0])
-		addPost(posts[1])
+		addPost(testPosts[0])
+		addPost(testPosts[1])
 		addRequestParameter("posts", "post1,post2,post3")
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
@@ -96,8 +96,8 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 
 	@Test
 	fun `request with multiple reply parameters responds with reply times and empty post times`() {
-		addReply(replies[0])
-		addReply(replies[1])
+		addReply(testReplies[0])
+		addReply(testReplies[1])
 		addRequestParameter("replies", "reply1,reply2,reply3")
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["postTimes"].toList(), emptyIterable())

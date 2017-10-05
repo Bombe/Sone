@@ -24,7 +24,7 @@ import java.io.Writer
  */
 class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requiresLogin = false, needsFormPassword = false, pageSupplier = ::GetNotificationsAjaxPage) {
 
-	private val notifications = listOf(
+	private val testNotifications = listOf(
 			createNotification("n1", 2000, "t1", 5000, true),
 			createNotification("n2", 1000, "t2", 6000, false),
 			createNotification("n3", 3000, "t3", 7000, true)
@@ -42,9 +42,9 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 
 	@Test
 	fun `notification hash is calculated correctly`() {
-		notifications.forEach { addNotification(it) }
+		testNotifications.forEach { addNotification(it) }
 		assertThat(json.isSuccess, equalTo(true))
-		assertThat(json["notificationHash"].asInt(), equalTo(listOf(1, 0, 2).map(notifications::get).hashCode()))
+		assertThat(json["notificationHash"].asInt(), equalTo(listOf(1, 0, 2).map(testNotifications::get).hashCode()))
 	}
 
 	@Test
@@ -75,7 +75,7 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 
 	@Test
 	fun `notifications are rendered correctly`() {
-		notifications.forEach { addNotification(it) }
+		testNotifications.forEach { addNotification(it) }
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["notifications"].toList().map { node -> listOf("id", "text", "createdTime", "lastUpdatedTime", "dismissable").map { it to node.get(it).asText() }.toMap() }, containsInAnyOrder(
 				mapOf("id" to "n1", "createdTime" to "2000", "lastUpdatedTime" to "5000", "dismissable" to "true", "text" to "t1"),
@@ -97,7 +97,7 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 			whenever(templateContext).thenReturn(TemplateContext())
 			whenever(render(any(), any())).then { it.get<Writer>(1).write("t4") }
 		}
-		notifications.forEach { addNotification(it) }
+		testNotifications.forEach { addNotification(it) }
 		addNotification(templateNotification)
 		assertThat(json.isSuccess, equalTo(true))
 		assertThat(json["notifications"].last()["text"].asText(), equalTo("t4"))
