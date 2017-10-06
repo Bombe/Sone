@@ -16,33 +16,11 @@ import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.Test
-import org.mockito.Mockito.verify
 
 /**
  * Unit test for [SoneTemplatePage].
  */
-class SoneTemplatePageTest: WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", template, webInterface, true) {}}) {
-
-	@Test
-	fun `current sone is retrieved from web interface`() {
-		assertThat(page.getCurrentSone(toadletContext), equalTo(currentSone))
-	}
-
-	@Test
-	fun `retrieving current sone without creation is forwarded to web interface`() {
-		mock<Sone>().let {
-			whenever(webInterface.getCurrentSone(toadletContext, false)).thenReturn(it)
-			assertThat(page.getCurrentSone(toadletContext, false), equalTo(it))
-		}
-	}
-
-	@Test
-	fun `setting the current sone is forwarded to web interface`() {
-		mock<Sone>().let {
-			page.setCurrentSone(toadletContext, it)
-			verify(webInterface).setCurrentSone(toadletContext, it)
-		}
-	}
+class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", template, webInterface, true) {} }) {
 
 	@Test
 	fun `page title is empty string if no page title key was given`() {
@@ -78,20 +56,6 @@ class SoneTemplatePageTest: WebPageTest({ template, webInterface -> object : Son
 	@Test
 	fun `shortcut icon is the sone icon`() {
 		assertThat(page.shortcutIcon, equalTo("images/icon.png"))
-	}
-
-	@Test
-	fun `page requires login if require login was specified in the constructor`() {
-		SoneTemplatePage("path.html", template, webInterface, true).let { page ->
-			assertThat(page.requiresLogin(), equalTo(true))
-		}
-	}
-
-	@Test
-	fun `page does not require login if require login was not specified in the constructor`() {
-		SoneTemplatePage("path.html", template, webInterface, false).let { page ->
-			assertThat(page.requiresLogin(), equalTo(false))
-		}
 	}
 
 	private fun verifyVariableIsSet(name: String, value: Any) = verifyVariableMatches(name, equalTo<Any>(value))
@@ -217,17 +181,6 @@ class SoneTemplatePageTest: WebPageTest({ template, webInterface -> object : Son
 				equalTo("login.html?target=index.html%3Ffoo%3Db%253Dr%26baz%3Dq%2526o"),
 				equalTo("login.html?target=index.html%3Fbaz%3Dq%2526o%26foo%3Db%253Dr")
 		))
-	}
-
-	@Test
-	fun `full access requirement is correctly forwarded from the preferences if false`() {
-		assertThat(page.isFullAccessOnly, equalTo(false))
-	}
-
-	@Test
-	fun `full access requirement is correctly forwarded from the preferences if true`() {
-		core.preferences.isRequireFullAccess = true
-		assertThat(page.isFullAccessOnly, equalTo(true))
 	}
 
 	@Test
