@@ -13,13 +13,13 @@ import net.pterodactylus.util.template.TemplateContext
 class UnlikePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unlike.html", template, "Page.Unlike.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			when (request.parameters["type"]) {
-				"post" -> getCurrentSone(request.toadletContext)!!.removeLikedPostId(request.parameters["post"]!!)
-				"reply" -> getCurrentSone(request.toadletContext)!!.removeLikedReplyId(request.parameters["reply"]!!)
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			when (freenetRequest.parameters["type"]) {
+				"post" -> getCurrentSone(freenetRequest.toadletContext)!!.removeLikedPostId(freenetRequest.parameters["post"]!!)
+				"reply" -> getCurrentSone(freenetRequest.toadletContext)!!.removeLikedReplyId(freenetRequest.parameters["reply"]!!)
 			}
-			throw RedirectException(request.parameters["returnPage", 256])
+			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}
 

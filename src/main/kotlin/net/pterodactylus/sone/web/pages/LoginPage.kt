@@ -15,12 +15,12 @@ import net.pterodactylus.util.template.TemplateContext
 class LoginPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("login.html", template, "Page.Login.Title", webInterface) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			val soneId = request.httpRequest.getPartAsStringFailsafe("sone-id", 43)
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			val soneId = freenetRequest.httpRequest.getPartAsStringFailsafe("sone-id", 43)
 			webInterface.core.getLocalSone(soneId)?.let { sone ->
-				setCurrentSone(request.toadletContext, sone)
-				val target = request.httpRequest.getParam("target").emptyToNull ?: "index.html"
+				setCurrentSone(freenetRequest.toadletContext, sone)
+				val target = freenetRequest.httpRequest.getParam("target").emptyToNull ?: "index.html"
 				throw RedirectException(target)
 			}
 		}
@@ -28,8 +28,8 @@ class LoginPage(template: Template, webInterface: WebInterface):
 		templateContext["identitiesWithoutSone"] = webInterface.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}" }
 	}
 
-	override public fun getRedirectTarget(request: FreenetRequest) =
-			getCurrentSone(request.toadletContext)?.let { "index.html" }
+	override public fun getRedirectTarget(freenetRequest: FreenetRequest) =
+			getCurrentSone(freenetRequest.toadletContext)?.let { "index.html" }
 
 	override fun isEnabled(toadletContext: ToadletContext) = when {
 		webInterface.core.preferences.isRequireFullAccess && !toadletContext.isAllowedFullAccess -> false

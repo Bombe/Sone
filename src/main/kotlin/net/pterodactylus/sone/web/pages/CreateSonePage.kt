@@ -18,17 +18,17 @@ class CreateSonePage(template: Template, webInterface: WebInterface):
 
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["sones"] = webInterface.core.localSones.sortedWith(Sone.NICE_NAME_COMPARATOR)
 		templateContext["identitiesWithoutSone"] = webInterface.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}".toLowerCase() }
-		if (request.isPOST) {
-			val identity = request.httpRequest.getPartAsStringFailsafe("identity", 43)
+		if (freenetRequest.isPOST) {
+			val identity = freenetRequest.httpRequest.getPartAsStringFailsafe("identity", 43)
 			webInterface.core.identityManager.allOwnIdentities.firstOrNull { it.id == identity }?.let { ownIdentity ->
 				val sone = webInterface.core.createSone(ownIdentity)
 				if (sone == null) {
 					logger.log(Level.SEVERE, "Could not create Sone for OwnIdentity: $ownIdentity")
 				}
-				setCurrentSone(request.toadletContext, sone)
+				setCurrentSone(freenetRequest.toadletContext, sone)
 				throw RedirectException("index.html")
 			}
 			templateContext["errorNoIdentity"] = true

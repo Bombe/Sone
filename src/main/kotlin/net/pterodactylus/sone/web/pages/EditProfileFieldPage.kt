@@ -12,15 +12,15 @@ import net.pterodactylus.util.template.TemplateContext
 class EditProfileFieldPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		sessionProvider.getCurrentSone(request.toadletContext)!!.let { currentSone ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		sessionProvider.getCurrentSone(freenetRequest.toadletContext)!!.let { currentSone ->
 			currentSone.profile.let { profile ->
-				if (request.isPOST) {
-					if (request.httpRequest.getPartAsStringFailsafe("cancel", 4) == "true") {
+				if (freenetRequest.isPOST) {
+					if (freenetRequest.httpRequest.getPartAsStringFailsafe("cancel", 4) == "true") {
 						throw RedirectException("editProfile.html#profile-fields")
 					}
-					val field = profile.getFieldById(request.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
-					request.httpRequest.getPartAsStringFailsafe("name", 256).let { name ->
+					val field = profile.getFieldById(freenetRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
+					freenetRequest.httpRequest.getPartAsStringFailsafe("name", 256).let { name ->
 						try {
 							if (name != field.name) {
 								field.name = name
@@ -33,7 +33,7 @@ class EditProfileFieldPage(template: Template, webInterface: WebInterface):
 						}
 					}
 				}
-				templateContext["field"] = profile.getFieldById(request.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
+				templateContext["field"] = profile.getFieldById(freenetRequest.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
 			}
 		}
 	}

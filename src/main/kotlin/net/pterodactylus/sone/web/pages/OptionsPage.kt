@@ -17,17 +17,17 @@ import net.pterodactylus.util.template.TemplateContext
 class OptionsPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("options.html", template, "Page.Options.Title", webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
 			val fieldsWithErrors = mutableListOf<String>()
-			getCurrentSone(request.toadletContext)?.options?.let { options ->
-				val autoFollow = "auto-follow" in request.parameters
-				val loadLinkedImages = request.parameters["load-linked-images"].emptyToNull
-				val showCustomAvatars = request.parameters["show-custom-avatars"].emptyToNull
-				val enableSoneInsertNotification = "enable-sone-insert-notifications" in request.parameters
-				val showNewSoneNotification = "show-notification-new-sones" in request.parameters
-				val showNewPostNotification = "show-notification-new-posts" in request.parameters
-				val showNewReplyNotification = "show-notification-new-replies" in request.parameters
+			getCurrentSone(freenetRequest.toadletContext)?.options?.let { options ->
+				val autoFollow = "auto-follow" in freenetRequest.parameters
+				val loadLinkedImages = freenetRequest.parameters["load-linked-images"].emptyToNull
+				val showCustomAvatars = freenetRequest.parameters["show-custom-avatars"].emptyToNull
+				val enableSoneInsertNotification = "enable-sone-insert-notifications" in freenetRequest.parameters
+				val showNewSoneNotification = "show-notification-new-sones" in freenetRequest.parameters
+				val showNewPostNotification = "show-notification-new-posts" in freenetRequest.parameters
+				val showNewReplyNotification = "show-notification-new-replies" in freenetRequest.parameters
 
 				options.isAutoFollow = autoFollow
 				options.isSoneInsertNotificationEnabled = enableSoneInsertNotification
@@ -37,21 +37,21 @@ class OptionsPage(template: Template, webInterface: WebInterface):
 				loadLinkedImages?.also { if (cantSetOption { options.loadLinkedImages = LoadExternalContent.valueOf(loadLinkedImages) }) fieldsWithErrors += "load-linked-images" }
 				showCustomAvatars?.also { if (cantSetOption { options.showCustomAvatars = LoadExternalContent.valueOf(showCustomAvatars) }) fieldsWithErrors += "show-custom-avatars" }
 			}
-			val fullAccessRequired = "require-full-access" in request.parameters
-			val fcpInterfaceActive = "fcp-interface-active" in request.parameters
+			val fullAccessRequired = "require-full-access" in freenetRequest.parameters
+			val fcpInterfaceActive = "fcp-interface-active" in freenetRequest.parameters
 
 			webInterface.core.preferences.isRequireFullAccess = fullAccessRequired
 			webInterface.core.preferences.isFcpInterfaceActive = fcpInterfaceActive
 
-			val postsPerPage = request.parameters["posts-per-page"]?.toIntOrNull()
-			val charactersPerPost = request.parameters["characters-per-post"]?.toIntOrNull()
-			val postCutOffLength = request.parameters["post-cut-off-length"]?.toIntOrNull()
-			val imagesPerPage = request.parameters["images-per-page"]?.toIntOrNull()
-			val insertionDelay = request.parameters["insertion-delay"]?.toIntOrNull()
-			val fcpFullAccessRequired = request.parameters["fcp-full-access-required"]?.toIntOrNull()
-			val negativeTrust = request.parameters["negative-trust"]?.toIntOrNull()
-			val positiveTrust = request.parameters["positive-trust"]?.toIntOrNull()
-			val trustComment = request.parameters["trust-comment"]?.emptyToNull
+			val postsPerPage = freenetRequest.parameters["posts-per-page"]?.toIntOrNull()
+			val charactersPerPost = freenetRequest.parameters["characters-per-post"]?.toIntOrNull()
+			val postCutOffLength = freenetRequest.parameters["post-cut-off-length"]?.toIntOrNull()
+			val imagesPerPage = freenetRequest.parameters["images-per-page"]?.toIntOrNull()
+			val insertionDelay = freenetRequest.parameters["insertion-delay"]?.toIntOrNull()
+			val fcpFullAccessRequired = freenetRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
+			val negativeTrust = freenetRequest.parameters["negative-trust"]?.toIntOrNull()
+			val positiveTrust = freenetRequest.parameters["positive-trust"]?.toIntOrNull()
+			val trustComment = freenetRequest.parameters["trust-comment"]?.emptyToNull
 
 			if (cantSetOption { it.setPostsPerPage(postsPerPage) }) fieldsWithErrors += "posts-per-page"
 			if (cantSetOption { it.setCharactersPerPost(charactersPerPost) }) fieldsWithErrors += "characters-per-post"
@@ -69,7 +69,7 @@ class OptionsPage(template: Template, webInterface: WebInterface):
 			}
 			templateContext["fieldErrors"] = fieldsWithErrors
 		}
-		getCurrentSone(request.toadletContext)?.options?.let { options ->
+		getCurrentSone(freenetRequest.toadletContext)?.options?.let { options ->
 			templateContext["auto-follow"] = options.isAutoFollow
 			templateContext["show-notification-new-sones"] = options.isShowNewSoneNotifications
 			templateContext["show-notification-new-posts"] = options.isShowNewPostNotifications

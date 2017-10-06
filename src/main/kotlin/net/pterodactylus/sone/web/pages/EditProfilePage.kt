@@ -14,8 +14,8 @@ import net.pterodactylus.util.template.TemplateContext
 class EditProfilePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("editProfile.html", template, "Page.EditProfile.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		request.currentSone!!.profile.let { profile ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		freenetRequest.currentSone!!.profile.let { profile ->
 			templateContext["firstName"] = profile.firstName
 			templateContext["middleName"] = profile.middleName
 			templateContext["lastName"] = profile.lastName
@@ -24,25 +24,25 @@ class EditProfilePage(template: Template, webInterface: WebInterface):
 			templateContext["birthYear"] = profile.birthYear
 			templateContext["avatarId"] = profile.avatar
 			templateContext["fields"] = profile.fields
-			if (request.isPOST) {
-				if (request.httpRequest.getPartAsStringFailsafe("save-profile", 4) == "true") {
-					profile.firstName = request.httpRequest.getPartAsStringFailsafe("first-name", 256).trim()
-					profile.middleName = request.httpRequest.getPartAsStringFailsafe("middle-name", 256).trim()
-					profile.lastName = request.httpRequest.getPartAsStringFailsafe("last-name", 256).trim()
-					profile.birthDay = request.httpRequest.getPartAsStringFailsafe("birth-day", 256).trim().toIntOrNull()
-					profile.birthMonth = request.httpRequest.getPartAsStringFailsafe("birth-month", 256).trim().toIntOrNull()
-					profile.birthYear = request.httpRequest.getPartAsStringFailsafe("birth-year", 256).trim().toIntOrNull()
-					profile.setAvatar(webInterface.core.getImage(request.httpRequest.getPartAsStringFailsafe("avatarId", 256).trim(), false))
+			if (freenetRequest.isPOST) {
+				if (freenetRequest.httpRequest.getPartAsStringFailsafe("save-profile", 4) == "true") {
+					profile.firstName = freenetRequest.httpRequest.getPartAsStringFailsafe("first-name", 256).trim()
+					profile.middleName = freenetRequest.httpRequest.getPartAsStringFailsafe("middle-name", 256).trim()
+					profile.lastName = freenetRequest.httpRequest.getPartAsStringFailsafe("last-name", 256).trim()
+					profile.birthDay = freenetRequest.httpRequest.getPartAsStringFailsafe("birth-day", 256).trim().toIntOrNull()
+					profile.birthMonth = freenetRequest.httpRequest.getPartAsStringFailsafe("birth-month", 256).trim().toIntOrNull()
+					profile.birthYear = freenetRequest.httpRequest.getPartAsStringFailsafe("birth-year", 256).trim().toIntOrNull()
+					profile.setAvatar(webInterface.core.getImage(freenetRequest.httpRequest.getPartAsStringFailsafe("avatarId", 256).trim(), false))
 					profile.fields.forEach { field ->
-						field.value = TextFilter.filter(request.httpRequest.getHeader("Host"), request.httpRequest.getPartAsStringFailsafe("field-${field.id}", 400).trim())
+						field.value = TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), freenetRequest.httpRequest.getPartAsStringFailsafe("field-${field.id}", 400).trim())
 					}
 					webInterface.core.touchConfiguration()
 					throw RedirectException("editProfile.html")
-				} else if (request.httpRequest.getPartAsStringFailsafe("add-field", 4) == "true") {
-					val fieldName = request.httpRequest.getPartAsStringFailsafe("field-name", 100)
+				} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("add-field", 4) == "true") {
+					val fieldName = freenetRequest.httpRequest.getPartAsStringFailsafe("field-name", 100)
 					try {
 						profile.addField(fieldName)
-						request.currentSone!!.profile = profile
+						freenetRequest.currentSone!!.profile = profile
 						webInterface.core.touchConfiguration()
 						throw RedirectException("editProfile.html#profile-fields")
 					} catch (e: DuplicateField) {
@@ -50,17 +50,17 @@ class EditProfilePage(template: Template, webInterface: WebInterface):
 						templateContext["duplicateFieldName"] = true
 					}
 				} else profile.fields.forEach { field ->
-					if (request.httpRequest.getPartAsStringFailsafe("delete-field-${field.id}", 4) == "true") {
+					if (freenetRequest.httpRequest.getPartAsStringFailsafe("delete-field-${field.id}", 4) == "true") {
 						throw RedirectException("deleteProfileField.html?field=${field.id}")
-					} else if (request.httpRequest.getPartAsStringFailsafe("edit-field-${field.id}", 4) == "true") {
+					} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("edit-field-${field.id}", 4) == "true") {
 						throw RedirectException("editProfileField.html?field=${field.id}")
-					} else if (request.httpRequest.getPartAsStringFailsafe("move-down-field-${field.id}", 4) == "true") {
+					} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("move-down-field-${field.id}", 4) == "true") {
 						profile.moveFieldDown(field)
-						request.currentSone!!.profile = profile
+						freenetRequest.currentSone!!.profile = profile
 						throw RedirectException("editProfile.html#profile-fields")
-					} else if (request.httpRequest.getPartAsStringFailsafe("move-up-field-${field.id}", 4) == "true") {
+					} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("move-up-field-${field.id}", 4) == "true") {
 						profile.moveFieldUp(field)
-						request.currentSone!!.profile = profile
+						freenetRequest.currentSone!!.profile = profile
 						throw RedirectException("editProfile.html#profile-fields")
 					}
 				}

@@ -13,23 +13,23 @@ import net.pterodactylus.util.template.TemplateContext
 class EditAlbumPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			val album = webInterface.core.getAlbum(request.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			val album = webInterface.core.getAlbum(freenetRequest.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
 			album.takeUnless { it.sone.isLocal }?.run { throw RedirectException("noPermission.html") }
-			if (request.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {
+			if (freenetRequest.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {
 				album.parent?.moveAlbumUp(album)
 				webInterface.core.touchConfiguration()
 				throw RedirectException("imageBrowser.html?album=${album.parent?.id}")
-			} else if (request.httpRequest.getPartAsStringFailsafe("moveRight", 4) == "true") {
+			} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("moveRight", 4) == "true") {
 				album.parent?.moveAlbumDown(album)
 				webInterface.core.touchConfiguration()
 				throw RedirectException("imageBrowser.html?album=${album.parent?.id}")
 			} else {
 				try {
 					album.modify()
-							.setTitle(request.httpRequest.getPartAsStringFailsafe("title", 100))
-							.setDescription(request.httpRequest.getPartAsStringFailsafe("description", 1000))
+							.setTitle(freenetRequest.httpRequest.getPartAsStringFailsafe("title", 100))
+							.setDescription(freenetRequest.httpRequest.getPartAsStringFailsafe("description", 1000))
 							.update()
 				} catch (e: AlbumTitleMustNotBeEmpty) {
 					throw RedirectException("emptyAlbumTitle.html")

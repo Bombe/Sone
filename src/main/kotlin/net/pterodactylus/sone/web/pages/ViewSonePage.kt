@@ -19,16 +19,16 @@ import java.net.URI
 class ViewSonePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("viewSone.html", template, webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		templateContext["soneId"] = request.parameters["sone"]
-		request.parameters["sone"].let(webInterface.core::getSone).let { sone ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		templateContext["soneId"] = freenetRequest.parameters["sone"]
+		freenetRequest.parameters["sone"].let(webInterface.core::getSone).let { sone ->
 			templateContext["sone"] = sone
 			val sonePosts = sone.posts
 			val directedPosts = webInterface.core.getDirectedPosts(sone.id)
 			(sonePosts + directedPosts)
 					.sortedByDescending(Post::getTime)
 					.paginate(webInterface.core.preferences.postsPerPage)
-					.apply { page = request.parameters["postPage"]?.toIntOrNull() ?: 0 }
+					.apply { page = freenetRequest.parameters["postPage"]?.toIntOrNull() ?: 0 }
 					.also {
 						templateContext["postPagination"] = it
 						templateContext["posts"] = it.items
@@ -40,7 +40,7 @@ class ViewSonePage(template: Template, webInterface: WebInterface):
 					.minus(directedPosts)
 					.sortedByDescending { webInterface.core.getReplies(it.id).first().time }
 					.paginate(webInterface.core.preferences.postsPerPage)
-					.apply { page = request.parameters["repliedPostPage"]?.toIntOrNull() ?: 0 }
+					.apply { page = freenetRequest.parameters["repliedPostPage"]?.toIntOrNull() ?: 0 }
 					.also {
 						templateContext["repliedPostPagination"] = it
 						templateContext["repliedPosts"] = it.items
@@ -50,8 +50,8 @@ class ViewSonePage(template: Template, webInterface: WebInterface):
 
 	override fun isLinkExcepted(link: URI?) = true
 
-	public override fun getPageTitle(request: FreenetRequest): String =
-			request.parameters["sone"].let(webInterface.core::getSone).let { sone ->
+	public override fun getPageTitle(freenetRequest: FreenetRequest): String =
+			freenetRequest.parameters["sone"].let(webInterface.core::getSone).let { sone ->
 				"${SoneAccessor.getNiceName(sone)} - ${webInterface.l10n.getString("Page.ViewSone.Title")}"
 			} ?: webInterface.l10n.getString("Page.ViewSone.Page.TitleWithoutSone")
 

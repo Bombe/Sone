@@ -12,9 +12,9 @@ import net.pterodactylus.util.template.TemplateContext
 class LockSonePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("lockSone.html", template, "Page.LockSone.Title", webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		request.parameters["returnPage", 256]!!.let { returnPage ->
-			request.parameters["sone", 44]!!
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		freenetRequest.parameters["returnPage", 256]!!.let { returnPage ->
+			freenetRequest.parameters["sone", 44]!!
 					.let { webInterface.core.getLocalSone(it) }
 					?.let { webInterface.core.lockSone(it) }
 			throw RedirectException(returnPage)

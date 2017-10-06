@@ -14,13 +14,13 @@ import java.util.regex.Pattern
 class UnfollowSonePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			getCurrentSone(request.toadletContext)!!.also { currentSone ->
-				request.parameters["sone"]!!.split(Regex("[ ,]+"))
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			getCurrentSone(freenetRequest.toadletContext)!!.also { currentSone ->
+				freenetRequest.parameters["sone"]!!.split(Regex("[ ,]+"))
 						.forEach { webInterface.core.unfollowSone(currentSone, it) }
 			}
-			throw RedirectException(request.parameters["returnPage", 256])
+			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}
 

@@ -11,9 +11,9 @@ import net.pterodactylus.util.template.TemplateContext
 class DismissNotificationPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("dismissNotification.html", template, "Page.DismissNotification.Title", webInterface) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		val returnPage = request.httpRequest.getPartAsStringFailsafe("returnPage", 256)
-		val notificationId = request.httpRequest.getPartAsStringFailsafe("notification", 36)
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
+		val notificationId = freenetRequest.httpRequest.getPartAsStringFailsafe("notification", 36)
 		webInterface.getNotification(notificationId).orNull()?.takeIf { it.isDismissable }?.dismiss()
 		throw RedirectException(returnPage)
 	}

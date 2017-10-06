@@ -15,14 +15,14 @@ import net.pterodactylus.util.template.TemplateContext
 class UntrustPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("untrust.html", template, "Page.Untrust.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			getCurrentSone(request.toadletContext)!!.also { currentSone ->
-				request.parameters["sone", 44]
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			getCurrentSone(freenetRequest.toadletContext)!!.also { currentSone ->
+				freenetRequest.parameters["sone", 44]
 						.let(webInterface.core::getSone)
 						.also { webInterface.core.untrustSone(currentSone, it) }
 			}
-			throw RedirectException(request.parameters["returnPage", 256])
+			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}
 

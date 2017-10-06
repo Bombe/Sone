@@ -23,15 +23,15 @@ import javax.imageio.ImageIO
 class UploadImagePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			val parentAlbum = request.parameters["parent"]!!.let(webInterface.core::getAlbum) ?: throw RedirectException("noPermission.html")
-			if (parentAlbum.sone != getCurrentSone(request.toadletContext)) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			val parentAlbum = freenetRequest.parameters["parent"]!!.let(webInterface.core::getAlbum) ?: throw RedirectException("noPermission.html")
+			if (parentAlbum.sone != getCurrentSone(freenetRequest.toadletContext)) {
 				throw RedirectException("noPermission.html")
 			}
-			val title = request.parameters["title", 200].emptyToNull ?: throw RedirectException("emptyImageTitle.html")
+			val title = freenetRequest.parameters["title", 200].emptyToNull ?: throw RedirectException("emptyImageTitle.html")
 
-			val uploadedFile = request.httpRequest.getUploadedFile("image")
+			val uploadedFile = freenetRequest.httpRequest.getUploadedFile("image")
 			val bytes = uploadedFile.data.use { it.toByteArray() }
 			val bufferedImage = bytes.toImage()
 			if (bufferedImage == null) {
@@ -40,11 +40,11 @@ class UploadImagePage(template: Template, webInterface: WebInterface):
 			}
 
 			val temporaryImage = webInterface.core.createTemporaryImage(bytes.mimeType, bytes)
-			webInterface.core.createImage(getCurrentSone(request.toadletContext), parentAlbum, temporaryImage).modify().apply {
+			webInterface.core.createImage(getCurrentSone(freenetRequest.toadletContext), parentAlbum, temporaryImage).modify().apply {
 				setWidth(bufferedImage.width)
 				setHeight(bufferedImage.height)
 				setTitle(title)
-				setDescription(TextFilter.filter(request.headers["Host"], request.parameters["description", 4000]))
+				setDescription(TextFilter.filter(freenetRequest.headers["Host"], freenetRequest.parameters["description", 4000]))
 			}.update()
 			throw RedirectException("imageBrowser.html?album=${parentAlbum.id}")
 		}

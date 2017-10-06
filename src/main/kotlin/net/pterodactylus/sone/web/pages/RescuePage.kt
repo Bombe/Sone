@@ -13,16 +13,16 @@ import net.pterodactylus.util.template.TemplateContext
 class RescuePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("rescue.html", template, "Page.Rescue.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		val soneRescuer = webInterface.core.getSoneRescuer(getCurrentSone(request.toadletContext)!!)
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		val soneRescuer = webInterface.core.getSoneRescuer(getCurrentSone(freenetRequest.toadletContext)!!)
 		templateContext["soneRescuer"] = soneRescuer
-		if (request.isPOST) {
-			request.parameters["edition", 9]?.toIntOrNull()?.also {
+		if (freenetRequest.isPOST) {
+			freenetRequest.parameters["edition", 9]?.toIntOrNull()?.also {
 				if (it > -1) {
 					soneRescuer.setEdition(it.toLong())
 				}
 			}
-			if (request.parameters["fetch", 8] == "true") {
+			if (freenetRequest.parameters["fetch", 8] == "true") {
 				soneRescuer.startNextFetch()
 			}
 			throw RedirectException("rescue.html")

@@ -13,12 +13,12 @@ import net.pterodactylus.util.template.TemplateContext
 class UnlockSonePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unlockSone.html", template, "Page.UnlockSone.Title", webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			request.parameters["sone", 44]
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			freenetRequest.parameters["sone", 44]
 					.let(webInterface.core::getLocalSone)
 					?.also(webInterface.core::unlockSone)
-			throw RedirectException(request.parameters["returnPage", 256])
+			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}
 

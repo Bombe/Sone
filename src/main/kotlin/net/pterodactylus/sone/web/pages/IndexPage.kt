@@ -15,8 +15,8 @@ import net.pterodactylus.util.template.TemplateContext
 class IndexPage(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter):
 		SoneTemplatePage("index.html", template, "Page.Index.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		getCurrentSone(request.toadletContext)!!.let { currentSone ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		getCurrentSone(freenetRequest.toadletContext)!!.let { currentSone ->
 			(currentSone.posts +
 					currentSone.friends
 							.map { webInterface.core.getSone(it) }
@@ -29,7 +29,7 @@ class IndexPage(template: Template, webInterface: WebInterface, private val post
 					.sortedByDescending { it.time }
 					.let { posts ->
 						Pagination(posts, webInterface.core.preferences.postsPerPage).apply {
-							page = request.parameters["page"]?.toIntOrNull() ?: 0
+							page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0
 						}.let { pagination ->
 							templateContext["pagination"] = pagination
 							templateContext["posts"] = pagination.items

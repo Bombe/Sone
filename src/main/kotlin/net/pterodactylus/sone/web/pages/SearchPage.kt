@@ -30,9 +30,9 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		val phrases = try {
-			request.parameters["query"].emptyToNull?.parse()
+			freenetRequest.parameters["query"].emptyToNull?.parse()
 		} catch (te: TextException) {
 			redirect("index.html")
 		}
@@ -53,13 +53,13 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 
 		val sonePagination = webInterface.core.sones
 				.scoreAndPaginate(phrases) { it.allText() }
-				.apply { page = request.parameters["sonePage"].emptyToNull?.toIntOrNull() ?: 0 }
+				.apply { page = freenetRequest.parameters["sonePage"].emptyToNull?.toIntOrNull() ?: 0 }
 		val postPagination = cache.get(phrases) {
 			webInterface.core.sones
 					.flatMap(Sone::getPosts)
 					.filter { Post.FUTURE_POSTS_FILTER.apply(it) }
 					.scoreAndPaginate(phrases) { it.allText() }
-		}.apply { page = request.parameters["postPage"].emptyToNull?.toIntOrNull() ?: 0 }
+		}.apply { page = freenetRequest.parameters["postPage"].emptyToNull?.toIntOrNull() ?: 0 }
 
 		templateContext["sonePagination"] = sonePagination
 		templateContext["soneHits"] = sonePagination.items

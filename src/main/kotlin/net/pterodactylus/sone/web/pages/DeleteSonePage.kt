@@ -14,10 +14,10 @@ import net.pterodactylus.util.template.TemplateContext
 class DeleteSonePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			if (request.httpRequest.isPartSet("deleteSone")) {
-				webInterface.core.deleteSone(getCurrentSone(request.toadletContext))
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			if (freenetRequest.httpRequest.isPartSet("deleteSone")) {
+				webInterface.core.deleteSone(getCurrentSone(freenetRequest.toadletContext))
 			}
 			throw RedirectException("index.html")
 		}

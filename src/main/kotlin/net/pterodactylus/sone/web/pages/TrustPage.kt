@@ -15,14 +15,14 @@ import net.pterodactylus.util.template.TemplateContext
 class TrustPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("trust.html", template, "Page.Trust.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			getCurrentSone(request.toadletContext)?.also { currentSone ->
-				webInterface.core.getSone(request.parameters["sone"]).let { sone ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			getCurrentSone(freenetRequest.toadletContext)?.also { currentSone ->
+				webInterface.core.getSone(freenetRequest.parameters["sone"]).let { sone ->
 					webInterface.core.trustSone(currentSone, sone)
 				}
 			}
-			throw RedirectException(request.parameters["returnPage", 256])
+			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}
 

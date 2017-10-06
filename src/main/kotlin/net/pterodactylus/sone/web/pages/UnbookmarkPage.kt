@@ -16,19 +16,19 @@ import net.pterodactylus.util.template.TemplateContext
 class UnbookmarkPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unbookmark.html", template, "Page.Unbookmark.Title", webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		when {
-			request.isGET && (request.parameters["post"] == "allNotLoaded") -> {
+			freenetRequest.isGET && (freenetRequest.parameters["post"] == "allNotLoaded") -> {
 				webInterface.core.bookmarkedPosts
 						.filterNot(Post::isLoaded)
 						.forEach(webInterface.core::unbookmarkPost)
 				throw RedirectException("bookmarks.html")
 			}
-			request.isPOST -> {
-				request.parameters["post", 36]
+			freenetRequest.isPOST -> {
+				freenetRequest.parameters["post", 36]
 						.let(webInterface.core::getPost)
 						.also(webInterface.core::unbookmarkPost)
-				throw RedirectException(request.parameters["returnPage", 256])
+				throw RedirectException(freenetRequest.parameters["returnPage", 256])
 			}
 		}
 	}

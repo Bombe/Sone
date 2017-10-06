@@ -12,8 +12,8 @@ import net.pterodactylus.util.template.TemplateContext
 class LogoutPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("logout.html", template, "Page.Logout.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		setCurrentSone(request.toadletContext, null)
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		setCurrentSone(freenetRequest.toadletContext, null)
 		throw RedirectException("index.html")
 	}
 

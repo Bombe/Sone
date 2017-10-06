@@ -14,24 +14,24 @@ import net.pterodactylus.util.template.TemplateContext
 class EditImagePage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("editImage.html", template, "Page.EditImage.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			val image = webInterface.core.getImage(request.httpRequest.getPartAsStringFailsafe("image", 36)) ?: throw RedirectException("invalid.html")
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			val image = webInterface.core.getImage(freenetRequest.httpRequest.getPartAsStringFailsafe("image", 36)) ?: throw RedirectException("invalid.html")
 			if (!image.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}
-			request.httpRequest.getPartAsStringFailsafe("returnPage", 256).let { returnPage ->
-				if (request.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {
+			freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256).let { returnPage ->
+				if (freenetRequest.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {
 					image.album.moveImageUp(image)
 					webInterface.core.touchConfiguration()
-				} else if (request.httpRequest.getPartAsStringFailsafe("moveRight", 4) == "true") {
+				} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("moveRight", 4) == "true") {
 					image.album.moveImageDown(image)
 					webInterface.core.touchConfiguration()
 				} else {
 					try {
 						image.modify()
-								.setTitle(request.httpRequest.getPartAsStringFailsafe("title", 100))
-								.setDescription(TextFilter.filter(request.httpRequest.getHeader("Host"), request.httpRequest.getPartAsStringFailsafe("description", 1024)))
+								.setTitle(freenetRequest.httpRequest.getPartAsStringFailsafe("title", 100))
+								.setDescription(TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), freenetRequest.httpRequest.getPartAsStringFailsafe("description", 1024)))
 								.update()
 						webInterface.core.touchConfiguration()
 					} catch (e: ImageTitleMustNotBeEmpty) {

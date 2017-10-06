@@ -16,15 +16,15 @@ import java.net.URI
 class ImageBrowserPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if ("album" in request.parameters) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if ("album" in freenetRequest.parameters) {
 			templateContext["albumRequested"] = true
-			templateContext["album"] = webInterface.core.getAlbum(request.parameters["album"]!!)
-			templateContext["page"] = request.parameters["page"]
-		} else if ("image" in request.parameters) {
+			templateContext["album"] = webInterface.core.getAlbum(freenetRequest.parameters["album"]!!)
+			templateContext["page"] = freenetRequest.parameters["page"]
+		} else if ("image" in freenetRequest.parameters) {
 			templateContext["imageRequested"] = true
-			templateContext["image"] = webInterface.core.getImage(request.parameters["image"])
-		} else if (request.parameters["mode"] == "gallery") {
+			templateContext["image"] = webInterface.core.getImage(freenetRequest.parameters["image"])
+		} else if (freenetRequest.parameters["mode"] == "gallery") {
 			templateContext["galleryRequested"] = true
 			webInterface.core.sones
 					.map(Sone::getRootAlbum)
@@ -33,14 +33,14 @@ class ImageBrowserPage(template: Template, webInterface: WebInterface):
 					.filterNot(Album::isEmpty)
 					.sortedBy(Album::getTitle)
 					.also { albums ->
-						Pagination(albums, webInterface.core.preferences.imagesPerPage).apply { page = request.parameters["page"]?.toIntOrNull() ?: 0 }.also { pagination ->
+						Pagination(albums, webInterface.core.preferences.imagesPerPage).apply { page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0 }.also { pagination ->
 							templateContext["albumPagination"] = pagination
 							templateContext["albums"] = pagination.items
 						}
 					}
 		} else {
 			templateContext["soneRequested"] = true
-			templateContext["sone"] = webInterface.core.getSone(request.httpRequest.getParam("sone")).orNull() ?: getCurrentSone(request.toadletContext)
+			templateContext["sone"] = webInterface.core.getSone(freenetRequest.httpRequest.getParam("sone")).orNull() ?: getCurrentSone(freenetRequest.toadletContext)
 		}
 	}
 

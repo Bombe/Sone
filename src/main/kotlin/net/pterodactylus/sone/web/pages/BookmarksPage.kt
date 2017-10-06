@@ -12,7 +12,7 @@ import net.pterodactylus.util.template.TemplateContext
  */
 class BookmarksPage(template: Template, webInterface: WebInterface): SoneTemplatePage("bookmarks.html", template, "Page.Bookmarks.Title", webInterface) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		webInterface.core.bookmarkedPosts.let { posts ->
 			val pagination = Pagination<Post>(posts.filter { it.isLoaded }.sortedByDescending { it.time }, webInterface.core.preferences.postsPerPage)
 			templateContext["pagination"] = pagination

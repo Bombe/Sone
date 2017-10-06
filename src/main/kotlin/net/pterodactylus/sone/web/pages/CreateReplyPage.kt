@@ -13,18 +13,18 @@ import net.pterodactylus.util.template.TemplateContext
 class CreateReplyPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("createReply.html", template, "Page.CreateReply.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		val postId = request.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }
-		val text = request.httpRequest.getPartAsStringFailsafe("text", 65536).trim().apply { templateContext["text"] = this }
-		val returnPage = request.httpRequest.getPartAsStringFailsafe("returnPage", 256).apply { templateContext["returnPage"] = this }
-		if (request.isPOST) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		val postId = freenetRequest.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }
+		val text = freenetRequest.httpRequest.getPartAsStringFailsafe("text", 65536).trim().apply { templateContext["text"] = this }
+		val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256).apply { templateContext["returnPage"] = this }
+		if (freenetRequest.isPOST) {
 			if (text == "") {
 				templateContext["errorTextEmpty"] = true
 				return
 			}
 			val post = webInterface.core.getPost(postId).orNull() ?: throw RedirectException("noPermission.html")
-			val sender = webInterface.core.getLocalSone(request.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: getCurrentSone(request.toadletContext)
-			webInterface.core.createReply(sender, post, TextFilter.filter(request.httpRequest.getHeader("Host"), text))
+			val sender = webInterface.core.getLocalSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: getCurrentSone(freenetRequest.toadletContext)
+			webInterface.core.createReply(sender, post, TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), text))
 			throw RedirectException(returnPage)
 		}
 	}

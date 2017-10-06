@@ -13,16 +13,16 @@ import net.pterodactylus.util.template.TemplateContext
 class LikePage(template: Template, webInterface: WebInterface)
 	: SoneTemplatePage("like.html", template, "Page.Like.Title", webInterface, true) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
-		if (request.isPOST) {
-			getCurrentSone(request.toadletContext)!!.let { currentSone ->
-				request.parameters["type", 16]?.also { type ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		if (freenetRequest.isPOST) {
+			getCurrentSone(freenetRequest.toadletContext)!!.let { currentSone ->
+				freenetRequest.parameters["type", 16]?.also { type ->
 					when(type) {
-						"post" -> currentSone.addLikedPostId(request.parameters["post", 36]!!)
-						"reply" -> currentSone.addLikedReplyId(request.parameters["reply", 36]!!)
+						"post" -> currentSone.addLikedPostId(freenetRequest.parameters["post", 36]!!)
+						"reply" -> currentSone.addLikedReplyId(freenetRequest.parameters["reply", 36]!!)
 					}
 				}
-				throw RedirectException(request.parameters["returnPage", 256]!!)
+				throw RedirectException(freenetRequest.parameters["returnPage", 256]!!)
 			}
 		}
 	}

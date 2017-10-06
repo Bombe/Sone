@@ -16,7 +16,7 @@ class AboutPage(template: Template, webInterface: WebInterface,
 		private val pluginYear: PluginYear,
 		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", template, "Page.About.Title", webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["version"] = pluginVersion.version
 		templateContext["year"] = pluginYear.year
 		templateContext["homepage"] = pluginHomepage.homepage

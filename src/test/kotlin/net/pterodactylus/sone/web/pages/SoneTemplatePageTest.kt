@@ -145,7 +145,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	fun `handleRequest method is called`() {
 		var called = false
 		val page = object : SoneTemplatePage("path.html", template, webInterface, true) {
-			override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+			override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 				called = true
 			}
 		}

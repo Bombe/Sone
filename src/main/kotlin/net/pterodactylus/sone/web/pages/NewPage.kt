@@ -15,14 +15,14 @@ import net.pterodactylus.util.template.TemplateContext
 class NewPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("new.html", template, "Page.New.Title", webInterface, false) {
 
-	override fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) =
-			getCurrentSone(request.toadletContext).let { currentSone ->
+	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) =
+			getCurrentSone(freenetRequest.toadletContext).let { currentSone ->
 				(webInterface.getNewPosts(currentSone) + webInterface.getNewReplies(currentSone).mapPresent { it.post })
 						.distinct()
 						.sortedByDescending { it.time }
 						.let { posts ->
 							Pagination(posts, webInterface.core.preferences.postsPerPage).apply {
-								page = request.parameters["page"]?.toIntOrNull() ?: 0
+								page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0
 							}.let { pagination ->
 								templateContext["pagination"] = pagination
 								templateContext["posts"] = pagination.items

@@ -42,7 +42,7 @@ open class SoneTemplatePage(
 
 	fun requiresLogin() = requiresLogin
 
-	override public fun getPageTitle(request: FreenetRequest) =
+	override public fun getPageTitle(freenetRequest: FreenetRequest) =
 			pageTitleKey?.let(webInterface.l10n::getString) ?: ""
 
 	override public fun getStyleSheets() =
@@ -76,16 +76,16 @@ open class SoneTemplatePage(
 		handleRequest(freenetRequest, templateContext)
 	}
 
-	internal open fun handleRequest(request: FreenetRequest, templateContext: TemplateContext) {
+	internal open fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 	}
 
-	override public fun getRedirectTarget(request: FreenetRequest): String? {
-		if (requiresLogin && getCurrentSone(request.toadletContext) == null) {
-			val parameters = request.httpRequest.parameterNames
-					.flatMap { name -> request.httpRequest.getMultipleParam(name).map { name to it } }
+	override public fun getRedirectTarget(freenetRequest: FreenetRequest): String? {
+		if (requiresLogin && getCurrentSone(freenetRequest.toadletContext) == null) {
+			val parameters = freenetRequest.httpRequest.parameterNames
+					.flatMap { name -> freenetRequest.httpRequest.getMultipleParam(name).map { name to it } }
 					.joinToString("&") { "${it.first.urlEncode}=${it.second.urlEncode}" }
 					.emptyToNull
-			return "login.html?target=${request.httpRequest.path}${parameters?.let { ("?" + it).urlEncode } ?: ""}"
+			return "login.html?target=${freenetRequest.httpRequest.path}${parameters?.let { ("?" + it).urlEncode } ?: ""}"
 		}
 		return null
 	}
