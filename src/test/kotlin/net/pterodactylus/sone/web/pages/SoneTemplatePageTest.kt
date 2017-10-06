@@ -68,7 +68,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `preferences are set in template context`() {
-	    verifyVariableIsSet("preferences", preferences)
+		verifyVariableIsSet("preferences", preferences)
 	}
 
 	@Test
