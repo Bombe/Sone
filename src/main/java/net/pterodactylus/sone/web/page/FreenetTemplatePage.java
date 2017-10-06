@@ -119,7 +119,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(FreenetRequest request, Response response) throws IOException {
+	public final Response handleRequest(FreenetRequest request, Response response) throws IOException {
 		String redirectTarget = getRedirectTarget(request);
 		if (redirectTarget != null) {
 			return new RedirectResponse(redirectTarget);

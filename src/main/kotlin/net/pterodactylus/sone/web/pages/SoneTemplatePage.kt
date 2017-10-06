@@ -58,7 +58,7 @@ open class SoneTemplatePage(
 					"href" to "http://${request.httpRequest.getHeader("host")}/Sone/OpenSearch.xml"
 			))
 
-	override public fun processTemplate(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	final override public fun processTemplate(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		super.processTemplate(freenetRequest, templateContext)
 		templateContext["preferences"] = core.preferences
 		templateContext["currentSone"] = getCurrentSone(freenetRequest.toadletContext)
