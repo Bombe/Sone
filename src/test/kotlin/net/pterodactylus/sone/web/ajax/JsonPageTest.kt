@@ -20,7 +20,7 @@ abstract class JsonPageTest(
 		page.createJsonObject(freenetRequest)
 	}
 
-	private val JsonReturnObject.error get() = if (this is JsonErrorReturnObject) this.error else null
+	private val JsonReturnObject.error get() = (this as? JsonErrorReturnObject)?.error
 
 	protected fun assertThatJsonIsSuccessful() {
 		assertThat(json.isSuccess, equalTo(true))
