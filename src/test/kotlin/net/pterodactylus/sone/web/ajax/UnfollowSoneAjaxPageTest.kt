@@ -13,22 +13,20 @@ class UnfollowSoneAjaxPageTest : JsonPageTest("unfollowSone.ajax", pageSupplier 
 
 	@Test
 	fun `request without sone returns invalid-sone-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with invalid sone returns invalid-sone-id`() {
 		addRequestParameter("sone", "invalid")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with valid sone unfollows sone`() {
 		addSone(mock(), "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).unfollowSone(currentSone, "sone-id")
 	}
 

@@ -14,15 +14,13 @@ class UnlockSoneAjaxPageTest : JsonPageTest("unlockSone.ajax", requiresLogin = f
 
 	@Test
 	fun `request without sone results in invalid-sone-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with invalid sone results in invalid-sone-id`() {
 		addRequestParameter("sone", "invalid")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
@@ -30,7 +28,7 @@ class UnlockSoneAjaxPageTest : JsonPageTest("unlockSone.ajax", requiresLogin = f
 		val sone = mock<Sone>()
 		addLocalSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).unlockSone(sone)
 	}
 

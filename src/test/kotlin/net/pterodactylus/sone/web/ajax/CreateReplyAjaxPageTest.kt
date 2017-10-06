@@ -16,8 +16,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 
 	@Test
 	fun `invalid post ID results in error message`() {
-	    assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
@@ -27,7 +26,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		val reply = mock<PostReply>().apply { whenever(id).thenReturn("reply-id") }
 		whenever(core.createReply(currentSone, post, "")).thenReturn(reply)
 	    addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
 		assertThat(json["sone"]?.asText(), equalTo("soneId"))
 	}
@@ -41,7 +40,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		addRequestParameter("post", "post-id")
 		addRequestParameter("text", "Text with http://127.0.0.1:8888/KSK@foo.bar link")
 		addRequestHeader("Host", "127.0.0.1:8888")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
 		assertThat(json["sone"]?.asText(), equalTo("soneId"))
 	}
@@ -57,7 +56,7 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		addRequestParameter("post", "post-id")
 		addRequestParameter("text", "Text")
 		addRequestParameter("sender", "local-sone")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
 		assertThat(json["sone"]?.asText(), equalTo("local-sone"))
 	}

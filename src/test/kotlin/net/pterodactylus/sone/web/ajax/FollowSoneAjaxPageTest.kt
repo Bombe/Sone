@@ -15,15 +15,14 @@ class FollowSoneAjaxPageTest : JsonPageTest("followSone.ajax", pageSupplier = ::
 
 	@Test
 	fun `request without sone id results in invalid-sone-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with sone follows sone`() {
 		addSone(mock<Sone>().apply { whenever(id).thenReturn("sone-id") })
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).followSone(currentSone, "sone-id")
 	}
 
@@ -32,7 +31,7 @@ class FollowSoneAjaxPageTest : JsonPageTest("followSone.ajax", pageSupplier = ::
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).markSoneKnown(sone)
 	}
 

@@ -54,7 +54,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 
 	@Test
 	fun `request without any parameters responds with empty post and reply times`() {
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postTimes"]?.toList(), emptyIterable())
 		assertThat(json["replyTimes"]?.toList(), emptyIterable())
 	}
@@ -63,7 +63,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 	fun `request with single post parameter responds with post times and empty reply times`() {
 		addPost(testPosts[0])
 		addRequestParameter("posts", "post1")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postTimes"]!!.fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
 				"post1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01")
 		))
@@ -74,7 +74,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 	fun `request with single reply parameter responds with reply times and empty post times`() {
 		addReply(testReplies[0])
 		addRequestParameter("replies", "reply1")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postTimes"]?.toList(), emptyIterable())
 		assertThat(json["replyTimes"]!!.fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
 				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01")
@@ -86,7 +86,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 		addPost(testPosts[0])
 		addPost(testPosts[1])
 		addRequestParameter("posts", "post1,post2,post3")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postTimes"]!!.fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
 				"post1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01"),
 				"post2" to jsonObject("timeText" to "2000", "refreshTime" to 4L, "tooltip" to "Jan 1, 1970, 00:00:02")
@@ -99,7 +99,7 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 		addReply(testReplies[0])
 		addReply(testReplies[1])
 		addRequestParameter("replies", "reply1,reply2,reply3")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postTimes"]?.toList(), emptyIterable())
 		assertThat(json["replyTimes"]!!.fields().asSequence().map { it.key to it.value }.toList(), containsInAnyOrder<Pair<String, JsonNode>>(
 				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01"),

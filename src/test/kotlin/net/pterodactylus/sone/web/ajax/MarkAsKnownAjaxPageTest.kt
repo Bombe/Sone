@@ -19,15 +19,14 @@ class MarkAsKnownAjaxPageTest : JsonPageTest("markAsKnown.ajax", requiresLogin =
 
 	@Test
 	fun `request without type results in invalid-type`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-type"))
+		assertThatJsonFailed("invalid-type")
 	}
 
 	@Test
 	fun `request with unknown sone returns successfully`() {
 		addRequestParameter("type", "sone")
 		addRequestParameter("id", "invalid")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core, never()).markSoneKnown(any())
 	}
 
@@ -39,7 +38,7 @@ class MarkAsKnownAjaxPageTest : JsonPageTest("markAsKnown.ajax", requiresLogin =
 		val sone2 = mock<Sone>().apply { whenever(id).thenReturn("sone-id2") }
 		addSone(sone1)
 		addSone(sone2)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).markSoneKnown(sone1)
 		verify(core).markSoneKnown(sone2)
 	}
@@ -52,7 +51,7 @@ class MarkAsKnownAjaxPageTest : JsonPageTest("markAsKnown.ajax", requiresLogin =
 		val post2 = mock<Post>()
 		addPost(post1, "post1")
 		addPost(post2, "post2")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).markPostKnown(post1)
 		verify(core).markPostKnown(post2)
 	}
@@ -65,7 +64,7 @@ class MarkAsKnownAjaxPageTest : JsonPageTest("markAsKnown.ajax", requiresLogin =
 		val reply2 = mock<PostReply>()
 		addReply(reply1, "reply1")
 		addReply(reply2, "reply2")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).markReplyKnown(reply1)
 		verify(core).markReplyKnown(reply2)
 	}

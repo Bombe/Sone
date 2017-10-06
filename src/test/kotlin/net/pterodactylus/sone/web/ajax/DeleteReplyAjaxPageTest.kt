@@ -16,8 +16,7 @@ class DeleteReplyAjaxPageTest : JsonPageTest("deleteReply.ajax", pageSupplier = 
 
 	@Test
 	fun `request with missing reply results in invalid id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-reply-id"))
+		assertThatJsonFailed("invalid-reply-id")
 	}
 
 	@Test
@@ -27,8 +26,7 @@ class DeleteReplyAjaxPageTest : JsonPageTest("deleteReply.ajax", pageSupplier = 
 		whenever(reply.sone).thenReturn(sone)
 		addReply(reply, "reply-id")
 		addRequestParameter("reply", "reply-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-authorized"))
+		assertThatJsonFailed("not-authorized")
 	}
 
 	@Test
@@ -39,7 +37,7 @@ class DeleteReplyAjaxPageTest : JsonPageTest("deleteReply.ajax", pageSupplier = 
 		whenever(reply.sone).thenReturn(sone)
 		addReply(reply, "reply-id")
 		addRequestParameter("reply", "reply-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).deleteReply(reply)
 	}
 

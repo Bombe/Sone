@@ -29,8 +29,7 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 
 	@Test
 	fun `request without image results in invalid-image-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-image-id"))
+		assertThatJsonFailed("invalid-image-id")
 	}
 
 	@Test
@@ -40,8 +39,7 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		whenever(image.sone).thenReturn(sone)
 		addImage(image, "image-id")
 		addRequestParameter("image", "image-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-authorized"))
+		assertThatJsonFailed("not-authorized")
 	}
 
 	@Test
@@ -56,7 +54,7 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		addImage(image)
 		addRequestParameter("image", "image-id")
 		addRequestParameter("moveLeft", "true")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["sourceImageId"]?.asText(), equalTo("image-id"))
 		assertThat(json["destinationImageId"]?.asText(), equalTo("swapped"))
 		verify(core).touchConfiguration()
@@ -74,7 +72,7 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		addImage(image)
 		addRequestParameter("image", "image-id")
 		addRequestParameter("moveRight", "true")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["sourceImageId"]?.asText(), equalTo("image-id"))
 		assertThat(json["destinationImageId"]?.asText(), equalTo("swapped"))
 		verify(core).touchConfiguration()
@@ -87,8 +85,7 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		whenever(image.sone).thenReturn(sone)
 		addImage(image)
 		addRequestParameter("image", "image-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-image-title"))
+		assertThatJsonFailed("invalid-image-title")
 	}
 
 	@Test
@@ -106,7 +103,7 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		addRequestParameter("title", "some title")
 		addRequestParameter("description", "some http://127.0.0.1:8888/KSK@foo link")
 		addRequestHeader("Host", "127.0.0.1:8888")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["title"]?.asText(), equalTo("some title"))
 		assertThat(json["description"]?.asText(), equalTo("some KSK@foo link"))
 		assertThat(json["parsedDescription"]?.asText(), equalTo("rendered description"))

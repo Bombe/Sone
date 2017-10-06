@@ -15,21 +15,19 @@ class BookmarkAjaxPageTest : JsonPageTest("bookmark.ajax", requiresLogin = false
 
 	@Test
 	fun `missing post ID results in invalid id response`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
 	fun `empty post ID results in invalid id response`() {
 		addRequestParameter("post", "")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
 	fun `invalid post ID results in success but does not bookmark anything`() {
 		addRequestParameter("post", "missing")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core, never()).bookmarkPost(any<Post>())
 	}
 
@@ -37,7 +35,7 @@ class BookmarkAjaxPageTest : JsonPageTest("bookmark.ajax", requiresLogin = false
 	fun `valid post ID results in success and bookmarks the post`() {
 		addRequestParameter("post", "valid-post-id")
 		val post = addNewPost("valid-post-id", "1", 2)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).bookmarkPost(post)
 	}
 

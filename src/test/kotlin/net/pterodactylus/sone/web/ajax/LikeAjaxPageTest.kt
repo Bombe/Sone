@@ -19,8 +19,7 @@ class LikeAjaxPageTest : JsonPageTest("like.ajax", pageSupplier = ::LikeAjaxPage
 	fun `request with invalid type results in invalid-type error`() {
 		addRequestParameter("type", "invalid")
 		addRequestParameter("invalid", "invalid-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-type"))
+		assertThatJsonFailed("invalid-type")
 	}
 
 	@Test
@@ -28,7 +27,7 @@ class LikeAjaxPageTest : JsonPageTest("like.ajax", pageSupplier = ::LikeAjaxPage
 		addRequestParameter("type", "post")
 		addRequestParameter("post", "post-id")
 		addPost(mock<Post>().apply { whenever(id).thenReturn("post-id") })
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(currentSone).addLikedPostId("post-id")
 		verify(core).touchConfiguration()
 	}
@@ -38,7 +37,7 @@ class LikeAjaxPageTest : JsonPageTest("like.ajax", pageSupplier = ::LikeAjaxPage
 		addRequestParameter("type", "reply")
 		addRequestParameter("reply", "reply-id")
 		addReply(mock<PostReply>().apply { whenever(id).thenReturn("reply-id") })
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(currentSone).addLikedReplyId("reply-id")
 		verify(core).touchConfiguration()
 	}

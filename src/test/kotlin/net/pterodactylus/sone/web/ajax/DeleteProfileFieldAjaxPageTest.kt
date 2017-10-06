@@ -13,8 +13,7 @@ class DeleteProfileFieldAjaxPageTest : JsonPageTest("deleteProfileField.ajax", p
 
 	@Test
 	fun `request without field id results in invalid field id error`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-field-id"))
+		assertThatJsonFailed("invalid-field-id")
 	}
 
 	@Test
@@ -22,7 +21,7 @@ class DeleteProfileFieldAjaxPageTest : JsonPageTest("deleteProfileField.ajax", p
 		profile.addField("foo")
 		val fieldId = profile.getFieldByName("foo")!!.id
 		addRequestParameter("field", fieldId)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(profile.getFieldByName("foo"), nullValue())
 		verify(currentSone).profile = profile
 		verify(core).touchConfiguration()

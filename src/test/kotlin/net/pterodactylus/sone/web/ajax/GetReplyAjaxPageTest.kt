@@ -20,8 +20,7 @@ class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = f
 
 	@Test
 	fun `request without reply id results in invalid-reply-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-reply-id"))
+		assertThatJsonFailed("invalid-reply-id")
 	}
 
 	@Test
@@ -37,7 +36,7 @@ class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = f
 		webInterface.templateContextFactory.addAccessor(Any::class.java, ReflectionAccessor())
 		addReply(reply)
 		addRequestParameter("reply", "reply-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["reply"]!!["id"].asText(), equalTo("reply-id"))
 		assertThat(json["reply"]!!["soneId"].asText(), equalTo("sone-id"))
 		assertThat(json["reply"]!!["postId"].asText(), equalTo("post-id"))

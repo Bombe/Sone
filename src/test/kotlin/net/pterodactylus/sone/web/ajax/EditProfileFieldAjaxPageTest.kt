@@ -12,8 +12,7 @@ class EditProfileFieldAjaxPageTest : JsonPageTest("editProfileField.ajax", pageS
 
 	@Test
 	fun `request without field id results in invalid-field-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-field-id"))
+		assertThatJsonFailed("invalid-field-id")
 	}
 
 	@Test
@@ -21,8 +20,7 @@ class EditProfileFieldAjaxPageTest : JsonPageTest("editProfileField.ajax", pageS
 		val field = currentSone.profile.addField("test-field")
 		addRequestParameter("field", field.id)
 		addRequestParameter("name", "  \t ")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-parameter-name"))
+		assertThatJsonFailed("invalid-parameter-name")
 	}
 
 	@Test
@@ -31,8 +29,7 @@ class EditProfileFieldAjaxPageTest : JsonPageTest("editProfileField.ajax", pageS
 		val field = currentSone.profile.addField("test-field")
 		addRequestParameter("field", field.id)
 		addRequestParameter("name", "other-field")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("duplicate-field-name"))
+		assertThatJsonFailed("duplicate-field-name")
 	}
 
 	@Test
@@ -41,7 +38,7 @@ class EditProfileFieldAjaxPageTest : JsonPageTest("editProfileField.ajax", pageS
 		val field = profile.addField("test-field")
 		addRequestParameter("field", field.id)
 		addRequestParameter("name", "  new name ")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(field.name, equalTo("new name"))
 		verify(currentSone).profile = profile
 	}

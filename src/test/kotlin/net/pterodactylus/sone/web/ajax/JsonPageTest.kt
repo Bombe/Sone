@@ -13,14 +13,23 @@ abstract class JsonPageTest(
 		private val expectedPath: String,
 		private val requiresLogin: Boolean = true,
 		private val needsFormPassword: Boolean = true,
-		pageSupplier: (WebInterface) -> JsonPage = { mock() }): TestObjects() {
+		pageSupplier: (WebInterface) -> JsonPage = { mock() }) : TestObjects() {
 
 	protected open val page: JsonPage by lazy { pageSupplier(webInterface) }
 	protected val json by lazy {
 		page.createJsonObject(freenetRequest)
 	}
 
-	protected val JsonReturnObject.error get() = if (this is JsonErrorReturnObject) this.error else null
+	private val JsonReturnObject.error get() = if (this is JsonErrorReturnObject) this.error else null
+
+	protected fun assertThatJsonIsSuccessful() {
+		assertThat(json.isSuccess, equalTo(true))
+	}
+
+	protected fun assertThatJsonFailed(error: String? = null) {
+		assertThat(json.isSuccess, equalTo(false))
+		error?.run { assertThat(json.error, equalTo(this)) }
+	}
 
 	@Test
 	fun `page returns correct path`() {

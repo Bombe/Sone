@@ -18,23 +18,21 @@ class UnlikeAjaxPageTest : JsonPageTest("unlike.ajax", pageSupplier = ::UnlikeAj
 	@Test
 	fun `request for post without id results in invalid-post-id`() {
 		addRequestParameter("type", "post")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
 	fun `request for invalid type results in invalid-type`() {
 		addRequestParameter("type", "invalid")
 		addRequestParameter("invalid", "invalid")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-type"))
+		assertThatJsonFailed("invalid-type")
 	}
 
 	@Test
 	fun `request for post with id removes id from liked posts`() {
 		addRequestParameter("type", "post")
 		addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(currentSone).removeLikedPostId("post-id")
 		verify(core).touchConfiguration()
 	}
@@ -42,15 +40,14 @@ class UnlikeAjaxPageTest : JsonPageTest("unlike.ajax", pageSupplier = ::UnlikeAj
 	@Test
 	fun `request for reply without id results in invalid-reply-id`() {
 		addRequestParameter("type", "reply")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-reply-id"))
+		assertThatJsonFailed("invalid-reply-id")
 	}
 
 	@Test
 	fun `request for reply with id removes id from liked replys`() {
 		addRequestParameter("type", "reply")
 		addRequestParameter("reply", "reply-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(currentSone).removeLikedReplyId("reply-id")
 		verify(core).touchConfiguration()
 	}

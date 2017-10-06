@@ -25,15 +25,13 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 	fun `request with invalid post id results in invalid-post-id`() {
 		addRequestParameter("type", "post")
 		addRequestParameter("post", "invalid")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
 	fun `request with missing post id results in invalid-post-id`() {
 		addRequestParameter("type", "post")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
@@ -43,7 +41,7 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 		addLikes(post, createSone(2), createSone(1), createSone(3))
 		addRequestParameter("type", "post")
 		addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["likes"]?.asInt(), equalTo(3))
 		assertThat(json["sones"]!!.toList().map { it["id"].asText() to it["name"].asText() }, contains(
 				"S1" to "F1 M1 L1",
@@ -56,15 +54,13 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 	fun `request with invalid reply id results in invalid-reply-id`() {
 		addRequestParameter("type", "reply")
 		addRequestParameter("reply", "invalid")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-reply-id"))
+		assertThatJsonFailed("invalid-reply-id")
 	}
 
 	@Test
 	fun `request with missing reply id results in invalid-reply-id`() {
 		addRequestParameter("type", "reply")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-reply-id"))
+		assertThatJsonFailed("invalid-reply-id")
 	}
 
 	@Test
@@ -74,7 +70,7 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 		addLikes(reply, createSone(2), createSone(1), createSone(3))
 		addRequestParameter("type", "reply")
 		addRequestParameter("reply", "reply-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["likes"]?.asInt(), equalTo(3))
 		assertThat(json["sones"]!!.toList().map { it["id"].asText() to it["name"].asText() }, contains(
 				"S1" to "F1 M1 L1",
@@ -87,8 +83,7 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 	fun `request with invalid type results in invalid-type`() {
 		addRequestParameter("type", "invalid")
 		addRequestParameter("invalid", "foo")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-type"))
+		assertThatJsonFailed("invalid-type")
 	}
 
 }

@@ -12,16 +12,14 @@ class MoveProfileFieldAjaxPageTest : JsonPageTest("moveProfileField.ajax", true,
 
 	@Test
 	fun `request without field id results in invalid-field-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-field-id"))
+		assertThatJsonFailed("invalid-field-id")
 	}
 
 	@Test
 	fun `request with invalid direction results in invalid-direction`() {
 		val fieldId = profile.addField("someField").id
 		addRequestParameter("field", fieldId)
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-direction"))
+		assertThatJsonFailed("invalid-direction")
 	}
 
 	@Test
@@ -29,8 +27,7 @@ class MoveProfileFieldAjaxPageTest : JsonPageTest("moveProfileField.ajax", true,
 		val fieldId = profile.addField("someField").id
 		addRequestParameter("field", fieldId)
 		addRequestParameter("direction", "up")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-possible"))
+		assertThatJsonFailed("not-possible")
 	}
 
 	@Test
@@ -38,8 +35,7 @@ class MoveProfileFieldAjaxPageTest : JsonPageTest("moveProfileField.ajax", true,
 		val fieldId = profile.addField("someField").id
 		addRequestParameter("field", fieldId)
 		addRequestParameter("direction", "down")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-possible"))
+		assertThatJsonFailed("not-possible")
 	}
 
 	@Test
@@ -48,7 +44,7 @@ class MoveProfileFieldAjaxPageTest : JsonPageTest("moveProfileField.ajax", true,
 		val fieldId = profile.addField("someField").id
 		addRequestParameter("field", fieldId)
 		addRequestParameter("direction", "up")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(profile.fields[0].id, equalTo(fieldId))
 		verify(core).touchConfiguration()
 		verify(currentSone).profile = profile
@@ -60,7 +56,7 @@ class MoveProfileFieldAjaxPageTest : JsonPageTest("moveProfileField.ajax", true,
 		profile.addField("firstField")
 		addRequestParameter("field", fieldId)
 		addRequestParameter("direction", "down")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(profile.fields.last().id, equalTo(fieldId))
 		verify(core).touchConfiguration()
 		verify(currentSone).profile = profile

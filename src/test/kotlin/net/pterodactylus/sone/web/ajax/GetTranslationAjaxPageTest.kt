@@ -13,7 +13,7 @@ class GetTranslationAjaxPageTest : JsonPageTest("getTranslation.ajax", requiresL
 	fun `translation is returned correctly`() {
 		addTranslation("foo", "bar")
 		addRequestParameter("key", "foo")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["value"]?.asText(), equalTo("bar"))
 	}
 

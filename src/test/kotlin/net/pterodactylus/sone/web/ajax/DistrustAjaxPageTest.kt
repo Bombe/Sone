@@ -14,15 +14,13 @@ class DistrustAjaxPageTest : JsonPageTest("distrustSone.ajax", pageSupplier = ::
 
 	@Test
 	fun `request with missing sone results in invalid-sone-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with invalid sone results in invalid-sone-id`() {
 		addRequestParameter("sone", "invalid-sone")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
@@ -30,7 +28,7 @@ class DistrustAjaxPageTest : JsonPageTest("distrustSone.ajax", pageSupplier = ::
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).distrustSone(currentSone, sone)
 	}
 
@@ -40,7 +38,7 @@ class DistrustAjaxPageTest : JsonPageTest("distrustSone.ajax", pageSupplier = ::
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["trustValue"]?.asInt(), equalTo(-33))
 	}
 

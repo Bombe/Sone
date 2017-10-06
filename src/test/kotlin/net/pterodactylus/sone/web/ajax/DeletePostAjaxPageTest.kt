@@ -16,8 +16,7 @@ class DeletePostAjaxPageTest : JsonPageTest("deletePost.ajax", pageSupplier = ::
 
 	@Test
 	fun `missing post ID results in invalid id response`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
@@ -27,8 +26,7 @@ class DeletePostAjaxPageTest : JsonPageTest("deletePost.ajax", pageSupplier = ::
 		whenever(post.sone).thenReturn(sone)
 		addPost(post, "post-id")
 		addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-authorized"))
+		assertThatJsonFailed("not-authorized")
 	}
 
 	@Test
@@ -38,7 +36,7 @@ class DeletePostAjaxPageTest : JsonPageTest("deletePost.ajax", pageSupplier = ::
 		whenever(post.sone).thenReturn(sone)
 		addPost(post, "post-id")
 		addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).deletePost(post)
 	}
 

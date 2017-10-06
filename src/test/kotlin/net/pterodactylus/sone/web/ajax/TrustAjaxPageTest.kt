@@ -16,15 +16,14 @@ class TrustAjaxPageTest : JsonPageTest("trustSone.ajax", requiresLogin = true, n
 
 	@Test
 	fun `request with invalid sone results in invalid-sone-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with valid sone trust sone`() {
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).trustSone(currentSone, sone)
 	}
 
@@ -33,7 +32,7 @@ class TrustAjaxPageTest : JsonPageTest("trustSone.ajax", requiresLogin = true, n
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
 		core.preferences.positiveTrust = 31
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["trustValue"]?.asInt(), equalTo(31))
 	}
 

@@ -17,15 +17,13 @@ class UnbookmarkAjaxPageTest : JsonPageTest("unbookmark.ajax", requiresLogin = f
 
 	@Test
 	fun `request without post id results in invalid-post-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
 	fun `request with empty post id results in invalid-post-id`() {
 		addRequestParameter("post", "")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
@@ -40,7 +38,7 @@ class UnbookmarkAjaxPageTest : JsonPageTest("unbookmark.ajax", requiresLogin = f
 		val post = mock<Post>()
 		addPost(post, "post-id")
 		addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).unbookmarkPost(eq(post))
 	}
 

@@ -15,15 +15,13 @@ class UntrustAjaxPageTest : JsonPageTest("untrustSone.ajax", pageSupplier = ::Un
 
 	@Test
 	fun `request without sone results in invalid-sone-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
 	fun `request with invalid sone results in invalid-sone-id`() {
 		addRequestParameter("sone", "invalid")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-sone-id"))
+		assertThatJsonFailed("invalid-sone-id")
 	}
 
 	@Test
@@ -31,7 +29,7 @@ class UntrustAjaxPageTest : JsonPageTest("untrustSone.ajax", pageSupplier = ::Un
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(core).untrustSone(currentSone, sone)
 	}
 
@@ -40,7 +38,7 @@ class UntrustAjaxPageTest : JsonPageTest("untrustSone.ajax", pageSupplier = ::Un
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["trustValue"], nullValue())
 	}
 

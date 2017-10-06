@@ -18,22 +18,19 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 
 	@Test
 	fun `missing text parameter returns error`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("text-required"))
+		assertThatJsonFailed("text-required")
 	}
 
 	@Test
 	fun `empty text returns error`() {
 		addRequestParameter("text", "")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("text-required"))
+		assertThatJsonFailed("text-required")
 	}
 
 	@Test
 	fun `whitespace-only text returns error`() {
 		addRequestParameter("text", "  ")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("text-required"))
+		assertThatJsonFailed("text-required")
 	}
 
 	@Test
@@ -41,7 +38,7 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		addRequestParameter("text", "test")
 		val post = createPost()
 		whenever(core.createPost(currentSone, Optional.absent(), "test")).thenReturn(post)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postId"]?.asText(), equalTo("id"))
 		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"], nullValue())
@@ -53,7 +50,7 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		addRequestParameter("recipient", "invalid")
 		val post = createPost()
 		whenever(core.createPost(currentSone, Optional.absent(), "test")).thenReturn(post)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postId"]?.asText(), equalTo("id"))
 		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"], nullValue())
@@ -67,7 +64,7 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		addSone(recipient)
 		val post = createPost("valid")
 		whenever(core.createPost(currentSone, Optional.of(recipient), "test")).thenReturn(post)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postId"]?.asText(), equalTo("id"))
 		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"]?.asText(), equalTo("valid"))
@@ -79,7 +76,7 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 		addRequestHeader("Host", "freenet.test:8888")
 		val post = createPost()
 		whenever(core.createPost(currentSone, Optional.absent(), "Link KSK@foo is filtered")).thenReturn(post)
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["postId"]?.asText(), equalTo("id"))
 		assertThat(json["sone"]?.asText(), equalTo(currentSone.id))
 		assertThat(json["recipient"], nullValue())

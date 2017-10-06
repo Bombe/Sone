@@ -21,8 +21,7 @@ class GetPostAjaxPageTest : JsonPageTest("getPost.ajax", needsFormPassword = fal
 
 	@Test
 	fun `request with missing post results in invalid-post-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-post-id"))
+		assertThatJsonFailed("invalid-post-id")
 	}
 
 	@Test
@@ -38,7 +37,7 @@ class GetPostAjaxPageTest : JsonPageTest("getPost.ajax", needsFormPassword = fal
 		webInterface.templateContextFactory.addAccessor(Any::class.java, ReflectionAccessor())
 		addPost(post)
 		addRequestParameter("post", "post-id")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["post"]!!["id"].asText(), equalTo("post-id"))
 		assertThat(json["post"]!!["time"].asLong(), equalTo(1000L))
 		assertThat(json["post"]!!["sone"].asText(), equalTo("sone-id"))

@@ -22,8 +22,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 
 	@Test
 	fun `request without album results in invalid-album-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-album-id"))
+		assertThatJsonFailed("invalid-album-id")
 	}
 
 	@Test
@@ -31,8 +30,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		whenever(album.sone).thenReturn(sone)
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-authorized"))
+		assertThatJsonFailed("not-authorized")
 	}
 
 	@Test
@@ -45,7 +43,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
 		addRequestParameter("moveLeft", "true")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["sourceAlbumId"]?.asText(), equalTo("album-id"))
 		assertThat(json["destinationAlbumId"]?.asText(), equalTo("swapped"))
 	}
@@ -60,7 +58,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
 		addRequestParameter("moveRight", "true")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["sourceAlbumId"]?.asText(), equalTo("album-id"))
 		assertThat(json["destinationAlbumId"]?.asText(), equalTo("swapped"))
 	}
@@ -72,8 +70,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		whenever(album.modify().setTitle("")).thenThrow(AlbumTitleMustNotBeEmpty::class.java)
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-album-title"))
+		assertThatJsonFailed("invalid-album-title")
 	}
 
 	@Test
@@ -84,7 +81,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 		addRequestParameter("title", "new title")
 		addRequestParameter("description", "foo http://127.0.0.1:8888/KSK@foo.html link")
 		addRequestHeader("Host", "127.0.0.1:8888")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		assertThat(json["albumId"]?.asText(), equalTo("album-id"))
 		assertThat(json["title"]?.asText(), equalTo("new title"))
 		assertThat(json["description"]?.asText(), equalTo("foo KSK@foo.html link"))

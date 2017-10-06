@@ -15,8 +15,7 @@ class DismissNotificationAjaxPageTest : JsonPageTest("dismissNotification.ajax",
 
 	@Test
 	fun `request without notification returns invalid-notification-id`() {
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("invalid-notification-id"))
+		assertThatJsonFailed("invalid-notification-id")
 	}
 
 	@Test
@@ -24,8 +23,7 @@ class DismissNotificationAjaxPageTest : JsonPageTest("dismissNotification.ajax",
 		val notification = mock<Notification>()
 		addNotification(notification, "foo")
 		addRequestParameter("notification", "foo")
-		assertThat(json.isSuccess, equalTo(false))
-		assertThat(json.error, equalTo("not-dismissable"))
+		assertThatJsonFailed("not-dismissable")
 	}
 
 	@Test
@@ -33,7 +31,7 @@ class DismissNotificationAjaxPageTest : JsonPageTest("dismissNotification.ajax",
 		val notification = mock<Notification>().apply { whenever(isDismissable).thenReturn(true) }
 		addNotification(notification, "foo")
 		addRequestParameter("notification", "foo")
-		assertThat(json.isSuccess, equalTo(true))
+		assertThatJsonIsSuccessful()
 		verify(notification).dismiss()
 	}
 
