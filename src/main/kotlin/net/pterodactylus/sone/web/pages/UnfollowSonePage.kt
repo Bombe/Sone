@@ -6,7 +6,6 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
-import java.util.regex.Pattern
 
 /**
  * This page lets the user unfollow another Sone.
