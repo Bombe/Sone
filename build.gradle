@@ -2,12 +2,14 @@ group = 'net.pterodactylus'
 version = '0.9.6'
 
 buildscript {
+    ext.kotlinVersion = '1.1.51'
     repositories {
         mavenCentral()
     }
     dependencies {
         classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.1.11'
-        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: '1.1.51'
+        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
+        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-noarg', version: kotlinVersion
     }
 }
 
@@ -46,6 +48,7 @@ dependencies {
     compile group: 'com.google.inject', name: 'guice', version: '3.0'
     compile group: 'com.google.guava', name: 'guava', version: '14.0.1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.1'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
 
@@ -116,4 +119,10 @@ task countLines {
     new File(buildDir, "reports/cloc").mkdirs()
     dependsOn tasks.countLinesMain
     dependsOn tasks.countLinesTest
+}
+
+apply plugin: 'kotlin-noarg'
+
+noArg {
+    annotation('net.pterodactylus.sone.main.NoArg')
 }
