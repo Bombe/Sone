@@ -84,7 +84,7 @@ class JsonReturnObjectTest {
 			put("text", "text")
 			put("int", 123)
 			put("boolean", true)
-			put("object", objectNode)
+			set("object", objectNode)
 		}))
 	}
 

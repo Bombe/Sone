@@ -43,7 +43,7 @@ class GetTimesAjaxPage(webInterface: WebInterface,
 					"tooltip" to synchronized(dateTimeFormatter) {
 						dateTimeFormatter.format(time)
 					})
-		}.forEach { this@jsonObject.put(it.first, it.second) }
+		}.forEach { this@jsonObject.set(it.first, it.second) }
 	}
 
 }
