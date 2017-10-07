@@ -40,6 +40,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
@@ -68,8 +71,8 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.AlbumBuilder;
 import net.pterodactylus.sone.database.Database;
@@ -314,6 +317,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/**
 	 * {@inheritDocs}
 	 */
+	@Nonnull
 	@Override
 	public Collection<Sone> getSones() {
 		return database.getSones();
@@ -534,7 +538,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The album with the given ID, or {@code null} if no album with the
 	 *         given ID exists
 	 */
-	public Album getAlbum(String albumId) {
+	@Nullable
+	public Album getAlbum(@Nonnull String albumId) {
 		return database.getAlbum(albumId).orNull();
 	}
 
@@ -549,6 +554,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The ID of the image
 	 * @return The image with the given ID
 	 */
+	@Nullable
 	public Image getImage(String imageId) {
 		return getImage(imageId, true);
 	}
@@ -565,6 +571,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The image with the given ID, or {@code null} if none exists and
 	 *         none was created
 	 */
+	@Nullable
 	public Image getImage(String imageId, boolean create) {
 		Optional<Image> image = database.getImage(imageId);
 		if (image.isPresent()) {
@@ -1070,7 +1077,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.getOptions().setShowNewSoneNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(true));
 		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(true));
 		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(true));
-		sone.getOptions().setShowCustomAvatars(ShowCustomAvatars.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(ShowCustomAvatars.NEVER.name())));
+		sone.getOptions().setShowCustomAvatars(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(LoadExternalContent.NEVER.name())));
+		sone.getOptions().setLoadLinkedImages(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").getValue(LoadExternalContent.NEVER.name())));
 
 		/* if we’re still here, Sone was loaded successfully. */
 		synchronized (sone) {
@@ -1548,6 +1556,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").setValue(sone.getOptions().isShowNewPostNotifications());
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").setValue(sone.getOptions().isShowNewReplyNotifications());
 			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().getShowCustomAvatars().name());
+			configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").setValue(sone.getOptions().getLoadLinkedImages().name());
 
 			configuration.save();
 

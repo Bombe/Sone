@@ -21,7 +21,6 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * The “GetPost” FCP command returns a single {@link Post} to an FCP client.
@@ -44,7 +43,7 @@ public class GetPostCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Post post = getPost(parameters, "Post");
 		boolean includeReplies = getBoolean(parameters, "IncludeReplies", true);
 

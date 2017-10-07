@@ -1194,7 +1194,13 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 }
 
 function getStatus() {
-	ajaxGet("getStatus.ajax", isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {}, function(data, textStatus) {
+	var parameters = isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {};
+	$.extend(parameters, {
+		"elements": JSON.stringify($(".linked-element.not-loaded").map(function () {
+			return $(this).attr("title");
+		}).toArray())
+	});
+	ajaxGet("getStatus.ajax", parameters, function(data, textStatus) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
@@ -1215,6 +1221,9 @@ function getStatus() {
 				$.each(data.newReplies, function(index, value) {
 					loadNewReply(value.id, value.sone, value.post, value.postSone);
 				});
+			}
+			if (data.linkedElements) {
+				loadLinkedElements(data.linkedElements)
 			}
 			/* do it again in 5 seconds. */
 			setTimeout(getStatus, 5000);
@@ -1520,6 +1529,41 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 	});
 }
 
+function loadLinkedElements(links) {
+	var failedElements = links.filter(function(element) {
+		return element.failed;
+	});
+	if (failedElements.length > 0) {
+		failedElements.forEach(function(element) {
+			getLinkedElements(element.link).each(function() {
+				$(this).remove()
+			});
+		});
+	}
+	var loadedElements = links.filter(function(element) {
+		return !element.loading && !element.failed;
+	});
+	if (loadedElements.length > 0) {
+		ajaxGet("getLinkedElement.ajax", {
+			"elements": JSON.stringify(loadedElements.map(function(element) {
+				return element.link;
+			}))
+		}, function (data, textStatus) {
+			if ((data != null) && (data.success)) {
+				data.linkedElements.forEach(function (linkedElement) {
+					getLinkedElements(linkedElement.link).each(function() {
+						$(this).replaceWith(linkedElement.html);
+					});
+				});
+			}
+		});
+	}
+}
+
+function getLinkedElements(link) {
+	return $(".linked-element[title='" + link + "']")
+}
+
 /**
  * Marks the given Sone as known if it is still new.
  *
@@ -1602,13 +1646,15 @@ function updatePostTime(postId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updatePostTimes(postIds) {
-	ajaxGet("getTimes.ajax", { "posts" : postIds }, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			$.each(data.postTimes, function(index, value) {
-				updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
-			});
-		}
-	});
+	if (postIds != "") {
+        ajaxGet("getTimes.ajax", {"posts": postIds}, function (data, textStatus) {
+            if ((data != null) && data.success) {
+                $.each(data.postTimes, function (index, value) {
+                    updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
+                });
+            }
+        });
+    }
 }
 
 /**
@@ -1639,13 +1685,15 @@ function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updateReplyTimes(replyIds) {
-	ajaxGet("getTimes.ajax", { "replies" : replyIds }, function(data, textStatus) {
-		if ((data != null) && data.success) {
-			$.each(data.replyTimes, function(index, value) {
-				updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
-			});
-		}
-	});
+	if (replyIds != "") {
+        ajaxGet("getTimes.ajax", {"replies": replyIds}, function (data, textStatus) {
+            if ((data != null) && data.success) {
+                $.each(data.replyTimes, function (index, value) {
+                    updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
+                });
+            }
+        });
+    }
 }
 
 function resetActivity() {

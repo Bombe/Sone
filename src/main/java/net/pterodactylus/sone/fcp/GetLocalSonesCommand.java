@@ -19,7 +19,6 @@ package net.pterodactylus.sone.fcp;
 
 import net.pterodactylus.sone.core.Core;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implements the “GetLocalSones” FCP command that returns the list of local
@@ -43,7 +42,7 @@ public class GetLocalSonesCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
+	public Response execute(SimpleFieldSet parameters) {
 		return new Response("ListLocalSones", encodeSones(getCore().getLocalSones(), "LocalSones."));
 	}
 

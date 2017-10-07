@@ -69,30 +69,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		downloading,
 	}
 
-	/**
-	 * The possible values for the “show custom avatars” option.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
-	 */
-	public static enum ShowCustomAvatars {
-
-		/** Never show custom avatars. */
-		NEVER,
-
-		/** Only show custom avatars of followed Sones. */
-		FOLLOWED,
-
-		/** Only show custom avatars of Sones you manually trust. */
-		MANUALLY_TRUSTED,
-
-		/** Only show custom avatars of automatically trusted Sones. */
-		TRUSTED,
-
-		/** Always show custom avatars. */
-		ALWAYS,
-
-	}
-
 	/** comparator that sorts Sones by their nice name. */
 	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
 
@@ -193,6 +169,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The identity of this Sone
 	 */
+	@Nonnull
 	Identity getIdentity();
 
 	/**
@@ -200,6 +177,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The name of this Sone
 	 */
+	@Nonnull
 	String getName();
 
 	/**
@@ -214,6 +192,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The request URI of this Sone
 	 */
+	@Nonnull
 	FreenetURI getRequestUri();
 
 	/**
@@ -221,6 +200,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The insert URI of this Sone
 	 */
+	@Nullable
 	FreenetURI getInsertUri();
 
 	/**
@@ -254,6 +234,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The time of the update (in milliseconds since Jan 1, 1970 UTC)
 	 * @return This Sone (for method chaining)
 	 */
+	@Nonnull
 	Sone setTime(long time);
 
 	/**
@@ -261,6 +242,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The status of this Sone
 	 */
+	@Nonnull
 	SoneStatus getStatus();
 
 	/**
@@ -272,7 +254,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @throws IllegalArgumentException
 	 * 		if {@code status} is {@code null}
 	 */
-	Sone setStatus(SoneStatus status);
+	@Nonnull
+	Sone setStatus(@Nonnull SoneStatus status);
 
 	/**
 	 * Returns a copy of the profile. If you want to update values in the profile
@@ -281,6 +264,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return A copy of the profile
 	 */
+	@Nonnull
 	Profile getProfile();
 
 	/**
@@ -291,13 +275,14 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @param profile
 	 * 		The profile to set
 	 */
-	void setProfile(Profile profile);
+	void setProfile(@Nonnull Profile profile);
 
 	/**
 	 * Returns the client used by this Sone.
 	 *
 	 * @return The client used by this Sone, or {@code null}
 	 */
+	@Nullable
 	Client getClient();
 
 	/**
@@ -307,7 +292,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The client used by this Sone, or {@code null}
 	 * @return This Sone (for method chaining)
 	 */
-	Sone setClient(Client client);
+	@Nonnull
+	Sone setClient(@Nullable Client client);
 
 	/**
 	 * Returns whether this Sone is known.
@@ -323,6 +309,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		{@code true} if this Sone is known, {@code false} otherwise
 	 * @return This Sone
 	 */
+	@Nonnull
 	Sone setKnown(boolean known);
 
 	/**
@@ -330,6 +317,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The friend Sones of this Sone
 	 */
+	@Nonnull
 	Collection<String> getFriends();
 
 	/**
@@ -340,13 +328,14 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @return {@code true} if this Sone has the given Sone as a friend, {@code
 	 *         false} otherwise
 	 */
-	boolean hasFriend(String friendSoneId);
+	boolean hasFriend(@Nonnull String friendSoneId);
 
 	/**
 	 * Returns the list of posts of this Sone, sorted by time, newest first.
 	 *
 	 * @return All posts of this Sone
 	 */
+	@Nonnull
 	List<Post> getPosts();
 
 	/**
@@ -356,7 +345,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The new (and only) posts of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	Sone setPosts(Collection<Post> posts);
+	@Nonnull
+	Sone setPosts(@Nonnull Collection<Post> posts);
 
 	/**
 	 * Adds the given post to this Sone. The post will not be added if its {@link
@@ -365,7 +355,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @param post
 	 * 		The post to add
 	 */
-	void addPost(Post post);
+	void addPost(@Nonnull Post post);
 
 	/**
 	 * Removes the given post from this Sone.
@@ -373,13 +363,14 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @param post
 	 * 		The post to remove
 	 */
-	void removePost(Post post);
+	void removePost(@Nonnull Post post);
 
 	/**
 	 * Returns all replies this Sone made.
 	 *
 	 * @return All replies this Sone made
 	 */
+	@Nonnull
 	Set<PostReply> getReplies();
 
 	/**
@@ -389,7 +380,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The new (and only) replies of this Sone
 	 * @return This Sone (for method chaining)
 	 */
-	Sone setReplies(Collection<PostReply> replies);
+	@Nonnull
+	Sone setReplies(@Nonnull Collection<PostReply> replies);
 
 	/**
 	 * Adds a reply to this Sone. If the given reply was not made by this Sone,
@@ -398,7 +390,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 * 		The reply to add
 	 */
-	void addReply(PostReply reply);
+	void addReply(@Nonnull PostReply reply);
 
 	/**
 	 * Removes a reply from this Sone.
@@ -406,13 +398,14 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @param reply
 	 * 		The reply to remove
 	 */
-	void removeReply(PostReply reply);
+	void removeReply(@Nonnull PostReply reply);
 
 	/**
 	 * Returns the IDs of all liked posts.
 	 *
 	 * @return All liked posts’ IDs
 	 */
+	@Nonnull
 	Set<String> getLikedPostIds();
 
 	/**
@@ -422,7 +415,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		All liked posts’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	Sone setLikePostIds(Set<String> likedPostIds);
+	@Nonnull
+	Sone setLikePostIds(@Nonnull Set<String> likedPostIds);
 
 	/**
 	 * Checks whether the given post ID is liked by this Sone.
@@ -432,7 +426,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @return {@code true} if this Sone likes the given post, {@code false}
 	 *         otherwise
 	 */
-	boolean isLikedPostId(String postId);
+	boolean isLikedPostId(@Nonnull String postId);
 
 	/**
 	 * Adds the given post ID to the list of posts this Sone likes.
@@ -441,22 +435,23 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The ID of the post
 	 * @return This Sone (for method chaining)
 	 */
-	Sone addLikedPostId(String postId);
+	@Nonnull
+	Sone addLikedPostId(@Nonnull String postId);
 
 	/**
 	 * Removes the given post ID from the list of posts this Sone likes.
 	 *
 	 * @param postId
 	 * 		The ID of the post
-	 * @return This Sone (for method chaining)
 	 */
-	Sone removeLikedPostId(String postId);
+	void removeLikedPostId(@Nonnull String postId);
 
 	/**
 	 * Returns the IDs of all liked replies.
 	 *
 	 * @return All liked replies’ IDs
 	 */
+	@Nonnull
 	Set<String> getLikedReplyIds();
 
 	/**
@@ -466,7 +461,8 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		All liked replies’ IDs
 	 * @return This Sone (for method chaining)
 	 */
-	Sone setLikeReplyIds(Set<String> likedReplyIds);
+	@Nonnull
+	Sone setLikeReplyIds(@Nonnull Set<String> likedReplyIds);
 
 	/**
 	 * Checks whether the given reply ID is liked by this Sone.
@@ -476,7 +472,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * @return {@code true} if this Sone likes the given reply, {@code false}
 	 *         otherwise
 	 */
-	boolean isLikedReplyId(String replyId);
+	boolean isLikedReplyId(@Nonnull String replyId);
 
 	/**
 	 * Adds the given reply ID to the list of replies this Sone likes.
@@ -485,22 +481,23 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The ID of the reply
 	 * @return This Sone (for method chaining)
 	 */
-	Sone addLikedReplyId(String replyId);
+	@Nonnull
+	Sone addLikedReplyId(@Nonnull String replyId);
 
 	/**
 	 * Removes the given post ID from the list of replies this Sone likes.
 	 *
 	 * @param replyId
 	 * 		The ID of the reply
-	 * @return This Sone (for method chaining)
 	 */
-	Sone removeLikedReplyId(String replyId);
+	void removeLikedReplyId(@Nonnull String replyId);
 
 	/**
 	 * Returns the root album that contains all visible albums of this Sone.
 	 *
 	 * @return The root album of this Sone
 	 */
+	@Nonnull
 	Album getRootAlbum();
 
 	/**
@@ -508,6 +505,7 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 *
 	 * @return The options of this Sone
 	 */
+	@Nonnull
 	SoneOptions getOptions();
 
 	/**
@@ -517,6 +515,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 * 		The options of this Sone
 	 */
 	/* TODO - remove this method again, maybe add an option provider */
-	void setOptions(SoneOptions options);
+	void setOptions(@Nonnull SoneOptions options);
 
 }

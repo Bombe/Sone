@@ -24,7 +24,6 @@ import java.util.List;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implements the “GetSones” FCP command that returns the list of known Sones.
@@ -47,15 +46,15 @@ public class GetSonesCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
+	public Response execute(SimpleFieldSet parameters) {
 		int startSone = getInt(parameters, "StartSone", 0);
 		int maxSones = getInt(parameters, "MaxSones", -1);
 		List<Sone> sones = new ArrayList<Sone>(getCore().getSones());
 		if (sones.size() < startSone) {
-			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), ""));
+			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), "Sones."));
 		}
 		Collections.sort(sones, Sone.NICE_NAME_COMPARATOR);
-		return new Response("Sones", encodeSones(sones.subList(startSone, (maxSones == -1) ? sones.size() : Math.min(startSone + maxSones, sones.size())), ""));
+		return new Response("Sones", encodeSones(sones.subList(startSone, (maxSones == -1) ? sones.size() : Math.min(startSone + maxSones, sones.size())), "Sones."));
 	}
 
 }

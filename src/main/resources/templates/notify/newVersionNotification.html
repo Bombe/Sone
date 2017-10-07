@@ -1,4 +1,4 @@
-<div class="text"><%= Notification.NewVersion.Text|l10n|replace needle=="{version}" replacement=latestVersion|replace needle=="{edition}" replacement=latestEdition|parse sone=="nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"></div>
+<div class="text"><%= Notification.NewVersion.Text|l10n|replace needle=="{version}" replacement=latestVersion|replace needle=="{edition}" replacement=latestEdition|parse sone=="nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI"|render></div>
 <%if disruptive>
 	<div class="text"><%= Notification.NewVersion.Disruptive.Text|l10n|html|replace needle=="{em}" replacement=="<em>"|replace needle=="{/em}" replacement=="</em>"></div>
 <%/if>

@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.database.memory;
 
 import static com.google.common.base.Optional.fromNullable;
-import static net.pterodactylus.sone.Matchers.isPostWithId;
+import static net.pterodactylus.sone.test.Matchers.isPostWithId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;

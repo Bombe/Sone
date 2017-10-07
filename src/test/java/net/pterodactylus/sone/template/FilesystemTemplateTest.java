@@ -2,6 +2,7 @@ package net.pterodactylus.sone.template;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -106,6 +107,21 @@ public class FilesystemTemplateTest {
 		writeTemplate("New");
 		filesystemTemplate.render(templateContext, stringWriter.get());
 		assertThat(getRenderedString(), is("New.a1.Test"));
+	}
+
+	@Test
+	public void columnOfReturnedTemplateIsReturnedAsZero() {
+		assertThat(filesystemTemplate.getColumn(), is(0));
+	}
+
+	@Test
+	public void lineOfReturnedTemplateIsReturnedAsZero() {
+		assertThat(filesystemTemplate.getLine(), is(0));
+	}
+
+	@Test
+	public void templateCanBeIteratedOver() {
+	    assertThat(filesystemTemplate.iterator(), notNullValue());
 	}
 
 }

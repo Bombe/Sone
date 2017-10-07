@@ -19,14 +19,19 @@ package net.pterodactylus.sone.fcp;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO;
+import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING;
+import static net.pterodactylus.sone.freenet.fcp.Command.AccessType.RESTRICTED_FCP;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+import javax.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent;
@@ -45,7 +50,6 @@ import freenet.support.api.Bucket;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
-import com.google.inject.Singleton;
 
 /**
  * Implementation of an FCP interface for other clients or plugins to
@@ -84,7 +88,8 @@ public class FcpInterface {
 	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<FullAccessRequired>(FullAccessRequired.ALWAYS);
 
 	/** All available FCP commands. */
-	private final Map<String, AbstractSoneCommand> commands = Collections.synchronizedMap(new HashMap<String, AbstractSoneCommand>());
+	private final Map<String, AbstractSoneCommand> commands;
+	private final AccessAuthorizer accessAuthorizer;
 
 	/**
 	 * Creates a new FCP interface.
@@ -93,22 +98,9 @@ public class FcpInterface {
 	 *            The core
 	 */
 	@Inject
-	public FcpInterface(Core core) {
-		commands.put("Version", new VersionCommand(core));
-		commands.put("GetLocalSones", new GetLocalSonesCommand(core));
-		commands.put("GetSones", new GetSonesCommand(core));
-		commands.put("GetSone", new GetSoneCommand(core));
-		commands.put("GetPost", new GetPostCommand(core));
-		commands.put("GetPosts", new GetPostsCommand(core));
-		commands.put("GetPostFeed", new GetPostFeedCommand(core));
-		commands.put("LockSone", new LockSoneCommand(core));
-		commands.put("UnlockSone", new UnlockSoneCommand(core));
-		commands.put("LikePost", new LikePostCommand(core));
-		commands.put("LikeReply", new LikeReplyCommand(core));
-		commands.put("CreatePost", new CreatePostCommand(core));
-		commands.put("CreateReply", new CreateReplyCommand(core));
-		commands.put("DeletePost", new DeletePostCommand(core));
-		commands.put("DeleteReply", new DeleteReplyCommand(core));
+	public FcpInterface(Core core, CommandSupplier commandSupplier, AccessAuthorizer accessAuthorizer) {
+		commands = commandSupplier.supplyCommands(core);
+		this.accessAuthorizer = accessAuthorizer;
 	}
 
 	//
@@ -152,42 +144,38 @@ public class FcpInterface {
 	 *            {@link FredPluginFCP#ACCESS_FCP_RESTRICTED}
 	 */
 	public void handle(PluginReplySender pluginReplySender, SimpleFieldSet parameters, Bucket data, int accessType) {
+		String identifier = parameters.get("Identifier");
+		if ((identifier == null) || (identifier.length() == 0)) {
+			sendErrorReply(pluginReplySender, null, 400, "Missing Identifier.");
+			return;
+		}
 		if (!active.get()) {
-			try {
-				sendReply(pluginReplySender, null, new ErrorResponse(400, "FCP Interface deactivated"));
-			} catch (PluginNotFoundException pnfe1) {
-				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
-			}
+			sendErrorReply(pluginReplySender, identifier, 503, "FCP Interface deactivated");
 			return;
 		}
 		AbstractSoneCommand command = commands.get(parameters.get("Message"));
-		if ((accessType == FredPluginFCP.ACCESS_FCP_RESTRICTED) && (((fullAccessRequired.get() == FullAccessRequired.WRITING) && command.requiresWriteAccess()) || (fullAccessRequired.get() == FullAccessRequired.ALWAYS))) {
-			try {
-				sendReply(pluginReplySender, null, new ErrorResponse(401, "Not authorized"));
-			} catch (PluginNotFoundException pnfe1) {
-				logger.log(Level.FINE, "Could not set error to plugin.", pnfe1);
-			}
+		if (command == null) {
+			sendErrorReply(pluginReplySender, identifier, 404, "Unrecognized Message: " + parameters.get("Message"));
+			return;
+		}
+		if (!accessAuthorizer.authorized(AccessType.values()[accessType], fullAccessRequired.get(), command.requiresWriteAccess())) {
+			sendErrorReply(pluginReplySender, identifier, 401, "Not authorized");
 			return;
 		}
 		try {
-			if (command == null) {
-				sendReply(pluginReplySender, null, new ErrorResponse("Unrecognized Message: " + parameters.get("Message")));
-				return;
-			}
-			String identifier = parameters.get("Identifier");
-			if ((identifier == null) || (identifier.length() == 0)) {
-				sendReply(pluginReplySender, null, new ErrorResponse("Missing Identifier."));
-				return;
-			}
-			try {
-				Response response = command.execute(parameters, data, AccessType.values()[accessType]);
-				sendReply(pluginReplySender, identifier, response);
-			} catch (Exception e1) {
-				logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);
-				sendReply(pluginReplySender, identifier, new ErrorResponse("Error executing command: " + e1.getMessage()));
-			}
+			Response response = command.execute(parameters);
+			sendReply(pluginReplySender, identifier, response);
+		} catch (Exception e1) {
+			logger.log(Level.WARNING, "Could not process FCP command “%s”.", command);
+			sendErrorReply(pluginReplySender, identifier, 500, "Error executing command: " + e1.getMessage());
+		}
+	}
+
+	private void sendErrorReply(PluginReplySender pluginReplySender, String identifier, int errorCode, String message) {
+		try {
+			sendReply(pluginReplySender, identifier, new ErrorResponse(errorCode, message));
 		} catch (PluginNotFoundException pnfe1) {
-			logger.log(Level.WARNING, "Could not find destination plugin: " + pluginReplySender);
+			logger.log(Level.FINE, "Could not send error to plugin.", pnfe1);
 		}
 	}
 
@@ -212,13 +200,7 @@ public class FcpInterface {
 		if (identifier != null) {
 			replyParameters.putOverwrite("Identifier", identifier);
 		}
-		if (response.hasData()) {
-			pluginReplySender.send(replyParameters, response.getData());
-		} else if (response.hasBucket()) {
-			pluginReplySender.send(replyParameters, response.getBucket());
-		} else {
-			pluginReplySender.send(replyParameters);
-		}
+		pluginReplySender.send(replyParameters);
 	}
 
 	@Subscribe
@@ -234,6 +216,40 @@ public class FcpInterface {
 	@Subscribe
 	public void fullAccessRequiredChanged(FullAccessRequiredChanged fullAccessRequiredChanged) {
 		setFullAccessRequired(fullAccessRequiredChanged.getFullAccessRequired());
+	}
+
+	@Singleton
+	public static class CommandSupplier {
+
+		public Map<String, AbstractSoneCommand> supplyCommands(Core core) {
+			Map<String, AbstractSoneCommand> commands = new HashMap<>();
+			commands.put("Version", new VersionCommand(core));
+			commands.put("GetLocalSones", new GetLocalSonesCommand(core));
+			commands.put("GetSones", new GetSonesCommand(core));
+			commands.put("GetSone", new GetSoneCommand(core));
+			commands.put("GetPost", new GetPostCommand(core));
+			commands.put("GetPosts", new GetPostsCommand(core));
+			commands.put("GetPostFeed", new GetPostFeedCommand(core));
+			commands.put("LockSone", new LockSoneCommand(core));
+			commands.put("UnlockSone", new UnlockSoneCommand(core));
+			commands.put("LikePost", new LikePostCommand(core));
+			commands.put("LikeReply", new LikeReplyCommand(core));
+			commands.put("CreatePost", new CreatePostCommand(core));
+			commands.put("CreateReply", new CreateReplyCommand(core));
+			commands.put("DeletePost", new DeletePostCommand(core));
+			commands.put("DeleteReply", new DeleteReplyCommand(core));
+			return commands;
+		}
+
+	}
+
+	@Singleton
+	public static class AccessAuthorizer {
+
+		public boolean authorized(@Nonnull AccessType accessType, @Nonnull FullAccessRequired fullAccessRequired, boolean commandRequiresWriteAccess) {
+			return (accessType != RESTRICTED_FCP) || (fullAccessRequired == NO) || ((fullAccessRequired == WRITING) && !commandRequiresWriteAccess);
+		}
+
 	}
 
 }

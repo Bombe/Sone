@@ -23,7 +23,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implements the “LikePost” FCP command which allows the user to like a post.
@@ -46,7 +45,7 @@ public class LikePostCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Post post = getPost(parameters, "Post");
 		Sone sone = getSone(parameters, "Sone", true);
 		sone.addLikedPostId(post.getId());

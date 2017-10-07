@@ -1,8 +1,8 @@
 package net.pterodactylus.sone.data;
 
-import static net.pterodactylus.sone.data.Sone.ShowCustomAvatars.NEVER;
+import static net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.NEVER;
 
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import javax.annotation.Nonnull;
 
 /**
  * All Sone-specific options.
@@ -26,8 +26,35 @@ public interface SoneOptions {
 	boolean isShowNewReplyNotifications();
 	void setShowNewReplyNotifications(boolean showNewReplyNotifications);
 
-	ShowCustomAvatars getShowCustomAvatars();
-	void setShowCustomAvatars(ShowCustomAvatars showCustomAvatars);
+	LoadExternalContent getShowCustomAvatars();
+	void setShowCustomAvatars(LoadExternalContent showCustomAvatars);
+
+	@Nonnull LoadExternalContent getLoadLinkedImages();
+	void setLoadLinkedImages(@Nonnull LoadExternalContent loadLinkedImages);
+
+	/**
+	 * Possible values for all options that are related to loading external content.
+	 *
+	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+	 */
+	enum LoadExternalContent {
+
+		/** Never show custom avatars. */
+		NEVER,
+
+		/** Only show custom avatars of followed Sones. */
+		FOLLOWED,
+
+		/** Only show custom avatars of Sones you manually trust. */
+		MANUALLY_TRUSTED,
+
+		/** Only show custom avatars of automatically trusted Sones. */
+		TRUSTED,
+
+		/** Always show custom avatars. */
+		ALWAYS,
+
+	}
 
 	/**
 	 * {@link SoneOptions} implementation.
@@ -41,7 +68,8 @@ public interface SoneOptions {
 		private boolean showNewSoneNotifications = true;
 		private boolean showNewPostNotifications = true;
 		private boolean showNewReplyNotifications = true;
-		private ShowCustomAvatars showCustomAvatars = NEVER;
+		private LoadExternalContent showCustomAvatars = NEVER;
+		private LoadExternalContent loadLinkedImages = NEVER;
 
 		@Override
 		public boolean isAutoFollow() {
@@ -94,13 +122,24 @@ public interface SoneOptions {
 		}
 
 		@Override
-		public ShowCustomAvatars getShowCustomAvatars() {
+		public LoadExternalContent getShowCustomAvatars() {
 			return showCustomAvatars;
 		}
 
 		@Override
-		public void setShowCustomAvatars(ShowCustomAvatars showCustomAvatars) {
+		public void setShowCustomAvatars(LoadExternalContent showCustomAvatars) {
 			this.showCustomAvatars = showCustomAvatars;
+		}
+
+		@Nonnull
+		@Override
+		public LoadExternalContent getLoadLinkedImages() {
+			return loadLinkedImages;
+		}
+
+		@Override
+		public void setLoadLinkedImages(@Nonnull LoadExternalContent loadLinkedImages) {
+			this.loadLinkedImages = loadLinkedImages;
 		}
 
 	}

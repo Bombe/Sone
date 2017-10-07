@@ -23,12 +23,15 @@ import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.freenet.Key.routingKey;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
 
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
@@ -44,6 +47,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import freenet.client.ClientMetadata;
+import freenet.client.FetchContext;
 import freenet.client.FetchException;
 import freenet.client.FetchException.FetchExceptionMode;
 import freenet.client.FetchResult;
@@ -51,16 +55,21 @@ import freenet.client.HighLevelSimpleClient;
 import freenet.client.InsertBlock;
 import freenet.client.InsertContext;
 import freenet.client.InsertException;
+import freenet.client.Metadata;
 import freenet.client.async.BaseClientPutter;
 import freenet.client.async.ClientContext;
+import freenet.client.async.ClientGetCallback;
+import freenet.client.async.ClientGetter;
 import freenet.client.async.ClientPutCallback;
 import freenet.client.async.ClientPutter;
+import freenet.client.async.SnoopMetadata;
 import freenet.client.async.USKCallback;
 import freenet.keys.FreenetURI;
 import freenet.keys.InsertableClientSSK;
 import freenet.keys.USK;
 import freenet.node.Node;
 import freenet.node.RequestClient;
+import freenet.node.RequestClientBuilder;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
 import freenet.support.api.RandomAccessBucket;
@@ -93,17 +102,8 @@ public class FreenetInterface {
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
 
-	private final RequestClient imageInserts = new RequestClient() {
-		@Override
-		public boolean persistent() {
-			return false;
-		}
-
-		@Override
-		public boolean realTimeFlag() {
-			return true;
-		}
-	};
+	private final RequestClient imageInserts = new RequestClientBuilder().realTime().build();
+	private final RequestClient imageLoader = new RequestClientBuilder().realTime().build();
 
 	/**
 	 * Creates a new Freenet interface.
@@ -146,6 +146,59 @@ public class FreenetInterface {
 				return null;
 			}
 		}
+	}
+
+	public void startFetch(final FreenetURI uri, final BackgroundFetchCallback backgroundFetchCallback) {
+		ClientGetCallback callback = new ClientGetCallback() {
+			@Override
+			public void onSuccess(FetchResult result, ClientGetter state) {
+				try {
+					backgroundFetchCallback.loaded(uri, result.getMimeType(), result.asByteArray());
+				} catch (IOException e) {
+					backgroundFetchCallback.failed(uri);
+				}
+			}
+
+			@Override
+			public void onFailure(FetchException e, ClientGetter state) {
+				backgroundFetchCallback.failed(uri);
+			}
+
+			@Override
+			public void onResume(ClientContext context) throws ResumeFailedException {
+				/* do nothing. */
+			}
+
+			@Override
+			public RequestClient getRequestClient() {
+				return imageLoader;
+			}
+		};
+		SnoopMetadata snoop = new SnoopMetadata() {
+			@Override
+			public boolean snoopMetadata(Metadata meta, ClientContext context) {
+				String mimeType = meta.getMIMEType();
+				boolean cancel = (mimeType == null) || backgroundFetchCallback.shouldCancel(uri, mimeType, meta.dataLength());
+				if (cancel) {
+					backgroundFetchCallback.failed(uri);
+				}
+				return cancel;
+			}
+		};
+		FetchContext fetchContext = client.getFetchContext();
+		try {
+			ClientGetter clientGetter = client.fetch(uri, 2097152, callback, fetchContext, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
+			clientGetter.setMetaSnoop(snoop);
+			clientGetter.restart(uri, fetchContext.filterData, node.clientCore.clientContext);
+		} catch (FetchException fe) {
+			/* stupid exception that can not actually be thrown! */
+		}
+	}
+
+	public interface BackgroundFetchCallback {
+		boolean shouldCancel(@Nonnull FreenetURI uri, @Nonnull String mimeType, long size);
+		void loaded(@Nonnull FreenetURI uri, @Nonnull String mimeType, @Nonnull byte[] data);
+		void failed(@Nonnull FreenetURI uri);
 	}
 
 	/**

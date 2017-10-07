@@ -440,6 +440,50 @@ textarea {
 	color: green;
 }
 
+#sone .post .linked-elements {
+	margin-top: 1ex;
+}
+
+#sone .linked-element.loaded .image {
+	display: inline-block;
+	border: solid 1px black;
+	width: 160px;
+	height: 120px;
+	background-size: cover;
+	background-position: center;
+	margin-right: 1ex;
+	margin-bottom: 1ex;
+}
+
+#sone .linked-element.loaded .html-page {
+	display: inline-block;
+	width: 160px;
+	max-height: 120px;
+	overflow: hidden;
+	vertical-align: top;
+}
+
+#sone .reply .linked-element.loaded .html-page {
+	width: 120px;
+	max-height: 90px;
+}
+
+#sone .linked-element.loaded .html-page .heading {
+	font-size: 115%;
+	font-weight: 600;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+#sone .linked-element.loaded .html-page .description {
+	font-size: 85%;
+}
+
+#sone .linked-element.loaded .html-page {
+	display: inline-block;
+}
+
 #sone .post .replies {
 	clear: both;
 	padding-top: 0.2ex;
@@ -494,6 +538,21 @@ textarea {
 	display: inline;
 	color: #666;
 	font-size: inherit;
+}
+
+#sone .post .reply .linked-elements {
+	margin-top: 1ex;
+}
+
+#sone .post .reply .linked-element.loaded .image {
+	display: inline-block;
+	border: solid 1px black;
+	width: 120px;
+	height: 90px;
+	background-size: cover;
+	background-position: center;
+	margin-right: 1ex;
+	margin-bottom: 1ex;
 }
 
 #sone .post .show-reply-form {

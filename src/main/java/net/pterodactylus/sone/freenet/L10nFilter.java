@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
@@ -53,8 +55,23 @@ public class L10nFilter implements Filter {
 	 */
 	@Override
 	public String format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
-		if (parameters.isEmpty()) {
-			return webInterface.getL10n().getString(String.valueOf(data));
+		List<Object> parameterValues = getParameters(data, parameters);
+		String text = getText(data);
+		if (parameterValues.isEmpty()) {
+			return webInterface.getL10n().getString(text);
+		}
+		return new MessageFormat(webInterface.getL10n().getString(text), new Locale(webInterface.getL10n().getSelectedLanguage().shortCode)).format(parameterValues.toArray());
+	}
+
+	@Nonnull
+	private String getText(Object data) {
+		return (data instanceof L10nText) ? ((L10nText) data).getText() : String.valueOf(data);
+	}
+
+	@Nonnull
+	private List<Object> getParameters(Object data, Map<String, Object> parameters) {
+		if (data instanceof L10nText) {
+			return ((L10nText) data).getParameters();
 		}
 		List<Object> parameterValues = new ArrayList<Object>();
 		int parameterIndex = 0;
@@ -63,7 +80,7 @@ public class L10nFilter implements Filter {
 			parameterValues.add(value);
 			++parameterIndex;
 		}
-		return new MessageFormat(webInterface.getL10n().getString(String.valueOf(data)), new Locale(webInterface.getL10n().getSelectedLanguage().shortCode)).format(parameterValues.toArray());
+		return parameterValues;
 	}
 
 }

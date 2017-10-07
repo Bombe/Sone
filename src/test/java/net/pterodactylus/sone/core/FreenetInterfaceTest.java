@@ -1,10 +1,11 @@
 package net.pterodactylus.sone.core;
 
+import static freenet.client.FetchException.FetchExceptionMode.ALL_DATA_NOT_FOUND;
 import static freenet.keys.InsertableClientSSK.createRandom;
 import static freenet.node.RequestStarter.INTERACTIVE_PRIORITY_CLASS;
 import static freenet.node.RequestStarter.PREFETCH_PRIORITY_CLASS;
-import static net.pterodactylus.sone.Matchers.delivers;
-import static net.pterodactylus.sone.TestUtil.setFinalField;
+import static net.pterodactylus.sone.test.Matchers.delivers;
+import static net.pterodactylus.sone.test.TestUtil.setFinalField;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -12,6 +13,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyShort;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -19,6 +21,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
@@ -26,7 +29,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 
-import net.pterodactylus.sone.TestUtil;
+import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
@@ -36,11 +39,13 @@ import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.impl.ImageImpl;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
+import net.pterodactylus.sone.data.impl.ImageImpl;
+import net.pterodactylus.sone.test.TestUtil;
 
 import freenet.client.ClientMetadata;
+import freenet.client.FetchContext;
 import freenet.client.FetchException;
 import freenet.client.FetchException.FetchExceptionMode;
 import freenet.client.FetchResult;
@@ -49,7 +54,12 @@ import freenet.client.InsertBlock;
 import freenet.client.InsertContext;
 import freenet.client.InsertException;
 import freenet.client.InsertException.InsertExceptionMode;
+import freenet.client.Metadata;
+import freenet.client.async.ClientContext;
+import freenet.client.async.ClientGetCallback;
+import freenet.client.async.ClientGetter;
 import freenet.client.async.ClientPutter;
+import freenet.client.async.SnoopMetadata;
 import freenet.client.async.USKCallback;
 import freenet.client.async.USKManager;
 import freenet.crypt.DummyRandomSource;
@@ -90,6 +100,20 @@ public class FreenetInterfaceTest {
 	private final Image image = mock(Image.class);
 	private InsertToken insertToken;
 	private final Bucket bucket = mock(Bucket.class);
+	private final ArgumentCaptor<ClientGetCallback> clientGetCallback = forClass(ClientGetCallback.class);
+	private final FreenetURI uri = new FreenetURI("KSK@pgl.png");
+	private final FetchResult fetchResult = mock(FetchResult.class);
+	private final BackgroundFetchCallback backgroundFetchCallback = mock(BackgroundFetchCallback.class);
+	private final ClientGetter clientGetter = mock(ClientGetter.class);
+
+	public FreenetInterfaceTest() throws MalformedURLException {
+	}
+
+	@Before
+	public void setupHighLevelSimpleClient() throws Exception {
+		when(highLevelSimpleClient.getFetchContext()).thenReturn(mock(FetchContext.class));
+		when(highLevelSimpleClient.fetch(eq(uri), anyLong(), any(ClientGetCallback.class), any(FetchContext.class), anyShort())).thenReturn( clientGetter);
+	}
 
 	@Before
 	public void setupFreenetInterface() {
@@ -97,6 +121,7 @@ public class FreenetInterfaceTest {
 		setFinalField(node, "clientCore", nodeClientCore);
 		setFinalField(node, "random", randomSource);
 		setFinalField(nodeClientCore, "uskManager", uskManager);
+		setFinalField(nodeClientCore, "clientContext", mock(ClientContext.class));
 		freenetInterface = new FreenetInterface(eventBus, node);
 		insertToken = freenetInterface.new InsertToken(image);
 		insertToken.setBucket(bucket);
@@ -141,7 +166,7 @@ public class FreenetInterfaceTest {
 	@Test
 	public void fetchReturnsNullOnFetchExceptions() throws MalformedURLException, FetchException {
 		FreenetURI freenetUri = new FreenetURI("KSK@GPLv2.txt");
-		FetchException fetchException = new FetchException(FetchExceptionMode.ALL_DATA_NOT_FOUND);
+		FetchException fetchException = new FetchException(ALL_DATA_NOT_FOUND);
 		when(highLevelSimpleClient.fetch(freenetUri)).thenThrow(fetchException);
 		Fetched fetched = freenetInterface.fetchUri(freenetUri);
 		assertThat(fetched, nullValue());
@@ -246,7 +271,7 @@ public class FreenetInterfaceTest {
 	public void registeringAnActiveNonUskWillNotSubscribeToAUsk()
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
-	    freenetInterface.registerActiveUsk(freenetUri, null);
+		freenetInterface.registerActiveUsk(freenetUri, null);
 		verify(uskManager, never()).subscribe(any(USK.class),
 				any(USKCallback.class), anyBoolean(),
 				eq((RequestClient) highLevelSimpleClient));
@@ -256,7 +281,7 @@ public class FreenetInterfaceTest {
 	public void registeringAnInactiveNonUskWillNotSubscribeToAUsk()
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
-	    freenetInterface.registerPassiveUsk(freenetUri, null);
+		freenetInterface.registerPassiveUsk(freenetUri, null);
 		verify(uskManager, never()).subscribe(any(USK.class),
 				any(USKCallback.class), anyBoolean(),
 				eq((RequestClient) highLevelSimpleClient));
@@ -397,6 +422,93 @@ public class FreenetInterfaceTest {
 	public void insertTokenSupplierSuppliesInsertTokens() {
 		InsertTokenSupplier insertTokenSupplier = freenetInterface.new InsertTokenSupplier();
 		assertThat(insertTokenSupplier.apply(image), notNullValue());
+	}
+
+	@Test
+	public void backgroundFetchCanBeStarted() throws Exception {
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		verify(highLevelSimpleClient).fetch(eq(uri), anyLong(), any(ClientGetCallback.class), any(FetchContext.class), anyShort());
+	}
+
+	@Test
+	public void backgroundFetchRegistersSnoopAndRestartsTheRequest() throws Exception {
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		verify(clientGetter).setMetaSnoop(any(SnoopMetadata.class));
+		verify(clientGetter).restart(eq(uri), anyBoolean(), any(ClientContext.class));
+	}
+
+	@Test
+	public void requestIsNotCancelledForImageMimeType() {
+		verifySnoopCancelsRequestForMimeType("image/png", false);
+		verify(backgroundFetchCallback, never()).failed(uri);
+	}
+
+	@Test
+	public void requestIsCancelledForNullMimeType() {
+		verifySnoopCancelsRequestForMimeType(null, true);
+		verify(backgroundFetchCallback, never()).shouldCancel(eq(uri), ArgumentMatchers.<String>any(), anyLong());
+		verify(backgroundFetchCallback).failed(uri);
+	}
+
+	@Test
+	public void requestIsCancelledForVideoMimeType() {
+		verifySnoopCancelsRequestForMimeType("video/mkv", true);
+		verify(backgroundFetchCallback).failed(uri);
+	}
+
+	@Test
+	public void requestIsCancelledForAudioMimeType() {
+		verifySnoopCancelsRequestForMimeType("audio/mpeg", true);
+		verify(backgroundFetchCallback).failed(uri);
+	}
+
+	@Test
+	public void requestIsCancelledForTextMimeType() {
+		verifySnoopCancelsRequestForMimeType("text/plain", true);
+		verify(backgroundFetchCallback).failed(uri);
+	}
+
+	private void verifySnoopCancelsRequestForMimeType(String mimeType, boolean cancel) {
+		when(backgroundFetchCallback.shouldCancel(eq(uri), eq(mimeType), anyLong())).thenReturn(cancel);
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		ArgumentCaptor<SnoopMetadata> snoopMetadata = forClass(SnoopMetadata.class);
+		verify(clientGetter).setMetaSnoop(snoopMetadata.capture());
+		Metadata metadata = mock(Metadata.class);
+		when(metadata.getMIMEType()).thenReturn(mimeType);
+		assertThat(snoopMetadata.getValue().snoopMetadata(metadata, mock(ClientContext.class)), is(cancel));
+	}
+
+	@Test
+	public void callbackOfBackgroundFetchIsNotifiedOnSuccess() throws Exception {
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		verify(highLevelSimpleClient).fetch(eq(uri), anyLong(), clientGetCallback.capture(), any(FetchContext.class), anyShort());
+		when(fetchResult.getMimeType()).thenReturn("image/png");
+		when(fetchResult.asByteArray()).thenReturn(new byte[] { 1, 2, 3, 4, 5 });
+		clientGetCallback.getValue().onSuccess(fetchResult, mock(ClientGetter.class));
+		verify(backgroundFetchCallback).loaded(uri, "image/png", new byte[] { 1, 2, 3, 4, 5 });
+		verifyNoMoreInteractions(backgroundFetchCallback);
+	}
+
+	@Test
+	public void callbackOfBackgroundFetchIsNotifiedOnFailure() throws Exception {
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		verify(highLevelSimpleClient).fetch(eq(uri), anyLong(), clientGetCallback.capture(), any(FetchContext.class), anyShort());
+		when(fetchResult.getMimeType()).thenReturn("image/png");
+		when(fetchResult.asByteArray()).thenReturn(new byte[] { 1, 2, 3, 4, 5 });
+		clientGetCallback.getValue().onFailure(new FetchException(ALL_DATA_NOT_FOUND), mock(ClientGetter.class));
+		verify(backgroundFetchCallback).failed(uri);
+		verifyNoMoreInteractions(backgroundFetchCallback);
+	}
+
+	@Test
+	public void callbackOfBackgroundFetchIsNotifiedAsFailureIfBucketCanNotBeLoaded() throws Exception {
+		freenetInterface.startFetch(uri, backgroundFetchCallback);
+		verify(highLevelSimpleClient).fetch(eq(uri), anyLong(), clientGetCallback.capture(), any(FetchContext.class), anyShort());
+		when(fetchResult.getMimeType()).thenReturn("image/png");
+		when(fetchResult.asByteArray()).thenThrow(IOException.class);
+		clientGetCallback.getValue().onSuccess(fetchResult, mock(ClientGetter.class));
+		verify(backgroundFetchCallback).failed(uri);
+		verifyNoMoreInteractions(backgroundFetchCallback);
 	}
 
 }

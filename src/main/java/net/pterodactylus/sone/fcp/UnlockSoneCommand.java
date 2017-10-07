@@ -23,7 +23,6 @@ import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 import com.google.common.base.Optional;
 
@@ -51,7 +50,7 @@ public class UnlockSoneCommand extends AbstractSoneCommand {
 	//
 
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Optional<Sone> sone = getSone(parameters, "Sone", true, true);
 		getCore().unlockSone(sone.get());
 		return new Response("SoneUnlocked", new SimpleFieldSetBuilder().put("Sone", sone.get().getId()).get());

@@ -13,7 +13,7 @@ import com.google.common.primitives.Longs;
  */
 public class NumberParsers {
 
-	@Nonnull
+	@Nullable
 	public static Integer parseInt(@Nullable String text,
 			@Nullable Integer defaultValue) {
 		if (text == null) {
@@ -23,7 +23,7 @@ public class NumberParsers {
 		return (value == null) ? defaultValue : value;
 	}
 
-	@Nonnull
+	@Nullable
 	public static Long parseLong(@Nullable String text,
 			@Nullable Long defaultValue) {
 		if (text == null) {

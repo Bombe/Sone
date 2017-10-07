@@ -341,7 +341,7 @@
 				<%/foreach>
 			</div>
 
-			<p id="description"><% album.description|parse sone=album.sone></p>
+			<p id="description"><% album.description|parse sone=album.sone|render></p>
 
 			<%if album.sone.local>
 				<div class="show-edit-album hidden toggle-link"><a class="small-link">» <%= Page.ImageBrowser.Album.Edit.Title|l10n|html></a></div>
@@ -376,7 +376,7 @@
 				</div>
 			<%/if>
 
-			<%foreach album.images image|paginate pageSize=core.preferences.imagesPerPage page=page>
+			<%foreach album.images image|paginate pageSize=preferences.imagesPerPage page=page>
 				<%first>
 					<h2><%= Page.ImageBrowser.Header.Images|l10n|html></h2>
 					<%include include/pagination.html pageParameter=="page">
@@ -389,7 +389,7 @@
 					</div>
 					<div class="show-data">
 						<div class="image-title"><% image.title|html></div>
-						<div class="image-description"><% image.description|parse sone=image.sone></div>
+						<div class="image-description"><% image.description|parse sone=image.sone|render></div>
 					</div>
 					<%if album.sone.local>
 						<form class="edit-image" action="editImage.html" method="post">
@@ -501,7 +501,7 @@
 				<%/if>
 			</div>
 
-			<p class="parsed"><%image.description|parse sone=image.sone></p>
+			<p class="parsed"><%image.description|parse sone=image.sone|render></p>
 
 			<%if image.sone.local>
 
@@ -599,7 +599,7 @@
 
 	<%elseif galleryRequested>
 
-		<%foreach albums album|paginate pageSize=core.preferences.imagesPerPage pageParameter=request.page pagination=albumPagination>
+		<%foreach albums album|paginate pageSize=preferences.imagesPerPage pageParameter=request.page pagination=albumPagination>
 			<%first>
 				<h2><%= Page.ImageBrowser.Header.Albums|l10n|html></h2>
 				<%include include/pagination.html pagination=albumPagination pageParameter=="page">
@@ -619,7 +619,7 @@
 				<div class="show-data">
 					<div class="album-sone"><a href="imageBrowser.html?sone=<%album.sone.id|html>"><%album.sone.niceName|html></a></div>
 					<div class="album-title"><% album.title|html> (<%= View.Sone.Stats.Images|l10n 0=album.images.size>)</div>
-					<div class="album-description"><% album.description|parse sone=album.sone></div>
+					<div class="album-description"><% album.description|parse sone=album.sone|render></div>
 				</div>
 			</div>
 			<%= false|store key==endRow>

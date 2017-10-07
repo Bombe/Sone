@@ -32,7 +32,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Implementation of an FCP interface for other clients or plugins to
@@ -56,7 +55,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Sone sone = getSone(parameters, "Sone", true);
 		int startPost = getInt(parameters, "StartPost", 0);
 		int maxPosts = getInt(parameters, "MaxPosts", -1);

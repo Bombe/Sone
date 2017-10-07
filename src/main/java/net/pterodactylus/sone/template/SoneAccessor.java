@@ -32,8 +32,7 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
-import net.pterodactylus.sone.web.WebInterface;
-import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
+import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateContext;
@@ -62,6 +61,7 @@ public class SoneAccessor extends ReflectionAccessor {
 
 	/** The core. */
 	private final Core core;
+	private final TimeTextConverter timeTextConverter;
 
 	/**
 	 * Creates a new Sone accessor.
@@ -69,8 +69,9 @@ public class SoneAccessor extends ReflectionAccessor {
 	 * @param core
 	 *            The Sone core
 	 */
-	public SoneAccessor(Core core) {
+	public SoneAccessor(Core core, TimeTextConverter timeTextConverter) {
 		this.core = core;
+		this.timeTextConverter = timeTextConverter;
 	}
 
 	/**
@@ -104,7 +105,7 @@ public class SoneAccessor extends ReflectionAccessor {
 		} else if (member.equals("locked")) {
 			return core.isLocked(sone);
 		} else if (member.equals("lastUpdatedText")) {
-			return GetTimesAjaxPage.getTime((WebInterface) templateContext.get("webInterface"), sone.getTime());
+			return timeTextConverter.getTimeText(sone.getTime()).getL10nText();
 		} else if (member.equals("trust")) {
 			Sone currentSone = (Sone) templateContext.get("currentSone");
 			if (currentSone == null) {

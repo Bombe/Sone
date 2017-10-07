@@ -30,8 +30,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
 
-import com.google.common.base.Optional;
-
 /**
  * {@link Filter} implementation that groups replies by the post the are in
  * reply to, returning a map with the post as key and the list of replies as
@@ -48,33 +46,30 @@ public class ReplyGroupFilter implements Filter {
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		@SuppressWarnings("unchecked")
 		List<PostReply> allReplies = (List<PostReply>) data;
-		Map<Post, Set<Sone>> postSones = new HashMap<Post, Set<Sone>>();
-		Map<Post, Set<PostReply>> postReplies = new HashMap<Post, Set<PostReply>>();
+		Map<Post, Set<Sone>> postSones = new HashMap<>();
+		Map<Post, Set<PostReply>> postReplies = new HashMap<>();
 		for (PostReply reply : allReplies) {
 			/*
 			 * All replies from a new-reply notification have posts,
 			 * ListNotificationFilters takes care of that.
 			 */
-			Optional<Post> post = reply.getPost();
-			Set<Sone> sones = postSones.get(post.get());
+			Post post = reply.getPost().get();
+			Set<Sone> sones = postSones.get(post);
 			if (sones == null) {
-				sones = new HashSet<Sone>();
-				postSones.put(post.get(), sones);
+				sones = new HashSet<>();
+				postSones.put(post, sones);
 			}
 			sones.add(reply.getSone());
-			Set<PostReply> replies = postReplies.get(post.get());
+			Set<PostReply> replies = postReplies.get(post);
 			if (replies == null) {
-				replies = new HashSet<PostReply>();
-				postReplies.put(post.get(), replies);
+				replies = new HashSet<>();
+				postReplies.put(post, replies);
 			}
 			replies.add(reply);
 		}
-		Map<Post, Map<String, Set<?>>> result = new HashMap<Post, Map<String, Set<?>>>();
+		Map<Post, Map<String, Set<?>>> result = new HashMap<>();
 		for (Entry<Post, Set<Sone>> postEntry : postSones.entrySet()) {
-			if (result.containsKey(postEntry.getKey())) {
-				continue;
-			}
-			Map<String, Set<?>> postResult = new HashMap<String, Set<?>>();
+			Map<String, Set<?>> postResult = new HashMap<>();
 			postResult.put("sones", postEntry.getValue());
 			postResult.put("replies", postReplies.get(postEntry.getKey()));
 			result.put(postEntry.getKey(), postResult);

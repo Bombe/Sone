@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 
+import net.pterodactylus.sone.utils.AutoCloseableBucket;
 import net.pterodactylus.util.web.Header;
 import net.pterodactylus.util.web.Method;
 import net.pterodactylus.util.web.Page;
@@ -33,9 +34,7 @@ import freenet.clients.http.Toadlet;
 import freenet.clients.http.ToadletContext;
 import freenet.clients.http.ToadletContextClosedException;
 import freenet.support.MultiValueTable;
-import freenet.support.api.Bucket;
 import freenet.support.api.HTTPRequest;
-import freenet.support.io.Closer;
 
 /**
  * {@link Toadlet} implementation that is wrapped around a {@link Page}.
@@ -145,31 +144,18 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	private void handleRequest(FreenetRequest pageRequest) throws IOException, ToadletContextClosedException {
-		Bucket pageBucket = null;
-		OutputStream pageBucketOutputStream = null;
-		Response pageResponse;
-		try {
-			pageBucket = pageRequest.getToadletContext().getBucketFactory().makeBucket(-1);
-			pageBucketOutputStream = pageBucket.getOutputStream();
-			pageResponse = page.handleRequest(pageRequest, new Response(pageBucketOutputStream));
-		} catch (IOException ioe1) {
-			Closer.close(pageBucket);
-			throw ioe1;
-		} finally {
-			Closer.close(pageBucketOutputStream);
-		}
-		MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
-		if (pageResponse.getHeaders() != null) {
-			for (Header header : pageResponse.getHeaders()) {
-				for (String value : header) {
-					headers.put(header.getName(), value);
+		try (AutoCloseableBucket pageBucket = new AutoCloseableBucket(pageRequest.getToadletContext().getBucketFactory().makeBucket(-1));
+		     OutputStream pageBucketOutputStream = pageBucket.getBucket().getOutputStream()) {
+			Response pageResponse = page.handleRequest(pageRequest, new Response(pageBucketOutputStream));
+			MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
+			if (pageResponse.getHeaders() != null) {
+				for (Header header : pageResponse.getHeaders()) {
+					for (String value : header) {
+						headers.put(header.getName(), value);
+					}
 				}
 			}
-		}
-		try {
-			writeReply(pageRequest.getToadletContext(), pageResponse.getStatusCode(), pageResponse.getContentType(), pageResponse.getStatusText(), headers, pageBucket);
-		} finally {
-			Closer.close(pageBucket);
+			writeReply(pageRequest.getToadletContext(), pageResponse.getStatusCode(), pageResponse.getContentType(), pageResponse.getStatusText(), headers, pageBucket.getBucket());
 		}
 	}
 

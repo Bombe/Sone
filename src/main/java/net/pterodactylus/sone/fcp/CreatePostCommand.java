@@ -25,12 +25,11 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * FCP command that creates a new {@link Post}.
  *
- * @see Core#createPost(Sone, Sone, String)
+ * @see Core#createPost(Sone, Optional, String)
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CreatePostCommand extends AbstractSoneCommand {
@@ -49,7 +48,7 @@ public class CreatePostCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) throws FcpException {
+	public Response execute(SimpleFieldSet parameters) throws FcpException {
 		Sone sone = getSone(parameters, "Sone", true);
 		String text = getString(parameters, "Text");
 		Sone recipient = null;

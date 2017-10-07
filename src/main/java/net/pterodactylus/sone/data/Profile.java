@@ -26,6 +26,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.hash.Hasher;
 import com.google.common.hash.Hashing;
 
@@ -80,7 +83,7 @@ public class Profile implements Fingerprintable {
 	 * @param profile
 	 *            The profile to copy
 	 */
-	public Profile(Profile profile) {
+	public Profile(@Nonnull Profile profile) {
 		this.sone = profile.sone;
 		this.firstName = profile.firstName;
 		this.middleName = profile.middleName;
@@ -101,6 +104,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The Sone this profile belongs to
 	 */
+	@Nonnull
 	public Sone getSone() {
 		return sone;
 	}
@@ -110,6 +114,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The first name
 	 */
+	@Nullable
 	public String getFirstName() {
 		return firstName;
 	}
@@ -121,7 +126,8 @@ public class Profile implements Fingerprintable {
 	 *            The first name to set
 	 * @return This profile (for method chaining)
 	 */
-	public Profile setFirstName(String firstName) {
+	@Nonnull
+	public Profile setFirstName(@Nullable String firstName) {
 		this.firstName = firstName;
 		return this;
 	}
@@ -131,6 +137,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The middle name
 	 */
+	@Nullable
 	public String getMiddleName() {
 		return middleName;
 	}
@@ -142,7 +149,8 @@ public class Profile implements Fingerprintable {
 	 *            The middle name to set
 	 * @return This profile (for method chaining)
 	 */
-	public Profile setMiddleName(String middleName) {
+	@Nonnull
+	public Profile setMiddleName(@Nullable String middleName) {
 		this.middleName = middleName;
 		return this;
 	}
@@ -152,6 +160,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The last name
 	 */
+	@Nullable
 	public String getLastName() {
 		return lastName;
 	}
@@ -163,7 +172,8 @@ public class Profile implements Fingerprintable {
 	 *            The last name to set
 	 * @return This profile (for method chaining)
 	 */
-	public Profile setLastName(String lastName) {
+	@Nonnull
+	public Profile setLastName(@Nullable String lastName) {
 		this.lastName = lastName;
 		return this;
 	}
@@ -173,6 +183,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The day of the birth date (from 1 to 31)
 	 */
+	@Nullable
 	public Integer getBirthDay() {
 		return birthDay;
 	}
@@ -184,7 +195,8 @@ public class Profile implements Fingerprintable {
 	 *            The day of the birth date (from 1 to 31)
 	 * @return This profile (for method chaining)
 	 */
-	public Profile setBirthDay(Integer birthDay) {
+	@Nonnull
+	public Profile setBirthDay(@Nullable Integer birthDay) {
 		this.birthDay = birthDay;
 		return this;
 	}
@@ -194,6 +206,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The month of the birth date (from 1 to 12)
 	 */
+	@Nullable
 	public Integer getBirthMonth() {
 		return birthMonth;
 	}
@@ -205,7 +218,8 @@ public class Profile implements Fingerprintable {
 	 *            The month of the birth date (from 1 to 12)
 	 * @return This profile (for method chaining)
 	 */
-	public Profile setBirthMonth(Integer birthMonth) {
+	@Nonnull
+	public Profile setBirthMonth(@Nullable Integer birthMonth) {
 		this.birthMonth = birthMonth;
 		return this;
 	}
@@ -215,6 +229,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The year of the birth date
 	 */
+	@Nullable
 	public Integer getBirthYear() {
 		return birthYear;
 	}
@@ -225,6 +240,7 @@ public class Profile implements Fingerprintable {
 	 * @return The ID of the currently selected avatar image, or {@code null} if
 	 *         no avatar is selected.
 	 */
+	@Nullable
 	public String getAvatar() {
 		return avatar;
 	}
@@ -237,7 +253,8 @@ public class Profile implements Fingerprintable {
 	 *            image.
 	 * @return This Sone
 	 */
-	public Profile setAvatar(Image avatar) {
+	@Nonnull
+	public Profile setAvatar(@Nullable Image avatar) {
 		if (avatar == null) {
 			this.avatar = null;
 			return this;
@@ -254,7 +271,8 @@ public class Profile implements Fingerprintable {
 	 *            The year of the birth date
 	 * @return This profile (for method chaining)
 	 */
-	public Profile setBirthYear(Integer birthYear) {
+	@Nonnull
+	public Profile setBirthYear(@Nullable Integer birthYear) {
 		this.birthYear = birthYear;
 		return this;
 	}
@@ -264,6 +282,7 @@ public class Profile implements Fingerprintable {
 	 *
 	 * @return The fields of this profile
 	 */
+	@Nonnull
 	public List<Field> getFields() {
 		return new ArrayList<Field>(fields);
 	}
@@ -275,7 +294,7 @@ public class Profile implements Fingerprintable {
 	 *            The field to check for
 	 * @return {@code true} if this profile contains the field, false otherwise
 	 */
-	public boolean hasField(Field field) {
+	public boolean hasField(@Nonnull Field field) {
 		return fields.contains(field);
 	}
 
@@ -287,7 +306,8 @@ public class Profile implements Fingerprintable {
 	 * @return The field, or {@code null} if this profile does not contain a
 	 *         field with the given ID
 	 */
-	public Field getFieldById(String fieldId) {
+	@Nullable
+	public Field getFieldById(@Nonnull String fieldId) {
 		checkNotNull(fieldId, "fieldId must not be null");
 		for (Field field : fields) {
 			if (field.getId().equals(fieldId)) {
@@ -305,7 +325,8 @@ public class Profile implements Fingerprintable {
 	 * @return The field, or {@code null} if this profile does not contain a
 	 *         field with the given name
 	 */
-	public Field getFieldByName(String fieldName) {
+	@Nullable
+	public Field getFieldByName(@Nonnull String fieldName) {
 		for (Field field : fields) {
 			if (field.getName().equals(fieldName)) {
 				return field;
@@ -323,7 +344,8 @@ public class Profile implements Fingerprintable {
 	 * @throws IllegalArgumentException
 	 *             if the name is not valid
 	 */
-	public Field addField(String fieldName) throws IllegalArgumentException {
+	@Nonnull
+	public Field addField(@Nonnull String fieldName) throws IllegalArgumentException {
 		checkNotNull(fieldName, "fieldName must not be null");
 		if (fieldName.length() == 0) {
 			throw new EmptyFieldName();
@@ -345,7 +367,7 @@ public class Profile implements Fingerprintable {
 	 * @param field
 	 *            The field to move up
 	 */
-	public void moveFieldUp(Field field) {
+	public void moveFieldUp(@Nonnull Field field) {
 		checkNotNull(field, "field must not be null");
 		checkArgument(hasField(field), "field must belong to this profile");
 		checkArgument(getFieldIndex(field) > 0, "field index must be > 0");
@@ -362,7 +384,7 @@ public class Profile implements Fingerprintable {
 	 * @param field
 	 *            The field to move down
 	 */
-	public void moveFieldDown(Field field) {
+	public void moveFieldDown(@Nonnull Field field) {
 		checkNotNull(field, "field must not be null");
 		checkArgument(hasField(field), "field must belong to this profile");
 		checkArgument(getFieldIndex(field) < fields.size() - 1, "field index must be < " + (fields.size() - 1));
@@ -377,7 +399,7 @@ public class Profile implements Fingerprintable {
 	 * @param field
 	 *            The field to remove
 	 */
-	public void removeField(Field field) {
+	public void removeField(@Nonnull Field field) {
 		checkNotNull(field, "field must not be null");
 		checkArgument(hasField(field), "field must belong to this profile");
 		fields.remove(field);
@@ -395,7 +417,7 @@ public class Profile implements Fingerprintable {
 	 * @return The index of the field, or {@code -1} if there is no field with
 	 *         the given name
 	 */
-	private int getFieldIndex(Field field) {
+	private int getFieldIndex(@Nonnull Field field) {
 		return fields.indexOf(field);
 	}
 
@@ -470,7 +492,7 @@ public class Profile implements Fingerprintable {
 		 * @param id
 		 *            The ID of the field
 		 */
-		private Field(String id) {
+		private Field(@Nonnull String id) {
 			this.id = checkNotNull(id, "id must not be null");
 		}
 
@@ -479,6 +501,7 @@ public class Profile implements Fingerprintable {
 		 *
 		 * @return The ID of this field
 		 */
+		@Nonnull
 		public String getId() {
 			return id;
 		}
@@ -488,6 +511,7 @@ public class Profile implements Fingerprintable {
 		 *
 		 * @return The name of this field
 		 */
+		@Nonnull
 		public String getName() {
 			return name;
 		}
@@ -501,7 +525,8 @@ public class Profile implements Fingerprintable {
 		 *            The new name of this field
 		 * @return This field
 		 */
-		public Field setName(String name) {
+		@Nonnull
+		public Field setName(@Nonnull String name) {
 			checkNotNull(name, "name must not be null");
 			checkArgument(getFieldByName(name) == null, "name must be unique");
 			this.name = name;
@@ -513,6 +538,7 @@ public class Profile implements Fingerprintable {
 		 *
 		 * @return The value of this field
 		 */
+		@Nullable
 		public String getValue() {
 			return value;
 		}
@@ -526,7 +552,8 @@ public class Profile implements Fingerprintable {
 		 *            The new value of this field
 		 * @return This field
 		 */
-		public Field setValue(String value) {
+		@Nonnull
+		public Field setValue(@Nullable String value) {
 			this.value = value;
 			return this;
 		}

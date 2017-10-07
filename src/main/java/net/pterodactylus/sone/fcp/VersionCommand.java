@@ -21,7 +21,6 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.main.SonePlugin;
 import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
 
 /**
  * Returns version information about the Sone plugin.
@@ -44,7 +43,7 @@ public class VersionCommand extends AbstractSoneCommand {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response execute(SimpleFieldSet parameters, Bucket data, AccessType accessType) {
+	public Response execute(SimpleFieldSet parameters) {
 		return new Response("Version", new SimpleFieldSetBuilder().put("Version", SonePlugin.getPluginVersion()).put("ProtocolVersion", 1).get());
 	}
 

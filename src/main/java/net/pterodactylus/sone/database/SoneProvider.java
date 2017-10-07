@@ -19,6 +19,8 @@ package net.pterodactylus.sone.database;
 
 import java.util.Collection;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Sone;
 
@@ -51,6 +53,7 @@ public interface SoneProvider {
 	 *
 	 * @return All Sones
 	 */
+	@Nonnull
 	public Collection<Sone> getSones();
 
 	/**

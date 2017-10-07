@@ -2,7 +2,7 @@ package net.pterodactylus.sone.template;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -17,8 +17,6 @@ import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateException;
 import net.pterodactylus.util.template.TemplateParser;
-
-import freenet.support.io.Closer;
 
 import com.google.common.base.Charsets;
 
@@ -46,28 +44,19 @@ public class FilesystemTemplate extends Template {
 
 	private void loadTemplate() {
 		File templateFile = new File(filename);
-		if (!templateFile.exists()) {
-			throw new TemplateFileNotFoundException(filename);
-		}
 		if (templateWasLoaded() && !templateFileHasBeenModifiedAfterLoading(templateFile)) {
 			return;
 		}
-		InputStream templateInputStream = null;
-		Reader templateReader = null;
-		try {
-			templateInputStream = new FileInputStream(templateFile);
-			templateReader = new InputStreamReader(templateInputStream, Charsets.UTF_8);
+		try (InputStream templateInputStream = new FileInputStream(templateFile);
+				Reader templateReader = new InputStreamReader(templateInputStream, Charsets.UTF_8)) {
 			Template template = TemplateParser.parse(templateReader);
 			lastTemplate.set(new LastLoadedTemplate(template));
 			template.getInitialContext().mergeContext(initialContext);
 			for (Part part : parts) {
 				template.add(part);
 			}
-		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
 			throw new TemplateFileNotFoundException(filename);
-		} finally {
-			Closer.close(templateReader);
-			Closer.close(templateInputStream);
 		}
 	}
 

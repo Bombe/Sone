@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web.page;
 
+import static java.lang.String.format;
 import static java.util.logging.Logger.getLogger;
 
 import java.io.IOException;
@@ -118,7 +119,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Response handleRequest(FreenetRequest request, Response response) throws IOException {
+	public final Response handleRequest(FreenetRequest request, Response response) throws IOException {
 		String redirectTarget = getRedirectTarget(request);
 		if (redirectTarget != null) {
 			return new RedirectResponse(redirectTarget);
@@ -157,7 +158,7 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 			long start = System.nanoTime();
 			processTemplate(request, templateContext);
 			long finish = System.nanoTime();
-			logger.log(Level.FINEST, String.format("Template was rendered in %.2fms.", (finish - start) / 1000000.0));
+			logger.log(Level.FINEST, format("Template was rendered in %.2fms.", (finish - start) / 1000000.0));
 		} catch (RedirectException re1) {
 			return new RedirectResponse(re1.getTarget());
 		}
@@ -310,6 +311,11 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 		 */
 		public String getTarget() {
 			return target;
+		}
+
+		@Override
+		public String toString() {
+			return format("RedirectException{target='%s'}", target);
 		}
 
 	}

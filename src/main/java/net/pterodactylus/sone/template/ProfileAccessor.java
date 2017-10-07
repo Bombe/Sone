@@ -20,7 +20,7 @@ package net.pterodactylus.sone.template;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.data.Sone.ShowCustomAvatars;
+import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.template.Accessor;
@@ -74,24 +74,24 @@ public class ProfileAccessor extends ReflectionAccessor {
 				/* always show your own avatars. */
 				return avatarId;
 			}
-			ShowCustomAvatars showCustomAvatars = currentSone.getOptions().getShowCustomAvatars();
-			if (showCustomAvatars == ShowCustomAvatars.NEVER) {
+			LoadExternalContent showCustomAvatars = currentSone.getOptions().getShowCustomAvatars();
+			if (showCustomAvatars == LoadExternalContent.NEVER) {
 				return null;
 			}
-			if (showCustomAvatars == ShowCustomAvatars.ALWAYS) {
+			if (showCustomAvatars == LoadExternalContent.ALWAYS) {
 				return avatarId;
 			}
-			if (showCustomAvatars == ShowCustomAvatars.FOLLOWED) {
+			if (showCustomAvatars == LoadExternalContent.FOLLOWED) {
 				return currentSone.hasFriend(remoteSone.getId()) ? avatarId : null;
 			}
 			Trust trust = remoteSone.getIdentity().getTrust((OwnIdentity) currentSone.getIdentity());
 			if (trust == null) {
 				return null;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.MANUALLY_TRUSTED) && (trust.getExplicit() != null) && (trust.getExplicit() > 0)) {
+			if ((showCustomAvatars == LoadExternalContent.MANUALLY_TRUSTED) && (trust.getExplicit() != null) && (trust.getExplicit() > 0)) {
 				return avatarId;
 			}
-			if ((showCustomAvatars == ShowCustomAvatars.TRUSTED) && (((trust.getExplicit() != null) && (trust.getExplicit() > 0)) || ((trust.getImplicit() != null) && (trust.getImplicit() > 0)))) {
+			if ((showCustomAvatars == LoadExternalContent.TRUSTED) && (((trust.getExplicit() != null) && (trust.getExplicit() > 0)) || ((trust.getImplicit() != null) && (trust.getImplicit() > 0)))) {
 				return avatarId;
 			}
 			return null;

@@ -25,7 +25,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.Field;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder;
 import net.pterodactylus.sone.freenet.fcp.AbstractCommand;
@@ -33,11 +32,10 @@ import net.pterodactylus.sone.freenet.fcp.Command;
 import net.pterodactylus.sone.freenet.fcp.FcpException;
 import net.pterodactylus.sone.template.SoneAccessor;
 
-import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
-
 import freenet.node.FSParseException;
 import freenet.support.SimpleFieldSet;
+
+import com.google.common.base.Optional;
 
 /**
  * Abstract base implementation of a {@link Command} with Sone-related helper
@@ -114,7 +112,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 * @return The encoded text
 	 */
 	protected static String encodeString(String text) {
-		return text.replaceAll("\\\\", "\\\\").replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r");
+		return text.replaceAll("\\\\", "\\\\\\\\").replaceAll("\n", "\\\\n").replaceAll("\r", "\\\\r");
 	}
 
 	/**
@@ -164,7 +162,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.");
 		}
 		Optional<Sone> sone = core.getSone(soneId);
-		if ((mandatory && !sone.isPresent()) || (mandatory && sone.isPresent() && (localOnly && !sone.get().isLocal()))) {
+		if ((mandatory && !sone.isPresent()) || (sone.isPresent() && localOnly && !sone.get().isLocal())) {
 			throw new FcpException("Could not load Sone from “" + soneId + "”.");
 		}
 		return sone;
@@ -239,6 +237,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected static SimpleFieldSet encodeSone(Sone sone, String prefix, Optional<Sone> localSone) {
 		SimpleFieldSetBuilder soneBuilder = new SimpleFieldSetBuilder();
 
+		soneBuilder.put(prefix + "ID", sone.getId());
 		soneBuilder.put(prefix + "Name", sone.getName());
 		soneBuilder.put(prefix + "NiceName", SoneAccessor.getNiceName(sone));
 		soneBuilder.put(prefix + "LastUpdated", sone.getTime());
@@ -274,10 +273,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		soneBuilder.put(prefix + "Count", sones.size());
 		for (Sone sone : sones) {
 			String sonePrefix = prefix + soneIndex++ + ".";
-			soneBuilder.put(sonePrefix + "ID", sone.getId());
-			soneBuilder.put(sonePrefix + "Name", sone.getName());
-			soneBuilder.put(sonePrefix + "NiceName", SoneAccessor.getNiceName(sone));
-			soneBuilder.put(sonePrefix + "Time", sone.getTime());
+			soneBuilder.put(encodeSone(sone, sonePrefix, Optional.<Sone>absent()));
 		}
 
 		return soneBuilder.get();
@@ -337,9 +333,6 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		for (Post post : posts) {
 			String postPrefix = prefix + postIndex++;
 			postBuilder.put(encodePost(post, postPrefix + ".", includeReplies));
-			if (includeReplies) {
-				postBuilder.put(encodeReplies(Collections2.filter(core.getReplies(post.getId()), Reply.FUTURE_REPLY_FILTER), postPrefix + "."));
-			}
 		}
 
 		return postBuilder.get();
@@ -355,7 +348,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	 *            {@code null})
 	 * @return The simple field set containing the replies
 	 */
-	protected static SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
+	protected SimpleFieldSet encodeReplies(Collection<? extends PostReply> replies, String prefix) {
 		SimpleFieldSetBuilder replyBuilder = new SimpleFieldSetBuilder();
 
 		int replyIndex = 0;
@@ -366,6 +359,7 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 			replyBuilder.put(replyPrefix + "Sone", reply.getSone().getId());
 			replyBuilder.put(replyPrefix + "Time", reply.getTime());
 			replyBuilder.put(replyPrefix + "Text", encodeString(reply.getText()));
+			replyBuilder.put(encodeLikes(core.getLikes(reply), replyPrefix + "Likes."));
 		}
 
 		return replyBuilder.get();

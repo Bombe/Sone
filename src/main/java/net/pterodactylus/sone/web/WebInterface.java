@@ -30,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -40,6 +41,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
@@ -72,6 +74,9 @@ import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.main.Loaders;
 import net.pterodactylus.sone.main.ReparseFilter;
 import net.pterodactylus.sone.main.SonePlugin;
+import net.pterodactylus.sone.main.SonePlugin.PluginHomepage;
+import net.pterodactylus.sone.main.SonePlugin.PluginVersion;
+import net.pterodactylus.sone.main.SonePlugin.PluginYear;
 import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.notify.ListNotificationFilter;
 import net.pterodactylus.sone.notify.PostVisibilityFilter;
@@ -84,12 +89,16 @@ import net.pterodactylus.sone.template.IdentityAccessor;
 import net.pterodactylus.sone.template.ImageAccessor;
 import net.pterodactylus.sone.template.ImageLinkFilter;
 import net.pterodactylus.sone.template.JavascriptFilter;
+import net.pterodactylus.sone.template.LinkedElementRenderFilter;
+import net.pterodactylus.sone.template.LinkedElementsFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.PostAccessor;
 import net.pterodactylus.sone.template.ProfileAccessor;
+import net.pterodactylus.sone.template.RenderFilter;
 import net.pterodactylus.sone.template.ReplyAccessor;
 import net.pterodactylus.sone.template.ReplyGroupFilter;
 import net.pterodactylus.sone.template.RequestChangeFilter;
+import net.pterodactylus.sone.template.ShortenFilter;
 import net.pterodactylus.sone.template.SoneAccessor;
 import net.pterodactylus.sone.template.SubstringFilter;
 import net.pterodactylus.sone.template.TrustAccessor;
@@ -98,6 +107,7 @@ import net.pterodactylus.sone.template.UnknownDateFilter;
 import net.pterodactylus.sone.text.Part;
 import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
+import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreateReplyAjaxPage;
@@ -111,12 +121,13 @@ import net.pterodactylus.sone.web.ajax.EditImageAjaxPage;
 import net.pterodactylus.sone.web.ajax.EditProfileFieldAjaxPage;
 import net.pterodactylus.sone.web.ajax.FollowSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetLikesAjaxPage;
+import net.pterodactylus.sone.web.ajax.GetLinkedElementAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetNotificationsAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetPostAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetReplyAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetStatusAjaxPage;
 import net.pterodactylus.sone.web.ajax.GetTimesAjaxPage;
-import net.pterodactylus.sone.web.ajax.GetTranslationPage;
+import net.pterodactylus.sone.web.ajax.GetTranslationAjaxPage;
 import net.pterodactylus.sone.web.ajax.LikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.LockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.MarkAsKnownAjaxPage;
@@ -130,6 +141,49 @@ import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.PageToadlet;
 import net.pterodactylus.sone.web.page.PageToadletFactory;
+import net.pterodactylus.sone.web.pages.AboutPage;
+import net.pterodactylus.sone.web.pages.BookmarkPage;
+import net.pterodactylus.sone.web.pages.BookmarksPage;
+import net.pterodactylus.sone.web.pages.CreateAlbumPage;
+import net.pterodactylus.sone.web.pages.CreatePostPage;
+import net.pterodactylus.sone.web.pages.CreateReplyPage;
+import net.pterodactylus.sone.web.pages.CreateSonePage;
+import net.pterodactylus.sone.web.pages.DeleteAlbumPage;
+import net.pterodactylus.sone.web.pages.DeleteImagePage;
+import net.pterodactylus.sone.web.pages.DeletePostPage;
+import net.pterodactylus.sone.web.pages.DeleteProfileFieldPage;
+import net.pterodactylus.sone.web.pages.DeleteReplyPage;
+import net.pterodactylus.sone.web.pages.DeleteSonePage;
+import net.pterodactylus.sone.web.pages.DismissNotificationPage;
+import net.pterodactylus.sone.web.pages.DistrustPage;
+import net.pterodactylus.sone.web.pages.EditAlbumPage;
+import net.pterodactylus.sone.web.pages.EditImagePage;
+import net.pterodactylus.sone.web.pages.EditProfileFieldPage;
+import net.pterodactylus.sone.web.pages.EditProfilePage;
+import net.pterodactylus.sone.web.pages.FollowSonePage;
+import net.pterodactylus.sone.web.pages.GetImagePage;
+import net.pterodactylus.sone.web.pages.ImageBrowserPage;
+import net.pterodactylus.sone.web.pages.IndexPage;
+import net.pterodactylus.sone.web.pages.KnownSonesPage;
+import net.pterodactylus.sone.web.pages.LikePage;
+import net.pterodactylus.sone.web.pages.LockSonePage;
+import net.pterodactylus.sone.web.pages.LoginPage;
+import net.pterodactylus.sone.web.pages.LogoutPage;
+import net.pterodactylus.sone.web.pages.MarkAsKnownPage;
+import net.pterodactylus.sone.web.pages.NewPage;
+import net.pterodactylus.sone.web.pages.OptionsPage;
+import net.pterodactylus.sone.web.pages.RescuePage;
+import net.pterodactylus.sone.web.pages.SearchPage;
+import net.pterodactylus.sone.web.pages.SoneTemplatePage;
+import net.pterodactylus.sone.web.pages.TrustPage;
+import net.pterodactylus.sone.web.pages.UnbookmarkPage;
+import net.pterodactylus.sone.web.pages.UnfollowSonePage;
+import net.pterodactylus.sone.web.pages.UnlikePage;
+import net.pterodactylus.sone.web.pages.UnlockSonePage;
+import net.pterodactylus.sone.web.pages.UntrustPage;
+import net.pterodactylus.sone.web.pages.UploadImagePage;
+import net.pterodactylus.sone.web.pages.ViewPostPage;
+import net.pterodactylus.sone.web.pages.ViewSonePage;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
@@ -170,7 +224,7 @@ import com.google.inject.Inject;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-public class WebInterface {
+public class WebInterface implements SessionProvider {
 
 	/** The logger. */
 	private static final Logger logger = getLogger(WebInterface.class.getName());
@@ -198,10 +252,17 @@ public class WebInterface {
 
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
+	private final ShortenFilter shortenFilter;
+	private final RenderFilter renderFilter;
 
 	private final ListNotificationFilter listNotificationFilter;
 	private final PostVisibilityFilter postVisibilityFilter;
 	private final ReplyVisibilityFilter replyVisibilityFilter;
+
+	private final ElementLoader elementLoader;
+	private final LinkedElementRenderFilter linkedElementRenderFilter;
+	private final TimeTextConverter timeTextConverter = new TimeTextConverter();
+	private final L10nFilter l10nFilter = new L10nFilter(this);
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -252,19 +313,20 @@ public class WebInterface {
 	 *            The Sone plugin
 	 */
 	@Inject
-	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter) {
+	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter, ElementLoader elementLoader) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
 		this.postVisibilityFilter = postVisibilityFilter;
 		this.replyVisibilityFilter = replyVisibilityFilter;
+		this.elementLoader = elementLoader;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
 		templateContextFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore()));
+		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore(), new TimeTextConverter()));
 		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
 		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
 		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
@@ -284,7 +346,11 @@ public class WebInterface {
 		templateContextFactory.addFilter("match", new MatchFilter());
 		templateContextFactory.addFilter("css", new CssClassNameFilter());
 		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), templateContextFactory, soneTextParser));
+		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), soneTextParser));
+		templateContextFactory.addFilter("shorten", shortenFilter = new ShortenFilter());
+		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), templateContextFactory));
+		templateContextFactory.addFilter("linked-elements", new LinkedElementsFilter(elementLoader));
+		templateContextFactory.addFilter("render-linked-element", linkedElementRenderFilter = new LinkedElementRenderFilter(templateContextFactory));
 		templateContextFactory.addFilter("reparse", new ReparseFilter());
 		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
 		templateContextFactory.addFilter("format", new FormatFilter());
@@ -344,6 +410,7 @@ public class WebInterface {
 	 *
 	 * @return The Sone core
 	 */
+	@Nonnull
 	public Core getCore() {
 		return sonePlugin.core();
 	}
@@ -357,68 +424,32 @@ public class WebInterface {
 		return templateContextFactory;
 	}
 
-	/**
-	 * Returns the current session, creating a new session if there is no
-	 * current session.
-	 *
-	 * @param toadletContenxt
-	 *            The toadlet context
-	 * @return The current session, or {@code null} if there is no current
-	 *         session
-	 */
-	public Session getCurrentSession(ToadletContext toadletContenxt) {
-		return getCurrentSession(toadletContenxt, true);
+	private Session getCurrentSessionWithoutCreation(ToadletContext toadletContenxt) {
+		return getSessionManager().useSession(toadletContenxt);
 	}
 
-	/**
-	 * Returns the current session, creating a new session if there is no
-	 * current session and {@code create} is {@code true}.
-	 *
-	 * @param toadletContenxt
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if there is no current
-	 *            session, {@code false} otherwise
-	 * @return The current session, or {@code null} if there is no current
-	 *         session
-	 */
-	public Session getCurrentSession(ToadletContext toadletContenxt, boolean create) {
-		Session session = getSessionManager().useSession(toadletContenxt);
-		if (create && (session == null)) {
+	private Session getOrCreateCurrentSession(ToadletContext toadletContenxt) {
+		Session session = getCurrentSessionWithoutCreation(toadletContenxt);
+		if (session == null) {
 			session = getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
 		}
 		return session;
 	}
 
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	public Sone getCurrentSone(ToadletContext toadletContext) {
-		return getCurrentSone(toadletContext, true);
-	}
-
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @param create
-	 *            {@code true} to create a new session if no session exists,
-	 *            {@code false} to not create a new session
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	public Sone getCurrentSone(ToadletContext toadletContext, boolean create) {
+	public Sone getCurrentSoneCreatingSession(ToadletContext toadletContext) {
 		Collection<Sone> localSones = getCore().getLocalSones();
 		if (localSones.size() == 1) {
 			return localSones.iterator().next();
 		}
-		return getCurrentSone(getCurrentSession(toadletContext, create));
+		return getCurrentSone(getOrCreateCurrentSession(toadletContext));
+	}
+
+	public Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
+		Collection<Sone> localSones = getCore().getLocalSones();
+		if (localSones.size() == 1) {
+			return localSones.iterator().next();
+		}
+		return getCurrentSone(getCurrentSessionWithoutCreation(toadletContext));
 	}
 
 	/**
@@ -429,7 +460,7 @@ public class WebInterface {
 	 * @return The currently logged in Sone, or {@code null} if no Sone is
 	 *         currently logged in
 	 */
-	public Sone getCurrentSone(Session session) {
+	private Sone getCurrentSone(Session session) {
 		if (session == null) {
 			return null;
 		}
@@ -440,6 +471,12 @@ public class WebInterface {
 		return getCore().getLocalSone(soneId);
 	}
 
+	@Override
+	@Nullable
+	public Sone getCurrentSone(@Nonnull ToadletContext toadletContext, boolean createSession) {
+		return createSession ? getCurrentSoneCreatingSession(toadletContext) : getCurrentSoneWithoutCreatingSession(toadletContext);
+	}
+
 	/**
 	 * Sets the currently logged in Sone.
 	 *
@@ -448,8 +485,9 @@ public class WebInterface {
 	 * @param sone
 	 *            The Sone to set as currently logged in
 	 */
-	public void setCurrentSone(ToadletContext toadletContext, Sone sone) {
-		Session session = getCurrentSession(toadletContext);
+	@Override
+	public void setCurrentSone(@Nonnull ToadletContext toadletContext, @Nullable Sone sone) {
+		Session session = getOrCreateCurrentSession(toadletContext);
 		if (sone == null) {
 			session.removeAttribute("Sone.CurrentSone");
 		} else {
@@ -717,7 +755,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, SonePlugin.getPluginVersion(), SonePlugin.getYear(), SonePlugin.getHomepage()), "About"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, new PluginVersion(SonePlugin.getPluginVersion()), new PluginYear(SonePlugin.getYear()), new PluginHomepage(SonePlugin.getHomepage())), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyImageTitle.html", emptyImageTitleTemplate, "Page.EmptyImageTitle.Title", this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyAlbumTitle.html", emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title", this)));
@@ -728,15 +766,16 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault())));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter, TimeZone.getDefault())));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
@@ -745,7 +784,7 @@ public class WebInterface {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter, shortenFilter, renderFilter)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));

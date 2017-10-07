@@ -3,7 +3,7 @@ package net.pterodactylus.sone.main;
 import java.io.File;
 
 import net.pterodactylus.sone.template.FilesystemTemplate;
-import net.pterodactylus.sone.web.ReloadingPage;
+import net.pterodactylus.sone.web.pages.ReloadingPage;
 import net.pterodactylus.util.template.FilesystemTemplateProvider;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateProvider;

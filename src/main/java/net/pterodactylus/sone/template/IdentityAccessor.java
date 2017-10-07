@@ -19,6 +19,9 @@ package net.pterodactylus.sone.template;
 
 import java.util.Set;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
@@ -32,6 +35,7 @@ import net.pterodactylus.util.template.TemplateContext;
  *
  * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
+@Singleton
 public class IdentityAccessor extends ReflectionAccessor {
 
 	/** The core. */
@@ -43,6 +47,7 @@ public class IdentityAccessor extends ReflectionAccessor {
 	 * @param core
 	 *            The core
 	 */
+	@Inject
 	public IdentityAccessor(Core core) {
 		this.core = core;
 	}
