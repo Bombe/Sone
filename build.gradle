@@ -55,6 +55,8 @@ dependencies {
     testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 }
 
+apply from: 'version.gradle'
+
 task fatJar(type: Jar) {
     archiveName = project.name + '-jar-with-dependencies.jar'
     from { (configurations.runtime - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) } }
