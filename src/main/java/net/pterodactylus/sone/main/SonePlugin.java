@@ -114,9 +114,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		});
 	}
 
-	/** The version. */
-	private static final Version VERSION = new Version(0, 9, 6);
-
 	/** The current year at time of release. */
 	private static final int YEAR = 2016;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
@@ -175,7 +172,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	public static String getPluginVersion() {
-		return VERSION.toString();
+		net.pterodactylus.sone.main.Version version = VersionParserKt.parseVersion();
+		return (version == null) ? "unknown" : version.getNice();
 	}
 
 	public static int getYear() {
@@ -250,7 +248,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
-				bind(Version.class).toInstance(VERSION);
+				bind(Version.class).toInstance(Version.parse(getVersion()));
 				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
 				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
 				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
@@ -404,7 +402,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public String getVersion() {
-		return VERSION.toString();
+		return getPluginVersion();
 	}
 
 	public static class PluginVersion {
