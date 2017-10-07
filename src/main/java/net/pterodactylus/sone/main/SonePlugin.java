@@ -172,7 +172,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	public static String getPluginVersion() {
-		net.pterodactylus.sone.main.Version version = VersionParserKt.parseVersion();
+		net.pterodactylus.sone.main.Version version = VersionParserKt.getParsedVersion();
 		return (version == null) ? "unknown" : version.getNice();
 	}
 

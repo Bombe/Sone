@@ -29,4 +29,11 @@ class VersionParserTest {
 		assertThat(version.nice, equalTo("0.9.6-466-g43f3e1c"))
 	}
 
+	@Test
+	fun `parsed version is created correctly`() {
+		val version = parsedVersion!!
+		assertThat(version.id, equalTo("43f3e1c3a0f487e37e5851a2cc72756d271c7571"))
+		assertThat(version.nice, equalTo("0.9.6-466-g43f3e1c"))
+	}
+
 }

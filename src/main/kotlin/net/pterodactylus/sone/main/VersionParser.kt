@@ -9,6 +9,8 @@ fun parseVersion(file: String = "/version.yaml"): Version? =
 			objectMapper.readValue(it, Version::class.java)
 		}
 
+val parsedVersion by lazy { parseVersion() }
+
 private val objectMapper = ObjectMapper(YAMLFactory())
 
 @NoArg
