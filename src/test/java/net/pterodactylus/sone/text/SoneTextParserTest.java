@@ -204,6 +204,12 @@ public class SoneTextParserTest {
 	}
 
 	@Test
+	public void invalidSskAndUskLinkIsParsedAsText() {
+		Iterable<Part> parts = soneTextParser.parse("SSK@a USK@a", null);
+		assertThat("Part Text", convertText(parts), is("SSK@a USK@a"));
+	}
+
+	@Test
 	public void sskLinkWithoutContextIsNotTrusted() {
 		Iterable<Part> parts = soneTextParser.parse("SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test", null);
 		assertThat("Part Text", convertText(parts), is("[SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|SSK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test|test]"));
