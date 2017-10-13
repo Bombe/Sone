@@ -63,7 +63,7 @@ class ParserFilterTest {
 		parameters.put("sone", soneOrSoneId)
 		filter.format(templateContext, "text", parameters)
 		val context = forClass(SoneTextParserContext::class.java)
-		verify(soneTextParser).parse(eq<String>("text"), context.capture())
+		verify(soneTextParser).parse(eq<String>("text") ?: "", context.capture())
 		assertThat(context.value.postingSone, `is`(sone))
 	}
 
