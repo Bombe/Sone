@@ -14,21 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.Image
 
 /**
- * Builder for {@link Image} objects.
- *
- * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
+ * Builder for [Image] objects.
  */
-public interface ImageBuilder {
+interface ImageBuilder {
 
-	ImageBuilder randomId();
+	fun randomId(): ImageBuilder
+	fun withId(id: String): ImageBuilder
 
-	ImageBuilder withId(String id);
-
-	Image build() throws IllegalStateException;
+	fun build(): Image
 
 }

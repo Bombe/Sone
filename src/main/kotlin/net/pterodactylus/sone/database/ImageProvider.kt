@@ -1,5 +1,5 @@
 /*
- * Sone - ImageBuilderFactory.java - Copyright © 2013–2016 David Roden
+ * Sone - ImageProvider.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,15 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
+
+import net.pterodactylus.sone.data.Image
+
+import com.google.common.base.Optional
 
 /**
- * Factory for {@link ImageBuilder}s.
- *
- * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
+ * Provides [Image]s.
  */
-public interface ImageBuilderFactory {
+interface ImageProvider {
 
-	ImageBuilder newImageBuilder();
+	fun getImage(imageId: String): Optional<Image>
 
 }

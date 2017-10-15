@@ -15,16 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
 
 /**
- * Combines an {@link ImageProvider}, an {@link ImageBuilderFactory}, and an
- * {@link ImageStore} into an image database.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Combines an [ImageProvider], an [ImageBuilderFactory], and an
+ * [ImageStore] into an image database.
  */
-public interface ImageDatabase extends ImageProvider, ImageBuilderFactory, ImageStore {
-
-	/* nothing here. */
-
-}
+interface ImageDatabase : ImageProvider, ImageBuilderFactory, ImageStore
