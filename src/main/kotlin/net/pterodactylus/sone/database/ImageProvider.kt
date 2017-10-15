@@ -26,6 +26,6 @@ import com.google.common.base.Optional
  */
 interface ImageProvider {
 
-	fun getImage(imageId: String): Optional<Image>
+	fun getImage(imageId: String): Image?
 
 }

@@ -527,11 +527,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// IMAGEPROVIDER METHODS
 	//
 
+	@Nullable
 	@Override
-	public Optional<Image> getImage(String imageId) {
+	public Image getImage(@Nonnull String imageId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allImages.get(imageId));
+			return allImages.get(imageId);
 		} finally {
 			lock.readLock().unlock();
 		}

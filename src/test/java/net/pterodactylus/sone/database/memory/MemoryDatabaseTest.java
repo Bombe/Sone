@@ -198,16 +198,16 @@ public class MemoryDatabaseTest {
 		assertThat(memoryDatabase.getAlbum("album3").get(),
 				isAlbum("album3", "album1", "album3", "album-description3"));
 		assertThat(memoryDatabase.getAlbum("album4").isPresent(), is(false));
-		assertThat(memoryDatabase.getImage("image1").get(),
+		assertThat(memoryDatabase.getImage("image1"),
 				isImage("image1", 1000L, "KSK@image1", "image1",
 						"image-description1", 16, 9));
-		assertThat(memoryDatabase.getImage("image2").get(),
+		assertThat(memoryDatabase.getImage("image2"),
 				isImage("image2", 2000L, "KSK@image2", "image2",
 						"image-description2", 32, 18));
-		assertThat(memoryDatabase.getImage("image3").get(),
+		assertThat(memoryDatabase.getImage("image3"),
 				isImage("image3", 3000L, "KSK@image3", "image3",
 						"image-description3", 48, 27));
-		assertThat(memoryDatabase.getImage("image4").isPresent(), is(false));
+		assertThat(memoryDatabase.getImage("image4"), nullValue());
 	}
 
 	@Test

@@ -576,9 +576,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Nullable
 	public Image getImage(String imageId, boolean create) {
-		Optional<Image> image = database.getImage(imageId);
-		if (image.isPresent()) {
-			return image.get();
+		Image image = database.getImage(imageId);
+		if (image != null) {
+			return image;
 		}
 		if (!create) {
 			return null;
