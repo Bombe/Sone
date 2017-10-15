@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.text.TextFilter
+import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -24,7 +25,7 @@ class CreatePostPage(template: Template, webInterface: WebInterface):
 			}
 			val sender = webInterface.core.getLocalSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: getCurrentSone(freenetRequest.toadletContext)
 			val recipient = webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("recipient", 43))
-			webInterface.core.createPost(sender, recipient, TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), text))
+			webInterface.core.createPost(sender, recipient.asOptional(), TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), text))
 			throw RedirectException(returnPage)
 		}
 	}

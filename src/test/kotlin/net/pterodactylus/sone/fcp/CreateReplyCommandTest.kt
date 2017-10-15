@@ -46,7 +46,7 @@ class CreateReplyCommandTest : SoneCommandTest() {
 
 	private fun addValidLocalSoneParameter() {
 		parameters += "Sone" to "LocalSoneId"
-		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 	}
 
 	@Test

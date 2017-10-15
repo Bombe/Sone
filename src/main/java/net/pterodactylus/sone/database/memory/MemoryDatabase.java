@@ -37,6 +37,8 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -56,7 +58,6 @@ import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
@@ -66,6 +67,7 @@ import com.google.common.collect.TreeMultimap;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import kotlin.jvm.functions.Function1;
 
 /**
  * Memory-based {@link PostDatabase} implementation.
@@ -241,21 +243,22 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
+	@Nonnull
 	@Override
-	public Function<String, Optional<Sone>> soneLoader() {
-		return new Function<String, Optional<Sone>>() {
+	public Function1<String, Sone> getSoneLoader() {
+		return new Function1<String, Sone>() {
 			@Override
-			public Optional<Sone> apply(String soneId) {
+			public Sone invoke(String soneId) {
 				return getSone(soneId);
 			}
 		};
 	}
 
 	@Override
-	public Optional<Sone> getSone(String soneId) {
+	public Sone getSone(String soneId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allSones.get(soneId));
+			return allSones.get(soneId);
 		} finally {
 			lock.readLock().unlock();
 		}

@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.utils.also
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -18,9 +17,9 @@ class UntrustPage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			getCurrentSone(freenetRequest.toadletContext)!!.also { currentSone ->
-				freenetRequest.parameters["sone", 44]
+				freenetRequest.parameters["sone", 44]!!
 						.let(webInterface.core::getSone)
-						.also { webInterface.core.untrustSone(currentSone, it) }
+						?.also { webInterface.core.untrustSone(currentSone, it) }
 			}
 			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}

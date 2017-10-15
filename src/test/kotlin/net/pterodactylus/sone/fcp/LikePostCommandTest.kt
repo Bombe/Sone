@@ -24,8 +24,8 @@ class LikePostCommandTest : SoneCommandTest() {
 	@Before
 	fun setupPostAndSones() {
 		whenever(core.getPost("PostId")).thenReturn(post.asOptional())
-		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone.asOptional())
-		whenever(core.getSone("LocalSoneId")).thenReturn(localSone.asOptional())
+		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone)
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 	}
 
 	@Test

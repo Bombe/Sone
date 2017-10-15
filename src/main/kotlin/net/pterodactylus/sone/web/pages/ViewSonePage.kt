@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.template.SoneAccessor
-import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
@@ -21,7 +20,7 @@ class ViewSonePage(template: Template, webInterface: WebInterface):
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["soneId"] = freenetRequest.parameters["sone"]
-		freenetRequest.parameters["sone"].let(webInterface.core::getSone).let { sone ->
+		freenetRequest.parameters["sone"]!!.let(webInterface.core::getSone)?.let { sone ->
 			templateContext["sone"] = sone
 			val sonePosts = sone.posts
 			val directedPosts = webInterface.core.getDirectedPosts(sone.id)
@@ -51,7 +50,7 @@ class ViewSonePage(template: Template, webInterface: WebInterface):
 	override fun isLinkExcepted(link: URI?) = true
 
 	public override fun getPageTitle(freenetRequest: FreenetRequest): String =
-			freenetRequest.parameters["sone"].let(webInterface.core::getSone).let { sone ->
+			freenetRequest.parameters["sone"]!!.let(webInterface.core::getSone)?.let { sone ->
 				"${SoneAccessor.getNiceName(sone)} - ${webInterface.l10n.getString("Page.ViewSone.Title")}"
 			} ?: webInterface.l10n.getString("Page.ViewSone.Page.TitleWithoutSone")
 

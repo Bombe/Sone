@@ -42,7 +42,7 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 			0 -> redirect("index.html")
 			1 -> phrases.first().phrase.also { word ->
 				when {
-					word.removePrefix("sone://").let(webInterface.core::getSone).isPresent -> redirect("viewSone.html?sone=${word.removePrefix("sone://")}")
+					word.removePrefix("sone://").let(webInterface.core::getSone) != null -> redirect("viewSone.html?sone=${word.removePrefix("sone://")}")
 					word.removePrefix("post://").let(webInterface.core::getPost).isPresent -> redirect("viewPost.html?post=${word.removePrefix("post://")}")
 					word.removePrefix("reply://").let(webInterface.core::getPostReply).isPresent -> redirect("viewPost.html?post=${word.removePrefix("reply://").let(webInterface.core::getPostReply).get().postId}")
 					word.removePrefix("album://").let(webInterface.core::getAlbum) != null -> redirect("imageBrowser.html?album=${word.removePrefix("album://")}")

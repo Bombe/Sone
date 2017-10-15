@@ -12,8 +12,8 @@ class UnfollowSoneAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("unfol
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
-					?.takeIf { core.getSone(it).isPresent }
-					?.also { core.unfollowSone(currentSone, it) }
+					?.let(core::getSone)
+					?.also { core.unfollowSone(currentSone, it.id) }
 					?.let { createSuccessJsonObject() }
 					?: createErrorJsonObject("invalid-sone-id")
 

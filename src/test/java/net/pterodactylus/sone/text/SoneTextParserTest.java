@@ -26,14 +26,17 @@ import static org.hamcrest.Matchers.notNullValue;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.impl.IdOnlySone;
 import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import kotlin.jvm.functions.Function1;
 import org.junit.Test;
 
 /**
@@ -410,22 +413,21 @@ public class SoneTextParserTest {
 	 */
 	private static class TestSoneProvider implements SoneProvider {
 
+		@Nonnull
 		@Override
-		public Function<String, Optional<Sone>> soneLoader() {
-			return new Function<String, Optional<Sone>>() {
+		public Function1<String, Sone> getSoneLoader() {
+			return new Function1<String, Sone>() {
 				@Override
-				public Optional<Sone> apply(String soneId) {
+				public Sone invoke(String soneId) {
 					return getSone(soneId);
 				}
 			};
 		}
 
-		/**
-		 * {@inheritDoc}
-		 */
+		@Nullable
 		@Override
-		public Optional<Sone> getSone(final String soneId) {
-			return Optional.<Sone>of(new IdOnlySone(soneId));
+		public Sone getSone(final String soneId) {
+			return new IdOnlySone(soneId);
 		}
 
 		/**
@@ -457,8 +459,8 @@ public class SoneTextParserTest {
 	private static class AbsentSoneProvider extends TestSoneProvider {
 
 		@Override
-		public Optional<Sone> getSone(String soneId) {
-			return Optional.absent();
+		public Sone getSone(String soneId) {
+			return null;
 		}
 
 	}

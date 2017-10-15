@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -18,7 +17,7 @@ class TrustPage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			getCurrentSone(freenetRequest.toadletContext)?.also { currentSone ->
-				webInterface.core.getSone(freenetRequest.parameters["sone"]).let { sone ->
+				webInterface.core.getSone(freenetRequest.parameters["sone"]!!)?.let { sone ->
 					webInterface.core.trustSone(currentSone, sone)
 				}
 			}

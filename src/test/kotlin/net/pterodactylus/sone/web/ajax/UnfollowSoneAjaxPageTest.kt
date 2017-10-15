@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web.ajax
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
@@ -24,7 +26,7 @@ class UnfollowSoneAjaxPageTest : JsonPageTest("unfollowSone.ajax", pageSupplier 
 
 	@Test
 	fun `request with valid sone unfollows sone`() {
-		addSone(mock(), "sone-id")
+		addSone(mock<Sone>().apply { whenever(id).thenReturn("sone-id") })
 		addRequestParameter("sone", "sone-id")
 		assertThatJsonIsSuccessful()
 		verify(core).unfollowSone(currentSone, "sone-id")

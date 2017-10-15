@@ -72,7 +72,7 @@ class SoneTextParser(private val soneProvider: SoneProvider?, private val postPr
 			} catch (e: MalformedURLException) {
 				PlainTextPart(link)
 			}
-		SONE -> link.substring(7).let { SonePart(soneProvider?.getSone(it)?.orNull() ?: IdOnlySone(it)) }
+		SONE -> link.substring(7).let { SonePart(soneProvider?.getSone(it) ?: IdOnlySone(it)) }
 		POST -> postProvider?.getPost(link.substring(7))?.let { PostPart(it) } ?: PlainTextPart(link)
 		FREEMAIL -> link.indexOf('@').let { atSign ->
 			link.substring(atSign + 1, link.length - 9).let { freemailId ->

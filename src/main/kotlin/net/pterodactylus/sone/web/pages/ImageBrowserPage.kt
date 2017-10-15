@@ -40,7 +40,7 @@ class ImageBrowserPage(template: Template, webInterface: WebInterface):
 					}
 		} else {
 			templateContext["soneRequested"] = true
-			templateContext["sone"] = webInterface.core.getSone(freenetRequest.httpRequest.getParam("sone")).orNull() ?: getCurrentSone(freenetRequest.toadletContext)
+			templateContext["sone"] = webInterface.core.getSone(freenetRequest.httpRequest.getParam("sone")) ?: getCurrentSone(freenetRequest.toadletContext)
 		}
 	}
 

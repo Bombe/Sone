@@ -89,7 +89,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 		whenever(core.preferences).thenReturn(preferences)
 		whenever(core.identityManager.allOwnIdentities).then { ownIdentities }
 		whenever(core.sones).then { allSones.values }
-		whenever(core.getSone(anyString())).then { allSones[it[0]].asOptional() }
+		whenever(core.getSone(anyString())).then { allSones[it[0]] }
 		whenever(core.localSones).then { localSones.values }
 		whenever(core.getLocalSone(anyString())).then { localSones[it[0]] }
 		whenever(core.getPost(anyString())).then { allPosts[it[0]].asOptional() }

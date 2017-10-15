@@ -59,7 +59,6 @@ import net.pterodactylus.util.template.XmlFilter;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Charsets;
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
@@ -125,20 +124,20 @@ public class SoneInserter extends AbstractService {
 		this(core, eventBus, freenetInterface, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
 			@Override
 			public boolean isLocked() {
-				final Optional<Sone> sone = core.getSone(soneId);
-				if (!sone.isPresent()) {
+				Sone sone = core.getSone(soneId);
+				if (sone == null) {
 					return false;
 				}
-				return core.isLocked(sone.get());
+				return core.isLocked(sone);
 			}
 
 			@Override
 			public String getFingerprint() {
-				final Optional<Sone> sone = core.getSone(soneId);
-				if (!sone.isPresent()) {
+				Sone sone = core.getSone(soneId);
+				if (sone == null) {
 					return null;
 				}
-				return sone.get().getFingerprint();
+				return sone.getFingerprint();
 			}
 		}, insertionDelay), 1000);
 	}
@@ -219,12 +218,11 @@ public class SoneInserter extends AbstractService {
 				sleep(delay);
 
 				if (soneModificationDetector.isEligibleForInsert()) {
-					Optional<Sone> soneOptional = core.getSone(soneId);
-					if (!soneOptional.isPresent()) {
+					Sone sone = core.getSone(soneId);
+					if (sone == null) {
 						logger.log(Level.WARNING, format("Sone %s has disappeared, exiting inserter.", soneId));
 						return;
 					}
-					Sone sone = soneOptional.get();
 					InsertInformation insertInformation = new InsertInformation(sone);
 					logger.log(Level.INFO, String.format("Inserting Sone “%s”…", sone.getName()));
 

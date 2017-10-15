@@ -22,7 +22,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent;
 import net.pterodactylus.util.config.Configuration;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
@@ -74,7 +73,7 @@ public class CoreTest {
 		Identity identity = mock(Identity.class);
 		when(identity.getId()).thenReturn("sone-id");
 		Sone sone = mock(Sone.class);
-		when(database.getSone("sone-id")).thenReturn(Optional.of(sone));
+		when(database.getSone("sone-id")).thenReturn(sone);
 		PostReply postReply1 = mock(PostReply.class);
 		PostReply postReply2 = mock(PostReply.class);
 		when(sone.getReplies()).thenReturn(ImmutableSet.of(postReply1, postReply2));

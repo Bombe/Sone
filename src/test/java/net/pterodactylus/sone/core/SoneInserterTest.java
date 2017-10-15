@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Optional.of;
 import static com.google.common.io.ByteStreams.toByteArray;
 import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
 import static java.lang.System.currentTimeMillis;
@@ -62,7 +61,7 @@ public class SoneInserterTest {
 	public void setupCore() {
 		UpdateChecker updateChecker = mock(UpdateChecker.class);
 		when(core.getUpdateChecker()).thenReturn(updateChecker);
-		when(core.getSone(anyString())).thenReturn(Optional.<Sone>absent());
+		when(core.getSone(anyString())).thenReturn(null);
 	}
 
 	@Test
@@ -78,7 +77,7 @@ public class SoneInserterTest {
 		when(sone.getInsertUri()).thenReturn(insertUri);
 		when(sone.getFingerprint()).thenReturn(fingerprint);
 		when(sone.getRootAlbum()).thenReturn(mock(Album.class));
-		when(core.getSone(anyString())).thenReturn(of(sone));
+		when(core.getSone(anyString())).thenReturn(sone);
 		return sone;
 	}
 
@@ -223,7 +222,7 @@ public class SoneInserterTest {
 				new SoneInserter(core, eventBus, freenetInterface, "SoneId",
 						soneModificationDetector, 1);
 		when(soneModificationDetector.isEligibleForInsert()).thenReturn(true);
-		when(core.getSone("SoneId")).thenReturn(Optional.<Sone>absent());
+		when(core.getSone("SoneId")).thenReturn(null);
 		soneInserter.serviceRun();
 	}
 

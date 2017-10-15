@@ -16,8 +16,7 @@ class FollowSonePage(template: Template, webInterface: WebInterface):
 		if (freenetRequest.isPOST) {
 			freenetRequest.httpRequest.getPartAsStringFailsafe("sone", 1200).split(Regex("[ ,]+"))
 					.map { it to webInterface.core.getSone(it) }
-					.filter { it.second.isPresent }
-					.map { it.first to it.second.get() }
+					.filterNot { it.second == null }
 					.forEach { sone ->
 						webInterface.core.followSone(freenetRequest.currentSone, sone.first)
 						webInterface.core.markSoneKnown(sone.second)

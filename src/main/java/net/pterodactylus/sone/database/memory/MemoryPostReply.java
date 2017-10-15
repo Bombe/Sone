@@ -97,7 +97,7 @@ class MemoryPostReply implements PostReply {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId).get();
+		return soneProvider.getSone(soneId);
 	}
 
 	/**

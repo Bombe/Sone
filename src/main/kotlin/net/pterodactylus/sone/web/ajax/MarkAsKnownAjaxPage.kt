@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.ajax
 
 import com.google.common.base.Optional
+import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -15,7 +16,7 @@ class MarkAsKnownAjaxPage(webInterface: WebInterface) : JsonPage("markAsKnown.aj
 	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) = when (request.parameters["type"]) {
-		"sone" -> processIds(request, core::getSone, core::markSoneKnown)
+		"sone" -> processIds(request, { core.getSone(it).asOptional() }, core::markSoneKnown)
 		"post" -> processIds(request, core::getPost, core::markPostKnown)
 		"reply" -> processIds(request, core::getPostReply, core::markReplyKnown)
 		else -> createErrorJsonObject("invalid-type")

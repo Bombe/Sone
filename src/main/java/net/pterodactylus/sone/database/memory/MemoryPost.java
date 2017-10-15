@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.database.memory;
 
+import static com.google.common.base.Optional.fromNullable;
+
 import java.util.UUID;
 
 import net.pterodactylus.sone.data.Post;
@@ -104,7 +106,7 @@ class MemoryPost implements Post {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId).get();
+		return soneProvider.getSone(soneId);
 	}
 
 	/**
@@ -112,7 +114,7 @@ class MemoryPost implements Post {
 	 */
 	@Override
 	public Optional<String> getRecipientId() {
-		return Optional.fromNullable(recipientId);
+		return fromNullable(recipientId);
 	}
 
 	/**
@@ -120,7 +122,7 @@ class MemoryPost implements Post {
 	 */
 	@Override
 	public Optional<Sone> getRecipient() {
-		return soneProvider.getSone(recipientId);
+		return fromNullable(soneProvider.getSone(recipientId));
 	}
 
 	/**

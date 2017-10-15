@@ -17,8 +17,8 @@ class DistrustPage(template: Template, webInterface: WebInterface):
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-			val sone = webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sone", 44)).orNull()
-			sone?.run { webInterface.core.distrustSone(getCurrentSone(freenetRequest.toadletContext), this) }
+			webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sone", 44))
+					?.run { webInterface.core.distrustSone(getCurrentSone(freenetRequest.toadletContext), this) }
 			throw RedirectException(freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
 		}
 	}

@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.fcp
 
-import com.google.common.base.Optional
 import com.google.common.base.Optional.absent
 import com.google.common.base.Optional.of
 import net.pterodactylus.sone.core.Core
@@ -47,7 +46,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 	@Test
 	fun `request without text results in fcp exception`() {
 		parameters += "Sone" to "LocalSoneId"
-		whenever(core.getSone("LocalSoneId")).thenReturn(Optional.of(localSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		executeCommandAndExpectFcpException()
 	}
 
@@ -55,7 +54,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 	fun `request with text creates post`() {
 		parameters += "Sone" to "LocalSoneId"
 		parameters += "Text" to "Test"
-		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		val post = mock<Post>().apply { whenever(id).thenReturn("PostId") }
 		whenever(core.createPost(localSone, absent(), "Test")).thenReturn(post)
 		val response = command.execute(parameters)
@@ -68,7 +67,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 		parameters += "Sone" to "LocalSoneId"
 		parameters += "Text" to "Test"
 		parameters += "Recipient" to "InvalidSoneId"
-		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		executeCommandAndExpectFcpException()
 	}
 
@@ -77,7 +76,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 		parameters += "Sone" to "LocalSoneId"
 		parameters += "Text" to "Test"
 		parameters += "Recipient" to "LocalSoneId"
-		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("Error"))
 		assertThat(response.replyParameters["ErrorMessage"], notNullValue())
@@ -88,8 +87,8 @@ class CreatePostCommandTest : SoneCommandTest() {
 		parameters += "Sone" to "LocalSoneId"
 		parameters += "Text" to "Test"
 		parameters += "Recipient" to "RemoteSoneId"
-		whenever(core.getSone("LocalSoneId")).thenReturn(of(localSone))
-		whenever(core.getSone("RemoteSoneId")).thenReturn(of(remoteSone))
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
+		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone)
 		val post = mock<Post>().apply { whenever(id).thenReturn("PostId") }
 		whenever(core.createPost(localSone, of(remoteSone), "Test")).thenReturn(post)
 		val response = command.execute(parameters)

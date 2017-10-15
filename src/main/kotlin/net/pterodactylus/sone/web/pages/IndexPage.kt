@@ -19,9 +19,7 @@ class IndexPage(template: Template, webInterface: WebInterface, private val post
 		getCurrentSone(freenetRequest.toadletContext)!!.let { currentSone ->
 			(currentSone.posts +
 					currentSone.friends
-							.map { webInterface.core.getSone(it) }
-							.filter { it.isPresent }
-							.map { it.get() }
+							.mapNotNull(webInterface.core::getSone)
 							.flatMap { it.posts } +
 					webInterface.core.getDirectedPosts(currentSone.id)
 					).distinct()
