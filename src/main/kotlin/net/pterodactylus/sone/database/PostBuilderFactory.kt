@@ -15,25 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.database.memory.MemoryDatabase;
+import net.pterodactylus.sone.database.memory.MemoryDatabase
 
-import com.google.inject.ImplementedBy;
+import com.google.inject.ImplementedBy
 
 /**
- * Factory for {@link PostBuilder}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Factory for [PostBuilder]s.
  */
-@ImplementedBy(MemoryDatabase.class)
-public interface PostBuilderFactory {
+@ImplementedBy(MemoryDatabase::class)
+interface PostBuilderFactory {
 
-	/**
-	 * Creates a new post builder.
-	 *
-	 * @return A new post builder
-	 */
-	public PostBuilder newPostBuilder();
+	fun newPostBuilder(): PostBuilder
 
 }

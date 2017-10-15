@@ -14,7 +14,7 @@ class DeletePostAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("deleteP
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]
-					.let(core::getPost)
+					?.let(core::getPost)
 					?.let { post ->
 						post.sone.isLocal.ifTrue {
 							createSuccessJsonObject().also {

@@ -1,5 +1,5 @@
 /*
- * Sone - PostStore.java - Copyright © 2013–2016 David Roden
+ * Sone - PostDatabase.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,34 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
-
-import java.util.Collection;
-
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Sone;
+package net.pterodactylus.sone.database
 
 /**
- * Interface for a store for posts.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Combines a [PostProvider], a [PostBuilderFactory], and a
+ * [PostStore] into a complete post database.
  */
-public interface PostStore {
-
-	/**
-	 * Adds the given post to the store.
-	 *
-	 * @param post
-	 *            The post to store
-	 */
-	public void storePost(Post post);
-
-	/**
-	 * Removes the given post.
-	 *
-	 * @param post
-	 *            The post to remove
-	 */
-	public void removePost(Post post);
-
-}
+interface PostDatabase : PostProvider, PostBuilderFactory, PostStore

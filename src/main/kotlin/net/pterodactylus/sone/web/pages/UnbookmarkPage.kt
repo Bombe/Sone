@@ -26,8 +26,8 @@ class UnbookmarkPage(template: Template, webInterface: WebInterface):
 			}
 			freenetRequest.isPOST -> {
 				freenetRequest.parameters["post", 36]
-						.let(webInterface.core::getPost)
-						.also(webInterface.core::unbookmarkPost)
+						?.let(webInterface.core::getPost)
+						?.also(webInterface.core::unbookmarkPost)
 				throw RedirectException(freenetRequest.parameters["returnPage", 256])
 			}
 		}

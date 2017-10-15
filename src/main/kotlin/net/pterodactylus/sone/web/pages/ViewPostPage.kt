@@ -16,14 +16,14 @@ class ViewPostPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("viewPost.html", template, "Page.ViewPost.Title", webInterface, false) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		templateContext["post"] = freenetRequest.parameters["post"].let(webInterface.core::getPost).orNull()
+		templateContext["post"] = freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.orNull()
 		templateContext["raw"] = freenetRequest.parameters["raw"] == "true"
 	}
 
 	override fun isLinkExcepted(link: URI?) = true
 
 	public override fun getPageTitle(freenetRequest: FreenetRequest) =
-			(freenetRequest.parameters["post"].let(webInterface.core::getPost).let {
+			(freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.let {
 				if (it.text.length > 20) {
 					it.text.substring(0..19) + "…"
 				} else {

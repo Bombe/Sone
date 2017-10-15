@@ -19,8 +19,8 @@ class GetPostAjaxPage(webInterface: WebInterface, private val postTemplate: Temp
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]
-					.let(core::getPost)
-					.let { post ->
+					?.let(core::getPost)
+					?.let { post ->
 						createSuccessJsonObject().
 								put("post", jsonObject(
 										"id" to post.id,
