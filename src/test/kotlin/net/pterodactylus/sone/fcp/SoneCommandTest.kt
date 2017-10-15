@@ -40,7 +40,7 @@ abstract class SoneCommandTest {
 	fun setupCore() {
 		whenever(core.getSone(anyString())).thenReturn(null)
 		whenever(core.getPost(anyString())).thenReturn(absent())
-		whenever(core.getPostReply(anyString())).thenReturn(absent())
+		whenever(core.getPostReply(anyString())).thenReturn(null)
 	}
 
 	protected fun createSone(id: String, name: String, firstName: String, lastName: String, time: Long) = mock<Sone>().apply {

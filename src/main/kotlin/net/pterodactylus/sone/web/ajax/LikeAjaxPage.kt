@@ -20,7 +20,7 @@ class LikeAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("like.ajax", w
 						?.let { createSuccessJsonObject() }
 						?: createErrorJsonObject("invalid-post-id")
 				"reply" -> request.parameters["reply"]
-						.let(core::getPostReply)
+						?.let(core::getPostReply)
 						?.let { currentSone.addLikedReplyId(it.id) }
 						?.also { core.touchConfiguration() }
 						?.let { createSuccessJsonObject() }

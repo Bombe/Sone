@@ -30,6 +30,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -183,14 +184,13 @@ public class MemoryDatabaseTest {
 		assertThat(memoryDatabase.getPost("post2").get(),
 				isPost(secondPost.getId(), 2000L, "post2", of(RECIPIENT_ID)));
 		assertThat(memoryDatabase.getPost("post3").isPresent(), is(false));
-		assertThat(memoryDatabase.getPostReply("reply1").get(),
+		assertThat(memoryDatabase.getPostReply("reply1"),
 				isPostReply("reply1", "post1", 3000L, "reply1"));
-		assertThat(memoryDatabase.getPostReply("reply2").get(),
+		assertThat(memoryDatabase.getPostReply("reply2"),
 				isPostReply("reply2", "post2", 4000L, "reply2"));
-		assertThat(memoryDatabase.getPostReply("reply3").get(),
+		assertThat(memoryDatabase.getPostReply("reply3"),
 				isPostReply("reply3", "post1", 5000L, "reply3"));
-		assertThat(memoryDatabase.getPostReply("reply4").isPresent(),
-				is(false));
+		assertThat(memoryDatabase.getPostReply("reply4"), nullValue());
 		assertThat(memoryDatabase.getAlbum("album1").get(),
 				isAlbum("album1", null, "album1", "album-description1"));
 		assertThat(memoryDatabase.getAlbum("album2").get(),

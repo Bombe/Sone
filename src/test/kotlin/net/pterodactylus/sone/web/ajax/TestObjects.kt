@@ -96,7 +96,7 @@ open class TestObjects {
 		whenever(core.getPost(ArgumentMatchers.anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
 		whenever(core.getLikes(ArgumentMatchers.any<Post>())).then { postLikes[it[0]] ?: emptySet<Sone>() }
 		whenever(core.getLikes(ArgumentMatchers.any<PostReply>())).then { replyLikes[it[0]] ?: emptySet<Sone>() }
-		whenever(core.getPostReply(ArgumentMatchers.anyString())).then { replies[it[0]].asOptional() }
+		whenever(core.getPostReply(ArgumentMatchers.anyString())).then { replies[it[0]] }
 		whenever(core.getAlbum(ArgumentMatchers.anyString())).then { albums[it[0]] }
 		whenever(core.getImage(ArgumentMatchers.anyString())).then { images[it[0]] }
 		whenever(core.getImage(ArgumentMatchers.anyString(), ArgumentMatchers.anyBoolean())).then { images[it[0]] }

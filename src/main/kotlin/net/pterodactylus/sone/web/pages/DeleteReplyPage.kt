@@ -15,7 +15,7 @@ class DeleteReplyPage(template: Template, webInterface: WebInterface):
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			val replyId = freenetRequest.httpRequest.getPartAsStringFailsafe("reply", 36)
-			val reply = webInterface.core.getPostReply(replyId).orNull() ?: throw RedirectException("noPermission.html")
+			val reply = webInterface.core.getPostReply(replyId) ?: throw RedirectException("noPermission.html")
 			if (!reply.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}

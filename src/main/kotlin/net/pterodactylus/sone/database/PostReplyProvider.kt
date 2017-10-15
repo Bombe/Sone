@@ -25,7 +25,7 @@ import net.pterodactylus.sone.data.PostReply
  */
 interface PostReplyProvider {
 
-	fun getPostReply(id: String): Optional<PostReply>
+	fun getPostReply(id: String): PostReply?
 
 	/**
 	 * Returns all replies for the given post, order ascending by time.

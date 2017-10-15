@@ -39,7 +39,7 @@ class DeleteReplyCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with remote post reply parameter results in error response`() {
 	    parameters += "Reply" to "RemoteReplyId"
-		whenever(core.getPostReply("RemoteReplyId")).thenReturn(of(remotePostReply))
+		whenever(core.getPostReply("RemoteReplyId")).thenReturn(remotePostReply)
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("Error"))
 		assertThat(response.replyParameters["ErrorCode"], equalTo("401"))
@@ -48,7 +48,7 @@ class DeleteReplyCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with local post reply parameter deletes reply`() {
 	    parameters += "Reply" to "RemoteReplyId"
-		whenever(core.getPostReply("RemoteReplyId")).thenReturn(of(localPostReply))
+		whenever(core.getPostReply("RemoteReplyId")).thenReturn(localPostReply)
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters["Message"], equalTo("ReplyDeleted"))
 		verify(core).deleteReply(localPostReply)

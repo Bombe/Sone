@@ -210,11 +210,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected PostReply getReply(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
 		try {
 			String replyId = simpleFieldSet.getString(parameterName);
-			Optional<PostReply> reply = core.getPostReply(replyId);
-			if (!reply.isPresent()) {
+			PostReply reply = core.getPostReply(replyId);
+			if (reply == null) {
 				throw new FcpException("Could not load reply from “" + replyId + "”.");
 			}
-			return reply.get();
+			return reply;
 		} catch (FSParseException fspe1) {
 			throw new FcpException("Could not reply ID from “" + parameterName + "”.", fspe1);
 		}

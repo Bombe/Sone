@@ -459,8 +459,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nullable
 	@Override
-	public Optional<PostReply> getPostReply(String replyId) {
+	public PostReply getPostReply(String replyId) {
 		return database.getPostReply(replyId);
 	}
 

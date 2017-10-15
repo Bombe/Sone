@@ -24,7 +24,7 @@ class LikeReplyCommandTest : SoneCommandTest() {
 
 	@Before
 	fun setupRepliesAndSones() {
-		whenever(core.getPostReply("ReplyId")).thenReturn(reply.asOptional())
+		whenever(core.getPostReply("ReplyId")).thenReturn(reply)
 		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone)
 		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 	}

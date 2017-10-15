@@ -19,7 +19,7 @@ class GetReplyAjaxPage(webInterface: WebInterface, private val template: Templat
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["reply"]
-					.let(core::getPostReply)
+					?.let(core::getPostReply)
 					?.let { it.toJson(currentSone, request) }
 					?.let { replyJson ->
 						createSuccessJsonObject().apply {

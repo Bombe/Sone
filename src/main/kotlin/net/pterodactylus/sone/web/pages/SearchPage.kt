@@ -44,7 +44,7 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 				when {
 					word.removePrefix("sone://").let(webInterface.core::getSone) != null -> redirect("viewSone.html?sone=${word.removePrefix("sone://")}")
 					word.removePrefix("post://").let(webInterface.core::getPost).isPresent -> redirect("viewPost.html?post=${word.removePrefix("post://")}")
-					word.removePrefix("reply://").let(webInterface.core::getPostReply).isPresent -> redirect("viewPost.html?post=${word.removePrefix("reply://").let(webInterface.core::getPostReply).get().postId}")
+					word.removePrefix("reply://").let(webInterface.core::getPostReply) != null -> redirect("viewPost.html?post=${word.removePrefix("reply://").let(webInterface.core::getPostReply)?.postId}")
 					word.removePrefix("album://").let(webInterface.core::getAlbum) != null -> redirect("imageBrowser.html?album=${word.removePrefix("album://")}")
 					word.removePrefix("image://").let { webInterface.core.getImage(it, false) } != null -> redirect("imageBrowser.html?image=${word.removePrefix("image://")}")
 				}

@@ -38,6 +38,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -409,12 +410,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTREPLYPROVIDER METHODS
 	//
 
-	/** {@inheritDocs} */
+	@Nullable
 	@Override
-	public Optional<PostReply> getPostReply(String id) {
+	public PostReply getPostReply(String id) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allPostReplies.get(id));
+			return allPostReplies.get(id);
 		} finally {
 			lock.readLock().unlock();
 		}

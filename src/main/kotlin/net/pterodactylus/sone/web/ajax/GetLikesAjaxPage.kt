@@ -25,7 +25,7 @@ class GetLikesAjaxPage(webInterface: WebInterface) : JsonPage("getLikes.ajax", w
 						?.toReply()
 						?: createErrorJsonObject("invalid-post-id")
 				"reply" -> request.parameters["reply"]
-						.let(core::getPostReply)
+						?.let(core::getPostReply)
 						?.let(core::getLikes)
 						?.toReply()
 						?: createErrorJsonObject("invalid-reply-id")
