@@ -1,5 +1,5 @@
 /*
- * Sone - AlbumStore.java - Copyright © 2013–2016 David Roden
+ * Sone - AlbumDatabase.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,31 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
-
-import net.pterodactylus.sone.data.Album;
+package net.pterodactylus.sone.database
 
 /**
- * Interface for a store of albums.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Combines an [AlbumProvider] and an [AlbumStore] into an album
+ * database.
  */
-public interface AlbumStore {
-
-	/**
-	 * Stores the given album.
-	 *
-	 * @param album
-	 * 		The album to store
-	 */
-	void storeAlbum(Album album);
-
-	/**
-	 * Removes the given album from the store.
-	 *
-	 * @param album
-	 * 		The album to remove
-	 */
-	void removeAlbum(Album album);
-
-}
+interface AlbumDatabase : AlbumProvider, AlbumBuilderFactory, AlbumStore

@@ -1,5 +1,5 @@
 /*
- * Sone - AlbumProvider.java - Copyright © 2013–2016 David Roden
+ * Sone - AlbumBuilderFactory.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,27 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
-
-import net.pterodactylus.sone.data.Album;
-
-import com.google.common.base.Optional;
+package net.pterodactylus.sone.database
 
 /**
- * Interface for objects that can provide {@link Album}s by their ID.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Factory for [AlbumBuilder]s.
  */
-public interface AlbumProvider {
+interface AlbumBuilderFactory {
 
-	/**
-	 * Returns the album with the given ID, or {@link Optional#absent()} if no such
-	 * album exists.
-	 *
-	 * @param albumId
-	 * 		The ID of the album
-	 * @return The album, or {@link Optional#absent()} if the album does not exist
-	 */
-	Optional<Album> getAlbum(String albumId);
+	fun newAlbumBuilder(): AlbumBuilder
 
 }
