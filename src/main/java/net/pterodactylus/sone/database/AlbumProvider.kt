@@ -26,6 +26,6 @@ import com.google.common.base.Optional
  */
 interface AlbumProvider {
 
-	fun getAlbum(albumId: String): Optional<Album>
+	fun getAlbum(albumId: String): Album?
 
 }

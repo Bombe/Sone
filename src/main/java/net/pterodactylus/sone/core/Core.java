@@ -543,7 +543,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Nullable
 	public Album getAlbum(@Nonnull String albumId) {
-		return database.getAlbum(albumId).orNull();
+		return database.getAlbum(albumId);
 	}
 
 	public ImageBuilder imageBuilder() {

@@ -191,13 +191,13 @@ public class MemoryDatabaseTest {
 		assertThat(memoryDatabase.getPostReply("reply3"),
 				isPostReply("reply3", "post1", 5000L, "reply3"));
 		assertThat(memoryDatabase.getPostReply("reply4"), nullValue());
-		assertThat(memoryDatabase.getAlbum("album1").get(),
+		assertThat(memoryDatabase.getAlbum("album1"),
 				isAlbum("album1", null, "album1", "album-description1"));
-		assertThat(memoryDatabase.getAlbum("album2").get(),
+		assertThat(memoryDatabase.getAlbum("album2"),
 				isAlbum("album2", null, "album2", "album-description2"));
-		assertThat(memoryDatabase.getAlbum("album3").get(),
+		assertThat(memoryDatabase.getAlbum("album3"),
 				isAlbum("album3", "album1", "album3", "album-description3"));
-		assertThat(memoryDatabase.getAlbum("album4").isPresent(), is(false));
+		assertThat(memoryDatabase.getAlbum("album4"), nullValue());
 		assertThat(memoryDatabase.getImage("image1"),
 				isImage("image1", 1000L, "KSK@image1", "image1",
 						"image-description1", 16, 9));
@@ -266,11 +266,11 @@ public class MemoryDatabaseTest {
 	@Test
 	public void testBasicAlbumFunctionality() {
 		Album newAlbum = new AlbumImpl(mock(Sone.class));
-		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(Optional.<Album>absent()));
+		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), nullValue());
 		memoryDatabase.storeAlbum(newAlbum);
-		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(of(newAlbum)));
+		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(newAlbum));
 		memoryDatabase.removeAlbum(newAlbum);
-		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), is(Optional.<Album>absent()));
+		assertThat(memoryDatabase.getAlbum(newAlbum.getId()), nullValue());
 	}
 
 	private void initializeFriends() {

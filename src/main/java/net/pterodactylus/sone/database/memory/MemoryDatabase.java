@@ -478,11 +478,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// ALBUMPROVDER METHODS
 	//
 
+	@Nullable
 	@Override
-	public Optional<Album> getAlbum(String albumId) {
+	public Album getAlbum(@Nonnull String albumId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allAlbums.get(albumId));
+			return allAlbums.get(albumId);
 		} finally {
 			lock.readLock().unlock();
 		}
