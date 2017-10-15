@@ -1,5 +1,5 @@
 /*
- * Sone - PostReplyDatabase.java - Copyright © 2013–2016 David Roden
+ * Sone - ReplyBuilder.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,16 +15,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
+
+import net.pterodactylus.sone.data.Reply
+import net.pterodactylus.sone.data.Sone
 
 /**
- * Combines a {@link PostReplyProvider}, a {@link PostReplyBuilderFactory}, and
- * a {@link PostReplyStore} into a complete post reply database.
+ * Methods that all reply builders need to implement in order to be able to
+ * create any kind of [Reply].
  *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * @param B The type of the builder
  */
-public interface PostReplyDatabase extends PostReplyProvider, PostReplyBuilderFactory, PostReplyStore {
+interface ReplyBuilder<B : ReplyBuilder<B>> {
 
-	/* nothing here. */
+	fun randomId(): B
+	fun withId(id: String): B
+
+	fun from(senderId: String): B
+	fun currentTime(): B
+	fun withTime(time: Long): B
+	fun withText(text: String): B
 
 }

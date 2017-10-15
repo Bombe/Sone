@@ -1,5 +1,5 @@
 /*
- * Sone - PostReplyBuilderFactory.java - Copyright © 2013–2016 David Roden
+ * Sone - PostReplyDatabase.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
-
-import net.pterodactylus.sone.database.memory.MemoryDatabase;
-
-import com.google.inject.ImplementedBy;
+package net.pterodactylus.sone.database
 
 /**
- * Factory for {@link PostReplyBuilder}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Combines a [PostReplyProvider], a [PostReplyBuilderFactory], and
+ * a [PostReplyStore] into a complete post reply database.
  */
-@ImplementedBy(MemoryDatabase.class)
-public interface PostReplyBuilderFactory {
-
-	/**
-	 * Creates a new post reply builder.
-	 *
-	 * @return A new post reply builder
-	 */
-	public PostReplyBuilder newPostReplyBuilder();
-
-}
+interface PostReplyDatabase : PostReplyProvider, PostReplyBuilderFactory, PostReplyStore

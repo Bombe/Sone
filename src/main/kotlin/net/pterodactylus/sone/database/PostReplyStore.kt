@@ -15,34 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
 
-import java.util.Collection;
-
-import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.Sone
 
 /**
- * Defines a store for {@link PostReply post replies}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Defines a store for [post replies][PostReply].
  */
-public interface PostReplyStore {
+interface PostReplyStore {
 
-	/**
-	 * Stores the given post reply.
-	 *
-	 * @param postReply
-	 *            The post reply
-	 */
-	public void storePostReply(PostReply postReply);
-
-	/**
-	 * Removes the given post reply from this store.
-	 *
-	 * @param postReply
-	 *            The post reply to remove
-	 */
-	public void removePostReply(PostReply postReply);
+	fun storePostReply(postReply: PostReply)
+	fun removePostReply(postReply: PostReply)
 
 }

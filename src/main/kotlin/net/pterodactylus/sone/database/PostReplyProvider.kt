@@ -15,37 +15,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
 
-import java.util.List;
-
-import net.pterodactylus.sone.data.PostReply;
-
-import com.google.common.base.Optional;
+import com.google.common.base.Optional
+import net.pterodactylus.sone.data.PostReply
 
 /**
- * Interface for objects that can provide {@link PostReply}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Interface for objects that can provide [PostReply]s.
  */
-public interface PostReplyProvider {
+interface PostReplyProvider {
 
-	/**
-	 * Returns the reply with the given ID.
-	 *
-	 * @param id
-	 *            The ID of the reply to get
-	 * @return The reply, or {@code null} if there is no such reply
-	 */
-	public Optional<PostReply> getPostReply(String id);
+	fun getPostReply(id: String): Optional<PostReply>
 
 	/**
 	 * Returns all replies for the given post, order ascending by time.
 	 *
-	 * @param postId
-	 *            The ID of the post to get all replies for
+	 * @param postId The ID of the post to get all replies for
 	 * @return All replies for the given post
 	 */
-	public List<PostReply> getReplies(String postId);
+	fun getReplies(postId: String): List<PostReply>
 
 }
