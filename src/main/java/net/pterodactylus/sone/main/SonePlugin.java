@@ -26,7 +26,11 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import javax.inject.Singleton;
+
 import net.pterodactylus.sone.core.Core;
+import net.pterodactylus.sone.database.Database;
+import net.pterodactylus.sone.database.memory.MemoryDatabase;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.wot.Context;
@@ -252,6 +256,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
 				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
 				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
+				bind(Database.class).to(MemoryDatabase.class).in(Singleton.class);
 				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
 					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
 					if (path != null) {

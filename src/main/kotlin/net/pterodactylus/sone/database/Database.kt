@@ -15,28 +15,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.database;
+package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.database.memory.MemoryDatabase;
-
-import com.google.common.util.concurrent.Service;
-import com.google.inject.ImplementedBy;
+import com.google.common.util.concurrent.Service
 
 /**
  * Database for Sone data. This interface combines the various provider,
  * store, and builder factory interfaces into a single interface.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
-@ImplementedBy(MemoryDatabase.class)
-public interface Database extends Service, SoneDatabase, FriendDatabase, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase, BookmarkDatabase {
+interface Database : Service, SoneDatabase, FriendDatabase, PostDatabase, PostReplyDatabase, AlbumDatabase, ImageDatabase, BookmarkDatabase {
 
-	/**
-	 * Saves the database.
-	 *
-	 * @throws DatabaseException
-	 *             if an error occurs while saving
-	 */
-	public void save() throws DatabaseException;
+	@Throws(DatabaseException::class)
+	fun save()
 
 }
