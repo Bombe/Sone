@@ -16,7 +16,7 @@ class ViewPostPage(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("viewPost.html", template, "Page.ViewPost.Title", webInterface, false) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		templateContext["post"] = freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.orNull()
+		templateContext["post"] = freenetRequest.parameters["post"]?.let(webInterface.core::getPost)
 		templateContext["raw"] = freenetRequest.parameters["raw"] == "true"
 	}
 

@@ -22,7 +22,7 @@ class CreateReplyPage(template: Template, webInterface: WebInterface):
 				templateContext["errorTextEmpty"] = true
 				return
 			}
-			val post = webInterface.core.getPost(postId).orNull() ?: throw RedirectException("noPermission.html")
+			val post = webInterface.core.getPost(postId) ?: throw RedirectException("noPermission.html")
 			val sender = webInterface.core.getLocalSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: getCurrentSone(freenetRequest.toadletContext)
 			webInterface.core.createReply(sender, post, TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), text))
 			throw RedirectException(returnPage)

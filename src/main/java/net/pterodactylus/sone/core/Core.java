@@ -422,11 +422,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		return database.newPostBuilder();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Nullable
 	@Override
-	public Optional<Post> getPost(String postId) {
+	public Post getPost(@Nonnull String postId) {
 		return database.getPost(postId);
 	}
 

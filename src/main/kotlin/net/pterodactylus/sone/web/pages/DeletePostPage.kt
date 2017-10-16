@@ -14,7 +14,7 @@ class DeletePostPage(template: Template, webInterface: WebInterface):
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-			val post = webInterface.core.getPost(freenetRequest.httpRequest.getPartAsStringFailsafe("post", 36)).orNull() ?: throw RedirectException("noPermission.html")
+			val post = webInterface.core.getPost(freenetRequest.httpRequest.getPartAsStringFailsafe("post", 36)) ?: throw RedirectException("noPermission.html")
 			val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 			if (!post.sone.isLocal) {
 				throw RedirectException("noPermission.html")
@@ -29,7 +29,7 @@ class DeletePostPage(template: Template, webInterface: WebInterface):
 			templateContext["returnPage"] = returnPage
 			return
 		}
-		templateContext["post"] = webInterface.core.getPost(freenetRequest.httpRequest.getParam("post")).orNull() ?: throw RedirectException("noPermission.html")
+		templateContext["post"] = webInterface.core.getPost(freenetRequest.httpRequest.getParam("post")) ?: throw RedirectException("noPermission.html")
 		templateContext["returnPage"] = freenetRequest.httpRequest.getParam("returnPage")
 	}
 

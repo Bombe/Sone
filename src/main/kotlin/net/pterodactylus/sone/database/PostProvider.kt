@@ -29,7 +29,7 @@ import com.google.inject.ImplementedBy
 @ImplementedBy(MemoryDatabase::class)
 interface PostProvider {
 
-	fun getPost(postId: String): Optional<Post>
+	fun getPost(postId: String): Post?
 	fun getPosts(soneId: String): Collection<Post>
 	fun getDirectedPosts(recipientId: String): Collection<Post>
 

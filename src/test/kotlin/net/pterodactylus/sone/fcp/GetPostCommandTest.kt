@@ -31,7 +31,7 @@ class GetPostCommandTest : SoneCommandTest() {
 
 	@Before
 	fun setupPostWithLikesAndReplies() {
-		whenever(core.getPost("ValidPostId")).thenReturn(post.asOptional())
+		whenever(core.getPost("ValidPostId")).thenReturn(post)
 		whenever(core.getLikes(post)).thenReturn(setOf(sone1, sone2))
 		val replies = listOf(postReply1, postReply2)
 		whenever(core.getReplies("ValidPostId")).thenReturn(replies)

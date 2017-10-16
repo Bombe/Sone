@@ -59,7 +59,6 @@ import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -332,12 +331,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTPROVIDER METHODS
 	//
 
-	/** {@inheritDocs} */
+	@Nullable
 	@Override
-	public Optional<Post> getPost(String postId) {
+	public Post getPost(@Nonnull String postId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allPosts.get(postId));
+			return allPosts.get(postId);
 		} finally {
 			lock.readLock().unlock();
 		}

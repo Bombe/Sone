@@ -92,7 +92,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 		whenever(core.getSone(anyString())).then { allSones[it[0]] }
 		whenever(core.localSones).then { localSones.values }
 		whenever(core.getLocalSone(anyString())).then { localSones[it[0]] }
-		whenever(core.getPost(anyString())).then { allPosts[it[0]].asOptional() }
+		whenever(core.getPost(anyString())).then { allPosts[it[0]] }
 		whenever(core.getPostReply(anyString())).then { allPostReplies[it[0]] }
 		whenever(core.getReplies(anyString())).then { perPostReplies[it[0]].asList() }
 		whenever(core.getAlbum(anyString())).then { allAlbums[it[0]] }

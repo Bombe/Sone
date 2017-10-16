@@ -19,7 +19,7 @@ class MarkAsKnownPage(template: Template, webInterface: WebInterface):
 		val ids = freenetRequest.parameters["id", 65536]!!.split(" ")
 		when (freenetRequest.parameters["type", 5]) {
 			"sone" -> ids.mapNotNull(webInterface.core::getSone).forEach(webInterface.core::markSoneKnown)
-			"post" -> ids.mapPresent(webInterface.core::getPost).forEach(webInterface.core::markPostKnown)
+			"post" -> ids.mapNotNull(webInterface.core::getPost).forEach(webInterface.core::markPostKnown)
 			"reply" -> ids.mapNotNull(webInterface.core::getPostReply).forEach(webInterface.core::markReplyKnown)
 			else -> throw RedirectException("invalid.html")
 		}

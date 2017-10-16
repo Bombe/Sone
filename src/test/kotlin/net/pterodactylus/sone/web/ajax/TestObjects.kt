@@ -93,7 +93,7 @@ open class TestObjects {
 		whenever(core.updateChecker).thenReturn(updateChecker)
 		whenever(core.getSone(ArgumentMatchers.anyString())).thenAnswer { (localSones + remoteSones)[it.getArgument(0)] }
 		whenever(core.getLocalSone(ArgumentMatchers.anyString())).thenAnswer { localSones[it[0]] }
-		whenever(core.getPost(ArgumentMatchers.anyString())).thenAnswer { (posts + newPosts)[it[0]].asOptional() }
+		whenever(core.getPost(ArgumentMatchers.anyString())).thenAnswer { (posts + newPosts)[it[0]] }
 		whenever(core.getLikes(ArgumentMatchers.any<Post>())).then { postLikes[it[0]] ?: emptySet<Sone>() }
 		whenever(core.getLikes(ArgumentMatchers.any<PostReply>())).then { replyLikes[it[0]] ?: emptySet<Sone>() }
 		whenever(core.getPostReply(ArgumentMatchers.anyString())).then { replies[it[0]] }

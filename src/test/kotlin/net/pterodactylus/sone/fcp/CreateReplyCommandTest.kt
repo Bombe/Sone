@@ -64,7 +64,7 @@ class CreateReplyCommandTest : SoneCommandTest() {
 
 	private fun addValidPostParameter() {
 		parameters += "Post" to "ValidPostId"
-		whenever(core.getPost("ValidPostId")).thenReturn(of(post))
+		whenever(core.getPost("ValidPostId")).thenReturn(post)
 	}
 
 	@Test

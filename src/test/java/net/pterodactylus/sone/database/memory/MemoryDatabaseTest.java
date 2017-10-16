@@ -178,12 +178,12 @@ public class MemoryDatabaseTest {
 		firstAlbum.addImage(thirdImage);
 		secondAlbum.addImage(secondImage);
 		memoryDatabase.storeSone(sone);
-		assertThat(memoryDatabase.getPost("post1").get(),
+		assertThat(memoryDatabase.getPost("post1"),
 				isPost(firstPost.getId(), 1000L, "post1",
 						Optional.<String>absent()));
-		assertThat(memoryDatabase.getPost("post2").get(),
+		assertThat(memoryDatabase.getPost("post2"),
 				isPost(secondPost.getId(), 2000L, "post2", of(RECIPIENT_ID)));
-		assertThat(memoryDatabase.getPost("post3").isPresent(), is(false));
+		assertThat(memoryDatabase.getPost("post3"), nullValue());
 		assertThat(memoryDatabase.getPostReply("reply1"),
 				isPostReply("reply1", "post1", 3000L, "reply1"));
 		assertThat(memoryDatabase.getPostReply("reply2"),

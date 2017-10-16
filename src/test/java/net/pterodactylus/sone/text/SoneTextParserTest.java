@@ -467,9 +467,10 @@ public class SoneTextParserTest {
 
 	private static class TestPostProvider implements PostProvider {
 
+		@Nullable
 		@Override
-		public Optional<Post> getPost(final String postId) {
-			return Optional.<Post>of(new Post() {
+		public Post getPost(@Nonnull final String postId) {
+			return new Post() {
 				@Override
 				public String getId() {
 					return postId;
@@ -514,7 +515,7 @@ public class SoneTextParserTest {
 				public Post setKnown(boolean known) {
 					return null;
 				}
-			});
+			};
 		}
 
 		@Override
@@ -531,9 +532,10 @@ public class SoneTextParserTest {
 
 	private static class AbsentPostProvider extends TestPostProvider {
 
+		@Nullable
 		@Override
-		public Optional<Post> getPost(String postId) {
-			return Optional.absent();
+		public Post getPost(@Nonnull String postId) {
+			return null;
 		}
 
 	}

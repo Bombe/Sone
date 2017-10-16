@@ -39,7 +39,7 @@ abstract class SoneCommandTest {
 	@Before
 	fun setupCore() {
 		whenever(core.getSone(anyString())).thenReturn(null)
-		whenever(core.getPost(anyString())).thenReturn(absent())
+		whenever(core.getPost(anyString())).thenReturn(null)
 		whenever(core.getPostReply(anyString())).thenReturn(null)
 	}
 
