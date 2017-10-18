@@ -3,6 +3,7 @@ package net.pterodactylus.sone.web.pages
 import com.google.common.base.Ticker
 import com.google.common.cache.Cache
 import com.google.common.cache.CacheBuilder
+import freenet.support.Logger
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
@@ -31,6 +32,7 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		val startTime = System.currentTimeMillis()
 		val phrases = try {
 			freenetRequest.parameters["query"].emptyToNull?.parse()
 		} catch (te: TextException) {
@@ -61,6 +63,7 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 					.scoreAndPaginate(phrases) { it.allText() }
 		}.apply { page = freenetRequest.parameters["postPage"].emptyToNull?.toIntOrNull() ?: 0 }
 
+		Logger.normal(SearchPage::class.java, "Finished search for “${freenetRequest.parameters["query"]}” in ${System.currentTimeMillis() - startTime}ms.")
 		templateContext["sonePagination"] = sonePagination
 		templateContext["soneHits"] = sonePagination.items
 		templateContext["postPagination"] = postPagination
