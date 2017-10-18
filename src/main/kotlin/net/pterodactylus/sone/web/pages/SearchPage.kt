@@ -106,15 +106,12 @@ class SearchPage @JvmOverloads constructor(template: Template, webInterface: Web
 		return requiredHits * 3 + optionalHits + (requiredHits - requiredPhrases) * 5 - (forbiddenHits * 2)
 	}
 
-	private fun String.findAll(needle: String): List<Int> {
-		var nextIndex = indexOf(needle)
-		val positions = mutableListOf<Int>()
-		while (nextIndex != -1) {
-			positions += nextIndex
-			nextIndex = indexOf(needle, nextIndex + 1)
-		}
-		return positions
-	}
+	private fun String.findAll(needle: String) =
+			generateSequence(indexOf(needle).takeIf { it > -1 }) { lastPosition ->
+				lastPosition
+						.let { indexOf(needle, it + 1) }
+						.takeIf { it > -1 }
+			}.toList()
 
 	private fun String.parse() =
 			StringEscaper.parseLine(this)
