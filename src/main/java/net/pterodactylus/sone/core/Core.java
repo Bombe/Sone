@@ -51,6 +51,7 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound
 import net.pterodactylus.sone.core.SoneChangeDetector.PostProcessor;
 import net.pterodactylus.sone.core.SoneChangeDetector.PostReplyProcessor;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
@@ -654,6 +655,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		soneInserter.insertionDelayChanged(new InsertionDelayChangedEvent(preferences.getInsertionDelay()));
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
 			soneInserters.put(sone, soneInserter);
