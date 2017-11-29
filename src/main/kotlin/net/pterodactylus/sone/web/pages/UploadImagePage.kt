@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import freenet.support.api.Bucket
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.headers
@@ -20,12 +21,12 @@ import javax.imageio.ImageIO
  * Page implementation that lets the user upload an image.
  */
 class UploadImagePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, true) {
+		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			val parentAlbum = freenetRequest.parameters["parent"]!!.let(webInterface.core::getAlbum) ?: throw RedirectException("noPermission.html")
-			if (parentAlbum.sone != getCurrentSone(freenetRequest.toadletContext)) {
+			if (parentAlbum.sone != currentSone) {
 				throw RedirectException("noPermission.html")
 			}
 			val title = freenetRequest.parameters["title", 200].emptyToNull ?: throw RedirectException("emptyImageTitle.html")
@@ -39,7 +40,7 @@ class UploadImagePage(template: Template, webInterface: WebInterface):
 			}
 
 			val temporaryImage = webInterface.core.createTemporaryImage(bytes.mimeType, bytes)
-			webInterface.core.createImage(getCurrentSone(freenetRequest.toadletContext), parentAlbum, temporaryImage).modify().apply {
+			webInterface.core.createImage(currentSone, parentAlbum, temporaryImage).modify().apply {
 				setWidth(bufferedImage.width)
 				setHeight(bufferedImage.height)
 				setTitle(title)

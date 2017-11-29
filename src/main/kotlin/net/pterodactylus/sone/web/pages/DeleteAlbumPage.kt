@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -10,9 +11,9 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user delete an {@link Album}.
  */
 class DeleteAlbumPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface, true) {
+		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			val album = webInterface.core.getAlbum(freenetRequest.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
 			if (!album.sone.isLocal) {

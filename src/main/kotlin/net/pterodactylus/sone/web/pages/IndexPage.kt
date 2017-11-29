@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.notify.PostVisibilityFilter
 import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.utils.parameters
@@ -13,10 +14,9 @@ import net.pterodactylus.util.template.TemplateContext
  * of all friends of the current user.
  */
 class IndexPage(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter):
-		SoneTemplatePage("index.html", template, "Page.Index.Title", webInterface, true) {
+		LoggedInPage("index.html", template, "Page.Index.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		getCurrentSone(freenetRequest.toadletContext)!!.let { currentSone ->
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 			(currentSone.posts +
 					currentSone.friends
 							.mapNotNull(webInterface.core::getSone)
@@ -33,7 +33,6 @@ class IndexPage(template: Template, webInterface: WebInterface, private val post
 							templateContext["posts"] = pagination.items
 						}
 					}
-		}
 	}
 
 }
