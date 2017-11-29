@@ -86,6 +86,7 @@ class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 		addHttpRequestPart("save-profile", "true")
 		addHttpRequestPart(fieldName, newValue.toString())
 		verifyRedirect("editProfile.html") {
+			verify(currentSone).profile = profile
 			verify(core).touchConfiguration()
 			assertThat(fieldAccessor(), equalTo(expectedValue))
 		}

@@ -37,6 +37,7 @@ class EditProfilePage(template: Template, webInterface: WebInterface) :
 					profile.fields.forEach { field ->
 						field.value = TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), freenetRequest.httpRequest.getPartAsStringFailsafe("field-${field.id}", 400).trim())
 					}
+					currentSone.profile = profile
 					webInterface.core.touchConfiguration()
 					throw RedirectException("editProfile.html")
 				} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("add-field", 4) == "true") {
