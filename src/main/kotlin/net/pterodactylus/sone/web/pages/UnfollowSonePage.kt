@@ -11,13 +11,13 @@ import net.pterodactylus.util.template.TemplateContext
 /**
  * This page lets the user unfollow another Sone.
  */
-class UnfollowSonePage(template: Template, webInterface: WebInterface):
+class UnfollowSonePage(template: Template, webInterface: WebInterface) :
 		LoggedInPage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-				freenetRequest.parameters["sone"]!!.split(Regex("[ ,]+"))
-						.forEach { webInterface.core.unfollowSone(currentSone, it) }
+			freenetRequest.parameters["sone"]!!.split(Regex("[ ,]+"))
+					.forEach { webInterface.core.unfollowSone(currentSone, it) }
 			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}

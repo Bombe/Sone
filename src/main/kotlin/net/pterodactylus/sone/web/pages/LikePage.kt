@@ -12,17 +12,17 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user like [net.pterodactylus.sone.data.Post]s and [net.pterodactylus.sone.data.Reply]s.
  */
 class LikePage(template: Template, webInterface: WebInterface) :
-	LoggedInPage("like.html", template, "Page.Like.Title", webInterface) {
+		LoggedInPage("like.html", template, "Page.Like.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-				freenetRequest.parameters["type", 16]?.also { type ->
-					when(type) {
-						"post" -> currentSone.addLikedPostId(freenetRequest.parameters["post", 36]!!)
-						"reply" -> currentSone.addLikedReplyId(freenetRequest.parameters["reply", 36]!!)
-					}
+			freenetRequest.parameters["type", 16]?.also { type ->
+				when (type) {
+					"post" -> currentSone.addLikedPostId(freenetRequest.parameters["post", 36]!!)
+					"reply" -> currentSone.addLikedReplyId(freenetRequest.parameters["reply", 36]!!)
 				}
-				throw RedirectException(freenetRequest.parameters["returnPage", 256]!!)
+			}
+			throw RedirectException(freenetRequest.parameters["returnPage", 256]!!)
 		}
 	}
 

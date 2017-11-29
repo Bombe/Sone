@@ -12,14 +12,14 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user untrust another Sone. This will remove all trust
  * assignments for an identity.
  */
-class UntrustPage(template: Template, webInterface: WebInterface):
+class UntrustPage(template: Template, webInterface: WebInterface) :
 		LoggedInPage("untrust.html", template, "Page.Untrust.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-				freenetRequest.parameters["sone", 44]!!
-						.let(webInterface.core::getSone)
-						?.also { webInterface.core.untrustSone(currentSone, it) }
+			freenetRequest.parameters["sone", 44]!!
+					.let(webInterface.core::getSone)
+					?.also { webInterface.core.untrustSone(currentSone, it) }
 			throw RedirectException(freenetRequest.parameters["returnPage", 256])
 		}
 	}
