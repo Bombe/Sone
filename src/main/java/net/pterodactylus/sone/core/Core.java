@@ -1712,7 +1712,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		if (sone.isLocal()) {
 			return;
 		}
-		sone.setLatestEdition(fromNullable(tryParse(identity.getProperty("Sone.LatestEdition"))).or(sone.getLatestEdition()));
+		String newLatestEdition = identity.getProperty("Sone.LatestEdition");
+		if (newLatestEdition != null) {
+			Long parsedNewLatestEdition = tryParse(newLatestEdition);
+			if (parsedNewLatestEdition != null) {
+				sone.setLatestEdition(parsedNewLatestEdition);
+			}
+		}
 		soneDownloader.addSone(sone);
 		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
 	}
