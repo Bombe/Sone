@@ -1,5 +1,5 @@
 group = 'net.pterodactylus'
-version = '0.9.7'
+version = '0.9.8'
 
 buildscript {
     ext.kotlinVersion = '1.2.0'
