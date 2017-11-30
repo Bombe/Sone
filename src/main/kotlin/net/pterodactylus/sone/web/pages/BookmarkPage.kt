@@ -16,7 +16,7 @@ class BookmarkPage(template: Template, webInterface: WebInterface)
 		if (freenetRequest.isPOST) {
 			val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 			val postId = freenetRequest.httpRequest.getPartAsStringFailsafe("post", 36)
-			webInterface.core.getPost(postId).orNull()?.let {
+			webInterface.core.getPost(postId)?.let {
 				webInterface.core.bookmarkPost(it)
 			}
 			throw RedirectException(returnPage)

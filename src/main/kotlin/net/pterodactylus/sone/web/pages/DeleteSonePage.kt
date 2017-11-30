@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -12,12 +13,12 @@ import net.pterodactylus.util.template.TemplateContext
  * installation.
  */
 class DeleteSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, true) {
+		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			if (freenetRequest.httpRequest.isPartSet("deleteSone")) {
-				webInterface.core.deleteSone(getCurrentSone(freenetRequest.toadletContext))
+				webInterface.core.deleteSone(currentSone)
 			}
 			throw RedirectException("index.html")
 		}

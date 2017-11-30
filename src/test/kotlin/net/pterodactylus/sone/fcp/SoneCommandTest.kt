@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.fcp
 
-import com.google.common.base.Optional
 import com.google.common.base.Optional.absent
 import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
@@ -39,9 +38,9 @@ abstract class SoneCommandTest {
 
 	@Before
 	fun setupCore() {
-		whenever(core.getSone(anyString())).thenReturn(absent())
-		whenever(core.getPost(anyString())).thenReturn(absent())
-		whenever(core.getPostReply(anyString())).thenReturn(absent())
+		whenever(core.getSone(anyString())).thenReturn(null)
+		whenever(core.getPost(anyString())).thenReturn(null)
+		whenever(core.getPostReply(anyString())).thenReturn(null)
 	}
 
 	protected fun createSone(id: String, name: String, firstName: String, lastName: String, time: Long) = mock<Sone>().apply {
@@ -92,7 +91,7 @@ abstract class SoneCommandTest {
 
 	fun requestWithValidRemoteSoneParameterResultsInFcpException() {
 		parameters += "Sone" to "RemoteSoneId"
-		whenever(core.getSone("RemoteSoneId")).thenReturn(Optional.of(remoteSone))
+		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone)
 		executeCommandAndExpectFcpException()
 	}
 

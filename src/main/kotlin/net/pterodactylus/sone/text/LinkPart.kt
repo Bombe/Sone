@@ -5,8 +5,4 @@ package net.pterodactylus.sone.text
  * attributes: the link itself, the text that is shown instead of the link, and
  * an explanatory text that can be displayed e.g. as a tooltip.
  */
-data class LinkPart(val link: String, override val text: String, val title: String) : Part {
-
-	constructor(link: String, text: String) : this(link, text, link)
-
-}
+data class LinkPart @JvmOverloads constructor(val link: String, override val text: String, val title: String = link) : Part

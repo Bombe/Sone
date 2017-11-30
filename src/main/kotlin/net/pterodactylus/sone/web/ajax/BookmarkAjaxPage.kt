@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.utils.also
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -15,9 +14,10 @@ class BookmarkAjaxPage(webInterface: WebInterface) : JsonPage("bookmark.ajax", w
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["post"].emptyToNull
-					?.let(core::getPost)
-					?.also(core::bookmarkPost)
-					?.let { createSuccessJsonObject() }
+					?.let { postId ->
+						core.getPost(postId)?.also(core::bookmarkPost)
+						createSuccessJsonObject()
+					}
 					?: createErrorJsonObject("invalid-post-id")
 
 }

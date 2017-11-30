@@ -2,7 +2,6 @@ package net.pterodactylus.sone.fcp
 
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.asOptional
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.junit.Before
@@ -18,8 +17,8 @@ class UnlockSoneCommandTest : SoneCommandTest() {
 
 	@Before
 	fun setupSones() {
-		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone.asOptional())
-		whenever(core.getSone("LocalSoneId")).thenReturn(localSone.asOptional())
+		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone)
+		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		whenever(localSone.id).thenReturn("LocalSoneId")
 	}
 

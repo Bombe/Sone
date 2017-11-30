@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.database.memory;
 
-import static com.google.common.base.Optional.fromNullable;
 import static net.pterodactylus.sone.test.Matchers.isPostWithId;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -19,7 +18,6 @@ import java.util.Set;
 
 import net.pterodactylus.sone.data.Post;
 
-import com.google.common.base.Optional;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -42,12 +40,11 @@ public class MemoryBookmarkDatabaseTest {
 	@Before
 	public void setupMemoryDatabase() {
 		when(memoryDatabase.getPost(anyString())).thenAnswer(
-				new Answer<Optional<Post>>() {
+				new Answer<Post>() {
 					@Override
-					public Optional<Post> answer(
+					public Post answer(
 							InvocationOnMock invocation) {
-						return fromNullable(
-								posts.get(invocation.getArguments()[0]));
+						return posts.get(invocation.getArguments()[0]);
 					}
 				});
 	}

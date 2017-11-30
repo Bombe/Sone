@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -13,12 +14,12 @@ import net.pterodactylus.util.template.TemplateContext
  * @see net.pterodactylus.sone.core.Core#distrustSone(Sone, Sone)
  */
 class DistrustPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("distrust.html", template, "Page.Distrust.Title", webInterface, true) {
+		LoggedInPage("distrust.html", template, "Page.Distrust.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-			val sone = webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sone", 44)).orNull()
-			sone?.run { webInterface.core.distrustSone(getCurrentSone(freenetRequest.toadletContext), this) }
+			webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sone", 44))
+					?.run { webInterface.core.distrustSone(currentSone, this) }
 			throw RedirectException(freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
 		}
 	}

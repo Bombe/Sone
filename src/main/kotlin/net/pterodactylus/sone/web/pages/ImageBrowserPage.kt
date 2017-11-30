@@ -14,9 +14,9 @@ import java.net.URI
  * The image browser page is the entry page for the image management.
  */
 class ImageBrowserPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface, true) {
+		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if ("album" in freenetRequest.parameters) {
 			templateContext["albumRequested"] = true
 			templateContext["album"] = webInterface.core.getAlbum(freenetRequest.parameters["album"]!!)
@@ -40,7 +40,7 @@ class ImageBrowserPage(template: Template, webInterface: WebInterface):
 					}
 		} else {
 			templateContext["soneRequested"] = true
-			templateContext["sone"] = webInterface.core.getSone(freenetRequest.httpRequest.getParam("sone")).orNull() ?: getCurrentSone(freenetRequest.toadletContext)
+			templateContext["sone"] = webInterface.core.getSone(freenetRequest.httpRequest.getParam("sone")) ?: currentSone
 		}
 	}
 

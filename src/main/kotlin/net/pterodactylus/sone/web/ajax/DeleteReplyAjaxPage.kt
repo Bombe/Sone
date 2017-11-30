@@ -14,7 +14,7 @@ class DeleteReplyAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("delete
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["reply"]
-					.let(core::getPostReply)
+					?.let(core::getPostReply)
 					?.let { reply ->
 						reply.sone.isLocal.ifTrue {
 							createSuccessJsonObject().also {

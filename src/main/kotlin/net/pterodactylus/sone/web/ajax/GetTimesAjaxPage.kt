@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.ajax
 import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
-import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest

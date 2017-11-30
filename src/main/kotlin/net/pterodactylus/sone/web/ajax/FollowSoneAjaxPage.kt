@@ -14,7 +14,7 @@ class FollowSoneAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("followS
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
-					.let(core::getSone)
+					?.let(core::getSone)
 					?.also { core.followSone(currentSone, it.id) }
 					?.also(core::markSoneKnown)
 					?.let { createSuccessJsonObject() }

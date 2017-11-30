@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.database.memory;
 
+import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.collect.FluentIterable.from;
 
 import java.util.HashSet;
@@ -99,7 +100,7 @@ public class MemoryBookmarkDatabase implements BookmarkDatabase {
 					new Function<String, Post>() {
 						@Override
 						public Post apply(String postId) {
-							return memoryDatabase.getPost(postId)
+							return fromNullable(memoryDatabase.getPost(postId))
 									.or(new EmptyPost(postId));
 						}
 					}).toSet();

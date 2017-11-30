@@ -20,12 +20,12 @@ class GetLikesAjaxPage(webInterface: WebInterface) : JsonPage("getLikes.ajax", w
 	override fun createJsonObject(request: FreenetRequest) =
 			when (request.parameters["type"]) {
 				"post" -> request.parameters["post"]
-						.let(core::getPost)
+						?.let(core::getPost)
 						?.let(core::getLikes)
 						?.toReply()
 						?: createErrorJsonObject("invalid-post-id")
 				"reply" -> request.parameters["reply"]
-						.let(core::getPostReply)
+						?.let(core::getPostReply)
 						?.let(core::getLikes)
 						?.toReply()
 						?: createErrorJsonObject("invalid-reply-id")

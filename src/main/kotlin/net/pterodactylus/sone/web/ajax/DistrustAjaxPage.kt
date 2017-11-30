@@ -16,7 +16,7 @@ class DistrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("distrustS
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
-					.let(core::getSone)
+					?.let(core::getSone)
 					?.let { sone ->
 						createSuccessJsonObject()
 								.put("trustValue", core.preferences.negativeTrust)

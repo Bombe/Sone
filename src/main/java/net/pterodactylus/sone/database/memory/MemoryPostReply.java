@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.database.memory;
 
+import static com.google.common.base.Optional.fromNullable;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
@@ -97,7 +99,7 @@ class MemoryPostReply implements PostReply {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId).get();
+		return soneProvider.getSone(soneId);
 	}
 
 	/**
@@ -150,7 +152,7 @@ class MemoryPostReply implements PostReply {
 	 */
 	@Override
 	public Optional<Post> getPost() {
-		return database.getPost(postId);
+		return fromNullable(database.getPost(postId));
 	}
 
 	//

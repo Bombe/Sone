@@ -37,6 +37,9 @@ import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -56,8 +59,6 @@ import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -66,6 +67,7 @@ import com.google.common.collect.TreeMultimap;
 import com.google.common.util.concurrent.AbstractService;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import kotlin.jvm.functions.Function1;
 
 /**
  * Memory-based {@link PostDatabase} implementation.
@@ -241,21 +243,22 @@ public class MemoryDatabase extends AbstractService implements Database {
 		}
 	}
 
+	@Nonnull
 	@Override
-	public Function<String, Optional<Sone>> soneLoader() {
-		return new Function<String, Optional<Sone>>() {
+	public Function1<String, Sone> getSoneLoader() {
+		return new Function1<String, Sone>() {
 			@Override
-			public Optional<Sone> apply(String soneId) {
+			public Sone invoke(String soneId) {
 				return getSone(soneId);
 			}
 		};
 	}
 
 	@Override
-	public Optional<Sone> getSone(String soneId) {
+	public Sone getSone(String soneId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allSones.get(soneId));
+			return allSones.get(soneId);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -328,12 +331,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTPROVIDER METHODS
 	//
 
-	/** {@inheritDocs} */
+	@Nullable
 	@Override
-	public Optional<Post> getPost(String postId) {
+	public Post getPost(@Nonnull String postId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allPosts.get(postId));
+			return allPosts.get(postId);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -406,12 +409,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// POSTREPLYPROVIDER METHODS
 	//
 
-	/** {@inheritDocs} */
+	@Nullable
 	@Override
-	public Optional<PostReply> getPostReply(String id) {
+	public PostReply getPostReply(String id) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allPostReplies.get(id));
+			return allPostReplies.get(id);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -474,11 +477,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// ALBUMPROVDER METHODS
 	//
 
+	@Nullable
 	@Override
-	public Optional<Album> getAlbum(String albumId) {
+	public Album getAlbum(@Nonnull String albumId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allAlbums.get(albumId));
+			return allAlbums.get(albumId);
 		} finally {
 			lock.readLock().unlock();
 		}
@@ -523,11 +527,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 	// IMAGEPROVIDER METHODS
 	//
 
+	@Nullable
 	@Override
-	public Optional<Image> getImage(String imageId) {
+	public Image getImage(@Nonnull String imageId) {
 		lock.readLock().lock();
 		try {
-			return fromNullable(allImages.get(imageId));
+			return allImages.get(imageId);
 		} finally {
 			lock.readLock().unlock();
 		}

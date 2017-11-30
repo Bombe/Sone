@@ -3,7 +3,6 @@ package net.pterodactylus.sone.fcp
 import freenet.support.SimpleFieldSet
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.asOptional
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
@@ -49,8 +48,8 @@ class GetPostsCommandTest : SoneCommandTest() {
 		whenever(core.getReplies("Post2")).thenReturn(listOf(post2Reply1, post2Reply2))
 		whenever(localSone.id).thenReturn("LocalSone")
 		whenever(remoteSone.id).thenReturn("RemoteSone")
-		whenever(core.getSone("LocalSone")).thenReturn(localSone.asOptional())
-		whenever(core.getSone("ValidSoneId")).thenReturn(remoteSone.asOptional())
+		whenever(core.getSone("LocalSone")).thenReturn(localSone)
+		whenever(core.getSone("ValidSoneId")).thenReturn(remoteSone)
 		whenever(remoteSone.posts).thenReturn(listOf(post2, post1))
 		parameters += "Sone" to "ValidSoneId"
 	}

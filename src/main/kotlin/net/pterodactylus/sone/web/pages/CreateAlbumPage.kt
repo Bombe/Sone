@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
@@ -12,9 +13,9 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user create a new album.
  */
 class CreateAlbumPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("createAlbum.html", template, "Page.CreateAlbum.Title", webInterface, true) {
+		LoggedInPage("createAlbum.html", template, "Page.CreateAlbum.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			val name = freenetRequest.httpRequest.getPartAsStringFailsafe("name", 64).trim()
 			if (name.isEmpty()) {
@@ -22,7 +23,6 @@ class CreateAlbumPage(template: Template, webInterface: WebInterface):
 				return
 			}
 			val description = freenetRequest.httpRequest.getPartAsStringFailsafe("description", 256).trim()
-			val currentSone = webInterface.getCurrentSoneCreatingSession(freenetRequest.toadletContext)
 			val parentId = freenetRequest.httpRequest.getPartAsStringFailsafe("parent", 36)
 			val parent = if (parentId == "") currentSone.rootAlbum else webInterface.core.getAlbum(parentId)
 			val album = webInterface.core.createAlbum(currentSone, parent)

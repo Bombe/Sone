@@ -15,7 +15,7 @@ class TrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("trustSone.aj
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
-					.let(core::getSone)
+					?.let(core::getSone)
 					?.let { core.trustSone(currentSone, it) }
 					?.let { createSuccessJsonObject().put("trustValue", core.preferences.positiveTrust) }
 					?: createErrorJsonObject("invalid-sone-id")

@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -10,12 +11,12 @@ import net.pterodactylus.util.template.TemplateContext
  * This page lets the user delete a reply.
  */
 class DeleteReplyPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface, true) {
+		LoggedInPage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
 			val replyId = freenetRequest.httpRequest.getPartAsStringFailsafe("reply", 36)
-			val reply = webInterface.core.getPostReply(replyId).orNull() ?: throw RedirectException("noPermission.html")
+			val reply = webInterface.core.getPostReply(replyId) ?: throw RedirectException("noPermission.html")
 			if (!reply.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}

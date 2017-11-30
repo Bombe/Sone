@@ -20,7 +20,7 @@ class ParserFilter @Inject constructor(private val core: Core, private val soneT
 		val text = data?.toString() ?: return listOf<Part>()
 		val soneParameter = parameters?.get("sone")
 		val sone = when (soneParameter) {
-			is String -> core.getSone(soneParameter).orNull()
+			is String -> core.getSone(soneParameter)
 			is Sone -> soneParameter
 			else -> null
 		}

@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.web.ajax
 
-import com.google.common.base.Optional
-import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -21,10 +19,10 @@ class MarkAsKnownAjaxPage(webInterface: WebInterface) : JsonPage("markAsKnown.aj
 		else -> createErrorJsonObject("invalid-type")
 	}
 
-	private fun <T> processIds(request: FreenetRequest, getter: (String) -> Optional<T>, marker: (T) -> Unit) =
+	private fun <T : Any> processIds(request: FreenetRequest, getter: (String) -> T?, marker: (T) -> Unit) =
 			request.parameters["id"]
 					?.split(Regex(" +"))
-					?.mapPresent(getter)
+					?.mapNotNull(getter)
 					?.onEach(marker)
 					.let { createSuccessJsonObject() }
 

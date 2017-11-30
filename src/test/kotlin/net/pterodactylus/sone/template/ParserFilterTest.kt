@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.template
 
-import com.google.common.base.Optional.of
 import com.google.inject.Guice
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Sone
@@ -40,7 +39,7 @@ class ParserFilterTest {
 	private fun setupSone(identity: String): Sone {
 		val sone = mock<Sone>()
 		`when`(sone.id).thenReturn(identity)
-		`when`(core.getSone(identity)).thenReturn(of(sone))
+		`when`(core.getSone(identity)).thenReturn(sone)
 		return sone
 	}
 
@@ -63,7 +62,7 @@ class ParserFilterTest {
 		parameters.put("sone", soneOrSoneId)
 		filter.format(templateContext, "text", parameters)
 		val context = forClass(SoneTextParserContext::class.java)
-		verify(soneTextParser).parse(eq<String>("text"), context.capture())
+		verify(soneTextParser).parse(eq<String>("text") ?: "", context.capture())
 		assertThat(context.value.postingSone, `is`(sone))
 	}
 

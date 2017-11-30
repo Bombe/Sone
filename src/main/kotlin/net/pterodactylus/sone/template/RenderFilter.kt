@@ -101,7 +101,7 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 
 	private fun render(writer: Writer, freemailPart: FreemailPart) {
 		val sone = core.getSone(freemailPart.identityId)
-		val soneName = sone.transform(SoneAccessor::getNiceName).or(freemailPart.identityId)
+		val soneName = sone?.let(SoneAccessor::getNiceName) ?: freemailPart.identityId
 		renderLink(writer,
 				"/Freemail/NewMessage?to=${freemailPart.identityId}",
 				"${freemailPart.emailLocalPart}@$soneName.freemail",

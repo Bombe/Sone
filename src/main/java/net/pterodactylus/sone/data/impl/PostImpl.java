@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data.impl;
 
+import static com.google.common.base.Optional.fromNullable;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.SoneProvider;
@@ -99,7 +101,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Sone getSone() {
-		return soneProvider.getSone(soneId).get();
+		return soneProvider.getSone(soneId);
 	}
 
 	/**
@@ -107,7 +109,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Optional<String> getRecipientId() {
-		return Optional.fromNullable(recipientId);
+		return fromNullable(recipientId);
 	}
 
 	/**
@@ -115,7 +117,7 @@ public class PostImpl implements Post {
 	 */
 	@Override
 	public Optional<Sone> getRecipient() {
-		return soneProvider.getSone(recipientId);
+		return fromNullable(soneProvider.getSone(recipientId));
 	}
 
 	/**

@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.data.impl;
 
+import static com.google.common.base.Optional.fromNullable;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.database.PostProvider;
@@ -78,7 +80,7 @@ public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 	 */
 	@Override
 	public Optional<Post> getPost() {
-		return postProvider.getPost(postId);
+		return fromNullable(postProvider.getPost(postId));
 	}
 
 }

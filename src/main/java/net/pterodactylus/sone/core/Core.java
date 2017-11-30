@@ -51,6 +51,7 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound
 import net.pterodactylus.sone.core.SoneChangeDetector.PostProcessor;
 import net.pterodactylus.sone.core.SoneChangeDetector.PostReplyProcessor;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
 import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
 import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
@@ -99,7 +100,6 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
@@ -109,6 +109,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import kotlin.jvm.functions.Function1;
 
 /**
  * The Sone core.
@@ -323,9 +324,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		return database.getSones();
 	}
 
+	@Nonnull
 	@Override
-	public Function<String, Optional<Sone>> soneLoader() {
-		return database.soneLoader();
+	public Function1<String, Sone> getSoneLoader() {
+		return database.getSoneLoader();
 	}
 
 	/**
@@ -338,7 +340,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *         Sone
 	 */
 	@Override
-	public Optional<Sone> getSone(String id) {
+	@Nullable
+	public Sone getSone(@Nonnull String id) {
 		return database.getSone(id);
 	}
 
@@ -358,9 +361,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sone with the given ID, or {@code null}
 	 */
 	public Sone getLocalSone(String id) {
-		Optional<Sone> sone = database.getSone(id);
-		if (sone.isPresent() && sone.get().isLocal()) {
-			return sone.get();
+		Sone sone = database.getSone(id);
+		if ((sone != null) && sone.isLocal()) {
+			return sone;
 		}
 		return null;
 	}
@@ -382,7 +385,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sone with the given ID
 	 */
 	public Sone getRemoteSone(String id) {
-		return database.getSone(id).orNull();
+		return database.getSone(id);
 	}
 
 	/**
@@ -420,11 +423,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		return database.newPostBuilder();
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Nullable
 	@Override
-	public Optional<Post> getPost(String postId) {
+	public Post getPost(@Nonnull String postId) {
 		return database.getPost(postId);
 	}
 
@@ -457,8 +458,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/**
 	 * {@inheritDoc}
 	 */
+	@Nullable
 	@Override
-	public Optional<PostReply> getPostReply(String replyId) {
+	public PostReply getPostReply(String replyId) {
 		return database.getPostReply(replyId);
 	}
 
@@ -540,7 +542,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Nullable
 	public Album getAlbum(@Nonnull String albumId) {
-		return database.getAlbum(albumId).orNull();
+		return database.getAlbum(albumId);
 	}
 
 	public ImageBuilder imageBuilder() {
@@ -573,9 +575,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Nullable
 	public Image getImage(String imageId, boolean create) {
-		Optional<Image> image = database.getImage(imageId);
-		if (image.isPresent()) {
-			return image.get();
+		Image image = database.getImage(imageId);
+		if (image != null) {
+			return image;
 		}
 		if (!create) {
 			return null;
@@ -653,6 +655,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
 		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		soneInserter.insertionDelayChanged(new InsertionDelayChangedEvent(preferences.getInsertionDelay()));
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
 			soneInserters.put(sone, soneInserter);
@@ -697,12 +700,12 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		String property = fromNullable(identity.getProperty("Sone.LatestEdition")).or("0");
 		long latestEdition = fromNullable(tryParse(property)).or(0L);
-		Optional<Sone> existingSone = getSone(identity.getId());
-		if (existingSone.isPresent() && existingSone.get().isLocal()) {
-			return existingSone.get();
+		Sone existingSone = getSone(identity.getId());
+		if ((existingSone != null )&& existingSone.isLocal()) {
+			return existingSone;
 		}
-		boolean newSone = !existingSone.isPresent();
-		Sone sone = !newSone ? existingSone.get() : database.newSoneBuilder().from(identity).build();
+		boolean newSone = existingSone == null;
+		Sone sone = !newSone ? existingSone : database.newSoneBuilder().from(identity).build();
 		sone.setLatestEdition(latestEdition);
 		if (newSone) {
 			synchronized (knownSones) {
@@ -740,16 +743,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			if (!soneFollowingTimes.containsKey(soneId)) {
 				long now = System.currentTimeMillis();
 				soneFollowingTimes.put(soneId, now);
-				Optional<Sone> followedSone = getSone(soneId);
-				if (!followedSone.isPresent()) {
+				Sone followedSone = getSone(soneId);
+				if (followedSone == null) {
 					return;
 				}
-				for (Post post : followedSone.get().getPosts()) {
+				for (Post post : followedSone.getPosts()) {
 					if (post.getTime() < now) {
 						markPostKnown(post);
 					}
 				}
-				for (PostReply reply : followedSone.get().getReplies()) {
+				for (PostReply reply : followedSone.getReplies()) {
 					if (reply.getTime() < now) {
 						markReplyKnown(reply);
 					}
@@ -874,20 +877,20 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            of the age of the given Sone
 	 */
 	public void updateSone(final Sone sone, boolean soneRescueMode) {
-		Optional<Sone> storedSone = getSone(sone.getId());
-		if (storedSone.isPresent()) {
-			if (!soneRescueMode && !(sone.getTime() > storedSone.get().getTime())) {
+		Sone storedSone = getSone(sone.getId());
+		if (storedSone != null) {
+			if (!soneRescueMode && !(sone.getTime() > storedSone.getTime())) {
 				logger.log(Level.FINE, String.format("Downloaded Sone %s is not newer than stored Sone %s.", sone, storedSone));
 				return;
 			}
 			List<Object> events =
-					collectEventsForChangesInSone(storedSone.get(), sone);
+					collectEventsForChangesInSone(storedSone, sone);
 			database.storeSone(sone);
 			for (Object event : events) {
 				eventBus.post(event);
 			}
-			sone.setOptions(storedSone.get().getOptions());
-			sone.setKnown(storedSone.get().isKnown());
+			sone.setOptions(storedSone.getOptions());
+			sone.setKnown(storedSone.isKnown());
 			sone.setStatus((sone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
 			if (sone.isLocal()) {
 				touchConfiguration();
@@ -1709,7 +1712,13 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		if (sone.isLocal()) {
 			return;
 		}
-		sone.setLatestEdition(fromNullable(tryParse(identity.getProperty("Sone.LatestEdition"))).or(sone.getLatestEdition()));
+		String newLatestEdition = identity.getProperty("Sone.LatestEdition");
+		if (newLatestEdition != null) {
+			Long parsedNewLatestEdition = tryParse(newLatestEdition);
+			if (parsedNewLatestEdition != null) {
+				sone.setLatestEdition(parsedNewLatestEdition);
+			}
+		}
 		soneDownloader.addSone(sone);
 		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
 	}
@@ -1733,19 +1742,19 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				return;
 			}
 		}
-		Optional<Sone> sone = getSone(identity.getId());
-		if (!sone.isPresent()) {
+		Sone sone = getSone(identity.getId());
+		if (sone == null) {
 			/* TODO - we don’t have the Sone anymore. should this happen? */
 			return;
 		}
-		for (PostReply postReply : sone.get().getReplies()) {
+		for (PostReply postReply : sone.getReplies()) {
 			eventBus.post(new PostReplyRemovedEvent(postReply));
 		}
-		for (Post post : sone.get().getPosts()) {
+		for (Post post : sone.getPosts()) {
 			eventBus.post(new PostRemovedEvent(post));
 		}
-		eventBus.post(new SoneRemovedEvent(sone.get()));
-		database.removeSone(sone.get());
+		eventBus.post(new SoneRemovedEvent(sone));
+		database.removeSone(sone);
 	}
 
 	/**

@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -10,11 +11,11 @@ import net.pterodactylus.util.template.TemplateContext
  * Lets the user delete a post they made.
  */
 class DeletePostPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("deletePost.html", template, "Page.DeletePost.Title", webInterface, true) {
+		LoggedInPage("deletePost.html", template, "Page.DeletePost.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
-			val post = webInterface.core.getPost(freenetRequest.httpRequest.getPartAsStringFailsafe("post", 36)).orNull() ?: throw RedirectException("noPermission.html")
+			val post = webInterface.core.getPost(freenetRequest.httpRequest.getPartAsStringFailsafe("post", 36)) ?: throw RedirectException("noPermission.html")
 			val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 			if (!post.sone.isLocal) {
 				throw RedirectException("noPermission.html")
@@ -29,7 +30,7 @@ class DeletePostPage(template: Template, webInterface: WebInterface):
 			templateContext["returnPage"] = returnPage
 			return
 		}
-		templateContext["post"] = webInterface.core.getPost(freenetRequest.httpRequest.getParam("post")).orNull() ?: throw RedirectException("noPermission.html")
+		templateContext["post"] = webInterface.core.getPost(freenetRequest.httpRequest.getParam("post")) ?: throw RedirectException("noPermission.html")
 		templateContext["returnPage"] = freenetRequest.httpRequest.getParam("returnPage")
 	}
 

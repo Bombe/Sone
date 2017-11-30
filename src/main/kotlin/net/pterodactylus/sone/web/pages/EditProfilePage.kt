@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Profile.DuplicateField
+import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
@@ -11,11 +12,11 @@ import net.pterodactylus.util.template.TemplateContext
 /**
  * This page lets the user edit her profile.
  */
-class EditProfilePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("editProfile.html", template, "Page.EditProfile.Title", webInterface, true) {
+class EditProfilePage(template: Template, webInterface: WebInterface) :
+		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		freenetRequest.currentSone!!.profile.let { profile ->
+	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
+		currentSone.profile.let { profile ->
 			templateContext["firstName"] = profile.firstName
 			templateContext["middleName"] = profile.middleName
 			templateContext["lastName"] = profile.lastName
@@ -36,13 +37,14 @@ class EditProfilePage(template: Template, webInterface: WebInterface):
 					profile.fields.forEach { field ->
 						field.value = TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), freenetRequest.httpRequest.getPartAsStringFailsafe("field-${field.id}", 400).trim())
 					}
+					currentSone.profile = profile
 					webInterface.core.touchConfiguration()
 					throw RedirectException("editProfile.html")
 				} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("add-field", 4) == "true") {
 					val fieldName = freenetRequest.httpRequest.getPartAsStringFailsafe("field-name", 100)
 					try {
 						profile.addField(fieldName)
-						freenetRequest.currentSone!!.profile = profile
+						currentSone.profile = profile
 						webInterface.core.touchConfiguration()
 						throw RedirectException("editProfile.html#profile-fields")
 					} catch (e: DuplicateField) {
@@ -56,18 +58,16 @@ class EditProfilePage(template: Template, webInterface: WebInterface):
 						throw RedirectException("editProfileField.html?field=${field.id}")
 					} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("move-down-field-${field.id}", 4) == "true") {
 						profile.moveFieldDown(field)
-						freenetRequest.currentSone!!.profile = profile
+						currentSone.profile = profile
 						throw RedirectException("editProfile.html#profile-fields")
 					} else if (freenetRequest.httpRequest.getPartAsStringFailsafe("move-up-field-${field.id}", 4) == "true") {
 						profile.moveFieldUp(field)
-						freenetRequest.currentSone!!.profile = profile
+						currentSone.profile = profile
 						throw RedirectException("editProfile.html#profile-fields")
 					}
 				}
 			}
 		}
 	}
-
-	private val FreenetRequest.currentSone get() = sessionProvider.getCurrentSone(toadletContext)
 
 }

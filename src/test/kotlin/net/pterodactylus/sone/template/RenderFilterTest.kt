@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.template
 
-import com.google.common.base.Optional
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Profile
@@ -101,7 +100,7 @@ class RenderFilterTest {
 		`when`(sone.profile).thenReturn(Profile(sone))
 		`when`(sone.name).thenReturn(name)
 		sone.profile.firstName = firstName
-		`when`(core.getSone(identity)).thenReturn(Optional.of<Sone>(sone))
+		`when`(core.getSone(identity)).thenReturn(sone)
 		return sone
 	}
 

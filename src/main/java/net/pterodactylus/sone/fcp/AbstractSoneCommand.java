@@ -161,11 +161,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 		if (mandatory && (soneId == null)) {
 			throw new FcpException("Could not load Sone ID from “" + parameterName + "”.");
 		}
-		Optional<Sone> sone = core.getSone(soneId);
-		if ((mandatory && !sone.isPresent()) || (sone.isPresent() && localOnly && !sone.get().isLocal())) {
+		Sone sone = core.getSone(soneId);
+		if ((mandatory && (sone == null)) || ((sone != null) && localOnly && !sone.isLocal())) {
 			throw new FcpException("Could not load Sone from “" + soneId + "”.");
 		}
-		return sone;
+		return Optional.fromNullable(sone);
 	}
 
 	/**
@@ -184,11 +184,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected Post getPost(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
 		try {
 			String postId = simpleFieldSet.getString(parameterName);
-			Optional<Post> post = core.getPost(postId);
-			if (!post.isPresent()) {
+			Post post = core.getPost(postId);
+			if (post == null) {
 				throw new FcpException("Could not load post from “" + postId + "”.");
 			}
-			return post.get();
+			return post;
 		} catch (FSParseException fspe1) {
 			throw new FcpException("Could not post ID from “" + parameterName + "”.", fspe1);
 		}
@@ -210,11 +210,11 @@ public abstract class AbstractSoneCommand extends AbstractCommand {
 	protected PostReply getReply(SimpleFieldSet simpleFieldSet, String parameterName) throws FcpException {
 		try {
 			String replyId = simpleFieldSet.getString(parameterName);
-			Optional<PostReply> reply = core.getPostReply(replyId);
-			if (!reply.isPresent()) {
+			PostReply reply = core.getPostReply(replyId);
+			if (reply == null) {
 				throw new FcpException("Could not load reply from “" + replyId + "”.");
 			}
-			return reply.get();
+			return reply;
 		} catch (FSParseException fspe1) {
 			throw new FcpException("Could not reply ID from “" + parameterName + "”.", fspe1);
 		}
