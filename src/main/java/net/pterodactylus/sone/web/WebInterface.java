@@ -756,11 +756,11 @@ public class WebInterface implements SessionProvider {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, new PluginVersion(SonePlugin.getPluginVersion()), new PluginYear(SonePlugin.getYear()), new PluginHomepage(SonePlugin.getHomepage())), "About"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", noPermissionTemplate, "Page.NoPermission.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyImageTitle.html", emptyImageTitleTemplate, "Page.EmptyImageTitle.Title", this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyAlbumTitle.html", emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title", this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", this, noPermissionTemplate, "Page.NoPermission.Title")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyImageTitle.html", this, emptyImageTitleTemplate, "Page.EmptyImageTitle.Title")));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyAlbumTitle.html", this, emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", invalidTemplate, "Page.Invalid.Title", this)));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", this, invalidTemplate, "Page.Invalid.Title")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png")));

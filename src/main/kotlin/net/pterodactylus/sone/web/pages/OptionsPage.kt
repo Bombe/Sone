@@ -15,7 +15,7 @@ import net.pterodactylus.util.template.TemplateContext
  * This page lets the user edit the options of the Sone plugin.
  */
 class OptionsPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("options.html", template, "Page.Options.Title", webInterface, false) {
+		SoneTemplatePage("options.html", webInterface, template, "Page.Options.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {

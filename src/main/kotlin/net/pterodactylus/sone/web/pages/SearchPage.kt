@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit.MINUTES
  * words.
  */
 class SearchPage @JvmOverloads constructor(template: Template, webInterface: WebInterface, ticker: Ticker = Ticker.systemTicker()):
-		SoneTemplatePage("search.html", template, "Page.Search.Title", webInterface, false) {
+		SoneTemplatePage("search.html", webInterface, template, "Page.Search.Title") {
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 

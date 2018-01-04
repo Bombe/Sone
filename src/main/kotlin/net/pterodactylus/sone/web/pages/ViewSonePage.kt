@@ -16,7 +16,7 @@ import java.net.URI
  * Lets the user browser another Sone.
  */
 class ViewSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("viewSone.html", template, webInterface, false) {
+		SoneTemplatePage("viewSone.html", webInterface, template) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["soneId"] = freenetRequest.parameters["sone"]

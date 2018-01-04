@@ -14,7 +14,7 @@ import net.pterodactylus.util.template.TemplateContext
 class AboutPage(template: Template, webInterface: WebInterface,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,
-		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", template, "Page.About.Title", webInterface, false) {
+		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", webInterface, template, "Page.About.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["version"] = pluginVersion.version

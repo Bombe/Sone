@@ -13,7 +13,7 @@ import net.pterodactylus.util.template.TemplateContext
  * The login page lets the user log in.
  */
 class LoginPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("login.html", template, "Page.Login.Title", webInterface) {
+		SoneTemplatePage("login.html", webInterface, template, "Page.Login.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {

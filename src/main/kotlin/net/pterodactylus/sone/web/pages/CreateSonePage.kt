@@ -14,7 +14,7 @@ import java.util.logging.Logger
  * The “create Sone” page lets the user create a new Sone.
  */
 class CreateSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("createSone.html", template, "Page.CreateSone.Title", webInterface, false) {
+		SoneTemplatePage("createSone.html", webInterface, template, "Page.CreateSone.Title") {
 
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
 

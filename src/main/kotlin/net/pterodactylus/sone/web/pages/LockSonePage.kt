@@ -10,7 +10,7 @@ import net.pterodactylus.util.template.TemplateContext
  * This page lets the user lock a [net.pterodactylus.sone.data.Sone] to prevent it from being inserted.
  */
 class LockSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("lockSone.html", template, "Page.LockSone.Title", webInterface, false) {
+		SoneTemplatePage("lockSone.html", webInterface, template, "Page.LockSone.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		freenetRequest.parameters["returnPage", 256]!!.let { returnPage ->

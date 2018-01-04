@@ -20,18 +20,18 @@ import org.junit.Test
 /**
  * Unit test for [SoneTemplatePage].
  */
-class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", template, webInterface, true) {} }) {
+class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", webInterface, template, requiresLogin = true) {} }) {
 
 	@Test
 	fun `page title is empty string if no page title key was given`() {
-		SoneTemplatePage("path.html", template, null, webInterface).let { page ->
+		SoneTemplatePage("path.html", webInterface, template, requiresLogin = false).let { page ->
 			assertThat(page.getPageTitle(freenetRequest), equalTo(""))
 		}
 	}
 
 	@Test
 	fun `page title is retrieved from l10n if page title key is given`() {
-		SoneTemplatePage("path.html", template, "page.title", webInterface).let { page ->
+		SoneTemplatePage("path.html", webInterface, template, "page.title", false).let { page ->
 			whenever(l10n.getString("page.title")).thenReturn("Page Title")
 			assertThat(page.getPageTitle(freenetRequest), equalTo("Page Title"))
 		}
@@ -144,7 +144,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	@Test
 	fun `handleRequest method is called`() {
 		var called = false
-		val page = object : SoneTemplatePage("path.html", template, webInterface, true) {
+		val page = object : SoneTemplatePage("path.html", webInterface, template, requiresLogin = true) {
 			override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 				called = true
 			}
@@ -155,7 +155,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `redirect does not happen if login is not required`() {
-		val page = SoneTemplatePage("page.html", template, webInterface, false)
+		val page = SoneTemplatePage("page.html", webInterface, template, requiresLogin = false)
 		assertThat(page.getRedirectTarget(freenetRequest), nullValue())
 	}
 
@@ -209,7 +209,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `page is enabled if no full access is required and login is not required`() {
-		SoneTemplatePage("path.html", template, webInterface, false).let { page ->
+		SoneTemplatePage("path.html", webInterface, template, requiresLogin = false).let { page ->
 			assertThat(page.isEnabled(toadletContext), equalTo(true))
 		}
 	}

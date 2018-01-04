@@ -13,7 +13,7 @@ import net.pterodactylus.util.template.TemplateContext
  * [Replie][net.pterodactylus.sone.data.Reply]s as known.
  */
 class MarkAsKnownPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("markAsKnown.html", template, "Page.MarkAsKnown.Title", webInterface, false) {
+		SoneTemplatePage("markAsKnown.html", webInterface, template, "Page.MarkAsKnown.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		val ids = freenetRequest.parameters["id", 65536]!!.split(" ")

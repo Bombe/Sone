@@ -13,7 +13,7 @@ import net.pterodactylus.util.template.TemplateContext
  * [PostVisibilityFilter.isPostVisible(Sone, Post)] and sorted by time.
  */
 class NewPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("new.html", template, "Page.New.Title", webInterface, false) {
+		SoneTemplatePage("new.html", webInterface, template, "Page.New.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) =
 			getCurrentSone(freenetRequest.toadletContext).let { currentSone ->

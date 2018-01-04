@@ -9,7 +9,7 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user dismiss a notification.
  */
 class DismissNotificationPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("dismissNotification.html", template, "Page.DismissNotification.Title", webInterface) {
+		SoneTemplatePage("dismissNotification.html", webInterface, template, "Page.DismissNotification.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)

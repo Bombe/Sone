@@ -14,7 +14,7 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user unbookmark a post.
  */
 class UnbookmarkPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("unbookmark.html", template, "Page.Unbookmark.Title", webInterface, false) {
+		SoneTemplatePage("unbookmark.html", webInterface, template, "Page.Unbookmark.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		when {

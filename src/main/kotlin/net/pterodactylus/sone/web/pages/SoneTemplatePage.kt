@@ -16,20 +16,14 @@ import java.net.URLEncoder
 /**
  * Base page for the Sone web interface.
  */
-open class SoneTemplatePage(
+open class SoneTemplatePage @JvmOverloads constructor(
 		path: String,
 		protected val webInterface: WebInterface,
 		template: Template,
 		private val pageTitleKey: String? = null,
-		private val requiresLogin: Boolean = true
+		private val requiresLogin: Boolean = false,
+		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.l10n::getString) ?: "" }
 ) : FreenetTemplatePage(path, webInterface.templateContextFactory, template, "noPermission.html") {
-
-	@JvmOverloads
-	constructor(path: String, template: Template, pageTitleKey: String?, webInterface: WebInterface, requireLogin: Boolean = false) :
-			this(path, webInterface, template, pageTitleKey, requireLogin)
-
-	constructor(path: String, template: Template, webInterface: WebInterface, requireLogin: Boolean = true) :
-			this(path, webInterface, template, null, requireLogin)
 
 	private val core = webInterface.core
 	protected val sessionProvider: SessionProvider = webInterface
@@ -42,8 +36,7 @@ open class SoneTemplatePage(
 
 	fun requiresLogin() = requiresLogin
 
-	override public fun getPageTitle(freenetRequest: FreenetRequest) =
-			pageTitleKey?.let(webInterface.l10n::getString) ?: ""
+	override public fun getPageTitle(freenetRequest: FreenetRequest) = pageTitle(freenetRequest)
 
 	override public fun getStyleSheets() =
 			listOf("css/sone.css")

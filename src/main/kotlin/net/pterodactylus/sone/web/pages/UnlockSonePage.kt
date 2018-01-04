@@ -11,7 +11,7 @@ import net.pterodactylus.util.template.TemplateContext
  * This page lets the user unlock a [net.pterodactylus.sone.data.Sone] to allow its insertion.
  */
 class UnlockSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("unlockSone.html", template, "Page.UnlockSone.Title", webInterface, false) {
+		SoneTemplatePage("unlockSone.html", webInterface, template, "Page.UnlockSone.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {

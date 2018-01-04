@@ -10,7 +10,7 @@ import net.pterodactylus.util.template.TemplateContext
  * Page that lets the user bookmark a post.
  */
 class BookmarkPage(template: Template, webInterface: WebInterface)
-	: SoneTemplatePage("bookmark.html", template, "Page.Bookmark.Title", webInterface) {
+	: SoneTemplatePage("bookmark.html", webInterface, template, "Page.Bookmark.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		if (freenetRequest.isPOST) {
