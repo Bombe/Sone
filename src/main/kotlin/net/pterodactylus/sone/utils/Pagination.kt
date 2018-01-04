@@ -39,6 +39,8 @@ class Pagination<out T>(private val originalItems: List<T>, pageSize: Int): Iter
 
 	override fun iterator() = items.iterator()
 
+	fun turnTo(page: Int) = apply { this.page = page }
+
 }
 
 fun <T> Iterable<T>.paginate(pageSize: Int) = Pagination<T>(toList(), pageSize)

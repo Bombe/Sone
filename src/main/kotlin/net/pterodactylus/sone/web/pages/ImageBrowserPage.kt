@@ -2,7 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -33,7 +33,9 @@ class ImageBrowserPage(template: Template, webInterface: WebInterface):
 					.filterNot(Album::isEmpty)
 					.sortedBy(Album::getTitle)
 					.also { albums ->
-						Pagination(albums, webInterface.core.preferences.imagesPerPage).apply { page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0 }.also { pagination ->
+						albums.paginate(webInterface.core.preferences.imagesPerPage)
+								.turnTo(freenetRequest.parameters["page"]?.toIntOrNull() ?: 0)
+								.also { pagination ->
 							templateContext["albumPagination"] = pagination
 							templateContext["albums"] = pagination.items
 						}

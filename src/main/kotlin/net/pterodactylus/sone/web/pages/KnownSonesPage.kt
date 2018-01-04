@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -16,7 +16,7 @@ class KnownSonesPage(template: Template, webInterface: WebInterface):
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		getCurrentSone(freenetRequest.toadletContext).let { currentSone ->
-			Pagination(webInterface.core.sones
+			webInterface.core.sones
 					.filterNot { freenetRequest.parameters["filter"] == "followed" && currentSone != null && !currentSone.hasFriend(it.id) }
 					.filterNot { freenetRequest.parameters["filter"] == "not-followed" && currentSone != null && currentSone.hasFriend(it.id) }
 					.filterNot { freenetRequest.parameters["filter"] == "new" && it.isKnown }
@@ -35,7 +35,8 @@ class KnownSonesPage(template: Template, webInterface: WebInterface):
 									else -> comparator
 								}
 							}
-					), 25).apply { page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0 }
+					).paginate(25)
+					.turnTo(freenetRequest.parameters["page"]?.toIntOrNull() ?: 0)
 					.let { pagination ->
 						templateContext["pagination"] = pagination
 						templateContext["knownSones"] = pagination.items

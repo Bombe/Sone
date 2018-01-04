@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.utils.mapPresent
+import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
@@ -21,12 +21,12 @@ class NewPage(template: Template, webInterface: WebInterface):
 						.distinct()
 						.sortedByDescending { it.time }
 						.let { posts ->
-							Pagination(posts, webInterface.core.preferences.postsPerPage).apply {
-								page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0
-							}.let { pagination ->
-								templateContext["pagination"] = pagination
-								templateContext["posts"] = pagination.items
-							}
+							posts.paginate(webInterface.core.preferences.postsPerPage)
+									.turnTo(freenetRequest.parameters["page"]?.toIntOrNull() ?: 0)
+									.let { pagination ->
+										templateContext["pagination"] = pagination
+										templateContext["posts"] = pagination.items
+									}
 						}
 			}
 
