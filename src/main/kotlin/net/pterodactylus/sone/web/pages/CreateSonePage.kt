@@ -9,11 +9,12 @@ import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.util.logging.Level
 import java.util.logging.Logger
+import javax.inject.Inject
 
 /**
  * The “create Sone” page lets the user create a new Sone.
  */
-class CreateSonePage(template: Template, webInterface: WebInterface):
+class CreateSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("createSone.html", webInterface, template, "Page.CreateSone.Title") {
 
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
