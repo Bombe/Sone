@@ -1,13 +1,11 @@
 package net.pterodactylus.sone.web.pages
 
-import com.google.inject.Guice
 import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
 import net.pterodactylus.sone.main.SonePlugin.PluginVersion
 import net.pterodactylus.sone.main.SonePlugin.PluginYear
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.util.template.Template
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -54,9 +52,7 @@ class AboutPageTest : WebPageTest({ template, webInterface -> AboutPage(template
 
 	@Test
 	fun `about page can be created by dependency injection`() {
-		val injector = Guice.createInjector(
-				Template::class.isProvidedByMock(),
-				WebInterface::class.isProvidedByMock(),
+		val injector = baseInjector.createChildInjector(
 				PluginVersion::class.isProvidedByMock(),
 				PluginYear::class.isProvidedByMock(),
 				PluginHomepage::class.isProvidedByMock()

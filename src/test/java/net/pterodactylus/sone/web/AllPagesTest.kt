@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.web
 
-import com.google.inject.Guice
+import com.google.inject.Guice.createInjector
 import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
 import net.pterodactylus.sone.main.SonePlugin.PluginVersion
 import net.pterodactylus.sone.main.SonePlugin.PluginYear
@@ -17,9 +17,7 @@ import org.junit.Test
 class AllPagesTest {
 
 	private val injector by lazy {
-		Guice.createInjector(
-				Template::class.isProvidedByMock(),
-				WebInterface::class.isProvidedByMock(),
+		baseInjector.createChildInjector(
 				PluginVersion::class.isProvidedByMock(),
 				PluginYear::class.isProvidedByMock(),
 				PluginHomepage::class.isProvidedByMock()
@@ -32,4 +30,11 @@ class AllPagesTest {
 		assertThat(allPages.aboutPage, notNullValue())
 	}
 
+}
+
+val baseInjector by lazy {
+	createInjector(
+			Template::class.isProvidedByMock(),
+			WebInterface::class.isProvidedByMock()
+	)!!
 }
