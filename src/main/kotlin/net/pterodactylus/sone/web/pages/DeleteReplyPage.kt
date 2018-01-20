@@ -6,11 +6,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * This page lets the user delete a reply.
  */
-class DeleteReplyPage(template: Template, webInterface: WebInterface):
+class DeleteReplyPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
