@@ -7,11 +7,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * A [SoneTemplatePage] that stores information about Sone in the [TemplateContext].
  */
-class AboutPage(template: Template, webInterface: WebInterface,
+class AboutPage @Inject constructor(template: Template, webInterface: WebInterface,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,
 		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", webInterface, template, "Page.About.Title") {
