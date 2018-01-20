@@ -6,11 +6,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user delete an {@link Image}.
  */
-class DeleteImagePage(template: Template, webInterface: WebInterface):
+class DeleteImagePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("deleteImage.html", template, "Page.DeleteImage.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
