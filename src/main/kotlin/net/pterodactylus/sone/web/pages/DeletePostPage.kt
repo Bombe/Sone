@@ -6,11 +6,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Lets the user delete a post they made.
  */
-class DeletePostPage(template: Template, webInterface: WebInterface):
+class DeletePostPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("deletePost.html", template, "Page.DeletePost.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
