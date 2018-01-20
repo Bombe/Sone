@@ -6,6 +6,7 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user distrust another Sone. This will assign a
@@ -13,7 +14,7 @@ import net.pterodactylus.util.template.TemplateContext
  *
  * @see net.pterodactylus.sone.core.Core#distrustSone(Sone, Sone)
  */
-class DistrustPage(template: Template, webInterface: WebInterface):
+class DistrustPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("distrust.html", template, "Page.Distrust.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
