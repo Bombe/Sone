@@ -7,11 +7,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * This page lets the user post a reply to a post.
  */
-class CreateReplyPage(template: Template, webInterface: WebInterface):
+class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
