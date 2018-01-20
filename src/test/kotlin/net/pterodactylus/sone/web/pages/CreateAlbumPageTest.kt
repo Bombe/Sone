@@ -4,11 +4,14 @@ import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Album.Modifier
 import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
 import net.pterodactylus.sone.test.deepMock
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.selfMock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.verify
@@ -94,6 +97,11 @@ class CreateAlbumPageTest: WebPageTest(::CreateAlbumPage) {
 		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(newAlbum.modify()).setDescription("new KSK@foo description")
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<CreateAlbumPage>(), notNullValue())
 	}
 
 }
