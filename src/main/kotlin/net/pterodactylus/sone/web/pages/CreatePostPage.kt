@@ -8,11 +8,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * This page lets the user create a new [Post].
  */
-class CreatePostPage(template: Template, webInterface: WebInterface):
+class CreatePostPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
