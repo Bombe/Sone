@@ -16,7 +16,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [BookmarkPage].
  */
-class BookmarkPageTest: WebPageTest(::BookmarkPage) {
+class BookmarkPageTest : WebPageTest(::BookmarkPage) {
 
 	@Test
 	fun `path is set correctly`() {
