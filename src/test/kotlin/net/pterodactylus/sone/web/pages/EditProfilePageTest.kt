@@ -2,8 +2,10 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Profile
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
@@ -216,6 +218,11 @@ class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 		setMethod(POST)
 		addHttpRequestPart("edit-field-${firstField.id}", "true")
 		verifyRedirect("editProfileField.html?field=${firstField.id}")
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<EditProfilePage>(), notNullValue())
 	}
 
 }

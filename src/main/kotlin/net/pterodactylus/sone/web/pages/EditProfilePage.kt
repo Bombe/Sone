@@ -8,11 +8,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * This page lets the user edit her profile.
  */
-class EditProfilePage(template: Template, webInterface: WebInterface) :
+class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface) :
 		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
