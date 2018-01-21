@@ -4,11 +4,12 @@ import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX page that lets the user bookmark a post.
  */
-class BookmarkAjaxPage(webInterface: WebInterface) : JsonPage("bookmark.ajax", webInterface) {
+class BookmarkAjaxPage @Inject constructor(webInterface: WebInterface) : JsonPage("bookmark.ajax", webInterface) {
 
 	override val requiresLogin = false
 
