@@ -8,11 +8,12 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.net.URI
+import javax.inject.Inject
 
 /**
  * This page lets the user view a post and all its replies.
  */
-class ViewPostPage(template: Template, webInterface: WebInterface):
+class ViewPostPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("viewPost.html", webInterface, template, "Page.ViewPost.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {

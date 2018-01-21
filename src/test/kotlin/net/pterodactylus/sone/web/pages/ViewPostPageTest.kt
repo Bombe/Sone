@@ -2,10 +2,13 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Profile
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.Test
 
@@ -95,6 +98,11 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 		addHttpRequestParameter("post", "post-id")
 		addTranslation("Page.ViewPost.Title", "view post title")
 		assertThat(page.getPageTitle(freenetRequest), equalTo("This is a text that … - First M. Last - view post title"))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<ViewPostPage>(), notNullValue())
 	}
 
 }
