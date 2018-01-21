@@ -6,11 +6,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Logs a user out.
  */
-class LogoutPage(template: Template, webInterface: WebInterface):
+class LogoutPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("logout.html", template, "Page.Logout.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
