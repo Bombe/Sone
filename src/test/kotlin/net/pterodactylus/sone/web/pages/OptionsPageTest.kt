@@ -6,11 +6,14 @@ import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.TRUSTED
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.Before
 import org.junit.Test
@@ -374,6 +377,11 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 	@Test
 	fun `trust comment is set to default when set to empty value`() {
 		verifyThatPreferencesCanBeSet("trust-comment", "", "Set from Sone Web Interface") { core.preferences.trustComment }
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<OptionsPage>(), notNullValue())
 	}
 
 }
