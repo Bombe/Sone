@@ -1,11 +1,14 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.ArgumentMatchers.any
@@ -78,6 +81,11 @@ class FollowSonePageTest: WebPageTest(::FollowSonePage) {
 			verify(core, never()).followSone(ArgumentMatchers.eq(currentSone), anyString())
 			verify(core, never()).markSoneKnown(any<Sone>())
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<FollowSonePage>(), notNullValue())
 	}
 
 }
