@@ -8,11 +8,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * The login page lets the user log in.
  */
-class LoginPage(template: Template, webInterface: WebInterface):
+class LoginPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("login.html", webInterface, template, "Page.Login.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
