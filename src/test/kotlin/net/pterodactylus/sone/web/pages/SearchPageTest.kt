@@ -8,13 +8,16 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isOnPage
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asOptional
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
@@ -363,5 +366,10 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Suppress("UNCHECKED_CAST")
 	private operator fun <T> get(key: String): T? = templateContext[key] as? T
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<SearchPage>(), notNullValue())
+	}
 
 }

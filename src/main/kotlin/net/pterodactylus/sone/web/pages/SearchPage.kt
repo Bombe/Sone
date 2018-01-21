@@ -22,13 +22,17 @@ import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.text.StringEscaper
 import net.pterodactylus.util.text.TextException
 import java.util.concurrent.TimeUnit.MINUTES
+import javax.inject.Inject
 
 /**
  * This page lets the user search for posts and replies that contain certain
  * words.
  */
-class SearchPage @JvmOverloads constructor(template: Template, webInterface: WebInterface, ticker: Ticker = Ticker.systemTicker()):
+class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker = Ticker.systemTicker()) :
 		SoneTemplatePage("search.html", webInterface, template, "Page.Search.Title") {
+
+	@Inject constructor(template: Template, webInterface: WebInterface) :
+			this(template, webInterface, Ticker.systemTicker())
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 
