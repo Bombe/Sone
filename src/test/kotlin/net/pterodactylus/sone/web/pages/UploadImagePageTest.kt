@@ -5,12 +5,15 @@ import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Image.Modifier
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.TemporaryImage
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.any
 import org.mockito.Mockito.eq
@@ -113,6 +116,11 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 			verify(imageModifier).setDescription("Description @ KSK@foo")
 			verify(imageModifier).update()
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<UploadImagePage>(), notNullValue())
 	}
 
 }

@@ -16,11 +16,12 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
+import javax.inject.Inject
 
 /**
  * Page implementation that lets the user upload an image.
  */
-class UploadImagePage(template: Template, webInterface: WebInterface):
+class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
