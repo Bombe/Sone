@@ -7,11 +7,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user control the rescue mode for a Sone.
  */
-class RescuePage(template: Template, webInterface: WebInterface):
+class RescuePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
