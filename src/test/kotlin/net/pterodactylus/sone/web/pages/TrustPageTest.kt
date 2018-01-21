@@ -1,10 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -66,6 +69,11 @@ class TrustPageTest: WebPageTest(::TrustPage) {
 		verifyRedirect("return.html") {
 			verify(core).trustSone(eq(currentSone), eq(sone))
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<TrustPage>(), notNullValue())
 	}
 
 }
