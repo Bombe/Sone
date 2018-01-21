@@ -11,11 +11,12 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.net.URI
+import javax.inject.Inject
 
 /**
  * Lets the user browser another Sone.
  */
-class ViewSonePage(template: Template, webInterface: WebInterface):
+class ViewSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("viewSone.html", webInterface, template) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
