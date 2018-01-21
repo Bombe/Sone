@@ -8,12 +8,13 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * The index page shows the main page of Sone. This page will contain the posts
  * of all friends of the current user.
  */
-class IndexPage(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter) :
+class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter) :
 		LoggedInPage("index.html", template, "Page.Index.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {

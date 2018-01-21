@@ -5,13 +5,16 @@ import com.google.common.base.Predicate
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.notify.PostVisibilityFilter
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.emptyIterable
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers
@@ -149,6 +152,11 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 		(templateContext["pagination"] as Pagination<Post>).let { pagination ->
 			assertThat(pagination.items, emptyIterable())
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<IndexPage>(), notNullValue())
 	}
 
 }
