@@ -7,11 +7,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user edit the name and description of an album.
  */
-class EditAlbumPage(template: Template, webInterface: WebInterface):
+class EditAlbumPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {

@@ -4,12 +4,15 @@ import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Album.Modifier
 import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.verify
@@ -118,6 +121,11 @@ class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
 			verify(modifier).update()
 			verify(core).touchConfiguration()
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<EditAlbumPage>(), notNullValue())
 	}
 
 }
