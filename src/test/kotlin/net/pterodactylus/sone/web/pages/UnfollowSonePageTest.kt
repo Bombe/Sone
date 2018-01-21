@@ -1,8 +1,11 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -51,6 +54,11 @@ class UnfollowSonePageTest: WebPageTest(::UnfollowSonePage) {
 			verify(core).unfollowSone(currentSone, "sone-id1")
 			verify(core).unfollowSone(currentSone, "sone-id2")
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<UnfollowSonePage>(), notNullValue())
 	}
 
 }
