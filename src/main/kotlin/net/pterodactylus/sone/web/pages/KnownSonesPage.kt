@@ -7,11 +7,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * This page shows all known Sones.
  */
-class KnownSonesPage(template: Template, webInterface: WebInterface):
+class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("knownSones.html", webInterface, template, "Page.KnownSones.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {

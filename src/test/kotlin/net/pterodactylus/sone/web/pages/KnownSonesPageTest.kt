@@ -8,12 +8,15 @@ import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.freenet.wot.Identity
 import net.pterodactylus.sone.freenet.wot.OwnIdentity
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 
@@ -240,6 +243,11 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 			@Suppress("UNCHECKED_CAST")
 			assertThat((templateContext["pagination"] as Pagination<Sone>).items, contains(*listOf(3, 2, 1, 0).map { sones[it] }.toTypedArray()))
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<KnownSonesPage>(), notNullValue())
 	}
 
 }
