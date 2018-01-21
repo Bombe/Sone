@@ -5,11 +5,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * This page lets the user lock a [net.pterodactylus.sone.data.Sone] to prevent it from being inserted.
  */
-class LockSonePage(template: Template, webInterface: WebInterface):
+class LockSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("lockSone.html", webInterface, template, "Page.LockSone.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
