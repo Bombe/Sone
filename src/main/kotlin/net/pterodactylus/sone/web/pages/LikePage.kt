@@ -7,11 +7,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user like [net.pterodactylus.sone.data.Post]s and [net.pterodactylus.sone.data.Reply]s.
  */
-class LikePage(template: Template, webInterface: WebInterface) :
+class LikePage @Inject constructor(template: Template, webInterface: WebInterface) :
 		LoggedInPage("like.html", template, "Page.Like.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
