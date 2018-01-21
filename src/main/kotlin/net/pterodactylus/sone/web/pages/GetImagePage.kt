@@ -5,11 +5,12 @@ import net.pterodactylus.sone.web.page.FreenetPage
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.web.Response
 import java.net.URI
+import javax.inject.Inject
 
 /**
  * Page that delivers a {@link TemporaryImage} to the browser.
  */
-class GetImagePage(webInterface: WebInterface): FreenetPage {
+class GetImagePage @Inject constructor(webInterface: WebInterface): FreenetPage {
 
 	private val core = webInterface.core
 

@@ -1,9 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.TemporaryImage
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 
 /**
@@ -57,6 +60,11 @@ class GetImagePageTest {
 		assertThat(response.headers.map { it.name to it.iterator().asSequence().toList() }, contains(
 				"Content-Disposition" to listOf("attachment; filename=temp-id.test")
 		))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<GetImagePage>(), notNullValue())
 	}
 
 }
