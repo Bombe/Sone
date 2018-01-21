@@ -7,12 +7,13 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user untrust another Sone. This will remove all trust
  * assignments for an identity.
  */
-class UntrustPage(template: Template, webInterface: WebInterface) :
+class UntrustPage @Inject constructor(template: Template, webInterface: WebInterface) :
 		LoggedInPage("untrust.html", template, "Page.Untrust.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
