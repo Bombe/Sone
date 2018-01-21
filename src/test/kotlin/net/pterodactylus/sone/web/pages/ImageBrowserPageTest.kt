@@ -3,11 +3,14 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 
 /**
@@ -131,6 +134,11 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 	@Test
 	fun `page is link-excepted`() {
 	    assertThat(page.isLinkExcepted(null), equalTo(true))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<ImageBrowserPage>(), notNullValue())
 	}
 
 }

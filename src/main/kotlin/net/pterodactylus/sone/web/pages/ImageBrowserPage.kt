@@ -9,11 +9,12 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.net.URI
+import javax.inject.Inject
 
 /**
  * The image browser page is the entry page for the image management.
  */
-class ImageBrowserPage(template: Template, webInterface: WebInterface):
+class ImageBrowserPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
