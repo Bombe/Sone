@@ -1,8 +1,11 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.sone.web.page.FreenetRequest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -50,6 +53,11 @@ class ReloadingPageTest {
 		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("text/plain"))
 		assertThat(responseBytes.toByteArray(), equalTo("Hello\nWorld\n".toByteArray()))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<ReloadingPage<*>>(), notNullValue())
 	}
 
 }
