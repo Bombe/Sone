@@ -3,10 +3,13 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -81,6 +84,11 @@ class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 		setMethod(POST)
 		addHttpRequestPart("type", "foo")
 		verifyRedirect("invalid.html")
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<MarkAsKnownPage>(), notNullValue())
 	}
 
 }

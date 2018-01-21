@@ -7,12 +7,13 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user mark a number of [net.pterodactylus.sone.data.Sone]s, [Post]s, or
  * [Replie][net.pterodactylus.sone.data.Reply]s as known.
  */
-class MarkAsKnownPage(template: Template, webInterface: WebInterface):
+class MarkAsKnownPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("markAsKnown.html", webInterface, template, "Page.MarkAsKnown.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
