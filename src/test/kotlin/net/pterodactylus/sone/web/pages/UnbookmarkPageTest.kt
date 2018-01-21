@@ -2,12 +2,15 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.test.capture
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.any
 import org.mockito.Mockito.never
@@ -75,6 +78,11 @@ class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
 		verifyRedirect("return.html") {
 			verify(core).unbookmarkPost(post)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<UnbookmarkPage>(), notNullValue())
 	}
 
 }

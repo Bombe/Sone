@@ -9,11 +9,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user unbookmark a post.
  */
-class UnbookmarkPage(template: Template, webInterface: WebInterface):
+class UnbookmarkPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unbookmark.html", webInterface, template, "Page.Unbookmark.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
