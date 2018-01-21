@@ -1,10 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Profile
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.Mockito.never
@@ -91,6 +94,11 @@ class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
 		assertThat(field.name, equalTo("Name"))
 		verify(currentSone, never()).profile = profile
 		assertThat(templateContext["duplicateFieldName"], equalTo<Any>(true))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<EditProfileFieldPage>(), notNullValue())
 	}
 
 }

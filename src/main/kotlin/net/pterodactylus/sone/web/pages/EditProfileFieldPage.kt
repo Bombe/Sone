@@ -6,11 +6,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that lets the user edit the name of a profile field.
  */
-class EditProfileFieldPage(template: Template, webInterface: WebInterface) :
+class EditProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface) :
 		LoggedInPage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface) {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
