@@ -7,12 +7,13 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that displays all new posts and replies. The posts are filtered using
  * [PostVisibilityFilter.isPostVisible(Sone, Post)] and sorted by time.
  */
-class NewPage(template: Template, webInterface: WebInterface):
+class NewPage @Inject constructor(  template: Template, webInterface: WebInterface):
 		SoneTemplatePage("new.html", webInterface, template, "Page.New.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) =

@@ -2,14 +2,17 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.utils.asOptional
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import java.util.Arrays.asList
@@ -79,6 +82,11 @@ class NewPageTest: WebPageTest(::NewPage) {
 		verifyNoRedirect {
 			assertThat((templateContext["pagination"] as Pagination<Post>).items, contains(posts[2]))
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<NewPage>(), notNullValue())
 	}
 
 }
