@@ -6,11 +6,13 @@ import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * This AJAX page deletes a reply.
  */
-class DeleteReplyAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("deleteReply.ajax", webInterface) {
+class DeleteReplyAjaxPage @Inject constructor(webInterface: WebInterface) :
+		LoggedInJsonPage("deleteReply.ajax", webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["reply"]
