@@ -5,11 +5,13 @@ import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX page that lets the user dismiss a notification.
  */
-class DismissNotificationAjaxPage(webInterface: WebInterface) : JsonPage("dismissNotification.ajax", webInterface) {
+class DismissNotificationAjaxPage @Inject constructor(webInterface: WebInterface) :
+		JsonPage("dismissNotification.ajax", webInterface) {
 
 	override val requiresLogin = false
 

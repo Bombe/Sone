@@ -1,10 +1,13 @@
 package net.pterodactylus.sone.web.ajax
 
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.notify.Notification
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -33,6 +36,11 @@ class DismissNotificationAjaxPageTest : JsonPageTest("dismissNotification.ajax",
 		addRequestParameter("notification", "foo")
 		assertThatJsonIsSuccessful()
 		verify(notification).dismiss()
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<DismissNotificationAjaxPage>(), notNullValue())
 	}
 
 }
