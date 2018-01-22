@@ -9,11 +9,12 @@ import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX handler that creates a new post.
  */
-class CreatePostAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("createPost.ajax", webInterface) {
+class CreatePostAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage("createPost.ajax", webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["text"].emptyToNull
