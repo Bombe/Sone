@@ -6,11 +6,12 @@ import net.pterodactylus.sone.utils.ifTrue
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * Page that stores a user’s album modifications.
  */
-class EditAlbumAjaxPage(webInterface: WebInterface) : JsonPage("editAlbum.ajax", webInterface) {
+class EditAlbumAjaxPage @Inject constructor(webInterface: WebInterface) : JsonPage("editAlbum.ajax", webInterface) {
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["album"]!!
