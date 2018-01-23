@@ -66,9 +66,9 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `searching for sone link redirects to view sone page`() {
-		addSone("sone-id", mock<Sone>())
-		addHttpRequestParameter("query", "sone://sone-id")
-		verifyRedirect("viewSone.html?sone=sone-id")
+		addSone("Sone-ID", mock())
+		addHttpRequestParameter("query", "sone://Sone-ID")
+		verifyRedirect("viewSone.html?sone=Sone-ID")
 	}
 
 	@Test
@@ -80,9 +80,9 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `searching for a post link redirects to post page`() {
-		addPost("post-id", mock<Post>())
-		addHttpRequestParameter("query", "post://post-id")
-		verifyRedirect("viewPost.html?post=post-id")
+		addPost("Post-id", mock<Post>())
+		addHttpRequestParameter("query", "post://Post-id")
+		verifyRedirect("viewPost.html?post=Post-id")
 	}
 
 	@Test
@@ -95,8 +95,8 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 	@Test
 	fun `searching for a reply link redirects to the post page`() {
 		val postReply = mock<PostReply>().apply { whenever(postId).thenReturn("post-id") }
-		addPostReply("reply-id", postReply)
-		addHttpRequestParameter("query", "reply://reply-id")
+		addPostReply("Reply-id", postReply)
+		addHttpRequestParameter("query", "reply://Reply-id")
 		verifyRedirect("viewPost.html?post=post-id")
 	}
 

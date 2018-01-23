@@ -98,22 +98,19 @@ class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker 
 					.filter { PostReply.FUTURE_REPLY_FILTER.apply(it) }
 					.map { "${soneNameCache(it.sone)} ${it.text}" }.joinToString(" ", " ")).toLowerCase()
 
+	private fun Iterable<Phrase>.indicesFor(text: String, predicate: (Phrase) -> Boolean) =
+			filter(predicate).map(Phrase::phrase).map(String::toLowerCase).flatMap { text.findAll(it) }
+
 	private fun score(text: String, phrases: Iterable<Phrase>): Double {
 		val requiredPhrases = phrases.count { it.required }
-		val requiredHits = phrases.filter(Phrase::required)
-				.map(Phrase::phrase)
-				.flatMap { text.findAll(it) }
+		val requiredHits = phrases.indicesFor(text, Phrase::required)
 				.map { Math.pow(1 - it / text.length.toDouble(), 2.0) }
 				.sum()
-		val optionalHits = phrases.filter(Phrase::optional)
-				.map(Phrase::phrase)
-				.flatMap { text.findAll(it) }
+		val optionalHits = phrases.indicesFor(text, Phrase::optional)
 				.map { Math.pow(1 - it / text.length.toDouble(), 2.0) }
 				.sum()
-		val forbiddenHits = phrases.filter(Phrase::forbidden)
-				.map(Phrase::phrase)
-				.map { text.findAll(it).size }
-				.sum()
+		val forbiddenHits = phrases.indicesFor(text, Phrase::forbidden)
+				.count()
 		return requiredHits * 3 + optionalHits + (requiredHits - requiredPhrases) * 5 - (forbiddenHits * 2)
 	}
 
@@ -126,7 +123,6 @@ class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker 
 
 	private fun String.parse() =
 			StringEscaper.parseLine(this)
-					.map(String::toLowerCase)
 					.map {
 						when {
 							it == "+" || it == "-" -> Phrase(it, OPTIONAL)
