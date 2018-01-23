@@ -10,11 +10,12 @@ import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that stores a user’s image modifications.
  */
-class EditImageAjaxPage(webInterface: WebInterface,
+class EditImageAjaxPage @Inject constructor(webInterface: WebInterface,
 		private val parserFilter: ParserFilter,
 		private val shortenFilter: ShortenFilter,
 		private val renderFilter: RenderFilter) : JsonPage("editImage.ajax", webInterface) {

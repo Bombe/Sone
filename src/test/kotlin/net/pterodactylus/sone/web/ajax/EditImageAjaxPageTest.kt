@@ -8,10 +8,14 @@ import net.pterodactylus.sone.template.ParserFilter
 import net.pterodactylus.sone.template.RenderFilter
 import net.pterodactylus.sone.template.ShortenFilter
 import net.pterodactylus.sone.test.argumentCaptor
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -111,6 +115,15 @@ class EditImageAjaxPageTest : JsonPageTest("editImage.ajax") {
 		val parameterCaptor = argumentCaptor<MutableMap<String, Any?>>()
 		verify(parserFilter).format(any(), any(), parameterCaptor.capture())
 		assertThat(parameterCaptor.value["sone"], equalTo<Any>(sone))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.createChildInjector(
+				ParserFilter::class.isProvidedByMock(),
+				ShortenFilter::class.isProvidedByMock(),
+				RenderFilter::class.isProvidedByMock()
+		).getInstance<EditImageAjaxPage>(), notNullValue())
 	}
 
 }
