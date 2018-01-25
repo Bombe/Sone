@@ -9,17 +9,19 @@ buildscript {
 
 import org.ajoberstar.grgit.Grgit
 
-task(writeVersion) << {
-	def grgit = Grgit.open(dir: project.rootDir)
-	def version = grgit.resolve.toCommit("HEAD").id
-	def niceVersion = grgit.describe()
-	grgit.close()
+task(writeVersion) {
+    doLast {
+        def grgit = Grgit.open(dir: project.rootDir)
+        def version = grgit.resolve.toCommit("HEAD").id
+        def niceVersion = grgit.describe()
+        grgit.close()
 
-    new File("src/generated/resources").mkdirs()
-	project.file("src/generated/resources/version.yaml").withWriter { out ->
-		out.println "id: ${version}"
-		out.println "nice: ${niceVersion}"
-	}
+        new File("src/generated/resources").mkdirs()
+        project.file("src/generated/resources/version.yaml").withWriter { out ->
+            out.println "id: ${version}"
+            out.println "nice: ${niceVersion}"
+        }
+    }
 }
 
 sourceSets {
