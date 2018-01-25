@@ -14,7 +14,6 @@ import net.pterodactylus.sone.utils.jsonObject
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.emptyIterable
-import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any

@@ -9,7 +9,6 @@ import net.pterodactylus.sone.utils.jsonArray
 import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 

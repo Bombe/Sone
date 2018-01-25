@@ -12,7 +12,6 @@ import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.template.SoneAccessor
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
-import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.toArray
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
