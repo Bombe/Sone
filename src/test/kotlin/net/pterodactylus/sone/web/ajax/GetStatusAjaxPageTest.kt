@@ -1,17 +1,21 @@
 package net.pterodactylus.sone.web.ajax
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.Sone.SoneStatus.downloading
 import net.pterodactylus.sone.data.Sone.SoneStatus.inserting
 import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.freenet.L10nText
 import net.pterodactylus.sone.test.deepMock
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.text.TimeText
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonArray
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.notify.Notification
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.allOf
@@ -19,6 +23,7 @@ import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.emptyIterable
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -132,6 +137,15 @@ class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = fals
 				mapOf("link" to "KSK@test.html", "loading" to "true", "failed" to "false"),
 				mapOf("link" to "KSK@test.jpeg", "loading" to "false", "failed" to "true")
 		))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.createChildInjector(
+			    ElementLoader::class.isProvidedByMock(),
+			    TimeTextConverter::class.isProvidedByMock(),
+			    L10nFilter::class.isProvidedByMock()
+	    ).getInstance<GetStatusAjaxPage>(), notNullValue())
 	}
 
 	private fun JsonNode.toMap() = fields().asSequence().map { it.key!! to if (it.value.isNull) null else it.value.asText()!! }.toMap()
