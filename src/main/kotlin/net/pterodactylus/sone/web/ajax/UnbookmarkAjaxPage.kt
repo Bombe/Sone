@@ -3,11 +3,13 @@ package net.pterodactylus.sone.web.ajax
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX page that lets the user unbookmark a post.
  */
-class UnbookmarkAjaxPage(webInterface: WebInterface) : JsonPage("unbookmark.ajax", webInterface) {
+class UnbookmarkAjaxPage @Inject constructor(webInterface: WebInterface) :
+		JsonPage("unbookmark.ajax", webInterface) {
 
 	override val requiresLogin = false
 
