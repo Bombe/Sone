@@ -9,11 +9,12 @@ import net.pterodactylus.sone.utils.jsonArray
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * Renders linked elements after they have been loaded.
  */
-class GetLinkedElementAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val linkedElementRenderFilter: LinkedElementRenderFilter):
+class GetLinkedElementAjaxPage @Inject constructor(webInterface: WebInterface, private val elementLoader: ElementLoader, private val linkedElementRenderFilter: LinkedElementRenderFilter):
 		JsonPage("getLinkedElement.ajax", webInterface) {
 
 	override val needsFormPassword = false
