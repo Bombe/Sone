@@ -2,10 +2,13 @@ package net.pterodactylus.sone.web.ajax
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -58,6 +61,11 @@ class LikeAjaxPageTest : JsonPageTest("like.ajax", pageSupplier = ::LikeAjaxPage
 		assertThat(json.isSuccess, equalTo(false))
 		verify(currentSone, never()).addLikedReplyId("reply-id")
 		verify(core, never()).touchConfiguration()
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<LikeAjaxPage>(), notNullValue())
 	}
 
 }
