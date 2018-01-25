@@ -5,13 +5,15 @@ import net.pterodactylus.sone.utils.let
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX page that lets the user trust a Sone.
  *
  * @see net.pterodactylus.sone.core.Core.trustSone
  */
-class TrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("trustSone.ajax", webInterface) {
+class TrustAjaxPage @Inject constructor(webInterface: WebInterface) :
+		LoggedInJsonPage("trustSone.ajax", webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
