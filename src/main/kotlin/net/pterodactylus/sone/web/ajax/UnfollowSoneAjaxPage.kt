@@ -4,11 +4,13 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX page that lets a Sone unfollow another Sone.
  */
-class UnfollowSoneAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("unfollowSone.ajax", webInterface) {
+class UnfollowSoneAjaxPage @Inject constructor(webInterface: WebInterface) :
+		LoggedInJsonPage("unfollowSone.ajax", webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]
