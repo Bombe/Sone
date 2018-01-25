@@ -7,12 +7,14 @@ import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
+import javax.inject.Inject
 
 /**
  * AJAX page that retrieves the number of “likes” a [net.pterodactylus.sone.data.Post]
  * or [net.pterodactylus.sone.data.PostReply] has.
  */
-class GetLikesAjaxPage(webInterface: WebInterface) : JsonPage("getLikes.ajax", webInterface) {
+class GetLikesAjaxPage @Inject constructor(webInterface: WebInterface) :
+		JsonPage("getLikes.ajax", webInterface) {
 
 	override val needsFormPassword = false
 
