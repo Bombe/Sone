@@ -10,11 +10,13 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.notify.TemplateNotification
 import java.io.StringWriter
+import javax.inject.Inject
 
 /**
  * AJAX handler to return all current notifications.
  */
-class GetNotificationsAjaxPage(webInterface: WebInterface) : JsonPage("getNotifications.ajax", webInterface) {
+class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface) :
+		JsonPage("getNotifications.ajax", webInterface) {
 
 	override val needsFormPassword = false
 	override val requiresLogin = false
