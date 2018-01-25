@@ -8,11 +8,13 @@ import net.pterodactylus.sone.utils.render
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.template.Template
+import javax.inject.Inject
 
 /**
  * This AJAX handler retrieves information and rendered representation of a [Post].
  */
-class GetPostAjaxPage(webInterface: WebInterface, private val postTemplate: Template) : LoggedInJsonPage("getPost.ajax", webInterface) {
+class GetPostAjaxPage @Inject constructor(webInterface: WebInterface, private val postTemplate: Template) :
+		LoggedInJsonPage("getPost.ajax", webInterface) {
 
 	override val needsFormPassword = false
 
