@@ -8,11 +8,12 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import java.text.SimpleDateFormat
 import java.util.TimeZone
+import javax.inject.Inject
 
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
  */
-class GetTimesAjaxPage(webInterface: WebInterface,
+class GetTimesAjaxPage @Inject constructor(webInterface: WebInterface,
 		private val timeTextConverter: TimeTextConverter,
 		private val l10nFilter: L10nFilter,
 		timeZone: TimeZone) : JsonPage("getTimes.ajax", webInterface) {
