@@ -41,8 +41,6 @@ import freenet.keys.FreenetURI;
 import freenet.keys.USK;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
-import freenet.support.io.Closer;
-import com.db4o.ObjectContainer;
 
 import com.google.common.annotations.VisibleForTesting;
 
