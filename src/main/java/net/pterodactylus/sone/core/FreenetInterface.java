@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
@@ -43,7 +44,6 @@ import net.pterodactylus.sone.data.TemporaryImage;
 
 import com.google.common.base.Function;
 import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import freenet.client.ClientMetadata;
@@ -558,11 +558,18 @@ public class FreenetInterface {
 
 	}
 
-	public class InsertTokenSupplier implements Function<Image, InsertToken> {
+	public static class InsertTokenSupplier implements Function<Image, InsertToken> {
+
+		private final FreenetInterface freenetInterface;
+
+		@Inject
+		public InsertTokenSupplier(FreenetInterface freenetInterface) {
+			this.freenetInterface = freenetInterface;
+		}
 
 		@Override
 		public InsertToken apply(Image image) {
-			return new InsertToken(image);
+			return freenetInterface.new InsertToken(image);
 		}
 
 	}

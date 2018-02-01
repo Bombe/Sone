@@ -4,8 +4,12 @@ import net.pterodactylus.sone.core.FreenetInterface.InsertToken
 import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.TemporaryImage
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -49,6 +53,11 @@ class ImageInserterTest {
 		imageInserter.insertImage(temporaryImage, image)
 		imageInserter.cancelImageInsert(image)
 		verify(insertToken).cancel()
+	}
+
+	@Test
+	fun `image inserter can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<ImageInserter>(), notNullValue())
 	}
 
 }

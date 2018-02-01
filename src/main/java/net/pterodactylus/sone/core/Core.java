@@ -208,22 +208,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The database
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
-		super("Sone Core");
-		this.configuration = configuration;
-		this.freenetInterface = freenetInterface;
-		this.identityManager = identityManager;
-		this.soneDownloader = soneDownloader;
-		this.imageInserter = new ImageInserter(freenetInterface, freenetInterface.new InsertTokenSupplier());
-		this.updateChecker = updateChecker;
-		this.webOfTrustUpdater = webOfTrustUpdater;
-		this.eventBus = eventBus;
-		this.database = database;
-		preferences = new Preferences(eventBus);
-	}
-
-	@VisibleForTesting
-	protected Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;

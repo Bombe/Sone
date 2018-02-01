@@ -27,7 +27,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
+import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.TemporaryImage;
 
@@ -61,7 +64,8 @@ public class ImageInserter {
 	 * @param insertTokenSupplier
 	 *            The supplier for insert tokens
 	 */
-	public ImageInserter(FreenetInterface freenetInterface, Function<Image, InsertToken> insertTokenSupplier) {
+	@Inject
+	public ImageInserter(FreenetInterface freenetInterface, InsertTokenSupplier insertTokenSupplier) {
 		this.freenetInterface = freenetInterface;
 		this.insertTokenSupplier = insertTokenSupplier;
 	}

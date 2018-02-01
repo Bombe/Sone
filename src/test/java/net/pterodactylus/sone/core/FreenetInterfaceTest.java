@@ -420,7 +420,7 @@ public class FreenetInterfaceTest {
 
 	@Test
 	public void insertTokenSupplierSuppliesInsertTokens() {
-		InsertTokenSupplier insertTokenSupplier = freenetInterface.new InsertTokenSupplier();
+		InsertTokenSupplier insertTokenSupplier = new InsertTokenSupplier(freenetInterface);
 		assertThat(insertTokenSupplier.apply(image), notNullValue());
 	}
 
