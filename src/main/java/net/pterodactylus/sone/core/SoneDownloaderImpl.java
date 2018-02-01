@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
@@ -75,6 +77,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	 * @param freenetInterface
 	 * 		The Freenet interface
 	 */
+	@Inject
 	public SoneDownloaderImpl(Core core, FreenetInterface freenetInterface) {
 		this(core, freenetInterface, new SoneParser(core));
 	}

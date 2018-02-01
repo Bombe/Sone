@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web
 
 import com.google.inject.Guice.createInjector
+import net.pterodactylus.sone.core.Core
+import net.pterodactylus.sone.core.FreenetInterface
 import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
 import net.pterodactylus.sone.main.SonePlugin.PluginVersion
 import net.pterodactylus.sone.main.SonePlugin.PluginYear
@@ -34,6 +36,8 @@ class AllPagesTest {
 
 val baseInjector by lazy {
 	createInjector(
+			Core::class.isProvidedByMock(),
+			FreenetInterface::class.isProvidedByMock(),
 			Template::class.isProvidedByMock(),
 			WebInterface::class.isProvidedByMock()
 	)!!

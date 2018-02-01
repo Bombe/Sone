@@ -6,8 +6,10 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.downloading;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.idle;
 import static net.pterodactylus.sone.data.Sone.SoneStatus.unknown;
+import static net.pterodactylus.sone.web.AllPagesTestKt.getBaseInjector;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -191,6 +193,11 @@ public class SoneDownloaderTest {
 		when(bucket.getInputStream()).thenReturn(inputStream);
 		FetchResult fetchResult = new FetchResult(clientMetadata, bucket);
 		return new Fetched(uri, fetchResult);
+	}
+
+	@Test
+	public void soneDownloaderCanBeCreatedByDependencyInjection() {
+	    assertThat(getBaseInjector().getInstance(SoneDownloader.class), notNullValue());
 	}
 
 }
