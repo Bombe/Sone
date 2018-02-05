@@ -75,7 +75,7 @@ public class MemoryDatabaseTest {
 	private static final String SONE_ID = "sone";
 	private static final String RECIPIENT_ID = "recipient";
 	private final Configuration configuration = mock(Configuration.class);
-	private final MemoryDatabase memoryDatabase = new MemoryDatabase(null, configuration);
+	private final MemoryDatabase memoryDatabase = new MemoryDatabase(configuration);
 	private final Sone sone = mock(Sone.class);
 
 	@Before

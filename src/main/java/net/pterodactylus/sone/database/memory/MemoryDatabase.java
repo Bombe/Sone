@@ -55,7 +55,6 @@ import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostDatabase;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.SoneBuilder;
-import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 
@@ -79,9 +78,6 @@ public class MemoryDatabase extends AbstractService implements Database {
 
 	/** The lock. */
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
-
-	/** The Sone provider. */
-	private final SoneProvider soneProvider;
 
 	/** The configuration. */
 	private final Configuration configuration;
@@ -125,14 +121,11 @@ public class MemoryDatabase extends AbstractService implements Database {
 	/**
 	 * Creates a new memory database.
 	 *
-	 * @param soneProvider
-	 * 		The Sone provider
 	 * @param configuration
 	 * 		The configuration for loading and saving elements
 	 */
 	@Inject
-	public MemoryDatabase(SoneProvider soneProvider, Configuration configuration) {
-		this.soneProvider = soneProvider;
+	public MemoryDatabase(Configuration configuration) {
 		this.configuration = configuration;
 		this.configurationLoader = new ConfigurationLoader(configuration);
 		memoryBookmarkDatabase =
@@ -371,7 +364,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	/** {@inheritDocs} */
 	@Override
 	public PostBuilder newPostBuilder() {
-		return new MemoryPostBuilder(this, soneProvider);
+		return new MemoryPostBuilder(this, this);
 	}
 
 	//
@@ -444,7 +437,7 @@ public class MemoryDatabase extends AbstractService implements Database {
 	/** {@inheritDocs} */
 	@Override
 	public PostReplyBuilder newPostReplyBuilder() {
-		return new MemoryPostReplyBuilder(this, soneProvider);
+		return new MemoryPostReplyBuilder(this, this);
 	}
 
 	//
