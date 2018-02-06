@@ -109,4 +109,16 @@ class ConfigurationLoaderTest {
 		assertThat(sone2Id.value, nullValue())
 	}
 
+	@Test
+	fun `sone with missing following time is not loaded`() {
+		setupStringValue("SoneFollowingTimes/0/Sone", "Sone1")
+		setupLongValue("SoneFollowingTimes/0/Time", 1000L)
+		setupStringValue("SoneFollowingTimes/1/Sone", "Sone2")
+		setupLongValue("SoneFollowingTimes/1/Time")
+		setupStringValue("SoneFollowingTimes/2/Sone")
+		assertThat(configurationLoader.getSoneFollowingTime("Sone1"), equalTo(1000L))
+		assertThat(configurationLoader.getSoneFollowingTime("Sone2"), nullValue())
+		assertThat(configurationLoader.getSoneFollowingTime("Sone3"), nullValue())
+	}
+
 }

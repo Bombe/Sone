@@ -75,7 +75,7 @@ public class ConfigurationLoader {
 			if (soneId == null) {
 				break;
 			}
-			soneFollowingTimes.put(soneId, configuration.getLongValue("SoneFollowingTimes/" + soneCounter++ + "/Time").getValue(Long.MAX_VALUE));
+			soneFollowingTimes.put(soneId, configuration.getLongValue("SoneFollowingTimes/" + soneCounter++ + "/Time").getValue(null));
 		}
 		return soneFollowingTimes;
 	}
