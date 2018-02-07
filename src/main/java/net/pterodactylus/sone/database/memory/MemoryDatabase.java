@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
