@@ -158,9 +158,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The trust updater. */
 	private final WebOfTrustUpdater webOfTrustUpdater;
 
-	/** The times Sones were followed. */
-	private final Map<String, Long> soneFollowingTimes = new HashMap<String, Long>();
-
 	/** Locked local Sones. */
 	/* synchronize on itself. */
 	private final Set<Sone> lockedSones = new HashSet<Sone>();
@@ -383,20 +380,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public boolean isModifiedSone(Sone sone) {
 		return soneInserters.containsKey(sone) && soneInserters.get(sone).isModified();
-	}
-
-	/**
-	 * Returns the time when the given was first followed by any local Sone.
-	 *
-	 * @param sone
-	 *            The Sone to get the time for
-	 * @return The time (in milliseconds since Jan 1, 1970) the Sone has first
-	 *         been followed, or {@link Long#MAX_VALUE}
-	 */
-	public long getSoneFollowingTime(Sone sone) {
-		synchronized (soneFollowingTimes) {
-			return Optional.fromNullable(soneFollowingTimes.get(sone.getId())).or(Long.MAX_VALUE);
-		}
 	}
 
 	/**
@@ -724,24 +707,20 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
 		database.addFriend(sone, soneId);
-		synchronized (soneFollowingTimes) {
-			if (!soneFollowingTimes.containsKey(soneId)) {
-				long now = System.currentTimeMillis();
-				soneFollowingTimes.put(soneId, now);
-				Sone followedSone = getSone(soneId);
-				if (followedSone == null) {
-					return;
-				}
-				for (Post post : followedSone.getPosts()) {
-					if (post.getTime() < now) {
-						markPostKnown(post);
-					}
-				}
-				for (PostReply reply : followedSone.getReplies()) {
-					if (reply.getTime() < now) {
-						markReplyKnown(reply);
-					}
-				}
+		@SuppressWarnings("ConstantConditions") // we just followed, this can’t be null.
+		long now = database.getFollowingTime(soneId);
+		Sone followedSone = getSone(soneId);
+		if (followedSone == null) {
+			return;
+		}
+		for (Post post : followedSone.getPosts()) {
+			if (post.getTime() < now) {
+				markPostKnown(post);
+			}
+		}
+		for (PostReply reply : followedSone.getReplies()) {
+			if (reply.getTime() < now) {
+				markReplyKnown(reply);
 			}
 		}
 		touchConfiguration();
@@ -759,15 +738,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
 		database.removeFriend(sone, soneId);
-		boolean unfollowedSoneStillFollowed = false;
-		for (Sone localSone : getLocalSones()) {
-			unfollowedSoneStillFollowed |= localSone.hasFriend(soneId);
-		}
-		if (!unfollowedSoneStillFollowed) {
-			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.remove(soneId);
-			}
-		}
 		touchConfiguration();
 	}
 
@@ -891,7 +861,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		soneChangeDetector.onNewPosts(new PostProcessor() {
 			@Override
 			public void processPost(Post post) {
-				if (post.getTime() < getSoneFollowingTime(newSone)) {
+				if (post.getTime() < database.getFollowingTime(newSone.getId())) {
 					post.setKnown(true);
 				} else if (!post.isKnown()) {
 					events.add(new NewPostFoundEvent(post));
@@ -907,7 +877,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
 			@Override
 			public void processPostReply(PostReply postReply) {
-				if (postReply.getTime() < getSoneFollowingTime(newSone)) {
+				if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
 					postReply.setKnown(true);
 				} else if (!postReply.isKnown()) {
 					events.add(new NewPostReplyFoundEvent(postReply));
@@ -1581,17 +1551,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
 			}
 
-			/* save Sone following times. */
-			soneCounter = 0;
-			synchronized (soneFollowingTimes) {
-				for (Entry<String, Long> soneFollowingTime : soneFollowingTimes.entrySet()) {
-					configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(soneFollowingTime.getKey());
-					configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").setValue(soneFollowingTime.getValue());
-					++soneCounter;
-				}
-				configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(null);
-			}
-
 			/* save known posts. */
 			database.save();
 
@@ -1625,20 +1584,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			synchronized (knownSones) {
 				knownSones.add(knownSoneId);
 			}
-		}
-
-		/* load Sone following times. */
-		soneCounter = 0;
-		while (true) {
-			String soneId = configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").getValue(null);
-			if (soneId == null) {
-				break;
-			}
-			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
-			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.put(soneId, time);
-			}
-			++soneCounter;
 		}
 	}
 
