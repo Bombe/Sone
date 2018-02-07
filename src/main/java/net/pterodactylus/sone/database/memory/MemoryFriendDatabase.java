@@ -48,6 +48,9 @@ class MemoryFriendDatabase {
 		try {
 			if (soneFriends.put(localSoneId, friendSoneId)) {
 				configurationLoader.saveFriends(localSoneId, soneFriends.get(localSoneId));
+				if (configurationLoader.getSoneFollowingTime(friendSoneId) == null) {
+					configurationLoader.setSoneFollowingTime(friendSoneId, System.currentTimeMillis());
+				}
 			}
 		} finally {
 			lock.writeLock().unlock();

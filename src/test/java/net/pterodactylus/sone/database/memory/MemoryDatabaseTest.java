@@ -30,11 +30,12 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.emptyIterable;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -57,9 +58,11 @@ import net.pterodactylus.sone.test.TestPostBuilder;
 import net.pterodactylus.sone.test.TestPostReplyBuilder;
 import net.pterodactylus.sone.test.TestValue;
 import net.pterodactylus.util.config.Configuration;
+import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.Value;
 
 import com.google.common.base.Optional;
+import org.hamcrest.CoreMatchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -324,14 +327,28 @@ public class MemoryDatabaseTest {
 		assertThat(memoryDatabase.isFriend(sone, "Friend1"), is(false));
 	}
 
-	private Map<String, Value<String>> prepareConfigurationValues() {
-		final Map<String, Value<String>> configurationValues = new HashMap<String, Value<String>>();
+	private Map<String, Value<?>> prepareConfigurationValues() {
+		final Map<String, Value<?>> configurationValues = new HashMap<>();
 		when(configuration.getStringValue(anyString())).thenAnswer(new Answer<Value<String>>() {
 			@Override
 			public Value<String> answer(InvocationOnMock invocation) throws Throwable {
-				Value<String> stringValue = TestValue.from(null);
-				configurationValues.put((String) invocation.getArguments()[0], stringValue);
-				return stringValue;
+				Value<?> value = configurationValues.get(invocation.<String>getArgument(0));
+				if (value == null) {
+					value = TestValue.from(null);
+					configurationValues.put(invocation.<String>getArgument(0), value);
+				}
+				return (Value<String>) value;
+			}
+		});
+		when(configuration.getLongValue(anyString())).thenAnswer(new Answer<Value<Long>>() {
+			@Override
+			public Value<Long> answer(InvocationOnMock invocation) throws Throwable {
+				Value<?> value = configurationValues.get(invocation.<String>getArgument(0));
+				if (value == null) {
+					value = TestValue.from(null);
+					configurationValues.put(invocation.<String>getArgument(0), value);
+				}
+				return (Value<Long>) value;
 			}
 		});
 		return configurationValues;
@@ -339,13 +356,13 @@ public class MemoryDatabaseTest {
 
 	@Test
 	public void friendIsAddedCorrectlyToLocalSone() {
-		Map<String, Value<String>> configurationValues = prepareConfigurationValues();
+		Map<String, Value<?>> configurationValues = prepareConfigurationValues();
 		when(sone.isLocal()).thenReturn(true);
 		memoryDatabase.addFriend(sone, "Friend1");
 		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/0/ID"),
-				is(TestValue.from("Friend1")));
+				CoreMatchers.<Value<?>>is(TestValue.from("Friend1")));
 		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/1/ID"),
-				is(TestValue.<String>from(null)));
+				CoreMatchers.<Value<?>>is(TestValue.<String>from(null)));
 	}
 
 	@Test
@@ -355,24 +372,15 @@ public class MemoryDatabaseTest {
 	}
 
 	@Test
-	public void configurationIsWrittenOnceIfFriendIsAddedTwice() {
-		prepareConfigurationValues();
-		when(sone.isLocal()).thenReturn(true);
-		memoryDatabase.addFriend(sone, "Friend1");
-		memoryDatabase.addFriend(sone, "Friend1");
-		verify(configuration, times(3)).getStringValue(anyString());
-	}
-
-	@Test
 	public void friendIsRemovedCorrectlyFromLocalSone() {
-		Map<String, Value<String>> configurationValues = prepareConfigurationValues();
+		Map<String, Value<?>> configurationValues = prepareConfigurationValues();
 		when(sone.isLocal()).thenReturn(true);
 		memoryDatabase.addFriend(sone, "Friend1");
 		memoryDatabase.removeFriend(sone, "Friend1");
 		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/0/ID"),
-				is(TestValue.<String>from(null)));
+				CoreMatchers.<Value<?>>is(TestValue.<String>from(null)));
 		assertThat(configurationValues.get("Sone/" + SONE_ID + "/Friends/1/ID"),
-				is(TestValue.<String>from(null)));
+				CoreMatchers.<Value<?>>is(TestValue.<String>from(null)));
 	}
 
 	@Test
@@ -381,6 +389,28 @@ public class MemoryDatabaseTest {
 		when(sone.isLocal()).thenReturn(true);
 		memoryDatabase.removeFriend(sone, "Friend1");
 		verify(configuration).getStringValue(anyString());
+	}
+
+	@Test
+	public void timeIsStoredInConfigurationWhenASoneIsFollowed() throws ConfigurationException {
+		prepareConfigurationValues();
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.addFriend(sone, "Friend");
+		assertThat(configuration.getStringValue("SoneFollowingTimes/0/Sone").getValue(), equalTo("Friend"));
+		assertThat(System.currentTimeMillis() - configuration.getLongValue("SoneFollowingTimes/0/Time").getValue(), lessThan(1000L));
+		assertThat(configuration.getStringValue("SoneFollowingTimes/1/Sone").getValue(), nullValue());
+	}
+
+	@Test
+	public void existingTimeIsNotOverwrittenWhenASoneIsFollowed() throws ConfigurationException {
+		prepareConfigurationValues();
+		configuration.getStringValue("SoneFollowingTimes/0/Sone").setValue("Friend");
+		configuration.getLongValue("SoneFollowingTimes/0/Time").setValue(1000L);
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.addFriend(sone, "Friend");
+		assertThat(configuration.getStringValue("SoneFollowingTimes/0/Sone").getValue(), equalTo("Friend"));
+		assertThat(configuration.getLongValue("SoneFollowingTimes/0/Time").getValue(), equalTo(1000L));
+		assertThat(configuration.getStringValue("SoneFollowingTimes/1/Sone").getValue(), nullValue());
 	}
 
 }
