@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
@@ -67,6 +70,11 @@ class MemoryFriendDatabase {
 		} finally {
 			lock.writeLock().unlock();
 		}
+	}
+
+	@Nullable
+	Long getFollowingTime(@Nonnull String soneId) {
+		return configurationLoader.getSoneFollowingTime(soneId);
 	}
 
 	private void loadFriends(String localSoneId) {

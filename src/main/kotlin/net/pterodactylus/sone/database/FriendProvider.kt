@@ -9,5 +9,6 @@ interface FriendProvider {
 
 	fun getFriends(localSone: Sone): Collection<String>
 	fun isFriend(localSone: Sone, friendSoneId: String): Boolean
+	fun getFollowingTime(friendSoneId: String): Long?
 
 }

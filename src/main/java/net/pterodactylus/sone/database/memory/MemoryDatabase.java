@@ -320,6 +320,12 @@ public class MemoryDatabase extends AbstractService implements Database {
 		memoryFriendDatabase.removeFriend(localSone.getId(), friendSoneId);
 	}
 
+	@Nullable
+	@Override
+	public Long getFollowingTime(@Nonnull String friendSoneId) {
+		return memoryFriendDatabase.getFollowingTime(friendSoneId);
+	}
+
 	//
 	// POSTPROVIDER METHODS
 	//

@@ -392,6 +392,22 @@ public class MemoryDatabaseTest {
 	}
 
 	@Test
+	public void soneFollowingTimeIsReturnedCorrectly() throws ConfigurationException {
+		prepareConfigurationValues();
+		configuration.getStringValue("SoneFollowingTimes/0/Sone").setValue("sone");
+		configuration.getLongValue("SoneFollowingTimes/0/Time").setValue(1000L);
+		assertThat(memoryDatabase.getFollowingTime("sone"), equalTo(1000L));
+	}
+
+	@Test
+	public void nullisReturnedWhenSoneIsNotFollowed() throws ConfigurationException {
+		prepareConfigurationValues();
+		configuration.getStringValue("SoneFollowingTimes/0/Sone").setValue("otherSone");
+		configuration.getLongValue("SoneFollowingTimes/0/Time").setValue(1000L);
+		assertThat(memoryDatabase.getFollowingTime("sone"), nullValue());
+	}
+
+	@Test
 	public void timeIsStoredInConfigurationWhenASoneIsFollowed() throws ConfigurationException {
 		prepareConfigurationValues();
 		when(sone.isLocal()).thenReturn(true);
