@@ -429,4 +429,32 @@ public class MemoryDatabaseTest {
 		assertThat(configuration.getStringValue("SoneFollowingTimes/1/Sone").getValue(), nullValue());
 	}
 
+	@Test
+	public void unfollowingASoneRemovesTheFollowingTime() throws ConfigurationException {
+		prepareConfigurationValues();
+		configuration.getStringValue("Sone/sone/Friends/0/ID").setValue("Friend");
+		configuration.getStringValue("SoneFollowingTimes/0/Sone").setValue("Friend");
+		configuration.getLongValue("SoneFollowingTimes/0/Time").setValue(1000L);
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.removeFriend(sone, "Friend");
+		assertThat(configuration.getStringValue("SoneFollowingTimes/0/Sone").getValue(), nullValue());
+	}
+
+	@Test
+	public void unfollowingASoneDoesNotRemoveTheFollowingTimeIfAnotherLocalSoneFollowsIt() throws ConfigurationException {
+		prepareConfigurationValues();
+		configuration.getStringValue("Sone/sone/Friends/0/ID").setValue("Friend");
+		configuration.getStringValue("Sone/other-sone/Friends/0/ID").setValue("Friend");
+		configuration.getStringValue("SoneFollowingTimes/0/Sone").setValue("Friend");
+		configuration.getLongValue("SoneFollowingTimes/0/Time").setValue(1000L);
+		Sone otherSone = mock(Sone.class);
+		when(otherSone.isLocal()).thenReturn(true);
+		when(otherSone.getId()).thenReturn("other-sone");
+		memoryDatabase.getFriends(otherSone);
+		when(sone.isLocal()).thenReturn(true);
+		memoryDatabase.removeFriend(sone, "Friend");
+		assertThat(configuration.getStringValue("SoneFollowingTimes/0/Sone").getValue(), equalTo("Friend"));
+		assertThat(configuration.getLongValue("SoneFollowingTimes/0/Time").getValue(), equalTo(1000L));
+	}
+
 }

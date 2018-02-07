@@ -66,6 +66,13 @@ class MemoryFriendDatabase {
 		try {
 			if (soneFriends.remove(localSoneId, friendSoneId)) {
 				configurationLoader.saveFriends(localSoneId, soneFriends.get(localSoneId));
+				boolean unfollowedSoneStillFollowed = false;
+				for (String soneId : soneFriends.keys()) {
+					unfollowedSoneStillFollowed |= getFriends(soneId).contains(friendSoneId);
+				}
+				if (!unfollowedSoneStillFollowed) {
+					configurationLoader.removeSoneFollowingTime(friendSoneId);
+				}
 			}
 		} finally {
 			lock.writeLock().unlock();
