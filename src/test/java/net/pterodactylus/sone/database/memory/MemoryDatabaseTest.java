@@ -215,7 +215,7 @@ public class MemoryDatabaseTest {
 
 	@Test
 	public void storedAndRemovedSoneIsNotAvailable() {
-	    storedSoneIsMadeAvailable();
+		storedSoneIsMadeAvailable();
 		memoryDatabase.removeSone(sone);
 		assertThat(memoryDatabase.getSones(), empty());
 	}
