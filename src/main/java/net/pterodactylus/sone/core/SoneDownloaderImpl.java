@@ -156,21 +156,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	}
 
 	private void fetchSone(Sone sone) {
-		fetchSone(sone, sone.getRequestUri().sskForUSK());
-	}
-
-	/**
-	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
-	 * specific URI.
-	 *
-	 * @param sone
-	 * 		The Sone to fetch
-	 * @param soneUri
-	 * 		The URI to fetch the Sone from
-	 */
-	@Override
-	public void fetchSone(Sone sone, FreenetURI soneUri) {
-		fetchSone(sone, soneUri, false);
+		fetchSone(sone, sone.getRequestUri().sskForUSK(), false);
 	}
 
 	/**
@@ -249,7 +235,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		return new Runnable() {
 			@Override
 			public void run() {
-				fetchSone(sone, sone.getRequestUri());
+				fetchSone(sone, sone.getRequestUri(), false);
 			}
 		};
 	}

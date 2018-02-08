@@ -17,7 +17,6 @@ import com.google.inject.ImplementedBy;
 public interface SoneDownloader extends Service {
 
 	void addSone(Sone sone);
-	void fetchSone(Sone sone, FreenetURI soneUri);
 	Sone fetchSone(Sone sone, FreenetURI soneUri, boolean fetchOnly);
 
 	Runnable fetchSoneWithUriAction(Sone sone);
