@@ -109,7 +109,7 @@ public class SoneDownloaderTest {
 		FreenetURI finalRequestUri = requestUri.sskForUSK()
 				.setMetaString(new String[] { "sone.xml" });
 		setupSoneAsUnknown();
-		soneDownloader.fetchSoneAction(sone).run();
+		soneDownloader.fetchSoneAsSskAction(sone).run();
 		verify(freenetInterface).fetchUri(finalRequestUri);
 		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(unknown);
 		verify(core, never()).updateSone(any(Sone.class));
@@ -126,7 +126,7 @@ public class SoneDownloaderTest {
 	public void notBeingAbleToFetchAKnownSoneDoesNotUpdateCore() {
 		FreenetURI finalRequestUri = requestUri.sskForUSK()
 				.setMetaString(new String[] { "sone.xml" });
-		soneDownloader.fetchSoneAction(sone).run();
+		soneDownloader.fetchSoneAsSskAction(sone).run();
 		verify(freenetInterface).fetchUri(finalRequestUri);
 		verifyThatSoneStatusWasChangedToDownloadingAndBackTo(idle);
 		verify(core, never()).updateSone(any(Sone.class));
@@ -139,7 +139,7 @@ public class SoneDownloaderTest {
 		setupSoneAsUnknown();
 		when(freenetInterface.fetchUri(finalRequestUri)).thenThrow(NullPointerException.class);
 		try {
-			soneDownloader.fetchSoneAction(sone).run();
+			soneDownloader.fetchSoneAsSskAction(sone).run();
 		} finally {
 			verify(freenetInterface).fetchUri(finalRequestUri);
 			verifyThatSoneStatusWasChangedToDownloadingAndBackTo(unknown);
@@ -153,7 +153,7 @@ public class SoneDownloaderTest {
 				.setMetaString(new String[] { "sone.xml" });
 		when(freenetInterface.fetchUri(finalRequestUri)).thenThrow( NullPointerException.class);
 		try {
-			soneDownloader.fetchSoneAction(sone).run();
+			soneDownloader.fetchSoneAsSskAction(sone).run();
 		} finally {
 			verify(freenetInterface).fetchUri(finalRequestUri);
 			verifyThatSoneStatusWasChangedToDownloadingAndBackTo(idle);
@@ -165,7 +165,7 @@ public class SoneDownloaderTest {
 	public void fetchingSoneWithInvalidXmlWillNotUpdateTheCore() throws IOException {
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-not-xml.xml"));
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSoneAction(sone).run();
+		soneDownloader.fetchSoneAsSskAction(sone).run();
 		verify(core, never()).updateSone(any(Sone.class));
 	}
 
@@ -174,7 +174,7 @@ public class SoneDownloaderTest {
 		final Fetched fetchResult = createFetchResult(requestUri, getClass().getResourceAsStream("sone-parser-no-payload.xml"));
 		when(core.soneBuilder()).thenReturn(null);
 		when(freenetInterface.fetchUri(requestUri)).thenReturn(fetchResult);
-		soneDownloader.fetchSoneAction(sone).run();
+		soneDownloader.fetchSoneAsSskAction(sone).run();
 		verify(core, never()).updateSone(any(Sone.class));
 	}
 

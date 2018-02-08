@@ -127,7 +127,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 						sone, key, newKnownGood, newSlotToo));
 				if (edition > sone.getLatestEdition()) {
 					sone.setLatestEdition(edition);
-					new Thread(fetchSoneAction(sone),
+					new Thread(fetchSoneAsSskAction(sone),
 							"Sone Downloader").start();
 				}
 			}
@@ -155,7 +155,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		return (currentTimeMillis() - sone.getTime()) < DAYS.toMillis(7);
 	}
 
-	private void fetchSone(Sone sone) {
+	private void fetchSoneAsSsk(Sone sone) {
 		fetchSone(sone, sone.getRequestUri().sskForUSK(), false);
 	}
 
@@ -231,7 +231,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	}
 
 	@Override
-	public Runnable fetchSoneWithUriAction(final Sone sone) {
+	public Runnable fetchSoneAsUskAction(final Sone sone) {
 		return new Runnable() {
 			@Override
 			public void run() {
@@ -241,11 +241,11 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	}
 
 	@Override
-	public Runnable fetchSoneAction(final Sone sone) {
+	public Runnable fetchSoneAsSskAction(final Sone sone) {
 		return new Runnable() {
 			@Override
 			public void run() {
-				fetchSone(sone);
+				fetchSoneAsSsk(sone);
 			}
 		};
 	}

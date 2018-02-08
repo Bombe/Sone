@@ -19,7 +19,7 @@ public interface SoneDownloader extends Service {
 	void addSone(Sone sone);
 	Sone fetchSone(Sone sone, FreenetURI soneUri, boolean fetchOnly);
 
-	Runnable fetchSoneWithUriAction(Sone sone);
-	Runnable fetchSoneAction(Sone sone);
+	Runnable fetchSoneAsUskAction(Sone sone);
+	Runnable fetchSoneAsSskAction(Sone sone);
 
 }

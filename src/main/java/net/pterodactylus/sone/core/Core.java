@@ -691,7 +691,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		database.storeSone(sone);
 		soneDownloader.addSone(sone);
-		soneDownloaders.execute(soneDownloader.fetchSoneWithUriAction(sone));
+		soneDownloaders.execute(soneDownloader.fetchSoneAsUskAction(sone));
 		return sone;
 	}
 
@@ -1650,7 +1650,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 		}
 		soneDownloader.addSone(sone);
-		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
+		soneDownloaders.execute(soneDownloader.fetchSoneAsSskAction(sone));
 	}
 
 	/**
