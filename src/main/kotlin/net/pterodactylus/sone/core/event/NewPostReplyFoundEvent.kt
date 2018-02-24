@@ -1,5 +1,5 @@
 /*
- * Sone - NewPostFoundEvent.java - Copyright © 2013–2016 David Roden
+ * Sone - NewPostReplyFoundEvent.java - Copyright © 2013–2016 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,25 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.PostReply
 
 /**
- * Event that signals that a new post was found.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
+ * Event that signals that a new [PostReply] was found.
  */
-public class NewPostFoundEvent extends PostEvent {
+data class NewPostReplyFoundEvent(val postReply: PostReply) {
 
-	/**
-	 * Creates a new “new post found” event.
-	 *
-	 * @param post
-	 *            The post that was found
-	 */
-	public NewPostFoundEvent(Post post) {
-		super(post);
-	}
+	@Deprecated(message = "will go away", replaceWith = ReplaceWith("postReply"))
+	fun postReply() = postReply
 
 }
