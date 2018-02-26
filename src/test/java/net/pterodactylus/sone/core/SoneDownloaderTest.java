@@ -26,6 +26,7 @@ import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.freenet.wot.Identity;
+import net.pterodactylus.sone.test.GuiceKt;
 
 import freenet.client.ClientMetadata;
 import freenet.client.FetchResult;
@@ -197,7 +198,9 @@ public class SoneDownloaderTest {
 
 	@Test
 	public void soneDownloaderCanBeCreatedByDependencyInjection() {
-	    assertThat(getBaseInjector().getInstance(SoneDownloader.class), notNullValue());
+		assertThat(getBaseInjector().createChildInjector(
+				GuiceKt.supply(SoneParser.class).byInstance(mock(SoneParser.class))
+		).getInstance(SoneDownloader.class), notNullValue());
 	}
 
 }

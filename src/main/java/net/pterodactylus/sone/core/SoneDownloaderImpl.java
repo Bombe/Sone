@@ -44,8 +44,6 @@ import freenet.keys.USK;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
 
-import com.google.common.annotations.VisibleForTesting;
-
 /**
  * The Sone downloader is responsible for download Sones as they are updated.
  *
@@ -76,22 +74,9 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	 * 		The core
 	 * @param freenetInterface
 	 * 		The Freenet interface
-	 */
-	@Inject
-	public SoneDownloaderImpl(Core core, FreenetInterface freenetInterface) {
-		this(core, freenetInterface, new SoneParser(core));
-	}
-
-	/**
-	 * Creates a new Sone downloader.
-	 *
-	 * @param core
-	 * 		The core
-	 * @param freenetInterface
-	 * 		The Freenet interface
 	 * @param soneParser
 	 */
-	@VisibleForTesting
+	@Inject
 	SoneDownloaderImpl(Core core, FreenetInterface freenetInterface, SoneParser soneParser) {
 		super("Sone Downloader", false);
 		this.core = core;

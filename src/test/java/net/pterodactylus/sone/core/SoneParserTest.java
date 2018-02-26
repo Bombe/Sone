@@ -36,6 +36,7 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.AlbumBuilder;
+import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.ImageBuilder;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
@@ -64,8 +65,8 @@ import org.mockito.stubbing.Answer;
  */
 public class SoneParserTest {
 
-	private final Core core = mock(Core.class);
-	private final SoneParser soneParser = new SoneParser(core);
+	private final Database database = mock(Database.class);
+	private final SoneParser soneParser = new SoneParser(database);
 	private final Sone sone = mock(Sone.class);
 	private FreenetURI requestUri = mock(FreenetURI.class);
 	private final PostBuilder postBuilder = mock(PostBuilder.class);
@@ -111,7 +112,7 @@ public class SoneParserTest {
 
 	@Before
 	public void setupSoneBuilder() {
-		when(core.soneBuilder()).thenAnswer(new Answer<SoneBuilder>() {
+		when(database.newSoneBuilder()).thenAnswer(new Answer<SoneBuilder>() {
 			@Override
 			public SoneBuilder answer(InvocationOnMock invocation) {
 				return new MemorySoneBuilder(null);
@@ -173,7 +174,7 @@ public class SoneParserTest {
 				return post;
 			}
 		});
-		when(core.postBuilder()).thenReturn(postBuilder);
+		when(database.newPostBuilder()).thenReturn(postBuilder);
 	}
 
 	@Before
@@ -237,7 +238,7 @@ public class SoneParserTest {
 				return postReply;
 			}
 		});
-		when(core.postReplyBuilder()).thenReturn(postReplyBuilder);
+		when(database.newPostReplyBuilder()).thenReturn(postReplyBuilder);
 	}
 
 	@Before
@@ -328,12 +329,12 @@ public class SoneParserTest {
 				return album;
 			}
 		});
-		when(core.albumBuilder()).thenReturn(albumBuilder);
+		when(database.newAlbumBuilder()).thenReturn(albumBuilder);
 	}
 
 	@Before
 	public void setupAlbums() {
-		when(core.getAlbum(anyString())).thenAnswer(new Answer<Album>() {
+		when(database.getAlbum(anyString())).thenAnswer(new Answer<Album>() {
 			@Override
 			public Album answer(InvocationOnMock invocation)
 			throws Throwable {
@@ -439,12 +440,12 @@ public class SoneParserTest {
 				return image;
 			}
 		});
-		when(core.imageBuilder()).thenReturn(imageBuilder);
+		when(database.newImageBuilder()).thenReturn(imageBuilder);
 	}
 
 	@Before
 	public void setupImages() {
-		when(core.getImage(anyString())).thenAnswer(new Answer<Image>() {
+		when(database.getImage(anyString())).thenAnswer(new Answer<Image>() {
 			@Override
 			public Image answer(InvocationOnMock invocation)
 			throws Throwable {
