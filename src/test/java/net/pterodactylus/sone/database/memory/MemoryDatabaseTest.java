@@ -141,6 +141,7 @@ public class MemoryDatabaseTest {
 				"album-description3").update();
 		firstAlbum.addAlbum(thirdAlbum);
 		Album rootAlbum = mock(Album.class);
+		when(rootAlbum.getId()).thenReturn("root");
 		when(rootAlbum.getAlbums()).thenReturn(
 				asList(firstAlbum, secondAlbum));
 		when(sone.getRootAlbum()).thenReturn(rootAlbum);
