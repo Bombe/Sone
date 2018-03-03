@@ -19,8 +19,6 @@ package net.pterodactylus.sone.database;
 
 /**
  * Exception that signals a database error.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DatabaseException extends Exception {
 

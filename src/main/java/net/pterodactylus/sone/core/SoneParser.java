@@ -36,8 +36,6 @@ import org.w3c.dom.Document;
 
 /**
  * Parses a {@link Sone} from an XML {@link InputStream}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneParser {
 

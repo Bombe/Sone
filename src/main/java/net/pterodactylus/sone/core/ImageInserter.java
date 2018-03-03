@@ -41,8 +41,6 @@ import com.google.common.base.Function;
  * {@link FreenetInterface#insertImage(TemporaryImage, Image, InsertToken)} and
  * also tracks running inserts, giving the possibility to abort a running
  * insert.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageInserter {
 

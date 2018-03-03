@@ -21,8 +21,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
 /**
  * Event that signals that an {@link OwnIdentity} was added.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class OwnIdentityAddedEvent extends OwnIdentityEvent {
 

@@ -21,8 +21,6 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 
 /**
  * Exception that signals an error when communicating with a plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PluginException extends WebOfTrustException {
 

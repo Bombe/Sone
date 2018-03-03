@@ -23,8 +23,6 @@ import freenet.client.HighLevelSimpleClient;
 /**
  * Factory that creates {@link PageToadlet}s using a given
  * {@link HighLevelSimpleClient}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PageToadletFactory {
 

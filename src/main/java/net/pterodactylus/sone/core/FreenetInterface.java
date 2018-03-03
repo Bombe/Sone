@@ -78,8 +78,6 @@ import freenet.support.io.ResumeFailedException;
 
 /**
  * Contains all necessary functionality for interacting with the Freenet node.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class FreenetInterface {
@@ -356,8 +354,6 @@ public class FreenetInterface {
 
 	/**
 	 * Callback for USK watcher events.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static interface Callback {
 
@@ -385,7 +381,6 @@ public class FreenetInterface {
 	 * @see ImageInsertStartedEvent
 	 * @see ImageInsertFailedEvent
 	 * @see ImageInsertFinishedEvent
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class InsertToken implements ClientPutCallback {
 

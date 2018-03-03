@@ -70,8 +70,6 @@ import org.mockito.stubbing.Answer;
 
 /**
  * Tests for {@link MemoryDatabase}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MemoryDatabaseTest {
 

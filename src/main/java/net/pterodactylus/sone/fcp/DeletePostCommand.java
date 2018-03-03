@@ -27,7 +27,6 @@ import freenet.support.SimpleFieldSet;
  * FCP command that deletes a {@link Post}.
  *
  * @see Core#deletePost(Post)
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DeletePostCommand extends AbstractSoneCommand {
 

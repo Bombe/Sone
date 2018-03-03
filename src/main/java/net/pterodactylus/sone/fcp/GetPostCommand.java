@@ -24,8 +24,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * The “GetPost” FCP command returns a single {@link Post} to an FCP client.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPostCommand extends AbstractSoneCommand {
 

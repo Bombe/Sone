@@ -24,8 +24,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link DefaultOwnIdentity}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultOwnIdentityTest extends DefaultIdentityTest {
 

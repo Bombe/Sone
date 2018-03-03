@@ -26,8 +26,6 @@ import freenet.l10n.BaseL10n;
 /**
  * {@link Filter} implementation that replaces a {@link Long} with a value of
  * {@code 0} by a {@link String} from an {@link BaseL10n l10n handler}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class UnknownDateFilter implements Filter {
 

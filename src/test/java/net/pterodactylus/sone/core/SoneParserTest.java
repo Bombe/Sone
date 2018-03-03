@@ -60,8 +60,6 @@ import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link SoneParser}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneParserTest {
 

@@ -23,8 +23,6 @@ import com.google.common.base.Predicate;
  * {@link Predicate} that verifies that an {@link Integer} value is not
  * {@code null} and is between a lower and an upper bound. Both bounds are
  * inclusive.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IntegerRangePredicate implements Predicate<Integer> {
 

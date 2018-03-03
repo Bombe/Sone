@@ -24,8 +24,6 @@ import com.google.common.base.Optional;
 
 /**
  * Interface for all objects that expose an ID.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Identified {
 

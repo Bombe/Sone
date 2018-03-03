@@ -24,7 +24,6 @@ import net.pterodactylus.sone.database.ReplyBuilder;
  *
  * @param <B>
  *            The interface implemented and exposed by the builder
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AbstractReplyBuilder<B extends ReplyBuilder<B>> implements ReplyBuilder<B> {
 

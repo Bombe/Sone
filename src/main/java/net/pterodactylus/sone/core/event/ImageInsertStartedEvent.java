@@ -21,8 +21,6 @@ import net.pterodactylus.sone.data.Image;
 
 /**
  * Event that signals that an {@link Image} is not being inserted.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageInsertStartedEvent extends ImageEvent {
 

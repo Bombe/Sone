@@ -26,7 +26,6 @@ import com.google.common.base.Predicate;
  *
  * @param <T>
  *            The type of the reply
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Reply<T extends Reply<T>> extends Identified {
 

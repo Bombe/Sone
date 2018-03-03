@@ -45,8 +45,6 @@ import freenet.support.api.Bucket;
 
 /**
  * The Sone downloader is responsible for download Sones as they are updated.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneDownloaderImpl extends AbstractService implements SoneDownloader {
 

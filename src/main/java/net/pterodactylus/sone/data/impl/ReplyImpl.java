@@ -26,7 +26,6 @@ import net.pterodactylus.sone.database.SoneProvider;
  *
  * @param <T>
  *            The type of the reply
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class ReplyImpl<T extends Reply<T>> implements Reply<T> {
 

@@ -27,8 +27,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Implements the “GetSones” FCP command that returns the list of known Sones.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetSonesCommand extends AbstractSoneCommand {
 

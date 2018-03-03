@@ -16,8 +16,6 @@ import com.google.common.base.Predicate;
 
 /**
  * Filters {@link Notification}s involving {@link Post}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class PostVisibilityFilter {

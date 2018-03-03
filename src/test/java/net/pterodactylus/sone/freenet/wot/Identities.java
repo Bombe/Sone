@@ -22,8 +22,6 @@ import java.util.Map;
 
 /**
  * Creates {@link Identity}s and {@link OwnIdentity}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Identities {
 

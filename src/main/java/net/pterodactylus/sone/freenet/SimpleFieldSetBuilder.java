@@ -23,8 +23,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Helper class to construct {@link SimpleFieldSet} objects in a single call.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SimpleFieldSetBuilder {
 

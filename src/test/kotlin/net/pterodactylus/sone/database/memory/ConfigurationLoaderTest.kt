@@ -13,8 +13,6 @@ import org.junit.Test
 
 /**
  * Unit test for [ConfigurationLoader].
- *
- * @author [David ‘Bombe’ Roden](mailto:bombe@pterodactylus.net)
  */
 class ConfigurationLoaderTest {
 

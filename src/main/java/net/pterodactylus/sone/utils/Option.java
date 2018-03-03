@@ -5,7 +5,6 @@ package net.pterodactylus.sone.utils;
  *
  * @param <T>
  *            The type of the option
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Option<T> {
 

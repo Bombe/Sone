@@ -21,8 +21,6 @@ import net.pterodactylus.sone.data.Image;
 
 /**
  * Base class for {@link Image} events.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class ImageEvent {
 

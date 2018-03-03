@@ -6,8 +6,6 @@ import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
 /**
  * Event that signals that the {@link FcpInterface}’s {@link
  * FullAccessRequired} parameter was changed in the configuration.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FullAccessRequiredChanged {
 

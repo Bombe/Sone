@@ -33,8 +33,6 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Album extends Identified, Fingerprintable {
 
@@ -271,8 +269,6 @@ public interface Album extends Identified, Fingerprintable {
 	 * Allows modifying an album. Modifications are only performed once {@link
 	 * #update()} has succesfully returned a new album with the modifications
 	 * made.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	interface Modifier {
 

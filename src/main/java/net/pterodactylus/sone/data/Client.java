@@ -23,8 +23,6 @@ import com.google.common.base.Objects;
 
 /**
  * Container for the client information of a {@link Sone}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Client {
 

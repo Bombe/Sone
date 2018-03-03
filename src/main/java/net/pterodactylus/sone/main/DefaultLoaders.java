@@ -18,8 +18,6 @@ import net.pterodactylus.util.web.StaticPage;
 
 /**
  * Default {@link Loaders} implementation that loads resources from the classpath.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultLoaders implements Loaders {
 

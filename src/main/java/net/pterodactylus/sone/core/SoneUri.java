@@ -28,8 +28,6 @@ import freenet.keys.FreenetURI;
 /**
  * Helper class that creates {@link FreenetURI}s for Sone to insert to and
  * request from.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneUri {
 

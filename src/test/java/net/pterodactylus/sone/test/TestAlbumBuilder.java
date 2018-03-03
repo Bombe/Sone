@@ -20,8 +20,6 @@ import org.mockito.stubbing.Answer;
 
 /**
  * {@link AlbumBuilder} that returns a mocked {@link Album}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestAlbumBuilder implements AlbumBuilder {
 

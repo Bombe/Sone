@@ -30,7 +30,6 @@ import freenet.support.SimpleFieldSet;
  * FCP command that creates a new {@link Reply}.
  *
  * @see Core#createReply(Sone, Post, String)
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CreateReplyCommand extends AbstractSoneCommand {
 

@@ -29,8 +29,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implements the “GetPosts” FCP command that returns the list of posts a Sone
  * made.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPostsCommand extends AbstractSoneCommand {
 

@@ -23,8 +23,6 @@ import net.pterodactylus.sone.database.ImageBuilder;
 /**
  * Abstract {@link ImageBuilder} implementation. It stores the state of the new
  * album and performs validation, you only need to implement {@link #build()}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class AbstractImageBuilder implements ImageBuilder {
 

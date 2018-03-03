@@ -21,8 +21,6 @@ import net.pterodactylus.sone.data.Sone;
 
 /**
  * Event that signals that a {@link Sone} was removed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneRemovedEvent extends SoneEvent {
 

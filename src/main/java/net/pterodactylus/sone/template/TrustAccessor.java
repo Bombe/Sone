@@ -30,8 +30,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <dd>{@link Boolean} that indicates whether this trust relationship has an
  * explicit value assigned to it.</dd>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TrustAccessor extends ReflectionAccessor {
 

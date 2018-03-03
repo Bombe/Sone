@@ -12,8 +12,6 @@ import net.pterodactylus.sone.database.PostBuilder;
 
 /**
  * {@link PostBuilder} implementation that returns a mocked {@link Post}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestPostBuilder implements PostBuilder {
 

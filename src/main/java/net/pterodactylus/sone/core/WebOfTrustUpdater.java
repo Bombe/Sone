@@ -8,8 +8,6 @@ import com.google.inject.ImplementedBy;
 
 /**
  * Updates WebOfTrust identity data.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @ImplementedBy(WebOfTrustUpdaterImpl.class)
 public interface WebOfTrustUpdater extends Service {

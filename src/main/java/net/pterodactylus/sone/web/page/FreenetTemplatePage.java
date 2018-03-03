@@ -47,8 +47,6 @@ import freenet.support.HTMLNode;
 /**
  * Base class for all {@link Page}s that are rendered with {@link Template}s and
  * fit into Freenet’s web interface.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 
@@ -286,8 +284,6 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 	 * wants to redirect the user during the
 	 * {@link FreenetTemplatePage#processTemplate(FreenetRequest, TemplateContext)}
 	 * method call.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class RedirectException extends Exception {
 

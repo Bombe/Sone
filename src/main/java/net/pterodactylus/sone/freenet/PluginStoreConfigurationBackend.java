@@ -31,8 +31,6 @@ import freenet.pluginmanager.PluginStore;
 
 /**
  * Backend for a {@link Configuration} that is based on a {@link PluginStore}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PluginStoreConfigurationBackend implements ExtendedConfigurationBackend {
 

@@ -23,8 +23,6 @@ import com.google.common.base.Objects;
 /**
  * {@link Sone} implementation that only stores the ID of a Sone and returns
  * {@code null}, {@code 0}, or empty collections where appropriate.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IdOnlySone implements Sone {
 

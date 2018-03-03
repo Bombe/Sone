@@ -27,7 +27,6 @@ import freenet.support.SimpleFieldSet;
  * FCP command that deletes a {@link PostReply}.
  *
  * @see Core#deleteReply(PostReply)
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DeleteReplyCommand extends AbstractSoneCommand {
 

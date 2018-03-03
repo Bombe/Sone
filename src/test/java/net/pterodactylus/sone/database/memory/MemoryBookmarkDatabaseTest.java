@@ -25,8 +25,6 @@ import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link MemoryBookmarkDatabase}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MemoryBookmarkDatabaseTest {
 

@@ -56,8 +56,6 @@ import com.google.common.hash.Hashing;
  * {@link Sone} implementation.
  * <p/>
  * Operations that modify the Sone need to synchronize on the Sone in question.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneImpl implements Sone {
 

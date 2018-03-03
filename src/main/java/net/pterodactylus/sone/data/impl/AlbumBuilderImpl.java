@@ -22,8 +22,6 @@ import net.pterodactylus.sone.database.AlbumBuilder;
 
 /**
  * {@link AlbumBuilder} implementation that creates {@link AlbumImpl} objects.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AlbumBuilderImpl extends AbstractAlbumBuilder {
 

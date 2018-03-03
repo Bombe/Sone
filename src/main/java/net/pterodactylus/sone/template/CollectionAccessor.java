@@ -35,8 +35,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <dt>Returns the nice names of all {@link Sone}s in the collection, sorted
  * ascending by their nice names.</dt>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CollectionAccessor extends ReflectionAccessor {
 

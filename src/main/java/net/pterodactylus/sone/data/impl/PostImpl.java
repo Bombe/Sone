@@ -28,8 +28,6 @@ import com.google.common.base.Optional;
 /**
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostImpl implements Post {
 

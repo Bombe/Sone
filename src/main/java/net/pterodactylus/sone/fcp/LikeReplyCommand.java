@@ -26,8 +26,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Implements the “LikeReply” FCP command which allows the user to like a reply.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class LikeReplyCommand extends AbstractSoneCommand {
 

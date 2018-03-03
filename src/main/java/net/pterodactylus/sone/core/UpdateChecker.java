@@ -43,8 +43,6 @@ import freenet.support.api.Bucket;
 
 /**
  * Watches the official Sone homepage for new releases.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class UpdateChecker {

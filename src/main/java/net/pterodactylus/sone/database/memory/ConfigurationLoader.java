@@ -18,8 +18,6 @@ import net.pterodactylus.util.config.ConfigurationException;
 
 /**
  * Helper class for interacting with a {@link Configuration}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ConfigurationLoader {
 

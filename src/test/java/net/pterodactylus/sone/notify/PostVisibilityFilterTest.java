@@ -19,8 +19,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link PostVisibilityFilterTest}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostVisibilityFilterTest {
 

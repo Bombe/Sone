@@ -33,7 +33,6 @@ import com.google.common.eventbus.EventBus;
  * Detects changes in {@link Identity}s trusted my multiple {@link
  * OwnIdentity}s.
  *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  * @see IdentityChangeDetector
  */
 public class IdentityChangeEventSender {

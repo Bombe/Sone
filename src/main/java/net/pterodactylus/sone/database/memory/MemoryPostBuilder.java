@@ -26,8 +26,6 @@ import net.pterodactylus.sone.database.SoneProvider;
 
 /**
  * {@link PostBuilder} implementation that creates a {@link MemoryPost}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class MemoryPostBuilder extends AbstractPostBuilder {
 

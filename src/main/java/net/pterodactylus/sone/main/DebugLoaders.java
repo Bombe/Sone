@@ -12,8 +12,6 @@ import net.pterodactylus.util.web.Request;
 
 /**
  * {@link Loaders} implementation that loads all resources from the filesystem.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DebugLoaders implements Loaders {
 

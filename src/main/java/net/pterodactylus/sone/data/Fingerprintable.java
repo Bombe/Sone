@@ -21,8 +21,6 @@ package net.pterodactylus.sone.data;
  * Interface for objects that can create a fingerprint of themselves, e.g. to
  * detect modifications. The fingerprint should only contain original
  * information; derived information should not be included.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Fingerprintable {
 

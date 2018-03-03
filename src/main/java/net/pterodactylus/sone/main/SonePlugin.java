@@ -72,8 +72,6 @@ import freenet.support.api.Bucket;
 /**
  * This class interfaces with Freenet. It is the class that is loaded by the
  * node and starts up the whole Sone system.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
 

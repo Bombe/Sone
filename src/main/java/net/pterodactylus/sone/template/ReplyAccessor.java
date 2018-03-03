@@ -28,8 +28,6 @@ import net.pterodactylus.util.template.TemplateContext;
 /**
  * {@link Accessor} implementation that adds a couple of properties to
  * {@link Reply}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ReplyAccessor extends ReflectionAccessor {
 

@@ -24,8 +24,6 @@ import freenet.keys.FreenetURI;
 /**
  * The Sone rescuer downloads older editions of a Sone and updates the currently
  * stored Sone with it.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneRescuer extends AbstractService {
 

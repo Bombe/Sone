@@ -44,15 +44,11 @@ import com.google.common.primitives.Ints;
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
  * replies, her likes and dislikes, etc.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 
 	/**
 	 * Enumeration for the possible states of a {@link Sone}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public enum SoneStatus {
 

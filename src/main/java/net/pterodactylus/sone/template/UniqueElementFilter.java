@@ -27,8 +27,6 @@ import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Filter that reduces a collection to a {@link Set}, removing duplicates.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class UniqueElementFilter implements Filter {
 

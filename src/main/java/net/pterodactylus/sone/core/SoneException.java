@@ -19,8 +19,6 @@ package net.pterodactylus.sone.core;
 
 /**
  * A Sone exception.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneException extends Exception {
 

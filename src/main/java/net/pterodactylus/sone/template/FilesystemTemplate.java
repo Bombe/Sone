@@ -22,8 +22,6 @@ import com.google.common.base.Charsets;
 
 /**
  * {@link Template} implementation that can be reloaded from the filesystem.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FilesystemTemplate extends Template {
 
@@ -120,8 +118,6 @@ public class FilesystemTemplate extends Template {
 
 	/**
 	 * Exception that signals that a template file could not be found.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class TemplateFileNotFoundException extends RuntimeException {
 

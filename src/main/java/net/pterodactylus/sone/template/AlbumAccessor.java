@@ -31,8 +31,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * {@link Accessor} implementation for {@link Album}s. A property named
  * “backlinks” is added, it returns links to all parents and the owner Sone of
  * an album.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AlbumAccessor extends ReflectionAccessor {
 
@@ -62,8 +60,6 @@ public class AlbumAccessor extends ReflectionAccessor {
 
 	/**
 	 * Container for links.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class Link {
 

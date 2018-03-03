@@ -32,8 +32,6 @@ import net.pterodactylus.util.template.TemplateContext;
 /**
  * {@link Filter} implementation replaces {@link String} values with their
  * translated equivalents.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class L10nFilter implements Filter {
 

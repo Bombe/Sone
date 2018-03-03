@@ -40,8 +40,6 @@ import com.google.common.base.Optional;
 /**
  * Abstract base implementation of a {@link Command} with Sone-related helper
  * methods.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class AbstractSoneCommand extends AbstractCommand {
 

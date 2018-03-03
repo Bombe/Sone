@@ -43,8 +43,6 @@ import com.google.inject.Singleton;
  * It is also responsible for polling identities from the Web of Trust plugin
  * and sending events to the {@link EventBus} when {@link Identity}s and
  * {@link OwnIdentity}s are discovered or disappearing.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class IdentityManagerImpl extends AbstractService implements IdentityManager {

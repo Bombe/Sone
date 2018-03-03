@@ -20,8 +20,6 @@ import java.net.URLEncoder
 
 /**
  * Renders a number of pre-parsed [Part] into a [String].
- *
- * @author [David ‘Bombe’ Roden](mailto:bombe@pterodactylus.net)
  */
 class RenderFilter(private val core: Core, private val templateContextFactory: TemplateContextFactory) : Filter {
 

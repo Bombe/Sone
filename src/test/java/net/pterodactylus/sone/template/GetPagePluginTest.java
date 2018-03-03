@@ -17,8 +17,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link GetPagePlugin}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPagePluginTest {
 

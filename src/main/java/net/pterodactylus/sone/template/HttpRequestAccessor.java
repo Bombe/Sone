@@ -27,7 +27,6 @@ import freenet.support.api.HTTPRequest;
  * {@link HTTPRequest}s.
  *
  * @see HTTPRequest#getHeader(String)
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class HttpRequestAccessor extends ReflectionAccessor {
 

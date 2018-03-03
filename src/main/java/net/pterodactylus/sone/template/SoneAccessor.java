@@ -51,8 +51,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <dd>Will return {@code true} if the sone in question is the currently logged
  * in Sone.</dd>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneAccessor extends ReflectionAccessor {
 

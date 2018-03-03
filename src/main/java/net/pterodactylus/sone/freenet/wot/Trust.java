@@ -23,8 +23,6 @@ import com.google.common.base.Objects;
 
 /**
  * Container class for trust in the web of trust.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Trust {
 

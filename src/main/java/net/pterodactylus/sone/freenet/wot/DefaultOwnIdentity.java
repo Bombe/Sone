@@ -22,8 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An own identity is an identity that the owner of the node has full control
  * over.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 

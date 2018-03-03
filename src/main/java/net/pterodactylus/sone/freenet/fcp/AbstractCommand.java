@@ -23,8 +23,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Basic implementation of a {@link Command} with various helper methods to
  * simplify processing of input parameters.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class AbstractCommand implements Command {
 

@@ -2,8 +2,6 @@ package net.pterodactylus.sone.text;
 
 /**
  * {@link Part} implementation that holds a freemail address.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FreemailPart implements Part {
 

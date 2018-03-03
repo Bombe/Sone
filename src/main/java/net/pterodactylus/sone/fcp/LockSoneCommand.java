@@ -30,8 +30,6 @@ import com.google.common.base.Optional;
  * Implements the “LockSone” FCP command. If a valid local Sone was given as
  * parameter “Sone,” this command will always lock the Sone and reply with
  * “SoneLocked.”
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class LockSoneCommand extends AbstractSoneCommand {
 

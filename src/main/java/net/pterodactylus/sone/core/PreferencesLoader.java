@@ -7,8 +7,6 @@ import net.pterodactylus.util.config.ConfigurationException;
 /**
  * Loads preferences stored in a {@link Configuration} into a {@link
  * Preferences} object.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PreferencesLoader {
 

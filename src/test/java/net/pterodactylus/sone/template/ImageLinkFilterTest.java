@@ -23,8 +23,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link ImageLinkFilterTest}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageLinkFilterTest {
 

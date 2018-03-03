@@ -221,8 +221,6 @@ import com.google.inject.Inject;
 /**
  * Bundles functionality that a web interface of a Freenet plugin needs, e.g.
  * references to l10n helpers.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class WebInterface implements SessionProvider {
 

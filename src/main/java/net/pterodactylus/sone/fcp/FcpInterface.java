@@ -54,16 +54,12 @@ import com.google.inject.Inject;
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class FcpInterface {
 
 	/**
 	 * The action level that full access for the FCP connection is required.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public enum FullAccessRequired {
 

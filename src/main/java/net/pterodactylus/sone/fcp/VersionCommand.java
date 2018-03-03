@@ -24,8 +24,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Returns version information about the Sone plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class VersionCommand extends AbstractSoneCommand {
 

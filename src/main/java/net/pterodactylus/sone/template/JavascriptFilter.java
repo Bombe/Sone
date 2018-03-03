@@ -28,8 +28,6 @@ import com.google.common.io.BaseEncoding;
  * Escapes double quotes, backslashes, carriage returns and line feeds, and
  * additionally encloses a given string with double quotes to make it possible
  * to use a string in Javascript.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class JavascriptFilter implements Filter {
 

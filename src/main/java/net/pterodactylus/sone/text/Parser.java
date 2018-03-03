@@ -27,7 +27,6 @@ import javax.annotation.Nullable;
  *
  * @param <C>
  *            The type of the parser context
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Parser<C extends ParserContext> {
 

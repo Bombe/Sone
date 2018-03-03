@@ -39,8 +39,6 @@ import com.google.common.eventbus.EventBus;
 /**
  * Convenience interface for external classes that want to access the core’s
  * configuration.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Preferences {
 

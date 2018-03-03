@@ -22,8 +22,6 @@ import net.pterodactylus.sone.data.Sone;
 /**
  * Event that signals that a {@link Sone} was locked. Only
  * {@link Sone#isLocal() local Sones} can be locked.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneLockedEvent extends SoneEvent {
 

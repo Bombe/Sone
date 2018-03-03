@@ -23,8 +23,6 @@ import freenet.support.api.Bucket;
 
 /**
  * Event that signals that a plugin reply was received.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ReceivedReplyEvent {
 

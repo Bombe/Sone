@@ -41,8 +41,6 @@ import com.google.common.hash.Hashing;
 
 /**
  * Container for images that can also contain nested {@link AlbumImpl}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AlbumImpl implements Album {
 

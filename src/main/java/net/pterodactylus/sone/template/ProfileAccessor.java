@@ -31,8 +31,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * {@link Accessor} for {@link Profile} objects that overwrites the original
  * “avatar” member to include checks for whether the custom avatar should
  * actually be shown.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ProfileAccessor extends ReflectionAccessor {
 

@@ -41,8 +41,6 @@ import org.junit.Test;
 
 /**
  * JUnit test case for {@link SoneTextParser}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneTextParserTest {
 
@@ -408,8 +406,6 @@ public class SoneTextParserTest {
 
 	/**
 	 * Mock Sone provider.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class TestSoneProvider implements SoneProvider {
 

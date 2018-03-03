@@ -43,8 +43,6 @@ import freenet.support.api.Bucket;
 
 /**
  * Connector for the Web of Trust plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class WebOfTrustConnector {
@@ -443,8 +441,6 @@ public class WebOfTrustConnector {
 
 	/**
 	 * Container for the data of the reply from a plugin.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class Reply {
 
@@ -502,8 +498,6 @@ public class WebOfTrustConnector {
 
 	/**
 	 * Helper method to create {@link SimpleFieldSet}s with terser code.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class SimpleFieldSetConstructor {
 
@@ -578,8 +572,6 @@ public class WebOfTrustConnector {
 	/**
 	 * Container for identifying plugins. Plugins are identified by their plugin
 	 * name and their unique identifier.
-	 *
-	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
 	 */
 	private static class PluginIdentifier {
 

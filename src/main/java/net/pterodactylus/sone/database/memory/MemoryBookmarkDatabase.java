@@ -16,8 +16,6 @@ import com.google.common.base.Function;
 
 /**
  * Memory-based {@link BookmarkDatabase} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MemoryBookmarkDatabase implements BookmarkDatabase {
 

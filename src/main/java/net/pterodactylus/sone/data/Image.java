@@ -19,8 +19,6 @@ package net.pterodactylus.sone.data;
 
 /**
  * Container for image metadata.
- *
- * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
  */
 public interface Image extends Identified, Fingerprintable {
 

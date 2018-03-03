@@ -12,8 +12,6 @@ import com.google.common.collect.Multimap;
 
 /**
  * In-memory implementation of friend-related functionality.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class MemoryFriendDatabase {
 

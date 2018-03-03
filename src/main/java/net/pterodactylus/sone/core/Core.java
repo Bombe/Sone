@@ -113,8 +113,6 @@ import kotlin.jvm.functions.Function1;
 
 /**
  * The Sone core.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {

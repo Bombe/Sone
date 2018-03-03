@@ -82,8 +82,6 @@ import org.mockito.ArgumentMatchers;
 
 /**
  * Unit test for {@link FreenetInterface}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FreenetInterfaceTest {
 

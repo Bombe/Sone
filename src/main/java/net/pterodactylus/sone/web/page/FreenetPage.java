@@ -24,8 +24,6 @@ import net.pterodactylus.util.web.Page;
 /**
  * Freenet-specific {@link Page} extension that adds the capability to allow a
  * link to a page to be unharmed by Freenet’s content filter.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface FreenetPage extends Page<FreenetRequest> {
 

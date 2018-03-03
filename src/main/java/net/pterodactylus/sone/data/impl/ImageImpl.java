@@ -34,8 +34,6 @@ import com.google.common.hash.Hashing;
 
 /**
  * Container for image metadata.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageImpl implements Image {
 

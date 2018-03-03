@@ -34,8 +34,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * This filter expects a {@link FreenetRequest} as input and outputs a
  * {@link URI} that is modified by the parameters. The name of the parameter is
  * handed in as “name”, the new value is stored in “value”.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class RequestChangeFilter implements Filter {
 

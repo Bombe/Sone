@@ -30,8 +30,6 @@ import com.google.common.base.Optional;
  * Implements the “UnlockSone” FCP command. If a valid local Sone was given as
  * parameter “Sone,” this command will always unlock the Sone and reply with
  * “SoneUnlocked.”
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class UnlockSoneCommand extends AbstractSoneCommand {
 

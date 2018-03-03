@@ -33,8 +33,6 @@ import org.mockito.InOrder;
 
 /**
  * Unit test for {@link Core} and its subclasses.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CoreTest {
 

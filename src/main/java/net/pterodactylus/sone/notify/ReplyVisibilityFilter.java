@@ -16,8 +16,6 @@ import com.google.common.base.Predicate;
 
 /**
  * Filter that checks a {@link PostReply} for visibility.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class ReplyVisibilityFilter {

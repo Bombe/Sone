@@ -24,8 +24,6 @@ import com.google.common.base.Function;
 /**
  * Custom container for the Web of Trust context. This allows easier
  * configuration of dependency injection.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Context {
 

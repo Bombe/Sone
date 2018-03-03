@@ -6,8 +6,6 @@ import javax.annotation.Nonnull;
 
 /**
  * All Sone-specific options.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface SoneOptions {
 
@@ -34,8 +32,6 @@ public interface SoneOptions {
 
 	/**
 	 * Possible values for all options that are related to loading external content.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	enum LoadExternalContent {
 
@@ -58,8 +54,6 @@ public interface SoneOptions {
 
 	/**
 	 * {@link SoneOptions} implementation.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class DefaultSoneOptions implements SoneOptions {
 

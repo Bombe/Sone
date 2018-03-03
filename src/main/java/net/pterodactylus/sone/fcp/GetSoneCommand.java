@@ -29,8 +29,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implements the “GetSone“ FCP command which returns {@link Profile}
  * information about a {@link Sone}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetSoneCommand extends AbstractSoneCommand {
 

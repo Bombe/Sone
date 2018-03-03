@@ -30,7 +30,6 @@ import net.pterodactylus.util.template.Template;
  *
  * @param <T>
  *            The type of the items
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ListNotification<T> extends TemplateNotification {
 

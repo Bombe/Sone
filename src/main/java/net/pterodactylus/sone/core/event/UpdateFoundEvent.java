@@ -21,8 +21,6 @@ import net.pterodactylus.util.version.Version;
 
 /**
  * Event that signals that an update for Sone was found.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class UpdateFoundEvent {
 

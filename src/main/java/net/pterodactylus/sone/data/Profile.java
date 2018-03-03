@@ -35,8 +35,6 @@ import com.google.common.hash.Hashing;
 /**
  * A profile stores personal information about a {@link Sone}. All information
  * is optional and can be {@code null}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Profile implements Fingerprintable {
 
@@ -465,8 +463,6 @@ public class Profile implements Fingerprintable {
 
 	/**
 	 * Container for a profile field.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class Field {
 
@@ -586,15 +582,11 @@ public class Profile implements Fingerprintable {
 
 	/**
 	 * Exception that signals the addition of a field with an empty name.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class EmptyFieldName extends IllegalArgumentException { }
 
 	/**
 	 * Exception that signals the addition of a field that already exists.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class DuplicateField extends IllegalArgumentException { }
 

@@ -23,8 +23,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implements the “GetLocalSones” FCP command that returns the list of local
  * Sones to the sender.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetLocalSonesCommand extends AbstractSoneCommand {
 

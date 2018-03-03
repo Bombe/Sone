@@ -35,8 +35,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPostFeedCommand extends AbstractSoneCommand {
 

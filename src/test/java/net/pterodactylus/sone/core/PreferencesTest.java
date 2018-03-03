@@ -23,8 +23,6 @@ import org.mockito.ArgumentCaptor;
 
 /**
  * Unit test for {@link Preferences}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PreferencesTest {
 

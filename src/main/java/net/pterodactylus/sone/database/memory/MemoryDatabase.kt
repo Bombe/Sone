@@ -49,8 +49,6 @@ import kotlin.concurrent.withLock
 
 /**
  * Memory-based [PostDatabase] implementation.
- *
- * @author [David ‘Bombe’ Roden](mailto:bombe@pterodactylus.net)
  */
 @Singleton
 class MemoryDatabase @Inject constructor(private val configuration: Configuration) : AbstractService(), Database {

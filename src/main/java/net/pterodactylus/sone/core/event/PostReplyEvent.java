@@ -21,8 +21,6 @@ import net.pterodactylus.sone.data.PostReply;
 
 /**
  * Base class for {@link PostReply} events.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostReplyEvent {
 

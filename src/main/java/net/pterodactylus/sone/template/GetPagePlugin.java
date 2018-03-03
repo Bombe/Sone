@@ -27,8 +27,6 @@ import net.pterodactylus.util.web.Request;
 /**
  * Extracts a page number from a {@link Request}’s parameters and stores it in
  * the {@link TemplateContext}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPagePlugin implements Plugin {
 

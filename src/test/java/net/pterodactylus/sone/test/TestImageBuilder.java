@@ -10,8 +10,6 @@ import net.pterodactylus.sone.database.ImageBuilder;
 
 /**
  * {@link ImageBuilder} implementation that returns a mocked {@link Image}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestImageBuilder implements ImageBuilder {
 

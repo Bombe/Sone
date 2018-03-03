@@ -32,8 +32,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <li>{@code next}: returns the next image in the image’s album, or {@code
  * null} if the image is the last image of its album.</li>
  * </ul>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageAccessor extends ReflectionAccessor {
 

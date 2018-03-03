@@ -28,8 +28,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * “start” and “length.” “length” is optional and defaults to “the rest of the
  * string.” “start” starts at {@code 0} and can be negative to denote starting
  * at the end of the string.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SubstringFilter implements Filter {
 

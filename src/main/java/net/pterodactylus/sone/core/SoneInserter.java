@@ -72,8 +72,6 @@ import freenet.support.io.ArrayBucket;
 
 /**
  * A Sone inserter is responsible for inserting a Sone if it has changed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneInserter extends AbstractService {
 
@@ -280,8 +278,6 @@ public class SoneInserter extends AbstractService {
 	 * Container for information that are required to insert a Sone. This
 	 * container merely exists to copy all relevant data without holding a lock
 	 * on the {@link Sone} object for too long.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class InsertInformation implements Closeable {
@@ -356,8 +352,6 @@ public class SoneInserter extends AbstractService {
 
 	/**
 	 * Creates manifest elements for an insert by rendering a template.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	static class ManifestCreator implements Closeable {

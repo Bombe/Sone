@@ -32,8 +32,6 @@ import com.google.common.collect.Collections2;
  * <dd>replies</dd>
  * <dt>All replies to this post, sorted by time, oldest first</dt>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostAccessor extends ReflectionAccessor {
 

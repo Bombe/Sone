@@ -26,8 +26,6 @@ import com.google.inject.Inject;
 /**
  * {@link PostBuilderFactory} implementation that creates
  * {@link PostBuilderImpl}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultPostBuilderFactory implements PostBuilderFactory {
 

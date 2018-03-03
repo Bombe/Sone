@@ -32,8 +32,6 @@ import net.pterodactylus.util.template.TemplateContext;
 /**
  * {@link Accessor} implementation that adds a “uniqueNickname” member to an
  * {@link Identity}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class IdentityAccessor extends ReflectionAccessor {

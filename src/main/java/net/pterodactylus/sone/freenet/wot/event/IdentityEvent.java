@@ -22,8 +22,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
 /**
  * Base class for {@link Identity} events.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class IdentityEvent {
 

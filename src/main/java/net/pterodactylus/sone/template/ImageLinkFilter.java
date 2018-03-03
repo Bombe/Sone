@@ -39,8 +39,6 @@ import com.google.common.base.Optional;
 /**
  * Template filter that turns an {@link Image} into an HTML &lt;img&gt; tag,
  * using some parameters to influence parameters of the image.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageLinkFilter implements Filter {
 

@@ -33,8 +33,6 @@ import org.junit.rules.TemporaryFolder;
 
 /**
  * Unit test for {@link DebugLoaders}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DebugLoadersTest {
 

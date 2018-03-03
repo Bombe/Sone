@@ -26,8 +26,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * Converts the {@link String} {@link String#valueOf(Object) representation} of
  * an object to a valid CSS class name by converting all characters that are not
  * US-ASCII letters or numbers to an underscore.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CssClassNameFilter implements Filter {
 

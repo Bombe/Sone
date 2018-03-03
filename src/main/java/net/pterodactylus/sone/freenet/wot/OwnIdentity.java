@@ -20,8 +20,6 @@ package net.pterodactylus.sone.freenet.wot;
 
 /**
  * Defines a local identity, an own identity.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface OwnIdentity extends Identity {
 

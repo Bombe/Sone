@@ -35,8 +35,6 @@ import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matchers used throughout the tests.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Matchers {
 

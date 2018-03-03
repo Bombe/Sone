@@ -26,8 +26,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Implements the “LikePost” FCP command which allows the user to like a post.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class LikePostCommand extends AbstractSoneCommand {
 

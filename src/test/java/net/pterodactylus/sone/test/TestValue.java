@@ -12,8 +12,6 @@ import com.google.common.base.Objects;
 
 /**
  * Simple {@link Value} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestValue<T> implements Value<T> {
 

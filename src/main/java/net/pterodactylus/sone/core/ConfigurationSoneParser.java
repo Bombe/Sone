@@ -27,8 +27,6 @@ import net.pterodactylus.util.config.Configuration;
 
 /**
  * Parses a {@link Sone}’s data from a {@link Configuration}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ConfigurationSoneParser {
 

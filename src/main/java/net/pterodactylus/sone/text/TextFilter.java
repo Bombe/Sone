@@ -23,8 +23,6 @@ package net.pterodactylus.sone.text;
  * will be converted to “KSK@gpl.txt”. This will only work for links that point
  * to the same address Sone is accessed by, so if you access Sone using
  * localhost:8888, links to 127.0.0.1:8888 will not be removed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TextFilter {
 

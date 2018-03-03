@@ -36,8 +36,6 @@ import com.google.common.base.Optional;
 
 /**
  * Filter for {@link ListNotification}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class ListNotificationFilter {

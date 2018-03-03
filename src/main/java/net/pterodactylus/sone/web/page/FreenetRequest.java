@@ -26,8 +26,6 @@ import freenet.support.api.HTTPRequest;
 
 /**
  * Encapsulates all Freenet-specific properties of a request.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FreenetRequest extends Request {
 

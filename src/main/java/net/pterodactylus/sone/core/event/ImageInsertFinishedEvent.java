@@ -22,8 +22,6 @@ import freenet.keys.FreenetURI;
 
 /**
  * Event that signals that an {@link Image} insert is finished.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageInsertFinishedEvent extends ImageEvent {
 

@@ -27,8 +27,6 @@ import com.google.common.base.Predicate;
 
 /**
  * Stores various options that influence Sone’s behaviour.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Options {
 

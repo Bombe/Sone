@@ -25,8 +25,6 @@ import java.util.UUID;
 /**
  * A temporary image stores an uploaded image in memory until it has been
  * inserted into Freenet and is subsequently loaded from there.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TemporaryImage {
 

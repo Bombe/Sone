@@ -17,8 +17,6 @@ import com.google.common.collect.FluentIterable;
 /**
  * Compares the contents of two {@link Sone}s and fires events for new and
  * removed elements.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneChangeDetector {
 

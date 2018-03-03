@@ -38,8 +38,6 @@ import freenet.support.api.HTTPRequest;
 
 /**
  * {@link Toadlet} implementation that is wrapped around a {@link Page}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFilterExceptedToadlet {
 

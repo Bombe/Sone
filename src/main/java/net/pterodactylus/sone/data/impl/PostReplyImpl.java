@@ -28,8 +28,6 @@ import com.google.common.base.Optional;
 
 /**
  * Simple {@link PostReply} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostReplyImpl extends ReplyImpl<PostReply> implements PostReply {
 

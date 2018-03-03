@@ -25,8 +25,6 @@ import net.pterodactylus.sone.database.PostReplyBuilder;
  * Abstract {@link PostReplyBuilder} implementation. It stores the state of the
  * new post and performs validation, implementations only need to implement
  * {@link #build()}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class AbstractPostReplyBuilder extends AbstractReplyBuilder<PostReplyBuilder> implements PostReplyBuilder {
 

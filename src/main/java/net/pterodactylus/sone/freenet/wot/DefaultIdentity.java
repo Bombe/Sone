@@ -26,8 +26,6 @@ import java.util.Set;
 
 /**
  * A Web of Trust identity.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultIdentity implements Identity {
 

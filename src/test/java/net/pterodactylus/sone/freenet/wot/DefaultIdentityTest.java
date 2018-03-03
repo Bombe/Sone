@@ -36,8 +36,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link DefaultIdentity}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultIdentityTest {
 

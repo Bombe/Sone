@@ -5,8 +5,6 @@ import com.google.common.eventbus.EventBus;
 /**
  * Notifies interested {@link EventBus} clients that the Sone insertion delay
  * has changed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class InsertionDelayChangedEvent {
 

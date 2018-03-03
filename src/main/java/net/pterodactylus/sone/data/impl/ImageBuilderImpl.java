@@ -22,8 +22,6 @@ import net.pterodactylus.sone.database.ImageBuilder;
 
 /**
  * {@link ImageBuilder} implementation that creates {@link ImageImpl} objects.
- *
- * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
  */
 public class ImageBuilderImpl extends AbstractImageBuilder {
 

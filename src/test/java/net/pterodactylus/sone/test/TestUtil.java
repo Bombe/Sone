@@ -7,8 +7,6 @@ import java.lang.reflect.Modifier;
 
 /**
  * Utilities for testing.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestUtil {
 

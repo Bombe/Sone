@@ -28,8 +28,6 @@ import com.google.common.base.Optional;
 
 /**
  * Memory-based {@link PostReply} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class MemoryPostReply implements PostReply {
 

@@ -33,8 +33,6 @@ import com.google.inject.Inject;
 
 /**
  * Loads {@link OwnIdentity}s and the {@link Identity}s they trust.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IdentityLoader {
 

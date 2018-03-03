@@ -20,8 +20,6 @@ package net.pterodactylus.sone.freenet.wot;
 /**
  * Exception that signals an error processing web of trust identities, mostly
  * when communicating with the web of trust plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class WebOfTrustException extends Exception {
 

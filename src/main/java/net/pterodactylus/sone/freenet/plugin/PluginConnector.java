@@ -33,8 +33,6 @@ import freenet.support.api.Bucket;
 /**
  * Interface for talking to other plugins. Other plugins are identified by their
  * name and a unique connection identifier.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class PluginConnector implements FredPluginTalker {
