@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.util.version.Version;
 

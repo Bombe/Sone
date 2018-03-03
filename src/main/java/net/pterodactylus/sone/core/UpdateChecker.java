@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import javax.inject.Singleton;
 
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;

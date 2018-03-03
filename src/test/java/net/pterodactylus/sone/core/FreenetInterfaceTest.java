@@ -31,7 +31,6 @@ import java.util.HashMap;
 
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;

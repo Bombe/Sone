@@ -31,7 +31,6 @@ import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.util.service.AbstractService;
