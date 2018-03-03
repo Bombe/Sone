@@ -55,7 +55,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	private static final int MAX_PROTOCOL_VERSION = 0;
 
 	/** The core. */
-	private final Core core;
+	private final UpdatedSoneProcessor updatedSoneProcessor;
 	private final SoneParser soneParser;
 
 	/** The Freenet interface. */
@@ -64,19 +64,10 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	/** The sones to update. */
 	private final Set<Sone> sones = new HashSet<Sone>();
 
-	/**
-	 * Creates a new Sone downloader.
-	 *
-	 * @param core
-	 * 		The core
-	 * @param freenetInterface
-	 * 		The Freenet interface
-	 * @param soneParser
-	 */
 	@Inject
-	SoneDownloaderImpl(Core core, FreenetInterface freenetInterface, SoneParser soneParser) {
+	SoneDownloaderImpl(UpdatedSoneProcessor updatedSoneProcessor, FreenetInterface freenetInterface, SoneParser soneParser) {
 		super("Sone Downloader", false);
-		this.core = core;
+		this.updatedSoneProcessor = updatedSoneProcessor;
 		this.freenetInterface = freenetInterface;
 		this.soneParser = soneParser;
 	}
@@ -170,7 +161,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			if (parsedSone != null) {
 				if (!fetchOnly) {
 					parsedSone.setStatus((parsedSone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
-					core.updateSone(parsedSone);
+					updatedSoneProcessor.updateSone(parsedSone);
 					addSone(parsedSone);
 				}
 			}
