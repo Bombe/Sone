@@ -93,6 +93,7 @@ public class FreenetInterface {
 
 	/** The high-level client to use for requests. */
 	private final HighLevelSimpleClient client;
+	private final RequestClient requestClient = new RequestClientBuilder().realTime().build();
 
 	/** The USK callbacks. */
 	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<String, USKCallback>();
@@ -256,7 +257,7 @@ public class FreenetInterface {
 		try {
 			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
 			node.clientCore.uskManager.subscribe(create(requestUri),
-					uskCallback, true, (RequestClient) client);
+					uskCallback, true, requestClient);
 		} catch (MalformedURLException mue1) {
 			logger.log(WARNING, format("Could not subscribe USK “%s”!",
 					requestUri), mue1);
@@ -269,8 +270,7 @@ public class FreenetInterface {
 			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
 			node.clientCore
 					.uskManager
-					.subscribe(create(requestUri), uskCallback, false,
-							(RequestClient) client);
+					.subscribe(create(requestUri), uskCallback, false, requestClient);
 		} catch (MalformedURLException mue1) {
 			logger.log(WARNING,
 					format("Could not subscribe USK “%s”!", requestUri),
@@ -326,7 +326,7 @@ public class FreenetInterface {
 
 		};
 		try {
-			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (RequestClient) client);
+			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, requestClient);
 			uriUskCallbacks.put(uri, uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
