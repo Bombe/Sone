@@ -237,7 +237,7 @@ public class FreenetInterfaceTest {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI().uskForSSK();
 		Callback callback = mock(Callback.class);
 		freenetInterface.registerUsk(freenetUri, callback);
-		verify(uskManager).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -245,7 +245,7 @@ public class FreenetInterfaceTest {
 		FreenetURI freenetUri = new FreenetURI("KSK@GPLv3.txt");
 		Callback callback = mock(Callback.class);
 		freenetInterface.registerUsk(freenetUri, callback);
-		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -269,9 +269,7 @@ public class FreenetInterfaceTest {
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
 		freenetInterface.registerActiveUsk(freenetUri, null);
-		verify(uskManager, never()).subscribe(any(USK.class),
-				any(USKCallback.class), anyBoolean(),
-				eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -279,9 +277,7 @@ public class FreenetInterfaceTest {
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
 		freenetInterface.registerPassiveUsk(freenetUri, null);
-		verify(uskManager, never()).subscribe(any(USK.class),
-				any(USKCallback.class), anyBoolean(),
-				eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
