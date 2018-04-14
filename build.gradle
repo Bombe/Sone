@@ -7,7 +7,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.1.11'
+        classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.2.4'
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-noarg', version: kotlinVersion
     }
