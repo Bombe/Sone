@@ -4,11 +4,13 @@ import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS;
 import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO;
 import static net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired;
@@ -17,7 +19,6 @@ import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent;
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged;
 
 import com.google.common.eventbus.EventBus;
-import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -29,16 +30,18 @@ public class PreferencesTest {
 	private final EventBus eventBus = mock(EventBus.class);
 	private final Preferences preferences = new Preferences(eventBus);
 
-	@After
-	public void tearDown() {
-		verifyNoMoreInteractions(eventBus);
-	}
-
 	@Test
 	public void preferencesRetainInsertionDelay() {
 		preferences.setInsertionDelay(15);
 		assertThat(preferences.getInsertionDelay(), is(15));
-		verify(eventBus).post(any(InsertionDelayChangedEvent.class));
+	}
+
+	@Test
+	public void preferencesSendsEventOnSettingInsertionDelay() {
+		preferences.setInsertionDelay(15);
+		ArgumentCaptor<Object> eventsCaptor = forClass(Object.class);
+		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture());
+		assertThat(eventsCaptor.getAllValues(), hasItem(new InsertionDelayChangedEvent(15)));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -50,7 +53,6 @@ public class PreferencesTest {
 	public void preferencesReturnDefaultValueWhenInsertionDelayIsSetToNull() {
 		preferences.setInsertionDelay(null);
 		assertThat(preferences.getInsertionDelay(), is(60));
-		verify(eventBus).post(any(InsertionDelayChangedEvent.class));
 	}
 
 	@Test
@@ -273,7 +275,7 @@ public class PreferencesTest {
 	private void verifyFullAccessRequiredChangedEvent(
 			FullAccessRequired fullAccessRequired) {
 		ArgumentCaptor<FullAccessRequiredChanged> fullAccessRequiredCaptor =
-				ArgumentCaptor.forClass(FullAccessRequiredChanged.class);
+				forClass(FullAccessRequiredChanged.class);
 		verify(eventBus).post(fullAccessRequiredCaptor.capture());
 		assertThat(
 				fullAccessRequiredCaptor.getValue().getFullAccessRequired(),
@@ -304,6 +306,14 @@ public class PreferencesTest {
 	@Test
 	public void preferencesStartWithFcpFullAccessRequiredDefaultValue() {
 		assertThat(preferences.getFcpFullAccessRequired(), is(ALWAYS));
+	}
+
+	@Test
+	public void settingInsertionDelayToValidValueSendsChangeEvent() {
+		preferences.setInsertionDelay(30);
+		ArgumentCaptor<Object> eventsCaptor = forClass(Object.class);
+		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture());
+		assertThat(eventsCaptor.getAllValues(), hasItem(new PreferenceChangedEvent("InsertionDelay", 30)));
 	}
 
 }

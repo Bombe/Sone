@@ -103,6 +103,7 @@ public class Preferences {
 	public Preferences setInsertionDelay(Integer insertionDelay) {
 		this.insertionDelay.set(insertionDelay);
 		eventBus.post(new InsertionDelayChangedEvent(getInsertionDelay()));
+		eventBus.post(new PreferenceChangedEvent("InsertionDelay", getInsertionDelay()));
 		return this;
 	}
 
