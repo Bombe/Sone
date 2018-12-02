@@ -1,0 +1,18 @@
+image: alpine/edge
+packages:
+  - openjdk8
+sources: 
+  - https://git.sr.ht/~bombe/sone
+tasks:
+  - clean: |
+      cd sone
+      ./gradlew clean
+  - build: |
+      cd sone
+      ./gradlew build
+  - test: |
+      cd sone
+      ./gradlew test
+  - jar: |
+      cd sone
+      ./gradlew fatJar
