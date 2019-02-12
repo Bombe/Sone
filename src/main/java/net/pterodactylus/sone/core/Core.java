@@ -859,7 +859,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		soneChangeDetector.onNewPosts(new PostProcessor() {
 			@Override
 			public void processPost(Post post) {
-				if (post.getTime() < database.getFollowingTime(newSone.getId())) {
+				if (post.getSone().equals(newSone)) {
+					post.setKnown(true);
+				} else if (post.getTime() < database.getFollowingTime(newSone.getId())) {
 					post.setKnown(true);
 				} else if (!post.isKnown()) {
 					events.add(new NewPostFoundEvent(post));
@@ -875,7 +877,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
 			@Override
 			public void processPostReply(PostReply postReply) {
-				if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
+				if (postReply.getSone().equals(newSone)) {
+					postReply.setKnown(true);
+				} else if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
 					postReply.setKnown(true);
 				} else if (!postReply.isKnown()) {
 					events.add(new NewPostReplyFoundEvent(postReply));
