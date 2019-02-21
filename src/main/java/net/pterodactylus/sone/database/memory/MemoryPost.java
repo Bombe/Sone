@@ -21,10 +21,13 @@ import static com.google.common.base.Optional.fromNullable;
 
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.database.SoneProvider;
 
+import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 /**
@@ -120,7 +123,13 @@ class MemoryPost implements Post {
 	 */
 	@Override
 	public Optional<Sone> getRecipient() {
-		return fromNullable(soneProvider.getSone(recipientId));
+		return Optional.fromNullable(recipientId).transform(new Function<String, Sone>() {
+			@Nullable
+			@Override
+			public Sone apply(String input) {
+				return soneProvider.getSone(input);
+			}
+		});
 	}
 
 	/**
