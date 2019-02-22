@@ -23,7 +23,7 @@ class ViewPostPage @Inject constructor(template: Template, webInterface: WebInte
 
 	override fun isLinkExcepted(link: URI?) = true
 
-	public override fun getPageTitle(freenetRequest: FreenetRequest) =
+	override fun getPageTitle(freenetRequest: FreenetRequest) =
 			(freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.let {
 				if (it.text.length > 20) {
 					it.text.substring(0..19) + "…"

@@ -50,7 +50,7 @@ class ViewSonePage @Inject constructor(template: Template, webInterface: WebInte
 
 	override fun isLinkExcepted(link: URI?) = true
 
-	public override fun getPageTitle(freenetRequest: FreenetRequest): String =
+	override fun getPageTitle(freenetRequest: FreenetRequest): String =
 			freenetRequest.parameters["sone"]!!.let(webInterface.core::getSone)?.let { sone ->
 				"${SoneAccessor.getNiceName(sone)} - ${webInterface.l10n.getString("Page.ViewSone.Title")}"
 			} ?: webInterface.l10n.getString("Page.ViewSone.Page.TitleWithoutSone")

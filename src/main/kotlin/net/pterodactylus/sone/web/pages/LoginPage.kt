@@ -29,7 +29,7 @@ class LoginPage @Inject constructor(template: Template, webInterface: WebInterfa
 		templateContext["identitiesWithoutSone"] = webInterface.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}" }
 	}
 
-	override public fun getRedirectTarget(freenetRequest: FreenetRequest) =
+	override fun getRedirectTarget(freenetRequest: FreenetRequest) =
 			getCurrentSone(freenetRequest.toadletContext)?.let { "index.html" }
 
 	override fun isEnabled(toadletContext: ToadletContext) = when {
