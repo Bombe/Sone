@@ -68,20 +68,20 @@ public class SoneParserTest {
 	private final Sone sone = mock(Sone.class);
 	private FreenetURI requestUri = mock(FreenetURI.class);
 	private final PostBuilder postBuilder = mock(PostBuilder.class);
-	private final List<Post> createdPosts = new ArrayList<Post>();
+	private final List<Post> createdPosts = new ArrayList<>();
 	private Post post = mock(Post.class);
 	private final PostReplyBuilder postReplyBuilder = mock(PostReplyBuilder.class);
-	private final Set<PostReply> createdPostReplies = new HashSet<PostReply>();
+	private final Set<PostReply> createdPostReplies = new HashSet<>();
 	private PostReply postReply = mock(PostReply.class);
 	private final AlbumBuilder albumBuilder = mock(AlbumBuilder.class);
 	private final ListMultimap<Album, Album>
 			nestedAlbums = ArrayListMultimap.create();
 	private final ListMultimap<Album, Image> albumImages = ArrayListMultimap.create();
 	private Album album = mock(Album.class);
-	private final Map<String, Album> albums = new HashMap<String, Album>();
+	private final Map<String, Album> albums = new HashMap<>();
 	private final ImageBuilder imageBuilder = mock(ImageBuilder.class);
 	private Image image = mock(Image.class);
-	private final Map<String, Image> images = new HashMap<String, Image>();
+	private final Map<String, Image> images = new HashMap<>();
 
 	@Before
 	public void setupSone() {

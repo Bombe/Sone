@@ -33,7 +33,7 @@ public class MemoryBookmarkDatabaseTest {
 			mock(ConfigurationLoader.class);
 	private final MemoryBookmarkDatabase bookmarkDatabase =
 			new MemoryBookmarkDatabase(memoryDatabase, configurationLoader);
-	private final Map<String, Post> posts = new HashMap<String, Post>();
+	private final Map<String, Post> posts = new HashMap<>();
 
 	@Before
 	public void setupMemoryDatabase() {
@@ -67,7 +67,7 @@ public class MemoryBookmarkDatabaseTest {
 
 	@Test
 	public void bookmarkDatabaseRetainsBookmarkedPosts() {
-		Set<Post> allPosts = new HashSet<Post>(posts.values());
+		Set<Post> allPosts = new HashSet<>(posts.values());
 		for (Post post : allPosts) {
 			bookmarkDatabase.bookmarkPost(post);
 		}
@@ -98,7 +98,7 @@ public class MemoryBookmarkDatabaseTest {
 
 	@Test
 	public void removingABookmarkRemovesTheCorrectBookmark() {
-		Set<Post> allPosts = new HashSet<Post>(posts.values());
+		Set<Post> allPosts = new HashSet<>(posts.values());
 		for (Post post : allPosts) {
 			bookmarkDatabase.bookmarkPost(post);
 		}

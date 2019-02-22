@@ -96,7 +96,7 @@ public class WebOfTrustConnector {
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetOwnIdentities").get());
 		SimpleFieldSet fields = reply.getFields();
 		int ownIdentityCounter = -1;
-		Set<OwnIdentity> ownIdentities = new HashSet<OwnIdentity>();
+		Set<OwnIdentity> ownIdentities = new HashSet<>();
 		while (true) {
 			String id = fields.get("Identity" + ++ownIdentityCounter);
 			if (id == null) {
@@ -142,7 +142,7 @@ public class WebOfTrustConnector {
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, Optional<String> context) throws PluginException {
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", context.or("")).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
-		Set<Identity> identities = new HashSet<Identity>();
+		Set<Identity> identities = new HashSet<>();
 		int identityCounter = -1;
 		while (true) {
 			String id = fields.get("Identity" + ++identityCounter);
@@ -329,7 +329,7 @@ public class WebOfTrustConnector {
 	 * @return The parsed contexts
 	 */
 	private static Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
-		Set<String> contexts = new HashSet<String>();
+		Set<String> contexts = new HashSet<>();
 		int contextCounter = -1;
 		while (true) {
 			String context = fields.get(prefix + "Context" + ++contextCounter);
@@ -351,7 +351,7 @@ public class WebOfTrustConnector {
 	 * @return The parsed properties
 	 */
 	private static Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		int propertiesCounter = -1;
 		while (true) {
 			String propertyName = fields.get(prefix + "Property" + ++propertiesCounter + ".Name");

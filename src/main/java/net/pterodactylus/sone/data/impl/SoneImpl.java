@@ -93,16 +93,16 @@ public class SoneImpl implements Sone {
 	private volatile boolean known;
 
 	/** All posts. */
-	private final Set<Post> posts = new CopyOnWriteArraySet<Post>();
+	private final Set<Post> posts = new CopyOnWriteArraySet<>();
 
 	/** All replies. */
-	private final Set<PostReply> replies = new CopyOnWriteArraySet<PostReply>();
+	private final Set<PostReply> replies = new CopyOnWriteArraySet<>();
 
 	/** The IDs of all liked posts. */
-	private final Set<String> likedPostIds = new CopyOnWriteArraySet<String>();
+	private final Set<String> likedPostIds = new CopyOnWriteArraySet<>();
 
 	/** The IDs of all liked replies. */
-	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
+	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<>();
 
 	/** The root album containing all albums. */
 	private final Album rootAlbum = new AlbumImpl(this);
@@ -381,7 +381,7 @@ public class SoneImpl implements Sone {
 	public List<Post> getPosts() {
 		List<Post> sortedPosts;
 		synchronized (this) {
-			sortedPosts = new ArrayList<Post>(posts);
+			sortedPosts = new ArrayList<>(posts);
 		}
 		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 		return sortedPosts;
@@ -642,7 +642,7 @@ public class SoneImpl implements Sone {
 		}
 		hash.putString(")");
 
-		List<PostReply> replies = new ArrayList<PostReply>(getReplies());
+		List<PostReply> replies = new ArrayList<>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
 		hash.putString("Replies(");
 		for (PostReply reply : replies) {
@@ -650,7 +650,7 @@ public class SoneImpl implements Sone {
 		}
 		hash.putString(")");
 
-		List<String> likedPostIds = new ArrayList<String>(getLikedPostIds());
+		List<String> likedPostIds = new ArrayList<>(getLikedPostIds());
 		Collections.sort(likedPostIds);
 		hash.putString("LikedPosts(");
 		for (String likedPostId : likedPostIds) {
@@ -658,7 +658,7 @@ public class SoneImpl implements Sone {
 		}
 		hash.putString(")");
 
-		List<String> likedReplyIds = new ArrayList<String>(getLikedReplyIds());
+		List<String> likedReplyIds = new ArrayList<>(getLikedReplyIds());
 		Collections.sort(likedReplyIds);
 		hash.putString("LikedReplies(");
 		for (String likedReplyId : likedReplyIds) {

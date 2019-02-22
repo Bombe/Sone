@@ -107,7 +107,7 @@ public class IdentityManagerImpl extends AbstractService implements IdentityMana
 	@Override
 	public Set<OwnIdentity> getAllOwnIdentities() {
 		synchronized (currentOwnIdentities) {
-			return new HashSet<OwnIdentity>(currentOwnIdentities);
+			return new HashSet<>(currentOwnIdentities);
 		}
 	}
 
@@ -120,7 +120,7 @@ public class IdentityManagerImpl extends AbstractService implements IdentityMana
 	 */
 	@Override
 	protected void serviceRun() {
-		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<>();
 
 		while (!shouldStop()) {
 			try {

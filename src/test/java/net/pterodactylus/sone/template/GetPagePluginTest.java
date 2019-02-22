@@ -24,7 +24,7 @@ public class GetPagePluginTest {
 	private final TemplateContext context = mock(TemplateContext.class);
 	private final FreenetRequest request = mock(FreenetRequest.class);
 	private final Map<String, String> parameters =
-			new HashMap<String, String>();
+			new HashMap<>();
 	private HTTPRequest httpRequest = mock(HTTPRequest.class);
 
 	@Before

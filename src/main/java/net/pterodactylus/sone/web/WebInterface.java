@@ -237,7 +237,7 @@ public class WebInterface implements SessionProvider {
 	private final SonePlugin sonePlugin;
 
 	/** The registered toadlets. */
-	private final List<PageToadlet> pageToadlets = new ArrayList<PageToadlet>();
+	private final List<PageToadlet> pageToadlets = new ArrayList<>();
 
 	/** The form password. */
 	private final String formPassword;
@@ -281,7 +281,7 @@ public class WebInterface implements SessionProvider {
 	private final ListNotification<Post> mentionNotification;
 
 	/** Notifications for sone inserts. */
-	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<Sone, TemplateNotification>();
+	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
 
 	/** Sone locked notification ticker objects. */
 	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
@@ -366,37 +366,37 @@ public class WebInterface implements SessionProvider {
 
 		/* create notifications. */
 		Template newSoneNotificationTemplate = loaders.loadTemplate("/templates/notify/newSoneNotification.html");
-		newSoneNotification = new ListNotification<Sone>("new-sone-notification", "sones", newSoneNotificationTemplate, false);
+		newSoneNotification = new ListNotification<>("new-sone-notification", "sones", newSoneNotificationTemplate, false);
 
 		Template newPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
-		newPostNotification = new ListNotification<Post>("new-post-notification", "posts", newPostNotificationTemplate, false);
+		newPostNotification = new ListNotification<>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
 		Template localPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
-		localPostNotification = new ListNotification<Post>("local-post-notification", "posts", localPostNotificationTemplate, false);
+		localPostNotification = new ListNotification<>("local-post-notification", "posts", localPostNotificationTemplate, false);
 
 		Template newReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
-		newReplyNotification = new ListNotification<PostReply>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
+		newReplyNotification = new ListNotification<>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
 
 		Template localReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
-		localReplyNotification = new ListNotification<PostReply>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
+		localReplyNotification = new ListNotification<>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 
 		Template mentionNotificationTemplate = loaders.loadTemplate("/templates/notify/mentionNotification.html");
-		mentionNotification = new ListNotification<Post>("mention-notification", "posts", mentionNotificationTemplate, false);
+		mentionNotification = new ListNotification<>("mention-notification", "posts", mentionNotificationTemplate, false);
 
 		Template lockedSonesTemplate = loaders.loadTemplate("/templates/notify/lockedSonesNotification.html");
-		lockedSonesNotification = new ListNotification<Sone>("sones-locked-notification", "sones", lockedSonesTemplate);
+		lockedSonesNotification = new ListNotification<>("sones-locked-notification", "sones", lockedSonesTemplate);
 
 		Template newVersionTemplate = loaders.loadTemplate("/templates/notify/newVersionNotification.html");
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 
 		Template insertingImagesTemplate = loaders.loadTemplate("/templates/notify/inserting-images-notification.html");
-		insertingImagesNotification = new ListNotification<Image>("inserting-images-notification", "images", insertingImagesTemplate);
+		insertingImagesNotification = new ListNotification<>("inserting-images-notification", "images", insertingImagesTemplate);
 
 		Template insertedImagesTemplate = loaders.loadTemplate("/templates/notify/inserted-images-notification.html");
-		insertedImagesNotification = new ListNotification<Image>("inserted-images-notification", "images", insertedImagesTemplate);
+		insertedImagesNotification = new ListNotification<>("inserted-images-notification", "images", insertedImagesTemplate);
 
 		Template imageInsertFailedTemplate = loaders.loadTemplate("/templates/notify/image-insert-failed-notification.html");
-		imageInsertFailedNotification = new ListNotification<Image>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
+		imageInsertFailedNotification = new ListNotification<>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
 	}
 
 	//
@@ -829,7 +829,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	private Collection<Sone> getMentionedSones(String text) {
 		/* we need no context to find mentioned Sones. */
-		Set<Sone> mentionedSones = new HashSet<Sone>();
+		Set<Sone> mentionedSones = new HashSet<>();
 		for (Part part : soneTextParser.parse(text, null)) {
 			if (part instanceof SonePart) {
 				mentionedSones.add(((SonePart) part).getSone());

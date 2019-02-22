@@ -44,28 +44,28 @@ public class Preferences {
 
 	private final EventBus eventBus;
 	private final Option<Integer> insertionDelay =
-			new DefaultOption<Integer>(60, range(0, MAX_VALUE));
+			new DefaultOption<>(60, range(0, MAX_VALUE));
 	private final Option<Integer> postsPerPage =
-			new DefaultOption<Integer>(10, range(1, MAX_VALUE));
+			new DefaultOption<>(10, range(1, MAX_VALUE));
 	private final Option<Integer> imagesPerPage =
-			new DefaultOption<Integer>(9, range(1, MAX_VALUE));
+			new DefaultOption<>(9, range(1, MAX_VALUE));
 	private final Option<Integer> charactersPerPost =
-			new DefaultOption<Integer>(400, Predicates.<Integer>or(
+			new DefaultOption<>(400, Predicates.<Integer>or(
 					range(50, MAX_VALUE), equalTo(-1)));
 	private final Option<Integer> postCutOffLength =
-			new DefaultOption<Integer>(200, range(50, MAX_VALUE));
+			new DefaultOption<>(200, range(50, MAX_VALUE));
 	private final Option<Boolean> requireFullAccess =
-			new DefaultOption<Boolean>(false);
+			new DefaultOption<>(false);
 	private final Option<Integer> positiveTrust =
-			new DefaultOption<Integer>(75, range(0, 100));
+			new DefaultOption<>(75, range(0, 100));
 	private final Option<Integer> negativeTrust =
-			new DefaultOption<Integer>(-25, range(-100, 100));
+			new DefaultOption<>(-25, range(-100, 100));
 	private final Option<String> trustComment =
-			new DefaultOption<String>("Set from Sone Web Interface");
+			new DefaultOption<>("Set from Sone Web Interface");
 	private final Option<Boolean> activateFcpInterface =
-			new DefaultOption<Boolean>(false);
+			new DefaultOption<>(false);
 	private final Option<FullAccessRequired> fcpFullAccessRequired =
-			new DefaultOption<FullAccessRequired>(ALWAYS);
+			new DefaultOption<>(ALWAYS);
 
 	public Preferences(EventBus eventBus) {
 		this.eventBus = eventBus;

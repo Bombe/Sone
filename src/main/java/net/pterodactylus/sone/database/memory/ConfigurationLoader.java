@@ -93,7 +93,7 @@ public class ConfigurationLoader {
 	}
 
 	private Set<String> loadIds(String prefix) {
-		Set<String> ids = new HashSet<String>();
+		Set<String> ids = new HashSet<>();
 		int idCounter = 0;
 		while (true) {
 			String id = configuration

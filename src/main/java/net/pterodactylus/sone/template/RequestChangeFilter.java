@@ -46,7 +46,7 @@ public class RequestChangeFilter implements Filter {
 		String name = String.valueOf(parameters.get("name"));
 		String value = String.valueOf(parameters.get("value"));
 
-		Map<String, String> values = new HashMap<String, String>();
+		Map<String, String> values = new HashMap<>();
 		Collection<String> parameterNames = request.getHttpRequest().getParameterNames();
 		for (String parameterName : parameterNames) {
 			values.put(parameterName, request.getHttpRequest().getParam(parameterName));

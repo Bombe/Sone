@@ -43,7 +43,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Album album = (Album) object;
 		if ("backlinks".equals(member)) {
-			List<Link> backlinks = new ArrayList<Link>();
+			List<Link> backlinks = new ArrayList<>();
 			Album currentAlbum = album;
 			while (!currentAlbum.isRoot()) {
 				backlinks.add(0, new Link("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getTitle()));

@@ -156,18 +156,18 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 	/** Locked local Sones. */
 	/* synchronize on itself. */
-	private final Set<Sone> lockedSones = new HashSet<Sone>();
+	private final Set<Sone> lockedSones = new HashSet<>();
 
 	/** Sone inserters. */
 	/* synchronize access on this on sones. */
-	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
+	private final Map<Sone, SoneInserter> soneInserters = new HashMap<>();
 
 	/** Sone rescuers. */
 	/* synchronize access on this on sones. */
-	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<Sone, SoneRescuer>();
+	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<>();
 
 	/** All known Sones. */
-	private final Set<String> knownSones = new HashSet<String>();
+	private final Set<String> knownSones = new HashSet<>();
 
 	/** The post database. */
 	private final Database database;
@@ -176,7 +176,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final Multimap<OwnIdentity, Identity> trustedIdentities = Multimaps.synchronizedSetMultimap(HashMultimap.<OwnIdentity, Identity>create());
 
 	/** All temporary images. */
-	private final Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
+	private final Map<String, TemporaryImage> temporaryImages = new HashMap<>();
 
 	/** Ticker for threads that mark own elements as known. */
 	private final ScheduledExecutorService localElementTicker = Executors.newScheduledThreadPool(1);
@@ -444,7 +444,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sones that like the given post
 	 */
 	public Set<Sone> getLikes(Post post) {
-		Set<Sone> sones = new HashSet<Sone>();
+		Set<Sone> sones = new HashSet<>();
 		for (Sone sone : getSones()) {
 			if (sone.getLikedPostIds().contains(post.getId())) {
 				sones.add(sone);
@@ -461,7 +461,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sones that like the given reply
 	 */
 	public Set<Sone> getLikes(PostReply reply) {
-		Set<Sone> sones = new HashSet<Sone>();
+		Set<Sone> sones = new HashSet<>();
 		for (Sone sone : getSones()) {
 			if (sone.getLikedReplyIds().contains(reply.getId())) {
 				sones.add(sone);

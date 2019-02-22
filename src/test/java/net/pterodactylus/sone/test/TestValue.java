@@ -15,7 +15,7 @@ import com.google.common.base.Objects;
  */
 public class TestValue<T> implements Value<T> {
 
-	private final AtomicReference<T> value = new AtomicReference<T>();
+	private final AtomicReference<T> value = new AtomicReference<>();
 
 	public TestValue(@Nullable T originalValue) {
 		value.set(originalValue);
@@ -58,7 +58,7 @@ public class TestValue<T> implements Value<T> {
 
 	@Nonnull
 	public static <T> Value<T> from(@Nullable T value) {
-		return new TestValue<T>(value);
+		return new TestValue<>(value);
 	}
 
 }

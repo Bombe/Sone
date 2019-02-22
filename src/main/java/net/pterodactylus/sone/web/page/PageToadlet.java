@@ -145,7 +145,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 		try (AutoCloseableBucket pageBucket = new AutoCloseableBucket(pageRequest.getToadletContext().getBucketFactory().makeBucket(-1));
 		     OutputStream pageBucketOutputStream = pageBucket.getBucket().getOutputStream()) {
 			Response pageResponse = page.handleRequest(pageRequest, new Response(pageBucketOutputStream));
-			MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
+			MultiValueTable<String, String> headers = new MultiValueTable<>();
 			if (pageResponse.getHeaders() != null) {
 				for (Header header : pageResponse.getHeaders()) {
 					for (String value : header) {

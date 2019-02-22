@@ -51,13 +51,13 @@ public class AlbumImpl implements Album {
 	private final Sone sone;
 
 	/** Nested albums. */
-	private final List<Album> albums = new ArrayList<Album>();
+	private final List<Album> albums = new ArrayList<>();
 
 	/** The image IDs in order. */
-	private final List<String> imageIds = new ArrayList<String>();
+	private final List<String> imageIds = new ArrayList<>();
 
 	/** The images in this album. */
-	private final Map<String, Image> images = new HashMap<String, Image>();
+	private final Map<String, Image> images = new HashMap<>();
 
 	/** The parent album. */
 	private Album parent;
@@ -100,7 +100,7 @@ public class AlbumImpl implements Album {
 
 	@Override
 	public List<Album> getAlbums() {
-		return new ArrayList<Album>(albums);
+		return new ArrayList<>(albums);
 	}
 
 	@Override
@@ -152,7 +152,7 @@ public class AlbumImpl implements Album {
 
 	@Override
 	public List<Image> getImages() {
-		return new ArrayList<Image>(Collections2.filter(Collections2.transform(imageIds, new Function<String, Image>() {
+		return new ArrayList<>(Collections2.filter(Collections2.transform(imageIds, new Function<String, Image>() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")

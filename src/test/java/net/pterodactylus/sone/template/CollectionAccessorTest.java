@@ -20,7 +20,7 @@ import org.junit.Test;
 public class CollectionAccessorTest {
 
 	private final CollectionAccessor accessor = new CollectionAccessor();
-	private final Collection<Object> collection = new ArrayList<Object>();
+	private final Collection<Object> collection = new ArrayList<>();
 
 	@Before
 	public void setupCollection() {

@@ -26,9 +26,9 @@ import com.google.common.base.Charsets;
 public class FilesystemTemplate extends Template {
 
 	private final String filename;
-	private final AtomicReference<LastLoadedTemplate> lastTemplate = new AtomicReference<LastLoadedTemplate>();
+	private final AtomicReference<LastLoadedTemplate> lastTemplate = new AtomicReference<>();
 	private final TemplateContext initialContext = new TemplateContext();
-	private final List<Part> parts = new ArrayList<Part>();
+	private final List<Part> parts = new ArrayList<>();
 
 	public FilesystemTemplate(String filename) {
 		this.filename = filename;

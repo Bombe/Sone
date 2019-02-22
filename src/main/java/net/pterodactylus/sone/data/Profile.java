@@ -282,7 +282,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public List<Field> getFields() {
-		return new ArrayList<Field>(fields);
+		return new ArrayList<>(fields);
 	}
 
 	/**

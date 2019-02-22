@@ -96,7 +96,7 @@ public class FreenetInterface {
 	private final RequestClient requestClient = new RequestClientBuilder().realTime().build();
 
 	/** The USK callbacks. */
-	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<String, USKCallback>();
+	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<>();
 
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());

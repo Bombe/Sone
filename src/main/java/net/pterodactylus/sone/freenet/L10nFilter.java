@@ -71,7 +71,7 @@ public class L10nFilter implements Filter {
 		if (data instanceof L10nText) {
 			return ((L10nText) data).getParameters();
 		}
-		List<Object> parameterValues = new ArrayList<Object>();
+		List<Object> parameterValues = new ArrayList<>();
 		int parameterIndex = 0;
 		while (parameters.containsKey(String.valueOf(parameterIndex))) {
 			Object value = parameters.get(String.valueOf(parameterIndex));

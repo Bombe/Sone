@@ -120,7 +120,7 @@ public class MemoryDatabaseTest {
 						.withTime(4000L)
 						.withText("reply2")
 						.build();
-		Set<PostReply> postReplies = new HashSet<PostReply>(
+		Set<PostReply> postReplies = new HashSet<>(
 				asList(firstPostFirstReply, firstPostSecondReply,
 						secondPostReply));
 		when(sone.getReplies()).thenReturn(postReplies);

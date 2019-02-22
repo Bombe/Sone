@@ -27,7 +27,7 @@ public class FilesystemTemplateTest {
 
 	private final File tempFile;
 	private final FilesystemTemplate filesystemTemplate;
-	private final AtomicReference<StringWriter> stringWriter = new AtomicReference<StringWriter>(new StringWriter());
+	private final AtomicReference<StringWriter> stringWriter = new AtomicReference<>(new StringWriter());
 	private final TemplateContext templateContext = new TemplateContext();
 
 	public FilesystemTemplateTest() throws IOException {

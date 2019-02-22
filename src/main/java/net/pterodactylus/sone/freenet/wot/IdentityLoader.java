@@ -55,7 +55,7 @@ public class IdentityLoader {
 	}
 
 	private Map<OwnIdentity, Collection<Identity>> loadTrustedIdentitiesForOwnIdentities(Collection<OwnIdentity> ownIdentities) throws PluginException {
-		Map<OwnIdentity, Collection<Identity>> currentIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> currentIdentities = new HashMap<>();
 
 		for (OwnIdentity ownIdentity : ownIdentities) {
 			if (identityDoesNotHaveTheCorrectContext(ownIdentity)) {

@@ -212,7 +212,7 @@ public class FreenetInterfaceTest {
 	@Test
 	public void insertingADirectory() throws InsertException, SoneException {
 		FreenetURI freenetUri = mock(FreenetURI.class);
-		HashMap<String, Object> manifestEntries = new HashMap<String, Object>();
+		HashMap<String, Object> manifestEntries = new HashMap<>();
 		String defaultFile = "index.html";
 		FreenetURI resultingUri = mock(FreenetURI.class);
 		when(highLevelSimpleClient.insertManifest(eq(freenetUri), eq(manifestEntries), eq(defaultFile))).thenReturn(resultingUri);

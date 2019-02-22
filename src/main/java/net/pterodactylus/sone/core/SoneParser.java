@@ -166,7 +166,7 @@ public class SoneParser {
 
 		/* parse posts. */
 		SimpleXML postsXml = soneXml.getNode("posts");
-		Set<Post> posts = new HashSet<Post>();
+		Set<Post> posts = new HashSet<>();
 		if (postsXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no posts!", sone));
@@ -199,7 +199,7 @@ public class SoneParser {
 
 		/* parse replies. */
 		SimpleXML repliesXml = soneXml.getNode("replies");
-		Set<PostReply> replies = new HashSet<PostReply>();
+		Set<PostReply> replies = new HashSet<>();
 		if (repliesXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no replies!", sone));
@@ -229,7 +229,7 @@ public class SoneParser {
 
 		/* parse liked post IDs. */
 		SimpleXML likePostIdsXml = soneXml.getNode("post-likes");
-		Set<String> likedPostIds = new HashSet<String>();
+		Set<String> likedPostIds = new HashSet<>();
 		if (likePostIdsXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no post likes!", sone));
@@ -242,7 +242,7 @@ public class SoneParser {
 
 		/* parse liked reply IDs. */
 		SimpleXML likeReplyIdsXml = soneXml.getNode("reply-likes");
-		Set<String> likedReplyIds = new HashSet<String>();
+		Set<String> likedReplyIds = new HashSet<>();
 		if (likeReplyIdsXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no reply likes!", sone));
@@ -255,8 +255,8 @@ public class SoneParser {
 
 		/* parse albums. */
 		SimpleXML albumsXml = soneXml.getNode("albums");
-		Map<String, Image> allImages = new HashMap<String, Image>();
-		List<Album> topLevelAlbums = new ArrayList<Album>();
+		Map<String, Image> allImages = new HashMap<>();
+		List<Album> topLevelAlbums = new ArrayList<>();
 		if (albumsXml != null) {
 			for (SimpleXML albumXml : albumsXml.getNodes("album")) {
 				String id = albumXml.getValue("id", null);

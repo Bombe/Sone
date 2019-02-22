@@ -44,7 +44,7 @@ public interface Album extends Identified, Fingerprintable {
 			if (album == null) {
 				return emptyList();
 			}
-			List<Album> albums = new ArrayList<Album>();
+			List<Album> albums = new ArrayList<>();
 			albums.add(album);
 			for (Album subAlbum : album.getAlbums()) {
 				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());

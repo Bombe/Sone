@@ -45,7 +45,7 @@ public class CollectionAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Collection<?> collection = (Collection<?>) object;
 		if (member.equals("soneNames")) {
-			List<Sone> sones = new ArrayList<Sone>();
+			List<Sone> sones = new ArrayList<>();
 			for (Object sone : collection) {
 				if (!(sone instanceof Sone)) {
 					continue;

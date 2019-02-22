@@ -49,7 +49,7 @@ public class GetSonesCommand extends AbstractSoneCommand {
 	public Response execute(SimpleFieldSet parameters) {
 		int startSone = getInt(parameters, "StartSone", 0);
 		int maxSones = getInt(parameters, "MaxSones", -1);
-		List<Sone> sones = new ArrayList<Sone>(getCore().getSones());
+		List<Sone> sones = new ArrayList<>(getCore().getSones());
 		if (sones.size() < startSone) {
 			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), "Sones."));
 		}

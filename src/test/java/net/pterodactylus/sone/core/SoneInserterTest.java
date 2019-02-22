@@ -248,7 +248,7 @@ public class SoneInserterTest {
 	@Test
 	public void templateIsRenderedCorrectlyForManifestElement()
 	throws IOException {
-		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		Map<String, Object> soneProperties = new HashMap<>();
 		soneProperties.put("id", "SoneId");
 		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
 		long now = currentTimeMillis();
@@ -264,7 +264,7 @@ public class SoneInserterTest {
 
 	@Test
 	public void invalidTemplateReturnsANullManifestElement() {
-		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		Map<String, Object> soneProperties = new HashMap<>();
 		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
 		assertThat(manifestCreator.createManifestElement("test.txt",
 				"plain/text; charset=utf-8",
@@ -274,7 +274,7 @@ public class SoneInserterTest {
 
 	@Test
 	public void errorWhileRenderingTemplateReturnsANullManifestElement() {
-		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		Map<String, Object> soneProperties = new HashMap<>();
 		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
 		when(core.toString()).thenThrow(NullPointerException.class);
 		assertThat(manifestCreator.createManifestElement("test.txt",

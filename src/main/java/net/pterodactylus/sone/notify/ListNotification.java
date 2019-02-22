@@ -37,7 +37,7 @@ public class ListNotification<T> extends TemplateNotification {
 	private final String key;
 
 	/** The list of new elements. */
-	private final List<T> elements = new CopyOnWriteArrayList<T>();
+	private final List<T> elements = new CopyOnWriteArrayList<>();
 
 	/**
 	 * Creates a new list notification.
@@ -96,7 +96,7 @@ public class ListNotification<T> extends TemplateNotification {
 	 * @return The current list of elements
 	 */
 	public List<T> getElements() {
-		return new ArrayList<T>(elements);
+		return new ArrayList<>(elements);
 	}
 
 	/**

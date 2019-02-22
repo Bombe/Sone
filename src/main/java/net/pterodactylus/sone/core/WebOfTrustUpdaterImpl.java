@@ -55,7 +55,7 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The queue for jobs. */
-	private final BlockingQueue<WebOfTrustUpdateJob> updateJobs = new LinkedBlockingQueue<WebOfTrustUpdateJob>();
+	private final BlockingQueue<WebOfTrustUpdateJob> updateJobs = new LinkedBlockingQueue<>();
 
 	/**
 	 * Creates a new trust updater.

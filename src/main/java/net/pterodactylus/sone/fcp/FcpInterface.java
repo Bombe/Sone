@@ -81,7 +81,7 @@ public class FcpInterface {
 	private final AtomicBoolean active = new AtomicBoolean();
 
 	/** What function full access is required for. */
-	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<FullAccessRequired>(FullAccessRequired.ALWAYS);
+	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<>(FullAccessRequired.ALWAYS);
 
 	/** All available FCP commands. */
 	private final Map<String, AbstractSoneCommand> commands;

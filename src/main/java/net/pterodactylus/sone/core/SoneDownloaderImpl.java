@@ -62,7 +62,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	private final FreenetInterface freenetInterface;
 
 	/** The sones to update. */
-	private final Set<Sone> sones = new HashSet<Sone>();
+	private final Set<Sone> sones = new HashSet<>();
 
 	@Inject
 	SoneDownloaderImpl(UpdatedSoneProcessor updatedSoneProcessor, FreenetInterface freenetInterface, SoneParser soneParser) {

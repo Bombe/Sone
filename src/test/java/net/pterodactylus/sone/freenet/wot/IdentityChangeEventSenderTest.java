@@ -75,14 +75,14 @@ public class IdentityChangeEventSenderTest {
 	}
 
 	private Map<OwnIdentity, Collection<Identity>> createNewIdentities() {
-		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<>();
 		oldIdentities.put(ownIdentities.get(1), asList(identities.get(3), identities.get(2)));
 		oldIdentities.put(ownIdentities.get(2), asList(identities.get(1), identities.get(2)));
 		return oldIdentities;
 	}
 
 	private Map<OwnIdentity, Collection<Identity>> createOldIdentities() {
-		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<>();
 		oldIdentities.put(ownIdentities.get(0), asList(identities.get(0), identities.get(1)));
 		oldIdentities.put(ownIdentities.get(1), asList(identities.get(0), identities.get(1)));
 		return oldIdentities;

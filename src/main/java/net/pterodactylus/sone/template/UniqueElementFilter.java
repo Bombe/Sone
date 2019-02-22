@@ -38,7 +38,7 @@ public class UniqueElementFilter implements Filter {
 		if (!(data instanceof Collection<?>)) {
 			return data;
 		}
-		return new HashSet<Object>((Collection<?>) data);
+		return new HashSet<>((Collection<?>) data);
 	}
 
 }
