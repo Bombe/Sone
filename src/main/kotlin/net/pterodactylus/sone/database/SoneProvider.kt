@@ -17,12 +17,9 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Sone
-
-import com.google.common.base.Function
-import com.google.common.base.Optional
-import com.google.inject.ImplementedBy
+import com.google.inject.*
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for objects that can provide [Sone]s by their ID.

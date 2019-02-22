@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Reply
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 
 /**
  * Methods that all reply builders need to implement in order to be able to

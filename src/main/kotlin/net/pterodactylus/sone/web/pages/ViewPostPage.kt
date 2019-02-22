@@ -1,14 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.template.SoneAccessor
-import net.pterodactylus.sone.utils.let
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
-import java.net.URI
-import javax.inject.Inject
+import net.pterodactylus.sone.template.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import java.net.*
+import javax.inject.*
 
 /**
  * This page lets the user view a post and all its replies.

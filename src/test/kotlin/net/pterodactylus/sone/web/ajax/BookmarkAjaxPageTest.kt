@@ -1,12 +1,11 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.web.baseInjector
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify

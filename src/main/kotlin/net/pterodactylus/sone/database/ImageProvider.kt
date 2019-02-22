@@ -17,9 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Image
-
-import com.google.common.base.Optional
+import net.pterodactylus.sone.data.*
 
 /**
  * Provides [Image]s.

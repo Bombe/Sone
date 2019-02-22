@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for a store for posts.

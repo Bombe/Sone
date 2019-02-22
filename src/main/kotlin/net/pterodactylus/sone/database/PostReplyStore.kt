@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 
 /**
  * Defines a store for [post replies][PostReply].

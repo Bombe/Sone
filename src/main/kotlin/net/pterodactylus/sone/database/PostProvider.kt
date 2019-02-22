@@ -17,11 +17,9 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.database.memory.MemoryDatabase
-
-import com.google.common.base.Optional
-import com.google.inject.ImplementedBy
+import com.google.inject.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.database.memory.*
 
 /**
  * Interface for objects that can provide [Post]s by their ID.

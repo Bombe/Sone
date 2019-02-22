@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import com.google.common.base.Optional
-import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for objects that can provide [PostReply]s.

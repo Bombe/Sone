@@ -17,9 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Album
-
-import com.google.common.base.Optional
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for objects that can provide [Album]s by their ID.
