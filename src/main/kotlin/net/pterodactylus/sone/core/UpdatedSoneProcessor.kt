@@ -32,7 +32,7 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 	override fun updateSone(sone: Sone) {
 		val storedSone = database.getSone(sone.id) ?: return
 		if (!soneCanBeUpdated(storedSone, sone)) {
-			logger.fine { "Downloaded Sone $sone can not update stored Sone $storedSone." }
+			logger.fine("Downloaded Sone $sone can not update stored Sone $storedSone.")
 			return
 		}
 		collectEventsForChanges(storedSone, sone)
