@@ -1,16 +1,13 @@
 package net.pterodactylus.sone.core
 
-import com.google.common.eventbus.EventBus
-import com.google.inject.ImplementedBy
-import net.pterodactylus.sone.core.event.NewPostFoundEvent
-import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent
-import net.pterodactylus.sone.core.event.PostRemovedEvent
-import net.pterodactylus.sone.core.event.PostReplyRemovedEvent
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.data.Sone.SoneStatus
-import net.pterodactylus.sone.database.Database
-import net.pterodactylus.sone.utils.ifFalse
-import net.pterodactylus.util.logging.Logging
+import com.google.common.eventbus.*
+import com.google.inject.*
+import net.pterodactylus.sone.core.event.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Sone.*
+import net.pterodactylus.sone.database.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.util.logging.*
 import javax.inject.Inject
 
 /**
@@ -35,9 +32,23 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 			logger.fine("Downloaded Sone $sone can not update stored Sone $storedSone.")
 			return
 		}
-		collectEventsForChanges(storedSone, sone)
-				.also { database.storeSone(sone) }
-				.forEach(eventBus::post)
+
+		SoneComparison(storedSone, sone).apply {
+			newPosts
+					.onEach { post -> if (post.time <= sone.followingTime) post.isKnown = true }
+					.mapNotNull { post -> post.isKnown.ifFalse { NewPostFoundEvent(post) } }
+					.forEach(eventBus::post)
+			removedPosts
+					.map { PostRemovedEvent(it) }
+					.forEach(eventBus::post)
+			newPostReplies
+					.onEach { postReply -> if (postReply.time <= sone.followingTime) postReply.isKnown = true }
+					.mapNotNull { postReply -> postReply.isKnown.ifFalse { NewPostReplyFoundEvent(postReply) } }
+					.forEach(eventBus::post)
+			removedPostReplies
+					.map { PostReplyRemovedEvent(it) }
+					.forEach(eventBus::post)
+		}
 		sone.options = storedSone.options
 		sone.isKnown = storedSone.isKnown
 		sone.status = if (sone.time != 0L) SoneStatus.idle else SoneStatus.unknown
@@ -46,16 +57,6 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 	protected abstract fun soneCanBeUpdated(storedSone: Sone, newSone: Sone): Boolean
 
 	private val Sone.followingTime get() = database.getFollowingTime(id) ?: 0
-
-	private fun collectEventsForChanges(oldSone: Sone, newSone: Sone): List<Any> =
-			SoneChangeCollector(oldSone)
-					.onNewPost { post -> if (post.time <= newSone.followingTime) post.isKnown = true }
-					.newPostEvent { post -> post.isKnown.ifFalse { NewPostFoundEvent(post) } }
-					.removedPostEvent { PostRemovedEvent(it) }
-					.onNewPostReply { postReply -> if (postReply.time <= newSone.followingTime) postReply.isKnown = true }
-					.newPostReplyEvent { postReply -> postReply.isKnown.ifFalse { NewPostReplyFoundEvent(postReply) } }
-					.onRemovedPostReply { PostReplyRemovedEvent(it) }
-					.detectChanges(newSone)
 
 }
 

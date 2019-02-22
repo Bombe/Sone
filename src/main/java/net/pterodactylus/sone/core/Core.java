@@ -48,8 +48,6 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
-import net.pterodactylus.sone.core.SoneChangeDetector.PostProcessor;
-import net.pterodactylus.sone.core.SoneChangeDetector.PostReplyProcessor;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
@@ -851,48 +849,33 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 	}
 
-	private List<Object> collectEventsForChangesInSone(Sone oldSone,
-			final Sone newSone) {
-		final List<Object> events = new ArrayList<Object>();
-		SoneChangeDetector soneChangeDetector = new SoneChangeDetector(
-				oldSone);
-		soneChangeDetector.onNewPosts(new PostProcessor() {
-			@Override
-			public void processPost(Post post) {
-				if (post.getSone().equals(newSone)) {
-					post.setKnown(true);
-				} else if (post.getTime() < database.getFollowingTime(newSone.getId())) {
-					post.setKnown(true);
-				} else if (!post.isKnown()) {
-					events.add(new NewPostFoundEvent(post));
-				}
+	private List<Object> collectEventsForChangesInSone(Sone oldSone, Sone newSone) {
+		List<Object> events = new ArrayList<>();
+		SoneComparison soneComparison = new SoneComparison(oldSone, newSone);
+		for (Post newPost : soneComparison.getNewPosts()) {
+			if (newPost.getSone().equals(newSone)) {
+				newPost.setKnown(true);
+			} else if (newPost.getTime() < database.getFollowingTime(newSone.getId())) {
+				newPost.setKnown(true);
+			} else if (!newPost.isKnown()) {
+				events.add(new NewPostFoundEvent(newPost));
 			}
-		});
-		soneChangeDetector.onRemovedPosts(new PostProcessor() {
-			@Override
-			public void processPost(Post post) {
-				events.add(new PostRemovedEvent(post));
+		}
+		for (Post post : soneComparison.getRemovedPosts()) {
+			events.add(new PostRemovedEvent(post));
+		}
+		for (PostReply postReply : soneComparison.getNewPostReplies()) {
+			if (postReply.getSone().equals(newSone)) {
+				postReply.setKnown(true);
+			} else if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
+				postReply.setKnown(true);
+			} else if (!postReply.isKnown()) {
+				events.add(new NewPostReplyFoundEvent(postReply));
 			}
-		});
-		soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
-			@Override
-			public void processPostReply(PostReply postReply) {
-				if (postReply.getSone().equals(newSone)) {
-					postReply.setKnown(true);
-				} else if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
-					postReply.setKnown(true);
-				} else if (!postReply.isKnown()) {
-					events.add(new NewPostReplyFoundEvent(postReply));
-				}
-			}
-		});
-		soneChangeDetector.onRemovedPostReplies(new PostReplyProcessor() {
-			@Override
-			public void processPostReply(PostReply postReply) {
-				events.add(new PostReplyRemovedEvent(postReply));
-			}
-		});
-		soneChangeDetector.detectChanges(newSone);
+		}
+		for (PostReply postReply : soneComparison.getRemovedPostReplies()) {
+			events.add(new PostReplyRemovedEvent(postReply));
+		}
 		return events;
 	}
 
