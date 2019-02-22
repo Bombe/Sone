@@ -26,7 +26,7 @@ class ReplyGroupFilterTest {
 
 	@Before
 	fun setupReplies() {
-		(0..4).forEach {
+		repeat(5) {
 			sones += mock<Sone>()
 		}
 		(0..7).forEach {
