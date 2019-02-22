@@ -18,9 +18,7 @@ public class TestUtil {
 			modifiersField.setAccessible(true);
 			modifiersField.setInt(clientCoreField, clientCoreField.getModifiers() & ~Modifier.FINAL);
 			clientCoreField.set(object, value);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -30,9 +28,7 @@ public class TestUtil {
 			Field field = object.getClass().getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return (T) field.get(object);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -42,11 +38,7 @@ public class TestUtil {
 			Method method = object.getClass().getDeclaredMethod(methodName, new Class[0]);
 			method.setAccessible(true);
 			return (T) method.invoke(object);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
