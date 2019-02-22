@@ -12,7 +12,7 @@ import org.junit.Test
 class PaginationTest {
 
 	private val items = listOf(1, 2, 3, 4, 5)
-	private val pagination = Pagination<Int>(items, 2)
+	private val pagination = Pagination(items, 2)
 
 	@Test
 	fun `pagination can be created from iterable`() {

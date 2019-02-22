@@ -78,7 +78,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `local sones are set in template context`() {
-		val localSones = listOf(mock<Sone>(), mock<Sone>())
+		val localSones = listOf(mock<Sone>(), mock())
 		whenever(core.localSones).thenReturn(localSones)
 		verifyVariableMatches("localSones", containsInAnyOrder(*localSones.toTypedArray()))
 	}

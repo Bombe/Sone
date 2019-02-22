@@ -8,7 +8,7 @@ import kotlin.reflect.KClass
 fun <T : Any> KClass<T>.isProvidedBy(instance: T) = Module { it.bind(this.java).toProvider { instance } }
 fun <T : Any> KClass<T>.isProvidedBy(provider: com.google.inject.Provider<T>) = Module { it.bind(this.java).toProvider(provider) }
 fun <T : Any> KClass<T>.isProvidedBy(provider: KClass<out Provider<T>>) = Module { it.bind(this.java).toProvider(provider.java) }
-inline fun <reified T : Any> KClass<T>.isProvidedByMock() = Module { it.bind(this.java).toProvider { mock<T>() } }
+inline fun <reified T : Any> KClass<T>.isProvidedByMock() = Module { it.bind(this.java).toProvider { mock() } }
 
 inline fun <reified T : Any> Injector.getInstance() = getInstance(T::class.java)!!
 

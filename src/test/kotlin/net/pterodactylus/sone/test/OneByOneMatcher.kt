@@ -9,7 +9,7 @@ class OneByOneMatcher<A> : TypeSafeDiagnosingMatcher<A>() {
 	private val matchers = mutableListOf<Matcher<A, *>>()
 
 	fun <V> expect(description: String, expected: V, actual: (A) -> V) {
-		matchers += Matcher<A, V>(expected, actual, description)
+		matchers += Matcher(expected, actual, description)
 	}
 
 	override fun describeTo(description: Description) {

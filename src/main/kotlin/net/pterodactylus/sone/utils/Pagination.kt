@@ -43,4 +43,4 @@ class Pagination<out T>(private val originalItems: List<T>, pageSize: Int): Iter
 
 }
 
-fun <T> Iterable<T>.paginate(pageSize: Int) = Pagination<T>(toList(), pageSize)
+fun <T> Iterable<T>.paginate(pageSize: Int) = Pagination(toList(), pageSize)

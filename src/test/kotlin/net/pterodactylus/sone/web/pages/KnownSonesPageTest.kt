@@ -53,7 +53,7 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 			whenever(albums).thenReturn(listOf(album))
 		}
 		whenever(this.rootAlbum).thenReturn(rootAlbum)
-		whenever(this.profile).thenReturn(mock<Profile>())
+		whenever(this.profile).thenReturn(mock())
 		whenever(id).thenReturn(name.toLowerCase())
 		whenever(this.name).thenReturn(name)
 	}

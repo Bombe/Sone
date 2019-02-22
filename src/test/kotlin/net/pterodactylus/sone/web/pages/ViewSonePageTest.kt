@@ -30,11 +30,11 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 
 	private val post1 = createPost("post1", "First Post.", 1000, currentSone)
 	private val post2 = createPost("post2", "Second Post.", 2000, currentSone)
-	private val foreignPost1 = createPost("foreign-post1", "First Foreign Post.", 1000, mock<Sone>())
-	private val foreignPost2 = createPost("foreign-post2", "Second Foreign Post.", 2000, mock<Sone>())
-	private val foreignPost3 = createPost("foreign-post3", "Third Foreign Post.", 3000, mock<Sone>())
-	private val directed1 = createPost("post3", "First directed.", 1500, mock<Sone>(), recipient = currentSone)
-	private val directed2 = createPost("post4", "Second directed.", 2500, mock<Sone>(), recipient = currentSone)
+	private val foreignPost1 = createPost("foreign-post1", "First Foreign Post.", 1000, mock())
+	private val foreignPost2 = createPost("foreign-post2", "Second Foreign Post.", 2000, mock())
+	private val foreignPost3 = createPost("foreign-post3", "Third Foreign Post.", 3000, mock())
+	private val directed1 = createPost("post3", "First directed.", 1500, mock(), recipient = currentSone)
+	private val directed2 = createPost("post4", "Second directed.", 2500, mock(), recipient = currentSone)
 
 	@Before
 	fun setup() {

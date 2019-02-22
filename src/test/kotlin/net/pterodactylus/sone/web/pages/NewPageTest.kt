@@ -47,7 +47,7 @@ class NewPageTest: WebPageTest(::NewPage) {
 	fun `posts are not duplicated when they come from both new posts and new replies notifications`() {
 		val extraPost = mock<Post>().withTime(2000)
 		val posts = asList(mock<Post>().withTime(1000), mock<Post>().withTime(3000))
-		val postReplies = asList(mock<PostReply>(), mock<PostReply>())
+		val postReplies = asList(mock<PostReply>(), mock())
 		whenever(postReplies[0].post).thenReturn(posts[0].asOptional())
 		whenever(postReplies[1].post).thenReturn(extraPost.asOptional())
 		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)

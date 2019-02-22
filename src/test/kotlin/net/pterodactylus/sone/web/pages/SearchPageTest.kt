@@ -73,21 +73,21 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `searching for sone link without prefix redirects to view sone page`() {
-		addSone("sone-id", mock<Sone>())
+		addSone("sone-id", mock())
 		addHttpRequestParameter("query", "sone-id")
 		verifyRedirect("viewSone.html?sone=sone-id")
 	}
 
 	@Test
 	fun `searching for a post link redirects to post page`() {
-		addPost("Post-id", mock<Post>())
+		addPost("Post-id", mock())
 		addHttpRequestParameter("query", "post://Post-id")
 		verifyRedirect("viewPost.html?post=Post-id")
 	}
 
 	@Test
 	fun `searching for a post ID without prefix redirects to post page`() {
-		addPost("post-id", mock<Post>())
+		addPost("post-id", mock())
 		addHttpRequestParameter("query", "post-id")
 		verifyRedirect("viewPost.html?post=post-id")
 	}
@@ -110,28 +110,28 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `searching for an album link redirects to the image browser`() {
-		addAlbum("album-id", mock<Album>())
+		addAlbum("album-id", mock())
 		addHttpRequestParameter("query", "album://album-id")
 		verifyRedirect("imageBrowser.html?album=album-id")
 	}
 
 	@Test
 	fun `searching for an album ID redirects to the image browser`() {
-		addAlbum("album-id", mock<Album>())
+		addAlbum("album-id", mock())
 		addHttpRequestParameter("query", "album-id")
 		verifyRedirect("imageBrowser.html?album=album-id")
 	}
 
 	@Test
 	fun `searching for an image link redirects to the image browser`() {
-		addImage("image-id", mock<Image>())
+		addImage("image-id", mock())
 		addHttpRequestParameter("query", "image://image-id")
 		verifyRedirect("imageBrowser.html?image=image-id")
 	}
 
 	@Test
 	fun `searching for an image ID redirects to the image browser`() {
-		addImage("image-id", mock<Image>())
+		addImage("image-id", mock())
 		addHttpRequestParameter("query", "image-id")
 		verifyRedirect("imageBrowser.html?image=image-id")
 	}

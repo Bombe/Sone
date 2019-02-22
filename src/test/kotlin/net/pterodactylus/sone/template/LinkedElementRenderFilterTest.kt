@@ -38,7 +38,7 @@ class LinkedElementRenderFilterTest {
 
 	@Test
 	fun `filter renders empty span for not loaded elements`() {
-		val html = filter.format(null, LinkedElement("KSK@gpl.png", loading = true), emptyMap<String, Any?>()) as String
+		val html = filter.format(null, LinkedElement("KSK@gpl.png", loading = true), emptyMap()) as String
 		val spanNode = Jsoup.parseBodyFragment(html).body().child(0)
 		assertThat(spanNode.nodeName(), `is`("span"))
 		assertThat(spanNode.attr("class"), `is`("linked-element not-loaded"))
@@ -49,7 +49,7 @@ class LinkedElementRenderFilterTest {
 
 	@Test
 	fun `filter can render linked images`() {
-		val html = filter.format(null, LinkedElement("KSK@gpl.png", properties = mapOf("type" to "image")), emptyMap<String, Any?>()) as String
+		val html = filter.format(null, LinkedElement("KSK@gpl.png", properties = mapOf("type" to "image")), emptyMap()) as String
 		val outerSpanNode = Jsoup.parseBodyFragment(html).body().child(0)
 		assertThat(outerSpanNode.nodeName(), `is`("span"))
 		assertThat(outerSpanNode.attr("class"), `is`("linked-element loaded"))
@@ -63,7 +63,7 @@ class LinkedElementRenderFilterTest {
 
 	@Test
 	fun `filter can render HTML pages`() {
-		val html = filter.format(null, LinkedElement("KSK@gpl.html", properties = mapOf("type" to "html", "title" to "Page Title", "description" to "This is the description.")), emptyMap<String, Any?>()) as String
+		val html = filter.format(null, LinkedElement("KSK@gpl.html", properties = mapOf("type" to "html", "title" to "Page Title", "description" to "This is the description.")), emptyMap()) as String
 		val outerSpanNode = Jsoup.parseBodyFragment(html).body().child(0)
 		assertThat(outerSpanNode.nodeName(), equalTo("span"))
 		assertThat(outerSpanNode.attr("class"), `is`("linked-element loaded"))

@@ -18,7 +18,7 @@ import org.mockito.Mockito.verify
  */
 class LikeReplyCommandTest : SoneCommandTest() {
 
-	private val reply = createReply("ReplyId", mock<Sone>(), mock<Post>(), 1000, "Text")
+	private val reply = createReply("ReplyId", mock(), mock(), 1000, "Text")
 
 	override fun createCommand(core: Core) = LikeReplyCommand(core)
 
@@ -71,7 +71,7 @@ class LikeReplyCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with local sone adds reply id to sone`() {
-		whenever(core.getLikes(reply)).thenReturn(setOf(mock<Sone>(), mock<Sone>(), mock<Sone>()))
+		whenever(core.getLikes(reply)).thenReturn(setOf(mock(), mock(), mock()))
 		parameters += "Reply" to "ReplyId"
 		parameters += "Sone" to "LocalSoneId"
 		val replyParameters = command.execute(parameters).replyParameters

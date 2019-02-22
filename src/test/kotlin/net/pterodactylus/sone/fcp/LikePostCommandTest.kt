@@ -17,7 +17,7 @@ import org.mockito.Mockito.verify
  */
 class LikePostCommandTest : SoneCommandTest() {
 
-	private val post = createPost("PostId", mock<Sone>(), null, 1000, "Text")
+	private val post = createPost("PostId", mock(), null, 1000, "Text")
 
 	override fun createCommand(core: Core) = LikePostCommand(core)
 
@@ -70,7 +70,7 @@ class LikePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with valid parameters adds post to liked posts for sone`() {
-		whenever(core.getLikes(post)).thenReturn(setOf(mock<Sone>(), mock<Sone>(), mock<Sone>()))
+		whenever(core.getLikes(post)).thenReturn(setOf(mock(), mock(), mock()))
 		parameters += "Post" to "PostId"
 		parameters += "Sone" to "LocalSoneId"
 		val replyParameters = command.execute(parameters).replyParameters

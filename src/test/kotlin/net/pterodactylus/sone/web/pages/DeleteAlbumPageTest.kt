@@ -99,7 +99,7 @@ class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
 	fun `album is deleted and page redirects to album if parent album is not root album`() {
 		setMethod(POST)
 		whenever(parentAlbum.isRoot).thenReturn(false)
-		whenever(sone.rootAlbum).thenReturn(mock<Album>())
+		whenever(sone.rootAlbum).thenReturn(mock())
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		verifyRedirect("imageBrowser.html?album=parent-id") {

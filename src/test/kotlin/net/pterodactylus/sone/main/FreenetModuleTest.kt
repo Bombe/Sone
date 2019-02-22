@@ -36,7 +36,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `plugin respirator is returned correctly`() {
-		assertThat(injector.getInstance<PluginRespirator>(), sameInstance(pluginRespirator))
+		assertThat(injector.getInstance(), sameInstance(pluginRespirator))
 	}
 
 	@Test
@@ -46,7 +46,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `node is returned correctly`() {
-		assertThat(injector.getInstance<Node>(), sameInstance(node))
+		assertThat(injector.getInstance(), sameInstance(node))
 	}
 
 	@Test
@@ -56,7 +56,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `high level simply client is returned correctly`() {
-		assertThat(injector.getInstance<HighLevelSimpleClient>(), sameInstance(highLevelSimpleClient))
+		assertThat(injector.getInstance(), sameInstance(highLevelSimpleClient))
 	}
 
 	@Test
@@ -66,7 +66,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `session manager is returned correctly`() {
-		assertThat(injector.getInstance<SessionManager>(), sameInstance(sessionManager))
+		assertThat(injector.getInstance(), sameInstance(sessionManager))
 	}
 
 	@Test

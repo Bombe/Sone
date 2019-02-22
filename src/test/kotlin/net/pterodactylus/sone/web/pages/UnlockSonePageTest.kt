@@ -59,7 +59,7 @@ class UnlockSonePageTest: WebPageTest(::UnlockSonePage) {
 		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "remote-sone")
-		addSone("remote-sone", mock<Sone>())
+		addSone("remote-sone", mock())
 		verifyRedirect("return.html") {
 			verify(core, never()).unlockSone(any())
 		}

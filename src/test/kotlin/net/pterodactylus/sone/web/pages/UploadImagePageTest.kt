@@ -64,7 +64,7 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 	fun `post request with parent that is not the current sone results in no permission error page`() {
 		setMethod(POST)
 		addHttpRequestPart("parent", "parent-id")
-		whenever(parentAlbum.sone).thenReturn(mock<Sone>())
+		whenever(parentAlbum.sone).thenReturn(mock())
 		addAlbum("parent-id", parentAlbum)
 		verifyRedirect("noPermission.html")
 	}

@@ -40,7 +40,7 @@ class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "post")
 		addHttpRequestPart("id", "post1 post2 post3")
-		val posts = listOf(mock<Post>(), mock<Post>())
+		val posts = listOf(mock<Post>(), mock())
 		addPost("post1", posts[0])
 		addPost("post3", posts[1])
 		verifyRedirect("return.html") {
@@ -55,7 +55,7 @@ class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "reply")
 		addHttpRequestPart("id", "reply1 reply2 reply3")
-		val replies = listOf(mock<PostReply>(), mock<PostReply>())
+		val replies = listOf(mock<PostReply>(), mock())
 		addPostReply("reply1", replies[0])
 		addPostReply("reply3", replies[1])
 		verifyRedirect("return.html") {
@@ -70,7 +70,7 @@ class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("type", "sone")
 		addHttpRequestPart("id", "sone1 sone2 sone3")
-		val sones = listOf(mock<Sone>(), mock<Sone>())
+		val sones = listOf(mock<Sone>(), mock())
 		addSone("sone1", sones[0])
 		addSone("sone3", sones[1])
 		verifyRedirect("return.html") {

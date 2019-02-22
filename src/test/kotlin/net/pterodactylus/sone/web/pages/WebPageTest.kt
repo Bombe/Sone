@@ -42,7 +42,7 @@ import kotlin.text.Charsets.UTF_8
 /**
  * Base class for web page tests.
  */
-open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePage = { _, _ -> mock<SoneTemplatePage>() }) {
+open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePage = { _, _ -> mock() }) {
 
 	val currentSone = mock<Sone>()
 	val template = mock<Template>()
@@ -164,7 +164,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 	}
 
 	fun addHttpRequestParameter(name: String, value: String) {
-		getRequestParameters[name] = getRequestParameters.getOrElse(name) { mutableListOf<String>() }.apply { add(value) }
+		getRequestParameters[name] = getRequestParameters.getOrElse(name) { mutableListOf() }.apply { add(value) }
 	}
 
 	fun addHttpRequestPart(name: String, value: String) {
