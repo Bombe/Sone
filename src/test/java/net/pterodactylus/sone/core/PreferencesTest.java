@@ -10,6 +10,7 @@ import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
@@ -47,6 +48,16 @@ public class PreferencesTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void invalidInsertionDelayIsRejected() {
 		preferences.setInsertionDelay(-15);
+	}
+
+	@Test
+	public void noEventIsSentWhenInvalidInsertionDelayIsSet() {
+		try {
+			preferences.setInsertionDelay(-15);
+		} catch (IllegalArgumentException iae) {
+			/* ignore. */
+		}
+		verify(eventBus, never()).post(any());
 	}
 
 	@Test
