@@ -15,20 +15,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.data;
+package net.pterodactylus.sone.data
 
 /**
  * Interface for objects that can create a fingerprint of themselves, e.g. to
  * detect modifications. The fingerprint should only contain original
  * information; derived information should not be included.
  */
-public interface Fingerprintable {
+interface Fingerprintable {
 
-	/**
-	 * Returns the fingerprint of this object.
-	 *
-	 * @return The fingerprint of this object
-	 */
-	public String getFingerprint();
+	val fingerprint: String
 
 }
