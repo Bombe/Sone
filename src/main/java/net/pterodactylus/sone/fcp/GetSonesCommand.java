@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static net.pterodactylus.sone.fcp.AbstractSoneCommandKt.encodeSones;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
