@@ -15,33 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.data;
-
-import javax.annotation.Nonnull;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
+package net.pterodactylus.sone.data
 
 /**
  * Interface for all objects that expose an ID.
  */
-public interface Identified {
+interface Identified {
 
-	/** Function to extract the ID from an optional. */
-	public static final Function<Optional<? extends Identified>, Optional<String>> GET_ID = new Function<Optional<? extends Identified>, Optional<String>>() {
-
-		@Override
-		@Nonnull
-		public Optional<String> apply(Optional<? extends Identified> identified) {
-			return (identified == null) ? Optional.<String>absent() : (identified.isPresent() ? Optional.of(identified.get().getId()) : Optional.<String>absent());
-		}
-	};
-
-	/**
-	 * Returns the ID of this element.
-	 *
-	 * @return The ID of this element
-	 */
-	public String getId();
+	val id: String
 
 }

@@ -22,7 +22,6 @@ import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nonnull;
 
@@ -35,15 +34,6 @@ import com.google.common.collect.ImmutableList;
  * Container for images that can also contain nested {@link Album}s.
  */
 public interface Album extends Identified, Fingerprintable {
-
-	/** Compares two {@link Album}s by {@link #getTitle()}. */
-	Comparator<Album> TITLE_COMPARATOR = new Comparator<Album>() {
-
-		@Override
-		public int compare(Album leftAlbum, Album rightAlbum) {
-			return leftAlbum.getTitle().compareToIgnoreCase(rightAlbum.getTitle());
-		}
-	};
 
 	/** Function that flattens the given album and all albums beneath it. */
 	Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {

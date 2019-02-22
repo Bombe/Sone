@@ -18,7 +18,7 @@ class GetLocalSonesCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `command does not require write access`() {
-		assertThat(command.requiresWriteAccess(), equalTo(false))
+		assertThat(command.requiresWriteAccess, equalTo(false))
 	}
 
 	@Test

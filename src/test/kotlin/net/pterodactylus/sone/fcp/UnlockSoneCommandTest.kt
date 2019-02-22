@@ -24,7 +24,7 @@ class UnlockSoneCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `command requires write access`() {
-		assertThat(command.requiresWriteAccess(), equalTo(true))
+		assertThat(command.requiresWriteAccess, equalTo(true))
 	}
 
 	@Test

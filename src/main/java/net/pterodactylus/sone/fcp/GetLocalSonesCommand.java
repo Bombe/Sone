@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static net.pterodactylus.sone.fcp.AbstractSoneCommandKt.encodeSones;
+
 import net.pterodactylus.sone.core.Core;
 import freenet.support.SimpleFieldSet;
 
