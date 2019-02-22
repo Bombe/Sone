@@ -61,7 +61,7 @@ class L10nFilterTest {
 	@Test
 	fun `filter does not replace values if there are no parameters`() {
 		translations["data"] = "{link}"
-		assertThat(filter.format(templateContext, "data", emptyMap()), equalTo("{link}"));
+		assertThat(filter.format(templateContext, "data", emptyMap()), equalTo("{link}"))
 	}
 
 }

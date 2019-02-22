@@ -24,7 +24,7 @@ class SonePluginTest {
 	init {
 		TestUtil.setFinalField(node, "clientCore", clientCore)
 		whenever(pluginRespirator.node).thenReturn(node)
-		TestUtil.setFinalField(clientCore, "uskManager", uskManager);
+		TestUtil.setFinalField(clientCore, "uskManager", uskManager)
 	}
 
 	@Test
