@@ -137,6 +137,7 @@ public class Preferences {
 	 */
 	public Preferences setPostsPerPage(Integer postsPerPage) {
 		this.postsPerPage.set(postsPerPage);
+		eventBus.post(new PreferenceChangedEvent("PostsPerPage", getPostsPerPage()));
 		return this;
 	}
 
