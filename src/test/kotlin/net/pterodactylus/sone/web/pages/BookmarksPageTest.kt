@@ -30,7 +30,7 @@ class BookmarksPageTest: WebPageTest(::BookmarksPage) {
 	@Before
 	fun setupBookmarkedPostsAndPagination() {
 		whenever(core.bookmarkedPosts).thenReturn(setOf(post1, post2, post3))
-		core.preferences.postsPerPage = 5
+		core.preferences.newPostsPerPage = 5
 	}
 
 	@Test

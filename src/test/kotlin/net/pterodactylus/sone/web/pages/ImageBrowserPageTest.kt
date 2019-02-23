@@ -90,7 +90,7 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `get request for gallery can show second page`() {
-		core.preferences.imagesPerPage = 2
+		core.preferences.newImagesPerPage = 2
 		val firstSone = createSone("first album", "second album")
 		addSone("sone1", firstSone)
 		val secondSone = createSone("third album", "fourth album")

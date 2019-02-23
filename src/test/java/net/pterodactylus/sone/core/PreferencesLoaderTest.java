@@ -61,11 +61,11 @@ public class PreferencesLoaderTest {
 		assertThat(preferences.getImagesPerPage(), is(12));
 		assertThat(preferences.getCharactersPerPost(), is(150));
 		assertThat(preferences.getPostCutOffLength(), is(300));
-		assertThat(preferences.isRequireFullAccess(), is(true));
+		assertThat(preferences.getRequireFullAccess(), is(true));
 		assertThat(preferences.getPositiveTrust(), is(50));
 		assertThat(preferences.getNegativeTrust(), is(-50));
 		assertThat(preferences.getTrustComment(), is("Trusted"));
-		assertThat(preferences.isFcpInterfaceActive(), is(true));
+		assertThat(preferences.getFcpInterfaceActive(), is(true));
 		assertThat(preferences.getFcpFullAccessRequired(), is(WRITING));
 	}
 

@@ -41,8 +41,8 @@ class OptionsPage @Inject constructor(template: Template, webInterface: WebInter
 			val fullAccessRequired = "require-full-access" in freenetRequest.parameters
 			val fcpInterfaceActive = "fcp-interface-active" in freenetRequest.parameters
 
-			webInterface.core.preferences.isRequireFullAccess = fullAccessRequired
-			webInterface.core.preferences.isFcpInterfaceActive = fcpInterfaceActive
+			webInterface.core.preferences.newRequireFullAccess = fullAccessRequired
+			webInterface.core.preferences.newFcpInterfaceActive = fcpInterfaceActive
 
 			val postsPerPage = freenetRequest.parameters["posts-per-page"]?.toIntOrNull()
 			val charactersPerPost = freenetRequest.parameters["characters-per-post"]?.toIntOrNull()
@@ -54,15 +54,15 @@ class OptionsPage @Inject constructor(template: Template, webInterface: WebInter
 			val positiveTrust = freenetRequest.parameters["positive-trust"]?.toIntOrNull()
 			val trustComment = freenetRequest.parameters["trust-comment"]?.emptyToNull
 
-			if (cantSetOption { it.setPostsPerPage(postsPerPage) }) fieldsWithErrors += "posts-per-page"
-			if (cantSetOption { it.setCharactersPerPost(charactersPerPost) }) fieldsWithErrors += "characters-per-post"
-			if (cantSetOption { it.setPostCutOffLength(postCutOffLength) }) fieldsWithErrors += "post-cut-off-length"
-			if (cantSetOption { it.setImagesPerPage(imagesPerPage) }) fieldsWithErrors += "images-per-page"
-			if (cantSetOption { it.setInsertionDelay(insertionDelay) }) fieldsWithErrors += "insertion-delay"
-			fcpFullAccessRequired?.also { if (cantSetOption { it.fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
-			if (cantSetOption { it.setNegativeTrust(negativeTrust) }) fieldsWithErrors += "negative-trust"
-			if (cantSetOption { it.setPositiveTrust(positiveTrust) }) fieldsWithErrors += "positive-trust"
-			if (cantSetOption { it.trustComment = trustComment }) fieldsWithErrors += "trust-comment"
+			if (cantSetOption { it.newPostsPerPage = postsPerPage }) fieldsWithErrors += "posts-per-page"
+			if (cantSetOption { it.newCharactersPerPost = charactersPerPost }) fieldsWithErrors += "characters-per-post"
+			if (cantSetOption { it.newPostCutOffLength = postCutOffLength }) fieldsWithErrors += "post-cut-off-length"
+			if (cantSetOption { it.newImagesPerPage = imagesPerPage }) fieldsWithErrors += "images-per-page"
+			if (cantSetOption { it.newInsertionDelay = insertionDelay }) fieldsWithErrors += "insertion-delay"
+			fcpFullAccessRequired?.also { if (cantSetOption { it.newFcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
+			if (cantSetOption { it.newNegativeTrust = negativeTrust }) fieldsWithErrors += "negative-trust"
+			if (cantSetOption { it.newPositiveTrust = positiveTrust }) fieldsWithErrors += "positive-trust"
+			if (cantSetOption { it.newTrustComment = trustComment }) fieldsWithErrors += "trust-comment"
 
 			if (fieldsWithErrors.isEmpty()) {
 				webInterface.core.touchConfiguration()
@@ -84,8 +84,8 @@ class OptionsPage @Inject constructor(template: Template, webInterface: WebInter
 			templateContext["characters-per-post"] = preferences.charactersPerPost
 			templateContext["fcp-full-access-required"] = preferences.fcpFullAccessRequired.ordinal
 			templateContext["images-per-page"] = preferences.imagesPerPage
-			templateContext["fcp-interface-active"] = preferences.isFcpInterfaceActive
-			templateContext["require-full-access"] = preferences.isRequireFullAccess
+			templateContext["fcp-interface-active"] = preferences.fcpInterfaceActive
+			templateContext["require-full-access"] = preferences.requireFullAccess
 			templateContext["negative-trust"] = preferences.negativeTrust
 			templateContext["positive-trust"] = preferences.positiveTrust
 			templateContext["post-cut-off-length"] = preferences.postCutOffLength

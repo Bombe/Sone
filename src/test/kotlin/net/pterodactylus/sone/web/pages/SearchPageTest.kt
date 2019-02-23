@@ -285,7 +285,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `sone hits are paginated correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSone("1Sone"), createSone("Other1"), createSone("22Sone"), createSone("333Sone"), createSone("Other2"))
 				.onEach { addSone(it.id, it) }
 		addHttpRequestParameter("query", "sone")
@@ -297,7 +297,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `sone hits page 2 is shown correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSone("1Sone"), createSone("Other1"), createSone("22Sone"), createSone("333Sone"), createSone("Other2"))
 				.onEach { addSone(it.id, it) }
 		addHttpRequestParameter("query", "sone")
@@ -310,7 +310,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `post hits are paginated correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSoneWithPost("match1", "1Sone"), createSoneWithPost("no-match1", "Other1"), createSoneWithPost("match2", "22Sone"), createSoneWithPost("match3", "333Sone"), createSoneWithPost("no-match2", "Other2"))
 		addHttpRequestParameter("query", "sone")
 		verifyNoRedirect {
@@ -321,7 +321,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `post hits page 2 is shown correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSoneWithPost("match1", "1Sone"), createSoneWithPost("no-match1", "Other1"), createSoneWithPost("match2", "22Sone"), createSoneWithPost("match3", "333Sone"), createSoneWithPost("no-match2", "Other2"))
 		addHttpRequestParameter("query", "sone")
 		addHttpRequestParameter("postPage", "1")

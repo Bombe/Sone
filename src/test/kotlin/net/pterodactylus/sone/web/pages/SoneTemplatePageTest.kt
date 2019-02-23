@@ -185,7 +185,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `page is disabled if full access is required but request does not have full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
 	}
 
@@ -202,7 +202,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `page is enabled if full access is required and request has full access and login is required and there is a current sone`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		assertThat(page.isEnabled(toadletContext), equalTo(true))
 	}

@@ -40,7 +40,7 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 	fun setup() {
 		whenever(currentSone.posts).thenReturn(mutableListOf(post2, post1))
 		whenever(core.getDirectedPosts("sone-id")).thenReturn(setOf(directed1, directed2))
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 	}
 
 	@Test

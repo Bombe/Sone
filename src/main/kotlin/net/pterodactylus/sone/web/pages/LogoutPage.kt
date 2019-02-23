@@ -20,7 +20,7 @@ class LogoutPage @Inject constructor(template: Template, webInterface: WebInterf
 	}
 
 	override fun isEnabled(toadletContext: ToadletContext): Boolean =
-			if (webInterface.core.preferences.isRequireFullAccess && !toadletContext.isAllowedFullAccess) {
+			if (webInterface.core.preferences.requireFullAccess && !toadletContext.isAllowedFullAccess) {
 				false
 			} else
 				getCurrentSone(toadletContext) != null && webInterface.core.localSones.size != 1

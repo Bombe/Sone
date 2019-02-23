@@ -49,7 +49,7 @@ class JsonPageBaseTest : TestObjects() {
 
 	@Test
 	fun `page returns 403 is full access is required but request is not full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(403))
 		assertThat(response.statusText, equalTo("Forbidden"))

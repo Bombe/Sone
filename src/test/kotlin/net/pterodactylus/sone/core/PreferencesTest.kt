@@ -25,26 +25,26 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain insertion delay`() {
-		preferences.insertionDelay = 15
+		preferences.newInsertionDelay = 15
 		assertThat(preferences.insertionDelay, equalTo(15))
 	}
 
 	@Test
 	fun `preferences sends event on setting insertion delay`() {
-		preferences.insertionDelay = 15
+		preferences.newInsertionDelay = 15
 		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
 		assertThat(eventsCaptor.allValues, hasItem(InsertionDelayChangedEvent(15)))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid insertion delay is rejected`() {
-		preferences.insertionDelay = -15
+		preferences.newInsertionDelay = -15
 	}
 
 	@Test
 	fun `no event is sent when invalid insertion delay is set`() {
 		try {
-			preferences.insertionDelay = -15
+			preferences.newInsertionDelay = -15
 		} catch (iae: IllegalArgumentException) {
 			/* ignore. */
 		}
@@ -54,7 +54,7 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences return default value when insertion delay is set to null`() {
-		preferences.setInsertionDelay(null)
+		preferences.newInsertionDelay = null
 		assertThat(preferences.insertionDelay, equalTo(60))
 	}
 
@@ -65,18 +65,18 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain posts per page`() {
-		preferences.postsPerPage = 15
+		preferences.newPostsPerPage = 15
 		assertThat(preferences.postsPerPage, equalTo(15))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid posts per page is rejected`() {
-		preferences.postsPerPage = -15
+		preferences.newPostsPerPage = -15
 	}
 
 	@Test
 	fun `preferences return default value when posts per page is set to null`() {
-		preferences.setPostsPerPage(null)
+		preferences.newPostsPerPage = null
 		assertThat(preferences.postsPerPage, equalTo(10))
 	}
 
@@ -87,18 +87,18 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain images per page`() {
-		preferences.imagesPerPage = 15
+		preferences.newImagesPerPage = 15
 		assertThat(preferences.imagesPerPage, equalTo(15))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid images per page is rejected`() {
-		preferences.imagesPerPage = -15
+		preferences.newImagesPerPage = -15
 	}
 
 	@Test
 	fun `preferences return default value when images per page is set to null`() {
-		preferences.setImagesPerPage(null)
+		preferences.newImagesPerPage = null
 		assertThat(preferences.imagesPerPage, equalTo(9))
 	}
 
@@ -109,18 +109,18 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain characters per post`() {
-		preferences.charactersPerPost = 150
+		preferences.newCharactersPerPost = 150
 		assertThat(preferences.charactersPerPost, equalTo(150))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid characters per post is rejected`() {
-		preferences.charactersPerPost = -15
+		preferences.newCharactersPerPost = -15
 	}
 
 	@Test
 	fun `preferences return default value when characters per post is set to null`() {
-		preferences.setCharactersPerPost(null)
+		preferences.newCharactersPerPost = null
 		assertThat(preferences.charactersPerPost, equalTo(400))
 	}
 
@@ -131,23 +131,23 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain post cut off length`() {
-		preferences.postCutOffLength = 150
+		preferences.newPostCutOffLength = 150
 		assertThat(preferences.postCutOffLength, equalTo(150))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid post cut off length is rejected`() {
-		preferences.postCutOffLength = -15
+		preferences.newPostCutOffLength = -15
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `cut off length of minus one is not allowed`() {
-		preferences.postCutOffLength = -1
+		preferences.newPostCutOffLength = -1
 	}
 
 	@Test
 	fun `preferences return default value when post cut off length is set to null`() {
-		preferences.setPostCutOffLength(null)
+		preferences.newPostCutOffLength = null
 		assertThat(preferences.postCutOffLength, equalTo(200))
 	}
 
@@ -158,41 +158,41 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain require full access of true`() {
-		preferences.isRequireFullAccess = true
-		assertThat(preferences.isRequireFullAccess, equalTo(true))
+		preferences.newRequireFullAccess = true
+		assertThat(preferences.requireFullAccess, equalTo(true))
 	}
 
 	@Test
 	fun `preferences retain require full access of false`() {
-		preferences.isRequireFullAccess = false
-		assertThat(preferences.isRequireFullAccess, equalTo(false))
+		preferences.newRequireFullAccess = false
+		assertThat(preferences.requireFullAccess, equalTo(false))
 	}
 
 	@Test
 	fun `preferences return default value when require full access is set to null`() {
-		preferences.setRequireFullAccess(null)
-		assertThat(preferences.isRequireFullAccess, equalTo(false))
+		preferences.newRequireFullAccess = null
+		assertThat(preferences.requireFullAccess, equalTo(false))
 	}
 
 	@Test
 	fun `preferences start with require full access default value`() {
-		assertThat(preferences.isRequireFullAccess, equalTo(false))
+		assertThat(preferences.requireFullAccess, equalTo(false))
 	}
 
 	@Test
 	fun `preferences retain positive trust`() {
-		preferences.positiveTrust = 15
+		preferences.newPositiveTrust = 15
 		assertThat(preferences.positiveTrust, equalTo(15))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid positive trust is rejected`() {
-		preferences.positiveTrust = -15
+		preferences.newPositiveTrust = -15
 	}
 
 	@Test
 	fun `preferences return default value when positive trust is set to null`() {
-		preferences.setPositiveTrust(null)
+		preferences.newPositiveTrust = null
 		assertThat(preferences.positiveTrust, equalTo(75))
 	}
 
@@ -203,18 +203,18 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain negative trust`() {
-		preferences.negativeTrust = -15
+		preferences.newNegativeTrust = -15
 		assertThat(preferences.negativeTrust, equalTo(-15))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
 	fun `invalid negative trust is rejected`() {
-		preferences.negativeTrust = 150
+		preferences.newNegativeTrust = 150
 	}
 
 	@Test
 	fun `preferences return default value when negative trust is set to null`() {
-		preferences.setNegativeTrust(null)
+		preferences.newNegativeTrust = null
 		assertThat(preferences.negativeTrust, equalTo(-25))
 	}
 
@@ -225,13 +225,13 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain trust comment`() {
-		preferences.trustComment = "Trust"
+		preferences.newTrustComment = "Trust"
 		assertThat(preferences.trustComment, equalTo("Trust"))
 	}
 
 	@Test
 	fun `preferences return default value when trust comment is set to null`() {
-		preferences.trustComment = null
+		preferences.newTrustComment = null
 		assertThat(preferences.trustComment,
 				equalTo("Set from Sone Web Interface"))
 	}
@@ -244,33 +244,33 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain fcp interface active of true`() {
-		preferences.isFcpInterfaceActive = true
-		assertThat(preferences.isFcpInterfaceActive, equalTo(true))
+		preferences.newFcpInterfaceActive = true
+		assertThat(preferences.fcpInterfaceActive, equalTo(true))
 		verify(eventBus).post(any(FcpInterfaceActivatedEvent::class.java))
 	}
 
 	@Test
 	fun `preferences retain fcp interface active of false`() {
-		preferences.isFcpInterfaceActive = false
-		assertThat(preferences.isFcpInterfaceActive, equalTo(false))
+		preferences.newFcpInterfaceActive = false
+		assertThat(preferences.fcpInterfaceActive, equalTo(false))
 		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent::class.java))
 	}
 
 	@Test
 	fun `preferences return default value when fcp interface active is set to null`() {
-		preferences.setFcpInterfaceActive(null)
-		assertThat(preferences.isFcpInterfaceActive, equalTo(false))
+		preferences.newFcpInterfaceActive = null
+		assertThat(preferences.fcpInterfaceActive, equalTo(false))
 		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent::class.java))
 	}
 
 	@Test
 	fun `preferences start with fcp interface active default value`() {
-		assertThat(preferences.isFcpInterfaceActive, equalTo(false))
+		assertThat(preferences.fcpInterfaceActive, equalTo(false))
 	}
 
 	@Test
 	fun `preferences retain fcp full access required of no`() {
-		preferences.fcpFullAccessRequired = NO
+		preferences.newFcpFullAccessRequired = NO
 		assertThat(preferences.fcpFullAccessRequired, equalTo(NO))
 		verifyFullAccessRequiredChangedEvent(NO)
 	}
@@ -285,21 +285,21 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain fcp full access required of writing`() {
-		preferences.fcpFullAccessRequired = WRITING
+		preferences.newFcpFullAccessRequired = WRITING
 		assertThat(preferences.fcpFullAccessRequired, equalTo(WRITING))
 		verifyFullAccessRequiredChangedEvent(WRITING)
 	}
 
 	@Test
 	fun `preferences retain fcp full access required of always`() {
-		preferences.fcpFullAccessRequired = ALWAYS
+		preferences.newFcpFullAccessRequired = ALWAYS
 		assertThat(preferences.fcpFullAccessRequired, equalTo(ALWAYS))
 		verifyFullAccessRequiredChangedEvent(ALWAYS)
 	}
 
 	@Test
 	fun `preferences return default value when fcp full access required is set to null`() {
-		preferences.fcpFullAccessRequired = null
+		preferences.newFcpFullAccessRequired = null
 		assertThat(preferences.fcpFullAccessRequired, equalTo(ALWAYS))
 		verifyFullAccessRequiredChangedEvent(ALWAYS)
 	}
@@ -311,14 +311,14 @@ class PreferencesTest {
 
 	@Test
 	fun `setting insertion delay to valid value sends change event`() {
-		preferences.insertionDelay = 30
+		preferences.newInsertionDelay = 30
 		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
 		assertThat(eventsCaptor.allValues, hasItem(PreferenceChangedEvent("InsertionDelay", 30)))
 	}
 
 	@Test
 	fun `setting posts per page to valid value sends change event`() {
-		preferences.postsPerPage = 30
+		preferences.newPostsPerPage = 30
 		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
 		assertThat(eventsCaptor.allValues, hasItem(PreferenceChangedEvent("PostsPerPage", 30)))
 	}

@@ -37,7 +37,7 @@ class DistrustAjaxPageTest : JsonPageTest("distrustSone.ajax", pageSupplier = ::
 
 	@Test
 	fun `request with valid sone results in correct trust value being sent back`() {
-		core.preferences.negativeTrust = -33
+		core.preferences.newNegativeTrust = -33
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")

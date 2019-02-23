@@ -24,7 +24,7 @@ class NewPageTest: WebPageTest(::NewPage) {
 
 	@Before
 	fun setupNumberOfPostsPerPage() {
-		webInterface.core.preferences.postsPerPage = 5
+		webInterface.core.preferences.newPostsPerPage = 5
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class NewPageTest: WebPageTest(::NewPage) {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `posts are paginated properly`() {
-		webInterface.core.preferences.postsPerPage = 2
+		webInterface.core.preferences.newPostsPerPage = 2
 		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
 		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)
 		verifyNoRedirect {
@@ -75,7 +75,7 @@ class NewPageTest: WebPageTest(::NewPage) {
 	@Test
 	@Suppress("UNCHECKED_CAST")
 	fun `posts are paginated properly on second page`() {
-		webInterface.core.preferences.postsPerPage = 2
+		webInterface.core.preferences.newPostsPerPage = 2
 		addHttpRequestParameter("page", "1")
 		val posts = listOf(mock<Post>().withTime(2000), mock<Post>().withTime(3000), mock<Post>().withTime(1000))
 		whenever(webInterface.getNewPosts(currentSone)).thenReturn(posts)

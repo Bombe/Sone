@@ -111,7 +111,7 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page is not enabled if full access required and request is not full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
 	}
 
@@ -128,7 +128,7 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page is enabled if full access required and request is full access and there is no current sone`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		unsetCurrentSone()
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		assertThat(page.isEnabled(toadletContext), equalTo(true))
@@ -136,7 +136,7 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page is not enabled if full access required and request is full access but there is a current sone`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
 	}

@@ -114,7 +114,7 @@ class CreateSonePageTest : WebPageTest(::CreateSonePage) {
 
 	@Test
 	fun `create sone is not shown in menu if full access is required but client doesn’t have full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
 	}
 
@@ -139,7 +139,7 @@ class CreateSonePageTest : WebPageTest(::CreateSonePage) {
 
 	@Test
 	fun `create sone is shown in menu if no sone is logged in and client has full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		unsetCurrentSone()
 		assertThat(page.isEnabled(toadletContext), equalTo(true))

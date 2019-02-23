@@ -33,7 +33,7 @@ class LoginPage @Inject constructor(template: Template, webInterface: WebInterfa
 			getCurrentSone(freenetRequest.toadletContext)?.let { "index.html" }
 
 	override fun isEnabled(toadletContext: ToadletContext) = when {
-		webInterface.core.preferences.isRequireFullAccess && !toadletContext.isAllowedFullAccess -> false
+		webInterface.core.preferences.requireFullAccess && !toadletContext.isAllowedFullAccess -> false
 		else -> getCurrentSone(toadletContext, false) == null
 	}
 

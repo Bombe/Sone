@@ -34,7 +34,7 @@ class TrustAjaxPageTest : JsonPageTest("trustSone.ajax", requiresLogin = true, n
 	fun `request with valid sone returns positive trust value`() {
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
-		core.preferences.positiveTrust = 31
+		core.preferences.newPositiveTrust = 31
 		assertThatJsonIsSuccessful()
 		assertThat(json["trustValue"]?.asInt(), equalTo(31))
 	}

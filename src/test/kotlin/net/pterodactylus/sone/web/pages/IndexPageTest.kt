@@ -137,7 +137,7 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 	fun `index page sets page correctly`() {
 		val posts = listOf(createPost(3000), createPost(2000), createPost(1000))
 		whenever(currentSone.posts).thenReturn(posts)
-		core.preferences.postsPerPage = 1
+		core.preferences.newPostsPerPage = 1
 		addHttpRequestParameter("page", "2")
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
@@ -146,7 +146,7 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 
 	@Test
 	fun `index page without posts sets correct pagination`() {
-		core.preferences.postsPerPage = 1
+		core.preferences.newPostsPerPage = 1
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		(templateContext["pagination"] as Pagination<Post>).let { pagination ->

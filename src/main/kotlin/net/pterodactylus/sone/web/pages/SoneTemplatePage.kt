@@ -87,7 +87,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	override fun isEnabled(toadletContext: ToadletContext) = when {
 		requiresLogin && getCurrentSone(toadletContext) == null -> false
-		core.preferences.isRequireFullAccess && !toadletContext.isAllowedFullAccess -> false
+		core.preferences.requireFullAccess && !toadletContext.isAllowedFullAccess -> false
 		else -> true
 	}
 
