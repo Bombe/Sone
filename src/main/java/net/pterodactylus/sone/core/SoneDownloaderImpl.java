@@ -191,6 +191,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			Sone parsedSone = soneParser.parseSone(originalSone,
 					soneInputStream);
 			if (parsedSone != null) {
+				logger.log(Level.FINER, "Sone %s was successfully parsed.", parsedSone);
 				parsedSone.setLatestEdition(requestUri.getEdition());
 			}
 			return parsedSone;
