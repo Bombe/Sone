@@ -17,7 +17,7 @@ class KnownSonesPage @Inject constructor(template: Template, webInterface: WebIn
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		getCurrentSone(freenetRequest.toadletContext).let { currentSone ->
-			webInterface.core.sones
+			webInterface.core.sones.asSequence()
 					.filterNot { freenetRequest.parameters["filter"] == "followed" && currentSone != null && !currentSone.hasFriend(it.id) }
 					.filterNot { freenetRequest.parameters["filter"] == "not-followed" && currentSone != null && currentSone.hasFriend(it.id) }
 					.filterNot { freenetRequest.parameters["filter"] == "new" && it.isKnown }
