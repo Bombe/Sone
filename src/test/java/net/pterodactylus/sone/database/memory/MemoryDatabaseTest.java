@@ -466,4 +466,14 @@ public class MemoryDatabaseTest {
 		assertThat(configuration.getStringValue("KnownPosts/1/ID").getValue(), equalTo(null));
 	}
 
+	@Test
+	public void markingAPostReplyAsKnownSavesConfiguration() throws ConfigurationException {
+		prepareConfigurationValues();
+		PostReply postReply = mock(PostReply.class);
+		when(postReply.getId()).thenReturn("post-reply-id");
+		memoryDatabase.setPostReplyKnown(postReply, true);
+		assertThat(configuration.getStringValue("KnownReplies/0/ID").getValue(), equalTo("post-reply-id"));
+		assertThat(configuration.getStringValue("KnownReplies/1/ID").getValue(), equalTo(null));
+	}
+
 }

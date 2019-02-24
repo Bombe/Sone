@@ -298,6 +298,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 					knownPostReplies.add(postReply.id)
 				else
 					knownPostReplies.remove(postReply.id)
+				saveKnownPostReplies()
 			}
 
 	private fun loadKnownPosts() =
