@@ -287,6 +287,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 					knownPosts.add(post.id)
 				else
 					knownPosts.remove(post.id)
+				saveKnownPosts()
 			}
 
 	protected fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
@@ -312,7 +313,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			try {
 				readLock.withLock {
 					knownPosts.forEachIndexed { index, knownPostId ->
-						configuration.getStringValue("KnowsPosts/$index/ID").value = knownPostId
+						configuration.getStringValue("KnownPosts/$index/ID").value = knownPostId
 					}
 					configuration.getStringValue("KnownPosts/${knownPosts.size}/ID").value = null
 				}

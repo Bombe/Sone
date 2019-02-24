@@ -456,4 +456,14 @@ public class MemoryDatabaseTest {
 		assertThat(configuration.getLongValue("SoneFollowingTimes/0/Time").getValue(), equalTo(1000L));
 	}
 
+	@Test
+	public void markingAPostAsKnownSavesConfiguration() throws ConfigurationException {
+		prepareConfigurationValues();
+		Post post = mock(Post.class);
+		when(post.getId()).thenReturn("post-id");
+		memoryDatabase.setPostKnown(post, true);
+		assertThat(configuration.getStringValue("KnownPosts/0/ID").getValue(), equalTo("post-id"));
+		assertThat(configuration.getStringValue("KnownPosts/1/ID").getValue(), equalTo(null));
+	}
+
 }
