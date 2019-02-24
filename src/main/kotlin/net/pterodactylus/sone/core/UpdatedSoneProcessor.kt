@@ -49,6 +49,7 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 					.map { PostReplyRemovedEvent(it) }
 					.forEach(eventBus::post)
 		}
+		database.storeSone(sone)
 		sone.options = storedSone.options
 		sone.isKnown = storedSone.isKnown
 		sone.status = if (sone.time != 0L) SoneStatus.idle else SoneStatus.unknown

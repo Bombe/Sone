@@ -142,6 +142,12 @@ class UpdatedSoneProcessorTest {
 	}
 
 	@Test
+	fun `updated sone processor stores sone in database`() {
+		updatedSoneProcessor.updateSone(newSone)
+		verify(database).storeSone(newSone)
+	}
+
+	@Test
 	fun `default updated Sone processor can be created by dependency injection`() {
 		assertThat(baseInjector.createChildInjector(
 				Database::class.isProvidedByMock()
