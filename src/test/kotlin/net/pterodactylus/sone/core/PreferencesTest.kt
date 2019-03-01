@@ -311,16 +311,18 @@ class PreferencesTest {
 
 	@Test
 	fun `setting insertion delay to valid value sends change event`() {
-		preferences.newInsertionDelay = 30
-		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
-		assertThat(eventsCaptor.allValues, hasItem(PreferenceChangedEvent("InsertionDelay", 30)))
+		testPreferencesChangedEvent("InsertionDelay", { preferences.newInsertionDelay = it }, 30)
 	}
 
 	@Test
 	fun `setting posts per page to valid value sends change event`() {
-		preferences.newPostsPerPage = 30
+		testPreferencesChangedEvent("PostsPerPage", { preferences.newPostsPerPage = it }, 31)
+	}
+
+	private fun <T : Any> testPreferencesChangedEvent(name: String, setter: (T) -> Unit, value: T) {
+		setter(value)
 		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
-		assertThat(eventsCaptor.allValues, hasItem(PreferenceChangedEvent("PostsPerPage", 30)))
+		assertThat(eventsCaptor.allValues, hasItem(PreferenceChangedEvent(name, value)))
 	}
 
 }
