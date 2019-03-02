@@ -21,6 +21,7 @@ import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -296,28 +297,28 @@ public class AlbumImpl implements Album {
 	@Override
 	public String getFingerprint() {
 		Hasher hash = Hashing.sha256().newHasher();
-		hash.putString("Album(");
-		hash.putString("ID(").putString(id).putString(")");
-		hash.putString("Title(").putString(title).putString(")");
-		hash.putString("Description(").putString(description).putString(")");
+		hash.putString("Album(", UTF_8);
+		hash.putString("ID(", UTF_8).putString(id, UTF_8).putString(")", UTF_8);
+		hash.putString("Title(", UTF_8).putString(title, UTF_8).putString(")", UTF_8);
+		hash.putString("Description(", UTF_8).putString(description, UTF_8).putString(")", UTF_8);
 
 		/* add nested albums. */
-		hash.putString("Albums(");
+		hash.putString("Albums(", UTF_8);
 		for (Album album : albums) {
-			hash.putString(album.getFingerprint());
+			hash.putString(album.getFingerprint(), UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
 		/* add images. */
-		hash.putString("Images(");
+		hash.putString("Images(", UTF_8);
 		for (Image image : getImages()) {
 			if (image.isInserted()) {
-				hash.putString(image.getFingerprint());
+				hash.putString(image.getFingerprint(), UTF_8);
 			}
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 		return hash.hash().toString();
 	}
 

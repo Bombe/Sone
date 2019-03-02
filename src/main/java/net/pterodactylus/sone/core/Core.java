@@ -1328,7 +1328,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		identityManager.start();
 		webOfTrustUpdater.init();
 		webOfTrustUpdater.start();
-		database.start();
+		database.startAsync();
 	}
 
 	/**
@@ -1368,7 +1368,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 		}
 		saveConfiguration();
-		database.stop();
+		database.stopAsync();
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		soneDownloader.stop();

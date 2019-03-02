@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.io.ByteStreams.toByteArray;
-import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -64,7 +64,7 @@ public class SoneInserterTest {
 
 	@Test
 	public void insertionDelayIsForwardedToSoneInserter() {
-		EventBus eventBus = new AsyncEventBus(sameThreadExecutor());
+		EventBus eventBus = new AsyncEventBus(directExecutor());
 		eventBus.register(new SoneInserter(core, eventBus, freenetInterface, "SoneId"));
 		eventBus.post(new InsertionDelayChangedEvent(15));
 		assertThat(SoneInserter.getInsertionDelay().get(), is(15));
