@@ -6,6 +6,7 @@ import com.google.inject.Provides
 import freenet.client.HighLevelSimpleClient
 import freenet.node.Node
 import freenet.pluginmanager.PluginRespirator
+import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
@@ -14,9 +15,9 @@ import javax.inject.Singleton
 class FreenetModule(private val pluginRespirator: PluginRespirator): Module {
 
 	override fun configure(binder: Binder): Unit = binder.run {
-		bind(PluginRespirator::class.java).toProvider { pluginRespirator }
-		pluginRespirator.node!!.let { node -> bind(Node::class.java).toProvider { node } }
-		bind(HighLevelSimpleClient::class.java).toProvider { pluginRespirator.hlSimpleClient!! }
+		bind(PluginRespirator::class.java).toProvider(Provider<PluginRespirator> { pluginRespirator })
+		pluginRespirator.node!!.let { node -> bind(Node::class.java).toProvider(Provider<Node> { node }) }
+		bind(HighLevelSimpleClient::class.java).toProvider(Provider<HighLevelSimpleClient> { pluginRespirator.hlSimpleClient!! })
 	}
 
 	@Provides @Singleton
