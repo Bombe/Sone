@@ -182,7 +182,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		return YEAR;
 	}
 
-	public static String getHomepage() {
+	public String getHomepage() {
 		return SONE_HOMEPAGE + LATEST_EDITION;
 	}
 

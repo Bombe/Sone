@@ -753,7 +753,7 @@ public class WebInterface implements SessionProvider {
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, new PluginVersion(SonePlugin.getPluginVersion()), new PluginYear(sonePlugin.getYear()), new PluginHomepage(SonePlugin.getHomepage())), "About"));
+		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, new PluginVersion(SonePlugin.getPluginVersion()), new PluginYear(sonePlugin.getYear()), new PluginHomepage(sonePlugin.getHomepage())), "About"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", this, noPermissionTemplate, "Page.NoPermission.Title")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyImageTitle.html", this, emptyImageTitleTemplate, "Page.EmptyImageTitle.Title")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyAlbumTitle.html", this, emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title")));

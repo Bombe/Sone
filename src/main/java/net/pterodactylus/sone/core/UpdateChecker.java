@@ -31,6 +31,7 @@ import java.util.logging.Logger;
 import javax.inject.Singleton;
 
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
+import net.pterodactylus.sone.main.PluginHomepage;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.version.Version;
@@ -69,6 +70,8 @@ public class UpdateChecker {
 	/** The release date of the latest version. */
 	private long latestVersionDate;
 
+	private final PluginHomepage pluginHomepage;
+
 	/**
 	 * Creates a new update checker.
 	 *
@@ -78,11 +81,12 @@ public class UpdateChecker {
 	 *            The freenet interface to use
 	 */
 	@Inject
-	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface, Version currentVersion) {
+	public UpdateChecker(EventBus eventBus, FreenetInterface freenetInterface, Version currentVersion, PluginHomepage pluginHomepage) {
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.currentRunningVersion = currentVersion;
 		this.currentLatestVersion = currentVersion;
+		this.pluginHomepage = pluginHomepage;
 	}
 
 	//
@@ -138,7 +142,7 @@ public class UpdateChecker {
 	 */
 	public void start() {
 		try {
-			currentUri = new FreenetURI(SonePlugin.getHomepage());
+			currentUri = new FreenetURI(pluginHomepage.getHomepage());
 		} catch (MalformedURLException mue1) {
 			/* this can not really happen unless I screw up. */
 			logger.log(Level.SEVERE, "Sone Homepage URI invalid!", mue1);
