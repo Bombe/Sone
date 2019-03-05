@@ -178,7 +178,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		return (version == null) ? "unknown" : version.getNice();
 	}
 
-	public static int getYear() {
+	public int getYear() {
 		return YEAR;
 	}
 
