@@ -3,9 +3,7 @@ package net.pterodactylus.sone.web
 import com.google.inject.Guice.createInjector
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.FreenetInterface
-import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
-import net.pterodactylus.sone.main.SonePlugin.PluginVersion
-import net.pterodactylus.sone.main.SonePlugin.PluginYear
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.util.template.Template

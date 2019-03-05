@@ -408,46 +408,4 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		return getPluginVersion();
 	}
 
-	public static class PluginVersion {
-
-		private final String version;
-
-		public PluginVersion(String version) {
-			this.version = version;
-		}
-
-		public String getVersion() {
-			return version;
-		}
-
-	}
-
-	public static class PluginYear {
-
-		private final int year;
-
-		public PluginYear(int year) {
-			this.year = year;
-		}
-
-		public int getYear() {
-			return year;
-		}
-
-	}
-
-	public static class PluginHomepage {
-
-		private final String homepage;
-
-		public PluginHomepage(String homepage) {
-			this.homepage = homepage;
-		}
-
-		public String getHomepage() {
-			return homepage;
-		}
-
-	}
-
 }

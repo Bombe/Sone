@@ -1,8 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
-import net.pterodactylus.sone.main.SonePlugin.PluginVersion
-import net.pterodactylus.sone.main.SonePlugin.PluginYear
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.web.baseInjector
