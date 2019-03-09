@@ -1,17 +1,15 @@
 package net.pterodactylus.sone.template
 
-import net.pterodactylus.sone.core.LinkedElement
-import net.pterodactylus.sone.utils.asTemplate
-import net.pterodactylus.util.template.Filter
-import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.template.TemplateContextFactory
-import java.io.StringWriter
-import javax.inject.Inject
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.util.template.*
+import java.io.*
+import javax.inject.*
 
 /**
  * Renders all kinds of [LinkedElement]s.
  */
-class LinkedElementRenderFilter @Inject constructor(private val templateContextFactory: TemplateContextFactory): Filter {
+class LinkedElementRenderFilter @Inject constructor(private val templateContextFactory: TemplateContextFactory) : Filter {
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
 			when {
