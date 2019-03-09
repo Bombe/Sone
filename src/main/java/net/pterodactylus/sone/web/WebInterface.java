@@ -347,7 +347,7 @@ public class WebInterface implements SessionProvider {
 		templateContextFactory.addFilter("js", new JavascriptFilter());
 		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), soneTextParser));
 		templateContextFactory.addFilter("shorten", shortenFilter = new ShortenFilter());
-		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), templateContextFactory));
+		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), soneTextParser, new HtmlFilter()));
 		templateContextFactory.addFilter("linked-elements", new LinkedElementsFilter(elementLoader));
 		templateContextFactory.addFilter("render-linked-element", linkedElementRenderFilter = new LinkedElementRenderFilter(templateContextFactory));
 		templateContextFactory.addFilter("reparse", new ReparseFilter());

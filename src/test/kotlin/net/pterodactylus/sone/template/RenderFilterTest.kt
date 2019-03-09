@@ -1,29 +1,18 @@
 package net.pterodactylus.sone.template
 
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.text.FreemailPart
-import net.pterodactylus.sone.text.FreenetLinkPart
-import net.pterodactylus.sone.text.LinkPart
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.database.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.text.Part
-import net.pterodactylus.sone.text.PlainTextPart
-import net.pterodactylus.sone.text.PostPart
-import net.pterodactylus.sone.text.SonePart
-import net.pterodactylus.util.template.HtmlFilter
-import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.template.TemplateContextFactory
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Attribute
-import org.jsoup.nodes.Element
-import org.junit.Test
-import org.mockito.Mockito.`when`
-import java.net.URLEncoder
+import net.pterodactylus.util.template.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.jsoup.*
+import org.jsoup.nodes.*
+import org.junit.*
+import org.mockito.*
+import java.net.*
 
 /**
  * Unit test for [RenderFilter].
@@ -37,22 +26,18 @@ class RenderFilterTest {
 		private const val POST_ID = "37a06250-6775-4b94-86ff-257ba690953c"
 	}
 
-	private val core = mock<Core>()
-	private val templateContextFactory = TemplateContextFactory()
-	private val templateContext: TemplateContext
+	private val soneProvider = mock<SoneProvider>()
+	private val soneTextParser = mock<SoneTextParser>()
+	private val htmlFilter = HtmlFilter()
 	private val sone = setupSone(SONE_IDENTITY, "Sone", "First")
 	private val parameters = mutableMapOf<String, Any?>()
 
-	init {
-		templateContextFactory.addFilter("html", HtmlFilter())
-		templateContext = templateContextFactory.createTemplateContext()
-	}
-
-	private val filter = RenderFilter(core, templateContextFactory)
+	private val filter = RenderFilter(soneProvider, soneTextParser, htmlFilter)
+	private val templateContext = TemplateContext()
 
 	@Test
 	fun `plain text part is rendered correctly`() {
-		assertThat(renderParts(PlainTextPart("plain text")), `is`("plain text"))
+		assertThat(renderParts(PlainTextPart("plain text")), equalTo("plain text"))
 	}
 
 	private fun renderParts(vararg part: Part) = filter.format(templateContext, listOf(*part), parameters) as String
@@ -64,13 +49,13 @@ class RenderFilterTest {
 	}
 
 	private fun verifyLink(linkNode: Element, url: String, cssClass: String, tooltip: String, text: String) {
-		assertThat(linkNode.nodeName(), `is`("a"))
+		assertThat(linkNode.nodeName(), equalTo("a"))
 		assertThat<List<Attribute>>(linkNode.attributes().asList(), containsInAnyOrder(
 				Attribute("href", url),
 				Attribute("class", cssClass),
 				Attribute("title", tooltip)
 		))
-		assertThat(linkNode.text(), `is`(text))
+		assertThat(linkNode.text(), equalTo(text))
 	}
 
 	@Test
@@ -96,11 +81,11 @@ class RenderFilterTest {
 
 	private fun setupSone(identity: String, name: String?, firstName: String): Sone {
 		val sone = mock<Sone>()
-		`when`(sone.id).thenReturn(identity)
-		`when`(sone.profile).thenReturn(Profile(sone))
-		`when`(sone.name).thenReturn(name)
+		whenever(sone.id).thenReturn(identity)
+		whenever(sone.profile).thenReturn(Profile(sone))
+		whenever(sone.name).thenReturn(name)
 		sone.profile.firstName = firstName
-		`when`(core.getSone(identity)).thenReturn(sone)
+		whenever(soneProvider.getSone(identity)).thenReturn(sone)
 		return sone
 	}
 
@@ -114,21 +99,24 @@ class RenderFilterTest {
 	@Test
 	fun `post part is cut off correctly when there are spaces`() {
 		val post = setupPost(sone, "1234 678901 345 789012 45678 01.")
+		whenever(soneTextParser.parse(eq("1234 678901 345 789012 45678 01."), ArgumentMatchers.any()))
+				.thenReturn(listOf(PlainTextPart("1234 678901 345 789012 45678 01.")))
 		val linkNode = renderParts(PostPart(post)).toLinkNode()
 		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "1234 678901 345…")
 	}
 
-	private fun setupPost(sone: Sone, value: String): Post {
-		val post = mock<Post>()
-		`when`(post.id).thenReturn(POST_ID)
-		`when`(post.sone).thenReturn(sone)
-		`when`(post.text).thenReturn(value)
-		return post
-	}
+	private fun setupPost(sone: Sone, value: String) =
+			mock<Post>().apply {
+				whenever(id).thenReturn(POST_ID)
+				whenever(this.sone).thenReturn(this@RenderFilterTest.sone)
+				whenever(text).thenReturn(value)
+			}
 
 	@Test
 	fun `post part is cut off correctly when there are no spaces`() {
 		val post = setupPost(sone, "1234567890123456789012345678901.")
+		whenever(soneTextParser.parse(eq("1234567890123456789012345678901."), ArgumentMatchers.any()))
+				.thenReturn(listOf(PlainTextPart("1234567890123456789012345678901.")))
 		val linkNode = renderParts(PostPart(post)).toLinkNode()
 		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "12345678901234567890…")
 	}
@@ -136,6 +124,8 @@ class RenderFilterTest {
 	@Test
 	fun `post part shorter than 21 chars is not cut off`() {
 		val post = setupPost(sone, "12345678901234567890")
+		whenever(soneTextParser.parse(eq("12345678901234567890"), ArgumentMatchers.any()))
+				.thenReturn(listOf(PlainTextPart("12345678901234567890")))
 		val linkNode = renderParts(PostPart(post)).toLinkNode()
 		verifyLink(linkNode, "viewPost.html?post=$POST_ID", "in-sone", "First", "12345678901234567890")
 	}
@@ -143,7 +133,7 @@ class RenderFilterTest {
 	@Test
 	fun `multiple parts are rendered correctly`() {
 		val parts = arrayOf(PlainTextPart("te"), PlainTextPart("xt"))
-		assertThat(renderParts(*parts), `is`("text"))
+		assertThat(renderParts(*parts), equalTo("text"))
 	}
 
 	@Test

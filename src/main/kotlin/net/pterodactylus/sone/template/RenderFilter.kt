@@ -1,31 +1,20 @@
 package net.pterodactylus.sone.template
 
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.text.FreemailPart
-import net.pterodactylus.sone.text.FreenetLinkPart
-import net.pterodactylus.sone.text.LinkPart
+import net.pterodactylus.sone.database.*
+import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.text.Part
-import net.pterodactylus.sone.text.PlainTextPart
-import net.pterodactylus.sone.text.PostPart
-import net.pterodactylus.sone.text.SonePart
-import net.pterodactylus.sone.text.SoneTextParser
-import net.pterodactylus.sone.text.SoneTextParserContext
-import net.pterodactylus.sone.utils.asTemplate
-import net.pterodactylus.util.template.Filter
-import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.template.TemplateContextFactory
-import java.io.StringWriter
-import java.io.Writer
-import java.net.URLEncoder
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.util.template.*
+import java.io.*
+import java.net.*
 
 /**
  * Renders a number of pre-parsed [Part] into a [String].
  */
-class RenderFilter(private val core: Core, private val templateContextFactory: TemplateContextFactory) : Filter {
+class RenderFilter(private val soneProvider: SoneProvider, private val soneTextParser: SoneTextParser, htmlFilter: HtmlFilter) : Filter {
 
-	companion object {
-		private val plainTextTemplate = "<%text|html>".asTemplate()
-		private val linkTemplate = "<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>".asTemplate()
+	private val templateContextFactory = TemplateContextFactory().apply {
+		addFilter("html", htmlFilter)
 	}
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: MutableMap<String, Any?>?): Any? {
@@ -77,9 +66,8 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 	}
 
 	private fun render(writer: Writer, postPart: PostPart) {
-		val parser = SoneTextParser(core, core)
 		val parserContext = SoneTextParserContext(postPart.post.sone)
-		val parts = parser.parse(postPart.post.text, parserContext)
+		val parts = soneTextParser.parse(postPart.post.text, parserContext)
 		val excerpt = StringBuilder()
 		for (part in parts) {
 			excerpt.append(part.text)
@@ -98,7 +86,7 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 	}
 
 	private fun render(writer: Writer, freemailPart: FreemailPart) {
-		val sone = core.getSone(freemailPart.identityId)
+		val sone = soneProvider.getSone(freemailPart.identityId)
 		val soneName = sone?.let(SoneAccessor::getNiceName) ?: freemailPart.identityId
 		renderLink(writer,
 				"/Freemail/NewMessage?to=${freemailPart.identityId}",
@@ -117,3 +105,6 @@ class RenderFilter(private val core: Core, private val templateContextFactory: T
 	}
 
 }
+
+private val plainTextTemplate = "<%text|html>".asTemplate()
+private val linkTemplate = "<a class=\"<%cssClass|html>\" href=\"<%link|html>\" title=\"<%title|html>\"><%text|html></a>".asTemplate()
