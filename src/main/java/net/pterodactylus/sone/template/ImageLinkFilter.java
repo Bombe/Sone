@@ -28,6 +28,7 @@ import java.util.Map;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
@@ -49,19 +50,12 @@ public class ImageLinkFilter implements Filter {
 	private final Core core;
 
 	/** The template context factory. */
-	private final TemplateContextFactory templateContextFactory;
+	private final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
 
-	/**
-	 * Creates a new image link filter.
-	 *
-	 * @param core
-	 *            The core
-	 * @param templateContextFactory
-	 *            The template context factory
-	 */
-	public ImageLinkFilter(Core core, TemplateContextFactory templateContextFactory) {
+	public ImageLinkFilter(Core core) {
 		this.core = core;
-		this.templateContextFactory = templateContextFactory;
+		templateContextFactory.addFilter("html", new HtmlFilter());
+		templateContextFactory.addFilter("css", new CssClassNameFilter());
 	}
 
 	/**
