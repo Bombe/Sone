@@ -13,12 +13,6 @@ import javax.inject.Inject
  */
 class LinkedElementRenderFilter @Inject constructor(private val templateContextFactory: TemplateContextFactory): Filter {
 
-	companion object {
-		private val loadedImageTemplate = """<%include linked/image.html>""".asTemplate()
-		private val loadedHtmlPageTemplate = """<%include linked/html-page.html>""".asTemplate()
-		private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".asTemplate()
-	}
-
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
 			when {
 				data is LinkedElement && data.loading -> renderNotLoadedLinkedElement(data)
@@ -51,3 +45,7 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 			}.toString()
 
 }
+
+private val loadedImageTemplate = """<%include linked/image.html>""".asTemplate()
+private val loadedHtmlPageTemplate = """<%include linked/html-page.html>""".asTemplate()
+private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".asTemplate()
