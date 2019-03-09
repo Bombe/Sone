@@ -260,7 +260,7 @@ public class WebInterface implements SessionProvider {
 	private final ElementLoader elementLoader;
 	private final LinkedElementRenderFilter linkedElementRenderFilter;
 	private final TimeTextConverter timeTextConverter = new TimeTextConverter();
-	private final L10nFilter l10nFilter = new L10nFilter(this);
+	private final L10nFilter l10nFilter;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -320,6 +320,7 @@ public class WebInterface implements SessionProvider {
 		this.elementLoader = elementLoader;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
+		l10nFilter = new L10nFilter(getL10n());
 
 		templateContextFactory = new TemplateContextFactory();
 		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
@@ -337,7 +338,7 @@ public class WebInterface implements SessionProvider {
 		templateContextFactory.addFilter("html", new HtmlFilter());
 		templateContextFactory.addFilter("replace", new ReplaceFilter());
 		templateContextFactory.addFilter("store", new StoreFilter());
-		templateContextFactory.addFilter("l10n", new L10nFilter(this));
+		templateContextFactory.addFilter("l10n", l10nFilter);
 		templateContextFactory.addFilter("substring", new SubstringFilter());
 		templateContextFactory.addFilter("xml", new XmlFilter());
 		templateContextFactory.addFilter("change", new RequestChangeFilter());
