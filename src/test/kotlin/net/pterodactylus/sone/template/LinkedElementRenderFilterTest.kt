@@ -1,31 +1,21 @@
 package net.pterodactylus.sone.template
 
-import com.google.inject.Guice
-import net.pterodactylus.sone.core.LinkedElement
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.isProvidedByMock
-import net.pterodactylus.util.template.ClassPathTemplateProvider
-import net.pterodactylus.util.template.HtmlFilter
-import net.pterodactylus.util.template.TemplateContextFactory
-import org.hamcrest.MatcherAssert.assertThat
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
-import org.junit.Test
+import com.google.inject.*
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.util.template.*
+import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import org.jsoup.*
+import org.jsoup.nodes.*
+import org.junit.*
 
 /**
  * Unit test for [LinkedElementRenderFilter].
  */
 class LinkedElementRenderFilterTest {
 
-	private val templateContextFactory = TemplateContextFactory()
-
-	init {
-		templateContextFactory.addFilter("html", HtmlFilter())
-		templateContextFactory.addProvider(ClassPathTemplateProvider(LinkedElementRenderFilter::class.java, "/templates/"))
-	}
-
-	private val filter = LinkedElementRenderFilter(templateContextFactory)
+	private val filter = LinkedElementRenderFilter()
 
 	@Test
 	fun `filter returns null for objects that are not linked elements`() {

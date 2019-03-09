@@ -4,12 +4,16 @@ import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.template.*
 import java.io.*
-import javax.inject.*
 
 /**
  * Renders all kinds of [LinkedElement]s.
  */
-class LinkedElementRenderFilter @Inject constructor(private val templateContextFactory: TemplateContextFactory) : Filter {
+class LinkedElementRenderFilter : Filter {
+
+	private val templateContextFactory = TemplateContextFactory().apply {
+		addFilter("html", HtmlFilter())
+		addProvider(ClassPathTemplateProvider(LinkedElementRenderFilter::class.java, "/templates/"))
+	}
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
 			when {
