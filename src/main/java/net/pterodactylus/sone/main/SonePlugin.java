@@ -30,12 +30,15 @@ import javax.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.database.Database;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.database.memory.MemoryDatabase;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.wot.Context;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.WebInterfaceModule;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
@@ -49,6 +52,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
@@ -56,6 +60,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 import freenet.client.async.PersistenceDisabledException;
+import freenet.l10n.BaseL10n;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
 import freenet.pluginmanager.FredPlugin;
@@ -255,6 +260,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
 				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
 				bind(Database.class).to(MemoryDatabase.class).in(Singleton.class);
+				bind(BaseL10n.class).toInstance(l10n.getBase());
+				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
+				bind(PostProvider.class).to(Core.class).in(Singleton.class);
 				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
 					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
 					if (path != null) {
@@ -282,7 +290,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			}
 
 		};
-		Injector injector = Guice.createInjector(freenetModule, soneModule);
+		Module webInterfaceModule = new WebInterfaceModule();
+		Injector injector = Guice.createInjector(freenetModule, soneModule, webInterfaceModule);
 		core = injector.getInstance(Core.class);
 
 		/* create web of trust connector. */

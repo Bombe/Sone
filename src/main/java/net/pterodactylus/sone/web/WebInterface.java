@@ -61,49 +61,24 @@ import net.pterodactylus.sone.core.event.SoneLockedEvent;
 import net.pterodactylus.sone.core.event.SoneRemovedEvent;
 import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
-import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
-import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.main.Loaders;
 import net.pterodactylus.sone.main.PluginHomepage;
 import net.pterodactylus.sone.main.PluginVersion;
 import net.pterodactylus.sone.main.PluginYear;
-import net.pterodactylus.sone.main.ReparseFilter;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.notify.ListNotificationFilter;
 import net.pterodactylus.sone.notify.PostVisibilityFilter;
 import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
-import net.pterodactylus.sone.template.AlbumAccessor;
-import net.pterodactylus.sone.template.CollectionAccessor;
-import net.pterodactylus.sone.template.CssClassNameFilter;
-import net.pterodactylus.sone.template.HttpRequestAccessor;
-import net.pterodactylus.sone.template.IdentityAccessor;
-import net.pterodactylus.sone.template.ImageAccessor;
-import net.pterodactylus.sone.template.ImageLinkFilter;
-import net.pterodactylus.sone.template.JavascriptFilter;
 import net.pterodactylus.sone.template.LinkedElementRenderFilter;
-import net.pterodactylus.sone.template.LinkedElementsFilter;
 import net.pterodactylus.sone.template.ParserFilter;
-import net.pterodactylus.sone.template.PostAccessor;
-import net.pterodactylus.sone.template.ProfileAccessor;
 import net.pterodactylus.sone.template.RenderFilter;
-import net.pterodactylus.sone.template.ReplyAccessor;
-import net.pterodactylus.sone.template.ReplyGroupFilter;
-import net.pterodactylus.sone.template.RequestChangeFilter;
 import net.pterodactylus.sone.template.ShortenFilter;
-import net.pterodactylus.sone.template.SoneAccessor;
-import net.pterodactylus.sone.template.SubstringFilter;
-import net.pterodactylus.sone.template.TrustAccessor;
-import net.pterodactylus.sone.template.UniqueElementFilter;
-import net.pterodactylus.sone.template.UnknownDateFilter;
 import net.pterodactylus.sone.text.Part;
 import net.pterodactylus.sone.text.SonePart;
 import net.pterodactylus.sone.text.SoneTextParser;
@@ -187,21 +162,8 @@ import net.pterodactylus.sone.web.pages.ViewSonePage;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
-import net.pterodactylus.util.template.CollectionSortFilter;
-import net.pterodactylus.util.template.ContainsFilter;
-import net.pterodactylus.util.template.DateFilter;
-import net.pterodactylus.util.template.FormatFilter;
-import net.pterodactylus.util.template.HtmlFilter;
-import net.pterodactylus.util.template.MatchFilter;
-import net.pterodactylus.util.template.ModFilter;
-import net.pterodactylus.util.template.PaginationFilter;
-import net.pterodactylus.util.template.ReflectionAccessor;
-import net.pterodactylus.util.template.ReplaceFilter;
-import net.pterodactylus.util.template.StoreFilter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContextFactory;
-import net.pterodactylus.util.template.TemplateProvider;
-import net.pterodactylus.util.template.XmlFilter;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.TemplatePage;
 
@@ -210,7 +172,6 @@ import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
-import freenet.support.api.HTTPRequest;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
@@ -304,64 +265,28 @@ public class WebInterface implements SessionProvider {
 	/** Scheduled executor for time-based notifications. */
 	private final ScheduledExecutorService ticker = Executors.newScheduledThreadPool(1);
 
-	/**
-	 * Creates a new web interface.
-	 *
-	 * @param sonePlugin
-	 *            The Sone plugin
-	 */
 	@Inject
-	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter, PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter, ElementLoader elementLoader) {
+	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter,
+			PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter,
+			ElementLoader elementLoader, TemplateContextFactory templateContextFactory,
+			ParserFilter parserFilter, ShortenFilter shortenFilter,
+			RenderFilter renderFilter,
+			LinkedElementRenderFilter linkedElementRenderFilter) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
 		this.postVisibilityFilter = postVisibilityFilter;
 		this.replyVisibilityFilter = replyVisibilityFilter;
 		this.elementLoader = elementLoader;
+		this.parserFilter = parserFilter;
+		this.shortenFilter = shortenFilter;
+		this.renderFilter = renderFilter;
+		this.linkedElementRenderFilter = linkedElementRenderFilter;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 		l10nFilter = new L10nFilter(getL10n());
 
-		templateContextFactory = new TemplateContextFactory();
-		templateContextFactory.addAccessor(Object.class, new ReflectionAccessor());
-		templateContextFactory.addAccessor(Collection.class, new CollectionAccessor());
-		templateContextFactory.addAccessor(Sone.class, new SoneAccessor(getCore(), new TimeTextConverter()));
-		templateContextFactory.addAccessor(Post.class, new PostAccessor(getCore()));
-		templateContextFactory.addAccessor(Reply.class, new ReplyAccessor(getCore()));
-		templateContextFactory.addAccessor(Album.class, new AlbumAccessor());
-		templateContextFactory.addAccessor(Image.class, new ImageAccessor());
-		templateContextFactory.addAccessor(Identity.class, new IdentityAccessor(getCore()));
-		templateContextFactory.addAccessor(Trust.class, new TrustAccessor());
-		templateContextFactory.addAccessor(HTTPRequest.class, new HttpRequestAccessor());
-		templateContextFactory.addAccessor(Profile.class, new ProfileAccessor(getCore()));
-		templateContextFactory.addFilter("date", new DateFilter());
-		templateContextFactory.addFilter("html", new HtmlFilter());
-		templateContextFactory.addFilter("replace", new ReplaceFilter());
-		templateContextFactory.addFilter("store", new StoreFilter());
-		templateContextFactory.addFilter("l10n", l10nFilter);
-		templateContextFactory.addFilter("substring", new SubstringFilter());
-		templateContextFactory.addFilter("xml", new XmlFilter());
-		templateContextFactory.addFilter("change", new RequestChangeFilter());
-		templateContextFactory.addFilter("match", new MatchFilter());
-		templateContextFactory.addFilter("css", new CssClassNameFilter());
-		templateContextFactory.addFilter("js", new JavascriptFilter());
-		templateContextFactory.addFilter("parse", parserFilter = new ParserFilter(getCore(), soneTextParser));
-		templateContextFactory.addFilter("shorten", shortenFilter = new ShortenFilter());
-		templateContextFactory.addFilter("render", renderFilter = new RenderFilter(getCore(), soneTextParser, new HtmlFilter()));
-		templateContextFactory.addFilter("linked-elements", new LinkedElementsFilter(elementLoader));
-		templateContextFactory.addFilter("render-linked-element", linkedElementRenderFilter = new LinkedElementRenderFilter(templateContextFactory));
-		templateContextFactory.addFilter("reparse", new ReparseFilter());
-		templateContextFactory.addFilter("unknown", new UnknownDateFilter(getL10n(), "View.Sone.Text.UnknownDate"));
-		templateContextFactory.addFilter("format", new FormatFilter());
-		templateContextFactory.addFilter("sort", new CollectionSortFilter());
-		templateContextFactory.addFilter("image-link", new ImageLinkFilter(getCore()));
-		templateContextFactory.addFilter("replyGroup", new ReplyGroupFilter());
-		templateContextFactory.addFilter("in", new ContainsFilter());
-		templateContextFactory.addFilter("unique", new UniqueElementFilter());
-		templateContextFactory.addFilter("mod", new ModFilter());
-		templateContextFactory.addFilter("paginate", new PaginationFilter());
-		templateContextFactory.addProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER);
-		templateContextFactory.addProvider(loaders.getTemplateProvider());
+		this.templateContextFactory = templateContextFactory;
 		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
