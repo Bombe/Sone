@@ -17,7 +17,9 @@
 
 package net.pterodactylus.sone.text;
 
+import static com.google.inject.Guice.createInjector;
 import static java.lang.String.format;
+import static net.pterodactylus.sone.test.GuiceKt.supply;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isIn;
@@ -36,6 +38,7 @@ import net.pterodactylus.sone.database.PostProvider;
 import net.pterodactylus.sone.database.SoneProvider;
 
 import com.google.common.base.Optional;
+import com.google.inject.Injector;
 import kotlin.jvm.functions.Function1;
 import org.junit.Test;
 
@@ -413,6 +416,15 @@ public class SoneTextParserTest {
 			}
 		}
 		return text.toString();
+	}
+
+	@Test
+	public void parserCanBeCreatedByGuice() {
+		Injector injector = createInjector(
+				supply(SoneProvider.class).byMock(),
+				supply(PostProvider.class).byMock()
+		);
+		assertThat(injector.getInstance(SoneTextParser.class), notNullValue());
 	}
 
 	/**

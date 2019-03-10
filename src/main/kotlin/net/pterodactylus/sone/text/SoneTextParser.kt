@@ -17,11 +17,12 @@ import net.pterodactylus.sone.text.LinkType.SSK
 import net.pterodactylus.sone.text.LinkType.USK
 import org.bitpedia.util.Base32
 import java.net.MalformedURLException
+import javax.inject.*
 
 /**
  * [Parser] implementation that can recognize Freenet URIs.
  */
-class SoneTextParser(private val soneProvider: SoneProvider?, private val postProvider: PostProvider?) {
+class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?, private val postProvider: PostProvider?) {
 
 	fun parse(source: String, context: SoneTextParserContext?) =
 			source.split("\n")
