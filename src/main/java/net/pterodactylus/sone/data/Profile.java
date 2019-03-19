@@ -127,7 +127,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public Profile setFirstName(@Nullable String firstName) {
-		this.firstName = firstName;
+		this.firstName = "".equals(firstName) ? null : firstName;
 		return this;
 	}
 
@@ -150,7 +150,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public Profile setMiddleName(@Nullable String middleName) {
-		this.middleName = middleName;
+		this.middleName = "".equals(middleName) ? null : middleName;
 		return this;
 	}
 
@@ -173,7 +173,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public Profile setLastName(@Nullable String lastName) {
-		this.lastName = lastName;
+		this.lastName = "".equals(lastName) ? null : lastName;
 		return this;
 	}
 
