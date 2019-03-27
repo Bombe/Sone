@@ -69,7 +69,7 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 		SSK, USK ->
 			try {
 				FreenetURI(link).let { uri ->
-					uri.docName ?: "${uri.keyType}@${uri.routingKey.freenetBase64}"
+					uri.allMetaStrings?.lastOrNull() ?: uri.docName ?: "${uri.keyType}@${uri.routingKey.freenetBase64}"
 				}.let { FreenetLinkPart(link, it, trusted = context?.routingKey?.contentEquals(FreenetURI(link).routingKey) == true) }
 			} catch (e: MalformedURLException) {
 				PlainTextPart(link)
