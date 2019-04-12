@@ -24,6 +24,8 @@ class PageToadletFactory(private val highLevelSimpleClient: HighLevelSimpleClien
 
 	@JvmOverloads
 	fun createPageToadlet(page: Page<FreenetRequest>, menuName: String? = null) =
-			PageToadlet(highLevelSimpleClient, menuName, page, pathPrefix)
+			PageToadlet(highLevelSimpleClient, menuName ?: page.menuName, page, pathPrefix)
 
 }
+
+private val Page<*>.menuName get() = javaClass.getAnnotation(MenuName::class.java)?.value
