@@ -17,8 +17,8 @@
 
 package net.pterodactylus.sone.web.page
 
-import freenet.client.HighLevelSimpleClient
-import net.pterodactylus.util.web.Page
+import freenet.client.*
+import net.pterodactylus.util.web.*
 
 class PageToadletFactory(private val highLevelSimpleClient: HighLevelSimpleClient, private val pathPrefix: String) {
 

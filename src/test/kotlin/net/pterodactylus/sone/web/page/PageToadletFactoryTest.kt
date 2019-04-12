@@ -1,14 +1,11 @@
 package net.pterodactylus.sone.web.page
 
-import freenet.client.HighLevelSimpleClient
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Page
-import net.pterodactylus.util.web.Response
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
-import org.junit.Test
+import freenet.client.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.util.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 private val highLevelSimpleClient = mock<HighLevelSimpleClient>()
 private const val pathPrefix = "/some/prefix/"
