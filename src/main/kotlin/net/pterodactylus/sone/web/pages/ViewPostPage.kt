@@ -19,7 +19,7 @@ class ViewPostPage @Inject constructor(template: Template, webInterface: WebInte
 		templateContext["raw"] = freenetRequest.parameters["raw"] == "true"
 	}
 
-	override fun isLinkExcepted(link: URI?) = true
+	override fun isLinkExcepted(link: URI) = true
 
 	override fun getPageTitle(freenetRequest: FreenetRequest) =
 			(freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.let {

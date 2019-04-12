@@ -11,6 +11,7 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.Test
+import java.net.*
 
 /**
  * Unit test for [ViewPostPage].
@@ -31,7 +32,7 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 
 	@Test
 	fun `the view post page is link-excepted`() {
-		assertThat(page.isLinkExcepted(null), equalTo(true))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(true))
 	}
 
 	@Test

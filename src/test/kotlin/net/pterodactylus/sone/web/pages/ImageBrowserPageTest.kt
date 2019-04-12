@@ -12,6 +12,7 @@ import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
+import java.net.*
 
 /**
  * Unit test for [ImageBrowserPage].
@@ -133,7 +134,7 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page is link-excepted`() {
-	    assertThat(page.isLinkExcepted(null), equalTo(true))
+	    assertThat(page.isLinkExcepted(URI("")), equalTo(true))
 	}
 
 	@Test

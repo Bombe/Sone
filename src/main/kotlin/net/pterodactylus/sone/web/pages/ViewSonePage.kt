@@ -48,7 +48,7 @@ class ViewSonePage @Inject constructor(template: Template, webInterface: WebInte
 		}
 	}
 
-	override fun isLinkExcepted(link: URI?) = true
+	override fun isLinkExcepted(link: URI) = true
 
 	override fun getPageTitle(freenetRequest: FreenetRequest): String =
 			freenetRequest.parameters["sone"]!!.let(webInterface.core::getSone)?.let { sone ->

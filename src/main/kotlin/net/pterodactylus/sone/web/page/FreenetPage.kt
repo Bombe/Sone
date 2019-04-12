@@ -15,26 +15,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.web.page;
+package net.pterodactylus.sone.web.page
 
-import java.net.URI;
+import net.pterodactylus.util.web.*
+import java.net.*
 
-import net.pterodactylus.util.web.Page;
+interface FreenetPage : Page<FreenetRequest> {
 
-/**
- * Freenet-specific {@link Page} extension that adds the capability to allow a
- * link to a page to be unharmed by Freenet’s content filter.
- */
-public interface FreenetPage extends Page<FreenetRequest> {
-
-	/**
-	 * Returns whether the given should be excepted from being filtered.
-	 *
-	 * @param link
-	 *            The link to check
-	 * @return {@code true} if the link should not be filtered, {@code false} if
-	 *         it should be filtered
-	 */
-	public boolean isLinkExcepted(URI link);
+	fun isLinkExcepted(link: URI): Boolean
 
 }

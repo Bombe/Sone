@@ -47,6 +47,6 @@ class ImageBrowserPage @Inject constructor(template: Template, webInterface: Web
 		}
 	}
 
-	override fun isLinkExcepted(link: URI?) = true
+	override fun isLinkExcepted(link: URI) = true
 
 }

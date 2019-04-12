@@ -36,7 +36,7 @@ class GetImagePage @Inject constructor(webInterface: WebInterface): FreenetPage 
 		}
 	}
 
-	override fun isLinkExcepted(link: URI?): Boolean {
+	override fun isLinkExcepted(link: URI): Boolean {
 		return false
 	}
 

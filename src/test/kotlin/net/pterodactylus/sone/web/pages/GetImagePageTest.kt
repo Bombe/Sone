@@ -8,6 +8,7 @@ import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
+import java.net.*
 
 /**
  * Unit test for [GetImagePage].
@@ -32,7 +33,7 @@ class GetImagePageTest {
 
 	@Test
 	fun `page is not link-excepted`() {
-		assertThat(page.isLinkExcepted(null), equalTo(false))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(false))
 	}
 
 	@Test
