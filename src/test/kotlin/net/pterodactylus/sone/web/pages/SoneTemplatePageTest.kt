@@ -4,7 +4,7 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.main.SonePlugin
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.version.Version
@@ -21,6 +21,10 @@ import org.junit.Test
  * Unit test for [SoneTemplatePage].
  */
 class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", webInterface, template, requiresLogin = true) {} }) {
+
+	init {
+		request("index.html")
+	}
 
 	@Test
 	fun `page title is empty string if no page title key was given`() {
@@ -167,14 +171,12 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	@Test
 	fun `redirect does happen if sone is not logged in`() {
 		unsetCurrentSone()
-		request("index.html")
 		assertThat(page.getRedirectTarget(freenetRequest), equalTo("login.html?target=index.html"))
 	}
 
 	@Test
 	fun `redirect does happen with parameters encoded correctly if sone is not logged in`() {
 		unsetCurrentSone()
-		request("index.html")
 		addHttpRequestParameter("foo", "b=r")
 		addHttpRequestParameter("baz", "q&o")
 		assertThat(page.getRedirectTarget(freenetRequest), anyOf(
@@ -212,6 +214,18 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 		SoneTemplatePage("path.html", webInterface, template, requiresLogin = false).let { page ->
 			assertThat(page.isEnabled(toadletContext), equalTo(true))
 		}
+	}
+
+	@Test
+	fun `handle request with sone request is called`() {
+		var called = false
+	    val page = object : SoneTemplatePage("path.html", webInterface, template) {
+		    override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+			    called = true
+		    }
+	    }
+		page.processTemplate(freenetRequest, templateContext)
+		assertThat(called, equalTo(true))
 	}
 
 }

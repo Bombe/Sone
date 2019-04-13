@@ -6,8 +6,7 @@ import net.pterodactylus.sone.main.SonePlugin
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.sone.web.page.FreenetTemplatePage
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
@@ -70,6 +69,10 @@ open class SoneTemplatePage @JvmOverloads constructor(
 	}
 
 	internal open fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+		handleRequest(freenetRequest.toSoneRequest(core), templateContext)
+	}
+
+	open fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 	}
 
 	override public fun getRedirectTarget(freenetRequest: FreenetRequest): String? {

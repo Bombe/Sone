@@ -22,4 +22,4 @@ import freenet.support.api.*
 import net.pterodactylus.util.web.*
 import java.net.*
 
-class FreenetRequest(uri: URI, method: Method, val httpRequest: HTTPRequest, val toadletContext: ToadletContext) : Request(uri, method)
+open class FreenetRequest(uri: URI, method: Method, val httpRequest: HTTPRequest, val toadletContext: ToadletContext) : Request(uri, method)
