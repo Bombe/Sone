@@ -60,6 +60,10 @@ dependencies {
 
 apply from: 'version.gradle'
 
+test {
+    maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+}
+
 task fatJar(type: Jar) {
     archiveName = project.name + '-jar-with-dependencies.jar'
     from { (configurations.runtime - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) } }
