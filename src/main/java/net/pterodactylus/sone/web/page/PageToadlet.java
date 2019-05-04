@@ -33,6 +33,7 @@ import freenet.clients.http.LinkFilterExceptedToadlet;
 import freenet.clients.http.Toadlet;
 import freenet.clients.http.ToadletContext;
 import freenet.clients.http.ToadletContextClosedException;
+import freenet.l10n.NodeL10n;
 import freenet.support.MultiValueTable;
 import freenet.support.api.HTTPRequest;
 
@@ -102,7 +103,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodGET(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext));
+		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext, NodeL10n.getBase()));
 	}
 
 	/**
@@ -120,7 +121,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodPOST(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext));
+		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext, NodeL10n.getBase()));
 	}
 
 	/**

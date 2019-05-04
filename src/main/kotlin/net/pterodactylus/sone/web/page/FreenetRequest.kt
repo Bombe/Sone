@@ -18,8 +18,13 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
+import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.util.web.*
 import java.net.*
 
-open class FreenetRequest(uri: URI, method: Method, val httpRequest: HTTPRequest, val toadletContext: ToadletContext) : Request(uri, method)
+open class FreenetRequest(uri: URI, method: Method,
+		val httpRequest: HTTPRequest,
+		val toadletContext: ToadletContext,
+		val l10n: BaseL10n
+) : Request(uri, method)

@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
-import freenet.clients.http.ToadletContext
+import freenet.clients.http.*
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.main.SonePlugin
 import net.pterodactylus.sone.utils.emptyToNull
@@ -10,6 +10,7 @@ import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.util.web.*
 import java.net.URLEncoder
 
 /**
@@ -35,7 +36,9 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	fun requiresLogin() = requiresLogin
 
-	override public fun getPageTitle(freenetRequest: FreenetRequest) = pageTitle(freenetRequest)
+	override public fun getPageTitle(freenetRequest: FreenetRequest) = getPageTitle(freenetRequest.toSoneRequest(core, webInterface))
+
+	open fun getPageTitle(soneRequest: SoneRequest) = pageTitle(soneRequest)
 
 	override public fun getStyleSheets() =
 			listOf("css/sone.css")
@@ -69,7 +72,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 	}
 
 	internal open fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		handleRequest(freenetRequest.toSoneRequest(core), templateContext)
+		handleRequest(freenetRequest.toSoneRequest(core, webInterface), templateContext)
 	}
 
 	open fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
@@ -88,9 +91,12 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	private val String.urlEncode: String get() = URLEncoder.encode(this, "UTF-8")
 
-	override fun isEnabled(toadletContext: ToadletContext) = when {
-		requiresLogin && getCurrentSone(toadletContext) == null -> false
-		core.preferences.requireFullAccess && !toadletContext.isAllowedFullAccess -> false
+	override fun isEnabled(toadletContext: ToadletContext) =
+			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, webInterface.l10n, core, webInterface))
+
+	open fun isEnabled(soneRequest: SoneRequest) = when {
+		requiresLogin && getCurrentSone(soneRequest.toadletContext) == null -> false
+		core.preferences.requireFullAccess && !soneRequest.toadletContext.isAllowedFullAccess -> false
 		else -> true
 	}
 

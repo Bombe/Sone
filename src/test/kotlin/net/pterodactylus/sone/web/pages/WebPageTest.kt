@@ -20,7 +20,7 @@ import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asList
 import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.template.Template
@@ -55,6 +55,10 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 	val page by lazy { pageSupplier(template, webInterface) }
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()
+	init {
+		whenever(freenetRequest.l10n).thenReturn(l10n)
+		whenever(freenetRequest.uri).thenReturn(mock())
+	}
 	val templateContext = TemplateContext()
 	val toadletContext = deepMock<ToadletContext>()
 	val responseContent = ByteArrayOutputStream()

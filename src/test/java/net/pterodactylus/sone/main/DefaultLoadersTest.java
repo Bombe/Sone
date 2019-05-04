@@ -22,6 +22,7 @@ import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 
 import freenet.clients.http.ToadletContext;
+import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
 import org.junit.Test;
@@ -31,6 +32,7 @@ import org.junit.Test;
  */
 public class DefaultLoadersTest {
 
+	private final BaseL10n l10n = mock(BaseL10n.class);
 	private final Loaders loaders = new DefaultLoaders();
 	private final StringWriter stringWriter = new StringWriter();
 	private final TemplateContext templateContext = new TemplateContext();
@@ -49,7 +51,7 @@ public class DefaultLoadersTest {
 		Method method = Method.GET;
 		HTTPRequest httpRequest = mock(HTTPRequest.class);
 		ToadletContext toadletContext = mock(ToadletContext.class);
-		FreenetRequest request = new FreenetRequest(uri, method, httpRequest, toadletContext);
+		FreenetRequest request = new FreenetRequest(uri, method, httpRequest, toadletContext, l10n);
 		OutputStream outputStream = new ByteArrayOutputStream();
 		Response response = new Response(outputStream);
 		staticPage.handleRequest(request, response);

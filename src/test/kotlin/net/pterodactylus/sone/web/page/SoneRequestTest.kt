@@ -1,9 +1,11 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
+import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
@@ -17,8 +19,10 @@ class SoneRequestTest {
 	private val method = Method.GET
 	private val httpRequest = Mockito.mock(HTTPRequest::class.java)
 	private val toadletContext = Mockito.mock(ToadletContext::class.java)
+	private val l10n = mock<BaseL10n>()
 	private val core = mock<Core>()
-	private val soneRequest = SoneRequest(uri, method, httpRequest, toadletContext, core)
+	private val webInterface = mock<WebInterface>()
+	private val soneRequest = SoneRequest(uri, method, httpRequest, toadletContext, l10n, core, webInterface)
 
 	@Test
 	fun `freenet request properties are retained correctly`() {
@@ -26,6 +30,7 @@ class SoneRequestTest {
 		assertThat(soneRequest.method, equalTo(method))
 		assertThat(soneRequest.httpRequest, equalTo(httpRequest))
 		assertThat(soneRequest.toadletContext, equalTo(toadletContext))
+		assertThat(soneRequest.l10n, equalTo(l10n))
 	}
 
 	@Test
@@ -34,14 +39,21 @@ class SoneRequestTest {
 	}
 
 	@Test
+	fun `web interface is retained correctly`() {
+		assertThat(soneRequest.webInterface, sameInstance(webInterface))
+	}
+
+	@Test
 	fun `freenet request is wrapped correctly`() {
-	    val freenetRequest = FreenetRequest(uri, method, httpRequest, toadletContext)
-		val wrappedSoneRequest = freenetRequest.toSoneRequest(core)
+	    val freenetRequest = FreenetRequest(uri, method, httpRequest, toadletContext, l10n)
+		val wrappedSoneRequest = freenetRequest.toSoneRequest(core, webInterface)
 		assertThat(wrappedSoneRequest.uri, equalTo(uri))
 		assertThat(wrappedSoneRequest.method, equalTo(method))
 		assertThat(wrappedSoneRequest.httpRequest, equalTo(httpRequest))
 		assertThat(wrappedSoneRequest.toadletContext, equalTo(toadletContext))
+		assertThat(wrappedSoneRequest.l10n, equalTo(l10n))
 		assertThat(wrappedSoneRequest.core, sameInstance(core))
+		assertThat(wrappedSoneRequest.webInterface, sameInstance(webInterface))
 	}
 
 }
