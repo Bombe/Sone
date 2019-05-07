@@ -35,7 +35,7 @@ class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Unbookmark.Title", "unbookmark page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("unbookmark page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("unbookmark page title"))
 	}
 
 	@Test

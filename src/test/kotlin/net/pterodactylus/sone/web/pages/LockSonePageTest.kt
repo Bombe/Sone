@@ -31,7 +31,7 @@ class LockSonePageTest: WebPageTest(::LockSonePage) {
 	@Test
 	fun `page returns correct title`() {
 	    addTranslation("Page.LockSone.Title", "lock Sone page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("lock Sone page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("lock Sone page title"))
 	}
 
 	@Test

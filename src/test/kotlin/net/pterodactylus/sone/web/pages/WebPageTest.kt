@@ -59,6 +59,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 		whenever(freenetRequest.l10n).thenReturn(l10n)
 		whenever(freenetRequest.uri).thenReturn(mock())
 	}
+	val soneRequest by lazy { freenetRequest.toSoneRequest(core, webInterface) }
 	val templateContext = TemplateContext()
 	val toadletContext = deepMock<ToadletContext>()
 	val responseContent = ByteArrayOutputStream()

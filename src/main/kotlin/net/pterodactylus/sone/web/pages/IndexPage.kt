@@ -5,7 +5,7 @@ import net.pterodactylus.sone.notify.PostVisibilityFilter
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
@@ -17,18 +17,18 @@ import javax.inject.Inject
 class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter) :
 		LoggedInPage("index.html", template, "Page.Index.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		(currentSone.posts +
 				currentSone.friends
-						.mapNotNull(webInterface.core::getSone)
+						.mapNotNull(soneRequest.core::getSone)
 						.flatMap { it.posts } +
-				webInterface.core.getDirectedPosts(currentSone.id)
+				soneRequest.core.getDirectedPosts(currentSone.id)
 				).distinct()
 				.filter { postVisibilityFilter.isVisible(currentSone).apply(it) }
 				.sortedByDescending { it.time }
 				.let { posts ->
-					posts.paginate(webInterface.core.preferences.postsPerPage)
-							.turnTo(freenetRequest.parameters["page"]?.toIntOrNull() ?: 0)
+					posts.paginate(soneRequest.core.preferences.postsPerPage)
+							.turnTo(soneRequest.parameters["page"]?.toIntOrNull() ?: 0)
 							.let { pagination ->
 								templateContext["pagination"] = pagination
 								templateContext["posts"] = pagination.items

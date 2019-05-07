@@ -76,14 +76,14 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 	@Test
 	fun `page title for request without parameters is default title`() {
 		addTranslation("Page.ViewPost.Title", "view post title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view post title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view post title"))
 	}
 
 	@Test
 	fun `page title for request with invalid post is default title`() {
 		addHttpRequestParameter("post", "invalid-post-id")
 		addTranslation("Page.ViewPost.Title", "view post title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view post title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view post title"))
 	}
 
 	@Test
@@ -98,7 +98,7 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
 		addTranslation("Page.ViewPost.Title", "view post title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("This is a text that … - First M. Last - view post title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("This is a text that … - First M. Last - view post title"))
 	}
 
 	@Test

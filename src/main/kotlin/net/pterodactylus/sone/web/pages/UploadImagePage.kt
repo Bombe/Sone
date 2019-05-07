@@ -9,7 +9,7 @@ import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.utils.use
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.awt.image.BufferedImage
@@ -24,28 +24,28 @@ import javax.inject.Inject
 class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			val parentAlbum = freenetRequest.parameters["parent"]!!.let(webInterface.core::getAlbum) ?: throw RedirectException("noPermission.html")
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			val parentAlbum = soneRequest.parameters["parent"]!!.let(soneRequest.core::getAlbum) ?: throw RedirectException("noPermission.html")
 			if (parentAlbum.sone != currentSone) {
 				throw RedirectException("noPermission.html")
 			}
-			val title = freenetRequest.parameters["title", 200].emptyToNull ?: throw RedirectException("emptyImageTitle.html")
+			val title = soneRequest.parameters["title", 200].emptyToNull ?: throw RedirectException("emptyImageTitle.html")
 
-			val uploadedFile = freenetRequest.httpRequest.getUploadedFile("image")
+			val uploadedFile = soneRequest.httpRequest.getUploadedFile("image")
 			val bytes = uploadedFile.data.use { it.toByteArray() }
 			val bufferedImage = bytes.toImage()
 			if (bufferedImage == null) {
-				templateContext["messages"] = webInterface.l10n.getString("Page.UploadImage.Error.InvalidImage")
+				templateContext["messages"] = soneRequest.l10n.getString("Page.UploadImage.Error.InvalidImage")
 				return
 			}
 
-			val temporaryImage = webInterface.core.createTemporaryImage(bytes.mimeType, bytes)
-			webInterface.core.createImage(currentSone, parentAlbum, temporaryImage).modify().apply {
+			val temporaryImage = soneRequest.core.createTemporaryImage(bytes.mimeType, bytes)
+			soneRequest.core.createImage(currentSone, parentAlbum, temporaryImage).modify().apply {
 				setWidth(bufferedImage.width)
 				setHeight(bufferedImage.height)
 				setTitle(title)
-				setDescription(TextFilter.filter(freenetRequest.headers["Host"], freenetRequest.parameters["description", 4000]))
+				setDescription(TextFilter.filter(soneRequest.headers["Host"], soneRequest.parameters["description", 4000]))
 			}.update()
 			throw RedirectException("imageBrowser.html?album=${parentAlbum.id}")
 		}

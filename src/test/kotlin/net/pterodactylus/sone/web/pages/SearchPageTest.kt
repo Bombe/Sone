@@ -44,7 +44,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Search.Title", "search page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("search page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("search page title"))
 	}
 
 	@Test

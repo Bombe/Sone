@@ -41,7 +41,7 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.Index.Title")).thenReturn("index page title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("index page title"))
+	    assertThat(page.getPageTitle(soneRequest), equalTo("index page title"))
 	}
 
 	@Before

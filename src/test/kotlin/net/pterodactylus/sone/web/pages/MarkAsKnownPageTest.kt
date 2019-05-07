@@ -31,7 +31,7 @@ class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.MarkAsKnown.Title", "mark as known page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("mark as known page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("mark as known page title"))
 	}
 
 	@Test

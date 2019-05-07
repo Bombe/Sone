@@ -40,7 +40,7 @@ class NewPageTest: WebPageTest(::NewPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.New.Title", "new page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("new page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("new page title"))
 	}
 
 	@Test

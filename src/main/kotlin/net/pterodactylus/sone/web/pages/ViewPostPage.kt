@@ -14,20 +14,20 @@ import javax.inject.*
 class ViewPostPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("viewPost.html", webInterface, template, "Page.ViewPost.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		templateContext["post"] = freenetRequest.parameters["post"]?.let(webInterface.core::getPost)
-		templateContext["raw"] = freenetRequest.parameters["raw"] == "true"
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		templateContext["post"] = soneRequest.parameters["post"]?.let(soneRequest.core::getPost)
+		templateContext["raw"] = soneRequest.parameters["raw"] == "true"
 	}
 
 	override fun isLinkExcepted(link: URI) = true
 
-	override fun getPageTitle(freenetRequest: FreenetRequest) =
-			(freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.let {
+	override fun getPageTitle(soneRequest: SoneRequest) =
+			(soneRequest.parameters["post"]?.let(soneRequest.core::getPost)?.let {
 				if (it.text.length > 20) {
 					it.text.substring(0..19) + "…"
 				} else {
 					it.text
 				} + " - ${SoneAccessor.getNiceName(it.sone)} - "
-			} ?: "") + super.getPageTitle(freenetRequest)
+			} ?: "") + super.getPageTitle(soneRequest)
 
 }

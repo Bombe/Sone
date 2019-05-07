@@ -3,7 +3,7 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
@@ -14,12 +14,12 @@ import javax.inject.Inject
 class UnlockSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unlockSone.html", webInterface, template, "Page.UnlockSone.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			freenetRequest.parameters["sone", 44]
-					.let(webInterface.core::getLocalSone)
-					?.also(webInterface.core::unlockSone)
-			throw RedirectException(freenetRequest.parameters["returnPage", 256])
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			soneRequest.parameters["sone", 44]
+					.let(soneRequest.core::getLocalSone)
+					?.also(soneRequest.core::unlockSone)
+			throw RedirectException(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

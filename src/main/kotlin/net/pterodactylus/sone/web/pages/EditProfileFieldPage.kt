@@ -3,7 +3,7 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
@@ -14,14 +14,14 @@ import javax.inject.Inject
 class EditProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface) :
 		LoggedInPage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->
-			if (freenetRequest.isPOST) {
-				if (freenetRequest.httpRequest.getPartAsStringFailsafe("cancel", 4) == "true") {
+			if (soneRequest.isPOST) {
+				if (soneRequest.httpRequest.getPartAsStringFailsafe("cancel", 4) == "true") {
 					throw RedirectException("editProfile.html#profile-fields")
 				}
-				val field = profile.getFieldById(freenetRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
-				freenetRequest.httpRequest.getPartAsStringFailsafe("name", 256).let { name ->
+				val field = profile.getFieldById(soneRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
+				soneRequest.httpRequest.getPartAsStringFailsafe("name", 256).let { name ->
 					try {
 						if (name != field.name) {
 							field.name = name
@@ -34,7 +34,7 @@ class EditProfileFieldPage @Inject constructor(template: Template, webInterface:
 					}
 				}
 			}
-			templateContext["field"] = profile.getFieldById(freenetRequest.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
+			templateContext["field"] = profile.getFieldById(soneRequest.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
 		}
 	}
 

@@ -27,7 +27,7 @@ class UnfollowSonePageTest: WebPageTest(::UnfollowSonePage) {
 	@Test
 	fun `page returns correct page title`() {
 	    addTranslation("Page.UnfollowSone.Title", "unfollow page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("unfollow page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("unfollow page title"))
 	}
 
 	@Test

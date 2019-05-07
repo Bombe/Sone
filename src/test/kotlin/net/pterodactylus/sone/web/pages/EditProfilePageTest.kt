@@ -53,7 +53,7 @@ class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 	@Test
 	fun `page returns correct title`() {
 	    whenever(l10n.getString("Page.EditProfile.Title")).thenReturn("edit profile page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("edit profile page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit profile page title"))
 	}
 
 	@Test

@@ -64,7 +64,7 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Options.Title", "options page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("options page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("options page title"))
 	}
 
 	@Test

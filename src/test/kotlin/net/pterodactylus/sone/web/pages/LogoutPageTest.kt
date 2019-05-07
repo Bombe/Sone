@@ -27,7 +27,7 @@ class LogoutPageTest: WebPageTest(::LogoutPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Logout.Title", "logout page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("logout page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("logout page title"))
 	}
 
 	@Test

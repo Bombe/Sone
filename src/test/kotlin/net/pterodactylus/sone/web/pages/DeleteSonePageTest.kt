@@ -30,7 +30,7 @@ class DeleteSonePageTest: WebPageTest(::DeleteSonePage) {
 	@Test
 	fun `page returns correct title`() {
 	    whenever(l10n.getString("Page.DeleteSone.Title")).thenReturn("delete sone page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("delete sone page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("delete sone page"))
 	}
 
 	@Test

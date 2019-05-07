@@ -13,7 +13,7 @@ import net.pterodactylus.sone.utils.memoize
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.FORBIDDEN
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.OPTIONAL
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.REQUIRED
@@ -36,10 +36,10 @@ class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker 
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val startTime = System.currentTimeMillis()
 		val phrases = try {
-			freenetRequest.parameters["query"].emptyToNull?.parse()
+			soneRequest.parameters["query"].emptyToNull?.parse()
 		} catch (te: TextException) {
 			redirect("index.html")
 		}
@@ -49,39 +49,39 @@ class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker 
 			0 -> redirect("index.html")
 			1 -> phrases.first().phrase.also { word ->
 				when {
-					word.removePrefix("sone://").let(webInterface.core::getSone) != null -> redirect("viewSone.html?sone=${word.removePrefix("sone://")}")
-					word.removePrefix("post://").let(webInterface.core::getPost) != null -> redirect("viewPost.html?post=${word.removePrefix("post://")}")
-					word.removePrefix("reply://").let(webInterface.core::getPostReply) != null -> redirect("viewPost.html?post=${word.removePrefix("reply://").let(webInterface.core::getPostReply)?.postId}")
-					word.removePrefix("album://").let(webInterface.core::getAlbum) != null -> redirect("imageBrowser.html?album=${word.removePrefix("album://")}")
-					word.removePrefix("image://").let { webInterface.core.getImage(it, false) } != null -> redirect("imageBrowser.html?image=${word.removePrefix("image://")}")
+					word.removePrefix("sone://").let(soneRequest.core::getSone) != null -> redirect("viewSone.html?sone=${word.removePrefix("sone://")}")
+					word.removePrefix("post://").let(soneRequest.core::getPost) != null -> redirect("viewPost.html?post=${word.removePrefix("post://")}")
+					word.removePrefix("reply://").let(soneRequest.core::getPostReply) != null -> redirect("viewPost.html?post=${word.removePrefix("reply://").let(soneRequest.core::getPostReply)?.postId}")
+					word.removePrefix("album://").let(soneRequest.core::getAlbum) != null -> redirect("imageBrowser.html?album=${word.removePrefix("album://")}")
+					word.removePrefix("image://").let { soneRequest.core.getImage(it, false) } != null -> redirect("imageBrowser.html?image=${word.removePrefix("image://")}")
 				}
 			}
 		}
 
 		val soneNameCache = { sone: Sone -> sone.names() }.memoize()
-		val sonePagination = webInterface.core.sones
-				.scoreAndPaginate(phrases) { it.allText(soneNameCache) }
-				.apply { page = freenetRequest.parameters["sonePage"].emptyToNull?.toIntOrNull() ?: 0 }
+		val sonePagination = soneRequest.core.sones
+				.scoreAndPaginate(phrases, soneRequest.core.preferences.postsPerPage) { it.allText(soneNameCache) }
+				.apply { page = soneRequest.parameters["sonePage"].emptyToNull?.toIntOrNull() ?: 0 }
 		val postPagination = cache.get(phrases) {
-			webInterface.core.sones
+			soneRequest.core.sones
 					.flatMap(Sone::getPosts)
 					.filter { Post.FUTURE_POSTS_FILTER.apply(it) }
-					.scoreAndPaginate(phrases) { it.allText(soneNameCache) }
-		}.apply { page = freenetRequest.parameters["postPage"].emptyToNull?.toIntOrNull() ?: 0 }
+					.scoreAndPaginate(phrases, soneRequest.core.preferences.postsPerPage) { it.allText(soneNameCache, soneRequest.core::getReplies) }
+		}.apply { page = soneRequest.parameters["postPage"].emptyToNull?.toIntOrNull() ?: 0 }
 
-		Logger.normal(SearchPage::class.java, "Finished search for “${freenetRequest.parameters["query"]}” in ${System.currentTimeMillis() - startTime}ms.")
+		Logger.normal(SearchPage::class.java, "Finished search for “${soneRequest.parameters["query"]}” in ${System.currentTimeMillis() - startTime}ms.")
 		templateContext["sonePagination"] = sonePagination
 		templateContext["soneHits"] = sonePagination.items
 		templateContext["postPagination"] = postPagination
 		templateContext["postHits"] = postPagination.items
 	}
 
-	private fun <T> Iterable<T>.scoreAndPaginate(phrases: Iterable<Phrase>, texter: (T) -> String) =
+	private fun <T> Iterable<T>.scoreAndPaginate(phrases: Iterable<Phrase>, postsPerPage: Int, texter: (T) -> String) =
 			map { it to score(texter(it), phrases) }
 					.filter { it.second > 0 }
 					.sortedByDescending { it.second }
 					.map { it.first }
-					.paginate(webInterface.core.preferences.postsPerPage)
+					.paginate(postsPerPage)
 
 	private fun Sone.names() =
 			with(profile) {
@@ -93,8 +93,8 @@ class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker 
 	private fun Sone.allText(soneNameCache: (Sone) -> String) =
 			(soneNameCache(this) + profile.fields.map { "${it.name} ${it.value}" }.joinToString(" ", " ")).toLowerCase()
 
-	private fun Post.allText(soneNameCache: (Sone) -> String) =
-			(text + recipient.orNull()?.let { " ${soneNameCache(it)}" } + webInterface.core.getReplies(id)
+	private fun Post.allText(soneNameCache: (Sone) -> String, getReplies: (String) -> Collection<PostReply>) =
+			(text + recipient.orNull()?.let { " ${soneNameCache(it)}" } + getReplies(id)
 					.filter { PostReply.FUTURE_REPLY_FILTER.apply(it) }
 					.map { "${soneNameCache(it.sone)} ${it.text}" }.joinToString(" ", " ")).toLowerCase()
 

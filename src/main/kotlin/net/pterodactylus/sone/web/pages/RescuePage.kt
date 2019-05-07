@@ -4,7 +4,7 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
@@ -15,16 +15,16 @@ import javax.inject.Inject
 class RescuePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		val soneRescuer = webInterface.core.getSoneRescuer(currentSone)
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		val soneRescuer = soneRequest.core.getSoneRescuer(currentSone)
 		templateContext["soneRescuer"] = soneRescuer
-		if (freenetRequest.isPOST) {
-			freenetRequest.parameters["edition", 9]?.toIntOrNull()?.also {
+		if (soneRequest.isPOST) {
+			soneRequest.parameters["edition", 9]?.toIntOrNull()?.also {
 				if (it > -1) {
 					soneRescuer.setEdition(it.toLong())
 				}
 			}
-			if (freenetRequest.parameters["fetch", 8] == "true") {
+			if (soneRequest.parameters["fetch", 8] == "true") {
 				soneRescuer.startNextFetch()
 			}
 			throw RedirectException("rescue.html")

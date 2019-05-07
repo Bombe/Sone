@@ -18,7 +18,7 @@ import java.net.URLEncoder
  */
 open class SoneTemplatePage @JvmOverloads constructor(
 		path: String,
-		protected val webInterface: WebInterface,
+		private val webInterface: WebInterface,
 		template: Template,
 		private val pageTitleKey: String? = null,
 		private val requiresLogin: Boolean = false,
@@ -71,7 +71,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 		handleRequest(freenetRequest, templateContext)
 	}
 
-	internal open fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	open fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		handleRequest(freenetRequest.toSoneRequest(core, webInterface), templateContext)
 	}
 

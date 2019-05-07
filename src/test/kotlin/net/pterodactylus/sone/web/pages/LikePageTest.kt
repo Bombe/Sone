@@ -28,7 +28,7 @@ class LikePageTest: WebPageTest(::LikePage) {
 	@Test
 	fun `page returns correct title`() {
 	    addTranslation("Page.Like.Title", "like page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("like page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("like page title"))
 	}
 
 	@Test

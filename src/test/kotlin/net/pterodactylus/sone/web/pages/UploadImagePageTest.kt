@@ -43,7 +43,7 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 	@Test
 	fun `page returns correct title`() {
 	    addTranslation("Page.UploadImage.Title", "upload image page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("upload image page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("upload image page title"))
 	}
 
 	@Test

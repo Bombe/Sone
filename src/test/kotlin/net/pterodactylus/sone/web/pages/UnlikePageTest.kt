@@ -29,7 +29,7 @@ class UnlikePageTest: WebPageTest(::UnlikePage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Unlike.Title", "unlike page title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("unlike page title"))
+	    assertThat(page.getPageTitle(soneRequest), equalTo("unlike page title"))
 	}
 
 	@Test

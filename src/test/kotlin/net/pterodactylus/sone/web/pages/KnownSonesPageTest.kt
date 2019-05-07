@@ -84,7 +84,7 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.KnownSones.Title")).thenReturn("known sones page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("known sones page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("known sones page title"))
 	}
 
 	@Test

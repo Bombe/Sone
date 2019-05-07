@@ -29,7 +29,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	@Test
 	fun `page title is empty string if no page title key was given`() {
 		SoneTemplatePage("path.html", webInterface, template, requiresLogin = false).let { page ->
-			assertThat(page.getPageTitle(freenetRequest), equalTo(""))
+			assertThat(page.getPageTitle(soneRequest), equalTo(""))
 		}
 	}
 
@@ -37,7 +37,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	fun `page title is retrieved from l10n if page title key is given`() {
 		SoneTemplatePage("path.html", webInterface, template, "page.title", false).let { page ->
 			whenever(l10n.getString("page.title")).thenReturn("Page Title")
-			assertThat(page.getPageTitle(freenetRequest), equalTo("Page Title"))
+			assertThat(page.getPageTitle(soneRequest), equalTo("Page Title"))
 		}
 	}
 

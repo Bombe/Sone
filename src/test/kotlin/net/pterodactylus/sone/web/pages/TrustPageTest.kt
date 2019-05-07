@@ -32,7 +32,7 @@ class TrustPageTest: WebPageTest(::TrustPage) {
 	@Test
 	fun `page returns correct title`() {
 	    addTranslation("Page.Trust.Title", "title trust page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("title trust page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("title trust page"))
 	}
 
 	@Test

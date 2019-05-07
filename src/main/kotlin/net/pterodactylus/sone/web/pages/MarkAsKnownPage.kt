@@ -14,15 +14,15 @@ import javax.inject.*
 class MarkAsKnownPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("markAsKnown.html", webInterface, template, "Page.MarkAsKnown.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		val ids = freenetRequest.parameters["id", 65536]!!.split(" ")
-		when (freenetRequest.parameters["type", 5]) {
-			"sone" -> ids.mapNotNull(webInterface.core::getSone).forEach(webInterface.core::markSoneKnown)
-			"post" -> ids.mapNotNull(webInterface.core::getPost).forEach(webInterface.core::markPostKnown)
-			"reply" -> ids.mapNotNull(webInterface.core::getPostReply).forEach(webInterface.core::markReplyKnown)
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		val ids = soneRequest.parameters["id", 65536]!!.split(" ")
+		when (soneRequest.parameters["type", 5]) {
+			"sone" -> ids.mapNotNull(soneRequest.core::getSone).forEach(soneRequest.core::markSoneKnown)
+			"post" -> ids.mapNotNull(soneRequest.core::getPost).forEach(soneRequest.core::markPostKnown)
+			"reply" -> ids.mapNotNull(soneRequest.core::getPostReply).forEach(soneRequest.core::markReplyKnown)
 			else -> throw RedirectException("invalid.html")
 		}
-		throw RedirectException(freenetRequest.parameters["returnPage", 256]!!)
+		throw RedirectException(soneRequest.parameters["returnPage", 256]!!)
 	}
 
 }

@@ -40,7 +40,7 @@ class RescuePageTest: WebPageTest(::RescuePage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Rescue.Title", "rescue page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("rescue page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("rescue page title"))
 	}
 
 	@Test

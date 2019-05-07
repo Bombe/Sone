@@ -34,7 +34,7 @@ class FollowSonePageTest: WebPageTest(::FollowSonePage) {
 	@Test
 	fun `page returns correct title`() {
 	    whenever(l10n.getString("Page.FollowSone.Title")).thenReturn("follow sone page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("follow sone page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("follow sone page title"))
 	}
 
 	@Test

@@ -52,7 +52,7 @@ class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.EditAlbum.Title")).thenReturn("edit album page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("edit album page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit album page"))
 	}
 
 	@Test

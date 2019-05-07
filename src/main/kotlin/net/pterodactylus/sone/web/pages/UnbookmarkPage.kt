@@ -13,19 +13,19 @@ import javax.inject.*
 class UnbookmarkPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("unbookmark.html", webInterface, template, "Page.Unbookmark.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		when {
-			freenetRequest.isGET && (freenetRequest.parameters["post"] == "allNotLoaded") -> {
-				webInterface.core.bookmarkedPosts
+			soneRequest.isGET && (soneRequest.parameters["post"] == "allNotLoaded") -> {
+				soneRequest.core.bookmarkedPosts
 						.filterNot(Post::isLoaded)
-						.forEach(webInterface.core::unbookmarkPost)
+						.forEach(soneRequest.core::unbookmarkPost)
 				throw RedirectException("bookmarks.html")
 			}
-			freenetRequest.isPOST -> {
-				freenetRequest.parameters["post", 36]
-						?.let(webInterface.core::getPost)
-						?.also(webInterface.core::unbookmarkPost)
-				throw RedirectException(freenetRequest.parameters["returnPage", 256])
+			soneRequest.isPOST -> {
+				soneRequest.parameters["post", 36]
+						?.let(soneRequest.core::getPost)
+						?.also(soneRequest.core::unbookmarkPost)
+				throw RedirectException(soneRequest.parameters["returnPage", 256])
 			}
 		}
 	}

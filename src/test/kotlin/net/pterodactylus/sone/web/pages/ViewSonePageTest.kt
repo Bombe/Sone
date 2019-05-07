@@ -180,14 +180,14 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 	@Test
 	fun `page title is default for request without parameters`() {
 		addTranslation("Page.ViewSone.Page.TitleWithoutSone", "view sone page without sone")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view sone page without sone"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view sone page without sone"))
 	}
 
 	@Test
 	fun `page title is default for request with invalid sone parameters`() {
 		addHttpRequestParameter("sone", "invalid-sone-id")
 		addTranslation("Page.ViewSone.Page.TitleWithoutSone", "view sone page without sone")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view sone page without sone"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view sone page without sone"))
 	}
 
 	@Test
@@ -200,7 +200,7 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 			lastName = "Last"
 		})
 		addTranslation("Page.ViewSone.Title", "view sone page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("First M. Last - view sone page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("First M. Last - view sone page"))
 	}
 
 	@Test

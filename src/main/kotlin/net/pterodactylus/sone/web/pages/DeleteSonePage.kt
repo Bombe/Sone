@@ -3,7 +3,7 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
@@ -16,10 +16,10 @@ import javax.inject.Inject
 class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			if (freenetRequest.httpRequest.isPartSet("deleteSone")) {
-				webInterface.core.deleteSone(currentSone)
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			if (soneRequest.httpRequest.isPartSet("deleteSone")) {
+				soneRequest.core.deleteSone(currentSone)
 			}
 			throw RedirectException("index.html")
 		}

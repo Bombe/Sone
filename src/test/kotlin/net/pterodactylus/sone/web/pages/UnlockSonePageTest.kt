@@ -32,7 +32,7 @@ class UnlockSonePageTest: WebPageTest(::UnlockSonePage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.UnlockSone.Title", "unlock page title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("unlock page title"))
+	    assertThat(page.getPageTitle(soneRequest), equalTo("unlock page title"))
 	}
 
 	@Test

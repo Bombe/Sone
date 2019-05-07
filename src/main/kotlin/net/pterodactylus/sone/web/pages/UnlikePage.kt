@@ -4,7 +4,7 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
@@ -15,13 +15,13 @@ import javax.inject.Inject
 class UnlikePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("unlike.html", template, "Page.Unlike.Title", webInterface) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			when (freenetRequest.parameters["type"]) {
-				"post" -> currentSone.removeLikedPostId(freenetRequest.parameters["post"]!!)
-				"reply" -> currentSone.removeLikedReplyId(freenetRequest.parameters["reply"]!!)
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			when (soneRequest.parameters["type"]) {
+				"post" -> currentSone.removeLikedPostId(soneRequest.parameters["post"]!!)
+				"reply" -> currentSone.removeLikedReplyId(soneRequest.parameters["reply"]!!)
 			}
-			throw RedirectException(freenetRequest.parameters["returnPage", 256])
+			throw RedirectException(soneRequest.parameters["returnPage", 256])
 		}
 	}
 
