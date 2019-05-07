@@ -2,7 +2,7 @@ group = 'net.pterodactylus'
 version = '0.9.8'
 
 buildscript {
-    ext.kotlinVersion = '1.2.31'
+    ext.kotlinVersion = '1.2.71'
     repositories {
         mavenCentral()
     }
