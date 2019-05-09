@@ -30,6 +30,7 @@ import net.pterodactylus.util.web.Response;
 import freenet.client.HighLevelSimpleClient;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.LinkFilterExceptedToadlet;
+import freenet.clients.http.SessionManager;
 import freenet.clients.http.Toadlet;
 import freenet.clients.http.ToadletContext;
 import freenet.clients.http.ToadletContextClosedException;
@@ -41,6 +42,8 @@ import freenet.support.api.HTTPRequest;
  * {@link Toadlet} implementation that is wrapped around a {@link Page}.
  */
 public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFilterExceptedToadlet {
+
+	private final SessionManager sessionManager;
 
 	/** The name of the menu item. */
 	private final String menuName;
@@ -64,8 +67,9 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *            Prefix that is prepended to all {@link Page#getPath()} return
 	 *            values
 	 */
-	protected PageToadlet(HighLevelSimpleClient highLevelSimpleClient, String menuName, Page<FreenetRequest> page, String pathPrefix) {
+	protected PageToadlet(HighLevelSimpleClient highLevelSimpleClient, SessionManager sessionManager, String menuName, Page<FreenetRequest> page, String pathPrefix) {
 		super(highLevelSimpleClient);
+		this.sessionManager = sessionManager;
 		this.menuName = menuName;
 		this.page = page;
 		this.pathPrefix = pathPrefix;
@@ -103,7 +107,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodGET(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext, NodeL10n.getBase()));
+		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext, NodeL10n.getBase(), sessionManager));
 	}
 
 	/**
@@ -121,7 +125,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodPOST(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext, NodeL10n.getBase()));
+		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext, NodeL10n.getBase(), sessionManager));
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.client.*
+import freenet.clients.http.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
@@ -8,11 +9,12 @@ import org.hamcrest.Matchers.*
 import org.junit.*
 
 private val highLevelSimpleClient = mock<HighLevelSimpleClient>()
+private val sessionManager = mock<SessionManager>()
 private const val pathPrefix = "/some/prefix/"
 
 class PageToadletFactoryTest {
 
-	private val pageToadletFactory = PageToadletFactory(highLevelSimpleClient, pathPrefix)
+	private val pageToadletFactory = PageToadletFactory(highLevelSimpleClient, sessionManager, pathPrefix)
 
 	@Test
 	fun `page toadlet without menu name is created without menu name`() {

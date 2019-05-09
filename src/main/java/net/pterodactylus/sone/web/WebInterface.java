@@ -638,7 +638,7 @@ public class WebInterface implements SessionProvider {
 		Template replyTemplate = loaders.loadTemplate("/templates/include/viewReply.html");
 		Template openSearchTemplate = loaders.loadTemplate("/templates/xml/OpenSearch.xml");
 
-		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), "/Sone/");
+		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), getSessionManager(), "/Sone/");
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this, postVisibilityFilter), "Index"));
 		pageToadlets.add(pageToadletFactory.createPageToadlet(new NewPage(newTemplate, this), "New"));

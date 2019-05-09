@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import com.google.common.eventbus.EventBus
-import freenet.clients.http.ToadletContext
+import freenet.clients.http.*
 import freenet.support.SimpleReadOnlyArrayBucket
 import freenet.support.api.HTTPRequest
 import freenet.support.api.HTTPUploadedFile
@@ -51,12 +51,14 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 	val eventBus = mock<EventBus>()
 	val preferences = Preferences(eventBus)
 	val l10n = webInterface.l10n!!
+	val sessionManager = mock<SessionManager>()
 
 	val page by lazy { pageSupplier(template, webInterface) }
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()
 	init {
 		whenever(freenetRequest.l10n).thenReturn(l10n)
+		whenever(freenetRequest.sessionManager).thenReturn(sessionManager)
 		whenever(freenetRequest.uri).thenReturn(mock())
 	}
 	val soneRequest by lazy { freenetRequest.toSoneRequest(core, webInterface) }
@@ -107,6 +109,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 	}
 
 	private fun setupWebInterface() {
+		whenever(webInterface.sessionManager).thenReturn(sessionManager)
 		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)

@@ -26,7 +26,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 ) : FreenetTemplatePage(path, webInterface.templateContextFactory, template, "noPermission.html") {
 
 	private val core = webInterface.core
-	protected val sessionProvider: SessionProvider = webInterface
+	private val sessionProvider: SessionProvider = webInterface
 
 	protected fun getCurrentSone(toadletContext: ToadletContext, createSession: Boolean = true) =
 			sessionProvider.getCurrentSone(toadletContext, createSession)
@@ -92,7 +92,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 	private val String.urlEncode: String get() = URLEncoder.encode(this, "UTF-8")
 
 	override fun isEnabled(toadletContext: ToadletContext) =
-			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, webInterface.l10n, core, webInterface))
+			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, webInterface.l10n, webInterface.sessionManager, core, webInterface))
 
 	open fun isEnabled(soneRequest: SoneRequest) = when {
 		requiresLogin && getCurrentSone(soneRequest.toadletContext) == null -> false
