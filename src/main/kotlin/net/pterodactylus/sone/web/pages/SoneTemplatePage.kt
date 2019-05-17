@@ -35,7 +35,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	fun requiresLogin() = requiresLogin
 
-	override public fun getPageTitle(freenetRequest: FreenetRequest) = getPageTitle(freenetRequest.toSoneRequest(core, webInterface))
+	override public fun getPageTitle(request: FreenetRequest) = getPageTitle(request.toSoneRequest(core, webInterface))
 
 	open fun getPageTitle(soneRequest: SoneRequest) = pageTitle(soneRequest)
 
@@ -51,22 +51,22 @@ open class SoneTemplatePage @JvmOverloads constructor(
 					"href" to "http://${request.httpRequest.getHeader("host")}/Sone/OpenSearch.xml"
 			))
 
-	final override public fun processTemplate(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		super.processTemplate(freenetRequest, templateContext)
+	final override public fun processTemplate(request: FreenetRequest, templateContext: TemplateContext) {
+		super.processTemplate(request, templateContext)
 		templateContext["preferences"] = core.preferences
-		templateContext["currentSone"] = getCurrentSone(freenetRequest.toadletContext)
+		templateContext["currentSone"] = getCurrentSone(request.toadletContext)
 		templateContext["localSones"] = core.localSones
-		templateContext["request"] = freenetRequest
+		templateContext["request"] = request
 		templateContext["currentVersion"] = SonePlugin.getPluginVersion()
 		templateContext["hasLatestVersion"] = core.updateChecker.hasLatestVersion()
 		templateContext["latestEdition"] = core.updateChecker.latestEdition
 		templateContext["latestVersion"] = core.updateChecker.latestVersion
 		templateContext["latestVersionTime"] = core.updateChecker.latestVersionDate
-		webInterface.getNotifications(getCurrentSone(freenetRequest.toadletContext)).sortedBy(Notification::getCreatedTime).run {
+		webInterface.getNotifications(getCurrentSone(request.toadletContext)).sortedBy(Notification::getCreatedTime).run {
 			templateContext["notifications"] = this
 			templateContext["notificationHash"] = this.hashCode()
 		}
-		handleRequest(freenetRequest, templateContext)
+		handleRequest(request, templateContext)
 	}
 
 	open fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
@@ -76,13 +76,13 @@ open class SoneTemplatePage @JvmOverloads constructor(
 	open fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 	}
 
-	override public fun getRedirectTarget(freenetRequest: FreenetRequest): String? {
-		if (requiresLogin && getCurrentSone(freenetRequest.toadletContext) == null) {
-			val parameters = freenetRequest.httpRequest.parameterNames
-					.flatMap { name -> freenetRequest.httpRequest.getMultipleParam(name).map { name to it } }
+	override public fun getRedirectTarget(request: FreenetRequest): String? {
+		if (requiresLogin && getCurrentSone(request.toadletContext) == null) {
+			val parameters = request.httpRequest.parameterNames
+					.flatMap { name -> request.httpRequest.getMultipleParam(name).map { name to it } }
 					.joinToString("&") { "${it.first.urlEncode}=${it.second.urlEncode}" }
 					.emptyToNull
-			return "login.html?target=${freenetRequest.httpRequest.path}${parameters?.let { ("?" + it).urlEncode } ?: ""}"
+			return "login.html?target=${request.httpRequest.path}${parameters?.let { ("?" + it).urlEncode } ?: ""}"
 		}
 		return null
 	}

@@ -29,8 +29,8 @@ class LoginPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 		templateContext["identitiesWithoutSone"] = soneRequest.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}" }
 	}
 
-	override fun getRedirectTarget(freenetRequest: FreenetRequest) =
-			getCurrentSone(freenetRequest.toadletContext)?.let { "index.html" }
+	override fun getRedirectTarget(request: FreenetRequest) =
+			getCurrentSone(request.toadletContext)?.let { "index.html" }
 
 	override fun isEnabled(soneRequest: SoneRequest) = when {
 		soneRequest.core.preferences.requireFullAccess && !soneRequest.toadletContext.isAllowedFullAccess -> false
