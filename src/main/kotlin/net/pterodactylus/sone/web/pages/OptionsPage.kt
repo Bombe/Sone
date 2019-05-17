@@ -15,6 +15,7 @@ import javax.inject.Inject
 /**
  * This page lets the user edit the options of the Sone plugin.
  */
+@MenuName("Options")
 class OptionsPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("options.html", webInterface, template, "Page.Options.Title") {
 
