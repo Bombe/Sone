@@ -10,6 +10,7 @@ import javax.inject.*
 /**
  * Page that lets the user bookmark a post.
  */
+@ToadletPath("bookmark.html")
 class BookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer)
 	: SoneTemplatePage("bookmark.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmark.Title") {
 

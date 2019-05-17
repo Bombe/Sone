@@ -19,6 +19,7 @@ import javax.inject.*
  * words.
  */
 @TemplatePath("/templates/search.html")
+@ToadletPath("search.html")
 class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
 		SoneTemplatePage("search.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Search.Title") {
 

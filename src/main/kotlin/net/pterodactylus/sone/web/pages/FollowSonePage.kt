@@ -11,6 +11,7 @@ import javax.inject.*
 /**
  * This page lets the user follow another Sone.
  */
+@ToadletPath("followSone.html")
 class FollowSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("followSone.html", "Page.FollowSone.Title", webInterface, loaders, templateRenderer) {
 

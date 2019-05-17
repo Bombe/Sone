@@ -15,6 +15,7 @@ import javax.inject.*
  */
 @MenuName("EditProfile")
 @TemplatePath("/templates/editProfile.html")
+@ToadletPath("editProfile.html")
 class EditProfilePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("editProfile.html", "Page.EditProfile.Title", webInterface, loaders, templateRenderer) {
 

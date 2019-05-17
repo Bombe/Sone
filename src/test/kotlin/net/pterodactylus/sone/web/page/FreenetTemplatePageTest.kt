@@ -16,7 +16,7 @@ class FreenetTemplatePageTest {
 	private val templateRenderer = deepMock<TemplateRenderer>()
 	private val loaders = mock<Loaders>()
 	private val template = mock<Template>()
-	private val page = FreenetTemplatePage("/test/path", templateRenderer, loaders, "invalid-form-password")
+	private val page = TestPage(templateRenderer, loaders)
 
 	@Test
 	fun `path is exposed correctly`() {
@@ -70,7 +70,7 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `isEnabled() returns false if full access only is true`() {
-		val page = object : FreenetTemplatePage("/test/path", templateRenderer, loaders, "invalid-form-password") {
+		val page = object : TestPage(templateRenderer, loaders) {
 			override val isFullAccessOnly = true
 		}
 		assertThat(page.isEnabled(mock()), equalTo(false))
@@ -78,7 +78,7 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `page with redirect target throws redirect exception on handleRequest`() {
-		val page = object : FreenetTemplatePage("/test/path", templateRenderer, loaders, "invalid-form-password") {
+		val page = object : TestPage(templateRenderer, loaders) {
 			override fun getRedirectTarget(request: FreenetRequest) = "foo"
 		}
 		val request = mock<FreenetRequest>()
@@ -90,7 +90,7 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `page with full access only returns unauthorized on handleRequest with non-full access request`() {
-		val page = object : FreenetTemplatePage("/test/path", templateRenderer, loaders, "invalid-form-password") {
+		val page = object : TestPage(templateRenderer, loaders) {
 			override val isFullAccessOnly = true
 		}
 		val request = deepMock<FreenetRequest>()
@@ -125,17 +125,11 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `template from annotation is loaded`() {
-		val template = deepMock<Template>()
-		whenever(loaders.loadTemplate("template-path")).thenReturn(template)
-		TestPage(templateRenderer, loaders)
 		verify(loaders).loadTemplate("template-path")
 	}
 
 	@TemplatePath("template-path")
-	private class TestPage(templateRenderer: TemplateRenderer, loaders: Loaders) : FreenetTemplatePage("/", templateRenderer, loaders, "") {
-		override fun getPath() = ""
-		override fun isPrefixPage() = false
-		override fun handleRequest(request: FreenetRequest, response: Response) = response
-	}
+	@ToadletPath("/test/path")
+	private open class TestPage(templateRenderer: TemplateRenderer, loaders: Loaders) : FreenetTemplatePage("/", templateRenderer, loaders, "invalid-form-password")
 
 }

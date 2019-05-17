@@ -9,3 +9,7 @@ val Page<*>.menuName get() = javaClass.getAnnotation(MenuName::class.java)?.valu
 annotation class TemplatePath(val value: String)
 
 val Page<*>.templatePath get() = javaClass.getAnnotation(TemplatePath::class.java)?.value
+
+annotation class ToadletPath(val value: String)
+
+val Page<*>.toadletPath get() = javaClass.getAnnotation(ToadletPath::class.java)?.value

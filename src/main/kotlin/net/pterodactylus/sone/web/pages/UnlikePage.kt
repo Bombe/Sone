@@ -11,6 +11,7 @@ import javax.inject.*
 /**
  * Page that lets the user unlike a [net.pterodactylus.sone.data.Post] or [net.pterodactylus.sone.data.Reply].
  */
+@ToadletPath("unlike.html")
 class UnlikePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("unlike.html", "Page.Unlike.Title", webInterface, loaders, templateRenderer) {
 

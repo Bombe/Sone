@@ -13,6 +13,7 @@ import javax.inject.*
  */
 @MenuName("KnownSones")
 @TemplatePath("/templates/knownSones.html")
+@ToadletPath("knownSones.html")
 class KnownSonesPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("knownSones.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.KnownSones.Title") {
 

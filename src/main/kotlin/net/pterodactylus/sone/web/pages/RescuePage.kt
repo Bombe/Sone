@@ -13,6 +13,7 @@ import javax.inject.*
  */
 @MenuName("Rescue")
 @TemplatePath("/templates/rescue.html")
+@ToadletPath("rescue.html")
 class RescuePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("rescue.html", "Page.Rescue.Title", webInterface, loaders, templateRenderer) {
 

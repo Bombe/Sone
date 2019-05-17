@@ -11,6 +11,7 @@ import javax.inject.*
 /**
  * Page that lets the user like [net.pterodactylus.sone.data.Post]s and [net.pterodactylus.sone.data.Reply]s.
  */
+@ToadletPath("like.html")
 class LikePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("like.html", "Page.Like.Title", webInterface, loaders, templateRenderer) {
 

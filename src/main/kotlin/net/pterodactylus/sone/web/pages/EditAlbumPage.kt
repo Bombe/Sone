@@ -12,6 +12,7 @@ import javax.inject.*
 /**
  * Page that lets the user edit the name and description of an album.
  */
+@ToadletPath("editAlbum.html")
 class EditAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("editAlbum.html", "Page.EditAlbum.Title", webInterface, loaders, templateRenderer) {
 

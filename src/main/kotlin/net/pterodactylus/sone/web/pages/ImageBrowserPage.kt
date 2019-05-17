@@ -14,6 +14,7 @@ import javax.inject.*
  */
 @MenuName("ImageBrowser")
 @TemplatePath("/templates/imageBrowser.html")
+@ToadletPath("imageBrowser.html")
 class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("imageBrowser.html", "Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
 

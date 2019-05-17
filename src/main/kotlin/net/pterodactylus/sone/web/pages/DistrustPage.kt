@@ -14,6 +14,7 @@ import javax.inject.*
  *
  * @see net.pterodactylus.sone.core.Core#distrustSone(Sone, Sone)
  */
+@ToadletPath("distrust.html")
 class DistrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("distrust.html", "Page.Distrust.Title", webInterface, loaders, templateRenderer) {
 

@@ -13,6 +13,7 @@ import javax.inject.*
  */
 @MenuName("Bookmarks")
 @TemplatePath("/templates/bookmarks.html")
+@ToadletPath("bookmarks.html")
 class BookmarksPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("bookmarks.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
 

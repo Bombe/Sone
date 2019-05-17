@@ -12,6 +12,7 @@ import javax.inject.*
  * Page that lets the user mark a number of [net.pterodactylus.sone.data.Sone]s, [Post]s, or
  * [Replie][net.pterodactylus.sone.data.Reply]s as known.
  */
+@ToadletPath("markAsKnown.html")
 class MarkAsKnownPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("markAsKnown.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.MarkAsKnown.Title") {
 

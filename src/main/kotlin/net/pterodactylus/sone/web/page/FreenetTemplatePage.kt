@@ -31,7 +31,7 @@ import java.util.logging.Logger.*
  * fit into Freenet’s web interface.
  */
 open class FreenetTemplatePage(
-		private val path: String,
+		path: String,
 		private val templateRenderer: TemplateRenderer,
 		loaders: Loaders,
 		private val invalidFormPasswordRedirectTarget: String
@@ -41,7 +41,7 @@ open class FreenetTemplatePage(
 	open val shortcutIcon: String? get() = null
 	open val isFullAccessOnly get() = false
 
-	override fun getPath() = path
+	override fun getPath() = toadletPath
 
 	open fun getPageTitle(request: FreenetRequest) = ""
 

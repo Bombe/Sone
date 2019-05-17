@@ -9,6 +9,7 @@ import javax.inject.*
 /**
  * Page that lets the user dismiss a notification.
  */
+@ToadletPath("dismissNotification.html")
 class DismissNotificationPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("dismissNotification.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.DismissNotification.Title") {
 

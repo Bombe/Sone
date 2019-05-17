@@ -11,6 +11,7 @@ import javax.inject.*
  * Logs a user out.
  */
 @MenuName("Logout")
+@ToadletPath("logout.html")
 class LogoutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("logout.html", "Page.Logout.Title", webInterface, loaders, templateRenderer) {
 

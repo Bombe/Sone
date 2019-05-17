@@ -11,6 +11,7 @@ import javax.inject.*
 /**
  * This page lets the user unfollow another Sone.
  */
+@ToadletPath("unfollowSone.html")
 class UnfollowSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("unfollowSone.html", "Page.UnfollowSone.Title", webInterface, loaders, templateRenderer) {
 

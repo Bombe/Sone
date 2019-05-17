@@ -15,6 +15,7 @@ import javax.inject.*
  */
 @MenuName("Index")
 @TemplatePath("/templates/index.html")
+@ToadletPath("index.html")
 class IndexPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val postVisibilityFilter: PostVisibilityFilter) :
 		LoggedInPage("index.html", "Page.Index.Title", webInterface, loaders, templateRenderer) {
 

@@ -12,6 +12,7 @@ import javax.inject.*
  * Page that lets the user untrust another Sone. This will remove all trust
  * assignments for an identity.
  */
+@ToadletPath("untrust.html")
 class UntrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("untrust.html", "Page.Untrust.Title", webInterface, loaders, templateRenderer) {
 

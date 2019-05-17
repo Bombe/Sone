@@ -10,6 +10,7 @@ import javax.inject.*
 /**
  * This page lets the user unlock a [net.pterodactylus.sone.data.Sone] to allow its insertion.
  */
+@ToadletPath("unlockSone.html")
 class UnlockSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("unlockSone.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.UnlockSone.Title") {
 

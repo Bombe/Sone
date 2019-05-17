@@ -11,6 +11,7 @@ import javax.inject.*
  */
 @MenuName("About")
 @TemplatePath("/templates/about.html")
+@ToadletPath("about.html")
 class AboutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,

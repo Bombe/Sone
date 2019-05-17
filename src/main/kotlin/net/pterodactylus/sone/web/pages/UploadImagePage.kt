@@ -17,6 +17,7 @@ import javax.inject.*
  * Page implementation that lets the user upload an image.
  */
 @TemplatePath("/templates/invalid.html")
+@ToadletPath("uploadImage.html")
 class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("uploadImage.html", "Page.UploadImage.Title", webInterface, loaders, templateRenderer) {
 

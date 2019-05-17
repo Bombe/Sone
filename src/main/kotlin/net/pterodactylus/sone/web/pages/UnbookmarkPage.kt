@@ -11,6 +11,7 @@ import javax.inject.*
 /**
  * Page that lets the user unbookmark a post.
  */
+@ToadletPath("unbookmark.html")
 class UnbookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("unbookmark.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Unbookmark.Title") {
 

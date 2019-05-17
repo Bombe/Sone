@@ -12,6 +12,7 @@ import javax.inject.*
  * Page that lets the user trust another Sone. This will assign a configurable
  * amount of trust to an identity.
  */
+@ToadletPath("trust.html")
 class TrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("trust.html", "Page.Trust.Title", webInterface, loaders, templateRenderer) {
 

@@ -13,6 +13,7 @@ import javax.inject.*
  * This page lets the user create a new [Post].
  */
 @TemplatePath("/templates/createPost.html")
+@ToadletPath("createPost.html")
 class CreatePostPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("createPost.html", "Page.CreatePost.Title", webInterface, loaders, templateRenderer) {
 
