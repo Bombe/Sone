@@ -35,7 +35,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	fun requiresLogin() = requiresLogin
 
-	override public fun getPageTitle(request: FreenetRequest) = getPageTitle(request.toSoneRequest(core, webInterface))
+	override fun getPageTitle(request: FreenetRequest) = getPageTitle(request.toSoneRequest(core, webInterface))
 
 	open fun getPageTitle(soneRequest: SoneRequest) = pageTitle(soneRequest)
 
@@ -43,7 +43,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	override val shortcutIcon = "images/icon.png"
 
-	override public fun getAdditionalLinkNodes(request: FreenetRequest) =
+	override fun getAdditionalLinkNodes(request: FreenetRequest) =
 			listOf(mapOf(
 					"rel" to "search",
 					"type" to "application/opensearchdescription+xml",
@@ -51,7 +51,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 					"href" to "http://${request.httpRequest.getHeader("host")}/Sone/OpenSearch.xml"
 			))
 
-	final override public fun processTemplate(request: FreenetRequest, templateContext: TemplateContext) {
+	final override fun processTemplate(request: FreenetRequest, templateContext: TemplateContext) {
 		super.processTemplate(request, templateContext)
 		templateContext["preferences"] = core.preferences
 		templateContext["currentSone"] = getCurrentSone(request.toadletContext)
@@ -76,7 +76,7 @@ open class SoneTemplatePage @JvmOverloads constructor(
 	open fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 	}
 
-	override public fun getRedirectTarget(request: FreenetRequest): String? {
+	override fun getRedirectTarget(request: FreenetRequest): String? {
 		if (requiresLogin && getCurrentSone(request.toadletContext) == null) {
 			val parameters = request.httpRequest.parameterNames
 					.flatMap { name -> request.httpRequest.getMultipleParam(name).map { name to it } }
