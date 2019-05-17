@@ -17,7 +17,7 @@ import javax.inject.*
  * Page implementation that lets the user upload an image.
  */
 @TemplatePath("/templates/invalid.html")
-class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("uploadImage.html", "Page.UploadImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
@@ -56,13 +56,14 @@ class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: L
 		ImageIO.read(it)
 	}
 
-	private val ByteArray.mimeType get() = ByteArrayInputStream(this).use {
-		ImageIO.createImageInputStream(it).use {
-			ImageIO.getImageReaders(it).asSequence()
-					.firstOrNull()?.originatingProvider?.mimeTypes?.firstOrNull()
-					?: UNKNOWN_MIME_TYPE
+	private val ByteArray.mimeType
+		get() = ByteArrayInputStream(this).use {
+			ImageIO.createImageInputStream(it).use {
+				ImageIO.getImageReaders(it).asSequence()
+						.firstOrNull()?.originatingProvider?.mimeTypes?.firstOrNull()
+						?: UNKNOWN_MIME_TYPE
+			}
 		}
-	}
 
 }
 

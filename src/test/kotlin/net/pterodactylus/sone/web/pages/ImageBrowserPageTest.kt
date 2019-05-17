@@ -12,22 +12,22 @@ import java.net.*
 /**
  * Unit test for [ImageBrowserPage].
  */
-class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
+class ImageBrowserPageTest : WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("imageBrowser.html"))
+		assertThat(page.path, equalTo("imageBrowser.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.ImageBrowser.Title")).thenReturn("image browser page title")
-	    assertThat(page.getPageTitle(soneRequest), equalTo("image browser page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("image browser page title"))
 	}
 
 	@Test
@@ -129,22 +129,22 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page is link-excepted`() {
-	    assertThat(page.isLinkExcepted(URI("")), equalTo(true))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(true))
 	}
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<ImageBrowserPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<ImageBrowserPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("ImageBrowser"))
+		assertThat(page.menuName, equalTo("ImageBrowser"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/imageBrowser.html"))
+		assertThat(page.templatePath, equalTo("/templates/imageBrowser.html"))
 	}
 
 }

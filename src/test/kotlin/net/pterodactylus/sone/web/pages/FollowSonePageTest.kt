@@ -16,21 +16,21 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [FollowSonePage].
  */
-class FollowSonePageTest: WebPageTest(::FollowSonePage) {
+class FollowSonePageTest : WebPageTest(::FollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("followSone.html"))
+		assertThat(page.path, equalTo("followSone.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    whenever(l10n.getString("Page.FollowSone.Title")).thenReturn("follow sone page title")
+		whenever(l10n.getString("Page.FollowSone.Title")).thenReturn("follow sone page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("follow sone page title"))
 	}
 
@@ -82,7 +82,7 @@ class FollowSonePageTest: WebPageTest(::FollowSonePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<FollowSonePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<FollowSonePage>(), notNullValue())
 	}
 
 }

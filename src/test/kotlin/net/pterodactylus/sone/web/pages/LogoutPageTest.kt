@@ -11,7 +11,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [LogoutPage].
  */
-class LogoutPageTest: WebPageTest(::LogoutPage) {
+class LogoutPageTest : WebPageTest(::LogoutPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -70,12 +70,12 @@ class LogoutPageTest: WebPageTest(::LogoutPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<LogoutPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<LogoutPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("Logout"))
+		assertThat(page.menuName, equalTo("Logout"))
 	}
 
 }

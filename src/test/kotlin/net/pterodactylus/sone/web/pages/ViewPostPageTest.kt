@@ -12,7 +12,7 @@ import java.net.*
 /**
  * Unit test for [ViewPostPage].
  */
-class ViewPostPageTest: WebPageTest(::ViewPostPage) {
+class ViewPostPageTest : WebPageTest(::ViewPostPage) {
 
 	private val post = mock<Post>()
 
@@ -99,12 +99,12 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<ViewPostPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<ViewPostPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/viewPost.html"))
+		assertThat(page.templatePath, equalTo("/templates/viewPost.html"))
 	}
 
 }

@@ -12,7 +12,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [MarkAsKnownPage].
  */
-class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
+class MarkAsKnownPageTest : WebPageTest(::MarkAsKnownPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -84,7 +84,7 @@ class MarkAsKnownPageTest: WebPageTest(::MarkAsKnownPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<MarkAsKnownPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<MarkAsKnownPage>(), notNullValue())
 	}
 
 }

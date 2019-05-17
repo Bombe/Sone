@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.*
 /**
  * Unit test for [SearchPage].
  */
-class SearchPageTest: WebPageTest({ webInterface, loaders, templateRenderer -> SearchPage(webInterface, loaders, templateRenderer, ticker) }) {
+class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> SearchPage(webInterface, loaders, templateRenderer, ticker) }) {
 
 	companion object {
 		val ticker = mock<Ticker>()
@@ -360,12 +360,12 @@ class SearchPageTest: WebPageTest({ webInterface, loaders, templateRenderer -> S
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<SearchPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<SearchPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/search.html"))
+		assertThat(page.templatePath, equalTo("/templates/search.html"))
 	}
 
 }

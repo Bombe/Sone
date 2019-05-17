@@ -12,7 +12,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [UnbookmarkPage].
  */
-class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
+class UnbookmarkPageTest : WebPageTest(::UnbookmarkPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -74,7 +74,7 @@ class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<UnbookmarkPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<UnbookmarkPage>(), notNullValue())
 	}
 
 }

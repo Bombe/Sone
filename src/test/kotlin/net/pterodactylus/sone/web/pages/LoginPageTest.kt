@@ -14,7 +14,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [LoginPage].
  */
-class LoginPageTest: WebPageTest(::LoginPage) {
+class LoginPageTest : WebPageTest(::LoginPage) {
 
 	private val sones = listOf(createSone("Sone", "Test"), createSone("Test"), createSone("Sone"))
 
@@ -40,12 +40,12 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("login.html"))
+		assertThat(page.path, equalTo("login.html"))
 	}
 
 	@Test
 	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
+		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test
@@ -135,17 +135,17 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<LoginPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<LoginPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("Login"))
+		assertThat(page.menuName, equalTo("Login"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/login.html"))
+		assertThat(page.templatePath, equalTo("/templates/login.html"))
 	}
 
 }

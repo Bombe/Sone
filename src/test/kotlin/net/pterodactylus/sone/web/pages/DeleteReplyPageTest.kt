@@ -13,7 +13,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [DeleteReplyPage].
  */
-class DeleteReplyPageTest: WebPageTest(::DeleteReplyPage) {
+class DeleteReplyPageTest : WebPageTest(::DeleteReplyPage) {
 
 	private val sone = mock<Sone>()
 	private val reply = mock<PostReply>()
@@ -26,12 +26,12 @@ class DeleteReplyPageTest: WebPageTest(::DeleteReplyPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("deleteReply.html"))
+		assertThat(page.path, equalTo("deleteReply.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
@@ -100,7 +100,7 @@ class DeleteReplyPageTest: WebPageTest(::DeleteReplyPage) {
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/deleteReply.html"))
+		assertThat(page.templatePath, equalTo("/templates/deleteReply.html"))
 	}
 
 }

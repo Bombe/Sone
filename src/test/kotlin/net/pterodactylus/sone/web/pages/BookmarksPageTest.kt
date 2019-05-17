@@ -12,7 +12,7 @@ import org.junit.*
 /**
  * Unit test for [BookmarksPage].
  */
-class BookmarksPageTest: WebPageTest(::BookmarksPage) {
+class BookmarksPageTest : WebPageTest(::BookmarksPage) {
 
 	private val post1 = createLoadedPost(1000)
 	private val post2 = createLoadedPost(3000)
@@ -62,12 +62,12 @@ class BookmarksPageTest: WebPageTest(::BookmarksPage) {
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("Bookmarks"))
+		assertThat(page.menuName, equalTo("Bookmarks"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/bookmarks.html"))
+		assertThat(page.templatePath, equalTo("/templates/bookmarks.html"))
 	}
 
 }

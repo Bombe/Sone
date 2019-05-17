@@ -13,7 +13,7 @@ import javax.inject.*
  */
 @MenuName("KnownSones")
 @TemplatePath("/templates/knownSones.html")
-class KnownSonesPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class KnownSonesPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("knownSones.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.KnownSones.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {

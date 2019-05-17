@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [RescuePage].
  */
-class RescuePageTest: WebPageTest(::RescuePage) {
+class RescuePageTest : WebPageTest(::RescuePage) {
 
 	private val soneRescuer = mock<SoneRescuer>()
 
@@ -87,17 +87,17 @@ class RescuePageTest: WebPageTest(::RescuePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<RescuePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<RescuePage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("Rescue"))
+		assertThat(page.menuName, equalTo("Rescue"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/rescue.html"))
+		assertThat(page.templatePath, equalTo("/templates/rescue.html"))
 	}
 
 }

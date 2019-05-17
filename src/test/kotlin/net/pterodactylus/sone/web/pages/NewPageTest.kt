@@ -13,7 +13,7 @@ import java.util.Arrays.*
 /**
  * Unit test for [NewPage].
  */
-class NewPageTest: WebPageTest(::NewPage) {
+class NewPageTest : WebPageTest(::NewPage) {
 
 	@Before
 	fun setupNumberOfPostsPerPage() {
@@ -79,17 +79,17 @@ class NewPageTest: WebPageTest(::NewPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<NewPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<NewPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with the correct menuname`() {
-	    assertThat(page.menuName, equalTo("New"))
+		assertThat(page.menuName, equalTo("New"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/new.html"))
+		assertThat(page.templatePath, equalTo("/templates/new.html"))
 	}
 
 }

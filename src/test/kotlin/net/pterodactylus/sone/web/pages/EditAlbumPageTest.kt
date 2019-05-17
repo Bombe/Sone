@@ -14,7 +14,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [EditAlbumPage].
  */
-class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
+class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 
 	private val album = mock<Album>()
 	private val parentAlbum = mock<Album>()
@@ -119,7 +119,7 @@ class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<EditAlbumPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<EditAlbumPage>(), notNullValue())
 	}
 
 }

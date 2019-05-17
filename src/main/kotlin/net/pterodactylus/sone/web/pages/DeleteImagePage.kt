@@ -12,7 +12,7 @@ import javax.inject.*
  * Page that lets the user delete an {@link Image}.
  */
 @TemplatePath("/templates/deleteImage.html")
-class DeleteImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class DeleteImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("deleteImage.html", "Page.DeleteImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {

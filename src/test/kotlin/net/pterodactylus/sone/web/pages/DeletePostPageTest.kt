@@ -13,7 +13,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [DeletePostPage].
  */
-class DeletePostPageTest: WebPageTest(::DeletePostPage) {
+class DeletePostPageTest : WebPageTest(::DeletePostPage) {
 
 	private val post = mock<Post>()
 	private val sone = mock<Sone>()
@@ -26,12 +26,12 @@ class DeletePostPageTest: WebPageTest(::DeletePostPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("deletePost.html"))
+		assertThat(page.path, equalTo("deletePost.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
@@ -102,12 +102,12 @@ class DeletePostPageTest: WebPageTest(::DeletePostPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<DeletePostPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<DeletePostPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/deletePost.html"))
+		assertThat(page.templatePath, equalTo("/templates/deletePost.html"))
 	}
 
 }

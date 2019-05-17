@@ -12,7 +12,7 @@ import javax.inject.*
  * This page lets the user delete a reply.
  */
 @TemplatePath("/templates/deleteReply.html")
-class DeleteReplyPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class DeleteReplyPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("deleteReply.html", "Page.DeleteReply.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {

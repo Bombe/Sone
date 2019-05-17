@@ -13,7 +13,7 @@ import java.net.*
 /**
  * Unit test for [ViewSonePage].
  */
-class ViewSonePageTest: WebPageTest(::ViewSonePage) {
+class ViewSonePageTest : WebPageTest(::ViewSonePage) {
 
 	init {
 		whenever(currentSone.id).thenReturn("sone-id")
@@ -200,12 +200,12 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<ViewSonePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<ViewSonePage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/viewSone.html"))
+		assertThat(page.templatePath, equalTo("/templates/viewSone.html"))
 	}
 
 }

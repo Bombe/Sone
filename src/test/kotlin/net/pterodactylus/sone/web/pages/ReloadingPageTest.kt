@@ -15,7 +15,9 @@ import kotlin.text.Charsets.UTF_8
  */
 class ReloadingPageTest {
 
-	@Rule @JvmField val tempFolder = TemporaryFolder()
+	@Rule
+	@JvmField
+	val tempFolder = TemporaryFolder()
 	private val folder by lazy { tempFolder.newFolder()!! }
 	private val page by lazy { ReloadingPage<FreenetRequest>("/prefix/", folder.path, "text/plain") }
 	private val webPageTest = WebPageTest()
@@ -54,7 +56,7 @@ class ReloadingPageTest {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<ReloadingPage<*>>(), notNullValue())
+		assertThat(baseInjector.getInstance<ReloadingPage<*>>(), notNullValue())
 	}
 
 }

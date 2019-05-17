@@ -16,21 +16,21 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [TrustPage].
  */
-class TrustPageTest: WebPageTest(::TrustPage) {
+class TrustPageTest : WebPageTest(::TrustPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("trust.html"))
+		assertThat(page.path, equalTo("trust.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.Trust.Title", "title trust page")
+		addTranslation("Page.Trust.Title", "title trust page")
 		assertThat(page.getPageTitle(soneRequest), equalTo("title trust page"))
 	}
 
@@ -72,7 +72,7 @@ class TrustPageTest: WebPageTest(::TrustPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<TrustPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<TrustPage>(), notNullValue())
 	}
 
 }

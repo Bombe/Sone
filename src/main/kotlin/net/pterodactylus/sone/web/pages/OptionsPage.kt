@@ -14,7 +14,7 @@ import javax.inject.*
  */
 @MenuName("Options")
 @TemplatePath("/templates/options.html")
-class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("options.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Options.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {

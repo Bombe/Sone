@@ -15,7 +15,7 @@ import org.junit.*
 /**
  * Unit test for [OptionsPage].
  */
-class OptionsPageTest: WebPageTest(::OptionsPage) {
+class OptionsPageTest : WebPageTest(::OptionsPage) {
 
 	@Before
 	fun setupPreferences() {
@@ -375,17 +375,17 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<OptionsPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<OptionsPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("Options"))
+		assertThat(page.menuName, equalTo("Options"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/options.html"))
+		assertThat(page.templatePath, equalTo("/templates/options.html"))
 	}
 
 }

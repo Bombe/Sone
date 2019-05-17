@@ -9,7 +9,7 @@ import javax.inject.*
 /**
  * Page that delivers a {@link TemporaryImage} to the browser.
  */
-class GetImagePage @Inject constructor(webInterface: WebInterface): FreenetPage {
+class GetImagePage @Inject constructor(webInterface: WebInterface) : FreenetPage {
 
 	private val core = webInterface.core
 

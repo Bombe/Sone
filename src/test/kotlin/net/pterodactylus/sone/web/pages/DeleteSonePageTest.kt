@@ -12,21 +12,21 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [DeleteSonePage].
  */
-class DeleteSonePageTest: WebPageTest(::DeleteSonePage) {
+class DeleteSonePageTest : WebPageTest(::DeleteSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("deleteSone.html"))
+		assertThat(page.path, equalTo("deleteSone.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    whenever(l10n.getString("Page.DeleteSone.Title")).thenReturn("delete sone page")
+		whenever(l10n.getString("Page.DeleteSone.Title")).thenReturn("delete sone page")
 		assertThat(page.getPageTitle(soneRequest), equalTo("delete sone page"))
 	}
 
@@ -59,12 +59,12 @@ class DeleteSonePageTest: WebPageTest(::DeleteSonePage) {
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("DeleteSone"))
+		assertThat(page.menuName, equalTo("DeleteSone"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/deleteSone.html"))
+		assertThat(page.templatePath, equalTo("/templates/deleteSone.html"))
 	}
 
 }

@@ -13,7 +13,7 @@ import org.junit.*
 /**
  * Unit test for [KnownSonesPage].
  */
-class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
+class KnownSonesPageTest : WebPageTest(::KnownSonesPage) {
 
 	private val sones = listOf(
 			createSone(1000, 4, 7, 2, "sone2", true, true),
@@ -237,17 +237,17 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<KnownSonesPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<KnownSonesPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with the correct menuname`() {
-	    assertThat(page.menuName, equalTo("KnownSones"))
+		assertThat(page.menuName, equalTo("KnownSones"))
 	}
 
 	@Test
 	fun `page is annotated with corrrect template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/knownSones.html"))
+		assertThat(page.templatePath, equalTo("/templates/knownSones.html"))
 	}
 
 }

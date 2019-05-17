@@ -12,7 +12,7 @@ import javax.inject.*
  * Lets the user delete a post they made.
  */
 @TemplatePath("/templates/deletePost.html")
-class DeletePostPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class DeletePostPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("deletePost.html", "Page.DeletePost.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {

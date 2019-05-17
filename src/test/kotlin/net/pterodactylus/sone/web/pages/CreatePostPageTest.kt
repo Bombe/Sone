@@ -15,7 +15,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [CreatePostPage].
  */
-class CreatePostPageTest: WebPageTest(::CreatePostPage) {
+class CreatePostPageTest : WebPageTest(::CreatePostPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -92,12 +92,12 @@ class CreatePostPageTest: WebPageTest(::CreatePostPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<CreatePostPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<CreatePostPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/createPost.html"))
+		assertThat(page.templatePath, equalTo("/templates/createPost.html"))
 	}
 
 }

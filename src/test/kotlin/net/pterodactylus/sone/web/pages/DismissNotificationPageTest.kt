@@ -12,7 +12,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [DismissNotificationPage].
  */
-class DismissNotificationPageTest: WebPageTest(::DismissNotificationPage) {
+class DismissNotificationPageTest : WebPageTest(::DismissNotificationPage) {
 
 	private val notification = mock<Notification>()
 

@@ -14,7 +14,7 @@ import javax.inject.*
  */
 @MenuName("ImageBrowser")
 @TemplatePath("/templates/imageBrowser.html")
-class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("imageBrowser.html", "Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
@@ -37,9 +37,9 @@ class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: 
 						albums.paginate(soneRequest.core.preferences.imagesPerPage)
 								.turnTo(soneRequest.parameters["page"]?.toIntOrNull() ?: 0)
 								.also { pagination ->
-							templateContext["albumPagination"] = pagination
-							templateContext["albums"] = pagination.items
-						}
+									templateContext["albumPagination"] = pagination
+									templateContext["albums"] = pagination.items
+								}
 					}
 		} else {
 			templateContext["soneRequested"] = true

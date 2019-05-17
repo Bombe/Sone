@@ -47,11 +47,13 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()
+
 	init {
 		whenever(freenetRequest.l10n).thenReturn(l10n)
 		whenever(freenetRequest.sessionManager).thenReturn(sessionManager)
 		whenever(freenetRequest.uri).thenReturn(mock())
 	}
+
 	val soneRequest by lazy { freenetRequest.toSoneRequest(core, webInterface) }
 	val templateContext = TemplateContext()
 	val toadletContext = deepMock<ToadletContext>()
@@ -94,8 +96,8 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 		whenever(core.getPostReply(anyString())).then { allPostReplies[it[0]] }
 		whenever(core.getReplies(anyString())).then { perPostReplies[it[0]].asList() }
 		whenever(core.getAlbum(anyString())).then { allAlbums[it[0]] }
-		whenever(core.getImage(anyString())).then { allImages[it[0]]}
-		whenever(core.getImage(anyString(), anyBoolean())).then { allImages[it[0]]}
+		whenever(core.getImage(anyString())).then { allImages[it[0]] }
+		whenever(core.getImage(anyString(), anyBoolean())).then { allImages[it[0]] }
 		whenever(core.getTemporaryImage(anyString())).thenReturn(null)
 	}
 
@@ -125,12 +127,13 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 		whenever(httpRequest.getPartAsStringFailsafe(anyString(), anyInt())).then { postRequestParameters[it[0]]?.decode()?.take(it[1]) ?: "" }
 		whenever(httpRequest.getUploadedFile(anyString())).then {
 			it.get<String>(0).takeIf { it in uploadedFileNames }
-					?.let { name -> UploadedFile(uploadedFileNames[name]!!, uploadedFileContentTypes[name]!!, uploadedFileResources[name]!!)
-			}
+					?.let { name ->
+						UploadedFile(uploadedFileNames[name]!!, uploadedFileContentTypes[name]!!, uploadedFileResources[name]!!)
+					}
 		}
 	}
 
-	private class UploadedFile(private val filename: String, private val contentType: String, private val resourceName: String): HTTPUploadedFile {
+	private class UploadedFile(private val filename: String, private val contentType: String, private val resourceName: String) : HTTPUploadedFile {
 		override fun getFilename() = filename
 		override fun getContentType() = contentType
 		override fun getData() = javaClass.getResourceAsStream(resourceName).readBytes().let(::SimpleReadOnlyArrayBucket)

@@ -102,7 +102,7 @@ class CreateAlbumPageTest : WebPageTest(::CreateAlbumPage) {
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/createAlbum.html"))
+		assertThat(page.templatePath, equalTo("/templates/createAlbum.html"))
 	}
 
 }

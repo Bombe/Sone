@@ -13,7 +13,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [DeleteImagePage].
  */
-class DeleteImagePageTest: WebPageTest(::DeleteImagePage) {
+class DeleteImagePageTest : WebPageTest(::DeleteImagePage) {
 
 	private val image = mock<Image>()
 	private val sone = mock<Sone>()
@@ -80,12 +80,12 @@ class DeleteImagePageTest: WebPageTest(::DeleteImagePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<DeleteImagePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<DeleteImagePage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/deleteImage.html"))
+		assertThat(page.templatePath, equalTo("/templates/deleteImage.html"))
 	}
 
 }

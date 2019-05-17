@@ -16,22 +16,22 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UntrustPage].
  */
-class UntrustPageTest: WebPageTest(::UntrustPage) {
+class UntrustPageTest : WebPageTest(::UntrustPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("untrust.html"))
+		assertThat(page.path, equalTo("untrust.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Untrust.Title", "untrust page title")
-	    assertThat(page.getPageTitle(soneRequest), equalTo("untrust page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("untrust page title"))
 	}
 
 	@Test
@@ -74,7 +74,7 @@ class UntrustPageTest: WebPageTest(::UntrustPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<UntrustPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<UntrustPage>(), notNullValue())
 	}
 
 }

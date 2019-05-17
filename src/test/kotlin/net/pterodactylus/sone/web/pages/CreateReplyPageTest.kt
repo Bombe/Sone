@@ -13,7 +13,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [CreateReplyPage].
  */
-class CreateReplyPageTest: WebPageTest(::CreateReplyPage) {
+class CreateReplyPageTest : WebPageTest(::CreateReplyPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -88,12 +88,12 @@ class CreateReplyPageTest: WebPageTest(::CreateReplyPage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<CreateReplyPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<CreateReplyPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/createReply.html"))
+		assertThat(page.templatePath, equalTo("/templates/createReply.html"))
 	}
 
 }

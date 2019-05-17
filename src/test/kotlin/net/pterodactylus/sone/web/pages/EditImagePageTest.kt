@@ -14,7 +14,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [EditImagePage].
  */
-class EditImagePageTest: WebPageTest(::EditImagePage) {
+class EditImagePageTest : WebPageTest(::EditImagePage) {
 
 	private val image = mock<Image>()
 	private val modifier = mockBuilder<Modifier>()
@@ -38,13 +38,13 @@ class EditImagePageTest: WebPageTest(::EditImagePage) {
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.EditImage.Title")).thenReturn("edit image page title")
-	    assertThat(page.getPageTitle(soneRequest), equalTo("edit image page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit image page title"))
 	}
 
 	@Test

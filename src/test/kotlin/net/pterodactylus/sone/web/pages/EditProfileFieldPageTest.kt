@@ -13,7 +13,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [EditProfileFieldPage].
  */
-class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
+class EditProfileFieldPageTest : WebPageTest(::EditProfileFieldPage) {
 
 	private val profile = Profile(currentSone)
 	private val field = profile.addField("Name")
@@ -25,18 +25,18 @@ class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("editProfileField.html"))
+		assertThat(page.path, equalTo("editProfileField.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.EditProfileField.Title")).thenReturn("edit profile field title")
-	    assertThat(page.getPageTitle(soneRequest), equalTo("edit profile field title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit profile field title"))
 	}
 
 	@Test
@@ -100,7 +100,7 @@ class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/editProfileField.html"))
+		assertThat(page.templatePath, equalTo("/templates/editProfileField.html"))
 	}
 
 }

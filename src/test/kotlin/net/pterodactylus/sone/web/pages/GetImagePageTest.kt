@@ -63,7 +63,7 @@ class GetImagePageTest {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<GetImagePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<GetImagePage>(), notNullValue())
 	}
 
 }

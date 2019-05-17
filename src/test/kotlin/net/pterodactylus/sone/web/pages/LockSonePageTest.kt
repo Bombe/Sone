@@ -14,7 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [LockSonePage].
  */
-class LockSonePageTest: WebPageTest(::LockSonePage) {
+class LockSonePageTest : WebPageTest(::LockSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -23,12 +23,12 @@ class LockSonePageTest: WebPageTest(::LockSonePage) {
 
 	@Test
 	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
+		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.LockSone.Title", "lock Sone page title")
+		addTranslation("Page.LockSone.Title", "lock Sone page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("lock Sone page title"))
 	}
 
@@ -55,7 +55,7 @@ class LockSonePageTest: WebPageTest(::LockSonePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<LockSonePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<LockSonePage>(), notNullValue())
 	}
 
 }

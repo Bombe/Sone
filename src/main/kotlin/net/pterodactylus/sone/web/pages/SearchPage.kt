@@ -22,7 +22,8 @@ import javax.inject.*
 class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
 		SoneTemplatePage("search.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Search.Title") {
 
-	@Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+	@Inject
+	constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 			this(webInterface, loaders, templateRenderer, Ticker.systemTicker())
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()

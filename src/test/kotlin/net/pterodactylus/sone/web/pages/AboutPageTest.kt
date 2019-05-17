@@ -59,12 +59,12 @@ class AboutPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> A
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("About"))
+		assertThat(page.menuName, equalTo("About"))
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/about.html"))
+		assertThat(page.templatePath, equalTo("/templates/about.html"))
 	}
 
 }

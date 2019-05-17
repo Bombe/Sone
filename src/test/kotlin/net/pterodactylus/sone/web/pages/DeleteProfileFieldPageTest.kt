@@ -13,7 +13,7 @@ import org.mockito.Mockito.*
 /**
  * Unit test for [DeleteProfileFieldPage].
  */
-class DeleteProfileFieldPageTest: WebPageTest(::DeleteProfileFieldPage) {
+class DeleteProfileFieldPageTest : WebPageTest(::DeleteProfileFieldPage) {
 
 	private val profile = Profile(currentSone)
 	private val field = profile.addField("name")
@@ -80,7 +80,7 @@ class DeleteProfileFieldPageTest: WebPageTest(::DeleteProfileFieldPage) {
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/deleteProfileField.html"))
+		assertThat(page.templatePath, equalTo("/templates/deleteProfileField.html"))
 	}
 
 }

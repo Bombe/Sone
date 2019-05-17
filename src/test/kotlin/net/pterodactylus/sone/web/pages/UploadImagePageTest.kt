@@ -18,7 +18,7 @@ import org.mockito.Mockito.eq
 /**
  * Unit test for [UploadImagePage].
  */
-class UploadImagePageTest: WebPageTest(::UploadImagePage) {
+class UploadImagePageTest : WebPageTest(::UploadImagePage) {
 
 	private val parentAlbum = mock<Album>().apply {
 		whenever(id).thenReturn("parent-id")
@@ -27,17 +27,17 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("uploadImage.html"))
+		assertThat(page.path, equalTo("uploadImage.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.UploadImage.Title", "upload image page title")
+		addTranslation("Page.UploadImage.Title", "upload image page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("upload image page title"))
 	}
 
@@ -115,12 +115,12 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<UploadImagePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<UploadImagePage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/invalid.html"))
+		assertThat(page.templatePath, equalTo("/templates/invalid.html"))
 	}
 
 }

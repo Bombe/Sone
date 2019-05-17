@@ -14,7 +14,7 @@ import javax.inject.*
  * Page that lets the user create a new album.
  */
 @TemplatePath("/templates/createAlbum.html")
-class CreateAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class CreateAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("createAlbum.html", "Page.CreateAlbum.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {

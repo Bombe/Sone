@@ -14,7 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [DeleteAlbumPage].
  */
-class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
+class DeleteAlbumPageTest : WebPageTest(::DeleteAlbumPage) {
 
 	private val sone = mock<Sone>()
 	private val album = mock<Album>()
@@ -110,7 +110,7 @@ class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
 
 	@Test
 	fun `page is annotated with correct template path`() {
-	    assertThat(page.templatePath, equalTo("/templates/deleteAlbum.html"))
+		assertThat(page.templatePath, equalTo("/templates/deleteAlbum.html"))
 	}
 
 }

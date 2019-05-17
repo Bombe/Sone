@@ -13,22 +13,22 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnlikePage].
  */
-class UnlikePageTest: WebPageTest(::UnlikePage) {
+class UnlikePageTest : WebPageTest(::UnlikePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("unlike.html"))
+		assertThat(page.path, equalTo("unlike.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Unlike.Title", "unlike page title")
-	    assertThat(page.getPageTitle(soneRequest), equalTo("unlike page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("unlike page title"))
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class UnlikePageTest: WebPageTest(::UnlikePage) {
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<UnlikePage>(), notNullValue())
+		assertThat(baseInjector.getInstance<UnlikePage>(), notNullValue())
 	}
 
 }

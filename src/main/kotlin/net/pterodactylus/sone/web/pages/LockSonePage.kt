@@ -10,7 +10,7 @@ import javax.inject.*
 /**
  * This page lets the user lock a [net.pterodactylus.sone.data.Sone] to prevent it from being inserted.
  */
-class LockSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+class LockSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		SoneTemplatePage("lockSone.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.LockSone.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {

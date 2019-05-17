@@ -16,7 +16,7 @@ import org.mockito.*
 /**
  * Unit test for [IndexPage].
  */
-class IndexPageTest: WebPageTest({ webInterface, loaders, templateRenderer -> IndexPage(webInterface, loaders, templateRenderer, postVisibilityFilter) }) {
+class IndexPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> IndexPage(webInterface, loaders, templateRenderer, postVisibilityFilter) }) {
 
 	companion object {
 		private val postVisibilityFilter = mock<PostVisibilityFilter>()
@@ -24,18 +24,18 @@ class IndexPageTest: WebPageTest({ webInterface, loaders, templateRenderer -> In
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("index.html"))
+		assertThat(page.path, equalTo("index.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.Index.Title")).thenReturn("index page title")
-	    assertThat(page.getPageTitle(soneRequest), equalTo("index page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("index page title"))
 	}
 
 	@Before
@@ -150,12 +150,12 @@ class IndexPageTest: WebPageTest({ webInterface, loaders, templateRenderer -> In
 
 	@Test
 	fun `page can be created by dependency injection`() {
-	    assertThat(baseInjector.getInstance<IndexPage>(), notNullValue())
+		assertThat(baseInjector.getInstance<IndexPage>(), notNullValue())
 	}
 
 	@Test
 	fun `page is annotated with correct menuname`() {
-	    assertThat(page.menuName, equalTo("Index"))
+		assertThat(page.menuName, equalTo("Index"))
 	}
 
 	@Test
