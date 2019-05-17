@@ -22,12 +22,10 @@ import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.util.template.TemplateParser.parse;
 
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -114,8 +112,6 @@ import net.pterodactylus.sone.web.ajax.UnlikeAjaxPage;
 import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
-import net.pterodactylus.sone.web.page.PageToadlet;
-import net.pterodactylus.sone.web.page.PageToadletFactory;
 import net.pterodactylus.sone.web.pages.AboutPage;
 import net.pterodactylus.sone.web.pages.BookmarkPage;
 import net.pterodactylus.sone.web.pages.BookmarksPage;
@@ -169,7 +165,6 @@ import net.pterodactylus.util.web.TemplatePage;
 
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
-import freenet.clients.http.ToadletContainer;
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
 
@@ -197,9 +192,6 @@ public class WebInterface implements SessionProvider {
 	/** The Sone plugin. */
 	private final SonePlugin sonePlugin;
 
-	/** The registered toadlets. */
-	private final List<PageToadlet> pageToadlets = new ArrayList<>();
-
 	/** The form password. */
 	private final String formPassword;
 
@@ -222,6 +214,8 @@ public class WebInterface implements SessionProvider {
 	private final LinkedElementRenderFilter linkedElementRenderFilter;
 	private final TimeTextConverter timeTextConverter = new TimeTextConverter();
 	private final L10nFilter l10nFilter;
+
+	private final PageToadletRegistry pageToadletRegistry;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -271,7 +265,8 @@ public class WebInterface implements SessionProvider {
 			ElementLoader elementLoader, TemplateContextFactory templateContextFactory,
 			ParserFilter parserFilter, ShortenFilter shortenFilter,
 			RenderFilter renderFilter,
-			LinkedElementRenderFilter linkedElementRenderFilter) {
+			LinkedElementRenderFilter linkedElementRenderFilter,
+			PageToadletRegistry pageToadletRegistry) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -282,6 +277,7 @@ public class WebInterface implements SessionProvider {
 		this.shortenFilter = shortenFilter;
 		this.renderFilter = renderFilter;
 		this.linkedElementRenderFilter = linkedElementRenderFilter;
+		this.pageToadletRegistry = pageToadletRegistry;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 		l10nFilter = new L10nFilter(getL10n());
@@ -593,7 +589,7 @@ public class WebInterface implements SessionProvider {
 	 * Stops the web interface and unregisters all toadlets.
 	 */
 	public void stop() {
-		unregisterToadlets();
+		pageToadletRegistry.unregisterToadlets();
 		ticker.shutdownNow();
 	}
 
@@ -638,110 +634,89 @@ public class WebInterface implements SessionProvider {
 		Template replyTemplate = loaders.loadTemplate("/templates/include/viewReply.html");
 		Template openSearchTemplate = loaders.loadTemplate("/templates/xml/OpenSearch.xml");
 
-		PageToadletFactory pageToadletFactory = new PageToadletFactory(sonePlugin.pluginRespirator().getHLSimpleClient(), getSessionManager(), "/Sone/");
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new RedirectPage<FreenetRequest>("", "index.html")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new IndexPage(indexTemplate, this, postVisibilityFilter), "Index"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new NewPage(newTemplate, this), "New"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateSonePage(createSoneTemplate, this), "CreateSone"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new KnownSonesPage(knownSonesTemplate, this), "KnownSones"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfilePage(editProfileTemplate, this), "EditProfile"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldPage(editProfileFieldTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldPage(deleteProfileFieldTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostPage(createPostTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyPage(createReplyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewSonePage(viewSoneTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new ViewPostPage(viewPostTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostPage(deletePostTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyPage(deleteReplyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSonePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSonePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSonePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSonePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new ImageBrowserPage(imageBrowserTemplate, this), "ImageBrowser"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateAlbumPage(createAlbumTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteAlbumPage(deleteAlbumTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UploadImagePage(invalidTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImagePage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteImagePage(deleteImageTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarksPage(bookmarksTemplate, this), "Bookmarks"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SearchPage(searchTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteSonePage(deleteSoneTemplate, this), "DeleteSone"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LoginPage(loginTemplate, this), "Login"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LogoutPage(emptyTemplate, this), "Logout"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new OptionsPage(optionsTemplate, this), "Options"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new RescuePage(rescueTemplate, this), "Rescue"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new AboutPage(aboutTemplate, this, new PluginVersion(SonePlugin.getPluginVersion()), new PluginYear(sonePlugin.getYear()), new PluginHomepage(sonePlugin.getHomepage())), "About"));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("noPermission.html", this, noPermissionTemplate, "Page.NoPermission.Title")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyImageTitle.html", this, emptyImageTitleTemplate, "Page.EmptyImageTitle.Title")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("emptyAlbumTitle.html", this, emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationPage(emptyTemplate, this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new SoneTemplatePage("invalid.html", this, invalidTemplate, "Page.Invalid.Title")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png")));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetImagePage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTranslationAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault())));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetNotificationsAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DismissNotificationAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreatePostAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new CreateReplyAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetReplyAjaxPage(this, replyTemplate)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetPostAjaxPage(this, postTemplate)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter, TimeZone.getDefault())));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new MarkAsKnownAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeletePostAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteReplyAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LockSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlockSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new FollowSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnfollowSoneAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditAlbumAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditImageAjaxPage(this, parserFilter, shortenFilter, renderFilter)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new TrustAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DistrustAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UntrustAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new LikeAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnlikeAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new GetLikesAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new BookmarkAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new UnbookmarkAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new EditProfileFieldAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new DeleteProfileFieldAjaxPage(this)));
-		pageToadlets.add(pageToadletFactory.createPageToadlet(new MoveProfileFieldAjaxPage(this)));
+		pageToadletRegistry.addPage(new RedirectPage<FreenetRequest>("", "index.html"));
+		pageToadletRegistry.addPage(new IndexPage(indexTemplate, this, postVisibilityFilter));
+		pageToadletRegistry.addPage(new NewPage(newTemplate, this));
+		pageToadletRegistry.addPage(new CreateSonePage(createSoneTemplate, this));
+		pageToadletRegistry.addPage(new KnownSonesPage(knownSonesTemplate, this));
+		pageToadletRegistry.addPage(new EditProfilePage(editProfileTemplate, this));
+		pageToadletRegistry.addPage(new EditProfileFieldPage(editProfileFieldTemplate, this));
+		pageToadletRegistry.addPage(new DeleteProfileFieldPage(deleteProfileFieldTemplate, this));
+		pageToadletRegistry.addPage(new CreatePostPage(createPostTemplate, this));
+		pageToadletRegistry.addPage(new CreateReplyPage(createReplyTemplate, this));
+		pageToadletRegistry.addPage(new ViewSonePage(viewSoneTemplate, this));
+		pageToadletRegistry.addPage(new ViewPostPage(viewPostTemplate, this));
+		pageToadletRegistry.addPage(new LikePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new UnlikePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new DeletePostPage(deletePostTemplate, this));
+		pageToadletRegistry.addPage(new DeleteReplyPage(deleteReplyTemplate, this));
+		pageToadletRegistry.addPage(new LockSonePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new UnlockSonePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new FollowSonePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new UnfollowSonePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new ImageBrowserPage(imageBrowserTemplate, this));
+		pageToadletRegistry.addPage(new CreateAlbumPage(createAlbumTemplate, this));
+		pageToadletRegistry.addPage(new EditAlbumPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new DeleteAlbumPage(deleteAlbumTemplate, this));
+		pageToadletRegistry.addPage(new UploadImagePage(invalidTemplate, this));
+		pageToadletRegistry.addPage(new EditImagePage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new DeleteImagePage(deleteImageTemplate, this));
+		pageToadletRegistry.addPage(new TrustPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new DistrustPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new UntrustPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new MarkAsKnownPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new BookmarkPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new UnbookmarkPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new BookmarksPage(bookmarksTemplate, this));
+		pageToadletRegistry.addPage(new SearchPage(searchTemplate, this));
+		pageToadletRegistry.addPage(new DeleteSonePage(deleteSoneTemplate, this));
+		pageToadletRegistry.addPage(new LoginPage(loginTemplate, this));
+		pageToadletRegistry.addPage(new LogoutPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new OptionsPage(optionsTemplate, this));
+		pageToadletRegistry.addPage(new RescuePage(rescueTemplate, this));
+		pageToadletRegistry.addPage(new AboutPage(aboutTemplate, this, new PluginVersion(SonePlugin.getPluginVersion()), new PluginYear(sonePlugin.getYear()), new PluginHomepage(sonePlugin.getHomepage())));
+		pageToadletRegistry.addPage(new SoneTemplatePage("noPermission.html", this, noPermissionTemplate, "Page.NoPermission.Title"));
+		pageToadletRegistry.addPage(new SoneTemplatePage("emptyImageTitle.html", this, emptyImageTitleTemplate, "Page.EmptyImageTitle.Title"));
+		pageToadletRegistry.addPage(new SoneTemplatePage("emptyAlbumTitle.html", this, emptyAlbumTitleTemplate, "Page.EmptyAlbumTitle.Title"));
+		pageToadletRegistry.addPage(new DismissNotificationPage(emptyTemplate, this));
+		pageToadletRegistry.addPage(new SoneTemplatePage("invalid.html", this, invalidTemplate, "Page.Invalid.Title"));
+		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css"));
+		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript"));
+		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png"));
+		pageToadletRegistry.addPage(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate));
+		pageToadletRegistry.addPage(new GetImagePage(this));
+		pageToadletRegistry.addPage(new GetTranslationAjaxPage(this));
+		pageToadletRegistry.addPage(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault()));
+		pageToadletRegistry.addPage(new GetNotificationsAjaxPage(this));
+		pageToadletRegistry.addPage(new DismissNotificationAjaxPage(this));
+		pageToadletRegistry.addPage(new CreatePostAjaxPage(this));
+		pageToadletRegistry.addPage(new CreateReplyAjaxPage(this));
+		pageToadletRegistry.addPage(new GetReplyAjaxPage(this, replyTemplate));
+		pageToadletRegistry.addPage(new GetPostAjaxPage(this, postTemplate));
+		pageToadletRegistry.addPage(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter));
+		pageToadletRegistry.addPage(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter, TimeZone.getDefault()));
+		pageToadletRegistry.addPage(new MarkAsKnownAjaxPage(this));
+		pageToadletRegistry.addPage(new DeletePostAjaxPage(this));
+		pageToadletRegistry.addPage(new DeleteReplyAjaxPage(this));
+		pageToadletRegistry.addPage(new LockSoneAjaxPage(this));
+		pageToadletRegistry.addPage(new UnlockSoneAjaxPage(this));
+		pageToadletRegistry.addPage(new FollowSoneAjaxPage(this));
+		pageToadletRegistry.addPage(new UnfollowSoneAjaxPage(this));
+		pageToadletRegistry.addPage(new EditAlbumAjaxPage(this));
+		pageToadletRegistry.addPage(new EditImageAjaxPage(this, parserFilter, shortenFilter, renderFilter));
+		pageToadletRegistry.addPage(new TrustAjaxPage(this));
+		pageToadletRegistry.addPage(new DistrustAjaxPage(this));
+		pageToadletRegistry.addPage(new UntrustAjaxPage(this));
+		pageToadletRegistry.addPage(new LikeAjaxPage(this));
+		pageToadletRegistry.addPage(new UnlikeAjaxPage(this));
+		pageToadletRegistry.addPage(new GetLikesAjaxPage(this));
+		pageToadletRegistry.addPage(new BookmarkAjaxPage(this));
+		pageToadletRegistry.addPage(new UnbookmarkAjaxPage(this));
+		pageToadletRegistry.addPage(new EditProfileFieldAjaxPage(this));
+		pageToadletRegistry.addPage(new DeleteProfileFieldAjaxPage(this));
+		pageToadletRegistry.addPage(new MoveProfileFieldAjaxPage(this));
 
-		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
-		toadletContainer.getPageMaker().addNavigationCategory("/Sone/index.html", "Navigation.Menu.Sone.Name", "Navigation.Menu.Sone.Tooltip", sonePlugin);
-		for (PageToadlet toadlet : pageToadlets) {
-			String menuName = toadlet.getMenuName();
-			if (menuName != null) {
-				toadletContainer.register(toadlet, "Navigation.Menu.Sone.Name", toadlet.path(), true, "Navigation.Menu.Sone.Item." + menuName + ".Name", "Navigation.Menu.Sone.Item." + menuName + ".Tooltip", false, toadlet);
-			} else {
-				toadletContainer.register(toadlet, null, toadlet.path(), true, false);
-			}
-		}
-	}
-
-	/**
-	 * Unregisters all toadlets.
-	 */
-	private void unregisterToadlets() {
-		ToadletContainer toadletContainer = sonePlugin.pluginRespirator().getToadletContainer();
-		for (PageToadlet pageToadlet : pageToadlets) {
-			toadletContainer.unregister(pageToadlet);
-		}
-		toadletContainer.getPageMaker().removeNavigationCategory("Navigation.Menu.Sone.Name");
+		pageToadletRegistry.registerToadlets();
 	}
 
 	/**
