@@ -11,6 +11,7 @@ import javax.inject.Inject
 /**
  * Logs a user out.
  */
+@MenuName("Logout")
 class LogoutPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("logout.html", template, "Page.Logout.Title", webInterface) {
 

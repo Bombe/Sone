@@ -3,6 +3,7 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -72,6 +73,11 @@ class LogoutPageTest: WebPageTest(::LogoutPage) {
 	@Test
 	fun `page can be created by dependency injection`() {
 	    assertThat(baseInjector.getInstance<LogoutPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+	    assertThat(page.menuName, equalTo("Logout"))
 	}
 
 }
