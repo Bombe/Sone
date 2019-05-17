@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web.page
 
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.*
-import net.pterodactylus.util.template.*
 import net.pterodactylus.util.web.*
 import net.pterodactylus.util.web.Method.*
 import org.hamcrest.MatcherAssert.*
@@ -12,10 +11,8 @@ import org.mockito.Mockito.*
 
 class FreenetTemplatePageTest {
 
-	private val templateContextFactory = deepMock<TemplateContextFactory>()
 	private val templateRenderer = deepMock<TemplateRenderer>()
 	private val loaders = mock<Loaders>()
-	private val template = mock<Template>()
 	private val page = TestPage(templateRenderer, loaders)
 
 	@Test
