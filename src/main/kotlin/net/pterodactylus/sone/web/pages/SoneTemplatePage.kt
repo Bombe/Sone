@@ -41,10 +41,9 @@ open class SoneTemplatePage @JvmOverloads constructor(
 
 	open fun getPageTitle(soneRequest: SoneRequest) = pageTitle(soneRequest)
 
-	override public fun getStyleSheets() =
-			listOf("css/sone.css")
+	override val styleSheets = listOf("css/sone.css")
 
-	override public fun getShortcutIcon() = "images/icon.png"
+	override val shortcutIcon = "images/icon.png"
 
 	override public fun getAdditionalLinkNodes(request: FreenetRequest) =
 			listOf(mapOf(

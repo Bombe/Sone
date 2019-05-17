@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web.page
 
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.util.template.*
 import net.pterodactylus.util.web.*
 import net.pterodactylus.util.web.Method.*
 import org.hamcrest.MatcherAssert.*
@@ -10,7 +12,10 @@ import org.mockito.ArgumentMatchers.*
 
 class FreenetTemplatePageTest {
 
-	private val page = FreenetTemplatePage("/test/path", null, null, null, "invalid-form-password")
+	private val templateContextFactory = mock<TemplateContextFactory>()
+	private val loaders = mock<Loaders>()
+	private val template = mock<Template>()
+	private val page = FreenetTemplatePage("/test/path", templateContextFactory, loaders, template, "invalid-form-password")
 
 	@Test
 	fun `path is exposed correctly`() {
@@ -18,8 +23,8 @@ class FreenetTemplatePageTest {
 	}
 
 	@Test
-	fun `getPageTitle() default implementation returns null`() {
-		assertThat(page.getPageTitle(mock()), nullValue())
+	fun `getPageTitle() default implementation returns empty string`() {
+		assertThat(page.getPageTitle(mock()), equalTo(""))
 	}
 
 	@Test
@@ -64,16 +69,16 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `isEnabled() returns false if full access only is true`() {
-		val page = object : FreenetTemplatePage("/test/path", null, null, null, null) {
-			override fun isFullAccessOnly() = true
+		val page = object : FreenetTemplatePage("/test/path", templateContextFactory, loaders, template, "invalid-form-password") {
+			override val isFullAccessOnly = true
 		}
 		assertThat(page.isEnabled(mock()), equalTo(false))
 	}
 
 	@Test
 	fun `page with redirect target throws redirect exception on handleRequest`() {
-		val page = object : FreenetTemplatePage("/test/path", null, null, null, null) {
-			override fun getRedirectTarget(request: FreenetRequest?) = "foo"
+		val page = object : FreenetTemplatePage("/test/path", templateContextFactory, loaders, template, "invalid-form-password") {
+			override fun getRedirectTarget(request: FreenetRequest) = "foo"
 		}
 		val request = mock<FreenetRequest>()
 		val response = mock<Response>()
@@ -84,8 +89,8 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `page with full access only returns unauthorized on handleRequest with non-full access request`() {
-		val page = object : FreenetTemplatePage("/test/path", null, null, null, null) {
-			override fun isFullAccessOnly() = true
+		val page = object : FreenetTemplatePage("/test/path", templateContextFactory, loaders, template, "invalid-form-password") {
+			override val isFullAccessOnly = true
 		}
 		val request = deepMock<FreenetRequest>()
 		val response = Response(null)
