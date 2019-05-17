@@ -14,6 +14,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
@@ -370,6 +371,11 @@ class SearchPageTest: WebPageTest({ template, webInterface, loaders, templateRen
 	@Test
 	fun `page can be created by dependency injection`() {
 	    assertThat(baseInjector.getInstance<SearchPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/search.html"))
 	}
 
 }

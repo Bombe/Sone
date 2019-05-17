@@ -99,4 +99,9 @@ class RescuePageTest: WebPageTest(::RescuePage) {
 	    assertThat(page.menuName, equalTo("Rescue"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/rescue.html"))
+	}
+
 }

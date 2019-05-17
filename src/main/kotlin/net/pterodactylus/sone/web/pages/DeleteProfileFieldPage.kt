@@ -12,6 +12,7 @@ import javax.inject.Inject
 /**
  * Page that lets the user confirm the deletion of a profile field.
  */
+@TemplatePath("/templates/deleteProfileField.html")
 class DeleteProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("deleteProfileField.html", template, "Page.DeleteProfileField.Title", webInterface, loaders, templateRenderer) {
 

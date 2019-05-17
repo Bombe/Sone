@@ -12,6 +12,7 @@ import javax.inject.Inject
 /**
  * Page that lets the user delete an {@link Album}.
  */
+@TemplatePath("/templates/deleteAlbum.html")
 class DeleteAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface, loaders, templateRenderer) {
 

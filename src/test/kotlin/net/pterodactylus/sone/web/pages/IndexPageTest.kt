@@ -165,4 +165,9 @@ class IndexPageTest: WebPageTest({ template, webInterface, loaders, templateRend
 	    assertThat(page.menuName, equalTo("Index"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/index.html"))
+	}
+
 }

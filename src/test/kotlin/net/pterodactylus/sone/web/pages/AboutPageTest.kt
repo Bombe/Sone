@@ -64,4 +64,9 @@ class AboutPageTest : WebPageTest({ template, webInterface, loaders, templateRen
 	    assertThat(page.menuName, equalTo("About"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/about.html"))
+	}
+
 }

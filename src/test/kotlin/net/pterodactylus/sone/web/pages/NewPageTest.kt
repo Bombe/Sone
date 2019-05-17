@@ -95,4 +95,9 @@ class NewPageTest: WebPageTest(::NewPage) {
 	    assertThat(page.menuName, equalTo("New"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/new.html"))
+	}
+
 }

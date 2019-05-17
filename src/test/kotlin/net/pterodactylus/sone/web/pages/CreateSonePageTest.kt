@@ -156,4 +156,9 @@ class CreateSonePageTest : WebPageTest(::CreateSonePage) {
 	    assertThat(page.menuName, equalTo("CreateSone"))
 	}
 
+	@Test
+	fun `page is annotated with the correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/createSone.html"))
+	}
+
 }

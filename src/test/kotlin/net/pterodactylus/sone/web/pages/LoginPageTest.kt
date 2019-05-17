@@ -152,4 +152,9 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 	    assertThat(page.menuName, equalTo("Login"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/login.html"))
+	}
+
 }

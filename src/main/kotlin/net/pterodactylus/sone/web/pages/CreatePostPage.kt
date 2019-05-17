@@ -14,6 +14,7 @@ import javax.inject.Inject
 /**
  * This page lets the user create a new [Post].
  */
+@TemplatePath("/templates/createPost.html")
 class CreatePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface, loaders, templateRenderer) {
 

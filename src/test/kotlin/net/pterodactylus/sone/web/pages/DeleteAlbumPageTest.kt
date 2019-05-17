@@ -6,6 +6,7 @@ import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -110,6 +111,11 @@ class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
 	@Test
 	fun `page can be created by dependency injection`() {
 		assertThat(baseInjector.getInstance<DeleteAlbumPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/deleteAlbum.html"))
 	}
 
 }

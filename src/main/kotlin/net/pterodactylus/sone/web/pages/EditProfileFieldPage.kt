@@ -12,6 +12,7 @@ import javax.inject.Inject
 /**
  * Page that lets the user edit the name of a profile field.
  */
+@TemplatePath("/templates/editProfileField.html")
 class EditProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface, loaders, templateRenderer) {
 

@@ -22,6 +22,7 @@ import javax.inject.Inject
 /**
  * Page implementation that lets the user upload an image.
  */
+@TemplatePath("/templates/invalid.html")
 class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, loaders, templateRenderer) {
 

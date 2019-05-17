@@ -15,6 +15,7 @@ import javax.inject.Inject
  * installation.
  */
 @MenuName("DeleteSone")
+@TemplatePath("/templates/deleteSone.html")
 class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, loaders, templateRenderer) {
 

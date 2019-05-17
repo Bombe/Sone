@@ -11,6 +11,7 @@ import javax.inject.Inject
  * A [SoneTemplatePage] that stores information about Sone in the [TemplateContext].
  */
 @MenuName("About")
+@TemplatePath("/templates/about.html")
 class AboutPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,

@@ -16,6 +16,7 @@ import javax.inject.Inject
  * of all friends of the current user.
  */
 @MenuName("Index")
+@TemplatePath("/templates/index.html")
 class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val postVisibilityFilter: PostVisibilityFilter) :
 		LoggedInPage("index.html", template, "Page.Index.Title", webInterface, loaders, templateRenderer) {
 

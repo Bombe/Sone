@@ -231,4 +231,9 @@ class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 	    assertThat(page.menuName, equalTo("EditProfile"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/editProfile.html"))
+	}
+
 }

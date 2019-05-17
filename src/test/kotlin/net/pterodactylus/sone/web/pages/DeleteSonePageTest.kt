@@ -66,4 +66,9 @@ class DeleteSonePageTest: WebPageTest(::DeleteSonePage) {
 	    assertThat(page.menuName, equalTo("DeleteSone"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/deleteSone.html"))
+	}
+
 }

@@ -14,6 +14,7 @@ import javax.inject.Inject
  * Page that lets the user control the rescue mode for a Sone.
  */
 @MenuName("Rescue")
+@TemplatePath("/templates/rescue.html")
 class RescuePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface, loaders, templateRenderer) {
 

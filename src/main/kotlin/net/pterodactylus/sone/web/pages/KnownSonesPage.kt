@@ -14,6 +14,7 @@ import javax.inject.Inject
  * This page shows all known Sones.
  */
 @MenuName("KnownSones")
+@TemplatePath("/templates/knownSones.html")
 class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		SoneTemplatePage("knownSones.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.KnownSones.Title") {
 

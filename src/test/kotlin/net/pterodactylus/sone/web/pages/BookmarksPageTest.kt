@@ -70,5 +70,9 @@ class BookmarksPageTest: WebPageTest(::BookmarksPage) {
 	    assertThat(page.menuName, equalTo("Bookmarks"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/bookmarks.html"))
+	}
 
 }

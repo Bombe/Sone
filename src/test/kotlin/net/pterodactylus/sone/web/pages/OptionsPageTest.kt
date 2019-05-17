@@ -390,4 +390,9 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 	    assertThat(page.menuName, equalTo("Options"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/options.html"))
+	}
+
 }

@@ -15,7 +15,8 @@ import javax.inject.Inject
  * [PostVisibilityFilter.isPostVisible(Sone, Post)] and sorted by time.
  */
 @MenuName("New")
-class NewPage @Inject constructor(  template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+@TemplatePath("/templates/new.html")
+class NewPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		SoneTemplatePage("new.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.New.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) =

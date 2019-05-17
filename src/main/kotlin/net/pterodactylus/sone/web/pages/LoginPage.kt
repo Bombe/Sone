@@ -15,6 +15,7 @@ import javax.inject.Inject
  * The login page lets the user log in.
  */
 @MenuName("Login")
+@TemplatePath("/templates/login.html")
 class LoginPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		SoneTemplatePage("login.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Login.Title") {
 

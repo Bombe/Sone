@@ -15,6 +15,7 @@ import javax.inject.Inject
  * This page lets the user edit her profile.
  */
 @MenuName("EditProfile")
+@TemplatePath("/templates/editProfile.html")
 class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface, loaders, templateRenderer) {
 

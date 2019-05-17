@@ -13,6 +13,7 @@ import javax.inject.Inject
 /**
  * This page lets the user post a reply to a post.
  */
+@TemplatePath("/templates/createReply.html")
 class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface, loaders, templateRenderer) {
 

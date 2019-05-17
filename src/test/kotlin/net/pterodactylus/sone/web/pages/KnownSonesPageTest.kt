@@ -256,4 +256,9 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 	    assertThat(page.menuName, equalTo("KnownSones"))
 	}
 
+	@Test
+	fun `page is annotated with corrrect template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/knownSones.html"))
+	}
+
 }

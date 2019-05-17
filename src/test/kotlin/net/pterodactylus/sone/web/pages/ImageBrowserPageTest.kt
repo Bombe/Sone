@@ -148,4 +148,9 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 	    assertThat(page.menuName, equalTo("ImageBrowser"))
 	}
 
+	@Test
+	fun `page is annotated with correct template path`() {
+	    assertThat(page.templatePath, equalTo("/templates/imageBrowser.html"))
+	}
+
 }

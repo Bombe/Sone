@@ -12,6 +12,7 @@ import javax.inject.*
 /**
  * This page lets the user view a post and all its replies.
  */
+@TemplatePath("/templates/viewPost.html")
 class ViewPostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
 		SoneTemplatePage("viewPost.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.ViewPost.Title") {
 
