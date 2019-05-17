@@ -20,6 +20,7 @@ class FreenetModule(private val pluginRespirator: PluginRespirator): Module {
 		pluginRespirator.node!!.let { node -> bind(Node::class.java).toProvider(Provider<Node> { node }) }
 		bind(HighLevelSimpleClient::class.java).toProvider(Provider<HighLevelSimpleClient> { pluginRespirator.hlSimpleClient!! })
 		bind(ToadletContainer::class.java).toProvider(Provider<ToadletContainer> { pluginRespirator.toadletContainer })
+		bind(PageMaker::class.java).toProvider(Provider<PageMaker> { pluginRespirator.pageMaker })
 	}
 
 	@Provides @Singleton

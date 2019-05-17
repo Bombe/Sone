@@ -26,6 +26,7 @@ class FreenetModuleTest {
 	private val node = pluginRespirator.node!!
 	private val highLevelSimpleClient = pluginRespirator.hlSimpleClient!!
 	private val toadletContainer: ToadletContainer = pluginRespirator.toadletContainer
+	private val pageMaker: PageMaker = pluginRespirator.pageMaker
 	private val module = FreenetModule(pluginRespirator)
 	private val injector = Guice.createInjector(module)
 
@@ -84,6 +85,16 @@ class FreenetModuleTest {
 	@Test
 	fun `toadlet container is returned as singleten`() {
 		verifySingletonInstance<ToadletContainer>()
+	}
+
+	@Test
+	fun `page maker is returned correctly`() {
+		assertThat(injector.getInstance(), sameInstance(pageMaker))
+	}
+
+	@Test
+	fun `page maker is returned as singleten`() {
+		verifySingletonInstance<PageMaker>()
 	}
 
 }
