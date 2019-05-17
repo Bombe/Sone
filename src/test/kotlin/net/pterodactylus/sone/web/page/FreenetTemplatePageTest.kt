@@ -8,11 +8,11 @@ import net.pterodactylus.util.web.Method.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.mockito.ArgumentMatchers.*
+import org.mockito.Mockito.*
 
 class FreenetTemplatePageTest {
 
-	private val templateContextFactory = mock<TemplateContextFactory>()
+	private val templateContextFactory = deepMock<TemplateContextFactory>()
 	private val loaders = mock<Loaders>()
 	private val template = mock<Template>()
 	private val page = FreenetTemplatePage("/test/path", templateContextFactory, loaders, template, "invalid-form-password")
@@ -120,6 +120,21 @@ class FreenetTemplatePageTest {
 		val pageResponse = page.handleRequest(request, response)
 		assertThat(pageResponse.statusCode, anyOf(equalTo(302), equalTo(307)))
 		assertThat(pageResponse.headers, contains(hasHeader("location", "invalid-form-password")))
+	}
+
+	@Test
+	fun `template from annotation is loaded`() {
+		val template = deepMock<Template>()
+		whenever(loaders.loadTemplate("template-path")).thenReturn(template)
+		TestPage(templateContextFactory, loaders)
+		verify(loaders).loadTemplate("template-path")
+	}
+
+	@TemplatePath("template-path")
+	private class TestPage(templateContextFactory: TemplateContextFactory, loaders: Loaders) : FreenetTemplatePage("/", templateContextFactory, loaders, Template(), "") {
+		override fun getPath() = ""
+		override fun isPrefixPage() = false
+		override fun handleRequest(request: FreenetRequest, response: Response) = response
 	}
 
 }

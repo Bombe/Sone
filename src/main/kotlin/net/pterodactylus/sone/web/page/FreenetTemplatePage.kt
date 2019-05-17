@@ -34,8 +34,8 @@ import java.util.logging.Logger.*
 open class FreenetTemplatePage(
 		private val path: String,
 		private val templateContextFactory: TemplateContextFactory,
-		private val loaders: Loaders,
-		private val template: Template,
+		loaders: Loaders,
+		template: Template,
 		private val invalidFormPasswordRedirectTarget: String
 ) : FreenetPage, LinkEnabledCallback {
 
@@ -56,6 +56,8 @@ open class FreenetTemplatePage(
 	override fun isLinkExcepted(link: URI) = false
 
 	override fun isEnabled(toadletContext: ToadletContext) = !isFullAccessOnly
+
+	private val template = templatePath?.let(loaders::loadTemplate) ?: template
 
 	override fun handleRequest(request: FreenetRequest, response: Response): Response {
 		getRedirectTarget(request)?.let { redirectTarget -> return RedirectResponse(redirectTarget) }
