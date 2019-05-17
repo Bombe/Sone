@@ -34,7 +34,6 @@ open class FreenetTemplatePage(
 		private val path: String,
 		private val templateRenderer: TemplateRenderer,
 		loaders: Loaders,
-		template: Template,
 		private val invalidFormPasswordRedirectTarget: String
 ) : FreenetPage, LinkEnabledCallback {
 
@@ -56,7 +55,7 @@ open class FreenetTemplatePage(
 
 	override fun isEnabled(toadletContext: ToadletContext) = !isFullAccessOnly
 
-	private val template = templatePath?.let(loaders::loadTemplate) ?: template
+	private val template = templatePath?.let(loaders::loadTemplate) ?: Template()
 
 	override fun handleRequest(request: FreenetRequest, response: Response): Response {
 		getRedirectTarget(request)?.let { redirectTarget -> return RedirectResponse(redirectTarget) }

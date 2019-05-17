@@ -5,7 +5,6 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -13,8 +12,8 @@ import javax.inject.Inject
  * Page that lets the user edit the name of a profile field.
  */
 @TemplatePath("/templates/editProfileField.html")
-class EditProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface, loaders, templateRenderer) {
+class EditProfileFieldPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("editProfileField.html", "Page.EditProfileField.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->

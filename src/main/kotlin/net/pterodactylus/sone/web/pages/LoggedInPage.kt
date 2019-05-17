@@ -4,14 +4,13 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 
 /**
  * Base class for [SoneTemplatePage] implementations that require a logged in user.
  */
-abstract class LoggedInPage(path: String, template: Template, pageTitleKey: String, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage(path, webInterface, loaders, template, templateRenderer, pageTitleKey = pageTitleKey, requiresLogin = true) {
+abstract class LoggedInPage(path: String, pageTitleKey: String, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(path, webInterface, loaders, templateRenderer, pageTitleKey = pageTitleKey, requiresLogin = true) {
 
 	final override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		handleRequest(soneRequest, getCurrentSone(soneRequest.toadletContext, false)!!, templateContext)

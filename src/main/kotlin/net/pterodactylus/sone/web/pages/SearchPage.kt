@@ -18,7 +18,6 @@ import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.FORBIDDEN
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.OPTIONAL
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.REQUIRED
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.text.StringEscaper
 import net.pterodactylus.util.text.TextException
@@ -30,11 +29,11 @@ import javax.inject.Inject
  * words.
  */
 @TemplatePath("/templates/search.html")
-class SearchPage(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
-		SoneTemplatePage("search.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Search.Title") {
+class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
+		SoneTemplatePage("search.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Search.Title") {
 
-	@Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-			this(template, webInterface, loaders, templateRenderer, Ticker.systemTicker())
+	@Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+			this(webInterface, loaders, templateRenderer, Ticker.systemTicker())
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 

@@ -7,7 +7,6 @@ import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -16,8 +15,8 @@ import javax.inject.Inject
  */
 @MenuName("Login")
 @TemplatePath("/templates/login.html")
-class LoginPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		SoneTemplatePage("login.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Login.Title") {
+class LoginPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("login.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Login.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

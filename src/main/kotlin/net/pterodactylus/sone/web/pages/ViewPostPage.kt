@@ -13,8 +13,8 @@ import javax.inject.*
  * This page lets the user view a post and all its replies.
  */
 @TemplatePath("/templates/viewPost.html")
-class ViewPostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		SoneTemplatePage("viewPost.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.ViewPost.Title") {
+class ViewPostPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("viewPost.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.ViewPost.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		templateContext["post"] = soneRequest.parameters["post"]?.let(soneRequest.core::getPost)

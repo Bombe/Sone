@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -12,10 +11,10 @@ import javax.inject.Inject
  */
 @MenuName("About")
 @TemplatePath("/templates/about.html")
-class AboutPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer,
+class AboutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,
-		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.About.Title") {
+		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.About.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["version"] = pluginVersion.version

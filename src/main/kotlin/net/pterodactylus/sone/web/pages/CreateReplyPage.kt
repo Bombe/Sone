@@ -6,7 +6,6 @@ import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -14,8 +13,8 @@ import javax.inject.Inject
  * This page lets the user post a reply to a post.
  */
 @TemplatePath("/templates/createReply.html")
-class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface, loaders, templateRenderer) {
+class CreateReplyPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("createReply.html", "Page.CreateReply.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val postId = soneRequest.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }

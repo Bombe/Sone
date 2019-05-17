@@ -7,7 +7,6 @@ import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.net.URI
 import javax.inject.Inject
@@ -17,8 +16,8 @@ import javax.inject.Inject
  */
 @MenuName("ImageBrowser")
 @TemplatePath("/templates/imageBrowser.html")
-class ImageBrowserPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
+class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("imageBrowser.html", "Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if ("album" in soneRequest.parameters) {

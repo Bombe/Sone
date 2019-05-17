@@ -13,7 +13,7 @@ import org.junit.Test
 /**
  * Unit test for [AboutPage].
  */
-class AboutPageTest : WebPageTest({ template, webInterface, loaders, templateRenderer -> AboutPage(template, webInterface, loaders, templateRenderer, PluginVersion(version), PluginYear(year), PluginHomepage(homepage)) }) {
+class AboutPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> AboutPage(webInterface, loaders, templateRenderer, PluginVersion(version), PluginYear(year), PluginHomepage(homepage)) }) {
 
 	companion object {
 		private const val version = "0.1.2"

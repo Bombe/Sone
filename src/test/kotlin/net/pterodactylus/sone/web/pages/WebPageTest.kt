@@ -24,7 +24,6 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.sone.web.page.FreenetTemplatePage.RedirectException
 import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.web.Method
 import net.pterodactylus.util.web.Method.GET
@@ -43,11 +42,10 @@ import kotlin.text.Charsets.UTF_8
 /**
  * Base class for web page tests.
  */
-open class WebPageTest(pageSupplier: (Template, WebInterface, Loaders, TemplateRenderer) -> SoneTemplatePage = { _, _, _, _ -> mock() }) {
+open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -> SoneTemplatePage = { _, _, _ -> mock() }) {
 
 	val currentSone = mock<Sone>()
 	val loaders = mock<Loaders>()
-	val template = mock<Template>()
 	val templateRenderer = mock<TemplateRenderer>()
 	val webInterface = deepMock<WebInterface>()
 	val core = webInterface.core
@@ -56,7 +54,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface, Loaders, TemplateR
 	val l10n = webInterface.l10n!!
 	val sessionManager = mock<SessionManager>()
 
-	val page by lazy { pageSupplier(template, webInterface, loaders, templateRenderer) }
+	val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
 
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()

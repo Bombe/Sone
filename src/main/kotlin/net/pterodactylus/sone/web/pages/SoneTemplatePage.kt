@@ -8,7 +8,6 @@ import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import net.pterodactylus.util.web.*
 import java.net.URLEncoder
@@ -20,12 +19,11 @@ open class SoneTemplatePage @JvmOverloads constructor(
 		path: String,
 		private val webInterface: WebInterface,
 		loaders: Loaders,
-		template: Template,
 		templateRenderer: TemplateRenderer,
 		private val pageTitleKey: String? = null,
 		private val requiresLogin: Boolean = false,
 		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.l10n::getString) ?: "" }
-) : FreenetTemplatePage(path, templateRenderer, loaders, template, "noPermission.html") {
+) : FreenetTemplatePage(path, templateRenderer, loaders, "noPermission.html") {
 
 	private val core = webInterface.core
 	private val sessionProvider: SessionProvider = webInterface

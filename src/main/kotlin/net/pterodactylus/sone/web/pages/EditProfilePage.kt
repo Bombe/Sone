@@ -7,7 +7,6 @@ import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -16,8 +15,8 @@ import javax.inject.Inject
  */
 @MenuName("EditProfile")
 @TemplatePath("/templates/editProfile.html")
-class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface, loaders, templateRenderer) {
+class EditProfilePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("editProfile.html", "Page.EditProfile.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->

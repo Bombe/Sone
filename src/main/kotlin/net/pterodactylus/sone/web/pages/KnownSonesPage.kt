@@ -6,7 +6,6 @@ import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -15,8 +14,8 @@ import javax.inject.Inject
  */
 @MenuName("KnownSones")
 @TemplatePath("/templates/knownSones.html")
-class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		SoneTemplatePage("knownSones.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.KnownSones.Title") {
+class KnownSonesPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("knownSones.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.KnownSones.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		getCurrentSone(soneRequest.toadletContext).let { currentSone ->

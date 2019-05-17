@@ -11,7 +11,6 @@ import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.utils.use
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -23,8 +22,8 @@ import javax.inject.Inject
  * Page implementation that lets the user upload an image.
  */
 @TemplatePath("/templates/invalid.html")
-class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, loaders, templateRenderer) {
+class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("uploadImage.html", "Page.UploadImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

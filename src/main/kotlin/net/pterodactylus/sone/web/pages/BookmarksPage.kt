@@ -5,7 +5,6 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -14,8 +13,8 @@ import javax.inject.Inject
  */
 @MenuName("Bookmarks")
 @TemplatePath("/templates/bookmarks.html")
-class BookmarksPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("bookmarks.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
+class BookmarksPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage("bookmarks.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		soneRequest.core.bookmarkedPosts.let { posts ->

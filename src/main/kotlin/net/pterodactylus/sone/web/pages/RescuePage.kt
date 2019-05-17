@@ -6,7 +6,6 @@ import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import javax.inject.Inject
 
@@ -15,8 +14,8 @@ import javax.inject.Inject
  */
 @MenuName("Rescue")
 @TemplatePath("/templates/rescue.html")
-class RescuePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface, loaders, templateRenderer) {
+class RescuePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("rescue.html", "Page.Rescue.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val soneRescuer = soneRequest.core.getSoneRescuer(currentSone)

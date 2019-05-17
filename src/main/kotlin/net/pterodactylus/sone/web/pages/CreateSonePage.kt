@@ -6,7 +6,6 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContext
 import java.util.logging.Level
 import java.util.logging.Logger
@@ -17,8 +16,8 @@ import javax.inject.Inject
  */
 @MenuName("CreateSone")
 @TemplatePath("/templates/createSone.html")
-class CreateSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
-		SoneTemplatePage("createSone.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.CreateSone.Title") {
+class CreateSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("createSone.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.CreateSone.Title") {
 
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
 
