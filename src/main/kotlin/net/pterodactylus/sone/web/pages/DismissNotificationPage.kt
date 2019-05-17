@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
@@ -9,8 +10,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user dismiss a notification.
  */
-class DismissNotificationPage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("dismissNotification.html", webInterface, template, "Page.DismissNotification.Title") {
+class DismissNotificationPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("dismissNotification.html", webInterface, loaders, template = template, pageTitleKey = "Page.DismissNotification.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)

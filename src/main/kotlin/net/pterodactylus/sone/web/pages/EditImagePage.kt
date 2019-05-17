@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Image.Modifier.ImageTitleMustNotBeEmpty
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
@@ -13,8 +14,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user edit title and description of an {@link Image}.
  */
-class EditImagePage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("editImage.html", template, "Page.EditImage.Title", webInterface) {
+class EditImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("editImage.html", template, "Page.EditImage.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

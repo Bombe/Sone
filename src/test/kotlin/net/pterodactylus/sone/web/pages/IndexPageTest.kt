@@ -23,7 +23,7 @@ import org.mockito.ArgumentMatchers
 /**
  * Unit test for [IndexPage].
  */
-class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template, webInterface, postVisibilityFilter) }) {
+class IndexPageTest: WebPageTest({ template, webInterface, loaders -> IndexPage(template, webInterface, loaders, postVisibilityFilter) }) {
 
 	companion object {
 		private val postVisibilityFilter = mock<PostVisibilityFilter>()

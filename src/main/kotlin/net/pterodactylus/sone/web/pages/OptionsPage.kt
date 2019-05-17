@@ -3,6 +3,7 @@ package net.pterodactylus.sone.web.pages
 import net.pterodactylus.sone.core.Preferences
 import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
@@ -16,8 +17,8 @@ import javax.inject.Inject
  * This page lets the user edit the options of the Sone plugin.
  */
 @MenuName("Options")
-class OptionsPage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("options.html", webInterface, template, "Page.Options.Title") {
+class OptionsPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("options.html", webInterface, loaders, template = template, pageTitleKey = "Page.Options.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

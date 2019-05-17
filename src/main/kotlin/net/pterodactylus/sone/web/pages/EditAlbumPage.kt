@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
@@ -12,8 +13,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user edit the name and description of an album.
  */
-class EditAlbumPage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface) {
+class EditAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

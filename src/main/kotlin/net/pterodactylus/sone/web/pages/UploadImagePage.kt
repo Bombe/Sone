@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import freenet.support.api.Bucket
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.headers
@@ -21,8 +22,8 @@ import javax.inject.Inject
 /**
  * Page implementation that lets the user upload an image.
  */
-class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface) {
+class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

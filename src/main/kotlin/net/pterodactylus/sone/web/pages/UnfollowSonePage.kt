@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -12,8 +13,8 @@ import javax.inject.Inject
 /**
  * This page lets the user unfollow another Sone.
  */
-class UnfollowSonePage @Inject constructor(template: Template, webInterface: WebInterface) :
-		LoggedInPage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface) {
+class UnfollowSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
+		LoggedInPage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

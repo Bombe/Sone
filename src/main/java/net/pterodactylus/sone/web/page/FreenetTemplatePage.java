@@ -31,6 +31,7 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import net.pterodactylus.sone.main.Loaders;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
@@ -61,26 +62,15 @@ public class FreenetTemplatePage implements FreenetPage, LinkEnabledCallback {
 
 	/** The template to render. */
 	private final Template template;
+	private final Loaders loaders;
 
 	/** Where to redirect for invalid form passwords. */
 	private final String invalidFormPasswordRedirectTarget;
 
-	/**
-	 * Creates a new template page.
-	 *
-	 * @param path
-	 *            The path of the page
-	 * @param templateContextFactory
-	 *            The template context factory
-	 * @param template
-	 *            The template to render
-	 * @param invalidFormPasswordRedirectTarget
-	 *            The target to redirect to if a POST request does not contain
-	 *            the correct form password
-	 */
-	public FreenetTemplatePage(String path, TemplateContextFactory templateContextFactory, Template template, String invalidFormPasswordRedirectTarget) {
+	public FreenetTemplatePage(String path, TemplateContextFactory templateContextFactory, Loaders loaders, Template template, String invalidFormPasswordRedirectTarget) {
 		this.path = path;
 		this.templateContextFactory = templateContextFactory;
+		this.loaders = loaders;
 		this.template = template;
 		this.invalidFormPasswordRedirectTarget = invalidFormPasswordRedirectTarget;
 	}

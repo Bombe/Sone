@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.utils.isPOST
@@ -13,8 +14,8 @@ import javax.inject.Inject
 /**
  * This page lets the user create a new [Post].
  */
-class CreatePostPage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface) {
+class CreatePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)

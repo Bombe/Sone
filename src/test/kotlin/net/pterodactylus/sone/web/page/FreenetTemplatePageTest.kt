@@ -10,7 +10,7 @@ import org.mockito.ArgumentMatchers.*
 
 class FreenetTemplatePageTest {
 
-	private val page = FreenetTemplatePage("/test/path", null, null, "invalid-form-password")
+	private val page = FreenetTemplatePage("/test/path", null, null, null, "invalid-form-password")
 
 	@Test
 	fun `path is exposed correctly`() {
@@ -64,7 +64,7 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `isEnabled() returns false if full access only is true`() {
-		val page = object : FreenetTemplatePage("/test/path", null, null, null) {
+		val page = object : FreenetTemplatePage("/test/path", null, null, null, null) {
 			override fun isFullAccessOnly() = true
 		}
 		assertThat(page.isEnabled(mock()), equalTo(false))
@@ -72,7 +72,7 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `page with redirect target throws redirect exception on handleRequest`() {
-		val page = object : FreenetTemplatePage("/test/path", null, null, null) {
+		val page = object : FreenetTemplatePage("/test/path", null, null, null, null) {
 			override fun getRedirectTarget(request: FreenetRequest?) = "foo"
 		}
 		val request = mock<FreenetRequest>()
@@ -84,7 +84,7 @@ class FreenetTemplatePageTest {
 
 	@Test
 	fun `page with full access only returns unauthorized on handleRequest with non-full access request`() {
-		val page = object : FreenetTemplatePage("/test/path", null, null, null) {
+		val page = object : FreenetTemplatePage("/test/path", null, null, null, null) {
 			override fun isFullAccessOnly() = true
 		}
 		val request = deepMock<FreenetRequest>()

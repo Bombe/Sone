@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
@@ -14,8 +15,8 @@ import javax.inject.Inject
  * The login page lets the user log in.
  */
 @MenuName("Login")
-class LoginPage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("login.html", webInterface, template, "Page.Login.Title") {
+class LoginPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("login.html", webInterface, loaders, template = template, pageTitleKey = "Page.Login.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

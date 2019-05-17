@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
@@ -11,8 +12,8 @@ import javax.inject.*
  * Page that lets the user mark a number of [net.pterodactylus.sone.data.Sone]s, [Post]s, or
  * [Replie][net.pterodactylus.sone.data.Reply]s as known.
  */
-class MarkAsKnownPage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("markAsKnown.html", webInterface, template, "Page.MarkAsKnown.Title") {
+class MarkAsKnownPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("markAsKnown.html", webInterface, loaders, template = template, pageTitleKey = "Page.MarkAsKnown.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val ids = soneRequest.parameters["id", 65536]!!.split(" ")

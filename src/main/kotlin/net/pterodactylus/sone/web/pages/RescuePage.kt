@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -13,8 +14,8 @@ import javax.inject.Inject
  * Page that lets the user control the rescue mode for a Sone.
  */
 @MenuName("Rescue")
-class RescuePage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface) {
+class RescuePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val soneRescuer = soneRequest.core.getSoneRescuer(currentSone)

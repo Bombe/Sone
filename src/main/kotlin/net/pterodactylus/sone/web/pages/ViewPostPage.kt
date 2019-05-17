@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
@@ -11,8 +12,8 @@ import javax.inject.*
 /**
  * This page lets the user view a post and all its replies.
  */
-class ViewPostPage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("viewPost.html", webInterface, template, "Page.ViewPost.Title") {
+class ViewPostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("viewPost.html", webInterface, loaders, template = template, pageTitleKey = "Page.ViewPost.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		templateContext["post"] = soneRequest.parameters["post"]?.let(soneRequest.core::getPost)

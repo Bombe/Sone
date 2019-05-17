@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
@@ -11,8 +12,8 @@ import javax.inject.Inject
 /**
  * Lets the user delete a post they made.
  */
-class DeletePostPage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("deletePost.html", template, "Page.DeletePost.Title", webInterface) {
+class DeletePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("deletePost.html", template, "Page.DeletePost.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

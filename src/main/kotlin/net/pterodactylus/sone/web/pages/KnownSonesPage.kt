@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -13,8 +14,8 @@ import javax.inject.Inject
  * This page shows all known Sones.
  */
 @MenuName("KnownSones")
-class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("knownSones.html", webInterface, template, "Page.KnownSones.Title") {
+class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("knownSones.html", webInterface, loaders, template = template, pageTitleKey = "Page.KnownSones.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		getCurrentSone(soneRequest.toadletContext).let { currentSone ->

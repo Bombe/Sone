@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
@@ -12,8 +13,8 @@ import javax.inject.Inject
 /**
  * This page lets the user post a reply to a post.
  */
-class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface) {
+class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val postId = soneRequest.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }

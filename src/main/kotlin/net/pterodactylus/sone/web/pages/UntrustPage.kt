@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
@@ -13,8 +14,8 @@ import javax.inject.Inject
  * Page that lets the user untrust another Sone. This will remove all trust
  * assignments for an identity.
  */
-class UntrustPage @Inject constructor(template: Template, webInterface: WebInterface) :
-		LoggedInPage("untrust.html", template, "Page.Untrust.Title", webInterface) {
+class UntrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
+		LoggedInPage("untrust.html", template, "Page.Untrust.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

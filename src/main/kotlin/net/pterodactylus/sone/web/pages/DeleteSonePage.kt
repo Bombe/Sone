@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
@@ -14,8 +15,8 @@ import javax.inject.Inject
  * installation.
  */
 @MenuName("DeleteSone")
-class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface) {
+class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

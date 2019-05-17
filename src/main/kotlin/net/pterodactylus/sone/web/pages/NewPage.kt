@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
@@ -14,8 +15,8 @@ import javax.inject.Inject
  * [PostVisibilityFilter.isPostVisible(Sone, Post)] and sorted by time.
  */
 @MenuName("New")
-class NewPage @Inject constructor(  template: Template, webInterface: WebInterface):
-		SoneTemplatePage("new.html", webInterface, template, "Page.New.Title") {
+class NewPage @Inject constructor(  template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("new.html", webInterface, loaders, template = template, pageTitleKey = "Page.New.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) =
 			getCurrentSone(soneRequest.toadletContext).let { currentSone ->

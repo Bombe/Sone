@@ -20,7 +20,7 @@ import org.junit.Test
 /**
  * Unit test for [SoneTemplatePage].
  */
-class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : SoneTemplatePage("path.html", webInterface, template, requiresLogin = true) {} }) {
+class SoneTemplatePageTest : WebPageTest({ template, webInterface, loaders -> object : SoneTemplatePage("path.html", webInterface, loaders, template = template, requiresLogin = true) {} }) {
 
 	init {
 		request("index.html")
@@ -28,14 +28,14 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `page title is empty string if no page title key was given`() {
-		SoneTemplatePage("path.html", webInterface, template, requiresLogin = false).let { page ->
+		SoneTemplatePage("path.html", webInterface, loaders, template = template, requiresLogin = false).let { page ->
 			assertThat(page.getPageTitle(soneRequest), equalTo(""))
 		}
 	}
 
 	@Test
 	fun `page title is retrieved from l10n if page title key is given`() {
-		SoneTemplatePage("path.html", webInterface, template, "page.title", false).let { page ->
+		SoneTemplatePage("path.html", webInterface, loaders, template = template, pageTitleKey = "page.title", requiresLogin = false).let { page ->
 			whenever(l10n.getString("page.title")).thenReturn("Page Title")
 			assertThat(page.getPageTitle(soneRequest), equalTo("Page Title"))
 		}
@@ -148,7 +148,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	@Test
 	fun `handleRequest method is called`() {
 		var called = false
-		val page = object : SoneTemplatePage("path.html", webInterface, template, requiresLogin = true) {
+		val page = object : SoneTemplatePage("path.html", webInterface, loaders, template = template, requiresLogin = true) {
 			override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 				called = true
 			}
@@ -159,7 +159,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `redirect does not happen if login is not required`() {
-		val page = SoneTemplatePage("page.html", webInterface, template, requiresLogin = false)
+		val page = SoneTemplatePage("page.html", webInterface, loaders, template = template, requiresLogin = false)
 		assertThat(page.getRedirectTarget(freenetRequest), nullValue())
 	}
 
@@ -211,7 +211,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 
 	@Test
 	fun `page is enabled if no full access is required and login is not required`() {
-		SoneTemplatePage("path.html", webInterface, template, requiresLogin = false).let { page ->
+		SoneTemplatePage("path.html", webInterface, loaders, template = template, requiresLogin = false).let { page ->
 			assertThat(page.isEnabled(toadletContext), equalTo(true))
 		}
 	}
@@ -219,7 +219,7 @@ class SoneTemplatePageTest : WebPageTest({ template, webInterface -> object : So
 	@Test
 	fun `handle request with sone request is called`() {
 		var called = false
-	    val page = object : SoneTemplatePage("path.html", webInterface, template) {
+	    val page = object : SoneTemplatePage("path.html", webInterface, loaders, template = template) {
 		    override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 			    called = true
 		    }

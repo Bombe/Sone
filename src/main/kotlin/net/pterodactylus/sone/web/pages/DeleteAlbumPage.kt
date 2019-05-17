@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
@@ -11,8 +12,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user delete an {@link Album}.
  */
-class DeleteAlbumPage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface) {
+class DeleteAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

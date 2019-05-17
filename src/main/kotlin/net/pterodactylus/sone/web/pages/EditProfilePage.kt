@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Profile.DuplicateField
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.text.TextFilter
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
@@ -14,8 +15,8 @@ import javax.inject.Inject
  * This page lets the user edit her profile.
  */
 @MenuName("EditProfile")
-class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface) :
-		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface) {
+class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
+		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->

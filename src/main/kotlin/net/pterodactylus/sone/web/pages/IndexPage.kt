@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.PostVisibilityFilter
 import net.pterodactylus.sone.utils.paginate
 import net.pterodactylus.sone.utils.parameters
@@ -15,8 +16,8 @@ import javax.inject.Inject
  * of all friends of the current user.
  */
 @MenuName("Index")
-class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter) :
-		LoggedInPage("index.html", template, "Page.Index.Title", webInterface) {
+class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, private val postVisibilityFilter: PostVisibilityFilter) :
+		LoggedInPage("index.html", template, "Page.Index.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		(currentSone.posts +

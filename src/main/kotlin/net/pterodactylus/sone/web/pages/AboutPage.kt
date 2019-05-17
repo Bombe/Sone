@@ -11,10 +11,10 @@ import javax.inject.Inject
  * A [SoneTemplatePage] that stores information about Sone in the [TemplateContext].
  */
 @MenuName("About")
-class AboutPage @Inject constructor(template: Template, webInterface: WebInterface,
+class AboutPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,
-		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", webInterface, template, "Page.About.Title") {
+		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", webInterface, loaders, template = template, pageTitleKey = "Page.About.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["version"] = pluginVersion.version

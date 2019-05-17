@@ -7,6 +7,7 @@ import freenet.support.Logger
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.memoize
@@ -28,11 +29,11 @@ import javax.inject.Inject
  * This page lets the user search for posts and replies that contain certain
  * words.
  */
-class SearchPage(template: Template, webInterface: WebInterface, ticker: Ticker = Ticker.systemTicker()) :
-		SoneTemplatePage("search.html", webInterface, template, "Page.Search.Title") {
+class SearchPage(template: Template, webInterface: WebInterface, loaders: Loaders, ticker: Ticker = Ticker.systemTicker()) :
+		SoneTemplatePage("search.html", webInterface, loaders, template = template, pageTitleKey = "Page.Search.Title") {
 
-	@Inject constructor(template: Template, webInterface: WebInterface) :
-			this(template, webInterface, Ticker.systemTicker())
+	@Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
+			this(template, webInterface, loaders, Ticker.systemTicker())
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 

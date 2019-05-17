@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
@@ -10,8 +11,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user bookmark a post.
  */
-class BookmarkPage @Inject constructor(template: Template, webInterface: WebInterface)
-	: SoneTemplatePage("bookmark.html", webInterface, template, "Page.Bookmark.Title") {
+class BookmarkPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders)
+	: SoneTemplatePage("bookmark.html", webInterface, loaders, template = template, pageTitleKey = "Page.Bookmark.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

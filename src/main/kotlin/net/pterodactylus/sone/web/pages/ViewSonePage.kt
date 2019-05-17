@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.SoneAccessor
 import net.pterodactylus.sone.utils.mapPresent
 import net.pterodactylus.sone.utils.paginate
@@ -16,8 +17,8 @@ import javax.inject.Inject
 /**
  * Lets the user browser another Sone.
  */
-class ViewSonePage @Inject constructor(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("viewSone.html", webInterface, template) {
+class ViewSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		SoneTemplatePage("viewSone.html", webInterface, loaders, template = template) {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		templateContext["soneId"] = soneRequest.parameters["sone"]

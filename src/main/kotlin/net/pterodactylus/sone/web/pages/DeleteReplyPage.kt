@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.isPOST
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
@@ -11,8 +12,8 @@ import javax.inject.Inject
 /**
  * This page lets the user delete a reply.
  */
-class DeleteReplyPage @Inject constructor(template: Template, webInterface: WebInterface):
-		LoggedInPage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface) {
+class DeleteReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
+		LoggedInPage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface, loaders) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

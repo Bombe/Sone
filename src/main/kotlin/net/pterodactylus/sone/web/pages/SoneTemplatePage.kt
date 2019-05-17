@@ -2,7 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import freenet.clients.http.*
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.main.SonePlugin
+import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.sone.web.WebInterface
@@ -19,11 +19,12 @@ import java.net.URLEncoder
 open class SoneTemplatePage @JvmOverloads constructor(
 		path: String,
 		private val webInterface: WebInterface,
+		loaders: Loaders,
 		template: Template,
 		private val pageTitleKey: String? = null,
 		private val requiresLogin: Boolean = false,
 		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.l10n::getString) ?: "" }
-) : FreenetTemplatePage(path, webInterface.templateContextFactory, template, "noPermission.html") {
+) : FreenetTemplatePage(path, webInterface.templateContextFactory, loaders, template, "noPermission.html") {
 
 	private val core = webInterface.core
 	private val sessionProvider: SessionProvider = webInterface
