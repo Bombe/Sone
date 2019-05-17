@@ -29,5 +29,3 @@ class PageToadletFactory @Inject constructor(private val highLevelSimpleClient: 
 			PageToadlet(highLevelSimpleClient, sessionManager, menuName ?: page.menuName, page, pathPrefix)
 
 }
-
-private val Page<*>.menuName get() = javaClass.getAnnotation(MenuName::class.java)?.value

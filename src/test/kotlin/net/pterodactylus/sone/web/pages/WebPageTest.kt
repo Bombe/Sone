@@ -54,7 +54,6 @@ open class WebPageTest(pageSupplier: (Template, WebInterface) -> SoneTemplatePag
 	val sessionManager = mock<SessionManager>()
 
 	val page by lazy { pageSupplier(template, webInterface) }
-	val SoneTemplatePage.menuName get() = javaClass.getAnnotation(MenuName::class.java)?.value
 
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()
