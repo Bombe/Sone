@@ -89,4 +89,9 @@ class NewPageTest: WebPageTest(::NewPage) {
 	    assertThat(baseInjector.getInstance<NewPage>(), notNullValue())
 	}
 
+	@Test
+	fun `page is annotated with the correct menuname`() {
+	    assertThat(page.menuName, equalTo("New"))
+	}
+
 }

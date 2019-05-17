@@ -13,6 +13,7 @@ import javax.inject.Inject
  * Page that displays all new posts and replies. The posts are filtered using
  * [PostVisibilityFilter.isPostVisible(Sone, Post)] and sorted by time.
  */
+@MenuName("New")
 class NewPage @Inject constructor(  template: Template, webInterface: WebInterface):
 		SoneTemplatePage("new.html", webInterface, template, "Page.New.Title") {
 
