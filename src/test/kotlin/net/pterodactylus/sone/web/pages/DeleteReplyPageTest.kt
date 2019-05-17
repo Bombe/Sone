@@ -1,20 +1,14 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [DeleteReplyPage].

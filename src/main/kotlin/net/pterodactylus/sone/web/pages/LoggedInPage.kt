@@ -1,10 +1,10 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.util.template.*
 
 /**
  * Base class for [SoneTemplatePage] implementations that require a logged in user.

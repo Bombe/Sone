@@ -1,15 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.utils.paginate
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
-import java.net.URI
-import javax.inject.Inject
+import net.pterodactylus.util.template.*
+import java.net.*
+import javax.inject.*
 
 /**
  * The image browser page is the entry page for the image management.

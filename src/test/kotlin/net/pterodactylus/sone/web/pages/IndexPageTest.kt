@@ -1,24 +1,17 @@
 package net.pterodactylus.sone.web.pages
 
-import com.google.common.base.Optional.fromNullable
-import com.google.common.base.Predicate
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.notify.PostVisibilityFilter
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.sone.web.baseInjector
+import com.google.common.base.*
+import com.google.common.base.Optional.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.emptyIterable
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Before
-import org.junit.Test
-import org.mockito.ArgumentMatchers
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.*
 
 /**
  * Unit test for [IndexPage].

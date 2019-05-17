@@ -1,14 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.notify.PostVisibilityFilter
-import net.pterodactylus.sone.utils.paginate
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
-import javax.inject.Inject
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * The index page shows the main page of Sone. This page will contain the posts

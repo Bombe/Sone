@@ -1,14 +1,14 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Album.Modifier.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.text.TextFilter
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
-import javax.inject.Inject
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user create a new album.

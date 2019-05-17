@@ -1,11 +1,10 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetPage
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.web.Response
-import java.net.URI
-import javax.inject.Inject
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.*
+import java.net.*
+import javax.inject.*
 
 /**
  * Page that delivers a {@link TemporaryImage} to the browser.

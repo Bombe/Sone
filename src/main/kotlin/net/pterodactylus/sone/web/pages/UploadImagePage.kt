@@ -1,22 +1,17 @@
 package net.pterodactylus.sone.web.pages
 
-import freenet.support.api.Bucket
-import net.pterodactylus.sone.data.Sone
+import freenet.support.api.*
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.text.TextFilter
-import net.pterodactylus.sone.utils.emptyToNull
-import net.pterodactylus.sone.utils.headers
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.utils.use
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
-import java.awt.image.BufferedImage
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
-import javax.inject.Inject
+import net.pterodactylus.util.template.*
+import java.awt.image.*
+import java.io.*
+import javax.imageio.*
+import javax.inject.*
 
 /**
  * Page implementation that lets the user upload an image.

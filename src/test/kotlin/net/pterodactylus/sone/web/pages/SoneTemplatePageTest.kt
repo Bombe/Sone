@@ -1,21 +1,16 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.main.SonePlugin
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.util.notify.*
+import net.pterodactylus.util.template.*
 import net.pterodactylus.util.version.Version
-import org.hamcrest.Matcher
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.anyOf
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
-import org.junit.Test
+import org.hamcrest.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
  * Unit test for [SoneTemplatePage].

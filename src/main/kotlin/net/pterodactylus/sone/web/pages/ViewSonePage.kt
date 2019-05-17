@@ -1,17 +1,14 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.template.SoneAccessor
-import net.pterodactylus.sone.utils.mapPresent
-import net.pterodactylus.sone.utils.paginate
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.template.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
-import java.net.URI
-import javax.inject.Inject
+import net.pterodactylus.util.template.*
+import java.net.*
+import javax.inject.*
 
 /**
  * Lets the user browser another Sone.

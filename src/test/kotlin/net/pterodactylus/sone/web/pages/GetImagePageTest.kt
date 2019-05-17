@@ -1,13 +1,11 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.TemporaryImage
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.web.baseInjector
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import java.net.*
 
 /**

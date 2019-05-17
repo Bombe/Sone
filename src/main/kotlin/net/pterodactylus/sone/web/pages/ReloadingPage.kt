@@ -1,10 +1,8 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.util.web.Page
-import net.pterodactylus.util.web.Request
-import net.pterodactylus.util.web.Response
-import java.io.File
-import javax.inject.Inject
+import net.pterodactylus.util.web.*
+import java.io.*
+import javax.inject.*
 
 /**
  * [Page] implementation that delivers static files from the filesystem.

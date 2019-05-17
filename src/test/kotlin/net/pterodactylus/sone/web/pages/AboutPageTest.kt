@@ -1,14 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.isProvidedByMock
-import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Test
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
  * Unit test for [AboutPage].

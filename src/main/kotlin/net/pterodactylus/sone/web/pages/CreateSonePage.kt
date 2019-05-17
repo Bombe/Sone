@@ -1,15 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import freenet.clients.http.ToadletContext
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.template.TemplateContext
-import java.util.logging.Level
-import java.util.logging.Logger
-import javax.inject.Inject
+import net.pterodactylus.util.template.*
+import java.util.logging.*
+import javax.inject.*
 
 /**
  * The “create Sone” page lets the user create a new Sone.

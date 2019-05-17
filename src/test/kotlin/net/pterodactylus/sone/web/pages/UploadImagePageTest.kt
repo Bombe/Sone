@@ -1,25 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Image.Modifier
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.data.TemporaryImage
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Image.*
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Test
-import org.mockito.Mockito.any
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 import org.mockito.Mockito.eq
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
 
 /**
  * Unit test for [UploadImagePage].

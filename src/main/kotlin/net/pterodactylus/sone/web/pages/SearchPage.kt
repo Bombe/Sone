@@ -1,28 +1,18 @@
 package net.pterodactylus.sone.web.pages
 
 import com.google.common.base.Ticker
-import com.google.common.cache.Cache
-import com.google.common.cache.CacheBuilder
-import freenet.support.Logger
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Sone
+import com.google.common.cache.*
+import freenet.support.*
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.sone.utils.emptyToNull
-import net.pterodactylus.sone.utils.memoize
-import net.pterodactylus.sone.utils.paginate
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.sone.web.pages.SearchPage.Optionality.FORBIDDEN
-import net.pterodactylus.sone.web.pages.SearchPage.Optionality.OPTIONAL
-import net.pterodactylus.sone.web.pages.SearchPage.Optionality.REQUIRED
-import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.text.StringEscaper
-import net.pterodactylus.util.text.TextException
-import java.util.concurrent.TimeUnit.MINUTES
-import javax.inject.Inject
+import net.pterodactylus.sone.web.pages.SearchPage.Optionality.*
+import net.pterodactylus.util.template.*
+import net.pterodactylus.util.text.*
+import java.util.concurrent.TimeUnit.*
+import javax.inject.*
 
 /**
  * This page lets the user search for posts and replies that contain certain

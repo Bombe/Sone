@@ -1,27 +1,17 @@
 package net.pterodactylus.sone.web.pages
 
-import com.google.common.base.Optional.absent
-import com.google.common.base.Ticker
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.isOnPage
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.asOptional
-import net.pterodactylus.sone.web.baseInjector
+import com.google.common.base.*
+import com.google.common.base.Optional.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Test
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.util.concurrent.*
+import java.util.concurrent.atomic.*
 
 /**
  * Unit test for [SearchPage].
