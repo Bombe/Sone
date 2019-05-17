@@ -1,18 +1,15 @@
 package net.pterodactylus.sone.main
 
-import com.google.inject.Guice
-import freenet.client.HighLevelSimpleClient
+import com.google.inject.*
+import freenet.client.*
 import freenet.clients.http.*
-import freenet.node.Node
-import freenet.pluginmanager.PluginRespirator
-import net.pterodactylus.sone.test.deepMock
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.sameInstance
-import org.junit.Test
-import org.mockito.Mockito.verify
+import freenet.node.*
+import freenet.pluginmanager.*
+import net.pterodactylus.sone.test.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [FreenetModule].
@@ -30,7 +27,7 @@ class FreenetModuleTest {
 	private val module = FreenetModule(pluginRespirator)
 	private val injector = Guice.createInjector(module)
 
-	private inline fun <reified T: Any> verifySingletonInstance() {
+	private inline fun <reified T : Any> verifySingletonInstance() {
 		val firstInstance = injector.getInstance<T>()
 		val secondInstance = injector.getInstance<T>()
 		assertThat(firstInstance, sameInstance(secondInstance))
@@ -79,7 +76,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `toadlet container is returned correctly`() {
-	    assertThat(injector.getInstance(), sameInstance(toadletContainer))
+		assertThat(injector.getInstance(), sameInstance(toadletContainer))
 	}
 
 	@Test

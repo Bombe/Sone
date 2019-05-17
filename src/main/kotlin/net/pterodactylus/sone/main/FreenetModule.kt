@@ -1,19 +1,17 @@
 package net.pterodactylus.sone.main
 
-import com.google.inject.Binder
-import com.google.inject.Module
-import com.google.inject.Provides
-import freenet.client.HighLevelSimpleClient
+import com.google.inject.*
+import freenet.client.*
 import freenet.clients.http.*
-import freenet.node.Node
-import freenet.pluginmanager.PluginRespirator
+import freenet.node.*
+import freenet.pluginmanager.*
 import javax.inject.Provider
 import javax.inject.Singleton
 
 /**
  * Guice [Module] that supplies some objects that are in fact supplied by the Freenet node.
  */
-class FreenetModule(private val pluginRespirator: PluginRespirator): Module {
+class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 
 	override fun configure(binder: Binder): Unit = binder.run {
 		bind(PluginRespirator::class.java).toProvider(Provider<PluginRespirator> { pluginRespirator })
@@ -23,7 +21,8 @@ class FreenetModule(private val pluginRespirator: PluginRespirator): Module {
 		bind(PageMaker::class.java).toProvider(Provider<PageMaker> { pluginRespirator.pageMaker })
 	}
 
-	@Provides @Singleton
+	@Provides
+	@Singleton
 	fun getSessionManager() = pluginRespirator.getSessionManager("Sone")!!
 
 }
