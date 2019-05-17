@@ -13,6 +13,7 @@ import javax.inject.Inject
  * Freenet; merely all references to it are removed from the local plugin
  * installation.
  */
+@MenuName("DeleteSone")
 class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface) {
 
