@@ -15,7 +15,7 @@ import javax.inject.*
 @TemplatePath("/templates/createReply.html")
 @ToadletPath("createReply.html")
 class CreateReplyPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("createReply.html", "Page.CreateReply.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.CreateReply.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val postId = soneRequest.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }

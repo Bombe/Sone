@@ -15,14 +15,13 @@ import java.net.*
  * Base page for the Sone web interface.
  */
 open class SoneTemplatePage @JvmOverloads constructor(
-		path: String,
 		private val webInterface: WebInterface,
 		loaders: Loaders,
 		templateRenderer: TemplateRenderer,
 		private val pageTitleKey: String? = null,
 		private val requiresLogin: Boolean = false,
 		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.l10n::getString) ?: "" }
-) : FreenetTemplatePage(path, templateRenderer, loaders, "noPermission.html") {
+) : FreenetTemplatePage(templateRenderer, loaders, "noPermission.html") {
 
 	private val core = webInterface.core
 	private val sessionProvider: SessionProvider = webInterface

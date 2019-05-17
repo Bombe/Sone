@@ -11,7 +11,7 @@ import javax.inject.*
  */
 @ToadletPath("dismissNotification.html")
 class DismissNotificationPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("dismissNotification.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.DismissNotification.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.DismissNotification.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)

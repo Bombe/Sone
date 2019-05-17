@@ -12,7 +12,7 @@ import javax.inject.*
  */
 @ToadletPath("bookmark.html")
 class BookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer)
-	: SoneTemplatePage("bookmark.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmark.Title") {
+	: SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmark.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

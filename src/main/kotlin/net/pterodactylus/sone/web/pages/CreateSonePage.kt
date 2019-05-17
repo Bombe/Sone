@@ -16,7 +16,7 @@ import javax.inject.*
 @TemplatePath("/templates/createSone.html")
 @ToadletPath("createSone.html")
 class CreateSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("createSone.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.CreateSone.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.CreateSone.Title") {
 
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
 

@@ -15,7 +15,7 @@ import javax.inject.*
  */
 @ToadletPath("editImage.html")
 class EditImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("editImage.html", "Page.EditImage.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.EditImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

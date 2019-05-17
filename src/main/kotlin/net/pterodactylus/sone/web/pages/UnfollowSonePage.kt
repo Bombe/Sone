@@ -13,7 +13,7 @@ import javax.inject.*
  */
 @ToadletPath("unfollowSone.html")
 class UnfollowSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("unfollowSone.html", "Page.UnfollowSone.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.UnfollowSone.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

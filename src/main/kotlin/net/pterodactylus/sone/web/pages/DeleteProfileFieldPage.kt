@@ -14,7 +14,7 @@ import javax.inject.*
 @TemplatePath("/templates/deleteProfileField.html")
 @ToadletPath("deleteProfileField.html")
 class DeleteProfileFieldPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("deleteProfileField.html", "Page.DeleteProfileField.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.DeleteProfileField.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

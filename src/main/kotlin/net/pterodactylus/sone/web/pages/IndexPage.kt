@@ -17,7 +17,7 @@ import javax.inject.*
 @TemplatePath("/templates/index.html")
 @ToadletPath("index.html")
 class IndexPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val postVisibilityFilter: PostVisibilityFilter) :
-		LoggedInPage("index.html", "Page.Index.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.Index.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		(currentSone.posts +

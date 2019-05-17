@@ -21,7 +21,7 @@ import javax.inject.*
 @TemplatePath("/templates/search.html")
 @ToadletPath("search.html")
 class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
-		SoneTemplatePage("search.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Search.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Search.Title") {
 
 	@Inject
 	constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :

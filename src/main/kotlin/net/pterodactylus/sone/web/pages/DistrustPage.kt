@@ -16,7 +16,7 @@ import javax.inject.*
  */
 @ToadletPath("distrust.html")
 class DistrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("distrust.html", "Page.Distrust.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.Distrust.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

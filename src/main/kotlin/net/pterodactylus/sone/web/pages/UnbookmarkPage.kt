@@ -13,7 +13,7 @@ import javax.inject.*
  */
 @ToadletPath("unbookmark.html")
 class UnbookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("unbookmark.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Unbookmark.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Unbookmark.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		when {

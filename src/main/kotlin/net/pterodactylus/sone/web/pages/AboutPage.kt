@@ -15,7 +15,7 @@ import javax.inject.*
 class AboutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,
-		private val pluginHomepage: PluginHomepage) : SoneTemplatePage("about.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.About.Title") {
+		private val pluginHomepage: PluginHomepage) : SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.About.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["version"] = pluginVersion.version

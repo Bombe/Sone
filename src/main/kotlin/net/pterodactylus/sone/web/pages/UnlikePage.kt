@@ -13,7 +13,7 @@ import javax.inject.*
  */
 @ToadletPath("unlike.html")
 class UnlikePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("unlike.html", "Page.Unlike.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.Unlike.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

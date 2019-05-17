@@ -16,7 +16,7 @@ import javax.inject.*
 @TemplatePath("/templates/createAlbum.html")
 @ToadletPath("createAlbum.html")
 class CreateAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("createAlbum.html", "Page.CreateAlbum.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.CreateAlbum.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

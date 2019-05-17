@@ -14,7 +14,7 @@ import javax.inject.*
  */
 @ToadletPath("markAsKnown.html")
 class MarkAsKnownPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("markAsKnown.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.MarkAsKnown.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.MarkAsKnown.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val ids = soneRequest.parameters["id", 65536]!!.split(" ")

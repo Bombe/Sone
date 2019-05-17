@@ -16,7 +16,7 @@ import javax.inject.*
 @TemplatePath("/templates/viewSone.html")
 @ToadletPath("viewSone.html")
 class ViewSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("viewSone.html", webInterface, loaders, templateRenderer) {
+		SoneTemplatePage(webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		templateContext["soneId"] = soneRequest.parameters["sone"]

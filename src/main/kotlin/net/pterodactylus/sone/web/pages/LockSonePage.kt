@@ -12,7 +12,7 @@ import javax.inject.*
  */
 @ToadletPath("lockSone.html")
 class LockSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("lockSone.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.LockSone.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.LockSone.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		soneRequest.parameters["returnPage", 256]!!.let { returnPage ->

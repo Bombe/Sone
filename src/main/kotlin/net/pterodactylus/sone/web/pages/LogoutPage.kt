@@ -13,7 +13,7 @@ import javax.inject.*
 @MenuName("Logout")
 @ToadletPath("logout.html")
 class LogoutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("logout.html", "Page.Logout.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.Logout.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		setCurrentSone(soneRequest.toadletContext, null)

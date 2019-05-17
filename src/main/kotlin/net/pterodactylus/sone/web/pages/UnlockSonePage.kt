@@ -12,7 +12,7 @@ import javax.inject.*
  */
 @ToadletPath("unlockSone.html")
 class UnlockSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("unlockSone.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.UnlockSone.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.UnlockSone.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

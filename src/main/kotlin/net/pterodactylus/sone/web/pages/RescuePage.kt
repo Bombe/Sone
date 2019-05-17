@@ -15,7 +15,7 @@ import javax.inject.*
 @TemplatePath("/templates/rescue.html")
 @ToadletPath("rescue.html")
 class RescuePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("rescue.html", "Page.Rescue.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.Rescue.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val soneRescuer = soneRequest.core.getSoneRescuer(currentSone)

@@ -14,7 +14,7 @@ import javax.inject.*
 @TemplatePath("/templates/editProfileField.html")
 @ToadletPath("editProfileField.html")
 class EditProfileFieldPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("editProfileField.html", "Page.EditProfileField.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.EditProfileField.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->

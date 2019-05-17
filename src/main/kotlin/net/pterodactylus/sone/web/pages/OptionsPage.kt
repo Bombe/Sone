@@ -16,7 +16,7 @@ import javax.inject.*
 @TemplatePath("/templates/options.html")
 @ToadletPath("options.html")
 class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("options.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Options.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Options.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

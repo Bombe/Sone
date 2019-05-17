@@ -14,7 +14,7 @@ import javax.inject.*
  */
 @ToadletPath("trust.html")
 class TrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("trust.html", "Page.Trust.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.Trust.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

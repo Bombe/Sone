@@ -14,7 +14,7 @@ import javax.inject.*
 @TemplatePath("/templates/deleteAlbum.html")
 @ToadletPath("deleteAlbum.html")
 class DeleteAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("deleteAlbum.html", "Page.DeleteAlbum.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.DeleteAlbum.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

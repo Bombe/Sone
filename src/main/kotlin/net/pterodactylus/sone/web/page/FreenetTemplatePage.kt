@@ -31,7 +31,6 @@ import java.util.logging.Logger.*
  * fit into Freenet’s web interface.
  */
 open class FreenetTemplatePage(
-		path: String,
 		private val templateRenderer: TemplateRenderer,
 		loaders: Loaders,
 		private val invalidFormPasswordRedirectTarget: String

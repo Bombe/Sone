@@ -130,6 +130,6 @@ class FreenetTemplatePageTest {
 
 	@TemplatePath("template-path")
 	@ToadletPath("/test/path")
-	private open class TestPage(templateRenderer: TemplateRenderer, loaders: Loaders) : FreenetTemplatePage("/", templateRenderer, loaders, "invalid-form-password")
+	private open class TestPage(templateRenderer: TemplateRenderer, loaders: Loaders) : FreenetTemplatePage(templateRenderer, loaders, "invalid-form-password")
 
 }

@@ -16,7 +16,7 @@ import javax.inject.*
 @TemplatePath("/templates/imageBrowser.html")
 @ToadletPath("imageBrowser.html")
 class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		LoggedInPage("imageBrowser.html", "Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
+		LoggedInPage("Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if ("album" in soneRequest.parameters) {

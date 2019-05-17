@@ -9,8 +9,8 @@ import net.pterodactylus.util.template.*
 /**
  * Base class for [SoneTemplatePage] implementations that require a logged in user.
  */
-abstract class LoggedInPage(path: String, pageTitleKey: String, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage(path, webInterface, loaders, templateRenderer, pageTitleKey = pageTitleKey, requiresLogin = true) {
+abstract class LoggedInPage(pageTitleKey: String, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = pageTitleKey, requiresLogin = true) {
 
 	final override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		handleRequest(soneRequest, getCurrentSone(soneRequest.toadletContext, false)!!, templateContext)

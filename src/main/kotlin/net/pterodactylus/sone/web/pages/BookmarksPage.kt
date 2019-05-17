@@ -15,7 +15,7 @@ import javax.inject.*
 @TemplatePath("/templates/bookmarks.html")
 @ToadletPath("bookmarks.html")
 class BookmarksPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
-		SoneTemplatePage("bookmarks.html", webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		soneRequest.core.bookmarkedPosts.let { posts ->
