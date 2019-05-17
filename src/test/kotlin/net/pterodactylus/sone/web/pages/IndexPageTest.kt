@@ -159,4 +159,9 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 	    assertThat(baseInjector.getInstance<IndexPage>(), notNullValue())
 	}
 
+	@Test
+	fun `page is annotated with correct menuname`() {
+	    assertThat(page.menuName, equalTo("Index"))
+	}
+
 }

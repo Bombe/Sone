@@ -14,6 +14,7 @@ import javax.inject.Inject
  * The index page shows the main page of Sone. This page will contain the posts
  * of all friends of the current user.
  */
+@MenuName("Index")
 class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, private val postVisibilityFilter: PostVisibilityFilter) :
 		LoggedInPage("index.html", template, "Page.Index.Title", webInterface) {
 
