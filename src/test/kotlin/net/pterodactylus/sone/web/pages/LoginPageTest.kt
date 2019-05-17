@@ -8,6 +8,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.thenReturnMock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.web.Method.POST
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
@@ -144,6 +145,11 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 	@Test
 	fun `page can be created by dependency injection`() {
 	    assertThat(baseInjector.getInstance<LoginPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+	    assertThat(page.menuName, equalTo("Login"))
 	}
 
 }

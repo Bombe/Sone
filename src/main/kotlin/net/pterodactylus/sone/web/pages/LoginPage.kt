@@ -13,6 +13,7 @@ import javax.inject.Inject
 /**
  * The login page lets the user log in.
  */
+@MenuName("Login")
 class LoginPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("login.html", webInterface, template, "Page.Login.Title") {
 
