@@ -6,6 +6,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
@@ -63,5 +64,11 @@ class BookmarksPageTest: WebPageTest(::BookmarksPage) {
 	fun `bookmarks page can be created by dependency injection`() {
 		assertThat(baseInjector.getInstance<BookmarksPage>(), notNullValue())
 	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+	    assertThat(page.menuName, equalTo("Bookmarks"))
+	}
+
 
 }

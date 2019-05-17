@@ -11,6 +11,7 @@ import javax.inject.Inject
 /**
  * Page that lets the user browse all his bookmarked posts.
  */
+@MenuName("Bookmarks")
 class BookmarksPage @Inject constructor(template: Template, webInterface: WebInterface) :
 		SoneTemplatePage("bookmarks.html", webInterface, template, "Page.Bookmarks.Title") {
 
