@@ -14,6 +14,7 @@ import javax.inject.Inject
 /**
  * The image browser page is the entry page for the image management.
  */
+@MenuName("ImageBrowser")
 class ImageBrowserPage @Inject constructor(template: Template, webInterface: WebInterface):
 		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface) {
 
