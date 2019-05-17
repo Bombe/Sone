@@ -4,6 +4,7 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -56,6 +57,11 @@ class AboutPageTest : WebPageTest({ template, webInterface -> AboutPage(template
 				PluginHomepage::class.isProvidedByMock()
 		)
 		assertThat(injector.getInstance<AboutPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+	    assertThat(page.menuName, equalTo("About"))
 	}
 
 }
