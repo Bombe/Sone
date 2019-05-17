@@ -12,6 +12,7 @@ import javax.inject.Inject
 /**
  * This page shows all known Sones.
  */
+@MenuName("KnownSones")
 class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("knownSones.html", webInterface, template, "Page.KnownSones.Title") {
 

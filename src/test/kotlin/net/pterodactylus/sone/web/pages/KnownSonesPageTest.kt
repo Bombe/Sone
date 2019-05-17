@@ -13,6 +13,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.Pagination
 import net.pterodactylus.sone.web.baseInjector
+import net.pterodactylus.sone.web.page.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
@@ -248,6 +249,11 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 	@Test
 	fun `page can be created by dependency injection`() {
 	    assertThat(baseInjector.getInstance<KnownSonesPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with the correct menuname`() {
+	    assertThat(page.menuName, equalTo("KnownSones"))
 	}
 
 }
