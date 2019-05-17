@@ -13,6 +13,7 @@ import javax.inject.Inject
 /**
  * This page lets the user edit her profile.
  */
+@MenuName("EditProfile")
 class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface) :
 		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface) {
 
