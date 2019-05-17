@@ -2,11 +2,13 @@ package net.pterodactylus.sone.test
 
 import com.google.inject.Injector
 import com.google.inject.Module
+import com.google.inject.name.*
 import org.mockito.*
 import javax.inject.Provider
 import kotlin.reflect.KClass
 
 fun <T : Any> KClass<T>.isProvidedBy(instance: T) = Module { it.bind(this.java).toProvider(Provider<T> { instance }) }
+fun <T : Any> KClass<T>.withNameIsProvidedBy(instance: T, name: String) = Module { it.bind(this.java).annotatedWith(Names.named(name)).toProvider(Provider<T> { instance }) }
 fun <T : Any> KClass<T>.isProvidedBy(provider: com.google.inject.Provider<T>) = Module { it.bind(this.java).toProvider(provider) }
 fun <T : Any> KClass<T>.isProvidedBy(provider: KClass<out Provider<T>>) = Module { it.bind(this.java).toProvider(provider.java) }
 inline fun <reified T : Any> KClass<T>.isProvidedByMock() = Module { it.bind(this.java).toProvider(Provider<T> { mock() }) }

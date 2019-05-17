@@ -12,6 +12,7 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.text.*
 import net.pterodactylus.util.template.*
+import javax.inject.*
 import javax.inject.Singleton
 
 class WebInterfaceModule : AbstractModule() {
@@ -119,5 +120,9 @@ class WebInterfaceModule : AbstractModule() {
 	@Provides
 	fun getImageLinkFilter(core: Core) =
 			ImageLinkFilter(core)
+
+	@Provides
+	@Named("toadletPathPrefix")
+	fun getPathPrefix(): String = "/Sone/"
 
 }

@@ -22,7 +22,11 @@ import freenet.clients.http.*
 import net.pterodactylus.util.web.*
 import javax.inject.*
 
-class PageToadletFactory @Inject constructor(private val highLevelSimpleClient: HighLevelSimpleClient, private val sessionManager: SessionManager, private val pathPrefix: String) {
+class PageToadletFactory @Inject constructor(
+		private val highLevelSimpleClient: HighLevelSimpleClient,
+		private val sessionManager: SessionManager,
+		@Named("toadletPathPrefix") private val pathPrefix: String
+) {
 
 	@JvmOverloads
 	fun createPageToadlet(page: Page<FreenetRequest>, menuName: String? = null) =

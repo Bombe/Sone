@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web
 
 import com.google.inject.Guice.*
+import freenet.client.*
+import freenet.clients.http.*
 import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
@@ -12,7 +14,9 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
+import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
@@ -28,7 +32,9 @@ class WebInterfaceModuleTest {
 			BaseL10n::class.isProvidedBy(l10n),
 			SoneTextParser::class.isProvidedByMock(),
 			ElementLoader::class.isProvidedByMock(),
-			Loaders::class.isProvidedBy(loaders)
+			Loaders::class.isProvidedBy(loaders),
+			HighLevelSimpleClient::class.isProvidedByMock(),
+			SessionManager::class.isProvidedByMock()
 	)
 	private val injector = createInjector(webInterfaceModule, *additionalModules)!!
 	private val templateContext by lazy { injector.getInstance<TemplateContextFactory>().createTemplateContext()!! }
@@ -255,6 +261,12 @@ class WebInterfaceModuleTest {
 			template.takeIf { templateName == "testTemplate" }
 		})
 		assertThat(templateContext.getTemplate("testTemplate"), sameInstance(template))
+	}
+
+	@Test
+	fun `page toadlet factory is created with correct prefix`() {
+		val page = mock<Page<FreenetRequest>>()
+	    assertThat(injector.getInstance<PageToadletFactory>().createPageToadlet(page).path(), startsWith("/Sone/"))
 	}
 
 }
