@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * This page lets the user unlock a [net.pterodactylus.sone.data.Sone] to allow its insertion.
  */
-class UnlockSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("unlockSone.html", webInterface, loaders, template = template, pageTitleKey = "Page.UnlockSone.Title") {
+class UnlockSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("unlockSone.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.UnlockSone.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

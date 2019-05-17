@@ -16,8 +16,8 @@ import javax.inject.Inject
  * of all friends of the current user.
  */
 @MenuName("Index")
-class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, private val postVisibilityFilter: PostVisibilityFilter) :
-		LoggedInPage("index.html", template, "Page.Index.Title", webInterface, loaders) {
+class IndexPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val postVisibilityFilter: PostVisibilityFilter) :
+		LoggedInPage("index.html", template, "Page.Index.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		(currentSone.posts +

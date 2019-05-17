@@ -13,8 +13,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user unlike a [net.pterodactylus.sone.data.Post] or [net.pterodactylus.sone.data.Reply].
  */
-class UnlikePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("unlike.html", template, "Page.Unlike.Title", webInterface, loaders) {
+class UnlikePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("unlike.html", template, "Page.Unlike.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

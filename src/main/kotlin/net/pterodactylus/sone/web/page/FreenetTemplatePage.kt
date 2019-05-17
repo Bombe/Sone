@@ -21,7 +21,6 @@ import freenet.clients.http.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.util.template.*
 import net.pterodactylus.util.web.*
-import java.io.*
 import java.lang.String.*
 import java.net.*
 import java.util.logging.*
@@ -33,7 +32,7 @@ import java.util.logging.Logger.*
  */
 open class FreenetTemplatePage(
 		private val path: String,
-		private val templateContextFactory: TemplateContextFactory,
+		private val templateRenderer: TemplateRenderer,
 		loaders: Loaders,
 		template: Template,
 		private val invalidFormPasswordRedirectTarget: String
@@ -84,20 +83,19 @@ open class FreenetTemplatePage(
 				}
 		shortcutIcon?.let { pageNode.addForwardLink("icon", it) }
 
-		val templateContext = templateContextFactory.createTemplateContext()
-		templateContext.mergeContext(template.initialContext)
-		try {
+		val output = try {
 			val start = System.nanoTime()
-			processTemplate(request, templateContext)
-			val finish = System.nanoTime()
-			logger.log(Level.FINEST, format("Template was rendered in %.2fms.", (finish - start) / 1000000.0))
+			templateRenderer.render(template) { templateContext ->
+				processTemplate(request, templateContext)
+			}.also {
+				val finish = System.nanoTime()
+				logger.log(Level.FINEST, format("Template was rendered in %.2fms.", (finish - start) / 1000000.0))
+			}
 		} catch (re1: RedirectException) {
 			return RedirectResponse(re1.target ?: "")
 		}
 
-		val stringWriter = StringWriter()
-		template.render(templateContext, stringWriter)
-		pageNode.content.addChild("%", stringWriter.toString())
+		pageNode.content.addChild("%", output)
 
 		return response.setStatusCode(200).setStatusText("OK").setContentType("text/html").write(pageNode.outer.generate())
 	}

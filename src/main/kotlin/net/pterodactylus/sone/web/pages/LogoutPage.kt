@@ -13,8 +13,8 @@ import javax.inject.Inject
  * Logs a user out.
  */
 @MenuName("Logout")
-class LogoutPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("logout.html", template, "Page.Logout.Title", webInterface, loaders) {
+class LogoutPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("logout.html", template, "Page.Logout.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		setCurrentSone(soneRequest.toadletContext, null)

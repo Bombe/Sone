@@ -14,8 +14,8 @@ import javax.inject.Inject
 /**
  * This page lets the user create a new [Post].
  */
-class CreatePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface, loaders) {
+class CreatePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)

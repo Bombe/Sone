@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user edit the name of a profile field.
  */
-class EditProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		LoggedInPage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface, loaders) {
+class EditProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("editProfileField.html", template, "Page.EditProfileField.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->

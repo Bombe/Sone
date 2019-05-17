@@ -13,8 +13,8 @@ import javax.inject.Inject
  * Page that lets the user browse all his bookmarked posts.
  */
 @MenuName("Bookmarks")
-class BookmarksPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		SoneTemplatePage("bookmarks.html", webInterface, loaders, template = template, pageTitleKey = "Page.Bookmarks.Title") {
+class BookmarksPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage("bookmarks.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		soneRequest.core.bookmarkedPosts.let { posts ->

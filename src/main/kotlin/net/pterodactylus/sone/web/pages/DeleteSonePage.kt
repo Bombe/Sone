@@ -15,8 +15,8 @@ import javax.inject.Inject
  * installation.
  */
 @MenuName("DeleteSone")
-class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, loaders) {
+class DeleteSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

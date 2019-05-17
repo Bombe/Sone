@@ -14,8 +14,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user edit title and description of an {@link Image}.
  */
-class EditImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("editImage.html", template, "Page.EditImage.Title", webInterface, loaders) {
+class EditImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("editImage.html", template, "Page.EditImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

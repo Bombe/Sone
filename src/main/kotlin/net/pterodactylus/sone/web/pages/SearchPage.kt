@@ -29,11 +29,11 @@ import javax.inject.Inject
  * This page lets the user search for posts and replies that contain certain
  * words.
  */
-class SearchPage(template: Template, webInterface: WebInterface, loaders: Loaders, ticker: Ticker = Ticker.systemTicker()) :
-		SoneTemplatePage("search.html", webInterface, loaders, template = template, pageTitleKey = "Page.Search.Title") {
+class SearchPage(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
+		SoneTemplatePage("search.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Search.Title") {
 
-	@Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-			this(template, webInterface, loaders, Ticker.systemTicker())
+	@Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+			this(template, webInterface, loaders, templateRenderer, Ticker.systemTicker())
 
 	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
 

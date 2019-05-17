@@ -14,8 +14,8 @@ import javax.inject.Inject
  * Page that lets the user control the rescue mode for a Sone.
  */
 @MenuName("Rescue")
-class RescuePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface, loaders) {
+class RescuePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("rescue.html", template, "Page.Rescue.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val soneRescuer = soneRequest.core.getSoneRescuer(currentSone)

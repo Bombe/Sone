@@ -22,8 +22,8 @@ import javax.inject.Inject
 /**
  * Page implementation that lets the user upload an image.
  */
-class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, loaders) {
+class UploadImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("uploadImage.html", template, "Page.UploadImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

@@ -13,8 +13,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user like [net.pterodactylus.sone.data.Post]s and [net.pterodactylus.sone.data.Reply]s.
  */
-class LikePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		LoggedInPage("like.html", template, "Page.Like.Title", webInterface, loaders) {
+class LikePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("like.html", template, "Page.Like.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

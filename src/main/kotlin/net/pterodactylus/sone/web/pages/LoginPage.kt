@@ -15,8 +15,8 @@ import javax.inject.Inject
  * The login page lets the user log in.
  */
 @MenuName("Login")
-class LoginPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("login.html", webInterface, loaders, template = template, pageTitleKey = "Page.Login.Title") {
+class LoginPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("login.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Login.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

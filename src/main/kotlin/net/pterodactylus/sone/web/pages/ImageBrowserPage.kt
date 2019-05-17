@@ -16,8 +16,8 @@ import javax.inject.Inject
  * The image browser page is the entry page for the image management.
  */
 @MenuName("ImageBrowser")
-class ImageBrowserPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface, loaders) {
+class ImageBrowserPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if ("album" in soneRequest.parameters) {

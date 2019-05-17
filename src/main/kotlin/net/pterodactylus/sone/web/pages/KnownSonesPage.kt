@@ -14,8 +14,8 @@ import javax.inject.Inject
  * This page shows all known Sones.
  */
 @MenuName("KnownSones")
-class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("knownSones.html", webInterface, loaders, template = template, pageTitleKey = "Page.KnownSones.Title") {
+class KnownSonesPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("knownSones.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.KnownSones.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		getCurrentSone(soneRequest.toadletContext).let { currentSone ->

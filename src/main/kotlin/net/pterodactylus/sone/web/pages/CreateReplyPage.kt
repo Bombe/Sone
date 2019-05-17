@@ -13,8 +13,8 @@ import javax.inject.Inject
 /**
  * This page lets the user post a reply to a post.
  */
-class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface, loaders) {
+class CreateReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("createReply.html", template, "Page.CreateReply.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		val postId = soneRequest.httpRequest.getPartAsStringFailsafe("post", 36).apply { templateContext["postId"] = this }

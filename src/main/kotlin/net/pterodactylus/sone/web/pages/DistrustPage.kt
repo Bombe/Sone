@@ -15,8 +15,8 @@ import javax.inject.Inject
  *
  * @see net.pterodactylus.sone.core.Core#distrustSone(Sone, Sone)
  */
-class DistrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("distrust.html", template, "Page.Distrust.Title", webInterface, loaders) {
+class DistrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("distrust.html", template, "Page.Distrust.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

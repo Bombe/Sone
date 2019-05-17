@@ -11,8 +11,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user bookmark a post.
  */
-class BookmarkPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders)
-	: SoneTemplatePage("bookmark.html", webInterface, loaders, template = template, pageTitleKey = "Page.Bookmark.Title") {
+class BookmarkPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer)
+	: SoneTemplatePage("bookmark.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Bookmark.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

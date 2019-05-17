@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user delete an {@link Album}.
  */
-class DeleteAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface, loaders) {
+class DeleteAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

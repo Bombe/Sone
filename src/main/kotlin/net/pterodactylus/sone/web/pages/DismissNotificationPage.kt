@@ -10,8 +10,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user dismiss a notification.
  */
-class DismissNotificationPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("dismissNotification.html", webInterface, loaders, template = template, pageTitleKey = "Page.DismissNotification.Title") {
+class DismissNotificationPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("dismissNotification.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.DismissNotification.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)

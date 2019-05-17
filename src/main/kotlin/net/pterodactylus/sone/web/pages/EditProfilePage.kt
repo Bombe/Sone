@@ -15,8 +15,8 @@ import javax.inject.Inject
  * This page lets the user edit her profile.
  */
 @MenuName("EditProfile")
-class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface, loaders) {
+class EditProfilePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("editProfile.html", template, "Page.EditProfile.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		currentSone.profile.let { profile ->

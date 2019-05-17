@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * This page lets the user follow another Sone.
  */
-class FollowSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("followSone.html", template, "Page.FollowSone.Title", webInterface, loaders) {
+class FollowSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("followSone.html", template, "Page.FollowSone.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

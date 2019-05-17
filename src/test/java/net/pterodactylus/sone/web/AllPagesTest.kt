@@ -7,6 +7,7 @@ import net.pterodactylus.sone.main.PluginHomepage
 import net.pterodactylus.sone.main.PluginVersion
 import net.pterodactylus.sone.main.PluginYear
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.sone.web.pages.*
 import net.pterodactylus.util.template.Template
 import org.hamcrest.Matcher
@@ -246,6 +247,7 @@ val baseInjector by lazy {
 			Core::class.isProvidedByMock(),
 			FreenetInterface::class.isProvidedByMock(),
 			Template::class.isProvidedByMock(),
-			WebInterface::class.isProvidedByDeepMock()
+			WebInterface::class.isProvidedByDeepMock(),
+			TemplateRenderer::class.isProvidedByMock()
 	)!!
 }

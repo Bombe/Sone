@@ -13,8 +13,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user edit the name and description of an album.
  */
-class EditAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface, loaders) {
+class EditAlbumPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("editAlbum.html", template, "Page.EditAlbum.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

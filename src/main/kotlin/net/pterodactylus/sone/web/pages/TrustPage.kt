@@ -14,8 +14,8 @@ import javax.inject.Inject
  * Page that lets the user trust another Sone. This will assign a configurable
  * amount of trust to an identity.
  */
-class TrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		LoggedInPage("trust.html", template, "Page.Trust.Title", webInterface, loaders) {
+class TrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("trust.html", template, "Page.Trust.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

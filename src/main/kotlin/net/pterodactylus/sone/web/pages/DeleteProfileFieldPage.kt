@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user confirm the deletion of a profile field.
  */
-class DeleteProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("deleteProfileField.html", template, "Page.DeleteProfileField.Title", webInterface, loaders) {
+class DeleteProfileFieldPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("deleteProfileField.html", template, "Page.DeleteProfileField.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

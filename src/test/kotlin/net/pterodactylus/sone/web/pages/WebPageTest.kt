@@ -43,11 +43,12 @@ import kotlin.text.Charsets.UTF_8
 /**
  * Base class for web page tests.
  */
-open class WebPageTest(pageSupplier: (Template, WebInterface, Loaders) -> SoneTemplatePage = { _, _, _ -> mock() }) {
+open class WebPageTest(pageSupplier: (Template, WebInterface, Loaders, TemplateRenderer) -> SoneTemplatePage = { _, _, _, _ -> mock() }) {
 
 	val currentSone = mock<Sone>()
 	val loaders = mock<Loaders>()
 	val template = mock<Template>()
+	val templateRenderer = mock<TemplateRenderer>()
 	val webInterface = deepMock<WebInterface>()
 	val core = webInterface.core
 	val eventBus = mock<EventBus>()
@@ -55,7 +56,7 @@ open class WebPageTest(pageSupplier: (Template, WebInterface, Loaders) -> SoneTe
 	val l10n = webInterface.l10n!!
 	val sessionManager = mock<SessionManager>()
 
-	val page by lazy { pageSupplier(template, webInterface, loaders) }
+	val page by lazy { pageSupplier(template, webInterface, loaders, templateRenderer) }
 
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()

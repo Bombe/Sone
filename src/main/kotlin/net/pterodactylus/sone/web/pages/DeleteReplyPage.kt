@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * This page lets the user delete a reply.
  */
-class DeleteReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface, loaders) {
+class DeleteReplyPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("deleteReply.html", template, "Page.DeleteReply.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

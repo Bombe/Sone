@@ -21,10 +21,11 @@ open class SoneTemplatePage @JvmOverloads constructor(
 		private val webInterface: WebInterface,
 		loaders: Loaders,
 		template: Template,
+		templateRenderer: TemplateRenderer,
 		private val pageTitleKey: String? = null,
 		private val requiresLogin: Boolean = false,
 		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.l10n::getString) ?: "" }
-) : FreenetTemplatePage(path, webInterface.templateContextFactory, loaders, template, "noPermission.html") {
+) : FreenetTemplatePage(path, templateRenderer, loaders, template, "noPermission.html") {
 
 	private val core = webInterface.core
 	private val sessionProvider: SessionProvider = webInterface

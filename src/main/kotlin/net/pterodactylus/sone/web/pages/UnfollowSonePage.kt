@@ -13,8 +13,8 @@ import javax.inject.Inject
 /**
  * This page lets the user unfollow another Sone.
  */
-class UnfollowSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		LoggedInPage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface, loaders) {
+class UnfollowSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

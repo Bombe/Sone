@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * Page that lets the user delete an {@link Image}.
  */
-class DeleteImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("deleteImage.html", template, "Page.DeleteImage.Title", webInterface, loaders) {
+class DeleteImagePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("deleteImage.html", template, "Page.DeleteImage.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

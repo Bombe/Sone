@@ -17,8 +17,8 @@ import javax.inject.Inject
 /**
  * Lets the user browser another Sone.
  */
-class ViewSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("viewSone.html", webInterface, loaders, template = template) {
+class ViewSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("viewSone.html", webInterface, loaders, template, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		templateContext["soneId"] = soneRequest.parameters["sone"]

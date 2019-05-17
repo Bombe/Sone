@@ -16,8 +16,8 @@ import javax.inject.Inject
  * The “create Sone” page lets the user create a new Sone.
  */
 @MenuName("CreateSone")
-class CreateSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("createSone.html", webInterface, loaders, template = template, pageTitleKey = "Page.CreateSone.Title") {
+class CreateSonePage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("createSone.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.CreateSone.Title") {
 
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
 

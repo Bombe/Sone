@@ -11,8 +11,8 @@ import javax.inject.*
 /**
  * Page that lets the user unbookmark a post.
  */
-class UnbookmarkPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		SoneTemplatePage("unbookmark.html", webInterface, loaders, template = template, pageTitleKey = "Page.Unbookmark.Title") {
+class UnbookmarkPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		SoneTemplatePage("unbookmark.html", webInterface, loaders, template, templateRenderer, pageTitleKey = "Page.Unbookmark.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		when {

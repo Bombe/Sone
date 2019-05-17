@@ -12,8 +12,8 @@ import javax.inject.Inject
 /**
  * Lets the user delete a post they made.
  */
-class DeletePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders):
-		LoggedInPage("deletePost.html", template, "Page.DeletePost.Title", webInterface, loaders) {
+class DeletePostPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer):
+		LoggedInPage("deletePost.html", template, "Page.DeletePost.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {

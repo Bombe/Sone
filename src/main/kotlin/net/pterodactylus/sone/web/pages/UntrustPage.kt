@@ -14,8 +14,8 @@ import javax.inject.Inject
  * Page that lets the user untrust another Sone. This will remove all trust
  * assignments for an identity.
  */
-class UntrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders) :
-		LoggedInPage("untrust.html", template, "Page.Untrust.Title", webInterface, loaders) {
+class UntrustPage @Inject constructor(template: Template, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("untrust.html", template, "Page.Untrust.Title", webInterface, loaders, templateRenderer) {
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
