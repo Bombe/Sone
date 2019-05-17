@@ -14,6 +14,7 @@ import javax.inject.Inject
 /**
  * The “create Sone” page lets the user create a new Sone.
  */
+@MenuName("CreateSone")
 class CreateSonePage @Inject constructor(template: Template, webInterface: WebInterface):
 		SoneTemplatePage("createSone.html", webInterface, template, "Page.CreateSone.Title") {
 
