@@ -10,7 +10,8 @@ import javax.inject.*
 /**
  * AJAX handler that creates a new post.
  */
-class CreatePostAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage("createPost.ajax", webInterface) {
+@ToadletPath("createPost.ajax")
+class CreatePostAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["text"].emptyToNull

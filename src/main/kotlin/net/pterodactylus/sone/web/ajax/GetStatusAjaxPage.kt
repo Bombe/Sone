@@ -14,7 +14,7 @@ import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.toArray
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 import javax.inject.Inject
@@ -23,8 +23,9 @@ import javax.inject.Inject
  * The “get status” AJAX handler returns all information that is necessary to
  * update the web interface in real-time.
  */
+@ToadletPath("getStatus.ajax")
 class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: ElementLoader, private val timeTextConverter: TimeTextConverter, private val l10nFilter: L10nFilter, timeZone: TimeZone):
-		JsonPage("getStatus.ajax", webInterface) {
+		JsonPage(webInterface) {
 
 	@Inject constructor(webInterface: WebInterface, elementLoader: ElementLoader, timeTextConverter: TimeTextConverter, l10nFilter: L10nFilter):
 			this(webInterface, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault())

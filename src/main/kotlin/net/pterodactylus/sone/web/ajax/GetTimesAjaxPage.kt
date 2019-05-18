@@ -5,7 +5,7 @@ import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import java.text.SimpleDateFormat
 import java.util.TimeZone
 import javax.inject.Inject
@@ -13,10 +13,11 @@ import javax.inject.Inject
 /**
  * Ajax page that returns a formatted, relative timestamp for replies or posts.
  */
+@ToadletPath("getTimes.ajax")
 class GetTimesAjaxPage @Inject constructor(webInterface: WebInterface,
 		private val timeTextConverter: TimeTextConverter,
 		private val l10nFilter: L10nFilter,
-		timeZone: TimeZone) : JsonPage("getTimes.ajax", webInterface) {
+		timeZone: TimeZone) : JsonPage(webInterface) {
 
 	private val dateTimeFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
 		this.timeZone = timeZone

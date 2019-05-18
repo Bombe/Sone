@@ -5,7 +5,7 @@ import net.pterodactylus.sone.data.Profile.Field
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import javax.inject.Inject
 
 /**
@@ -14,8 +14,8 @@ import javax.inject.Inject
  * @see net.pterodactylus.sone.data.Profile#moveFieldUp(Field)
  * @see net.pterodactylus.sone.data.Profile#moveFieldDown(Field)
  */
-class MoveProfileFieldAjaxPage @Inject constructor(webInterface: WebInterface) :
-		LoggedInJsonPage("moveProfileField.ajax", webInterface) {
+@ToadletPath("moveProfileField.ajax")
+class MoveProfileFieldAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			currentSone.profile.let { profile ->

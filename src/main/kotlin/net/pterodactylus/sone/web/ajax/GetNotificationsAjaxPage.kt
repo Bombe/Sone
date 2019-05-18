@@ -6,7 +6,7 @@ import net.pterodactylus.sone.main.SonePlugin
 import net.pterodactylus.sone.utils.jsonArray
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.notify.TemplateNotification
 import java.io.StringWriter
@@ -15,8 +15,8 @@ import javax.inject.Inject
 /**
  * AJAX handler to return all current notifications.
  */
-class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface) :
-		JsonPage("getNotifications.ajax", webInterface) {
+@ToadletPath("getNotifications.ajax")
+class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface) : JsonPage(webInterface) {
 
 	override val needsFormPassword = false
 	override val requiresLogin = false

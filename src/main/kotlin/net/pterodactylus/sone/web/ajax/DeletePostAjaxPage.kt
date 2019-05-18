@@ -9,7 +9,8 @@ import javax.inject.*
 /**
  * This AJAX page deletes a post.
  */
-class DeletePostAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage("deletePost.ajax", webInterface) {
+@ToadletPath("deletePost.ajax")
+class DeletePostAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["post"]

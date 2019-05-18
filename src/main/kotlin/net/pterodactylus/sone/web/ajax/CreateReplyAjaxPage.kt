@@ -10,7 +10,8 @@ import javax.inject.*
 /**
  * This AJAX page create a reply.
  */
-class CreateReplyAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage("createReply.ajax", webInterface) {
+@ToadletPath("createReply.ajax")
+class CreateReplyAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest): JsonReturnObject =
 			request.parameters["post"].emptyToNull

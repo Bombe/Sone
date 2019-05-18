@@ -9,8 +9,8 @@ import javax.inject.*
 /**
  * This AJAX page deletes a reply.
  */
-class DeleteReplyAjaxPage @Inject constructor(webInterface: WebInterface) :
-		LoggedInJsonPage("deleteReply.ajax", webInterface) {
+@ToadletPath("deleteReply.ajax")
+class DeleteReplyAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["reply"]

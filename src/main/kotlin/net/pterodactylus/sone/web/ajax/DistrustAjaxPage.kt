@@ -12,8 +12,8 @@ import javax.inject.*
  *
  * @see Core.distrustSone(Sone, Sone)
  */
-class DistrustAjaxPage @Inject constructor(webInterface: WebInterface) :
-		LoggedInJsonPage("distrustSone.ajax", webInterface) {
+@ToadletPath("distrustSone.ajax")
+class DistrustAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]

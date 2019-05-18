@@ -4,14 +4,14 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.ifFalse
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import javax.inject.Inject
 
 /**
  * AJAX page that lets the user rename a profile field.
  */
-class EditProfileFieldAjaxPage @Inject constructor(webInterface: WebInterface) :
-		LoggedInJsonPage("editProfileField.ajax", webInterface) {
+@ToadletPath("editProfileField.ajax")
+class EditProfileFieldAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			currentSone.profile.let { profile ->

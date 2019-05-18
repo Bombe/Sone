@@ -5,7 +5,7 @@ import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.web.Page
 import net.pterodactylus.util.web.Response
 import java.io.ByteArrayOutputStream
@@ -15,13 +15,13 @@ import java.io.PrintStream
  * A JSON page is a specialized [Page] that will always return a JSON
  * object to the browser, e.g. for use with AJAX or other scripting frameworks.
  */
-abstract class JsonPage(private val path: String, protected val webInterface: WebInterface) : Page<FreenetRequest> {
+abstract class JsonPage(protected val webInterface: WebInterface) : Page<FreenetRequest> {
 
 	private val objectMapper = ObjectMapper()
 	private val sessionProvider: SessionProvider = webInterface
 	protected val core = webInterface.core
 
-	override fun getPath() = path
+	override fun getPath() = toadletPath
 	override fun isPrefixPage() = false
 
 	open val needsFormPassword = true

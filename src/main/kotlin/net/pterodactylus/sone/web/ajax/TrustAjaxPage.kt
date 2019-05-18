@@ -11,8 +11,8 @@ import javax.inject.*
  *
  * @see net.pterodactylus.sone.core.Core.trustSone
  */
-class TrustAjaxPage @Inject constructor(webInterface: WebInterface) :
-		LoggedInJsonPage("trustSone.ajax", webInterface) {
+@ToadletPath("trustSone.ajax")
+class TrustAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]

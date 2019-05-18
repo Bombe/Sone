@@ -6,15 +6,15 @@ import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.utils.render
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import javax.inject.Inject
 
 /**
  * This AJAX page returns the details of a reply.
  */
-class GetReplyAjaxPage @Inject constructor(webInterface: WebInterface, private val template: Template) :
-		LoggedInJsonPage("getReply.ajax", webInterface) {
+@ToadletPath("getReply.ajax")
+class GetReplyAjaxPage @Inject constructor(webInterface: WebInterface, private val template: Template) : LoggedInJsonPage(webInterface) {
 
 	override val needsFormPassword = false
 

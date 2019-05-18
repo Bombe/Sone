@@ -8,14 +8,15 @@ import net.pterodactylus.sone.template.LinkedElementRenderFilter
 import net.pterodactylus.sone.utils.jsonArray
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import javax.inject.Inject
 
 /**
  * Renders linked elements after they have been loaded.
  */
+@ToadletPath("getLinkedElement.ajax")
 class GetLinkedElementAjaxPage @Inject constructor(webInterface: WebInterface, private val elementLoader: ElementLoader, private val linkedElementRenderFilter: LinkedElementRenderFilter):
-		JsonPage("getLinkedElement.ajax", webInterface) {
+		JsonPage(webInterface) {
 
 	override val needsFormPassword = false
 	override val requiresLogin = false

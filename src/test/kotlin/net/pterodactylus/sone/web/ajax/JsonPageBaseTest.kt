@@ -23,7 +23,7 @@ class JsonPageBaseTest : TestObjects() {
 	private val outputStream = ByteArrayOutputStream()
 	private val response = Response(outputStream)
 
-	private val page = object : JsonPage("path.html", webInterface) {
+	private val page = object : JsonPage(webInterface) {
 
 		override val needsFormPassword get() = this@JsonPageBaseTest.needsFormPassword
 
