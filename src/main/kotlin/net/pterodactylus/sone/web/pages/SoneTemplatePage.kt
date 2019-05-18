@@ -14,7 +14,7 @@ import java.net.*
 /**
  * Base page for the Sone web interface.
  */
-open class SoneTemplatePage @JvmOverloads constructor(
+open class SoneTemplatePage(
 		private val webInterface: WebInterface,
 		loaders: Loaders,
 		templateRenderer: TemplateRenderer,
