@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -39,6 +40,16 @@ public class TestUtil {
 			method.setAccessible(true);
 			return (T) method.invoke(object);
 		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static <T> T createObject(Class<T> clazz, Class[] parameterTypes, Object... arguments) {
+		try {
+			Constructor<T> constructor = clazz.getDeclaredConstructor(parameterTypes);
+			constructor.setAccessible(true);
+			return constructor.newInstance(arguments);
+		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}
