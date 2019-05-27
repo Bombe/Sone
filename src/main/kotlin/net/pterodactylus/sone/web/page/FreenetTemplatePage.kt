@@ -36,6 +36,7 @@ open class FreenetTemplatePage(
 		private val invalidFormPasswordRedirectTarget: String
 ) : FreenetPage, LinkEnabledCallback {
 
+	private val pageMakerInteractionFactory: PageMakerInteractionFactory = DefaultPageMakerInteractionFactory()
 	open val styleSheets: Collection<String> = emptySet()
 	open val shortcutIcon: String? get() = null
 	open val isFullAccessOnly get() = false
@@ -70,16 +71,11 @@ open class FreenetTemplatePage(
 				return RedirectResponse(invalidFormPasswordRedirectTarget)
 			}
 		}
-		val pageMaker = toadletContext.pageMaker
-		val pageNode = pageMaker.getPageNode(getPageTitle(request), toadletContext)
 
-		styleSheets.forEach(pageNode::addCustomStyleSheet)
-		getAdditionalLinkNodes(request)
-				.map { it to pageNode.headNode.addChild("link") }
-				.forEach { (linkNodeParameters, linkNode) ->
-					linkNodeParameters.forEach(linkNode::addAttribute)
-				}
-		shortcutIcon?.let { pageNode.addForwardLink("icon", it) }
+		val pageMakerInteraction = pageMakerInteractionFactory.createPageMaker(toadletContext, getPageTitle(request))
+		styleSheets.forEach(pageMakerInteraction::addStyleSheet)
+		getAdditionalLinkNodes(request).forEach(pageMakerInteraction::addLinkNode)
+		shortcutIcon?.let(pageMakerInteraction::addShortcutIcon)
 
 		val output = try {
 			val start = System.nanoTime()
@@ -93,9 +89,9 @@ open class FreenetTemplatePage(
 			return RedirectResponse(re1.target ?: "")
 		}
 
-		pageNode.content.addChild("%", output)
+		pageMakerInteraction.setContent(output)
 
-		return response.setStatusCode(200).setStatusText("OK").setContentType("text/html").write(pageNode.outer.generate())
+		return response.setStatusCode(200).setStatusText("OK").setContentType("text/html").write(pageMakerInteraction.renderPage())
 	}
 
 	open fun processTemplate(request: FreenetRequest, templateContext: TemplateContext) {

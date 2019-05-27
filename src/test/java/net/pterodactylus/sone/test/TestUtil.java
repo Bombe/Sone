@@ -6,11 +6,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import kotlin.Deprecated;
+import kotlin.ReplaceWith;
+
 /**
  * Utilities for testing.
  */
 public class TestUtil {
 
+	@Deprecated(message = "It only checks the given class, not its superclasses.", replaceWith = @ReplaceWith(imports = { "net.pterodactylus.sone.test" }, expression = "setField(`object`, fieldName, value)"))
 	public static void setFinalField(Object object, String fieldName, Object value) {
 		try {
 			Field clientCoreField = object.getClass().getField(fieldName);

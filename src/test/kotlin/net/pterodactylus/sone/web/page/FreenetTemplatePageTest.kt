@@ -8,6 +8,8 @@ import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
 import org.mockito.Mockito.*
+import java.io.*
+import java.nio.charset.StandardCharsets.*
 
 class FreenetTemplatePageTest {
 
@@ -118,6 +120,21 @@ class FreenetTemplatePageTest {
 		val pageResponse = page.handleRequest(request, response)
 		assertThat(pageResponse.statusCode, anyOf(equalTo(302), equalTo(307)))
 		assertThat(pageResponse.headers, contains(hasHeader("location", "invalid-form-password")))
+	}
+
+	@Test
+	@Dirty
+	fun `freenet template page creates page with correct title`() {
+		val page = object : TestPage(templateRenderer, loaders) {
+			override fun getPageTitle(request: FreenetRequest) = "page title"
+		}
+		val request = deepMock<FreenetRequest>()
+		val pageMakerInteractionFactory = deepMock<PageMakerInteractionFactory>()
+		whenever(pageMakerInteractionFactory.createPageMaker(request.toadletContext, "page title").renderPage()).thenReturn("<page>")
+		setField(page, "pageMakerInteractionFactory", pageMakerInteractionFactory)
+		val response = page.handleRequest(request, Response(ByteArrayOutputStream()))
+		assertThat(response.statusCode, equalTo(200))
+		assertThat((response.content as ByteArrayOutputStream).toString(UTF_8.name()), equalTo("<page>"))
 	}
 
 	@Test
