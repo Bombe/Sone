@@ -5,9 +5,7 @@ import freenet.l10n.BaseL10n.LANGUAGE.ENGLISH
 import freenet.node.Node
 import freenet.node.NodeClientCore
 import freenet.pluginmanager.PluginRespirator
-import net.pterodactylus.sone.test.TestUtil
-import net.pterodactylus.sone.test.deepMock
-import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.test.*
 import org.junit.Test
 
 /**
@@ -22,9 +20,9 @@ class SonePluginTest {
 	private val uskManager = deepMock<USKManager>()
 
 	init {
-		TestUtil.setFinalField(node, "clientCore", clientCore)
+		setField(node, "clientCore", clientCore)
 		whenever(pluginRespirator.node).thenReturn(node)
-		TestUtil.setFinalField(clientCore, "uskManager", uskManager)
+		setField(clientCore, "uskManager", uskManager)
 	}
 
 	@Test
