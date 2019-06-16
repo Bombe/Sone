@@ -14,8 +14,8 @@ buildscript {
 }
 
 repositories {
-     maven { url "http://maven.pterodactylus.net/" }
      mavenCentral()
+     maven { url "https://maven.pterodactylus.net/" }
 }
 
 apply plugin: 'java'
