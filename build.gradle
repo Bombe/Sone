@@ -52,7 +52,7 @@ dependencies {
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
 
-    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test'
+    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit'
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.10.0'
     testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'

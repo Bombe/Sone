@@ -24,7 +24,7 @@ import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.junit.*
+import kotlin.test.*
 
 /**
  * JUnit test case for [SoneTextParser].
