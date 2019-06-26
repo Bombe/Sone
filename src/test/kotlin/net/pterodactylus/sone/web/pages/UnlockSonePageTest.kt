@@ -1,12 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -14,22 +14,22 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [UnlockSonePage].
  */
-class UnlockSonePageTest: WebPageTest(::UnlockSonePage) {
+class UnlockSonePageTest : WebPageTest(::UnlockSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("unlockSone.html"))
+		assertThat(page.path, equalTo("unlockSone.html"))
 	}
 
 	@Test
 	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
+		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.UnlockSone.Title", "unlock page title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("unlock page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("unlock page title"))
 	}
 
 	@Test
@@ -56,7 +56,7 @@ class UnlockSonePageTest: WebPageTest(::UnlockSonePage) {
 		setMethod(POST)
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("sone", "remote-sone")
-		addSone("remote-sone", mock<Sone>())
+		addSone("remote-sone", mock())
 		verifyRedirect("return.html") {
 			verify(core, never()).unlockSone(any())
 		}
@@ -72,6 +72,11 @@ class UnlockSonePageTest: WebPageTest(::UnlockSonePage) {
 		verifyRedirect("return.html") {
 			verify(core).unlockSone(sone)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<UnlockSonePage>(), notNullValue())
 	}
 
 }

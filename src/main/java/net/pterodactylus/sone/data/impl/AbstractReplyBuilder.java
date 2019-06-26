@@ -1,5 +1,5 @@
 /*
- * Sone - AbstractReplyBuilder.java - Copyright © 2013–2016 David Roden
+ * Sone - AbstractReplyBuilder.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,7 +24,6 @@ import net.pterodactylus.sone.database.ReplyBuilder;
  *
  * @param <B>
  *            The interface implemented and exposed by the builder
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AbstractReplyBuilder<B extends ReplyBuilder<B>> implements ReplyBuilder<B> {
 

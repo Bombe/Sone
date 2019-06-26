@@ -1,5 +1,5 @@
 /*
- * Sone - IdentityLoader.java - Copyright © 2013–2016 David Roden
+ * Sone - IdentityLoader.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@ import com.google.inject.Inject;
 
 /**
  * Loads {@link OwnIdentity}s and the {@link Identity}s they trust.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IdentityLoader {
 
@@ -57,7 +55,7 @@ public class IdentityLoader {
 	}
 
 	private Map<OwnIdentity, Collection<Identity>> loadTrustedIdentitiesForOwnIdentities(Collection<OwnIdentity> ownIdentities) throws PluginException {
-		Map<OwnIdentity, Collection<Identity>> currentIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> currentIdentities = new HashMap<>();
 
 		for (OwnIdentity ownIdentity : ownIdentities) {
 			if (identityDoesNotHaveTheCorrectContext(ownIdentity)) {

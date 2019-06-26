@@ -1,5 +1,5 @@
 /*
- * Sone - IdentityChangeEventSender.java - Copyright © 2013–2016 David Roden
+ * Sone - IdentityChangeEventSender.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@ import com.google.common.eventbus.EventBus;
  * Detects changes in {@link Identity}s trusted my multiple {@link
  * OwnIdentity}s.
  *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  * @see IdentityChangeDetector
  */
 public class IdentityChangeEventSender {

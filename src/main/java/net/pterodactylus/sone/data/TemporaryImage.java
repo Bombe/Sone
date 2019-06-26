@@ -1,5 +1,5 @@
 /*
- * Sone - TemporaryImage.java - Copyright © 2011–2016 David Roden
+ * Sone - TemporaryImage.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,8 +25,6 @@ import java.util.UUID;
 /**
  * A temporary image stores an uploaded image in memory until it has been
  * inserted into Freenet and is subsequently loaded from there.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TemporaryImage {
 

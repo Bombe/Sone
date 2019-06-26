@@ -1,31 +1,34 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user delete an {@link Album}.
  */
-class DeleteAlbumPage(template: Template, webInterface: WebInterface):
-		LoggedInPage("deleteAlbum.html", template, "Page.DeleteAlbum.Title", webInterface) {
+@TemplatePath("/templates/deleteAlbum.html")
+@ToadletPath("deleteAlbum.html")
+class DeleteAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.DeleteAlbum.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			val album = webInterface.core.getAlbum(freenetRequest.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			val album = soneRequest.core.getAlbum(soneRequest.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
 			if (!album.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}
-			if (freenetRequest.httpRequest.getPartAsStringFailsafe("abortDelete", 4) == "true") {
+			if (soneRequest.httpRequest.getPartAsStringFailsafe("abortDelete", 4) == "true") {
 				throw RedirectException("imageBrowser.html?album=${album.id}")
 			}
-			webInterface.core.deleteAlbum(album)
+			soneRequest.core.deleteAlbum(album)
 			throw RedirectException(if (album.parent.isRoot) "imageBrowser.html?sone=${album.sone.id}" else "imageBrowser.html?album=${album.parent.id}")
 		}
-		val album = webInterface.core.getAlbum(freenetRequest.httpRequest.getParam("album"))
+		val album = soneRequest.core.getAlbum(soneRequest.httpRequest.getParam("album"))
 		templateContext["album"] = album ?: throw RedirectException("invalid.html")
 	}
 

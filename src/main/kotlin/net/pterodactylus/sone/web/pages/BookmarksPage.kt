@@ -1,20 +1,25 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user browse all his bookmarked posts.
  */
-class BookmarksPage(template: Template, webInterface: WebInterface): SoneTemplatePage("bookmarks.html", template, "Page.Bookmarks.Title", webInterface) {
+@MenuName("Bookmarks")
+@TemplatePath("/templates/bookmarks.html")
+@ToadletPath("bookmarks.html")
+class BookmarksPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Bookmarks.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		webInterface.core.bookmarkedPosts.let { posts ->
-			val pagination = Pagination<Post>(posts.filter { it.isLoaded }.sortedByDescending { it.time }, webInterface.core.preferences.postsPerPage)
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		soneRequest.core.bookmarkedPosts.let { posts ->
+			val pagination = posts.filter(Post::isLoaded).sortedByDescending { it.time }.paginate(soneRequest.core.preferences.postsPerPage)
 			templateContext["pagination"] = pagination
 			templateContext["posts"] = pagination.items
 			templateContext["postsNotLoaded"] = posts.any { !it.isLoaded }

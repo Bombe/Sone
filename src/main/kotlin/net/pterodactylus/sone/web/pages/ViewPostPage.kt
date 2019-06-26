@@ -1,34 +1,36 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.template.SoneAccessor
-import net.pterodactylus.sone.utils.let
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
-import java.net.URI
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.template.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import java.net.*
+import javax.inject.*
 
 /**
  * This page lets the user view a post and all its replies.
  */
-class ViewPostPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("viewPost.html", template, "Page.ViewPost.Title", webInterface, false) {
+@TemplatePath("/templates/viewPost.html")
+@ToadletPath("viewPost.html")
+class ViewPostPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.ViewPost.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		templateContext["post"] = freenetRequest.parameters["post"]?.let(webInterface.core::getPost)
-		templateContext["raw"] = freenetRequest.parameters["raw"] == "true"
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		templateContext["post"] = soneRequest.parameters["post"]?.let(soneRequest.core::getPost)
+		templateContext["raw"] = soneRequest.parameters["raw"] == "true"
 	}
 
-	override fun isLinkExcepted(link: URI?) = true
+	override fun isLinkExcepted(link: URI) = true
 
-	public override fun getPageTitle(freenetRequest: FreenetRequest) =
-			(freenetRequest.parameters["post"]?.let(webInterface.core::getPost)?.let {
+	override fun getPageTitle(soneRequest: SoneRequest) =
+			(soneRequest.parameters["post"]?.let(soneRequest.core::getPost)?.let {
 				if (it.text.length > 20) {
 					it.text.substring(0..19) + "…"
 				} else {
 					it.text
 				} + " - ${SoneAccessor.getNiceName(it.sone)} - "
-			} ?: "") + super.getPageTitle(freenetRequest)
+			} ?: "") + super.getPageTitle(soneRequest)
 
 }

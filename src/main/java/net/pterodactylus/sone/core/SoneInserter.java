@@ -1,5 +1,5 @@
 /*
- * Sone - SoneInserter.java - Copyright © 2010–2016 David Roden
+ * Sone - SoneInserter.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -72,8 +72,6 @@ import freenet.support.io.ArrayBucket;
 
 /**
  * A Sone inserter is responsible for inserting a Sone if it has changed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneInserter extends AbstractService {
 
@@ -280,14 +278,12 @@ public class SoneInserter extends AbstractService {
 	 * Container for information that are required to insert a Sone. This
 	 * container merely exists to copy all relevant data without holding a lock
 	 * on the {@link Sone} object for too long.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class InsertInformation implements Closeable {
 
 		/** All properties of the Sone, copied for thread safety. */
-		private final Map<String, Object> soneProperties = new HashMap<String, Object>();
+		private final Map<String, Object> soneProperties = new HashMap<>();
 		private final String fingerprint;
 		private final ManifestCreator manifestCreator;
 
@@ -299,7 +295,7 @@ public class SoneInserter extends AbstractService {
 		 */
 		public InsertInformation(Sone sone) {
 			this.fingerprint = sone.getFingerprint();
-			Map<String, Object> soneProperties = new HashMap<String, Object>();
+			Map<String, Object> soneProperties = new HashMap<>();
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
 			soneProperties.put("time", currentTimeMillis());
@@ -307,8 +303,8 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", Ordering.from(Post.NEWEST_FIRST).sortedCopy(sone.getPosts()));
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
-			soneProperties.put("likedPostIds", new HashSet<String>(sone.getLikedPostIds()));
-			soneProperties.put("likedReplyIds", new HashSet<String>(sone.getLikedReplyIds()));
+			soneProperties.put("likedPostIds", new HashSet<>(sone.getLikedPostIds()));
+			soneProperties.put("likedReplyIds", new HashSet<>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
 			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
@@ -332,7 +328,7 @@ public class SoneInserter extends AbstractService {
 		 * @return The manifest entries for the Sone insert
 		 */
 		public HashMap<String, Object> generateManifestEntries() {
-			HashMap<String, Object> manifestEntries = new HashMap<String, Object>();
+			HashMap<String, Object> manifestEntries = new HashMap<>();
 
 			/* first, create an index.html. */
 			manifestEntries.put("index.html", manifestCreator.createManifestElement(
@@ -356,15 +352,13 @@ public class SoneInserter extends AbstractService {
 
 	/**
 	 * Creates manifest elements for an insert by rendering a template.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	static class ManifestCreator implements Closeable {
 
 		private final Core core;
 		private final Map<String, Object> soneProperties;
-		private final Set<Bucket> buckets = new HashSet<Bucket>();
+		private final Set<Bucket> buckets = new HashSet<>();
 
 		ManifestCreator(Core core, Map<String, Object> soneProperties) {
 			this.core = core;

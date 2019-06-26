@@ -1,5 +1,5 @@
 /*
- * Sone - CollectionAccessor.java - Copyright © 2010–2016 David Roden
+ * Sone - CollectionAccessor.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <dt>Returns the nice names of all {@link Sone}s in the collection, sorted
  * ascending by their nice names.</dt>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CollectionAccessor extends ReflectionAccessor {
 
@@ -47,7 +45,7 @@ public class CollectionAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Collection<?> collection = (Collection<?>) object;
 		if (member.equals("soneNames")) {
-			List<Sone> sones = new ArrayList<Sone>();
+			List<Sone> sones = new ArrayList<>();
 			for (Object sone : collection) {
 				if (!(sone instanceof Sone)) {
 					continue;

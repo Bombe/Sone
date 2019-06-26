@@ -1,25 +1,20 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.freenet.wot.Identity
-import net.pterodactylus.sone.freenet.wot.OwnIdentity
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.thenReturnMock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.wot.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [LoginPage].
  */
-class LoginPageTest: WebPageTest(::LoginPage) {
+class LoginPageTest : WebPageTest(::LoginPage) {
 
 	private val sones = listOf(createSone("Sone", "Test"), createSone("Test"), createSone("Sone"))
 
@@ -45,12 +40,12 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("login.html"))
+		assertThat(page.path, equalTo("login.html"))
 	}
 
 	@Test
 	fun `page does not require login`() {
-	    assertThat(page.requiresLogin(), equalTo(false))
+		assertThat(page.requiresLogin(), equalTo(false))
 	}
 
 	@Test
@@ -108,7 +103,7 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page is not enabled if full access required and request is not full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
 	}
 
@@ -125,7 +120,7 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page is enabled if full access required and request is full access and there is no current sone`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		unsetCurrentSone()
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		assertThat(page.isEnabled(toadletContext), equalTo(true))
@@ -133,9 +128,24 @@ class LoginPageTest: WebPageTest(::LoginPage) {
 
 	@Test
 	fun `page is not enabled if full access required and request is full access but there is a current sone`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<LoginPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("Login"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/login.html"))
 	}
 
 }

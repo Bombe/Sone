@@ -1,5 +1,5 @@
 /*
- * Sone - PluginConnector.java - Copyright © 2010–2016 David Roden
+ * Sone - PluginConnector.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,8 +33,6 @@ import freenet.support.api.Bucket;
 /**
  * Interface for talking to other plugins. Other plugins are identified by their
  * name and a unique connection identifier.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class PluginConnector implements FredPluginTalker {

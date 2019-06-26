@@ -1,5 +1,5 @@
 /*
- * Sone - Album.java - Copyright © 2011–2016 David Roden
+ * Sone - Album.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@ import static java.util.Collections.emptyList;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import javax.annotation.Nonnull;
 
@@ -33,19 +32,8 @@ import com.google.common.collect.ImmutableList;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Album extends Identified, Fingerprintable {
-
-	/** Compares two {@link Album}s by {@link #getTitle()}. */
-	Comparator<Album> TITLE_COMPARATOR = new Comparator<Album>() {
-
-		@Override
-		public int compare(Album leftAlbum, Album rightAlbum) {
-			return leftAlbum.getTitle().compareToIgnoreCase(rightAlbum.getTitle());
-		}
-	};
 
 	/** Function that flattens the given album and all albums beneath it. */
 	Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
@@ -56,7 +44,7 @@ public interface Album extends Identified, Fingerprintable {
 			if (album == null) {
 				return emptyList();
 			}
-			List<Album> albums = new ArrayList<Album>();
+			List<Album> albums = new ArrayList<>();
 			albums.add(album);
 			for (Album subAlbum : album.getAlbums()) {
 				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
@@ -271,8 +259,6 @@ public interface Album extends Identified, Fingerprintable {
 	 * Allows modifying an album. Modifications are only performed once {@link
 	 * #update()} has succesfully returned a new album with the modifications
 	 * made.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	interface Modifier {
 

@@ -1,17 +1,18 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.let
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import javax.inject.*
 
 /**
  * AJAX page that lets the user trust a Sone.
  *
  * @see net.pterodactylus.sone.core.Core.trustSone
  */
-class TrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("trustSone.ajax", webInterface) {
+@ToadletPath("trustSone.ajax")
+class TrustAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]

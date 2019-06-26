@@ -1,5 +1,5 @@
 /*
- * Sone - SimpleFieldSetBuilder.java - Copyright © 2011–2016 David Roden
+ * Sone - SimpleFieldSetBuilder.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Helper class to construct {@link SimpleFieldSet} objects in a single call.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SimpleFieldSetBuilder {
 

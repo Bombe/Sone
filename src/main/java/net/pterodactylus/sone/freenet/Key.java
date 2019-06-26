@@ -10,8 +10,6 @@ import com.google.common.annotations.VisibleForTesting;
 /**
  * Encapsulates the parts of a {@link FreenetURI} that do not change while
  * being converted from SSK to USK and/or back.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Key {
 

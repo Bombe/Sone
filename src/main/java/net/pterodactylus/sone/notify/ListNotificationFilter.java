@@ -1,5 +1,5 @@
 /*
- * Sone - ListNotificationFilter.java - Copyright © 2010–2016 David Roden
+ * Sone - ListNotificationFilter.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,8 +36,6 @@ import com.google.common.base.Optional;
 
 /**
  * Filter for {@link ListNotification}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class ListNotificationFilter {
@@ -67,7 +65,7 @@ public class ListNotificationFilter {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Notification> filterNotifications(Collection<? extends Notification> notifications, Sone currentSone) {
-		List<Notification> filteredNotifications = new ArrayList<Notification>();
+		List<Notification> filteredNotifications = new ArrayList<>();
 		for (Notification notification : notifications) {
 			if (notification.getId().equals("new-sone-notification")) {
 				if ((currentSone != null) && !currentSone.getOptions().isShowNewSoneNotifications()) {
@@ -128,7 +126,7 @@ public class ListNotificationFilter {
 		if (newPosts.size() == postNotification.getElements().size()) {
 			return Optional.of(postNotification);
 		}
-		ListNotification<Post> filteredNotification = new ListNotification<Post>(postNotification);
+		ListNotification<Post> filteredNotification = new ListNotification<>(postNotification);
 		filteredNotification.setElements(newPosts);
 		filteredNotification.setLastUpdateTime(postNotification.getLastUpdatedTime());
 		return Optional.of(filteredNotification);
@@ -157,7 +155,7 @@ public class ListNotificationFilter {
 		if (newReplies.size() == newReplyNotification.getElements().size()) {
 			return Optional.of(newReplyNotification);
 		}
-		ListNotification<PostReply> filteredNotification = new ListNotification<PostReply>(newReplyNotification);
+		ListNotification<PostReply> filteredNotification = new ListNotification<>(newReplyNotification);
 		filteredNotification.setElements(newReplies);
 		filteredNotification.setLastUpdateTime(newReplyNotification.getLastUpdatedTime());
 		return Optional.of(filteredNotification);

@@ -12,8 +12,6 @@ import net.pterodactylus.util.template.TemplateParser;
 
 /**
  * Takes the input and parses it as a new {@link Template}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ReparseFilter implements Filter {
 

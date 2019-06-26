@@ -1,5 +1,5 @@
 /*
- * Sone - AlbumAccessor.java - Copyright © 2011–2016 David Roden
+ * Sone - AlbumAccessor.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * {@link Accessor} implementation for {@link Album}s. A property named
  * “backlinks” is added, it returns links to all parents and the owner Sone of
  * an album.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AlbumAccessor extends ReflectionAccessor {
 
@@ -45,7 +43,7 @@ public class AlbumAccessor extends ReflectionAccessor {
 	public Object get(TemplateContext templateContext, Object object, String member) {
 		Album album = (Album) object;
 		if ("backlinks".equals(member)) {
-			List<Link> backlinks = new ArrayList<Link>();
+			List<Link> backlinks = new ArrayList<>();
 			Album currentAlbum = album;
 			while (!currentAlbum.isRoot()) {
 				backlinks.add(0, new Link("imageBrowser.html?album=" + currentAlbum.getId(), currentAlbum.getTitle()));
@@ -62,8 +60,6 @@ public class AlbumAccessor extends ReflectionAccessor {
 
 	/**
 	 * Container for links.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class Link {
 

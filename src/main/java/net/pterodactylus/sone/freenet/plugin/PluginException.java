@@ -1,5 +1,5 @@
 /*
- * Sone - PluginException.java - Copyright © 2010–2016 David Roden
+ * Sone - PluginException.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@ import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 
 /**
  * Exception that signals an error when communicating with a plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PluginException extends WebOfTrustException {
 

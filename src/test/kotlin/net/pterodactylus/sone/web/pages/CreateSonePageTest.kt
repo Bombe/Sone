@@ -1,22 +1,21 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.freenet.wot.OwnIdentity
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.wot.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
 
 /**
  * Unit test for [CreateSonePage].
  */
-class CreateSonePageTest: WebPageTest(::CreateSonePage) {
+class CreateSonePageTest : WebPageTest(::CreateSonePage) {
 
 	private val localSones_ = listOf(
 			createSone("local-sone1"),
@@ -111,7 +110,7 @@ class CreateSonePageTest: WebPageTest(::CreateSonePage) {
 
 	@Test
 	fun `create sone is not shown in menu if full access is required but client doesn’t have full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		assertThat(page.isEnabled(toadletContext), equalTo(false))
 	}
 
@@ -136,10 +135,25 @@ class CreateSonePageTest: WebPageTest(::CreateSonePage) {
 
 	@Test
 	fun `create sone is shown in menu if no sone is logged in and client has full access`() {
-		core.preferences.isRequireFullAccess = true
+		core.preferences.newRequireFullAccess = true
 		whenever(toadletContext.isAllowedFullAccess).thenReturn(true)
 		unsetCurrentSone()
 		assertThat(page.isEnabled(toadletContext), equalTo(true))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<CreateSonePage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with the correct menuname`() {
+		assertThat(page.menuName, equalTo("CreateSone"))
+	}
+
+	@Test
+	fun `page is annotated with the correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/createSone.html"))
 	}
 
 }

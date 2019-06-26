@@ -1,5 +1,5 @@
 /*
- * Sone - PageToadlet.java - Copyright © 2010–2016 David Roden
+ * Sone - PageToadlet.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,18 +30,20 @@ import net.pterodactylus.util.web.Response;
 import freenet.client.HighLevelSimpleClient;
 import freenet.clients.http.LinkEnabledCallback;
 import freenet.clients.http.LinkFilterExceptedToadlet;
+import freenet.clients.http.SessionManager;
 import freenet.clients.http.Toadlet;
 import freenet.clients.http.ToadletContext;
 import freenet.clients.http.ToadletContextClosedException;
+import freenet.l10n.NodeL10n;
 import freenet.support.MultiValueTable;
 import freenet.support.api.HTTPRequest;
 
 /**
  * {@link Toadlet} implementation that is wrapped around a {@link Page}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFilterExceptedToadlet {
+
+	private final SessionManager sessionManager;
 
 	/** The name of the menu item. */
 	private final String menuName;
@@ -65,8 +67,9 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *            Prefix that is prepended to all {@link Page#getPath()} return
 	 *            values
 	 */
-	protected PageToadlet(HighLevelSimpleClient highLevelSimpleClient, String menuName, Page<FreenetRequest> page, String pathPrefix) {
+	protected PageToadlet(HighLevelSimpleClient highLevelSimpleClient, SessionManager sessionManager, String menuName, Page<FreenetRequest> page, String pathPrefix) {
 		super(highLevelSimpleClient);
+		this.sessionManager = sessionManager;
 		this.menuName = menuName;
 		this.page = page;
 		this.pathPrefix = pathPrefix;
@@ -104,7 +107,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodGET(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext));
+		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext, NodeL10n.getBase(), sessionManager));
 	}
 
 	/**
@@ -122,7 +125,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodPOST(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext));
+		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext, NodeL10n.getBase(), sessionManager));
 	}
 
 	/**
@@ -147,7 +150,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 		try (AutoCloseableBucket pageBucket = new AutoCloseableBucket(pageRequest.getToadletContext().getBucketFactory().makeBucket(-1));
 		     OutputStream pageBucketOutputStream = pageBucket.getBucket().getOutputStream()) {
 			Response pageResponse = page.handleRequest(pageRequest, new Response(pageBucketOutputStream));
-			MultiValueTable<String, String> headers = new MultiValueTable<String, String>();
+			MultiValueTable<String, String> headers = new MultiValueTable<>();
 			if (pageResponse.getHeaders() != null) {
 				for (Header header : pageResponse.getHeaders()) {
 					for (String value : header) {

@@ -4,13 +4,14 @@ import java.util.Collection;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 
 /**
  * In-memory implementation of friend-related functionality.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class MemoryFriendDatabase {
 
@@ -48,6 +49,9 @@ class MemoryFriendDatabase {
 		try {
 			if (soneFriends.put(localSoneId, friendSoneId)) {
 				configurationLoader.saveFriends(localSoneId, soneFriends.get(localSoneId));
+				if (configurationLoader.getSoneFollowingTime(friendSoneId) == null) {
+					configurationLoader.setSoneFollowingTime(friendSoneId, System.currentTimeMillis());
+				}
 			}
 		} finally {
 			lock.writeLock().unlock();
@@ -60,10 +64,22 @@ class MemoryFriendDatabase {
 		try {
 			if (soneFriends.remove(localSoneId, friendSoneId)) {
 				configurationLoader.saveFriends(localSoneId, soneFriends.get(localSoneId));
+				boolean unfollowedSoneStillFollowed = false;
+				for (String soneId : soneFriends.keys()) {
+					unfollowedSoneStillFollowed |= getFriends(soneId).contains(friendSoneId);
+				}
+				if (!unfollowedSoneStillFollowed) {
+					configurationLoader.removeSoneFollowingTime(friendSoneId);
+				}
 			}
 		} finally {
 			lock.writeLock().unlock();
 		}
+	}
+
+	@Nullable
+	Long getFollowingTime(@Nonnull String soneId) {
+		return configurationLoader.getSoneFollowingTime(soneId);
 	}
 
 	private void loadFriends(String localSoneId) {

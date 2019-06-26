@@ -1,5 +1,5 @@
 /*
- * Sone - GetPostCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - GetPostCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * The “GetPost” FCP command returns a single {@link Post} to an FCP client.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPostCommand extends AbstractSoneCommand {
 

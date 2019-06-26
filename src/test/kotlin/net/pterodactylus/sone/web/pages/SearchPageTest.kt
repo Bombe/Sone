@@ -1,28 +1,22 @@
 package net.pterodactylus.sone.web.pages
 
-import com.google.common.base.Optional.absent
-import com.google.common.base.Ticker
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.isOnPage
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.asOptional
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
+import com.google.common.base.*
+import com.google.common.base.Optional.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.util.concurrent.*
+import java.util.concurrent.atomic.*
 
 /**
  * Unit test for [SearchPage].
  */
-class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(template, webInterface, ticker) }) {
+class SearchPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> SearchPage(webInterface, loaders, templateRenderer, ticker) }) {
 
 	companion object {
 		val ticker = mock<Ticker>()
@@ -41,7 +35,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Search.Title", "search page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("search page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("search page title"))
 	}
 
 	@Test
@@ -63,28 +57,28 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `searching for sone link redirects to view sone page`() {
-		addSone("sone-id", mock<Sone>())
-		addHttpRequestParameter("query", "sone://sone-id")
-		verifyRedirect("viewSone.html?sone=sone-id")
+		addSone("Sone-ID", mock())
+		addHttpRequestParameter("query", "sone://Sone-ID")
+		verifyRedirect("viewSone.html?sone=Sone-ID")
 	}
 
 	@Test
 	fun `searching for sone link without prefix redirects to view sone page`() {
-		addSone("sone-id", mock<Sone>())
+		addSone("sone-id", mock())
 		addHttpRequestParameter("query", "sone-id")
 		verifyRedirect("viewSone.html?sone=sone-id")
 	}
 
 	@Test
 	fun `searching for a post link redirects to post page`() {
-		addPost("post-id", mock<Post>())
-		addHttpRequestParameter("query", "post://post-id")
-		verifyRedirect("viewPost.html?post=post-id")
+		addPost("Post-id", mock())
+		addHttpRequestParameter("query", "post://Post-id")
+		verifyRedirect("viewPost.html?post=Post-id")
 	}
 
 	@Test
 	fun `searching for a post ID without prefix redirects to post page`() {
-		addPost("post-id", mock<Post>())
+		addPost("post-id", mock())
 		addHttpRequestParameter("query", "post-id")
 		verifyRedirect("viewPost.html?post=post-id")
 	}
@@ -92,8 +86,8 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 	@Test
 	fun `searching for a reply link redirects to the post page`() {
 		val postReply = mock<PostReply>().apply { whenever(postId).thenReturn("post-id") }
-		addPostReply("reply-id", postReply)
-		addHttpRequestParameter("query", "reply://reply-id")
+		addPostReply("Reply-id", postReply)
+		addHttpRequestParameter("query", "reply://Reply-id")
 		verifyRedirect("viewPost.html?post=post-id")
 	}
 
@@ -107,28 +101,28 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `searching for an album link redirects to the image browser`() {
-		addAlbum("album-id", mock<Album>())
+		addAlbum("album-id", mock())
 		addHttpRequestParameter("query", "album://album-id")
 		verifyRedirect("imageBrowser.html?album=album-id")
 	}
 
 	@Test
 	fun `searching for an album ID redirects to the image browser`() {
-		addAlbum("album-id", mock<Album>())
+		addAlbum("album-id", mock())
 		addHttpRequestParameter("query", "album-id")
 		verifyRedirect("imageBrowser.html?album=album-id")
 	}
 
 	@Test
 	fun `searching for an image link redirects to the image browser`() {
-		addImage("image-id", mock<Image>())
+		addImage("image-id", mock())
 		addHttpRequestParameter("query", "image://image-id")
 		verifyRedirect("imageBrowser.html?image=image-id")
 	}
 
 	@Test
 	fun `searching for an image ID redirects to the image browser`() {
-		addImage("image-id", mock<Image>())
+		addImage("image-id", mock())
 		addHttpRequestParameter("query", "image-id")
 		verifyRedirect("imageBrowser.html?image=image-id")
 	}
@@ -282,7 +276,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `sone hits are paginated correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSone("1Sone"), createSone("Other1"), createSone("22Sone"), createSone("333Sone"), createSone("Other2"))
 				.onEach { addSone(it.id, it) }
 		addHttpRequestParameter("query", "sone")
@@ -294,7 +288,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `sone hits page 2 is shown correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSone("1Sone"), createSone("Other1"), createSone("22Sone"), createSone("333Sone"), createSone("Other2"))
 				.onEach { addSone(it.id, it) }
 		addHttpRequestParameter("query", "sone")
@@ -307,7 +301,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `post hits are paginated correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSoneWithPost("match1", "1Sone"), createSoneWithPost("no-match1", "Other1"), createSoneWithPost("match2", "22Sone"), createSoneWithPost("match3", "333Sone"), createSoneWithPost("no-match2", "Other2"))
 		addHttpRequestParameter("query", "sone")
 		verifyNoRedirect {
@@ -318,7 +312,7 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Test
 	fun `post hits page 2 is shown correctly`() {
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 		val sones = listOf(createSoneWithPost("match1", "1Sone"), createSoneWithPost("no-match1", "Other1"), createSoneWithPost("match2", "22Sone"), createSoneWithPost("match3", "333Sone"), createSoneWithPost("no-match2", "Other2"))
 		addHttpRequestParameter("query", "sone")
 		addHttpRequestParameter("postPage", "1")
@@ -363,5 +357,15 @@ class SearchPageTest: WebPageTest({ template, webInterface -> SearchPage(templat
 
 	@Suppress("UNCHECKED_CAST")
 	private operator fun <T> get(key: String): T? = templateContext[key] as? T
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<SearchPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/search.html"))
+	}
 
 }

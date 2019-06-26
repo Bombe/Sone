@@ -16,15 +16,13 @@ import com.google.common.base.Function;
 
 /**
  * Memory-based {@link BookmarkDatabase} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MemoryBookmarkDatabase implements BookmarkDatabase {
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final MemoryDatabase memoryDatabase;
 	private final ConfigurationLoader configurationLoader;
-	private final Set<String> bookmarkedPosts = new HashSet<String>();
+	private final Set<String> bookmarkedPosts = new HashSet<>();
 
 	public MemoryBookmarkDatabase(MemoryDatabase memoryDatabase,
 			ConfigurationLoader configurationLoader) {

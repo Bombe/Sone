@@ -8,8 +8,6 @@ import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
 /**
  * Abstract {@link SoneBuilder} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public abstract class AbstractSoneBuilder implements SoneBuilder {
 

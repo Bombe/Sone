@@ -1,11 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.never
@@ -14,22 +16,22 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [TrustPage].
  */
-class TrustPageTest: WebPageTest(::TrustPage) {
+class TrustPageTest : WebPageTest(::TrustPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("trust.html"))
+		assertThat(page.path, equalTo("trust.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.Trust.Title", "title trust page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("title trust page"))
+		addTranslation("Page.Trust.Title", "title trust page")
+		assertThat(page.getPageTitle(soneRequest), equalTo("title trust page"))
 	}
 
 	@Test
@@ -66,6 +68,11 @@ class TrustPageTest: WebPageTest(::TrustPage) {
 		verifyRedirect("return.html") {
 			verify(core).trustSone(eq(currentSone), eq(sone))
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<TrustPage>(), notNullValue())
 	}
 
 }

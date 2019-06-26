@@ -1,24 +1,25 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * This page lets the user unlock a [net.pterodactylus.sone.data.Sone] to allow its insertion.
  */
-class UnlockSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("unlockSone.html", template, "Page.UnlockSone.Title", webInterface, false) {
+@ToadletPath("unlockSone.html")
+class UnlockSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.UnlockSone.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			freenetRequest.parameters["sone", 44]
-					.let(webInterface.core::getLocalSone)
-					?.also(webInterface.core::unlockSone)
-			throw RedirectException(freenetRequest.parameters["returnPage", 256])
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			soneRequest.parameters["sone", 44]
+					.let(soneRequest.core::getLocalSone)
+					?.also(soneRequest.core::unlockSone)
+			throw RedirectException(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

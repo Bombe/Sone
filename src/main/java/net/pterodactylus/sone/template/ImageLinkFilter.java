@@ -1,5 +1,5 @@
 /*
- * Sone - ImageLinkFilter.java - Copyright © 2011–2016 David Roden
+ * Sone - ImageLinkFilter.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import java.util.Map;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.util.template.Filter;
+import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContext;
 import net.pterodactylus.util.template.TemplateContextFactory;
@@ -39,8 +40,6 @@ import com.google.common.base.Optional;
 /**
  * Template filter that turns an {@link Image} into an HTML &lt;img&gt; tag,
  * using some parameters to influence parameters of the image.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageLinkFilter implements Filter {
 
@@ -51,19 +50,12 @@ public class ImageLinkFilter implements Filter {
 	private final Core core;
 
 	/** The template context factory. */
-	private final TemplateContextFactory templateContextFactory;
+	private final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
 
-	/**
-	 * Creates a new image link filter.
-	 *
-	 * @param core
-	 *            The core
-	 * @param templateContextFactory
-	 *            The template context factory
-	 */
-	public ImageLinkFilter(Core core, TemplateContextFactory templateContextFactory) {
+	public ImageLinkFilter(Core core) {
 		this.core = core;
-		this.templateContextFactory = templateContextFactory;
+		templateContextFactory.addFilter("html", new HtmlFilter());
+		templateContextFactory.addFilter("css", new CssClassNameFilter());
 	}
 
 	/**

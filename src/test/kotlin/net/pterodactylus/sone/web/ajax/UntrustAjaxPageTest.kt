@@ -1,12 +1,12 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [UntrustAjaxPage].
@@ -40,6 +40,11 @@ class UntrustAjaxPageTest : JsonPageTest("untrustSone.ajax", pageSupplier = ::Un
 		addRequestParameter("sone", "sone-id")
 		assertThatJsonIsSuccessful()
 		assertThat(json["trustValue"], nullValue())
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<UntrustAjaxPage>(), notNullValue())
 	}
 
 }

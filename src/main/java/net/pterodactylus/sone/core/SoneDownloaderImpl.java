@@ -1,5 +1,5 @@
 /*
- * Sone - SoneDownloaderImpl.java - Copyright © 2010–2016 David Roden
+ * Sone - SoneDownloaderImpl.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
+import javax.inject.Inject;
+
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.util.service.AbstractService;
@@ -41,15 +42,9 @@ import freenet.keys.FreenetURI;
 import freenet.keys.USK;
 import freenet.node.RequestStarter;
 import freenet.support.api.Bucket;
-import freenet.support.io.Closer;
-import com.db4o.ObjectContainer;
-
-import com.google.common.annotations.VisibleForTesting;
 
 /**
  * The Sone downloader is responsible for download Sones as they are updated.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneDownloaderImpl extends AbstractService implements SoneDownloader {
 
@@ -60,40 +55,19 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	private static final int MAX_PROTOCOL_VERSION = 0;
 
 	/** The core. */
-	private final Core core;
+	private final UpdatedSoneProcessor updatedSoneProcessor;
 	private final SoneParser soneParser;
 
 	/** The Freenet interface. */
 	private final FreenetInterface freenetInterface;
 
 	/** The sones to update. */
-	private final Set<Sone> sones = new HashSet<Sone>();
+	private final Set<Sone> sones = new HashSet<>();
 
-	/**
-	 * Creates a new Sone downloader.
-	 *
-	 * @param core
-	 * 		The core
-	 * @param freenetInterface
-	 * 		The Freenet interface
-	 */
-	public SoneDownloaderImpl(Core core, FreenetInterface freenetInterface) {
-		this(core, freenetInterface, new SoneParser(core));
-	}
-
-	/**
-	 * Creates a new Sone downloader.
-	 *
-	 * @param core
-	 * 		The core
-	 * @param freenetInterface
-	 * 		The Freenet interface
-	 * @param soneParser
-	 */
-	@VisibleForTesting
-	SoneDownloaderImpl(Core core, FreenetInterface freenetInterface, SoneParser soneParser) {
+	@Inject
+	SoneDownloaderImpl(UpdatedSoneProcessor updatedSoneProcessor, FreenetInterface freenetInterface, SoneParser soneParser) {
 		super("Sone Downloader", false);
-		this.core = core;
+		this.updatedSoneProcessor = updatedSoneProcessor;
 		this.freenetInterface = freenetInterface;
 		this.soneParser = soneParser;
 	}
@@ -126,7 +100,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 						sone, key, newKnownGood, newSlotToo));
 				if (edition > sone.getLatestEdition()) {
 					sone.setLatestEdition(edition);
-					new Thread(fetchSoneAction(sone),
+					new Thread(fetchSoneAsSskAction(sone),
 							"Sone Downloader").start();
 				}
 			}
@@ -154,22 +128,8 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		return (currentTimeMillis() - sone.getTime()) < DAYS.toMillis(7);
 	}
 
-	private void fetchSone(Sone sone) {
-		fetchSone(sone, sone.getRequestUri().sskForUSK());
-	}
-
-	/**
-	 * Fetches the updated Sone. This method can be used to fetch a Sone from a
-	 * specific URI.
-	 *
-	 * @param sone
-	 * 		The Sone to fetch
-	 * @param soneUri
-	 * 		The URI to fetch the Sone from
-	 */
-	@Override
-	public void fetchSone(Sone sone, FreenetURI soneUri) {
-		fetchSone(sone, soneUri, false);
+	private void fetchSoneAsSsk(Sone sone) {
+		fetchSone(sone, sone.getRequestUri().sskForUSK(), false);
 	}
 
 	/**
@@ -201,7 +161,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			if (parsedSone != null) {
 				if (!fetchOnly) {
 					parsedSone.setStatus((parsedSone.getTime() == 0) ? SoneStatus.unknown : SoneStatus.idle);
-					core.updateSone(parsedSone);
+					updatedSoneProcessor.updateSone(parsedSone);
 					addSone(parsedSone);
 				}
 			}
@@ -231,6 +191,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			Sone parsedSone = soneParser.parseSone(originalSone,
 					soneInputStream);
 			if (parsedSone != null) {
+				logger.log(Level.FINER, "Sone %s was successfully parsed.", parsedSone);
 				parsedSone.setLatestEdition(requestUri.getEdition());
 			}
 			return parsedSone;
@@ -244,21 +205,21 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	}
 
 	@Override
-	public Runnable fetchSoneWithUriAction(final Sone sone) {
+	public Runnable fetchSoneAsUskAction(final Sone sone) {
 		return new Runnable() {
 			@Override
 			public void run() {
-				fetchSone(sone, sone.getRequestUri());
+				fetchSone(sone, sone.getRequestUri(), false);
 			}
 		};
 	}
 
 	@Override
-	public Runnable fetchSoneAction(final Sone sone) {
+	public Runnable fetchSoneAsSskAction(final Sone sone) {
 		return new Runnable() {
 			@Override
 			public void run() {
-				fetchSone(sone);
+				fetchSoneAsSsk(sone);
 			}
 		};
 	}

@@ -1,13 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.core.SoneRescuer
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.anyLong
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -15,7 +15,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [RescuePage].
  */
-class RescuePageTest: WebPageTest(::RescuePage) {
+class RescuePageTest : WebPageTest(::RescuePage) {
 
 	private val soneRescuer = mock<SoneRescuer>()
 
@@ -37,7 +37,7 @@ class RescuePageTest: WebPageTest(::RescuePage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Rescue.Title", "rescue page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("rescue page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("rescue page title"))
 	}
 
 	@Test
@@ -83,6 +83,21 @@ class RescuePageTest: WebPageTest(::RescuePage) {
 			verify(soneRescuer, never()).setEdition(anyLong())
 			verify(soneRescuer).startNextFetch()
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<RescuePage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("Rescue"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/rescue.html"))
 	}
 
 }

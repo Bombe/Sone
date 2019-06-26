@@ -1,5 +1,5 @@
 /*
- * Sone - Profile.java - Copyright © 2010–2016 David Roden
+ * Sone - Profile.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@ package net.pterodactylus.sone.data;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,8 +36,6 @@ import com.google.common.hash.Hashing;
 /**
  * A profile stores personal information about a {@link Sone}. All information
  * is optional and can be {@code null}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Profile implements Fingerprintable {
 
@@ -128,7 +127,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public Profile setFirstName(@Nullable String firstName) {
-		this.firstName = firstName;
+		this.firstName = "".equals(firstName) ? null : firstName;
 		return this;
 	}
 
@@ -151,7 +150,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public Profile setMiddleName(@Nullable String middleName) {
-		this.middleName = middleName;
+		this.middleName = "".equals(middleName) ? null : middleName;
 		return this;
 	}
 
@@ -174,7 +173,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public Profile setLastName(@Nullable String lastName) {
-		this.lastName = lastName;
+		this.lastName = "".equals(lastName) ? null : lastName;
 		return this;
 	}
 
@@ -284,7 +283,7 @@ public class Profile implements Fingerprintable {
 	 */
 	@Nonnull
 	public List<Field> getFields() {
-		return new ArrayList<Field>(fields);
+		return new ArrayList<>(fields);
 	}
 
 	/**
@@ -431,42 +430,40 @@ public class Profile implements Fingerprintable {
 	@Override
 	public String getFingerprint() {
 		Hasher hash = Hashing.sha256().newHasher();
-		hash.putString("Profile(");
+		hash.putString("Profile(", UTF_8);
 		if (firstName != null) {
-			hash.putString("FirstName(").putString(firstName).putString(")");
+			hash.putString("FirstName(", UTF_8).putString(firstName, UTF_8).putString(")", UTF_8);
 		}
 		if (middleName != null) {
-			hash.putString("MiddleName(").putString(middleName).putString(")");
+			hash.putString("MiddleName(", UTF_8).putString(middleName, UTF_8).putString(")", UTF_8);
 		}
 		if (lastName != null) {
-			hash.putString("LastName(").putString(lastName).putString(")");
+			hash.putString("LastName(", UTF_8).putString(lastName, UTF_8).putString(")", UTF_8);
 		}
 		if (birthDay != null) {
-			hash.putString("BirthDay(").putInt(birthDay).putString(")");
+			hash.putString("BirthDay(", UTF_8).putInt(birthDay).putString(")", UTF_8);
 		}
 		if (birthMonth != null) {
-			hash.putString("BirthMonth(").putInt(birthMonth).putString(")");
+			hash.putString("BirthMonth(", UTF_8).putInt(birthMonth).putString(")", UTF_8);
 		}
 		if (birthYear != null) {
-			hash.putString("BirthYear(").putInt(birthYear).putString(")");
+			hash.putString("BirthYear(", UTF_8).putInt(birthYear).putString(")", UTF_8);
 		}
 		if (avatar != null) {
-			hash.putString("Avatar(").putString(avatar).putString(")");
+			hash.putString("Avatar(", UTF_8).putString(avatar, UTF_8).putString(")", UTF_8);
 		}
-		hash.putString("ContactInformation(");
+		hash.putString("ContactInformation(", UTF_8);
 		for (Field field : fields) {
-			hash.putString(field.getName()).putString("(").putString(field.getValue()).putString(")");
+			hash.putString(field.getName(), UTF_8).putString("(", UTF_8).putString(field.getValue(), UTF_8).putString(")", UTF_8);
 		}
-		hash.putString(")");
-		hash.putString(")");
+		hash.putString(")", UTF_8);
+		hash.putString(")", UTF_8);
 
 		return hash.hash().toString();
 	}
 
 	/**
 	 * Container for a profile field.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class Field {
 
@@ -586,15 +583,11 @@ public class Profile implements Fingerprintable {
 
 	/**
 	 * Exception that signals the addition of a field with an empty name.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class EmptyFieldName extends IllegalArgumentException { }
 
 	/**
 	 * Exception that signals the addition of a field that already exists.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class DuplicateField extends IllegalArgumentException { }
 

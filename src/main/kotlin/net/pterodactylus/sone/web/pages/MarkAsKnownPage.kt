@@ -1,29 +1,30 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.utils.mapPresent
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user mark a number of [net.pterodactylus.sone.data.Sone]s, [Post]s, or
  * [Replie][net.pterodactylus.sone.data.Reply]s as known.
  */
-class MarkAsKnownPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("markAsKnown.html", template, "Page.MarkAsKnown.Title", webInterface, false) {
+@ToadletPath("markAsKnown.html")
+class MarkAsKnownPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.MarkAsKnown.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		val ids = freenetRequest.parameters["id", 65536]!!.split(" ")
-		when (freenetRequest.parameters["type", 5]) {
-			"sone" -> ids.mapNotNull(webInterface.core::getSone).forEach(webInterface.core::markSoneKnown)
-			"post" -> ids.mapNotNull(webInterface.core::getPost).forEach(webInterface.core::markPostKnown)
-			"reply" -> ids.mapNotNull(webInterface.core::getPostReply).forEach(webInterface.core::markReplyKnown)
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		val ids = soneRequest.parameters["id", 65536]!!.split(" ")
+		when (soneRequest.parameters["type", 5]) {
+			"sone" -> ids.mapNotNull(soneRequest.core::getSone).forEach(soneRequest.core::markSoneKnown)
+			"post" -> ids.mapNotNull(soneRequest.core::getPost).forEach(soneRequest.core::markPostKnown)
+			"reply" -> ids.mapNotNull(soneRequest.core::getPostReply).forEach(soneRequest.core::markReplyKnown)
 			else -> throw RedirectException("invalid.html")
 		}
-		throw RedirectException(freenetRequest.parameters["returnPage", 256]!!)
+		throw RedirectException(soneRequest.parameters["returnPage", 256]!!)
 	}
 
 }

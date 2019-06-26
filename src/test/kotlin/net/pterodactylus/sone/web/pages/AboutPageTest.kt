@@ -1,16 +1,17 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
-import net.pterodactylus.sone.main.SonePlugin.PluginVersion
-import net.pterodactylus.sone.main.SonePlugin.PluginYear
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
  * Unit test for [AboutPage].
  */
-class AboutPageTest: WebPageTest({ template, webInterface -> AboutPage(template, webInterface, PluginVersion(version), PluginYear(year), PluginHomepage(homepage)) }) {
+class AboutPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> AboutPage(webInterface, loaders, templateRenderer, PluginVersion(version), PluginYear(year), PluginHomepage(homepage)) }) {
 
 	companion object {
 		private const val version = "0.1.2"
@@ -44,6 +45,26 @@ class AboutPageTest: WebPageTest({ template, webInterface -> AboutPage(template,
 	fun `page sets correct year in template context`() {
 		page.processTemplate(freenetRequest, templateContext)
 		assertThat(templateContext["year"], equalTo<Any>(year))
+	}
+
+	@Test
+	fun `about page can be created by dependency injection`() {
+		val injector = baseInjector.createChildInjector(
+				PluginVersion::class.isProvidedByMock(),
+				PluginYear::class.isProvidedByMock(),
+				PluginHomepage::class.isProvidedByMock()
+		)
+		assertThat(injector.getInstance<AboutPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("About"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/about.html"))
 	}
 
 }

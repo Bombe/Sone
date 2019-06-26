@@ -1,15 +1,15 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetPage
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.web.Response
-import java.net.URI
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.*
+import java.net.*
+import javax.inject.*
 
 /**
  * Page that delivers a {@link TemporaryImage} to the browser.
  */
-class GetImagePage(webInterface: WebInterface): FreenetPage {
+class GetImagePage @Inject constructor(webInterface: WebInterface) : FreenetPage {
 
 	private val core = webInterface.core
 
@@ -35,7 +35,7 @@ class GetImagePage(webInterface: WebInterface): FreenetPage {
 		}
 	}
 
-	override fun isLinkExcepted(link: URI?): Boolean {
+	override fun isLinkExcepted(link: URI): Boolean {
 		return false
 	}
 

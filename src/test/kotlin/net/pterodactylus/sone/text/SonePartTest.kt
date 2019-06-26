@@ -16,7 +16,7 @@ class SonePartTest {
 	private val sone = mock<Sone>()
 
 	init {
-		`when`(sone.profile).thenReturn(mock<Profile>())
+		`when`(sone.profile).thenReturn(mock())
 		`when`(sone.name).thenReturn("sone")
 	}
 

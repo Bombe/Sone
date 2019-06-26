@@ -1,5 +1,5 @@
 /*
- * Sone - TrustAccessor.java - Copyright © 2010–2016 David Roden
+ * Sone - TrustAccessor.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <dd>{@link Boolean} that indicates whether this trust relationship has an
  * explicit value assigned to it.</dd>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TrustAccessor extends ReflectionAccessor {
 

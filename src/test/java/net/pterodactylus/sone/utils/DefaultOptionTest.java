@@ -11,8 +11,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link DefaultOption}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultOptionTest {
 
@@ -27,19 +25,19 @@ public class DefaultOptionTest {
 
 	@Test
 	public void defaultOptionReturnsDefaultValueWhenUnset() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue);
 		assertThat(defaultOption.get(), is(defaultValue));
 	}
 
 	@Test
 	public void defaultOptionReturnsNullForRealWhenUnset() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue);
 		assertThat(defaultOption.getReal(), nullValue());
 	}
 
 	@Test
 	public void defaultOptionWillReturnSetValue() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue);
 		Object newValue = new Object();
 		defaultOption.set(newValue);
 		assertThat(defaultOption.get(), is(newValue));
@@ -47,40 +45,40 @@ public class DefaultOptionTest {
 
 	@Test
 	public void defaultOptionWithValidatorAcceptsValidValues() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue, matchesAcceptedValue);
 		defaultOption.set(acceptedValue);
 		assertThat(defaultOption.get(), is(acceptedValue));
 	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void defaultOptionWithValidatorRejectsInvalidValues() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue, matchesAcceptedValue);
 		defaultOption.set(new Object());
 	}
 
 	@Test
 	public void defaultOptionValidatesObjectsCorrectly() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue, matchesAcceptedValue);
 		assertThat(defaultOption.validate(acceptedValue), is(true));
 		assertThat(defaultOption.validate(new Object()), is(false));
 	}
 
 	@Test
 	public void settingToNullWillRestoreDefaultValue() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue);
 		defaultOption.set(null);
 		assertThat(defaultOption.get(), is(defaultValue));
 	}
 
 	@Test
 	public void validateWithoutValidatorWillValidateNull() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue);
 		assertThat(defaultOption.validate(null), is(true));
 	}
 
 	@Test
 	public void validateWithValidatorWillValidateNull() {
-		DefaultOption<Object> defaultOption = new DefaultOption<Object>(defaultValue, matchesAcceptedValue);
+		DefaultOption<Object> defaultOption = new DefaultOption<>(defaultValue, matchesAcceptedValue);
 		assertThat(defaultOption.validate(null), is(true));
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Sone - IdentityManagerImpl.java - Copyright © 2010–2016 David Roden
+ * Sone - IdentityManagerImpl.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ import com.google.inject.Singleton;
  * It is also responsible for polling identities from the Web of Trust plugin
  * and sending events to the {@link EventBus} when {@link Identity}s and
  * {@link OwnIdentity}s are discovered or disappearing.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class IdentityManagerImpl extends AbstractService implements IdentityManager {
@@ -109,7 +107,7 @@ public class IdentityManagerImpl extends AbstractService implements IdentityMana
 	@Override
 	public Set<OwnIdentity> getAllOwnIdentities() {
 		synchronized (currentOwnIdentities) {
-			return new HashSet<OwnIdentity>(currentOwnIdentities);
+			return new HashSet<>(currentOwnIdentities);
 		}
 	}
 
@@ -122,7 +120,7 @@ public class IdentityManagerImpl extends AbstractService implements IdentityMana
 	 */
 	@Override
 	protected void serviceRun() {
-		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<>();
 
 		while (!shouldStop()) {
 			try {

@@ -2,13 +2,15 @@ package net.pterodactylus.sone.web.ajax
 
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
+import javax.inject.Inject
 
 /**
  * AJAX page that lets the user mark a number of [net.pterodactylus.sone.data.Sone]s,
  * [net.pterodactylus.sone.data.Post]s, or [net.pterodactylus.sone.data.Reply]s as known.
  */
-class MarkAsKnownAjaxPage(webInterface: WebInterface) : JsonPage("markAsKnown.ajax", webInterface) {
+@ToadletPath("markAsKnown.ajax")
+class MarkAsKnownAjaxPage @Inject constructor(webInterface: WebInterface) : JsonPage(webInterface) {
 
 	override val requiresLogin = false
 

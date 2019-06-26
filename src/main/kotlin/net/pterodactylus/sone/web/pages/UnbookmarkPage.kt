@@ -1,34 +1,33 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.utils.also
-import net.pterodactylus.sone.utils.isGET
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user unbookmark a post.
  */
-class UnbookmarkPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("unbookmark.html", template, "Page.Unbookmark.Title", webInterface, false) {
+@ToadletPath("unbookmark.html")
+class UnbookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Unbookmark.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		when {
-			freenetRequest.isGET && (freenetRequest.parameters["post"] == "allNotLoaded") -> {
-				webInterface.core.bookmarkedPosts
+			soneRequest.isGET && (soneRequest.parameters["post"] == "allNotLoaded") -> {
+				soneRequest.core.bookmarkedPosts
 						.filterNot(Post::isLoaded)
-						.forEach(webInterface.core::unbookmarkPost)
+						.forEach(soneRequest.core::unbookmarkPost)
 				throw RedirectException("bookmarks.html")
 			}
-			freenetRequest.isPOST -> {
-				freenetRequest.parameters["post", 36]
-						?.let(webInterface.core::getPost)
-						?.also(webInterface.core::unbookmarkPost)
-				throw RedirectException(freenetRequest.parameters["returnPage", 256])
+			soneRequest.isPOST -> {
+				soneRequest.parameters["post", 36]
+						?.let(soneRequest.core::getPost)
+						?.also(soneRequest.core::unbookmarkPost)
+				throw RedirectException(soneRequest.parameters["returnPage", 256])
 			}
 		}
 	}

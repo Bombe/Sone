@@ -8,16 +8,18 @@ import net.pterodactylus.sone.utils.headers
 import net.pterodactylus.sone.utils.ifTrue
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.TemplateContext
+import javax.inject.Inject
 
 /**
  * Page that stores a user’s image modifications.
  */
-class EditImageAjaxPage(webInterface: WebInterface,
+@ToadletPath("editImage.ajax")
+class EditImageAjaxPage @Inject constructor(webInterface: WebInterface,
 		private val parserFilter: ParserFilter,
 		private val shortenFilter: ShortenFilter,
-		private val renderFilter: RenderFilter) : JsonPage("editImage.ajax", webInterface) {
+		private val renderFilter: RenderFilter) : JsonPage(webInterface) {
 
 	override fun createJsonObject(request: FreenetRequest) =
 			request.parameters["image"]

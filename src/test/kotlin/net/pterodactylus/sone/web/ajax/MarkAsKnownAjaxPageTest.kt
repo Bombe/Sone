@@ -1,16 +1,12 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.any
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [MarkAsKnownAjaxPage].
@@ -67,6 +63,11 @@ class MarkAsKnownAjaxPageTest : JsonPageTest("markAsKnown.ajax", requiresLogin =
 		assertThatJsonIsSuccessful()
 		verify(core).markReplyKnown(reply1)
 		verify(core).markReplyKnown(reply2)
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<MarkAsKnownAjaxPage>(), notNullValue())
 	}
 
 }

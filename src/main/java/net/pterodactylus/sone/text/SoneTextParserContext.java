@@ -1,5 +1,5 @@
 /*
- * Sone - SoneTextParserContext.java - Copyright © 2011–2016 David Roden
+ * Sone - SoneTextParserContext.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@ import net.pterodactylus.sone.web.page.FreenetRequest;
  * {@link ParserContext} implementation for the {@link SoneTextParser}. It
  * stores the {@link Sone} that provided the parsed text so that certain links
  * can be marked in a different way.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneTextParserContext implements ParserContext {
 

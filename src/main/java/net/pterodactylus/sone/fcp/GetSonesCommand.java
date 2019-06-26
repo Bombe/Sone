@@ -1,5 +1,5 @@
 /*
- * Sone - GetSonesCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - GetSonesCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static net.pterodactylus.sone.fcp.AbstractSoneCommandKt.encodeSones;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,8 +29,6 @@ import freenet.support.SimpleFieldSet;
 
 /**
  * Implements the “GetSones” FCP command that returns the list of known Sones.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetSonesCommand extends AbstractSoneCommand {
 
@@ -49,7 +49,7 @@ public class GetSonesCommand extends AbstractSoneCommand {
 	public Response execute(SimpleFieldSet parameters) {
 		int startSone = getInt(parameters, "StartSone", 0);
 		int maxSones = getInt(parameters, "MaxSones", -1);
-		List<Sone> sones = new ArrayList<Sone>(getCore().getSones());
+		List<Sone> sones = new ArrayList<>(getCore().getSones());
 		if (sones.size() < startSone) {
 			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), "Sones."));
 		}

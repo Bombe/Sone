@@ -1,5 +1,5 @@
 /*
- * Sone - IdentityChangeEventSenderTest.java - Copyright © 2013–2016 David Roden
+ * Sone - IdentityChangeEventSenderTest.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link IdentityChangeEventSender}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IdentityChangeEventSenderTest {
 
@@ -77,14 +75,14 @@ public class IdentityChangeEventSenderTest {
 	}
 
 	private Map<OwnIdentity, Collection<Identity>> createNewIdentities() {
-		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<>();
 		oldIdentities.put(ownIdentities.get(1), asList(identities.get(3), identities.get(2)));
 		oldIdentities.put(ownIdentities.get(2), asList(identities.get(1), identities.get(2)));
 		return oldIdentities;
 	}
 
 	private Map<OwnIdentity, Collection<Identity>> createOldIdentities() {
-		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<OwnIdentity, Collection<Identity>>();
+		Map<OwnIdentity, Collection<Identity>> oldIdentities = new HashMap<>();
 		oldIdentities.put(ownIdentities.get(0), asList(identities.get(0), identities.get(1)));
 		oldIdentities.put(ownIdentities.get(1), asList(identities.get(0), identities.get(1)));
 		return oldIdentities;

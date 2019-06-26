@@ -1,18 +1,18 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [DistrustPage].
  */
-class DistrustPageTest: WebPageTest(::DistrustPage) {
+class DistrustPageTest : WebPageTest(::DistrustPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -27,7 +27,7 @@ class DistrustPageTest: WebPageTest(::DistrustPage) {
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.Distrust.Title")).thenReturn("distrust page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("distrust page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("distrust page title"))
 	}
 
 	@Test
@@ -52,6 +52,11 @@ class DistrustPageTest: WebPageTest(::DistrustPage) {
 		verifyRedirect("return.html") {
 			verify(core).distrustSone(currentSone, remoteSone)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<DistrustPage>(), notNullValue())
 	}
 
 }

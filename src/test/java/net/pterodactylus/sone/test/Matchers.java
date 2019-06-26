@@ -1,5 +1,5 @@
 /*
- * Sone - Matchers.java - Copyright © 2013–2016 David Roden
+ * Sone - Matchers.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,6 @@ import org.hamcrest.TypeSafeMatcher;
 
 /**
  * Matchers used throughout the tests.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Matchers {
 

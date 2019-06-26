@@ -1,17 +1,20 @@
 package net.pterodactylus.sone.test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import kotlin.Deprecated;
+import kotlin.ReplaceWith;
+
 /**
  * Utilities for testing.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestUtil {
 
+	@Deprecated(message = "It only checks the given class, not its superclasses.", replaceWith = @ReplaceWith(imports = { "net.pterodactylus.sone.test" }, expression = "setField(`object`, fieldName, value)"))
 	public static void setFinalField(Object object, String fieldName, Object value) {
 		try {
 			Field clientCoreField = object.getClass().getField(fieldName);
@@ -20,9 +23,7 @@ public class TestUtil {
 			modifiersField.setAccessible(true);
 			modifiersField.setInt(clientCoreField, clientCoreField.getModifiers() & ~Modifier.FINAL);
 			clientCoreField.set(object, value);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -32,9 +33,7 @@ public class TestUtil {
 			Field field = object.getClass().getDeclaredField(fieldName);
 			field.setAccessible(true);
 			return (T) field.get(object);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		} catch (NoSuchFieldException | IllegalAccessException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -44,11 +43,17 @@ public class TestUtil {
 			Method method = object.getClass().getDeclaredMethod(methodName, new Class[0]);
 			method.setAccessible(true);
 			return (T) method.invoke(object);
-		} catch (NoSuchMethodException e) {
+		} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
+		}
+	}
+
+	public static <T> T createObject(Class<T> clazz, Class[] parameterTypes, Object... arguments) {
+		try {
+			Constructor<T> constructor = clazz.getDeclaredConstructor(parameterTypes);
+			constructor.setAccessible(true);
+			return constructor.newInstance(arguments);
+		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
 			throw new RuntimeException(e);
 		}
 	}

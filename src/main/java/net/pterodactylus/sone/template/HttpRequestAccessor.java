@@ -1,5 +1,5 @@
 /*
- * Sone - HttpRequestAccessor.java - Copyright © 2011–2016 David Roden
+ * Sone - HttpRequestAccessor.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import freenet.support.api.HTTPRequest;
  * {@link HTTPRequest}s.
  *
  * @see HTTPRequest#getHeader(String)
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class HttpRequestAccessor extends ReflectionAccessor {
 

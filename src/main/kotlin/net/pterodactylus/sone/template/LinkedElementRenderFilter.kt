@@ -1,22 +1,18 @@
 package net.pterodactylus.sone.template
 
-import net.pterodactylus.sone.core.LinkedElement
-import net.pterodactylus.sone.utils.asTemplate
-import net.pterodactylus.util.template.Filter
-import net.pterodactylus.util.template.TemplateContext
-import net.pterodactylus.util.template.TemplateContextFactory
-import java.io.StringWriter
-import javax.inject.Inject
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.util.template.*
+import java.io.*
 
 /**
  * Renders all kinds of [LinkedElement]s.
  */
-class LinkedElementRenderFilter @Inject constructor(private val templateContextFactory: TemplateContextFactory): Filter {
+class LinkedElementRenderFilter : Filter {
 
-	companion object {
-		private val loadedImageTemplate = """<%include linked/image.html>""".asTemplate()
-		private val loadedHtmlPageTemplate = """<%include linked/html-page.html>""".asTemplate()
-		private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".asTemplate()
+	private val templateContextFactory = TemplateContextFactory().apply {
+		addFilter("html", HtmlFilter())
+		addProvider(ClassPathTemplateProvider(LinkedElementRenderFilter::class.java, "/templates/"))
 	}
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any?>?) =
@@ -51,3 +47,7 @@ class LinkedElementRenderFilter @Inject constructor(private val templateContextF
 			}.toString()
 
 }
+
+private val loadedImageTemplate = """<%include linked/image.html>""".asTemplate()
+private val loadedHtmlPageTemplate = """<%include linked/html-page.html>""".asTemplate()
+private val notLoadedImageTemplate = """<%include linked/notLoaded.html>""".asTemplate()

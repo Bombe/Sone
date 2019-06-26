@@ -1,19 +1,18 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.notify.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [DismissNotificationPage].
  */
-class DismissNotificationPageTest: WebPageTest(::DismissNotificationPage) {
+class DismissNotificationPageTest : WebPageTest(::DismissNotificationPage) {
 
 	private val notification = mock<Notification>()
 
@@ -30,7 +29,7 @@ class DismissNotificationPageTest: WebPageTest(::DismissNotificationPage) {
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.DismissNotification.Title")).thenReturn("dismiss notification page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("dismiss notification page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("dismiss notification page"))
 	}
 
 	@Test
@@ -61,6 +60,11 @@ class DismissNotificationPageTest: WebPageTest(::DismissNotificationPage) {
 		verifyRedirect("return.html") {
 			verify(notification).dismiss()
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<DismissNotificationPage>(), notNullValue())
 	}
 
 }

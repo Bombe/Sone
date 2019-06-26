@@ -1,5 +1,5 @@
 /*
- * Sone - SoneInsertException.java - Copyright © 2011–2016 David Roden
+ * Sone - SoneInsertException.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ package net.pterodactylus.sone.core;
 
 /**
  * Exception that signals a problem with an insert.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneInsertException extends SoneException {
 

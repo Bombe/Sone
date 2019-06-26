@@ -7,8 +7,6 @@ import net.pterodactylus.util.config.ConfigurationException;
 /**
  * Loads preferences stored in a {@link Configuration} into a {@link
  * Preferences} object.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PreferencesLoader {
 
@@ -33,31 +31,31 @@ public class PreferencesLoader {
 	}
 
 	private void loadInsertionDelay(Configuration configuration) {
-		preferences.setInsertionDelay(configuration.getIntValue(
+		preferences.setNewInsertionDelay(configuration.getIntValue(
 				"Option/InsertionDelay").getValue(null));
 	}
 
 	private void loadPostsPerPage(Configuration configuration) {
-		preferences.setPostsPerPage(
+		preferences.setNewPostsPerPage(
 				configuration.getIntValue("Option/PostsPerPage")
 						.getValue(null));
 	}
 
 	private void loadImagesPerPage(Configuration configuration) {
-		preferences.setImagesPerPage(
+		preferences.setNewImagesPerPage(
 				configuration.getIntValue("Option/ImagesPerPage")
 						.getValue(null));
 	}
 
 	private void loadCharactersPerPost(Configuration configuration) {
-		preferences.setCharactersPerPost(
+		preferences.setNewCharactersPerPost(
 				configuration.getIntValue("Option/CharactersPerPost")
 						.getValue(null));
 	}
 
 	private void loadPostCutOffLength(Configuration configuration) {
 		try {
-			preferences.setPostCutOffLength(
+			preferences.setNewPostCutOffLength(
 					configuration.getIntValue("Option/PostCutOffLength")
 							.getValue(null));
 		} catch (IllegalArgumentException iae1) {
@@ -66,38 +64,38 @@ public class PreferencesLoader {
 	}
 
 	private void loadRequireFullAccess(Configuration configuration) {
-		preferences.setRequireFullAccess(
+		preferences.setNewRequireFullAccess(
 				configuration.getBooleanValue("Option/RequireFullAccess")
 						.getValue(null));
 	}
 
 	private void loadPositiveTrust(Configuration configuration) {
-		preferences.setPositiveTrust(
+		preferences.setNewPositiveTrust(
 				configuration.getIntValue("Option/PositiveTrust")
 						.getValue(null));
 	}
 
 	private void loadNegativeTrust(Configuration configuration) {
-		preferences.setNegativeTrust(
+		preferences.setNewNegativeTrust(
 				configuration.getIntValue("Option/NegativeTrust")
 						.getValue(null));
 	}
 
 	private void loadTrustComment(Configuration configuration) {
-		preferences.setTrustComment(
+		preferences.setNewTrustComment(
 				configuration.getStringValue("Option/TrustComment")
 						.getValue(null));
 	}
 
 	private void loadFcpInterfaceActive(Configuration configuration) {
-		preferences.setFcpInterfaceActive(configuration.getBooleanValue(
+		preferences.setNewFcpInterfaceActive(configuration.getBooleanValue(
 				"Option/ActivateFcpInterface").getValue(null));
 	}
 
 	private void loadFcpFullAccessRequired(Configuration configuration) {
 		Integer fullAccessRequiredInteger = configuration
 				.getIntValue("Option/FcpFullAccessRequired").getValue(null);
-		preferences.setFcpFullAccessRequired(
+		preferences.setNewFcpFullAccessRequired(
 				(fullAccessRequiredInteger == null) ? null :
 						FullAccessRequired.values()[fullAccessRequiredInteger]);
 	}

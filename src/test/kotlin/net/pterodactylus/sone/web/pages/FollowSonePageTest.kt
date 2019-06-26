@@ -1,13 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.ArgumentMatchers
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.never
@@ -16,22 +16,22 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [FollowSonePage].
  */
-class FollowSonePageTest: WebPageTest(::FollowSonePage) {
+class FollowSonePageTest : WebPageTest(::FollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("followSone.html"))
+		assertThat(page.path, equalTo("followSone.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    whenever(l10n.getString("Page.FollowSone.Title")).thenReturn("follow sone page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("follow sone page title"))
+		whenever(l10n.getString("Page.FollowSone.Title")).thenReturn("follow sone page title")
+		assertThat(page.getPageTitle(soneRequest), equalTo("follow sone page title"))
 	}
 
 	@Test
@@ -78,6 +78,11 @@ class FollowSonePageTest: WebPageTest(::FollowSonePage) {
 			verify(core, never()).followSone(ArgumentMatchers.eq(currentSone), anyString())
 			verify(core, never()).markSoneKnown(any<Sone>())
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<FollowSonePage>(), notNullValue())
 	}
 
 }

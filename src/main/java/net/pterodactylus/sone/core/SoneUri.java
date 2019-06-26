@@ -1,5 +1,5 @@
 /*
- * Sone - SoneUri.java - Copyright © 2013–2016 David Roden
+ * Sone - SoneUri.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ import freenet.keys.FreenetURI;
 /**
  * Helper class that creates {@link FreenetURI}s for Sone to insert to and
  * request from.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneUri {
 

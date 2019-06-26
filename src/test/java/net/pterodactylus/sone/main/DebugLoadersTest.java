@@ -21,7 +21,9 @@ import net.pterodactylus.util.web.Method;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Response;
 
+import freenet.clients.http.SessionManager;
 import freenet.clients.http.ToadletContext;
+import freenet.l10n.BaseL10n;
 import freenet.support.api.HTTPRequest;
 
 import com.google.common.base.Charsets;
@@ -33,14 +35,13 @@ import org.junit.rules.TemporaryFolder;
 
 /**
  * Unit test for {@link DebugLoaders}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DebugLoadersTest {
 
 	@Rule
 	public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+	private final BaseL10n l10n = mock(BaseL10n.class);
 	private final StringWriter stringWriter = new StringWriter();
 	private final TemplateContext templateContext = new TemplateContext();
 	private Loaders loaders;
@@ -70,7 +71,8 @@ public class DebugLoadersTest {
 		Method method = Method.GET;
 		HTTPRequest httpRequest = mock(HTTPRequest.class);
 		ToadletContext toadletContext = mock(ToadletContext.class);
-		FreenetRequest request = new FreenetRequest(uri, method, httpRequest, toadletContext);
+		SessionManager sessionManager = mock(SessionManager.class);
+		FreenetRequest request = new FreenetRequest(uri, method, httpRequest, toadletContext, l10n, sessionManager);
 		OutputStream outputStream = new ByteArrayOutputStream();
 		Response response = new Response(outputStream);
 		page.handleRequest(request, response);

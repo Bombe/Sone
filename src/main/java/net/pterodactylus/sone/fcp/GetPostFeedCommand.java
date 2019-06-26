@@ -1,5 +1,5 @@
 /*
- * Sone - GetPostFeedCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - GetPostFeedCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,8 +35,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPostFeedCommand extends AbstractSoneCommand {
 
@@ -59,7 +57,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		int startPost = getInt(parameters, "StartPost", 0);
 		int maxPosts = getInt(parameters, "MaxPosts", -1);
 
-		Collection<Post> allPosts = new HashSet<Post>();
+		Collection<Post> allPosts = new HashSet<>();
 		allPosts.addAll(sone.getPosts());
 		for (String friendSoneId : sone.getFriends()) {
 			Sone friendSone = getCore().getSone(friendSoneId);
@@ -71,7 +69,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		allPosts.addAll(getCore().getDirectedPosts(sone.getId()));
 		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
 
-		List<Post> sortedPosts = new ArrayList<Post>(allPosts);
+		List<Post> sortedPosts = new ArrayList<>(allPosts);
 		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 
 		if (sortedPosts.size() < startPost) {

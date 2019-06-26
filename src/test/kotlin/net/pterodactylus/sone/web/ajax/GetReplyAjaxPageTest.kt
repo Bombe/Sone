@@ -2,12 +2,15 @@ package net.pterodactylus.sone.web.ajax
 
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asTemplate
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.template.ReflectionAccessor
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 
 /**
@@ -47,6 +50,11 @@ class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = f
 				"reply text",
 				currentSone.toString()
 		).joinToString("\n")))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<GetReplyAjaxPage>(), notNullValue())
 	}
 
 }

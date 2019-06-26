@@ -1,5 +1,5 @@
 /*
- * Sone - SoneImpl.java - Copyright © 2010–2016 David Roden
+ * Sone - SoneImpl.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@ package net.pterodactylus.sone.data.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
 
 import java.net.MalformedURLException;
@@ -56,8 +57,6 @@ import com.google.common.hash.Hashing;
  * {@link Sone} implementation.
  * <p/>
  * Operations that modify the Sone need to synchronize on the Sone in question.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneImpl implements Sone {
 
@@ -95,16 +94,16 @@ public class SoneImpl implements Sone {
 	private volatile boolean known;
 
 	/** All posts. */
-	private final Set<Post> posts = new CopyOnWriteArraySet<Post>();
+	private final Set<Post> posts = new CopyOnWriteArraySet<>();
 
 	/** All replies. */
-	private final Set<PostReply> replies = new CopyOnWriteArraySet<PostReply>();
+	private final Set<PostReply> replies = new CopyOnWriteArraySet<>();
 
 	/** The IDs of all liked posts. */
-	private final Set<String> likedPostIds = new CopyOnWriteArraySet<String>();
+	private final Set<String> likedPostIds = new CopyOnWriteArraySet<>();
 
 	/** The IDs of all liked replies. */
-	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<String>();
+	private final Set<String> likedReplyIds = new CopyOnWriteArraySet<>();
 
 	/** The root album containing all albums. */
 	private final Album rootAlbum = new AlbumImpl(this);
@@ -383,7 +382,7 @@ public class SoneImpl implements Sone {
 	public List<Post> getPosts() {
 		List<Post> sortedPosts;
 		synchronized (this) {
-			sortedPosts = new ArrayList<Post>(posts);
+			sortedPosts = new ArrayList<>(posts);
 		}
 		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
 		return sortedPosts;
@@ -636,46 +635,46 @@ public class SoneImpl implements Sone {
 	@Override
 	public synchronized String getFingerprint() {
 		Hasher hash = Hashing.sha256().newHasher();
-		hash.putString(profile.getFingerprint());
+		hash.putString(profile.getFingerprint(), UTF_8);
 
-		hash.putString("Posts(");
+		hash.putString("Posts(", UTF_8);
 		for (Post post : getPosts()) {
-			hash.putString("Post(").putString(post.getId()).putString(")");
+			hash.putString("Post(", UTF_8).putString(post.getId(), UTF_8).putString(")", UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
-		List<PostReply> replies = new ArrayList<PostReply>(getReplies());
+		List<PostReply> replies = new ArrayList<>(getReplies());
 		Collections.sort(replies, Reply.TIME_COMPARATOR);
-		hash.putString("Replies(");
+		hash.putString("Replies(", UTF_8);
 		for (PostReply reply : replies) {
-			hash.putString("Reply(").putString(reply.getId()).putString(")");
+			hash.putString("Reply(", UTF_8).putString(reply.getId(), UTF_8).putString(")", UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
-		List<String> likedPostIds = new ArrayList<String>(getLikedPostIds());
+		List<String> likedPostIds = new ArrayList<>(getLikedPostIds());
 		Collections.sort(likedPostIds);
-		hash.putString("LikedPosts(");
+		hash.putString("LikedPosts(", UTF_8);
 		for (String likedPostId : likedPostIds) {
-			hash.putString("Post(").putString(likedPostId).putString(")");
+			hash.putString("Post(", UTF_8).putString(likedPostId, UTF_8).putString(")", UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
-		List<String> likedReplyIds = new ArrayList<String>(getLikedReplyIds());
+		List<String> likedReplyIds = new ArrayList<>(getLikedReplyIds());
 		Collections.sort(likedReplyIds);
-		hash.putString("LikedReplies(");
+		hash.putString("LikedReplies(", UTF_8);
 		for (String likedReplyId : likedReplyIds) {
-			hash.putString("Reply(").putString(likedReplyId).putString(")");
+			hash.putString("Reply(", UTF_8).putString(likedReplyId, UTF_8).putString(")", UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
-		hash.putString("Albums(");
+		hash.putString("Albums(", UTF_8);
 		for (Album album : rootAlbum.getAlbums()) {
 			if (!Album.NOT_EMPTY.apply(album)) {
 				continue;
 			}
-			hash.putString(album.getFingerprint());
+			hash.putString(album.getFingerprint(), UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
 		return hash.hash().toString();
 	}

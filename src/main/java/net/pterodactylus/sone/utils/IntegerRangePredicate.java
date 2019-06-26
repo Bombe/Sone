@@ -1,5 +1,5 @@
 /*
- * Sone - IntegerRangePredicate.java - Copyright © 2013–2016 David Roden
+ * Sone - IntegerRangePredicate.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import com.google.common.base.Predicate;
  * {@link Predicate} that verifies that an {@link Integer} value is not
  * {@code null} and is between a lower and an upper bound. Both bounds are
  * inclusive.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IntegerRangePredicate implements Predicate<Integer> {
 

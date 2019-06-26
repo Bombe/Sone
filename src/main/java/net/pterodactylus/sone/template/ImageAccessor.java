@@ -1,5 +1,5 @@
 /*
- * Sone - ImageAccessor.java - Copyright © 2011–2016 David Roden
+ * Sone - ImageAccessor.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * <li>{@code next}: returns the next image in the image’s album, or {@code
  * null} if the image is the last image of its album.</li>
  * </ul>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageAccessor extends ReflectionAccessor {
 

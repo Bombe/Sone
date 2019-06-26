@@ -27,9 +27,9 @@ class LinkedElementsFilter(private val elementLoader: ElementLoader) : Filter {
 						?.filterIsInstance<FreenetLinkPart>()
 						?.map { elementLoader.loadElement(it.link) }
 						?.filter { !it.failed }
-						?: listOf<LinkedElement>()
+						?: listOf()
 			} else {
-				listOf<LinkedElement>()
+				listOf()
 			}
 
 	private fun showLinkedImages(currentSone: Sone?, sone: Sone?): Boolean {

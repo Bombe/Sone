@@ -18,8 +18,6 @@ import com.google.common.base.Ticker;
  * Class that detects {@link Sone} modifications (as per their {@link
  * Sone#getFingerprint() fingerprints} and determines when a modified Sone may
  * be inserted.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class SoneModificationDetector {
 
@@ -83,8 +81,6 @@ class SoneModificationDetector {
 	/**
 	 * Provider for a fingerprint and the information if a {@link Sone} is locked. This
 	 * prevents us from having to lug a Sone object around.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	static interface LockableFingerprintProvider {
 

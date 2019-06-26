@@ -1,21 +1,20 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.verify
 
 /**
  * Unit test for [DeleteAlbumPage].
  */
-class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
+class DeleteAlbumPageTest : WebPageTest(::DeleteAlbumPage) {
 
 	private val sone = mock<Sone>()
 	private val album = mock<Album>()
@@ -96,12 +95,22 @@ class DeleteAlbumPageTest: WebPageTest(::DeleteAlbumPage) {
 	fun `album is deleted and page redirects to album if parent album is not root album`() {
 		setMethod(POST)
 		whenever(parentAlbum.isRoot).thenReturn(false)
-		whenever(sone.rootAlbum).thenReturn(mock<Album>())
+		whenever(sone.rootAlbum).thenReturn(mock())
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		verifyRedirect("imageBrowser.html?album=parent-id") {
 			verify(core).deleteAlbum(album)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<DeleteAlbumPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/deleteAlbum.html"))
 	}
 
 }

@@ -1,24 +1,28 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Lets the user delete a Sone. Of course the Sone is not really deleted from
  * Freenet; merely all references to it are removed from the local plugin
  * installation.
  */
-class DeleteSonePage(template: Template, webInterface: WebInterface):
-		LoggedInPage("deleteSone.html", template, "Page.DeleteSone.Title", webInterface) {
+@MenuName("DeleteSone")
+@TemplatePath("/templates/deleteSone.html")
+@ToadletPath("deleteSone.html")
+class DeleteSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.DeleteSone.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			if (freenetRequest.httpRequest.isPartSet("deleteSone")) {
-				webInterface.core.deleteSone(currentSone)
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			if (soneRequest.httpRequest.isPartSet("deleteSone")) {
+				soneRequest.core.deleteSone(currentSone)
 			}
 			throw RedirectException("index.html")
 		}

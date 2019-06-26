@@ -12,8 +12,6 @@ import net.pterodactylus.util.web.Request;
 
 /**
  * {@link Loaders} implementation that loads all resources from the filesystem.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DebugLoaders implements Loaders {
 
@@ -30,7 +28,7 @@ public class DebugLoaders implements Loaders {
 
 	@Override
 	public <REQ extends Request> Page<REQ> loadStaticPage(String basePath, String prefix, String mimeType) {
-		return new ReloadingPage<REQ>(basePath, new File(filesystemPath, prefix).getAbsolutePath(), mimeType);
+		return new ReloadingPage<>(basePath, new File(filesystemPath, prefix).getAbsolutePath(), mimeType);
 	}
 
 	@Override

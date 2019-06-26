@@ -1,31 +1,34 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user delete an {@link Image}.
  */
-class DeleteImagePage(template: Template, webInterface: WebInterface):
-		LoggedInPage("deleteImage.html", template, "Page.DeleteImage.Title", webInterface) {
+@TemplatePath("/templates/deleteImage.html")
+@ToadletPath("deleteImage.html")
+class DeleteImagePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.DeleteImage.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			val image = webInterface.core.getImage(freenetRequest.httpRequest.getPartAsStringFailsafe("image", 36)) ?: throw RedirectException("invalid.html")
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			val image = soneRequest.core.getImage(soneRequest.httpRequest.getPartAsStringFailsafe("image", 36)) ?: throw RedirectException("invalid.html")
 			if (!image.sone.isLocal) {
 				throw RedirectException("noPermission.html")
 			}
-			if (freenetRequest.httpRequest.isPartSet("abortDelete")) {
+			if (soneRequest.httpRequest.isPartSet("abortDelete")) {
 				throw RedirectException("imageBrowser.html?image=${image.id}")
 			}
-			webInterface.core.deleteImage(image)
+			soneRequest.core.deleteImage(image)
 			throw RedirectException("imageBrowser.html?album=${image.album.id}")
 		}
-		val image = webInterface.core.getImage(freenetRequest.httpRequest.getParam("image")) ?: throw RedirectException("invalid.html")
+		val image = soneRequest.core.getImage(soneRequest.httpRequest.getParam("image")) ?: throw RedirectException("invalid.html")
 		if (!image.sone.isLocal) {
 			throw RedirectException("noPermission.html")
 		}

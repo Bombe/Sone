@@ -1,5 +1,5 @@
 /*
- * Sone - PluginStoreConfigurationBackend.java - Copyright © 2010–2016 David Roden
+ * Sone - PluginStoreConfigurationBackend.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ import freenet.pluginmanager.PluginStore;
 
 /**
  * Backend for a {@link Configuration} that is based on a {@link PluginStore}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PluginStoreConfigurationBackend implements ExtendedConfigurationBackend {
 

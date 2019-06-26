@@ -1,5 +1,5 @@
 /*
- * Sone - WebOfTrustConnector.java - Copyright © 2010–2016 David Roden
+ * Sone - WebOfTrustConnector.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,8 +43,6 @@ import freenet.support.api.Bucket;
 
 /**
  * Connector for the Web of Trust plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class WebOfTrustConnector {
@@ -98,7 +96,7 @@ public class WebOfTrustConnector {
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetOwnIdentities").get());
 		SimpleFieldSet fields = reply.getFields();
 		int ownIdentityCounter = -1;
-		Set<OwnIdentity> ownIdentities = new HashSet<OwnIdentity>();
+		Set<OwnIdentity> ownIdentities = new HashSet<>();
 		while (true) {
 			String id = fields.get("Identity" + ++ownIdentityCounter);
 			if (id == null) {
@@ -144,7 +142,7 @@ public class WebOfTrustConnector {
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, Optional<String> context) throws PluginException {
 		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", context.or("")).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
-		Set<Identity> identities = new HashSet<Identity>();
+		Set<Identity> identities = new HashSet<>();
 		int identityCounter = -1;
 		while (true) {
 			String id = fields.get("Identity" + ++identityCounter);
@@ -331,7 +329,7 @@ public class WebOfTrustConnector {
 	 * @return The parsed contexts
 	 */
 	private static Set<String> parseContexts(String prefix, SimpleFieldSet fields) {
-		Set<String> contexts = new HashSet<String>();
+		Set<String> contexts = new HashSet<>();
 		int contextCounter = -1;
 		while (true) {
 			String context = fields.get(prefix + "Context" + ++contextCounter);
@@ -353,7 +351,7 @@ public class WebOfTrustConnector {
 	 * @return The parsed properties
 	 */
 	private static Map<String, String> parseProperties(String prefix, SimpleFieldSet fields) {
-		Map<String, String> properties = new HashMap<String, String>();
+		Map<String, String> properties = new HashMap<>();
 		int propertiesCounter = -1;
 		while (true) {
 			String propertyName = fields.get(prefix + "Property" + ++propertiesCounter + ".Name");
@@ -443,8 +441,6 @@ public class WebOfTrustConnector {
 
 	/**
 	 * Container for the data of the reply from a plugin.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class Reply {
 
@@ -502,8 +498,6 @@ public class WebOfTrustConnector {
 
 	/**
 	 * Helper method to create {@link SimpleFieldSet}s with terser code.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	private static class SimpleFieldSetConstructor {
 
@@ -578,8 +572,6 @@ public class WebOfTrustConnector {
 	/**
 	 * Container for identifying plugins. Plugins are identified by their plugin
 	 * name and their unique identifier.
-	 *
-	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
 	 */
 	private static class PluginIdentifier {
 

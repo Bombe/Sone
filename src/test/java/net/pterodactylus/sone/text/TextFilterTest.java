@@ -9,8 +9,6 @@ import org.junit.Test;
 
 /**
  * JUnit test for {@link TextFilter}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TextFilterTest {
 

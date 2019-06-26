@@ -1,5 +1,5 @@
 /*
- * Sone - Identities.java - Copyright © 2013–2016 David Roden
+ * Sone - Identities.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ import java.util.Map;
 
 /**
  * Creates {@link Identity}s and {@link OwnIdentity}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Identities {
 

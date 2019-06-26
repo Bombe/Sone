@@ -1,5 +1,5 @@
 /*
- * Sone - PostAccessor.java - Copyright © 2010–2016 David Roden
+ * Sone - PostAccessor.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,8 +32,6 @@ import com.google.common.collect.Collections2;
  * <dd>replies</dd>
  * <dt>All replies to this post, sorted by time, oldest first</dt>
  * </dl>
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class PostAccessor extends ReflectionAccessor {
 

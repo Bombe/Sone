@@ -1,5 +1,5 @@
 /*
- * Sone - Identity.java - Copyright © 2010–2016 David Roden
+ * Sone - Identity.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,8 +28,6 @@ import com.google.common.base.Function;
  * Interface for web of trust identities, defining all functions that can be
  * performed on an identity. An identity is only a container for identity data
  * and will not perform any updating in the WebOfTrust plugin itself.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Identity {
 

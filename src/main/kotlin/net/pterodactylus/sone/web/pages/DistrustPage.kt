@@ -1,11 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that lets the user distrust another Sone. This will assign a
@@ -13,14 +14,15 @@ import net.pterodactylus.util.template.TemplateContext
  *
  * @see net.pterodactylus.sone.core.Core#distrustSone(Sone, Sone)
  */
-class DistrustPage(template: Template, webInterface: WebInterface):
-		LoggedInPage("distrust.html", template, "Page.Distrust.Title", webInterface) {
+@ToadletPath("distrust.html")
+class DistrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.Distrust.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sone", 44))
-					?.run { webInterface.core.distrustSone(currentSone, this) }
-			throw RedirectException(freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			soneRequest.core.getSone(soneRequest.httpRequest.getPartAsStringFailsafe("sone", 44))
+					?.run { soneRequest.core.distrustSone(currentSone, this) }
+			throw RedirectException(soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
 		}
 	}
 

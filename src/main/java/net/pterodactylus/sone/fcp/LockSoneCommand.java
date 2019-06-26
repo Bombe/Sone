@@ -1,5 +1,5 @@
 /*
- * Sone - LockSoneCommand.java - Copyright © 2013–2016 David Roden
+ * Sone - LockSoneCommand.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@ import com.google.common.base.Optional;
  * Implements the “LockSone” FCP command. If a valid local Sone was given as
  * parameter “Sone,” this command will always lock the Sone and reply with
  * “SoneLocked.”
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class LockSoneCommand extends AbstractSoneCommand {
 

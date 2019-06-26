@@ -1,34 +1,33 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.net.*
 
 /**
  * Unit test for [ImageBrowserPage].
  */
-class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
+class ImageBrowserPageTest : WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("imageBrowser.html"))
+		assertThat(page.path, equalTo("imageBrowser.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.ImageBrowser.Title")).thenReturn("image browser page title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("image browser page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("image browser page title"))
 	}
 
 	@Test
@@ -87,7 +86,7 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `get request for gallery can show second page`() {
-		core.preferences.imagesPerPage = 2
+		core.preferences.newImagesPerPage = 2
 		val firstSone = createSone("first album", "second album")
 		addSone("sone1", firstSone)
 		val secondSone = createSone("third album", "fourth album")
@@ -130,7 +129,22 @@ class ImageBrowserPageTest: WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page is link-excepted`() {
-	    assertThat(page.isLinkExcepted(null), equalTo(true))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(true))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<ImageBrowserPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("ImageBrowser"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/imageBrowser.html"))
 	}
 
 }

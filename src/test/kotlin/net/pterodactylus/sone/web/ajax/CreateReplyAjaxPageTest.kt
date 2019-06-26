@@ -3,10 +3,13 @@ package net.pterodactylus.sone.web.ajax
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 
 /**
@@ -59,6 +62,11 @@ class CreateReplyAjaxPageTest : JsonPageTest("createReply.ajax", pageSupplier = 
 		assertThatJsonIsSuccessful()
 		assertThat(json["reply"]?.asText(), equalTo("reply-id"))
 		assertThat(json["sone"]?.asText(), equalTo("local-sone"))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<CreateReplyAjaxPage>(), notNullValue())
 	}
 
 }

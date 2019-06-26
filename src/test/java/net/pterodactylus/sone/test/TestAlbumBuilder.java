@@ -20,14 +20,12 @@ import org.mockito.stubbing.Answer;
 
 /**
  * {@link AlbumBuilder} that returns a mocked {@link Album}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestAlbumBuilder implements AlbumBuilder {
 
 	private final Album album = mock(Album.class);
-	private final List<Album> albums = new ArrayList<Album>();
-	private final List<Image> images = new ArrayList<Image>();
+	private final List<Album> albums = new ArrayList<>();
+	private final List<Image> images = new ArrayList<>();
 	private Album parentAlbum;
 	private String title;
 	private String description;

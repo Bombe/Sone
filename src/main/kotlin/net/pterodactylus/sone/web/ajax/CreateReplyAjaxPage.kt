@@ -1,18 +1,17 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.text.TextFilter
-import net.pterodactylus.sone.utils.emptyToNull
-import net.pterodactylus.sone.utils.headers
-import net.pterodactylus.sone.utils.let
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import javax.inject.*
 
 /**
  * This AJAX page create a reply.
  */
-class CreateReplyAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("createReply.ajax", webInterface) {
+@ToadletPath("createReply.ajax")
+class CreateReplyAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest): JsonReturnObject =
 			request.parameters["post"].emptyToNull

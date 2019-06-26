@@ -1,32 +1,34 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.text.TextFilter
-import net.pterodactylus.sone.utils.asOptional
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * This page lets the user create a new [Post].
  */
-class CreatePostPage(template: Template, webInterface: WebInterface):
-		LoggedInPage("createPost.html", template, "Page.CreatePost.Title", webInterface) {
+@TemplatePath("/templates/createPost.html")
+@ToadletPath("createPost.html")
+class CreatePostPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.CreatePost.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		val returnPage = freenetRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 		templateContext["returnPage"] = returnPage
-		if (freenetRequest.isPOST) {
-			val text = freenetRequest.httpRequest.getPartAsStringFailsafe("text", 65536).trim()
+		if (soneRequest.isPOST) {
+			val text = soneRequest.httpRequest.getPartAsStringFailsafe("text", 65536).trim()
 			if (text == "") {
 				templateContext["errorTextEmpty"] = true
 				return
 			}
-			val sender = webInterface.core.getLocalSone(freenetRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: currentSone
-			val recipient = webInterface.core.getSone(freenetRequest.httpRequest.getPartAsStringFailsafe("recipient", 43))
-			webInterface.core.createPost(sender, recipient.asOptional(), TextFilter.filter(freenetRequest.httpRequest.getHeader("Host"), text))
+			val sender = soneRequest.core.getLocalSone(soneRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: currentSone
+			val recipient = soneRequest.core.getSone(soneRequest.httpRequest.getPartAsStringFailsafe("recipient", 43))
+			soneRequest.core.createPost(sender, recipient.asOptional(), TextFilter.filter(soneRequest.httpRequest.getHeader("Host"), text))
 			throw RedirectException(returnPage)
 		}
 	}

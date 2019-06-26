@@ -14,6 +14,8 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -23,6 +25,7 @@ import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Profile.DuplicateField;
 import net.pterodactylus.sone.data.Profile.EmptyFieldName;
 import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.database.PostBuilder;
 import net.pterodactylus.sone.database.PostReplyBuilder;
 import net.pterodactylus.sone.database.SoneBuilder;
@@ -33,17 +36,16 @@ import org.w3c.dom.Document;
 
 /**
  * Parses a {@link Sone} from an XML {@link InputStream}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneParser {
 
 	private static final Logger logger = getLogger(SoneParser.class.getName());
 	private static final int MAX_PROTOCOL_VERSION = 0;
-	private final Core core;
+	private final Database database;
 
-	public SoneParser(Core core) {
-		this.core = core;
+	@Inject
+	public SoneParser(Database database) {
+		this.database = database;
 	}
 
 	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
@@ -60,7 +62,7 @@ public class SoneParser {
 			return null;
 		}
 
-		SoneBuilder soneBuilder = core.soneBuilder().from(originalSone.getIdentity());
+		SoneBuilder soneBuilder = database.newSoneBuilder().from(originalSone.getIdentity());
 		if (originalSone.isLocal()) {
 			soneBuilder = soneBuilder.local();
 		}
@@ -164,7 +166,7 @@ public class SoneParser {
 
 		/* parse posts. */
 		SimpleXML postsXml = soneXml.getNode("posts");
-		Set<Post> posts = new HashSet<Post>();
+		Set<Post> posts = new HashSet<>();
 		if (postsXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no posts!", sone));
@@ -180,7 +182,7 @@ public class SoneParser {
 					return null;
 				}
 				try {
-					PostBuilder postBuilder = core.postBuilder();
+					PostBuilder postBuilder = database.newPostBuilder();
 					/* TODO - parse time correctly. */
 					postBuilder.withId(postId).from(sone.getId()).withTime(Long.parseLong(postTime)).withText(postText);
 					if ((postRecipientId != null) && (postRecipientId.length() == 43)) {
@@ -197,7 +199,7 @@ public class SoneParser {
 
 		/* parse replies. */
 		SimpleXML repliesXml = soneXml.getNode("replies");
-		Set<PostReply> replies = new HashSet<PostReply>();
+		Set<PostReply> replies = new HashSet<>();
 		if (repliesXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no replies!", sone));
@@ -213,7 +215,7 @@ public class SoneParser {
 					return null;
 				}
 				try {
-					PostReplyBuilder postReplyBuilder = core.postReplyBuilder();
+					PostReplyBuilder postReplyBuilder = database.newPostReplyBuilder();
 					/* TODO - parse time correctly. */
 					postReplyBuilder.withId(replyId).from(sone.getId()).to(replyPostId).withTime(Long.parseLong(replyTime)).withText(replyText);
 					replies.add(postReplyBuilder.build());
@@ -227,7 +229,7 @@ public class SoneParser {
 
 		/* parse liked post IDs. */
 		SimpleXML likePostIdsXml = soneXml.getNode("post-likes");
-		Set<String> likedPostIds = new HashSet<String>();
+		Set<String> likedPostIds = new HashSet<>();
 		if (likePostIdsXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no post likes!", sone));
@@ -240,7 +242,7 @@ public class SoneParser {
 
 		/* parse liked reply IDs. */
 		SimpleXML likeReplyIdsXml = soneXml.getNode("reply-likes");
-		Set<String> likedReplyIds = new HashSet<String>();
+		Set<String> likedReplyIds = new HashSet<>();
 		if (likeReplyIdsXml == null) {
 			/* TODO - mark Sone as bad. */
 			logger.log(Level.WARNING, String.format("Downloaded Sone %s has no reply likes!", sone));
@@ -253,8 +255,8 @@ public class SoneParser {
 
 		/* parse albums. */
 		SimpleXML albumsXml = soneXml.getNode("albums");
-		Map<String, Image> allImages = new HashMap<String, Image>();
-		List<Album> topLevelAlbums = new ArrayList<Album>();
+		Map<String, Image> allImages = new HashMap<>();
+		List<Album> topLevelAlbums = new ArrayList<>();
 		if (albumsXml != null) {
 			for (SimpleXML albumXml : albumsXml.getNodes("album")) {
 				String id = albumXml.getValue("id", null);
@@ -267,13 +269,13 @@ public class SoneParser {
 				}
 				Album parent = null;
 				if (parentId != null) {
-					parent = core.getAlbum(parentId);
+					parent = database.getAlbum(parentId);
 					if (parent == null) {
 						logger.log(Level.WARNING, String.format("Downloaded Sone %s has album with invalid parent!", sone));
 						return null;
 					}
 				}
-				Album album = core.albumBuilder()
+				Album album = database.newAlbumBuilder()
 						.withId(id)
 						.by(sone)
 						.build()
@@ -307,7 +309,7 @@ public class SoneParser {
 							logger.log(Level.WARNING, String.format("Downloaded Sone %s contains image %s with invalid dimensions (%s, %s)!", sone, imageId, imageWidthString, imageHeightString));
 							return null;
 						}
-						Image image = core.imageBuilder().withId(imageId).build().modify().setSone(sone).setKey(imageKey).setCreationTime(creationTime).update();
+						Image image = database.newImageBuilder().withId(imageId).build().modify().setSone(sone).setKey(imageKey).setCreationTime(creationTime).update();
 						image = image.modify().setTitle(imageTitle).setDescription(imageDescription).update();
 						image = image.modify().setWidth(imageWidth).setHeight(imageHeight).update();
 						album.addImage(image);

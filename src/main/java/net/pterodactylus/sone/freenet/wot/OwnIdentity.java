@@ -1,5 +1,5 @@
 /*
- * Sone - OwnIdentity.java - Copyright © 2010–2016 David Roden
+ * Sone - OwnIdentity.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@ package net.pterodactylus.sone.freenet.wot;
 
 /**
  * Defines a local identity, an own identity.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface OwnIdentity extends Identity {
 

@@ -1,5 +1,5 @@
 /*
- * Sone - GetSoneCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - GetSoneCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static net.pterodactylus.sone.fcp.AbstractSoneCommandKt.encodeSone;
+
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
@@ -29,8 +31,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implements the “GetSone“ FCP command which returns {@link Profile}
  * information about a {@link Sone}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetSoneCommand extends AbstractSoneCommand {
 

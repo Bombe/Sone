@@ -14,7 +14,7 @@ class ElementLoaderTest {
 	@Test
 	fun `default image loader can be loaded by guice`() {
 		val injector = createInjector(bindMock<FreenetInterface>())
-		assertThat(injector.getInstance(ElementLoader::class.java), notNullValue());
+		assertThat(injector.getInstance(ElementLoader::class.java), notNullValue())
 	}
 
 }

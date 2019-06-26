@@ -1,5 +1,5 @@
 /*
- * Sone - SonePlugin.java - Copyright © 2010–2016 David Roden
+ * Sone - SonePlugin.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,12 +30,15 @@ import javax.inject.Singleton;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.database.Database;
+import net.pterodactylus.sone.database.PostProvider;
+import net.pterodactylus.sone.database.SoneProvider;
 import net.pterodactylus.sone.database.memory.MemoryDatabase;
 import net.pterodactylus.sone.fcp.FcpInterface;
 import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
 import net.pterodactylus.sone.freenet.wot.Context;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 import net.pterodactylus.sone.web.WebInterface;
+import net.pterodactylus.sone.web.WebInterfaceModule;
 import net.pterodactylus.util.config.Configuration;
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.MapConfigurationBackend;
@@ -49,6 +52,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
 import com.google.inject.matcher.Matchers;
 import com.google.inject.spi.InjectionListener;
@@ -56,6 +60,7 @@ import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
 
 import freenet.client.async.PersistenceDisabledException;
+import freenet.l10n.BaseL10n;
 import freenet.l10n.BaseL10n.LANGUAGE;
 import freenet.l10n.PluginL10n;
 import freenet.pluginmanager.FredPlugin;
@@ -72,8 +77,6 @@ import freenet.support.api.Bucket;
 /**
  * This class interfaces with Freenet. It is the class that is loaded by the
  * node and starts up the whole Sone system.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, FredPluginBaseL10n, FredPluginThreadless, FredPluginVersioned {
 
@@ -119,9 +122,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The current year at time of release. */
-	private static final int YEAR = 2017;
+	private static final int YEAR = 2019;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-	private static final int LATEST_EDITION = 77;
+	private static final int LATEST_EDITION = 78;
 
 	/** The logger. */
 	private static final Logger logger = getLogger(SonePlugin.class.getName());
@@ -180,11 +183,11 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		return (version == null) ? "unknown" : version.getNice();
 	}
 
-	public static int getYear() {
+	public int getYear() {
 		return YEAR;
 	}
 
-	public static String getHomepage() {
+	public String getHomepage() {
 		return SONE_HOMEPAGE + LATEST_EDITION;
 	}
 
@@ -257,6 +260,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
 				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
 				bind(Database.class).to(MemoryDatabase.class).in(Singleton.class);
+				bind(BaseL10n.class).toInstance(l10n.getBase());
+				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
+				bind(PostProvider.class).to(Core.class).in(Singleton.class);
 				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
 					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
 					if (path != null) {
@@ -284,7 +290,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			}
 
 		};
-		Injector injector = Guice.createInjector(freenetModule, soneModule);
+		Module webInterfaceModule = new WebInterfaceModule();
+		Injector injector = Guice.createInjector(freenetModule, soneModule, webInterfaceModule);
 		core = injector.getInstance(Core.class);
 
 		/* create web of trust connector. */
@@ -408,48 +415,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	@Override
 	public String getVersion() {
 		return getPluginVersion();
-	}
-
-	public static class PluginVersion {
-
-		private final String version;
-
-		public PluginVersion(String version) {
-			this.version = version;
-		}
-
-		public String getVersion() {
-			return version;
-		}
-
-	}
-
-	public static class PluginYear {
-
-		private final int year;
-
-		public PluginYear(int year) {
-			this.year = year;
-		}
-
-		public int getYear() {
-			return year;
-		}
-
-	}
-
-	public static class PluginHomepage {
-
-		private final String homepage;
-
-		public PluginHomepage(String homepage) {
-			this.homepage = homepage;
-		}
-
-		public String getHomepage() {
-			return homepage;
-		}
-
 	}
 
 }

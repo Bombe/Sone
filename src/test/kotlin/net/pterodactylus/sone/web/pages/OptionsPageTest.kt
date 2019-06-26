@@ -1,38 +1,35 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
-import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.FOLLOWED
-import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.TRUSTED
+import net.pterodactylus.sone.data.SoneOptions.*
+import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.*
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.*
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.hasItem
-import org.hamcrest.Matchers.nullValue
-import org.junit.Before
-import org.junit.Test
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
  * Unit test for [OptionsPage].
  */
-class OptionsPageTest: WebPageTest(::OptionsPage) {
+class OptionsPageTest : WebPageTest(::OptionsPage) {
 
 	@Before
 	fun setupPreferences() {
-		core.preferences.insertionDelay = 1
-		core.preferences.charactersPerPost = 50
-		core.preferences.fcpFullAccessRequired = WRITING
-		core.preferences.imagesPerPage = 4
-		core.preferences.isFcpInterfaceActive = true
-		core.preferences.isRequireFullAccess = true
-		core.preferences.negativeTrust = 7
-		core.preferences.positiveTrust = 8
-		core.preferences.postCutOffLength = 51
-		core.preferences.postsPerPage = 10
-		core.preferences.trustComment = "11"
+		core.preferences.newInsertionDelay = 1
+		core.preferences.newCharactersPerPost = 50
+		core.preferences.newFcpFullAccessRequired = WRITING
+		core.preferences.newImagesPerPage = 4
+		core.preferences.newFcpInterfaceActive = true
+		core.preferences.newRequireFullAccess = true
+		core.preferences.newNegativeTrust = 7
+		core.preferences.newPositiveTrust = 8
+		core.preferences.newPostCutOffLength = 51
+		core.preferences.newPostsPerPage = 10
+		core.preferences.newTrustComment = "11"
 	}
 
 	@Before
@@ -61,7 +58,7 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Options.Title", "options page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("options page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("options page title"))
 	}
 
 	@Test
@@ -268,22 +265,22 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 
 	@Test
 	fun `fcp interface can be set to true`() {
-		verifyThatPreferencesCanBeSet("fcp-interface-active", "checked", true) { core.preferences.isFcpInterfaceActive }
+		verifyThatPreferencesCanBeSet("fcp-interface-active", "checked", true) { core.preferences.fcpInterfaceActive }
 	}
 
 	@Test
 	fun `fcp interface can be set to false`() {
-		verifyThatPreferencesCanBeSet("fcp-interface-active", null, false) { core.preferences.isFcpInterfaceActive }
+		verifyThatPreferencesCanBeSet("fcp-interface-active", null, false) { core.preferences.fcpInterfaceActive }
 	}
 
 	@Test
 	fun `require full access can be set to true`() {
-		verifyThatPreferencesCanBeSet("require-full-access", "checked", true) { core.preferences.isRequireFullAccess }
+		verifyThatPreferencesCanBeSet("require-full-access", "checked", true) { core.preferences.requireFullAccess }
 	}
 
 	@Test
 	fun `require full access can be set to false`() {
-		verifyThatPreferencesCanBeSet("require-full-access", null, false) { core.preferences.isRequireFullAccess }
+		verifyThatPreferencesCanBeSet("require-full-access", null, false) { core.preferences.requireFullAccess }
 	}
 
 	@Test
@@ -374,6 +371,21 @@ class OptionsPageTest: WebPageTest(::OptionsPage) {
 	@Test
 	fun `trust comment is set to default when set to empty value`() {
 		verifyThatPreferencesCanBeSet("trust-comment", "", "Set from Sone Web Interface") { core.preferences.trustComment }
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<OptionsPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("Options"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/options.html"))
 	}
 
 }

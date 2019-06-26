@@ -1,5 +1,5 @@
 /*
- * Sone - WebOfTrustUpdaterImpl.java - Copyright © 2013–2016 David Roden
+ * Sone - WebOfTrustUpdaterImpl.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,8 +40,6 @@ import com.google.inject.Singleton;
 /**
  * Updates WebOfTrust identity data in a background thread because communicating
  * with the WebOfTrust plugin can potentially last quite long.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrustUpdater {
@@ -57,7 +55,7 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 	private final WebOfTrustConnector webOfTrustConnector;
 
 	/** The queue for jobs. */
-	private final BlockingQueue<WebOfTrustUpdateJob> updateJobs = new LinkedBlockingQueue<WebOfTrustUpdateJob>();
+	private final BlockingQueue<WebOfTrustUpdateJob> updateJobs = new LinkedBlockingQueue<>();
 
 	/**
 	 * Creates a new trust updater.
@@ -229,8 +227,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 
 	/**
 	 * Base class for WebOfTrust update jobs.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class WebOfTrustUpdateJob implements Runnable {
@@ -302,8 +298,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 
 	/**
 	 * Update job that sets the trust relation between two identities.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class SetTrustJob extends WebOfTrustUpdateJob {
@@ -389,8 +383,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 
 	/**
 	 * Base class for context updates of an {@link OwnIdentity}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class WebOfTrustContextUpdateJob extends WebOfTrustUpdateJob {
@@ -445,8 +437,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 
 	/**
 	 * Job that adds a context to an {@link OwnIdentity}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class AddContextJob extends WebOfTrustContextUpdateJob {
@@ -481,8 +471,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 
 	/**
 	 * Job that removes a context from an {@link OwnIdentity}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class RemoveContextJob extends WebOfTrustContextUpdateJob {
@@ -517,8 +505,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 
 	/**
 	 * WebOfTrust update job that sets a property on an {@link OwnIdentity}.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	@VisibleForTesting
 	class SetPropertyJob extends WebOfTrustUpdateJob {

@@ -1,15 +1,19 @@
 package net.pterodactylus.sone.web.ajax
 
 import com.fasterxml.jackson.databind.JsonNode
+import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
 import net.pterodactylus.sone.template.LinkedElementRenderFilter
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.jsonArray
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers
 
@@ -38,6 +42,14 @@ class GetLinkedElementAjaxPageTest: JsonPageTest("getLinkedElement.ajax", requir
 				mapOf<String, String?>("link" to "KSK@foo.jpg", "html" to "jpeg-image"),
 				mapOf("link" to "KSK@foo.html", "html" to "html-page")
 		))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.createChildInjector(
+			    ElementLoader::class.isProvidedByMock(),
+			    LinkedElementRenderFilter::class.isProvidedByMock()
+	    ).getInstance<GetLinkedElementAjaxPage>(), notNullValue())
 	}
 
 	private fun JsonNode.toMap() = fields().asSequence().map { it.key!! to if (it.value.isNull) null else it.value.asText()!! }.toMap()

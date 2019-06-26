@@ -1,7 +1,10 @@
 package net.pterodactylus.sone.web.ajax
 
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -60,6 +63,11 @@ class MoveProfileFieldAjaxPageTest : JsonPageTest("moveProfileField.ajax", true,
 		assertThat(profile.fields.last().id, equalTo(fieldId))
 		verify(core).touchConfiguration()
 		verify(currentSone).profile = profile
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<MoveProfileFieldAjaxPage>(), notNullValue())
 	}
 
 }

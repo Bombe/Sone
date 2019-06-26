@@ -1,9 +1,11 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Post
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -37,6 +39,11 @@ class BookmarkAjaxPageTest : JsonPageTest("bookmark.ajax", requiresLogin = false
 		val post = addNewPost("valid-post-id", "1", 2)
 		assertThatJsonIsSuccessful()
 		verify(core).bookmarkPost(post)
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<BookmarkAjaxPage>(), notNullValue())
 	}
 
 }

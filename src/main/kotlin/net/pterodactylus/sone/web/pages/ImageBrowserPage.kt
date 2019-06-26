@@ -1,49 +1,53 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
-import java.net.URI
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import java.net.*
+import javax.inject.*
 
 /**
  * The image browser page is the entry page for the image management.
  */
-class ImageBrowserPage(template: Template, webInterface: WebInterface):
-		LoggedInPage("imageBrowser.html", template, "Page.ImageBrowser.Title", webInterface) {
+@MenuName("ImageBrowser")
+@TemplatePath("/templates/imageBrowser.html")
+@ToadletPath("imageBrowser.html")
+class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.ImageBrowser.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if ("album" in freenetRequest.parameters) {
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if ("album" in soneRequest.parameters) {
 			templateContext["albumRequested"] = true
-			templateContext["album"] = webInterface.core.getAlbum(freenetRequest.parameters["album"]!!)
-			templateContext["page"] = freenetRequest.parameters["page"]
-		} else if ("image" in freenetRequest.parameters) {
+			templateContext["album"] = soneRequest.core.getAlbum(soneRequest.parameters["album"]!!)
+			templateContext["page"] = soneRequest.parameters["page"]
+		} else if ("image" in soneRequest.parameters) {
 			templateContext["imageRequested"] = true
-			templateContext["image"] = webInterface.core.getImage(freenetRequest.parameters["image"])
-		} else if (freenetRequest.parameters["mode"] == "gallery") {
+			templateContext["image"] = soneRequest.core.getImage(soneRequest.parameters["image"])
+		} else if (soneRequest.parameters["mode"] == "gallery") {
 			templateContext["galleryRequested"] = true
-			webInterface.core.sones
+			soneRequest.core.sones
 					.map(Sone::getRootAlbum)
 					.flatMap(Album::getAlbums)
 					.flatMap { Album.FLATTENER.apply(it)!! }
 					.filterNot(Album::isEmpty)
 					.sortedBy(Album::getTitle)
 					.also { albums ->
-						Pagination(albums, webInterface.core.preferences.imagesPerPage).apply { page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0 }.also { pagination ->
-							templateContext["albumPagination"] = pagination
-							templateContext["albums"] = pagination.items
-						}
+						albums.paginate(soneRequest.core.preferences.imagesPerPage)
+								.turnTo(soneRequest.parameters["page"]?.toIntOrNull() ?: 0)
+								.also { pagination ->
+									templateContext["albumPagination"] = pagination
+									templateContext["albums"] = pagination.items
+								}
 					}
 		} else {
 			templateContext["soneRequested"] = true
-			templateContext["sone"] = webInterface.core.getSone(freenetRequest.httpRequest.getParam("sone")) ?: currentSone
+			templateContext["sone"] = soneRequest.core.getSone(soneRequest.httpRequest.getParam("sone")) ?: currentSone
 		}
 	}
 
-	override fun isLinkExcepted(link: URI?) = true
+	override fun isLinkExcepted(link: URI) = true
 
 }

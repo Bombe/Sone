@@ -24,8 +24,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link IdentityAccessor}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IdentityAccessorTest {
 

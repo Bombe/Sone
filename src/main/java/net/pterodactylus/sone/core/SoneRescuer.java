@@ -1,5 +1,5 @@
 /*
- * Sone - SoneRescuer.java - Copyright © 2011–2016 David Roden
+ * Sone - SoneRescuer.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@ import freenet.keys.FreenetURI;
 /**
  * The Sone rescuer downloads older editions of a Sone and updates the currently
  * stored Sone with it.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneRescuer extends AbstractService {
 

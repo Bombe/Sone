@@ -1,5 +1,5 @@
 /*
- * Sone - L10nFilter.java - Copyright © 2010–2016 David Roden
+ * Sone - L10nFilter.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,29 +25,21 @@ import java.util.Map;
 
 import javax.annotation.Nonnull;
 
-import net.pterodactylus.sone.web.WebInterface;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
+
+import freenet.l10n.BaseL10n;
 
 /**
  * {@link Filter} implementation replaces {@link String} values with their
  * translated equivalents.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class L10nFilter implements Filter {
 
-	/** The web interface. */
-	private final WebInterface webInterface;
+	private final BaseL10n l10n;
 
-	/**
-	 * Creates a new L10n filter.
-	 *
-	 * @param webInterface
-	 *            The Sone web interface
-	 */
-	public L10nFilter(WebInterface webInterface) {
-		this.webInterface = webInterface;
+	public L10nFilter(BaseL10n l10n) {
+		this.l10n = l10n;
 	}
 
 	/**
@@ -58,9 +50,9 @@ public class L10nFilter implements Filter {
 		List<Object> parameterValues = getParameters(data, parameters);
 		String text = getText(data);
 		if (parameterValues.isEmpty()) {
-			return webInterface.getL10n().getString(text);
+			return l10n.getString(text);
 		}
-		return new MessageFormat(webInterface.getL10n().getString(text), new Locale(webInterface.getL10n().getSelectedLanguage().shortCode)).format(parameterValues.toArray());
+		return new MessageFormat(l10n.getString(text), new Locale(l10n.getSelectedLanguage().shortCode)).format(parameterValues.toArray());
 	}
 
 	@Nonnull
@@ -73,7 +65,7 @@ public class L10nFilter implements Filter {
 		if (data instanceof L10nText) {
 			return ((L10nText) data).getParameters();
 		}
-		List<Object> parameterValues = new ArrayList<Object>();
+		List<Object> parameterValues = new ArrayList<>();
 		int parameterIndex = 0;
 		while (parameters.containsKey(String.valueOf(parameterIndex))) {
 			Object value = parameters.get(String.valueOf(parameterIndex));

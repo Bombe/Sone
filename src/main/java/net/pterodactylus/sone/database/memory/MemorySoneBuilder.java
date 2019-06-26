@@ -7,8 +7,6 @@ import net.pterodactylus.sone.database.Database;
 
 /**
  * Memory-based {@link AbstractSoneBuilder} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MemorySoneBuilder extends AbstractSoneBuilder {
 

@@ -1,11 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
@@ -13,7 +14,7 @@ import org.mockito.Mockito.verify
 /**
  * Unit test for [BookmarkPage].
  */
-class BookmarkPageTest: WebPageTest(::BookmarkPage) {
+class BookmarkPageTest : WebPageTest(::BookmarkPage) {
 
 	@Test
 	fun `path is set correctly`() {
@@ -49,6 +50,11 @@ class BookmarkPageTest: WebPageTest(::BookmarkPage) {
 		verifyRedirect("return-page.html") {
 			verify(core, never()).bookmarkPost(any())
 		}
+	}
+
+	@Test
+	fun `bookmark page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<BookmarkPage>(), notNullValue())
 	}
 
 }

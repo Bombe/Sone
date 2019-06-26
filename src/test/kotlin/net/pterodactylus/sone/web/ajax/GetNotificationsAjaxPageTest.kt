@@ -3,8 +3,10 @@ package net.pterodactylus.sone.web.ajax
 import net.pterodactylus.sone.main.SonePlugin
 import net.pterodactylus.sone.test.argumentCaptor
 import net.pterodactylus.sone.test.get
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.notify.TemplateNotification
 import net.pterodactylus.util.template.TemplateContext
@@ -14,6 +16,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.empty
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.verify
@@ -113,6 +116,11 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 		assertThat(templateContext.value["latestVersion"], equalTo<Any>(Version(0, 1, 2)))
 		assertThat(templateContext.value["latestVersionTime"], equalTo<Any>(998L))
 		assertThat(templateContext.value["notification"], equalTo<Any>(templateNotification))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<GetNotificationsAjaxPage>(), notNullValue())
 	}
 
 }

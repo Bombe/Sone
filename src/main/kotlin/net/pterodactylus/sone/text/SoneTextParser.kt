@@ -1,28 +1,20 @@
 package net.pterodactylus.sone.text
 
-import freenet.keys.FreenetURI
-import freenet.support.Base64
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.data.impl.IdOnlySone
-import net.pterodactylus.sone.database.PostProvider
-import net.pterodactylus.sone.database.SoneProvider
-import net.pterodactylus.sone.text.LinkType.CHK
-import net.pterodactylus.sone.text.LinkType.FREEMAIL
-import net.pterodactylus.sone.text.LinkType.HTTP
-import net.pterodactylus.sone.text.LinkType.HTTPS
-import net.pterodactylus.sone.text.LinkType.KSK
-import net.pterodactylus.sone.text.LinkType.POST
-import net.pterodactylus.sone.text.LinkType.SONE
-import net.pterodactylus.sone.text.LinkType.SSK
+import freenet.keys.*
+import freenet.support.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.database.*
+import net.pterodactylus.sone.text.LinkType.*
 import net.pterodactylus.sone.text.LinkType.USK
-import net.pterodactylus.sone.utils.let
-import org.bitpedia.util.Base32
-import java.net.MalformedURLException
+import org.bitpedia.util.*
+import java.net.*
+import javax.inject.*
 
 /**
  * [Parser] implementation that can recognize Freenet URIs.
  */
-class SoneTextParser(private val soneProvider: SoneProvider?, private val postProvider: PostProvider?) {
+class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?, private val postProvider: PostProvider?) {
 
 	fun parse(source: String, context: SoneTextParserContext?) =
 			source.split("\n")
@@ -50,27 +42,39 @@ class SoneTextParser(private val soneProvider: SoneProvider?, private val postPr
 							}
 			}.map { it.first }.toList()
 
+	private val NextLink.linkWithoutBacklink: String
+		get() {
+			val backlink = link.indexOf("/../")
+			val query = link.indexOf("?")
+			return if ((backlink > -1) && ((query == -1) || (query > -1) && (backlink < query)))
+				link.substring(0, backlink)
+			else
+				link
+		}
+
 	private fun NextLink.toPart(context: SoneTextParserContext?) = when (linkType) {
 		KSK, CHK -> try {
-			FreenetURI(link).let { freenetUri ->
+			FreenetURI(linkWithoutBacklink).let { freenetUri ->
 				FreenetLinkPart(
-						link,
-						if (freenetUri.isKSK) {
-							freenetUri.guessableKey
-						} else {
-							freenetUri.metaString ?: freenetUri.docName ?: link.substring(0, 9)
-						},
-						link.split('?').first()
+						linkWithoutBacklink,
+						freenetUri.allMetaStrings?.lastOrNull { it != "" } ?: freenetUri.docName ?: linkWithoutBacklink.substring(0, 9),
+						linkWithoutBacklink.split('?').first()
 				)
 			}
 		} catch (e: MalformedURLException) {
-			PlainTextPart(link)
+			PlainTextPart(linkWithoutBacklink)
 		}
 		SSK, USK ->
 			try {
-				 FreenetLinkPart(link, FreenetURI(link).docName, trusted = context?.routingKey?.contentEquals(FreenetURI(link).routingKey) == true)
+				FreenetURI(linkWithoutBacklink).let { uri ->
+					uri.allMetaStrings
+							?.takeIf { (it.size > 1) || ((it.size == 1) && (it.single() != "")) }
+							?.lastOrNull()
+							?: uri.docName
+							?: "${uri.keyType}@${uri.routingKey.freenetBase64}"
+				}.let { FreenetLinkPart(linkWithoutBacklink.removeSuffix("/"), it, trusted = context?.routingKey?.contentEquals(FreenetURI(linkWithoutBacklink).routingKey) == true) }
 			} catch (e: MalformedURLException) {
-				PlainTextPart(link)
+				PlainTextPart(linkWithoutBacklink)
 			}
 		SONE -> link.substring(7).let { SonePart(soneProvider?.getSone(it) ?: IdOnlySone(it)) }
 		POST -> postProvider?.getPost(link.substring(7))?.let { PostPart(it) } ?: PlainTextPart(link)
@@ -195,3 +199,5 @@ private fun isPunctuation(char: Char) = char in punctuationChars
 private val whitespace = Regex("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]")
 
 private data class NextLink(val position: Int, val linkType: LinkType, val link: String, val remainder: String)
+
+private val ByteArray.freenetBase64 get() = Base64.encode(this)!!

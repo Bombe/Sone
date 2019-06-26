@@ -1,5 +1,5 @@
 /*
- * Sone - DefaultOwnIdentity.java - Copyright © 2010–2016 David Roden
+ * Sone - DefaultOwnIdentity.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * An own identity is an identity that the owner of the node has full control
  * over.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 

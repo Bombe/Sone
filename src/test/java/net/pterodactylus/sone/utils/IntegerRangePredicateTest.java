@@ -10,8 +10,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link IntegerRangePredicate}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class IntegerRangePredicateTest {
 

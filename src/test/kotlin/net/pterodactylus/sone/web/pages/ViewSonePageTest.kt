@@ -1,25 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.isOnPage
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.sone.utils.asOptional
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
-import org.junit.Before
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.net.*
 
 /**
  * Unit test for [ViewSonePage].
  */
-class ViewSonePageTest: WebPageTest(::ViewSonePage) {
+class ViewSonePageTest : WebPageTest(::ViewSonePage) {
 
 	init {
 		whenever(currentSone.id).thenReturn("sone-id")
@@ -27,17 +21,17 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 
 	private val post1 = createPost("post1", "First Post.", 1000, currentSone)
 	private val post2 = createPost("post2", "Second Post.", 2000, currentSone)
-	private val foreignPost1 = createPost("foreign-post1", "First Foreign Post.", 1000, mock<Sone>())
-	private val foreignPost2 = createPost("foreign-post2", "Second Foreign Post.", 2000, mock<Sone>())
-	private val foreignPost3 = createPost("foreign-post3", "Third Foreign Post.", 3000, mock<Sone>())
-	private val directed1 = createPost("post3", "First directed.", 1500, mock<Sone>(), recipient = currentSone)
-	private val directed2 = createPost("post4", "Second directed.", 2500, mock<Sone>(), recipient = currentSone)
+	private val foreignPost1 = createPost("foreign-post1", "First Foreign Post.", 1000, mock())
+	private val foreignPost2 = createPost("foreign-post2", "Second Foreign Post.", 2000, mock())
+	private val foreignPost3 = createPost("foreign-post3", "Third Foreign Post.", 3000, mock())
+	private val directed1 = createPost("post3", "First directed.", 1500, mock(), recipient = currentSone)
+	private val directed2 = createPost("post4", "Second directed.", 2500, mock(), recipient = currentSone)
 
 	@Before
 	fun setup() {
 		whenever(currentSone.posts).thenReturn(mutableListOf(post2, post1))
 		whenever(core.getDirectedPosts("sone-id")).thenReturn(setOf(directed1, directed2))
-		core.preferences.postsPerPage = 2
+		core.preferences.newPostsPerPage = 2
 	}
 
 	@Test
@@ -176,14 +170,14 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 	@Test
 	fun `page title is default for request without parameters`() {
 		addTranslation("Page.ViewSone.Page.TitleWithoutSone", "view sone page without sone")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view sone page without sone"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view sone page without sone"))
 	}
 
 	@Test
 	fun `page title is default for request with invalid sone parameters`() {
 		addHttpRequestParameter("sone", "invalid-sone-id")
 		addTranslation("Page.ViewSone.Page.TitleWithoutSone", "view sone page without sone")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view sone page without sone"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view sone page without sone"))
 	}
 
 	@Test
@@ -196,12 +190,22 @@ class ViewSonePageTest: WebPageTest(::ViewSonePage) {
 			lastName = "Last"
 		})
 		addTranslation("Page.ViewSone.Title", "view sone page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("First M. Last - view sone page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("First M. Last - view sone page"))
 	}
 
 	@Test
 	fun `page is link-excepted`() {
-		assertThat(page.isLinkExcepted(null), equalTo(true))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(true))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<ViewSonePage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/viewSone.html"))
 	}
 
 }

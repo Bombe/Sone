@@ -61,7 +61,7 @@ class ProfileAccessorTest {
 
 	@Before
 	fun setupCore() {
-		whenever(core.getImage(eq("avatar-id"), anyBoolean())).thenReturn(mock<Image>())
+		whenever(core.getImage(eq("avatar-id"), anyBoolean())).thenReturn(mock())
 	}
 
 

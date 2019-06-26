@@ -1,5 +1,5 @@
 /*
- * Sone - AlbumImpl.java - Copyright © 2011–2016 David Roden
+ * Sone - AlbumImpl.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,8 +42,6 @@ import com.google.common.hash.Hashing;
 
 /**
  * Container for images that can also contain nested {@link AlbumImpl}s.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class AlbumImpl implements Album {
 
@@ -53,13 +52,13 @@ public class AlbumImpl implements Album {
 	private final Sone sone;
 
 	/** Nested albums. */
-	private final List<Album> albums = new ArrayList<Album>();
+	private final List<Album> albums = new ArrayList<>();
 
 	/** The image IDs in order. */
-	private final List<String> imageIds = new ArrayList<String>();
+	private final List<String> imageIds = new ArrayList<>();
 
 	/** The images in this album. */
-	private final Map<String, Image> images = new HashMap<String, Image>();
+	private final Map<String, Image> images = new HashMap<>();
 
 	/** The parent album. */
 	private Album parent;
@@ -102,7 +101,7 @@ public class AlbumImpl implements Album {
 
 	@Override
 	public List<Album> getAlbums() {
-		return new ArrayList<Album>(albums);
+		return new ArrayList<>(albums);
 	}
 
 	@Override
@@ -154,7 +153,7 @@ public class AlbumImpl implements Album {
 
 	@Override
 	public List<Image> getImages() {
-		return new ArrayList<Image>(Collections2.filter(Collections2.transform(imageIds, new Function<String, Image>() {
+		return new ArrayList<>(Collections2.filter(Collections2.transform(imageIds, new Function<String, Image>() {
 
 			@Override
 			@SuppressWarnings("synthetic-access")
@@ -298,28 +297,28 @@ public class AlbumImpl implements Album {
 	@Override
 	public String getFingerprint() {
 		Hasher hash = Hashing.sha256().newHasher();
-		hash.putString("Album(");
-		hash.putString("ID(").putString(id).putString(")");
-		hash.putString("Title(").putString(title).putString(")");
-		hash.putString("Description(").putString(description).putString(")");
+		hash.putString("Album(", UTF_8);
+		hash.putString("ID(", UTF_8).putString(id, UTF_8).putString(")", UTF_8);
+		hash.putString("Title(", UTF_8).putString(title, UTF_8).putString(")", UTF_8);
+		hash.putString("Description(", UTF_8).putString(description, UTF_8).putString(")", UTF_8);
 
 		/* add nested albums. */
-		hash.putString("Albums(");
+		hash.putString("Albums(", UTF_8);
 		for (Album album : albums) {
-			hash.putString(album.getFingerprint());
+			hash.putString(album.getFingerprint(), UTF_8);
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
 		/* add images. */
-		hash.putString("Images(");
+		hash.putString("Images(", UTF_8);
 		for (Image image : getImages()) {
 			if (image.isInserted()) {
-				hash.putString(image.getFingerprint());
+				hash.putString(image.getFingerprint(), UTF_8);
 			}
 		}
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 
-		hash.putString(")");
+		hash.putString(")", UTF_8);
 		return hash.hash().toString();
 	}
 

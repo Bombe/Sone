@@ -1,5 +1,5 @@
 /*
- * Sone - FreenetInterface.java - Copyright © 2010–2016 David Roden
+ * Sone - FreenetInterface.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
 
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
@@ -43,7 +44,6 @@ import net.pterodactylus.sone.data.TemporaryImage;
 
 import com.google.common.base.Function;
 import com.google.common.eventbus.EventBus;
-import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import freenet.client.ClientMetadata;
@@ -78,8 +78,6 @@ import freenet.support.io.ResumeFailedException;
 
 /**
  * Contains all necessary functionality for interacting with the Freenet node.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class FreenetInterface {
@@ -95,9 +93,10 @@ public class FreenetInterface {
 
 	/** The high-level client to use for requests. */
 	private final HighLevelSimpleClient client;
+	private final RequestClient requestClient = new RequestClientBuilder().realTime().build();
 
 	/** The USK callbacks. */
-	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<String, USKCallback>();
+	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<>();
 
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
@@ -258,7 +257,7 @@ public class FreenetInterface {
 		try {
 			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
 			node.clientCore.uskManager.subscribe(create(requestUri),
-					uskCallback, true, (RequestClient) client);
+					uskCallback, true, requestClient);
 		} catch (MalformedURLException mue1) {
 			logger.log(WARNING, format("Could not subscribe USK “%s”!",
 					requestUri), mue1);
@@ -271,8 +270,7 @@ public class FreenetInterface {
 			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
 			node.clientCore
 					.uskManager
-					.subscribe(create(requestUri), uskCallback, false,
-							(RequestClient) client);
+					.subscribe(create(requestUri), uskCallback, false, requestClient);
 		} catch (MalformedURLException mue1) {
 			logger.log(WARNING,
 					format("Could not subscribe USK “%s”!", requestUri),
@@ -328,7 +326,7 @@ public class FreenetInterface {
 
 		};
 		try {
-			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, (RequestClient) client);
+			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, requestClient);
 			uriUskCallbacks.put(uri, uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
@@ -355,59 +353,7 @@ public class FreenetInterface {
 	}
 
 	/**
-	 * Container for a fetched URI and the {@link FetchResult}.
-	 *
-	 * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
-	 */
-	public static class Fetched {
-
-		/** The fetched URI. */
-		private final FreenetURI freenetUri;
-
-		/** The fetch result. */
-		private final FetchResult fetchResult;
-
-		/**
-		 * Creates a new fetched URI.
-		 *
-		 * @param freenetUri
-		 *            The URI that was fetched
-		 * @param fetchResult
-		 *            The fetch result
-		 */
-		public Fetched(FreenetURI freenetUri, FetchResult fetchResult) {
-			this.freenetUri = freenetUri;
-			this.fetchResult = fetchResult;
-		}
-
-		//
-		// ACCESSORS
-		//
-
-		/**
-		 * Returns the fetched URI.
-		 *
-		 * @return The fetched URI
-		 */
-		public FreenetURI getFreenetUri() {
-			return freenetUri;
-		}
-
-		/**
-		 * Returns the fetch result.
-		 *
-		 * @return The fetch result
-		 */
-		public FetchResult getFetchResult() {
-			return fetchResult;
-		}
-
-	}
-
-	/**
 	 * Callback for USK watcher events.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static interface Callback {
 
@@ -435,7 +381,6 @@ public class FreenetInterface {
 	 * @see ImageInsertStartedEvent
 	 * @see ImageInsertFailedEvent
 	 * @see ImageInsertFinishedEvent
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class InsertToken implements ClientPutCallback {
 
@@ -558,11 +503,18 @@ public class FreenetInterface {
 
 	}
 
-	public class InsertTokenSupplier implements Function<Image, InsertToken> {
+	public static class InsertTokenSupplier implements Function<Image, InsertToken> {
+
+		private final FreenetInterface freenetInterface;
+
+		@Inject
+		public InsertTokenSupplier(FreenetInterface freenetInterface) {
+			this.freenetInterface = freenetInterface;
+		}
 
 		@Override
 		public InsertToken apply(Image image) {
-			return new InsertToken(image);
+			return freenetInterface.new InsertToken(image);
 		}
 
 	}

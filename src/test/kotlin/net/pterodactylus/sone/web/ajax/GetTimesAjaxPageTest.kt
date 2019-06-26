@@ -6,19 +6,23 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.freenet.L10nText
 import net.pterodactylus.sone.test.get
+import net.pterodactylus.sone.test.getInstance
+import net.pterodactylus.sone.test.isProvidedByMock
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.text.TimeText
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonObject
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.containsInAnyOrder
 import org.hamcrest.Matchers.emptyIterable
-import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
+import java.util.TimeZone
 import java.util.TimeZone.getTimeZone
 
 /**
@@ -105,6 +109,15 @@ class GetTimesAjaxPageTest : JsonPageTest("getTimes.ajax", needsFormPassword = f
 				"reply1" to jsonObject("timeText" to "1000", "refreshTime" to 2L, "tooltip" to "Jan 1, 1970, 00:00:01"),
 				"reply2" to jsonObject("timeText" to "2000", "refreshTime" to 4L, "tooltip" to "Jan 1, 1970, 00:00:02")
 		))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.createChildInjector(
+				TimeTextConverter::class.isProvidedByMock(),
+				L10nFilter::class.isProvidedByMock(),
+				TimeZone::class.isProvidedByMock()
+		).getInstance<GetTimesAjaxPage>(), notNullValue())
 	}
 
 }

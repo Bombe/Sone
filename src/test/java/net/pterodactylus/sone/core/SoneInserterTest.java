@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.core;
 
 import static com.google.common.io.ByteStreams.toByteArray;
-import static com.google.common.util.concurrent.MoreExecutors.sameThreadExecutor;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -48,8 +48,6 @@ import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link SoneInserter} and its subclasses.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class SoneInserterTest {
 
@@ -66,7 +64,7 @@ public class SoneInserterTest {
 
 	@Test
 	public void insertionDelayIsForwardedToSoneInserter() {
-		EventBus eventBus = new AsyncEventBus(sameThreadExecutor());
+		EventBus eventBus = new AsyncEventBus(directExecutor());
 		eventBus.register(new SoneInserter(core, eventBus, freenetInterface, "SoneId"));
 		eventBus.post(new InsertionDelayChangedEvent(15));
 		assertThat(SoneInserter.getInsertionDelay().get(), is(15));
@@ -250,7 +248,7 @@ public class SoneInserterTest {
 	@Test
 	public void templateIsRenderedCorrectlyForManifestElement()
 	throws IOException {
-		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		Map<String, Object> soneProperties = new HashMap<>();
 		soneProperties.put("id", "SoneId");
 		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
 		long now = currentTimeMillis();
@@ -266,7 +264,7 @@ public class SoneInserterTest {
 
 	@Test
 	public void invalidTemplateReturnsANullManifestElement() {
-		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		Map<String, Object> soneProperties = new HashMap<>();
 		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
 		assertThat(manifestCreator.createManifestElement("test.txt",
 				"plain/text; charset=utf-8",
@@ -276,7 +274,7 @@ public class SoneInserterTest {
 
 	@Test
 	public void errorWhileRenderingTemplateReturnsANullManifestElement() {
-		Map<String, Object> soneProperties = new HashMap<String, Object>();
+		Map<String, Object> soneProperties = new HashMap<>();
 		ManifestCreator manifestCreator = new ManifestCreator(core, soneProperties);
 		when(core.toString()).thenThrow(NullPointerException.class);
 		assertThat(manifestCreator.createManifestElement("test.txt",

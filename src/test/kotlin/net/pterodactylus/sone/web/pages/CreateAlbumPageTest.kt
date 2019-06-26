@@ -1,22 +1,21 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Album.Modifier
-import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
-import net.pterodactylus.sone.test.deepMock
-import net.pterodactylus.sone.test.selfMock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Album.*
+import net.pterodactylus.sone.data.Album.Modifier.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [CreateAlbumPage].
  */
-class CreateAlbumPageTest: WebPageTest(::CreateAlbumPage) {
+class CreateAlbumPageTest : WebPageTest(::CreateAlbumPage) {
 
 	private val parentAlbum = createAlbum("parent-id")
 	private val newAlbum = createAlbum("album-id")
@@ -94,6 +93,16 @@ class CreateAlbumPageTest: WebPageTest(::CreateAlbumPage) {
 		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(newAlbum.modify()).setDescription("new KSK@foo description")
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<CreateAlbumPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/createAlbum.html"))
 	}
 
 }

@@ -1,18 +1,19 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.let
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import javax.inject.*
 
 /**
  * AJAX page that lets the user distrust a Sone.
  *
  * @see Core.distrustSone(Sone, Sone)
  */
-class DistrustAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("distrustSone.ajax", webInterface) {
+@ToadletPath("distrustSone.ajax")
+class DistrustAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) =
 			request.parameters["sone"]

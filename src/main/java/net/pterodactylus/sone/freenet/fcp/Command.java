@@ -1,5 +1,5 @@
 /*
- * Sone - Command.java - Copyright © 2011–2016 David Roden
+ * Sone - Command.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Command {
 
@@ -42,8 +40,6 @@ public interface Command {
 
 	/**
 	 * The access type of the request.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static enum AccessType {
 
@@ -60,8 +56,6 @@ public interface Command {
 
 	/**
 	 * Interface for command replies.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class Response {
 
@@ -98,8 +92,6 @@ public interface Command {
 	/**
 	 * Response implementation that can return an error message and an optional
 	 * error code.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public class ErrorResponse extends Response {
 

@@ -1,9 +1,12 @@
 package net.pterodactylus.sone.web.ajax
 
 import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
@@ -40,6 +43,11 @@ class UnbookmarkAjaxPageTest : JsonPageTest("unbookmark.ajax", requiresLogin = f
 		addRequestParameter("post", "post-id")
 		assertThatJsonIsSuccessful()
 		verify(core).unbookmarkPost(eq(post))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<UnbookmarkAjaxPage>(), notNullValue())
 	}
 
 }

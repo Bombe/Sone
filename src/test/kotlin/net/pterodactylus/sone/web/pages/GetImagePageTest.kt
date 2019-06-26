@@ -1,10 +1,12 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.TemporaryImage
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.net.*
 
 /**
  * Unit test for [GetImagePage].
@@ -29,7 +31,7 @@ class GetImagePageTest {
 
 	@Test
 	fun `page is not link-excepted`() {
-		assertThat(page.isLinkExcepted(null), equalTo(false))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(false))
 	}
 
 	@Test
@@ -57,6 +59,11 @@ class GetImagePageTest {
 		assertThat(response.headers.map { it.name to it.iterator().asSequence().toList() }, contains(
 				"Content-Disposition" to listOf("attachment; filename=temp-id.test")
 		))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<GetImagePage>(), notNullValue())
 	}
 
 }

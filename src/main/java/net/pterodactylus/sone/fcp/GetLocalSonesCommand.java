@@ -1,5 +1,5 @@
 /*
- * Sone - GetLocalSonesCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - GetLocalSonesCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,14 +17,14 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static net.pterodactylus.sone.fcp.AbstractSoneCommandKt.encodeSones;
+
 import net.pterodactylus.sone.core.Core;
 import freenet.support.SimpleFieldSet;
 
 /**
  * Implements the “GetLocalSones” FCP command that returns the list of local
  * Sones to the sender.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetLocalSonesCommand extends AbstractSoneCommand {
 

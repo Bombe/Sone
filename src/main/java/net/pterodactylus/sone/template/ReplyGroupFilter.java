@@ -1,5 +1,5 @@
 /*
- * Sone - ReplyGroupFilter.java - Copyright © 2010–2016 David Roden
+ * Sone - ReplyGroupFilter.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * {@link Filter} implementation that groups replies by the post the are in
  * reply to, returning a map with the post as key and the list of replies as
  * values.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ReplyGroupFilter implements Filter {
 

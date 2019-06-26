@@ -1,32 +1,34 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.utils.Pagination
-import net.pterodactylus.sone.utils.mapPresent
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Page that displays all new posts and replies. The posts are filtered using
  * [PostVisibilityFilter.isPostVisible(Sone, Post)] and sorted by time.
  */
-class NewPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("new.html", template, "Page.New.Title", webInterface, false) {
+@MenuName("New")
+@TemplatePath("/templates/new.html")
+@ToadletPath("new.html")
+class NewPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.New.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) =
-			getCurrentSone(freenetRequest.toadletContext).let { currentSone ->
-				(webInterface.getNewPosts(currentSone) + webInterface.getNewReplies(currentSone).mapPresent { it.post })
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) =
+			getCurrentSone(soneRequest.toadletContext).let { currentSone ->
+				(soneRequest.webInterface.getNewPosts(currentSone) + soneRequest.webInterface.getNewReplies(currentSone).mapPresent { it.post })
 						.distinct()
 						.sortedByDescending { it.time }
 						.let { posts ->
-							Pagination(posts, webInterface.core.preferences.postsPerPage).apply {
-								page = freenetRequest.parameters["page"]?.toIntOrNull() ?: 0
-							}.let { pagination ->
-								templateContext["pagination"] = pagination
-								templateContext["posts"] = pagination.items
-							}
+							posts.paginate(soneRequest.core.preferences.postsPerPage)
+									.turnTo(soneRequest.parameters["page"]?.toIntOrNull() ?: 0)
+									.let { pagination ->
+										templateContext["pagination"] = pagination
+										templateContext["posts"] = pagination.items
+									}
 						}
 			}
 

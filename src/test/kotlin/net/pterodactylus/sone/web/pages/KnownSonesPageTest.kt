@@ -1,26 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.freenet.wot.Identity
-import net.pterodactylus.sone.freenet.wot.OwnIdentity
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.Pagination
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.wot.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
  * Unit test for [KnownSonesPage].
  */
-class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
+class KnownSonesPageTest : WebPageTest(::KnownSonesPage) {
 
 	private val sones = listOf(
 			createSone(1000, 4, 7, 2, "sone2", true, true),
@@ -50,7 +43,7 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 			whenever(albums).thenReturn(listOf(album))
 		}
 		whenever(this.rootAlbum).thenReturn(rootAlbum)
-		whenever(this.profile).thenReturn(mock<Profile>())
+		whenever(this.profile).thenReturn(mock())
 		whenever(id).thenReturn(name.toLowerCase())
 		whenever(this.name).thenReturn(name)
 	}
@@ -81,7 +74,7 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.KnownSones.Title")).thenReturn("known sones page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("known sones page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("known sones page title"))
 	}
 
 	@Test
@@ -240,6 +233,21 @@ class KnownSonesPageTest: WebPageTest(::KnownSonesPage) {
 			@Suppress("UNCHECKED_CAST")
 			assertThat((templateContext["pagination"] as Pagination<Sone>).items, contains(*listOf(3, 2, 1, 0).map { sones[it] }.toTypedArray()))
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<KnownSonesPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with the correct menuname`() {
+		assertThat(page.menuName, equalTo("KnownSones"))
+	}
+
+	@Test
+	fun `page is annotated with corrrect template path`() {
+		assertThat(page.templatePath, equalTo("/templates/knownSones.html"))
 	}
 
 }

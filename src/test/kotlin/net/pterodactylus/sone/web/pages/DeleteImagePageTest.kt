@@ -1,21 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [DeleteImagePage].
  */
-class DeleteImagePageTest: WebPageTest(::DeleteImagePage) {
+class DeleteImagePageTest : WebPageTest(::DeleteImagePage) {
 
 	private val image = mock<Image>()
 	private val sone = mock<Sone>()
@@ -78,6 +76,16 @@ class DeleteImagePageTest: WebPageTest(::DeleteImagePage) {
 		verifyRedirect("imageBrowser.html?album=album-id") {
 			verify(webInterface.core).deleteImage(image)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<DeleteImagePage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/deleteImage.html"))
 	}
 
 }

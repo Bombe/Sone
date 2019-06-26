@@ -1,25 +1,22 @@
 package net.pterodactylus.sone.web.pages
 
-import com.google.common.base.Optional.fromNullable
-import com.google.common.base.Predicate
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.notify.PostVisibilityFilter
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.Pagination
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.emptyIterable
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.ArgumentMatchers
+import com.google.common.base.*
+import com.google.common.base.Optional.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.*
 
 /**
  * Unit test for [IndexPage].
  */
-class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template, webInterface, postVisibilityFilter) }) {
+class IndexPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> IndexPage(webInterface, loaders, templateRenderer, postVisibilityFilter) }) {
 
 	companion object {
 		private val postVisibilityFilter = mock<PostVisibilityFilter>()
@@ -27,18 +24,18 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("index.html"))
+		assertThat(page.path, equalTo("index.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.Index.Title")).thenReturn("index page title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("index page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("index page title"))
 	}
 
 	@Before
@@ -134,7 +131,7 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 	fun `index page sets page correctly`() {
 		val posts = listOf(createPost(3000), createPost(2000), createPost(1000))
 		whenever(currentSone.posts).thenReturn(posts)
-		core.preferences.postsPerPage = 1
+		core.preferences.newPostsPerPage = 1
 		addHttpRequestParameter("page", "2")
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
@@ -143,12 +140,27 @@ class IndexPageTest: WebPageTest({ template, webInterface -> IndexPage(template,
 
 	@Test
 	fun `index page without posts sets correct pagination`() {
-		core.preferences.postsPerPage = 1
+		core.preferences.newPostsPerPage = 1
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")
 		(templateContext["pagination"] as Pagination<Post>).let { pagination ->
 			assertThat(pagination.items, emptyIterable())
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<IndexPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("Index"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/index.html"))
 	}
 
 }

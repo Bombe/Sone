@@ -16,13 +16,11 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link CollectionAccessor}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CollectionAccessorTest {
 
 	private final CollectionAccessor accessor = new CollectionAccessor();
-	private final Collection<Object> collection = new ArrayList<Object>();
+	private final Collection<Object> collection = new ArrayList<>();
 
 	@Before
 	public void setupCollection() {

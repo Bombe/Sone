@@ -1,5 +1,5 @@
 /*
- * Sone - PostProvider.java - Copyright © 2011–2016 David Roden
+ * Sone - PostProvider.kt - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,9 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.database.memory.MemoryDatabase
-
-import com.google.common.base.Optional
-import com.google.inject.ImplementedBy
+import com.google.inject.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.database.memory.*
 
 /**
  * Interface for objects that can provide [Post]s by their ID.

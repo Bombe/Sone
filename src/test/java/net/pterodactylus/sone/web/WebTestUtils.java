@@ -10,8 +10,6 @@ import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 /**
  * Utilities for testing the <code>web</code> package.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class WebTestUtils {
 

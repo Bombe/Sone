@@ -1,21 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [DeleteReplyPage].
  */
-class DeleteReplyPageTest: WebPageTest(::DeleteReplyPage) {
+class DeleteReplyPageTest : WebPageTest(::DeleteReplyPage) {
 
 	private val sone = mock<Sone>()
 	private val reply = mock<PostReply>()
@@ -28,12 +26,12 @@ class DeleteReplyPageTest: WebPageTest(::DeleteReplyPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("deleteReply.html"))
+		assertThat(page.path, equalTo("deleteReply.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
@@ -93,6 +91,16 @@ class DeleteReplyPageTest: WebPageTest(::DeleteReplyPage) {
 		verifyRedirect("return.html") {
 			verify(core, never()).deleteReply(reply)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<DeleteReplyPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/deleteReply.html"))
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - ImageImpl.java - Copyright © 2011–2016 David Roden
+ * Sone - ImageImpl.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@ import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Optional.of;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.util.UUID;
 
@@ -34,8 +35,6 @@ import com.google.common.hash.Hashing;
 
 /**
  * Container for image metadata.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageImpl implements Image {
 
@@ -248,11 +247,11 @@ public class ImageImpl implements Image {
 	@Override
 	public String getFingerprint() {
 		Hasher hash = Hashing.sha256().newHasher();
-		hash.putString("Image(");
-		hash.putString("ID(").putString(id).putString(")");
-		hash.putString("Title(").putString(title).putString(")");
-		hash.putString("Description(").putString(description).putString(")");
-		hash.putString(")");
+		hash.putString("Image(", UTF_8);
+		hash.putString("ID(", UTF_8).putString(id, UTF_8).putString(")", UTF_8);
+		hash.putString("Title(", UTF_8).putString(title, UTF_8).putString(")", UTF_8);
+		hash.putString("Description(", UTF_8).putString(description, UTF_8).putString(")", UTF_8);
+		hash.putString(")", UTF_8);
 		return hash.hash().toString();
 	}
 

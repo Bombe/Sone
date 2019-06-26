@@ -1,5 +1,5 @@
 /*
- * Sone - CssClassNameFilter.java - Copyright © 2010–2016 David Roden
+ * Sone - CssClassNameFilter.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * Converts the {@link String} {@link String#valueOf(Object) representation} of
  * an object to a valid CSS class name by converting all characters that are not
  * US-ASCII letters or numbers to an underscore.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class CssClassNameFilter implements Filter {
 

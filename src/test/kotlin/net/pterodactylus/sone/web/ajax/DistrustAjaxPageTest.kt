@@ -1,9 +1,12 @@
 package net.pterodactylus.sone.web.ajax
 
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 import org.mockito.Mockito.verify
 
@@ -34,12 +37,17 @@ class DistrustAjaxPageTest : JsonPageTest("distrustSone.ajax", pageSupplier = ::
 
 	@Test
 	fun `request with valid sone results in correct trust value being sent back`() {
-		core.preferences.negativeTrust = -33
+		core.preferences.newNegativeTrust = -33
 		val sone = mock<Sone>()
 		addSone(sone, "sone-id")
 		addRequestParameter("sone", "sone-id")
 		assertThatJsonIsSuccessful()
 		assertThat(json["trustValue"]?.asInt(), equalTo(-33))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<DistrustAjaxPage>(), notNullValue())
 	}
 
 }

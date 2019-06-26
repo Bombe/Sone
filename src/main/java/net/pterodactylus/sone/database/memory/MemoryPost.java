@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryPost.java - Copyright © 2010–2016 David Roden
+ * Sone - MemoryPost.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,8 +30,6 @@ import com.google.common.base.Optional;
 /**
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class MemoryPost implements Post {
 
@@ -122,7 +120,7 @@ class MemoryPost implements Post {
 	 */
 	@Override
 	public Optional<Sone> getRecipient() {
-		return fromNullable(soneProvider.getSone(recipientId));
+		return recipientId == null ? Optional.<Sone>absent() : fromNullable(soneProvider.getSone(recipientId));
 	}
 
 	/**

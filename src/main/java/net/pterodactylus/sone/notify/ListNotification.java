@@ -1,5 +1,5 @@
 /*
- * Sone - ListNotification.java - Copyright © 2010–2016 David Roden
+ * Sone - ListNotification.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,7 +30,6 @@ import net.pterodactylus.util.template.Template;
  *
  * @param <T>
  *            The type of the items
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ListNotification<T> extends TemplateNotification {
 
@@ -38,7 +37,7 @@ public class ListNotification<T> extends TemplateNotification {
 	private final String key;
 
 	/** The list of new elements. */
-	private final List<T> elements = new CopyOnWriteArrayList<T>();
+	private final List<T> elements = new CopyOnWriteArrayList<>();
 
 	/**
 	 * Creates a new list notification.
@@ -97,7 +96,7 @@ public class ListNotification<T> extends TemplateNotification {
 	 * @return The current list of elements
 	 */
 	public List<T> getElements() {
-		return new ArrayList<T>(elements);
+		return new ArrayList<>(elements);
 	}
 
 	/**

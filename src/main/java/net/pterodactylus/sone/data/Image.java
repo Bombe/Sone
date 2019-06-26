@@ -1,5 +1,5 @@
 /*
- * Sone - Image.java - Copyright © 2011–2016 David Roden
+ * Sone - Image.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ package net.pterodactylus.sone.data;
 
 /**
  * Container for image metadata.
- *
- * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
  */
 public interface Image extends Identified, Fingerprintable {
 

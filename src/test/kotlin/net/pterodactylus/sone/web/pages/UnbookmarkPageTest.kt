@@ -1,23 +1,18 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.test.capture
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.any
-import org.mockito.Mockito.never
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [UnbookmarkPage].
  */
-class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
+class UnbookmarkPageTest : WebPageTest(::UnbookmarkPage) {
 
 	@Test
 	fun `page returns correct path`() {
@@ -32,7 +27,7 @@ class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
 	@Test
 	fun `page returns correct title`() {
 		addTranslation("Page.Unbookmark.Title", "unbookmark page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("unbookmark page title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("unbookmark page title"))
 	}
 
 	@Test
@@ -75,6 +70,11 @@ class UnbookmarkPageTest: WebPageTest(::UnbookmarkPage) {
 		verifyRedirect("return.html") {
 			verify(core).unbookmarkPost(post)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<UnbookmarkPage>(), notNullValue())
 	}
 
 }

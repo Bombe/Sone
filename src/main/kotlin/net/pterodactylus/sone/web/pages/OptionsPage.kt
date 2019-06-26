@@ -1,33 +1,34 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.core.Preferences
-import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
-import net.pterodactylus.sone.utils.emptyToNull
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.SoneOptions.*
+import net.pterodactylus.sone.fcp.FcpInterface.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * This page lets the user edit the options of the Sone plugin.
  */
-class OptionsPage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("options.html", template, "Page.Options.Title", webInterface, false) {
+@MenuName("Options")
+@TemplatePath("/templates/options.html")
+@ToadletPath("options.html")
+class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.Options.Title") {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
 			val fieldsWithErrors = mutableListOf<String>()
-			getCurrentSone(freenetRequest.toadletContext)?.options?.let { options ->
-				val autoFollow = "auto-follow" in freenetRequest.parameters
-				val loadLinkedImages = freenetRequest.parameters["load-linked-images"].emptyToNull
-				val showCustomAvatars = freenetRequest.parameters["show-custom-avatars"].emptyToNull
-				val enableSoneInsertNotification = "enable-sone-insert-notifications" in freenetRequest.parameters
-				val showNewSoneNotification = "show-notification-new-sones" in freenetRequest.parameters
-				val showNewPostNotification = "show-notification-new-posts" in freenetRequest.parameters
-				val showNewReplyNotification = "show-notification-new-replies" in freenetRequest.parameters
+			getCurrentSone(soneRequest.toadletContext)?.options?.let { options ->
+				val autoFollow = "auto-follow" in soneRequest.parameters
+				val loadLinkedImages = soneRequest.parameters["load-linked-images"].emptyToNull
+				val showCustomAvatars = soneRequest.parameters["show-custom-avatars"].emptyToNull
+				val enableSoneInsertNotification = "enable-sone-insert-notifications" in soneRequest.parameters
+				val showNewSoneNotification = "show-notification-new-sones" in soneRequest.parameters
+				val showNewPostNotification = "show-notification-new-posts" in soneRequest.parameters
+				val showNewReplyNotification = "show-notification-new-replies" in soneRequest.parameters
 
 				options.isAutoFollow = autoFollow
 				options.isSoneInsertNotificationEnabled = enableSoneInsertNotification
@@ -37,39 +38,39 @@ class OptionsPage(template: Template, webInterface: WebInterface):
 				loadLinkedImages?.also { if (cantSetOption { options.loadLinkedImages = LoadExternalContent.valueOf(loadLinkedImages) }) fieldsWithErrors += "load-linked-images" }
 				showCustomAvatars?.also { if (cantSetOption { options.showCustomAvatars = LoadExternalContent.valueOf(showCustomAvatars) }) fieldsWithErrors += "show-custom-avatars" }
 			}
-			val fullAccessRequired = "require-full-access" in freenetRequest.parameters
-			val fcpInterfaceActive = "fcp-interface-active" in freenetRequest.parameters
+			val fullAccessRequired = "require-full-access" in soneRequest.parameters
+			val fcpInterfaceActive = "fcp-interface-active" in soneRequest.parameters
 
-			webInterface.core.preferences.isRequireFullAccess = fullAccessRequired
-			webInterface.core.preferences.isFcpInterfaceActive = fcpInterfaceActive
+			soneRequest.core.preferences.newRequireFullAccess = fullAccessRequired
+			soneRequest.core.preferences.newFcpInterfaceActive = fcpInterfaceActive
 
-			val postsPerPage = freenetRequest.parameters["posts-per-page"]?.toIntOrNull()
-			val charactersPerPost = freenetRequest.parameters["characters-per-post"]?.toIntOrNull()
-			val postCutOffLength = freenetRequest.parameters["post-cut-off-length"]?.toIntOrNull()
-			val imagesPerPage = freenetRequest.parameters["images-per-page"]?.toIntOrNull()
-			val insertionDelay = freenetRequest.parameters["insertion-delay"]?.toIntOrNull()
-			val fcpFullAccessRequired = freenetRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
-			val negativeTrust = freenetRequest.parameters["negative-trust"]?.toIntOrNull()
-			val positiveTrust = freenetRequest.parameters["positive-trust"]?.toIntOrNull()
-			val trustComment = freenetRequest.parameters["trust-comment"]?.emptyToNull
+			val postsPerPage = soneRequest.parameters["posts-per-page"]?.toIntOrNull()
+			val charactersPerPost = soneRequest.parameters["characters-per-post"]?.toIntOrNull()
+			val postCutOffLength = soneRequest.parameters["post-cut-off-length"]?.toIntOrNull()
+			val imagesPerPage = soneRequest.parameters["images-per-page"]?.toIntOrNull()
+			val insertionDelay = soneRequest.parameters["insertion-delay"]?.toIntOrNull()
+			val fcpFullAccessRequired = soneRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
+			val negativeTrust = soneRequest.parameters["negative-trust"]?.toIntOrNull()
+			val positiveTrust = soneRequest.parameters["positive-trust"]?.toIntOrNull()
+			val trustComment = soneRequest.parameters["trust-comment"]?.emptyToNull
 
-			if (cantSetOption { it.setPostsPerPage(postsPerPage) }) fieldsWithErrors += "posts-per-page"
-			if (cantSetOption { it.setCharactersPerPost(charactersPerPost) }) fieldsWithErrors += "characters-per-post"
-			if (cantSetOption { it.setPostCutOffLength(postCutOffLength) }) fieldsWithErrors += "post-cut-off-length"
-			if (cantSetOption { it.setImagesPerPage(imagesPerPage) }) fieldsWithErrors += "images-per-page"
-			if (cantSetOption { it.setInsertionDelay(insertionDelay) }) fieldsWithErrors += "insertion-delay"
-			fcpFullAccessRequired?.also { if (cantSetOption { it.fcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
-			if (cantSetOption { it.setNegativeTrust(negativeTrust) }) fieldsWithErrors += "negative-trust"
-			if (cantSetOption { it.setPositiveTrust(positiveTrust) }) fieldsWithErrors += "positive-trust"
-			if (cantSetOption { it.trustComment = trustComment }) fieldsWithErrors += "trust-comment"
+			if (cantSetOption { soneRequest.core.preferences.newPostsPerPage = postsPerPage }) fieldsWithErrors += "posts-per-page"
+			if (cantSetOption { soneRequest.core.preferences.newCharactersPerPost = charactersPerPost }) fieldsWithErrors += "characters-per-post"
+			if (cantSetOption { soneRequest.core.preferences.newPostCutOffLength = postCutOffLength }) fieldsWithErrors += "post-cut-off-length"
+			if (cantSetOption { soneRequest.core.preferences.newImagesPerPage = imagesPerPage }) fieldsWithErrors += "images-per-page"
+			if (cantSetOption { soneRequest.core.preferences.newInsertionDelay = insertionDelay }) fieldsWithErrors += "insertion-delay"
+			fcpFullAccessRequired?.also { if (cantSetOption { soneRequest.core.preferences.newFcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
+			if (cantSetOption { soneRequest.core.preferences.newNegativeTrust = negativeTrust }) fieldsWithErrors += "negative-trust"
+			if (cantSetOption { soneRequest.core.preferences.newPositiveTrust = positiveTrust }) fieldsWithErrors += "positive-trust"
+			if (cantSetOption { soneRequest.core.preferences.newTrustComment = trustComment }) fieldsWithErrors += "trust-comment"
 
 			if (fieldsWithErrors.isEmpty()) {
-				webInterface.core.touchConfiguration()
+				soneRequest.core.touchConfiguration()
 				throw RedirectException("options.html")
 			}
 			templateContext["fieldErrors"] = fieldsWithErrors
 		}
-		getCurrentSone(freenetRequest.toadletContext)?.options?.let { options ->
+		getCurrentSone(soneRequest.toadletContext)?.options?.let { options ->
 			templateContext["auto-follow"] = options.isAutoFollow
 			templateContext["show-notification-new-sones"] = options.isShowNewSoneNotifications
 			templateContext["show-notification-new-posts"] = options.isShowNewPostNotifications
@@ -78,13 +79,13 @@ class OptionsPage(template: Template, webInterface: WebInterface):
 			templateContext["load-linked-images"] = options.loadLinkedImages.toString()
 			templateContext["show-custom-avatars"] = options.showCustomAvatars.toString()
 		}
-		webInterface.core.preferences.let { preferences ->
+		soneRequest.core.preferences.let { preferences ->
 			templateContext["insertion-delay"] = preferences.insertionDelay
 			templateContext["characters-per-post"] = preferences.charactersPerPost
 			templateContext["fcp-full-access-required"] = preferences.fcpFullAccessRequired.ordinal
 			templateContext["images-per-page"] = preferences.imagesPerPage
-			templateContext["fcp-interface-active"] = preferences.isFcpInterfaceActive
-			templateContext["require-full-access"] = preferences.isRequireFullAccess
+			templateContext["fcp-interface-active"] = preferences.fcpInterfaceActive
+			templateContext["require-full-access"] = preferences.requireFullAccess
 			templateContext["negative-trust"] = preferences.negativeTrust
 			templateContext["positive-trust"] = preferences.positiveTrust
 			templateContext["post-cut-off-length"] = preferences.postCutOffLength
@@ -93,9 +94,9 @@ class OptionsPage(template: Template, webInterface: WebInterface):
 		}
 	}
 
-	private fun cantSetOption(setter: (Preferences) -> Unit) =
+	private fun cantSetOption(setter: () -> Unit) =
 			try {
-				setter(webInterface.core.preferences)
+				setter()
 				false
 			} catch (iae: IllegalArgumentException) {
 				true

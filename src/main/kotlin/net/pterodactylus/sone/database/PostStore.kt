@@ -1,5 +1,5 @@
 /*
- * Sone - PostStore.java - Copyright © 2013–2016 David Roden
+ * Sone - PostStore.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for a store for posts.

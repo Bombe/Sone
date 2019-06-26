@@ -1,5 +1,5 @@
 /*
- * Sone - Reply.java - Copyright © 2010–2016 David Roden
+ * Sone - Reply.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import com.google.common.base.Predicate;
  *
  * @param <T>
  *            The type of the reply
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface Reply<T extends Reply<T>> extends Identified {
 

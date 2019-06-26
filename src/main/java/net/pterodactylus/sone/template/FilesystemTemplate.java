@@ -22,15 +22,13 @@ import com.google.common.base.Charsets;
 
 /**
  * {@link Template} implementation that can be reloaded from the filesystem.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FilesystemTemplate extends Template {
 
 	private final String filename;
-	private final AtomicReference<LastLoadedTemplate> lastTemplate = new AtomicReference<LastLoadedTemplate>();
+	private final AtomicReference<LastLoadedTemplate> lastTemplate = new AtomicReference<>();
 	private final TemplateContext initialContext = new TemplateContext();
-	private final List<Part> parts = new ArrayList<Part>();
+	private final List<Part> parts = new ArrayList<>();
 
 	public FilesystemTemplate(String filename) {
 		this.filename = filename;
@@ -120,8 +118,6 @@ public class FilesystemTemplate extends Template {
 
 	/**
 	 * Exception that signals that a template file could not be found.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public static class TemplateFileNotFoundException extends RuntimeException {
 

@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryPostReplyBuilder.java - Copyright © 2013–2016 David Roden
+ * Sone - MemoryPostReplyBuilder.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ import net.pterodactylus.sone.database.SoneProvider;
 /**
  * {@link PostReplyBuilder} implementation that creates {@link MemoryPostReply}
  * objects.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
 

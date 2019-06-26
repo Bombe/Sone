@@ -17,7 +17,7 @@ class ImageAccessorTest {
 
 	private val accessor = ImageAccessor()
 	private val album = mock<Album>()
-	private val images = listOf(mock<Image>(), mock<Image>())
+	private val images = listOf(mock<Image>(), mock())
 
 	@Before
 	fun setupImages() {

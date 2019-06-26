@@ -34,7 +34,7 @@ class ReplyAccessorTest {
 
 	@Test
 	fun `returns the likes correctly`() {
-		val sones = setOf(mock<Sone>(), mock<Sone>(), mock<Sone>())
+		val sones = setOf(mock<Sone>(), mock(), mock())
 		whenever(core.getLikes(reply)).thenReturn(sones)
 		assertThat(accessor.get(templateContext, reply, "likes"), equalTo<Any>(sones))
 	}
@@ -74,7 +74,7 @@ class ReplyAccessorTest {
 
 	@Test
 	fun `return that a reply is loaded if its sone is not null`() {
-		whenever(reply.sone).thenReturn(mock<Sone>())
+		whenever(reply.sone).thenReturn(mock())
 		assertThat(accessor.get(templateContext, reply, "loaded"), equalTo<Any>(true))
 	}
 

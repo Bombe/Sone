@@ -27,17 +27,15 @@ import net.pterodactylus.util.config.Configuration;
 
 /**
  * Parses a {@link Sone}’s data from a {@link Configuration}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ConfigurationSoneParser {
 
 	private final Configuration configuration;
 	private final Sone sone;
 	private final String sonePrefix;
-	private final Map<String, Album> albums = new HashMap<String, Album>();
-	private final List<Album> topLevelAlbums = new ArrayList<Album>();
-	private final Map<String, Image> images = new HashMap<String, Image>();
+	private final Map<String, Album> albums = new HashMap<>();
+	private final List<Album> topLevelAlbums = new ArrayList<>();
+	private final Map<String, Image> images = new HashMap<>();
 
 	public ConfigurationSoneParser(Configuration configuration, Sone sone) {
 		this.configuration = configuration;
@@ -86,7 +84,7 @@ public class ConfigurationSoneParser {
 
 	public Set<Post> parsePosts(PostBuilderFactory postBuilderFactory)
 	throws InvalidPostFound {
-		Set<Post> posts = new HashSet<Post>();
+		Set<Post> posts = new HashSet<>();
 		while (true) {
 			String postPrefix = "/Posts/" + posts.size();
 			String postId = getString(postPrefix + "/ID", null);
@@ -123,7 +121,7 @@ public class ConfigurationSoneParser {
 
 	public Set<PostReply> parsePostReplies(
 			PostReplyBuilderFactory postReplyBuilderFactory) {
-		Set<PostReply> replies = new HashSet<PostReply>();
+		Set<PostReply> replies = new HashSet<>();
 		while (true) {
 			String replyPrefix = "/Replies/" + replies.size();
 			String replyId = getString(replyPrefix + "/ID", null);
@@ -149,7 +147,7 @@ public class ConfigurationSoneParser {
 	}
 
 	public Set<String> parseLikedPostIds() {
-		Set<String> likedPostIds = new HashSet<String>();
+		Set<String> likedPostIds = new HashSet<>();
 		while (true) {
 			String likedPostId =
 					getString("/Likes/Post/" + likedPostIds.size() + "/ID",
@@ -163,7 +161,7 @@ public class ConfigurationSoneParser {
 	}
 
 	public Set<String> parseLikedPostReplyIds() {
-		Set<String> likedPostReplyIds = new HashSet<String>();
+		Set<String> likedPostReplyIds = new HashSet<>();
 		while (true) {
 			String likedReplyId = getString(
 					"/Likes/Reply/" + likedPostReplyIds.size() + "/ID", null);
@@ -176,7 +174,7 @@ public class ConfigurationSoneParser {
 	}
 
 	public Set<String> parseFriends() {
-		Set<String> friends = new HashSet<String>();
+		Set<String> friends = new HashSet<>();
 		while (true) {
 			String friendId =
 					getString("/Friends/" + friends.size() + "/ID", null);

@@ -31,7 +31,6 @@ import java.util.HashMap;
 
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback;
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;
 import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
@@ -83,8 +82,6 @@ import org.mockito.ArgumentMatchers;
 
 /**
  * Unit test for {@link FreenetInterface}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class FreenetInterfaceTest {
 
@@ -215,7 +212,7 @@ public class FreenetInterfaceTest {
 	@Test
 	public void insertingADirectory() throws InsertException, SoneException {
 		FreenetURI freenetUri = mock(FreenetURI.class);
-		HashMap<String, Object> manifestEntries = new HashMap<String, Object>();
+		HashMap<String, Object> manifestEntries = new HashMap<>();
 		String defaultFile = "index.html";
 		FreenetURI resultingUri = mock(FreenetURI.class);
 		when(highLevelSimpleClient.insertManifest(eq(freenetUri), eq(manifestEntries), eq(defaultFile))).thenReturn(resultingUri);
@@ -240,7 +237,7 @@ public class FreenetInterfaceTest {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI().uskForSSK();
 		Callback callback = mock(Callback.class);
 		freenetInterface.registerUsk(freenetUri, callback);
-		verify(uskManager).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -248,7 +245,7 @@ public class FreenetInterfaceTest {
 		FreenetURI freenetUri = new FreenetURI("KSK@GPLv3.txt");
 		Callback callback = mock(Callback.class);
 		freenetInterface.registerUsk(freenetUri, callback);
-		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -272,9 +269,7 @@ public class FreenetInterfaceTest {
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
 		freenetInterface.registerActiveUsk(freenetUri, null);
-		verify(uskManager, never()).subscribe(any(USK.class),
-				any(USKCallback.class), anyBoolean(),
-				eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -282,9 +277,7 @@ public class FreenetInterfaceTest {
 	throws MalformedURLException {
 		FreenetURI freenetUri = createRandom(randomSource, "test-0").getURI();
 		freenetInterface.registerPassiveUsk(freenetUri, null);
-		verify(uskManager, never()).subscribe(any(USK.class),
-				any(USKCallback.class), anyBoolean(),
-				eq((RequestClient) highLevelSimpleClient));
+		verify(uskManager, never()).subscribe(any(USK.class), any(USKCallback.class), anyBoolean(), any(RequestClient.class));
 	}
 
 	@Test
@@ -420,7 +413,7 @@ public class FreenetInterfaceTest {
 
 	@Test
 	public void insertTokenSupplierSuppliesInsertTokens() {
-		InsertTokenSupplier insertTokenSupplier = freenetInterface.new InsertTokenSupplier();
+		InsertTokenSupplier insertTokenSupplier = new InsertTokenSupplier(freenetInterface);
 		assertThat(insertTokenSupplier.apply(image), notNullValue());
 	}
 

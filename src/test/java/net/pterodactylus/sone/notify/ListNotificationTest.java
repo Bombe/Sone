@@ -21,8 +21,6 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link ListNotification}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ListNotificationTest {
 
@@ -36,7 +34,7 @@ public class ListNotificationTest {
 
 	public ListNotificationTest() {
 		when(template.getInitialContext()).thenReturn(templateInitialContext);
-		listNotification = new ListNotification<Object>(ID, KEY, template);
+		listNotification = new ListNotification<>(ID, KEY, template);
 	}
 
 	@Test

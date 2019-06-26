@@ -33,8 +33,6 @@ import org.mockito.ArgumentMatchers;
 
 /**
  * Unit test for {@link ListNotificationFilterTest}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ListNotificationFilterTest {
 

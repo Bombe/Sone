@@ -1,21 +1,21 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
 
 /**
  * Base class for [SoneTemplatePage] implementations that require a logged in user.
  */
-abstract class LoggedInPage(path: String, template: Template, pageTitleKey: String, webInterface: WebInterface) :
-		SoneTemplatePage(path, template, pageTitleKey, webInterface, true) {
+abstract class LoggedInPage(pageTitleKey: String, webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = pageTitleKey, requiresLogin = true) {
 
-	final override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		handleRequest(freenetRequest, getCurrentSone(freenetRequest.toadletContext, false)!!, templateContext)
+	final override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		handleRequest(soneRequest, getCurrentSone(soneRequest.toadletContext, false)!!, templateContext)
 	}
 
-	protected abstract fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext)
+	protected abstract fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext)
 
 }

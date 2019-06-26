@@ -1,5 +1,5 @@
 /*
- * Sone - PostReplyProvider.java - Copyright © 2013–2016 David Roden
+ * Sone - PostReplyProvider.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database
 
-import com.google.common.base.Optional
-import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for objects that can provide [PostReply]s.

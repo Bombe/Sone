@@ -3,11 +3,14 @@ package net.pterodactylus.sone.web.ajax
 import com.google.common.base.Optional
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asOptional
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.Test
 
@@ -88,5 +91,10 @@ class CreatePostAjaxPageTest : JsonPageTest("createPost.ajax", pageSupplier = ::
 				whenever(sone).thenReturn(currentSone)
 				whenever(this.recipientId).thenReturn(recipientId.asOptional())
 			}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<CreatePostAjaxPage>(), notNullValue())
+	}
 
 }

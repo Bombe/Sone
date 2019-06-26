@@ -1,5 +1,5 @@
 /*
- * Sone - ImageInserter.java - Copyright © 2011–2016 David Roden
+ * Sone - ImageInserter.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
+import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.TemporaryImage;
 
@@ -38,8 +41,6 @@ import com.google.common.base.Function;
  * {@link FreenetInterface#insertImage(TemporaryImage, Image, InsertToken)} and
  * also tracks running inserts, giving the possibility to abort a running
  * insert.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageInserter {
 
@@ -61,7 +62,8 @@ public class ImageInserter {
 	 * @param insertTokenSupplier
 	 *            The supplier for insert tokens
 	 */
-	public ImageInserter(FreenetInterface freenetInterface, Function<Image, InsertToken> insertTokenSupplier) {
+	@Inject
+	public ImageInserter(FreenetInterface freenetInterface, InsertTokenSupplier insertTokenSupplier) {
 		this.freenetInterface = freenetInterface;
 		this.insertTokenSupplier = insertTokenSupplier;
 	}

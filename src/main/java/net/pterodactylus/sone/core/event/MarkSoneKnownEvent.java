@@ -1,5 +1,5 @@
 /*
- * Sone - MarkSoneKnownEvent.java - Copyright © 2013–2016 David Roden
+ * Sone - MarkSoneKnownEvent.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ import net.pterodactylus.sone.data.Sone;
 /**
  * Event that signals that a {@link Sone} has been marked as
  * {@link Sone#isKnown() known}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MarkSoneKnownEvent extends SoneEvent {
 

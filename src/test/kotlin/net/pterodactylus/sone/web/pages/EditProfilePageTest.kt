@@ -1,23 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.contains
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.notNullValue
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [EditProfilePage].
  */
-class EditProfilePageTest: WebPageTest(::EditProfilePage) {
+class EditProfilePageTest : WebPageTest(::EditProfilePage) {
 
 	private val profile = Profile(currentSone)
 	private val firstField = profile.addField("First Field")
@@ -40,18 +36,18 @@ class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("editProfile.html"))
+		assertThat(page.path, equalTo("editProfile.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    whenever(l10n.getString("Page.EditProfile.Title")).thenReturn("edit profile page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("edit profile page title"))
+		whenever(l10n.getString("Page.EditProfile.Title")).thenReturn("edit profile page title")
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit profile page title"))
 	}
 
 	@Test
@@ -216,6 +212,21 @@ class EditProfilePageTest: WebPageTest(::EditProfilePage) {
 		setMethod(POST)
 		addHttpRequestPart("edit-field-${firstField.id}", "true")
 		verifyRedirect("editProfileField.html?field=${firstField.id}")
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<EditProfilePage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct menuname`() {
+		assertThat(page.menuName, equalTo("EditProfile"))
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/editProfile.html"))
 	}
 
 }

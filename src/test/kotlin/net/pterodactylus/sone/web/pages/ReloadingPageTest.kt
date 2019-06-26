@@ -1,13 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.web.page.FreenetRequest
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
-import java.nio.file.Files
-import java.nio.file.Paths
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.junit.rules.*
+import java.nio.file.*
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -15,7 +15,9 @@ import kotlin.text.Charsets.UTF_8
  */
 class ReloadingPageTest {
 
-	@Rule @JvmField val tempFolder = TemporaryFolder()
+	@Rule
+	@JvmField
+	val tempFolder = TemporaryFolder()
 	private val folder by lazy { tempFolder.newFolder()!! }
 	private val page by lazy { ReloadingPage<FreenetRequest>("/prefix/", folder.path, "text/plain") }
 	private val webPageTest = WebPageTest()
@@ -50,6 +52,11 @@ class ReloadingPageTest {
 		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("text/plain"))
 		assertThat(responseBytes.toByteArray(), equalTo("Hello\nWorld\n".toByteArray()))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<ReloadingPage<*>>(), notNullValue())
 	}
 
 }

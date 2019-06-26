@@ -1,33 +1,33 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.template.SoneAccessor
-import net.pterodactylus.sone.utils.mapPresent
-import net.pterodactylus.sone.utils.paginate
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
-import java.net.URI
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.template.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import java.net.*
+import javax.inject.*
 
 /**
  * Lets the user browser another Sone.
  */
-class ViewSonePage(template: Template, webInterface: WebInterface):
-		SoneTemplatePage("viewSone.html", template, webInterface, false) {
+@TemplatePath("/templates/viewSone.html")
+@ToadletPath("viewSone.html")
+class ViewSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		SoneTemplatePage(webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
-		templateContext["soneId"] = freenetRequest.parameters["sone"]
-		freenetRequest.parameters["sone"]!!.let(webInterface.core::getSone)?.let { sone ->
+	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
+		templateContext["soneId"] = soneRequest.parameters["sone"]
+		soneRequest.parameters["sone"]!!.let(soneRequest.core::getSone)?.let { sone ->
 			templateContext["sone"] = sone
 			val sonePosts = sone.posts
-			val directedPosts = webInterface.core.getDirectedPosts(sone.id)
+			val directedPosts = soneRequest.core.getDirectedPosts(sone.id)
 			(sonePosts + directedPosts)
 					.sortedByDescending(Post::getTime)
-					.paginate(webInterface.core.preferences.postsPerPage)
-					.apply { page = freenetRequest.parameters["postPage"]?.toIntOrNull() ?: 0 }
+					.paginate(soneRequest.core.preferences.postsPerPage)
+					.apply { page = soneRequest.parameters["postPage"]?.toIntOrNull() ?: 0 }
 					.also {
 						templateContext["postPagination"] = it
 						templateContext["posts"] = it.items
@@ -37,9 +37,9 @@ class ViewSonePage(template: Template, webInterface: WebInterface):
 					.distinct()
 					.minus(sonePosts)
 					.minus(directedPosts)
-					.sortedByDescending { webInterface.core.getReplies(it.id).first().time }
-					.paginate(webInterface.core.preferences.postsPerPage)
-					.apply { page = freenetRequest.parameters["repliedPostPage"]?.toIntOrNull() ?: 0 }
+					.sortedByDescending { soneRequest.core.getReplies(it.id).first().time }
+					.paginate(soneRequest.core.preferences.postsPerPage)
+					.apply { page = soneRequest.parameters["repliedPostPage"]?.toIntOrNull() ?: 0 }
 					.also {
 						templateContext["repliedPostPagination"] = it
 						templateContext["repliedPosts"] = it.items
@@ -47,11 +47,11 @@ class ViewSonePage(template: Template, webInterface: WebInterface):
 		}
 	}
 
-	override fun isLinkExcepted(link: URI?) = true
+	override fun isLinkExcepted(link: URI) = true
 
-	public override fun getPageTitle(freenetRequest: FreenetRequest): String =
-			freenetRequest.parameters["sone"]!!.let(webInterface.core::getSone)?.let { sone ->
-				"${SoneAccessor.getNiceName(sone)} - ${webInterface.l10n.getString("Page.ViewSone.Title")}"
-			} ?: webInterface.l10n.getString("Page.ViewSone.Page.TitleWithoutSone")
+	override fun getPageTitle(soneRequest: SoneRequest): String =
+			soneRequest.parameters["sone"]!!.let(soneRequest.core::getSone)?.let { sone ->
+				"${SoneAccessor.getNiceName(sone)} - ${soneRequest.l10n.getString("Page.ViewSone.Title")}"
+			} ?: soneRequest.l10n.getString("Page.ViewSone.Page.TitleWithoutSone")
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - DatabaseException.java - Copyright © 2013–2016 David Roden
+ * Sone - DatabaseException.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,6 @@ package net.pterodactylus.sone.database;
 
 /**
  * Exception that signals a database error.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DatabaseException extends Exception {
 

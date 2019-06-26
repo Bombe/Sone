@@ -1,5 +1,5 @@
 /*
- * Sone - Client.java - Copyright © 2010–2016 David Roden
+ * Sone - Client.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import com.google.common.base.Objects;
 
 /**
  * Container for the client information of a {@link Sone}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Client {
 

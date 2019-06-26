@@ -1,5 +1,5 @@
 /*
- * Sone - ParserContext.java - Copyright © 2010–2016 David Roden
+ * Sone - ParserContext.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@ package net.pterodactylus.sone.text;
  * Context for the {@link Parser}. This interface needs to be implemented by
  * {@link Parser}s that need to provide more information than just the text to
  * parse to {@link Parser#parse(String, ParserContext)}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface ParserContext {
 

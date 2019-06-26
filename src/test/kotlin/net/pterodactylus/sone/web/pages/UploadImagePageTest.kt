@@ -1,26 +1,24 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.data.Image.Modifier
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.data.TemporaryImage
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Image.*
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.any
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 import org.mockito.Mockito.eq
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
 
 /**
  * Unit test for [UploadImagePage].
  */
-class UploadImagePageTest: WebPageTest(::UploadImagePage) {
+class UploadImagePageTest : WebPageTest(::UploadImagePage) {
 
 	private val parentAlbum = mock<Album>().apply {
 		whenever(id).thenReturn("parent-id")
@@ -29,18 +27,18 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("uploadImage.html"))
+		assertThat(page.path, equalTo("uploadImage.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.UploadImage.Title", "upload image page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("upload image page title"))
+		addTranslation("Page.UploadImage.Title", "upload image page title")
+		assertThat(page.getPageTitle(soneRequest), equalTo("upload image page title"))
 	}
 
 	@Test
@@ -61,7 +59,7 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 	fun `post request with parent that is not the current sone results in no permission error page`() {
 		setMethod(POST)
 		addHttpRequestPart("parent", "parent-id")
-		whenever(parentAlbum.sone).thenReturn(mock<Sone>())
+		whenever(parentAlbum.sone).thenReturn(mock())
 		addAlbum("parent-id", parentAlbum)
 		verifyRedirect("noPermission.html")
 	}
@@ -113,6 +111,16 @@ class UploadImagePageTest: WebPageTest(::UploadImagePage) {
 			verify(imageModifier).setDescription("Description @ KSK@foo")
 			verify(imageModifier).update()
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<UploadImagePage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/invalid.html"))
 	}
 
 }

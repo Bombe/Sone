@@ -4,12 +4,14 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.emptyToNull
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
+import net.pterodactylus.sone.web.page.*
+import javax.inject.Inject
 
 /**
  * AJAX page that lets the user unlike a [net.pterodactylus.sone.data.Post].
  */
-class UnlikeAjaxPage(webInterface: WebInterface) : LoggedInJsonPage("unlike.ajax", webInterface) {
+@ToadletPath("unlike.ajax")
+class UnlikeAjaxPage @Inject constructor(webInterface: WebInterface) : LoggedInJsonPage(webInterface) {
 
 	override fun createJsonObject(currentSone: Sone, request: FreenetRequest) = when (request.parameters["type"]) {
 		"post" -> request.processEntity("post", currentSone::removeLikedPostId)

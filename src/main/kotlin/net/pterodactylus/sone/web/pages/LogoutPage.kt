@@ -1,27 +1,29 @@
 package net.pterodactylus.sone.web.pages
 
-import freenet.clients.http.ToadletContext
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * Logs a user out.
  */
-class LogoutPage(template: Template, webInterface: WebInterface):
-		LoggedInPage("logout.html", template, "Page.Logout.Title", webInterface) {
+@MenuName("Logout")
+@ToadletPath("logout.html")
+class LogoutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.Logout.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		setCurrentSone(freenetRequest.toadletContext, null)
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		setCurrentSone(soneRequest.toadletContext, null)
 		throw RedirectException("index.html")
 	}
 
-	override fun isEnabled(toadletContext: ToadletContext): Boolean =
-			if (webInterface.core.preferences.isRequireFullAccess && !toadletContext.isAllowedFullAccess) {
+	override fun isEnabled(soneRequest: SoneRequest): Boolean =
+			if (soneRequest.core.preferences.requireFullAccess && !soneRequest.toadletContext.isAllowedFullAccess) {
 				false
 			} else
-				getCurrentSone(toadletContext) != null && webInterface.core.localSones.size != 1
+				getCurrentSone(soneRequest.toadletContext) != null && soneRequest.core.localSones.size != 1
 
 }

@@ -4,7 +4,6 @@ import freenet.l10n.BaseL10n
 import freenet.l10n.BaseL10n.LANGUAGE.ENGLISH
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
@@ -17,16 +16,10 @@ import org.mockito.ArgumentMatchers.anyString
  */
 class L10nFilterTest {
 
-	private val webInterface = mock<WebInterface>()
-	private val filter = L10nFilter(webInterface)
-	private val templateContext = mock<TemplateContext>()
 	private val l10n = mock<BaseL10n>()
+	private val filter = L10nFilter(l10n)
+	private val templateContext = mock<TemplateContext>()
 	private val translations = mutableMapOf<String, String>()
-
-	@Before
-	fun setupWebInterface() {
-		whenever(webInterface.l10n).thenReturn(l10n)
-	}
 
 	@Before
 	fun setupL10n() {
@@ -61,7 +54,7 @@ class L10nFilterTest {
 	@Test
 	fun `filter does not replace values if there are no parameters`() {
 		translations["data"] = "{link}"
-		assertThat(filter.format(templateContext, "data", emptyMap()), equalTo("{link}"));
+		assertThat(filter.format(templateContext, "data", emptyMap()), equalTo("{link}"))
 	}
 
 }

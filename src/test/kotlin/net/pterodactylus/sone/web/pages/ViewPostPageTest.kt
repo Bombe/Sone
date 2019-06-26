@@ -1,18 +1,18 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.nullValue
-import org.junit.Test
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.net.*
 
 /**
  * Unit test for [ViewPostPage].
  */
-class ViewPostPageTest: WebPageTest(::ViewPostPage) {
+class ViewPostPageTest : WebPageTest(::ViewPostPage) {
 
 	private val post = mock<Post>()
 
@@ -28,7 +28,7 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 
 	@Test
 	fun `the view post page is link-excepted`() {
-		assertThat(page.isLinkExcepted(null), equalTo(true))
+		assertThat(page.isLinkExcepted(URI("")), equalTo(true))
 	}
 
 	@Test
@@ -72,14 +72,14 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 	@Test
 	fun `page title for request without parameters is default title`() {
 		addTranslation("Page.ViewPost.Title", "view post title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view post title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view post title"))
 	}
 
 	@Test
 	fun `page title for request with invalid post is default title`() {
 		addHttpRequestParameter("post", "invalid-post-id")
 		addTranslation("Page.ViewPost.Title", "view post title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("view post title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("view post title"))
 	}
 
 	@Test
@@ -94,7 +94,17 @@ class ViewPostPageTest: WebPageTest(::ViewPostPage) {
 		addPost("post-id", post)
 		addHttpRequestParameter("post", "post-id")
 		addTranslation("Page.ViewPost.Title", "view post title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("This is a text that … - First M. Last - view post title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("This is a text that … - First M. Last - view post title"))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<ViewPostPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/viewPost.html"))
 	}
 
 }

@@ -8,8 +8,6 @@ import com.google.common.primitives.Longs;
 
 /**
  * Parses numbers from strings.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class NumberParsers {
 

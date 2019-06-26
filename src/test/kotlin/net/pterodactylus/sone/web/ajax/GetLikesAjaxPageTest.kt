@@ -4,11 +4,14 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.web.baseInjector
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.junit.Test
 
 /**
@@ -86,6 +89,11 @@ class GetLikesAjaxPageTest : JsonPageTest("getLikes.ajax", needsFormPassword = f
 		assertThatJsonFailed("invalid-type")
 	}
 
+	@Test
+	fun `page can be created by dependency injection`() {
+	    assertThat(baseInjector.getInstance<GetLikesAjaxPage>(), notNullValue())
+	}
+	
 }
 
 private fun createSone(index: Int) = mock<Sone>().apply {

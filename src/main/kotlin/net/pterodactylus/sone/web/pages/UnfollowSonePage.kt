@@ -1,24 +1,25 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.isPOST
-import net.pterodactylus.sone.utils.parameters
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * This page lets the user unfollow another Sone.
  */
-class UnfollowSonePage(template: Template, webInterface: WebInterface) :
-		LoggedInPage("unfollowSone.html", template, "Page.UnfollowSone.Title", webInterface) {
+@ToadletPath("unfollowSone.html")
+class UnfollowSonePage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
+		LoggedInPage("Page.UnfollowSone.Title", webInterface, loaders, templateRenderer) {
 
-	override fun handleRequest(freenetRequest: FreenetRequest, currentSone: Sone, templateContext: TemplateContext) {
-		if (freenetRequest.isPOST) {
-			freenetRequest.parameters["sone"]!!.split(Regex("[ ,]+"))
-					.forEach { webInterface.core.unfollowSone(currentSone, it) }
-			throw RedirectException(freenetRequest.parameters["returnPage", 256])
+	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
+		if (soneRequest.isPOST) {
+			soneRequest.parameters["sone"]!!.split(Regex("[ ,]+"))
+					.forEach { soneRequest.core.unfollowSone(currentSone, it) }
+			throw RedirectException(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

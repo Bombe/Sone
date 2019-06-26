@@ -1,5 +1,5 @@
 /*
- * Sone - ImageInsertFailedEvent.java - Copyright © 2013–2016 David Roden
+ * Sone - ImageInsertFailedEvent.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,8 +21,6 @@ import net.pterodactylus.sone.data.Image;
 
 /**
  * Event that signals that an {@link Image} insert has failed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageInsertFailedEvent extends ImageEvent {
 

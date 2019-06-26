@@ -128,7 +128,7 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns that the sone’s status is not unknown if it is not unknown`() {
-		whenever(sone.status).thenReturn(mock<SoneStatus>())
+		whenever(sone.status).thenReturn(mock())
 		assertAccessorReturnValue("unknown", false)
 	}
 
@@ -140,7 +140,7 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns that the sone’s status is not idle if it is not idle`() {
-		whenever(sone.status).thenReturn(mock<SoneStatus>())
+		whenever(sone.status).thenReturn(mock())
 		assertAccessorReturnValue("idle", false)
 	}
 
@@ -152,7 +152,7 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns that the sone’s status is not inserting if it is not inserting`() {
-		whenever(sone.status).thenReturn(mock<SoneStatus>())
+		whenever(sone.status).thenReturn(mock())
 		assertAccessorReturnValue("inserting", false)
 	}
 
@@ -164,7 +164,7 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns that the sone’s status is not downloading if it is not downloading`() {
-		whenever(sone.status).thenReturn(mock<SoneStatus>())
+		whenever(sone.status).thenReturn(mock())
 		assertAccessorReturnValue("downloading", false)
 	}
 
@@ -217,7 +217,7 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns all images in the correct order`() {
-		val images = listOf(mock<Image>(), mock<Image>(), mock<Image>(), mock<Image>(), mock<Image>())
+		val images = listOf(mock<Image>(), mock(), mock(), mock(), mock())
 		val firstAlbum = createAlbum(listOf(), listOf(images[0], images[3]))
 		val secondAlbum = createAlbum(listOf(), listOf(images[1], images[4], images[2]))
 		val rootAlbum = createAlbum(listOf(firstAlbum, secondAlbum), listOf())
@@ -233,7 +233,7 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns all albums in the correct order`() {
-		val albums = listOf(mock<Album>(), mock<Album>(), mock<Album>(), mock<Album>(), mock<Album>())
+		val albums = listOf(mock<Album>(), mock(), mock(), mock(), mock())
 		val rootAlbum = createAlbum(albums, listOf())
 		whenever(sone.rootAlbum).thenReturn(rootAlbum)
 		assertAccessorReturnValueMatches("albums", contains(*albums.toTypedArray()))

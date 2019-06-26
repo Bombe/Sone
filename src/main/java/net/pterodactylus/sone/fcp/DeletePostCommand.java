@@ -1,5 +1,5 @@
 /*
- * Sone - DeletePostCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - DeletePostCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,6 @@ import freenet.support.SimpleFieldSet;
  * FCP command that deletes a {@link Post}.
  *
  * @see Core#deletePost(Post)
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class DeletePostCommand extends AbstractSoneCommand {
 

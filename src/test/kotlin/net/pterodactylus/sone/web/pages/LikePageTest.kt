@@ -1,31 +1,32 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.verify
-import org.mockito.Mockito.verifyNoMoreInteractions
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [LikePage].
  */
-class LikePageTest: WebPageTest(::LikePage) {
+class LikePageTest : WebPageTest(::LikePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("like.html"))
+		assertThat(page.path, equalTo("like.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
-	    addTranslation("Page.Like.Title", "like page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("like page title"))
+		addTranslation("Page.Like.Title", "like page title")
+		assertThat(page.getPageTitle(soneRequest), equalTo("like page title"))
 	}
 
 	@Test
@@ -63,6 +64,11 @@ class LikePageTest: WebPageTest(::LikePage) {
 		verifyRedirect("return.html") {
 			verifyNoMoreInteractions(currentSone)
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<LikePage>(), notNullValue())
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Sone - Context.java - Copyright © 2014–2016 David Roden
+ * Sone - Context.java - Copyright © 2014–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,8 +24,6 @@ import com.google.common.base.Function;
 /**
  * Custom container for the Web of Trust context. This allows easier
  * configuration of dependency injection.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class Context {
 

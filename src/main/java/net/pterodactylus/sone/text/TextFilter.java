@@ -1,5 +1,5 @@
 /*
- * Sone - TextFilter.java - Copyright © 2011–2016 David Roden
+ * Sone - TextFilter.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ package net.pterodactylus.sone.text;
  * will be converted to “KSK@gpl.txt”. This will only work for links that point
  * to the same address Sone is accessed by, so if you access Sone using
  * localhost:8888, links to 127.0.0.1:8888 will not be removed.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TextFilter {
 

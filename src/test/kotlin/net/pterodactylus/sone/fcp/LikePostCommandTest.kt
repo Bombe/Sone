@@ -1,23 +1,19 @@
 package net.pterodactylus.sone.fcp
 
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.freenet.fcp.FcpException
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.sone.utils.asOptional
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.freenet.fcp.*
+import net.pterodactylus.sone.test.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [LikePostCommand].
  */
 class LikePostCommandTest : SoneCommandTest() {
 
-	private val post = createPost("PostId", mock<Sone>(), null, 1000, "Text")
+	private val post = createPost("PostId", mock(), null, 1000, "Text")
 
 	override fun createCommand(core: Core) = LikePostCommand(core)
 
@@ -30,7 +26,7 @@ class LikePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `command requires write access`() {
-		assertThat(command.requiresWriteAccess(), equalTo(true))
+		assertThat(command.requiresWriteAccess, equalTo(true))
 	}
 
 	@Test
@@ -70,7 +66,7 @@ class LikePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `request with valid parameters adds post to liked posts for sone`() {
-		whenever(core.getLikes(post)).thenReturn(setOf(mock<Sone>(), mock<Sone>(), mock<Sone>()))
+		whenever(core.getLikes(post)).thenReturn(setOf(mock(), mock(), mock()))
 		parameters += "Post" to "PostId"
 		parameters += "Sone" to "LocalSoneId"
 		val replyParameters = command.execute(parameters).replyParameters

@@ -9,9 +9,6 @@ import static org.mockito.Mockito.when;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.util.template.HtmlFilter;
-import net.pterodactylus.util.template.TemplateContext;
-import net.pterodactylus.util.template.TemplateContextFactory;
 
 import com.google.common.collect.ImmutableMap;
 import org.hamcrest.Matchers;
@@ -23,21 +20,12 @@ import org.junit.Test;
 
 /**
  * Unit test for {@link ImageLinkFilterTest}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class ImageLinkFilterTest {
 
 	private final Core core = mock(Core.class);
-	private final TemplateContextFactory templateContextFactory = new TemplateContextFactory();
-	private final ImageLinkFilter imageLinkFilter = new ImageLinkFilter(core, templateContextFactory);
-	private final TemplateContext templateContext = null;
+	private final ImageLinkFilter imageLinkFilter = new ImageLinkFilter(core);
 	private final Image image = mock(Image.class);
-
-	@Before
-	public void setupTemplateContextFactory() {
-		templateContextFactory.addFilter("html", new HtmlFilter());
-	}
 
 	@Before
 	public void setupCore() {
@@ -58,7 +46,7 @@ public class ImageLinkFilterTest {
 	@Test
 	public void imageLinkIsGeneratedCorrectlyForNotInsertedImages() {
 		when(image.isInserted()).thenReturn(false);
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image, ImmutableMap.<String, Object>of()));
+		String result = String.valueOf(imageLinkFilter.format(null, image, ImmutableMap.<String, Object>of()));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("class"), is(""));
 		assertThat(imageElement.attr("src"), is("getImage.html?image=image-id"));
@@ -70,7 +58,7 @@ public class ImageLinkFilterTest {
 
 	@Test
 	public void imageLinkIsGeneratedCorrectlyForInsertedImages() {
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image, ImmutableMap.<String, Object>of()));
+		String result = String.valueOf(imageLinkFilter.format(null, image, ImmutableMap.<String, Object>of()));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("class"), is(""));
 		assertThat(imageElement.attr("src"), is("/image-key"));
@@ -82,7 +70,7 @@ public class ImageLinkFilterTest {
 
 	@Test
 	public void imageTitleAndDescriptionAreOverriddenCorrectly() {
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image, ImmutableMap.<String, Object>of("title", "Test Title")));
+		String result = String.valueOf(imageLinkFilter.format(null, image, ImmutableMap.<String, Object>of("title", "Test Title")));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("title"), is("Test Title"));
 		assertThat(imageElement.attr("alt"), is("Test Title"));
@@ -90,7 +78,7 @@ public class ImageLinkFilterTest {
 
 	@Test
 	public void imageIsScaledByWidthCorrectly() {
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image, ImmutableMap.<String, Object>of("max-width", "320")));
+		String result = String.valueOf(imageLinkFilter.format(null, image, ImmutableMap.<String, Object>of("max-width", "320")));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("width"), is("320"));
 		assertThat(imageElement.attr("height"), is("135"));
@@ -98,7 +86,7 @@ public class ImageLinkFilterTest {
 
 	@Test
 	public void imageIsScaledByHeightCorrectly() {
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image, ImmutableMap.<String, Object>of("max-height", "135")));
+		String result = String.valueOf(imageLinkFilter.format(null, image, ImmutableMap.<String, Object>of("max-height", "135")));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("width"), is("320"));
 		assertThat(imageElement.attr("height"), is("135"));
@@ -106,7 +94,7 @@ public class ImageLinkFilterTest {
 
 	@Test
 	public void wideImageIsEnlargedCorrectly() {
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image,
+		String result = String.valueOf(imageLinkFilter.format(null, image,
 				ImmutableMap.<String, Object>of("mode", "enlarge", "max-width", "100", "max-height", "100")));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("width"), is("237"));
@@ -119,7 +107,7 @@ public class ImageLinkFilterTest {
 	public void highImageIsEnlargedCorrectly() {
 		when(image.getWidth()).thenReturn(270);
 		when(image.getHeight()).thenReturn(640);
-		String result = String.valueOf(imageLinkFilter.format(templateContext, image,
+		String result = String.valueOf(imageLinkFilter.format(null, image,
 				ImmutableMap.<String, Object>of("mode", "enlarge", "max-width", "100", "max-height", "100")));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("width"), is("100"));
@@ -130,12 +118,12 @@ public class ImageLinkFilterTest {
 
 	@Test
 	public void nullImageIsReturnedAsNull() {
-		assertThat(imageLinkFilter.format(templateContext, null, null), nullValue());
+		assertThat(imageLinkFilter.format(null, null, null), nullValue());
 	}
 
 	@Test
 	public void stringIsUsedToLoadImageFromCore() {
-		String result = String.valueOf(imageLinkFilter.format(templateContext, "image-id", ImmutableMap.<String, Object>of()));
+		String result = String.valueOf(imageLinkFilter.format(null, "image-id", ImmutableMap.<String, Object>of()));
 		Element imageElement = getSingleElement(result);
 		assertThat(imageElement.attr("class"), is(""));
 		assertThat(imageElement.attr("src"), is("/image-key"));

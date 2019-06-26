@@ -1,5 +1,5 @@
 /*
- * Sone - ImageBuilderImpl.java - Copyright © 2013–2016 David Roden
+ * Sone - ImageBuilderImpl.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ import net.pterodactylus.sone.database.ImageBuilder;
 
 /**
  * {@link ImageBuilder} implementation that creates {@link ImageImpl} objects.
- *
- * @author <a href="mailto:d.roden@xplosion.de">David Roden</a>
  */
 public class ImageBuilderImpl extends AbstractImageBuilder {
 

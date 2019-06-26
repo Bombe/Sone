@@ -1,14 +1,12 @@
 package net.pterodactylus.sone.fcp
 
-import com.google.common.base.Optional.of
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [DeletePostCommand].
@@ -21,7 +19,7 @@ class DeletePostCommandTest : SoneCommandTest() {
 
 	@Test
 	fun `command requires write access`() {
-		assertThat(command.requiresWriteAccess(), equalTo(true))
+		assertThat(command.requiresWriteAccess, equalTo(true))
 	}
 
 	@Test

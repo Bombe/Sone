@@ -1,5 +1,5 @@
 /*
- * Sone - Core.java - Copyright © 2010–2016 David Roden
+ * Sone - Core.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,8 +48,6 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
-import net.pterodactylus.sone.core.SoneChangeDetector.PostProcessor;
-import net.pterodactylus.sone.core.SoneChangeDetector.PostReplyProcessor;
 import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
@@ -113,8 +111,6 @@ import kotlin.jvm.functions.Function1;
 
 /**
  * The Sone core.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class Core extends AbstractService implements SoneProvider, PostProvider, PostReplyProvider {
@@ -158,23 +154,20 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The trust updater. */
 	private final WebOfTrustUpdater webOfTrustUpdater;
 
-	/** The times Sones were followed. */
-	private final Map<String, Long> soneFollowingTimes = new HashMap<String, Long>();
-
 	/** Locked local Sones. */
 	/* synchronize on itself. */
-	private final Set<Sone> lockedSones = new HashSet<Sone>();
+	private final Set<Sone> lockedSones = new HashSet<>();
 
 	/** Sone inserters. */
 	/* synchronize access on this on sones. */
-	private final Map<Sone, SoneInserter> soneInserters = new HashMap<Sone, SoneInserter>();
+	private final Map<Sone, SoneInserter> soneInserters = new HashMap<>();
 
 	/** Sone rescuers. */
 	/* synchronize access on this on sones. */
-	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<Sone, SoneRescuer>();
+	private final Map<Sone, SoneRescuer> soneRescuers = new HashMap<>();
 
 	/** All known Sones. */
-	private final Set<String> knownSones = new HashSet<String>();
+	private final Set<String> knownSones = new HashSet<>();
 
 	/** The post database. */
 	private final Database database;
@@ -183,7 +176,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final Multimap<OwnIdentity, Identity> trustedIdentities = Multimaps.synchronizedSetMultimap(HashMultimap.<OwnIdentity, Identity>create());
 
 	/** All temporary images. */
-	private final Map<String, TemporaryImage> temporaryImages = new HashMap<String, TemporaryImage>();
+	private final Map<String, TemporaryImage> temporaryImages = new HashMap<>();
 
 	/** Ticker for threads that mark own elements as known. */
 	private final ScheduledExecutorService localElementTicker = Executors.newScheduledThreadPool(1);
@@ -208,22 +201,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The database
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
-		super("Sone Core");
-		this.configuration = configuration;
-		this.freenetInterface = freenetInterface;
-		this.identityManager = identityManager;
-		this.soneDownloader = new SoneDownloaderImpl(this, freenetInterface);
-		this.imageInserter = new ImageInserter(freenetInterface, freenetInterface.new InsertTokenSupplier());
-		this.updateChecker = updateChecker;
-		this.webOfTrustUpdater = webOfTrustUpdater;
-		this.eventBus = eventBus;
-		this.database = database;
-		preferences = new Preferences(eventBus);
-	}
-
-	@VisibleForTesting
-	protected Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -401,20 +379,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	/**
-	 * Returns the time when the given was first followed by any local Sone.
-	 *
-	 * @param sone
-	 *            The Sone to get the time for
-	 * @return The time (in milliseconds since Jan 1, 1970) the Sone has first
-	 *         been followed, or {@link Long#MAX_VALUE}
-	 */
-	public long getSoneFollowingTime(Sone sone) {
-		synchronized (soneFollowingTimes) {
-			return Optional.fromNullable(soneFollowingTimes.get(sone.getId())).or(Long.MAX_VALUE);
-		}
-	}
-
-	/**
 	 * Returns a post builder.
 	 *
 	 * @return A new post builder
@@ -480,7 +444,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sones that like the given post
 	 */
 	public Set<Sone> getLikes(Post post) {
-		Set<Sone> sones = new HashSet<Sone>();
+		Set<Sone> sones = new HashSet<>();
 		for (Sone sone : getSones()) {
 			if (sone.getLikedPostIds().contains(post.getId())) {
 				sones.add(sone);
@@ -497,7 +461,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 * @return The Sones that like the given reply
 	 */
 	public Set<Sone> getLikes(PostReply reply) {
-		Set<Sone> sones = new HashSet<Sone>();
+		Set<Sone> sones = new HashSet<>();
 		for (Sone sone : getSones()) {
 			if (sone.getLikedReplyIds().contains(reply.getId())) {
 				sones.add(sone);
@@ -723,7 +687,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		database.storeSone(sone);
 		soneDownloader.addSone(sone);
-		soneDownloaders.execute(soneDownloader.fetchSoneWithUriAction(sone));
+		soneDownloaders.execute(soneDownloader.fetchSoneAsUskAction(sone));
 		return sone;
 	}
 
@@ -739,24 +703,20 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
 		database.addFriend(sone, soneId);
-		synchronized (soneFollowingTimes) {
-			if (!soneFollowingTimes.containsKey(soneId)) {
-				long now = System.currentTimeMillis();
-				soneFollowingTimes.put(soneId, now);
-				Sone followedSone = getSone(soneId);
-				if (followedSone == null) {
-					return;
-				}
-				for (Post post : followedSone.getPosts()) {
-					if (post.getTime() < now) {
-						markPostKnown(post);
-					}
-				}
-				for (PostReply reply : followedSone.getReplies()) {
-					if (reply.getTime() < now) {
-						markReplyKnown(reply);
-					}
-				}
+		@SuppressWarnings("ConstantConditions") // we just followed, this can’t be null.
+		long now = database.getFollowingTime(soneId);
+		Sone followedSone = getSone(soneId);
+		if (followedSone == null) {
+			return;
+		}
+		for (Post post : followedSone.getPosts()) {
+			if (post.getTime() < now) {
+				markPostKnown(post);
+			}
+		}
+		for (PostReply reply : followedSone.getReplies()) {
+			if (reply.getTime() < now) {
+				markReplyKnown(reply);
 			}
 		}
 		touchConfiguration();
@@ -774,15 +734,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(sone, "sone must not be null");
 		checkNotNull(soneId, "soneId must not be null");
 		database.removeFriend(sone, soneId);
-		boolean unfollowedSoneStillFollowed = false;
-		for (Sone localSone : getLocalSones()) {
-			unfollowedSoneStillFollowed |= localSone.hasFriend(soneId);
-		}
-		if (!unfollowedSoneStillFollowed) {
-			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.remove(soneId);
-			}
-		}
 		touchConfiguration();
 	}
 
@@ -898,44 +849,33 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 	}
 
-	private List<Object> collectEventsForChangesInSone(Sone oldSone,
-			final Sone newSone) {
-		final List<Object> events = new ArrayList<Object>();
-		SoneChangeDetector soneChangeDetector = new SoneChangeDetector(
-				oldSone);
-		soneChangeDetector.onNewPosts(new PostProcessor() {
-			@Override
-			public void processPost(Post post) {
-				if (post.getTime() < getSoneFollowingTime(newSone)) {
-					post.setKnown(true);
-				} else if (!post.isKnown()) {
-					events.add(new NewPostFoundEvent(post));
-				}
+	private List<Object> collectEventsForChangesInSone(Sone oldSone, Sone newSone) {
+		List<Object> events = new ArrayList<>();
+		SoneComparison soneComparison = new SoneComparison(oldSone, newSone);
+		for (Post newPost : soneComparison.getNewPosts()) {
+			if (newPost.getSone().equals(newSone)) {
+				newPost.setKnown(true);
+			} else if (newPost.getTime() < database.getFollowingTime(newSone.getId())) {
+				newPost.setKnown(true);
+			} else if (!newPost.isKnown()) {
+				events.add(new NewPostFoundEvent(newPost));
 			}
-		});
-		soneChangeDetector.onRemovedPosts(new PostProcessor() {
-			@Override
-			public void processPost(Post post) {
-				events.add(new PostRemovedEvent(post));
+		}
+		for (Post post : soneComparison.getRemovedPosts()) {
+			events.add(new PostRemovedEvent(post));
+		}
+		for (PostReply postReply : soneComparison.getNewPostReplies()) {
+			if (postReply.getSone().equals(newSone)) {
+				postReply.setKnown(true);
+			} else if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
+				postReply.setKnown(true);
+			} else if (!postReply.isKnown()) {
+				events.add(new NewPostReplyFoundEvent(postReply));
 			}
-		});
-		soneChangeDetector.onNewPostReplies(new PostReplyProcessor() {
-			@Override
-			public void processPostReply(PostReply postReply) {
-				if (postReply.getTime() < getSoneFollowingTime(newSone)) {
-					postReply.setKnown(true);
-				} else if (!postReply.isKnown()) {
-					events.add(new NewPostReplyFoundEvent(postReply));
-				}
-			}
-		});
-		soneChangeDetector.onRemovedPostReplies(new PostReplyProcessor() {
-			@Override
-			public void processPostReply(PostReply postReply) {
-				events.add(new PostReplyRemovedEvent(postReply));
-			}
-		});
-		soneChangeDetector.detectChanges(newSone);
+		}
+		for (PostReply postReply : soneComparison.getRemovedPostReplies()) {
+			events.add(new PostReplyRemovedEvent(postReply));
+		}
 		return events;
 	}
 
@@ -1388,7 +1328,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		identityManager.start();
 		webOfTrustUpdater.init();
 		webOfTrustUpdater.start();
-		database.start();
+		database.startAsync();
 	}
 
 	/**
@@ -1428,7 +1368,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 		}
 		saveConfiguration();
-		database.stop();
+		database.stopAsync();
 		webOfTrustUpdater.stop();
 		updateChecker.stop();
 		soneDownloader.stop();
@@ -1596,17 +1536,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 				configuration.getStringValue("KnownSone/" + soneCounter + "/ID").setValue(null);
 			}
 
-			/* save Sone following times. */
-			soneCounter = 0;
-			synchronized (soneFollowingTimes) {
-				for (Entry<String, Long> soneFollowingTime : soneFollowingTimes.entrySet()) {
-					configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(soneFollowingTime.getKey());
-					configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").setValue(soneFollowingTime.getValue());
-					++soneCounter;
-				}
-				configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").setValue(null);
-			}
-
 			/* save known posts. */
 			database.save();
 
@@ -1640,20 +1569,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			synchronized (knownSones) {
 				knownSones.add(knownSoneId);
 			}
-		}
-
-		/* load Sone following times. */
-		soneCounter = 0;
-		while (true) {
-			String soneId = configuration.getStringValue("SoneFollowingTimes/" + soneCounter + "/Sone").getValue(null);
-			if (soneId == null) {
-				break;
-			}
-			long time = configuration.getLongValue("SoneFollowingTimes/" + soneCounter + "/Time").getValue(Long.MAX_VALUE);
-			synchronized (soneFollowingTimes) {
-				soneFollowingTimes.put(soneId, time);
-			}
-			++soneCounter;
 		}
 	}
 
@@ -1720,7 +1635,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			}
 		}
 		soneDownloader.addSone(sone);
-		soneDownloaders.execute(soneDownloader.fetchSoneAction(sone));
+		soneDownloaders.execute(soneDownloader.fetchSoneAsSskAction(sone));
 	}
 
 	/**

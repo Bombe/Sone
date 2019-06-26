@@ -1,5 +1,5 @@
 /*
- * Sone - UniqueElementFilter.java - Copyright © 2011–2016 David Roden
+ * Sone - UniqueElementFilter.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,8 +27,6 @@ import net.pterodactylus.util.template.TemplateContext;
 
 /**
  * Filter that reduces a collection to a {@link Set}, removing duplicates.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class UniqueElementFilter implements Filter {
 
@@ -40,7 +38,7 @@ public class UniqueElementFilter implements Filter {
 		if (!(data instanceof Collection<?>)) {
 			return data;
 		}
-		return new HashSet<Object>((Collection<?>) data);
+		return new HashSet<>((Collection<?>) data);
 	}
 
 }

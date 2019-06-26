@@ -1,19 +1,19 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Profile
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [EditProfileFieldPage].
  */
-class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
+class EditProfileFieldPageTest : WebPageTest(::EditProfileFieldPage) {
 
 	private val profile = Profile(currentSone)
 	private val field = profile.addField("Name")
@@ -25,18 +25,18 @@ class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("editProfileField.html"))
+		assertThat(page.path, equalTo("editProfileField.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.EditProfileField.Title")).thenReturn("edit profile field title")
-	    assertThat(page.getPageTitle(freenetRequest), equalTo("edit profile field title"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit profile field title"))
 	}
 
 	@Test
@@ -91,6 +91,16 @@ class EditProfileFieldPageTest: WebPageTest(::EditProfileFieldPage) {
 		assertThat(field.name, equalTo("Name"))
 		verify(currentSone, never()).profile = profile
 		assertThat(templateContext["duplicateFieldName"], equalTo<Any>(true))
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<EditProfileFieldPage>(), notNullValue())
+	}
+
+	@Test
+	fun `page is annotated with correct template path`() {
+		assertThat(page.templatePath, equalTo("/templates/editProfileField.html"))
 	}
 
 }

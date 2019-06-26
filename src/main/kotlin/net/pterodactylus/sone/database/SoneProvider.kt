@@ -1,5 +1,5 @@
 /*
- * Sone - SoneProvider.java - Copyright © 2011–2016 David Roden
+ * Sone - SoneProvider.kt - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,9 @@
 
 package net.pterodactylus.sone.database
 
-import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Sone
-
-import com.google.common.base.Function
-import com.google.common.base.Optional
-import com.google.inject.ImplementedBy
+import com.google.inject.*
+import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.data.*
 
 /**
  * Interface for objects that can provide [Sone]s by their ID.

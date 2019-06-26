@@ -1,23 +1,20 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Album.Modifier
-import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.mockBuilder
-import net.pterodactylus.sone.test.whenever
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Before
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Album.*
+import net.pterodactylus.sone.data.Album.Modifier.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [EditAlbumPage].
  */
-class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
+class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 
 	private val album = mock<Album>()
 	private val parentAlbum = mock<Album>()
@@ -49,7 +46,7 @@ class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
 	@Test
 	fun `page returns correct title`() {
 		whenever(l10n.getString("Page.EditAlbum.Title")).thenReturn("edit album page")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("edit album page"))
+		assertThat(page.getPageTitle(soneRequest), equalTo("edit album page"))
 	}
 
 	@Test
@@ -118,6 +115,11 @@ class EditAlbumPageTest: WebPageTest(::EditAlbumPage) {
 			verify(modifier).update()
 			verify(core).touchConfiguration()
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<EditAlbumPage>(), notNullValue())
 	}
 
 }

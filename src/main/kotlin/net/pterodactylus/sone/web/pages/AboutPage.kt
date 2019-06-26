@@ -1,20 +1,21 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.main.SonePlugin.PluginHomepage
-import net.pterodactylus.sone.main.SonePlugin.PluginVersion
-import net.pterodactylus.sone.main.SonePlugin.PluginYear
-import net.pterodactylus.sone.web.WebInterface
-import net.pterodactylus.sone.web.page.FreenetRequest
-import net.pterodactylus.util.template.Template
-import net.pterodactylus.util.template.TemplateContext
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.template.*
+import javax.inject.*
 
 /**
  * A [SoneTemplatePage] that stores information about Sone in the [TemplateContext].
  */
-class AboutPage(template: Template, webInterface: WebInterface,
+@MenuName("About")
+@TemplatePath("/templates/about.html")
+@ToadletPath("about.html")
+class AboutPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer,
 		private val pluginVersion: PluginVersion,
 		private val pluginYear: PluginYear,
-		private val pluginHomepage: PluginHomepage): SoneTemplatePage("about.html", template, "Page.About.Title", webInterface, false) {
+		private val pluginHomepage: PluginHomepage) : SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.About.Title") {
 
 	override fun handleRequest(freenetRequest: FreenetRequest, templateContext: TemplateContext) {
 		templateContext["version"] = pluginVersion.version

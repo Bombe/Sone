@@ -1,5 +1,5 @@
 /*
- * Sone - FcpInterface.java - Copyright © 2011–2016 David Roden
+ * Sone - FcpInterface.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,16 +54,12 @@ import com.google.inject.Inject;
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 @Singleton
 public class FcpInterface {
 
 	/**
 	 * The action level that full access for the FCP connection is required.
-	 *
-	 * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
 	 */
 	public enum FullAccessRequired {
 
@@ -85,7 +81,7 @@ public class FcpInterface {
 	private final AtomicBoolean active = new AtomicBoolean();
 
 	/** What function full access is required for. */
-	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<FullAccessRequired>(FullAccessRequired.ALWAYS);
+	private final AtomicReference<FullAccessRequired> fullAccessRequired = new AtomicReference<>(FullAccessRequired.ALWAYS);
 
 	/** All available FCP commands. */
 	private final Map<String, AbstractSoneCommand> commands;

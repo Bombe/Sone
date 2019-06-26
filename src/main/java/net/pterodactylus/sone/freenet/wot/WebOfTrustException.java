@@ -1,5 +1,5 @@
 /*
- * Sone - WebOfTrustException.java - Copyright © 2010–2016 David Roden
+ * Sone - WebOfTrustException.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@ package net.pterodactylus.sone.freenet.wot;
 /**
  * Exception that signals an error processing web of trust identities, mostly
  * when communicating with the web of trust plugin.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class WebOfTrustException extends Exception {
 

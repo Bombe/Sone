@@ -2,6 +2,9 @@ package net.pterodactylus.sone.test;
 
 import java.util.concurrent.atomic.AtomicReference;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.pterodactylus.util.config.ConfigurationException;
 import net.pterodactylus.util.config.Value;
 
@@ -9,30 +12,30 @@ import com.google.common.base.Objects;
 
 /**
  * Simple {@link Value} implementation.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class TestValue<T> implements Value<T> {
 
-	private final AtomicReference<T> value = new AtomicReference<T>();
+	private final AtomicReference<T> value = new AtomicReference<>();
 
-	public TestValue(T originalValue) {
+	public TestValue(@Nullable T originalValue) {
 		value.set(originalValue);
 	}
 
 	@Override
+	@Nullable
 	public T getValue() throws ConfigurationException {
 		return value.get();
 	}
 
 	@Override
-	public T getValue(T defaultValue) {
+	@Nullable
+	public T getValue(@Nullable T defaultValue) {
 		final T realValue = value.get();
 		return (realValue != null) ? realValue : defaultValue;
 	}
 
 	@Override
-	public void setValue(T newValue) throws ConfigurationException {
+	public void setValue(@Nullable T newValue) throws ConfigurationException {
 		value.set(newValue);
 	}
 
@@ -48,12 +51,14 @@ public class TestValue<T> implements Value<T> {
 	}
 
 	@Override
+	@Nonnull
 	public String toString() {
 		return String.valueOf(value.get());
 	}
 
-	public static <T> Value<T> from(T value) {
-		return new TestValue<T>(value);
+	@Nonnull
+	public static <T> Value<T> from(@Nullable T value) {
+		return new TestValue<>(value);
 	}
 
 }

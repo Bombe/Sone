@@ -17,8 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import net.pterodactylus.sone.core.FreenetInterface.Callback;
-import net.pterodactylus.sone.core.FreenetInterface.Fetched;
 import net.pterodactylus.sone.core.event.UpdateFoundEvent;
+import net.pterodactylus.sone.main.PluginHomepage;
 import net.pterodactylus.util.version.Version;
 
 import freenet.client.ClientMetadata;
@@ -36,15 +36,14 @@ import org.mockito.stubbing.Answer;
 
 /**
  * Unit test for {@link UpdateChecker}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class UpdateCheckerTest {
 
 	private final EventBus eventBus = mock(EventBus.class);
 	private final FreenetInterface freenetInterface = mock(FreenetInterface.class);
 	private final Version currentVersion = new Version(1, 0, 0);
-	private final UpdateChecker updateChecker = new UpdateChecker(eventBus, freenetInterface, currentVersion);
+	private final PluginHomepage pluginHomepage = new PluginHomepage("KSK@homepage");
+	private final UpdateChecker updateChecker = new UpdateChecker(eventBus, freenetInterface, currentVersion, pluginHomepage);
 
 	@Before
 	public void startUpdateChecker() {

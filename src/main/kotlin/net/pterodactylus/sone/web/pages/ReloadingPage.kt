@@ -1,14 +1,13 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.util.web.Page
-import net.pterodactylus.util.web.Request
-import net.pterodactylus.util.web.Response
-import java.io.File
+import net.pterodactylus.util.web.*
+import java.io.*
+import javax.inject.*
 
 /**
  * [Page] implementation that delivers static files from the filesystem.
  */
-class ReloadingPage<R: Request>(private val prefix: String, private val path: String, private val mimeType: String): Page<R> {
+class ReloadingPage<R : Request> @Inject constructor(private val prefix: String, private val path: String, private val mimeType: String) : Page<R> {
 
 	override fun isPrefixPage() = true
 

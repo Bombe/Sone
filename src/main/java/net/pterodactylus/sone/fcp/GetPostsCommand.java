@@ -1,5 +1,5 @@
 /*
- * Sone - GetPostsCommand.java - Copyright © 2011–2016 David Roden
+ * Sone - GetPostsCommand.java - Copyright © 2011–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,8 +29,6 @@ import freenet.support.SimpleFieldSet;
 /**
  * Implements the “GetPosts” FCP command that returns the list of posts a Sone
  * made.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class GetPostsCommand extends AbstractSoneCommand {
 

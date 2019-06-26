@@ -1,5 +1,5 @@
 /*
- * Sone - PostReply.java - Copyright © 2010–2016 David Roden
+ * Sone - PostReply.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@ import com.google.common.base.Predicate;
 /**
  * A reply is like a {@link Post} but can never be posted on its own, it always
  * refers to another {@link Post}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public interface PostReply extends Reply<PostReply> {
 

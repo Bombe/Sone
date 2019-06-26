@@ -1,5 +1,5 @@
 /*
- * Sone - RequestChangeFilter.java - Copyright © 2010–2016 David Roden
+ * Sone - RequestChangeFilter.java - Copyright © 2010–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,6 @@ import net.pterodactylus.util.template.TemplateContext;
  * This filter expects a {@link FreenetRequest} as input and outputs a
  * {@link URI} that is modified by the parameters. The name of the parameter is
  * handed in as “name”, the new value is stored in “value”.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class RequestChangeFilter implements Filter {
 
@@ -48,7 +46,7 @@ public class RequestChangeFilter implements Filter {
 		String name = String.valueOf(parameters.get("name"));
 		String value = String.valueOf(parameters.get("value"));
 
-		Map<String, String> values = new HashMap<String, String>();
+		Map<String, String> values = new HashMap<>();
 		Collection<String> parameterNames = request.getHttpRequest().getParameterNames();
 		for (String parameterName : parameterNames) {
 			values.put(parameterName, request.getHttpRequest().getParam(parameterName));

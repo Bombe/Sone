@@ -7,7 +7,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 /**
  * Base JSON page for all pages that require the user to be logged in.
  */
-open class LoggedInJsonPage(path: String, webInterface: WebInterface) : JsonPage(path, webInterface) {
+open class LoggedInJsonPage(webInterface: WebInterface) : JsonPage(webInterface) {
 
 	final override val requiresLogin = true
 

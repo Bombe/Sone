@@ -1,5 +1,5 @@
 /*
- * Sone - MarkPostReplyKnownEvent.java - Copyright © 2013–2016 David Roden
+ * Sone - MarkPostReplyKnownEvent.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,8 +22,6 @@ import net.pterodactylus.sone.data.PostReply;
 /**
  * Event that signals that a {@link PostReply} has been marked as
  * {@link PostReply#isKnown() known}.
- *
- * @author <a href="mailto:bombe@pterodactylus.net">David ‘Bombe’ Roden</a>
  */
 public class MarkPostReplyKnownEvent extends PostReplyEvent {
 

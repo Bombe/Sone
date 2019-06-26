@@ -1,30 +1,32 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.util.web.Method.POST
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
-import org.mockito.Mockito.verify
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.*
+import net.pterodactylus.util.web.Method.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import org.mockito.Mockito.*
 
 /**
  * Unit test for [UnfollowSonePage].
  */
-class UnfollowSonePageTest: WebPageTest(::UnfollowSonePage) {
+class UnfollowSonePageTest : WebPageTest(::UnfollowSonePage) {
 
 	@Test
 	fun `page returns correct path`() {
-	    assertThat(page.path, equalTo("unfollowSone.html"))
+		assertThat(page.path, equalTo("unfollowSone.html"))
 	}
 
 	@Test
 	fun `page requires login`() {
-	    assertThat(page.requiresLogin(), equalTo(true))
+		assertThat(page.requiresLogin(), equalTo(true))
 	}
 
 	@Test
 	fun `page returns correct page title`() {
-	    addTranslation("Page.UnfollowSone.Title", "unfollow page title")
-		assertThat(page.getPageTitle(freenetRequest), equalTo("unfollow page title"))
+		addTranslation("Page.UnfollowSone.Title", "unfollow page title")
+		assertThat(page.getPageTitle(soneRequest), equalTo("unfollow page title"))
 	}
 
 	@Test
@@ -51,6 +53,11 @@ class UnfollowSonePageTest: WebPageTest(::UnfollowSonePage) {
 			verify(core).unfollowSone(currentSone, "sone-id1")
 			verify(core).unfollowSone(currentSone, "sone-id2")
 		}
+	}
+
+	@Test
+	fun `page can be created by dependency injection`() {
+		assertThat(baseInjector.getInstance<UnfollowSonePage>(), notNullValue())
 	}
 
 }
