@@ -244,6 +244,13 @@ class SoneTextParserTest {
 	}
 
 	@Test
+	fun `usk links with backlinks is parsed correctly`() {
+		val context = SoneTextParserContext(IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"))
+		val parts = soneTextParser.parse("USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0/../../../USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/78/", context)
+		assertThat("Part Text", convertText(parts), equalTo("[USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|trusted|USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test]"))
+	}
+
+	@Test
 	fun `test basic ksk links`() {
 		val parts: Iterable<Part> = soneTextParser.parse("KSK@gpl.txt", null)
 		assertThat("Part Text", convertText(parts, FreenetLinkPart::class.java), equalTo("[KSK@gpl.txt|KSK@gpl.txt|gpl.txt]"))
@@ -259,6 +266,12 @@ class SoneTextParserTest {
 	fun `embedded ksk links and line breaks are parsed correctly`() {
 		val parts = soneTextParser.parse("Link is KSK@gpl.txt\nKSK@test.dat\n", null)
 		assertThat("Part Text", convertText(parts, PlainTextPart::class.java, FreenetLinkPart::class.java), equalTo("Link is [KSK@gpl.txt|KSK@gpl.txt|gpl.txt]\n[KSK@test.dat|KSK@test.dat|test.dat]"))
+	}
+
+	@Test
+	fun `ksk links with backlinks are parsed correctly`() {
+		val parts = soneTextParser.parse("KSK@gallery/../Sone/imageBrowser.html?album=30c930ee-97cd-11e9-bd44-f3e595768b77", null)
+		assertThat("Part Text", convertText(parts, FreenetLinkPart::class.java), equalTo("[KSK@gallery|KSK@gallery|gallery]"))
 	}
 
 	@Test
