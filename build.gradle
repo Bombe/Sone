@@ -1,5 +1,5 @@
 group = 'net.pterodactylus'
-version = '0.9.8'
+version = '79'
 
 buildscript {
     ext.kotlinVersion = '1.2.71'
@@ -65,7 +65,7 @@ test {
 }
 
 task fatJar(type: Jar) {
-    archiveName = project.name + '-jar-with-dependencies.jar'
+    archiveName = project.name.toLowerCase() + '-jar-with-dependencies.jar'
     from { (configurations.runtime - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) } }
     manifest {
         attributes('Plugin-Main-Class': 'net.pterodactylus.sone.main.SonePlugin')
