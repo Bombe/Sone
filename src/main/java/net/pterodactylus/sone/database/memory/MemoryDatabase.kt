@@ -281,7 +281,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 
 	protected fun isPostKnown(post: Post) = readLock.withLock { post.id in knownPosts }
 
-	protected fun setPostKnown(post: Post, known: Boolean): Unit =
+	fun setPostKnown(post: Post, known: Boolean): Unit =
 			writeLock.withLock {
 				if (known)
 					knownPosts.add(post.id)
@@ -292,7 +292,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 
 	protected fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
 
-	protected fun setPostReplyKnown(postReply: PostReply, known: Boolean): Unit =
+	fun setPostReplyKnown(postReply: PostReply, known: Boolean): Unit =
 			writeLock.withLock {
 				if (known)
 					knownPostReplies.add(postReply.id)
