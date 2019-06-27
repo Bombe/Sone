@@ -255,7 +255,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
-				bind(Version.class).toInstance(Version.parse(getVersion()));
+				bind(Version.class).toInstance(Version.parse(getVersion().substring(1)));
 				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
 				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
 				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
