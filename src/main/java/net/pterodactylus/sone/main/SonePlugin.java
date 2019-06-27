@@ -124,7 +124,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	/** The current year at time of release. */
 	private static final int YEAR = 2019;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-	private static final int LATEST_EDITION = 78;
+	private static final int LATEST_EDITION = 79;
 
 	/** The logger. */
 	private static final Logger logger = getLogger(SonePlugin.class.getName());
@@ -255,7 +255,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				bind(Context.class).toInstance(context);
 				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
 				bind(SonePlugin.class).toInstance(SonePlugin.this);
-				bind(Version.class).toInstance(Version.parse(getVersion()));
+				bind(Version.class).toInstance(Version.parse(getVersion().substring(1)));
 				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
 				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
 				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));

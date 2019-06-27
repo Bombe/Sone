@@ -25,15 +25,15 @@ class VersionParserTest {
 	@Test
 	fun `default version file is parsed`() {
 		val version = parseVersion()!!
-		assertThat(version.id, equalTo("43f3e1c3a0f487e37e5851a2cc72756d271c7571"))
-		assertThat(version.nice, equalTo("0.9.6-466-g43f3e1c"))
+		assertThat(version.id, equalTo("73241df664f676482d8ca2c13b03d3deac3eacba"))
+		assertThat(version.nice, equalTo("v79-2-g73241df6"))
 	}
 
 	@Test
 	fun `parsed version is created correctly`() {
 		val version = parsedVersion!!
-		assertThat(version.id, equalTo("43f3e1c3a0f487e37e5851a2cc72756d271c7571"))
-		assertThat(version.nice, equalTo("0.9.6-466-g43f3e1c"))
+		assertThat(version.id, equalTo("73241df664f676482d8ca2c13b03d3deac3eacba"))
+		assertThat(version.nice, equalTo("v79-2-g73241df6"))
 	}
 
 }
