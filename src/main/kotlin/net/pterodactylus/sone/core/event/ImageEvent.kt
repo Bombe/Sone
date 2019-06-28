@@ -1,5 +1,5 @@
 /*
- * Sone - PostEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - ImageEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.*
 
 /**
- * Base class for post events.
+ * Base class for [Image] events.
  */
-public class PostEvent {
-
-	/** The post the event is about. */
-	private final Post post;
-
-	/**
-	 * Creates a new post event.
-	 *
-	 * @param post
-	 *            The post the event is about
-	 */
-	protected PostEvent(Post post) {
-		this.post = post;
-	}
-
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the post the event is about.
-	 *
-	 * @return The post the event is about
-	 */
-	public Post post() {
-		return post;
-	}
-
-}
+abstract class ImageEvent(val image: Image)

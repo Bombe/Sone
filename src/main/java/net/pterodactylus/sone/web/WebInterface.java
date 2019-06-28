@@ -981,7 +981,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void imageInsertStarted(ImageInsertStartedEvent imageInsertStartedEvent) {
-		insertingImagesNotification.add(imageInsertStartedEvent.image());
+		insertingImagesNotification.add(imageInsertStartedEvent.getImage());
 		notificationManager.addNotification(insertingImagesNotification);
 	}
 
@@ -993,7 +993,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void imageInsertAborted(ImageInsertAbortedEvent imageInsertAbortedEvent) {
-		insertingImagesNotification.remove(imageInsertAbortedEvent.image());
+		insertingImagesNotification.remove(imageInsertAbortedEvent.getImage());
 	}
 
 	/**
@@ -1004,8 +1004,8 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
-		insertingImagesNotification.remove(imageInsertFinishedEvent.image());
-		insertedImagesNotification.add(imageInsertFinishedEvent.image());
+		insertingImagesNotification.remove(imageInsertFinishedEvent.getImage());
+		insertedImagesNotification.add(imageInsertFinishedEvent.getImage());
 		notificationManager.addNotification(insertedImagesNotification);
 	}
 
@@ -1017,8 +1017,8 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void imageInsertFailed(ImageInsertFailedEvent imageInsertFailedEvent) {
-		insertingImagesNotification.remove(imageInsertFailedEvent.image());
-		imageInsertFailedNotification.add(imageInsertFailedEvent.image());
+		insertingImagesNotification.remove(imageInsertFailedEvent.getImage());
+		imageInsertFailedNotification.add(imageInsertFailedEvent.getImage());
 		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 

@@ -1680,9 +1680,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
-		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", imageInsertFinishedEvent.image(), imageInsertFinishedEvent.resultingUri()));
-		imageInsertFinishedEvent.image().modify().setKey(imageInsertFinishedEvent.resultingUri().toString()).update();
-		deleteTemporaryImage(imageInsertFinishedEvent.image().getId());
+		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", imageInsertFinishedEvent.getImage(), imageInsertFinishedEvent.getResultingUri()));
+		imageInsertFinishedEvent.getImage().modify().setKey(imageInsertFinishedEvent.getResultingUri().toString()).update();
+		deleteTemporaryImage(imageInsertFinishedEvent.getImage().getId());
 		touchConfiguration();
 	}
 

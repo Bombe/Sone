@@ -15,24 +15,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Post;
+import net.pterodactylus.sone.data.Post
 
 /**
- * Event that signals that a {@link Post} has been marked as
- * {@link Post#isKnown() known}.
+ * Event that signals that a [Post] has been marked as
+ * [known][Post.isKnown].
  */
-public class MarkPostKnownEvent extends PostEvent {
-
-	/**
-	 * Creates a new “post marked known” event.
-	 *
-	 * @param post
-	 *            The post that was marked as known
-	 */
-	public MarkPostKnownEvent(Post post) {
-		super(post);
-	}
-
-}
+class MarkPostKnownEvent
+/**
+ * Creates a new “post marked known” event.
+ *
+ * @param post
+ * The post that was marked as known
+ */
+(post: Post) : PostEvent(post)

@@ -75,6 +75,7 @@ import freenet.support.io.ArrayBucket;
 import freenet.support.io.ResumeFailedException;
 
 import com.google.common.eventbus.EventBus;
+import org.hamcrest.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -353,22 +354,23 @@ public class FreenetInterfaceTest {
 		insertToken.setClientPutter(clientPutter);
 		ArgumentCaptor<ImageInsertStartedEvent> imageInsertStartedEvent = forClass(ImageInsertStartedEvent.class);
 		verify(eventBus).post(imageInsertStartedEvent.capture());
-		assertThat(imageInsertStartedEvent.getValue().image(), is(image));
+		assertThat(imageInsertStartedEvent.getValue().getImage(), is(image));
 		insertToken.cancel();
 		ArgumentCaptor<ImageInsertAbortedEvent> imageInsertAbortedEvent = forClass(ImageInsertAbortedEvent.class);
 		verify(eventBus, times(2)).post(imageInsertAbortedEvent.capture());
 		verify(bucket).free();
-		assertThat(imageInsertAbortedEvent.getValue().image(), is(image));
+		assertThat(imageInsertAbortedEvent.getValue().getImage(), is(image));
 	}
 
 	@Test
 	public void failureWithoutExceptionSendsFailedEvent() {
-		insertToken.onFailure(null, null);
+		InsertException insertException = new InsertException(mock(InsertException.class));
+		insertToken.onFailure(insertException, null);
 		ArgumentCaptor<ImageInsertFailedEvent> imageInsertFailedEvent = forClass(ImageInsertFailedEvent.class);
 		verify(eventBus).post(imageInsertFailedEvent.capture());
 		verify(bucket).free();
-		assertThat(imageInsertFailedEvent.getValue().image(), is(image));
-		assertThat(imageInsertFailedEvent.getValue().cause(), nullValue());
+		assertThat(imageInsertFailedEvent.getValue().getImage(), is(image));
+		assertThat(imageInsertFailedEvent.getValue().getCause(), Matchers.<Throwable>is(insertException));
 	}
 
 	@Test
@@ -378,8 +380,8 @@ public class FreenetInterfaceTest {
 		ArgumentCaptor<ImageInsertFailedEvent> imageInsertFailedEvent = forClass(ImageInsertFailedEvent.class);
 		verify(eventBus).post(imageInsertFailedEvent.capture());
 		verify(bucket).free();
-		assertThat(imageInsertFailedEvent.getValue().image(), is(image));
-		assertThat(imageInsertFailedEvent.getValue().cause(), is((Throwable) insertException));
+		assertThat(imageInsertFailedEvent.getValue().getImage(), is(image));
+		assertThat(imageInsertFailedEvent.getValue().getCause(), is((Throwable) insertException));
 	}
 
 	@Test
@@ -389,7 +391,7 @@ public class FreenetInterfaceTest {
 		ArgumentCaptor<ImageInsertAbortedEvent> imageInsertAbortedEvent = forClass(ImageInsertAbortedEvent.class);
 		verify(eventBus).post(imageInsertAbortedEvent.capture());
 		verify(bucket).free();
-		assertThat(imageInsertAbortedEvent.getValue().image(), is(image));
+		assertThat(imageInsertAbortedEvent.getValue().getImage(), is(image));
 	}
 
 	@Test
@@ -407,8 +409,8 @@ public class FreenetInterfaceTest {
 		ArgumentCaptor<ImageInsertFinishedEvent> imageInsertFinishedEvent = forClass(ImageInsertFinishedEvent.class);
 		verify(eventBus).post(imageInsertFinishedEvent.capture());
 		verify(bucket).free();
-		assertThat(imageInsertFinishedEvent.getValue().image(), is(image));
-		assertThat(imageInsertFinishedEvent.getValue().resultingUri(), is(generatedUri));
+		assertThat(imageInsertFinishedEvent.getValue().getImage(), is(image));
+		assertThat(imageInsertFinishedEvent.getValue().getResultingUri(), is(generatedUri));
 	}
 
 	@Test

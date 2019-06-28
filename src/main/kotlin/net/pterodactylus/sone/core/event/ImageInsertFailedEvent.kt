@@ -1,5 +1,5 @@
 /*
- * Sone - ImageEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - ImageInsertFailedEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.*
 
 /**
- * Base class for {@link Image} events.
+ * Event that signals that an [Image] insert has failed.
  */
-public abstract class ImageEvent {
-
-	/** The image this event is about. */
-	private final Image image;
-
-	/**
-	 * Creates a new image event.
-	 *
-	 * @param image
-	 *            The image this event is about
-	 */
-	protected ImageEvent(Image image) {
-		this.image = image;
-	}
-
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the image this event is about.
-	 *
-	 * @return The image this event is about
-	 */
-	public Image image() {
-		return image;
-	}
-
-}
+class ImageInsertFailedEvent(image: Image, val cause: Throwable) : ImageEvent(image)

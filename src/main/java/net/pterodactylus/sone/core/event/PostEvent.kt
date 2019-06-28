@@ -1,5 +1,5 @@
 /*
- * Sone - ImageInsertAbortedEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - PostEvent.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,35 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.Post
 
 /**
- * Event that signals that an {@link Image} insert is aborted.
+ * Base class for post events.
  */
-public class ImageInsertAbortedEvent extends ImageEvent {
+open class PostEvent
+/**
+ * Creates a new post event.
+ *
+ * @param post
+ * The post the event is about
+ */
+protected constructor(
+		/** The post the event is about.  */
+		private val post: Post) {
+
+	//
+	// ACCESSORS
+	//
 
 	/**
-	 * Creates a new “image insert aborted” event.
+	 * Returns the post the event is about.
 	 *
-	 * @param image
-	 *            The image whose insert aborted
+	 * @return The post the event is about
 	 */
-	public ImageInsertAbortedEvent(Image image) {
-		super(image);
+	fun post(): Post {
+		return post
 	}
 
 }

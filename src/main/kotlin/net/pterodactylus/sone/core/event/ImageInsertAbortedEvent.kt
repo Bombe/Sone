@@ -1,5 +1,5 @@
 /*
- * Sone - ImageInsertStartedEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - ImageInsertAbortedEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Image;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that an {@link Image} is not being inserted.
+ * Event that signals that an [Image] insert is aborted.
  */
-public class ImageInsertStartedEvent extends ImageEvent {
-
-	/**
-	 * Creates a new “image is inserted” event.
-	 *
-	 * @param image
-	 *            The image that is being inserted
-	 */
-	public ImageInsertStartedEvent(Image image) {
-		super(image);
-	}
-
-}
+class ImageInsertAbortedEvent(image: Image) : ImageEvent(image)
