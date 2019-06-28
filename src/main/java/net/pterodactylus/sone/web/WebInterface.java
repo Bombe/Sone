@@ -844,7 +844,7 @@ public class WebInterface implements SessionProvider {
 
 	@Subscribe
 	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
-		removeReply(markPostReplyKnownEvent.postReply());
+		removeReply(markPostReplyKnownEvent.getPostReply());
 	}
 
 	@Subscribe

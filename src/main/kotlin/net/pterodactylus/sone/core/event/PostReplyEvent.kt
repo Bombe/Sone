@@ -1,5 +1,5 @@
 /*
- * Sone - MarkPostReplyKnownEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - PostReplyEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.PostReply;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a {@link PostReply} has been marked as
- * {@link PostReply#isKnown() known}.
+ * Base class for [PostReply] events.
  */
-public class MarkPostReplyKnownEvent extends PostReplyEvent {
-
-	/**
-	 * Creates a new “post reply marked known” event.
-	 *
-	 * @param postReply
-	 *            The post reply that was marked as known
-	 */
-	public MarkPostReplyKnownEvent(PostReply postReply) {
-		super(postReply);
-	}
-
-}
+open class PostReplyEvent(val postReply: PostReply)
