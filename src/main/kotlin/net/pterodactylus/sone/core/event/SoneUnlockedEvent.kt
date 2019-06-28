@@ -1,5 +1,5 @@
 /*
- * Sone - MarkSoneKnownEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - SoneUnlockedEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a {@link Sone} has been marked as
- * {@link Sone#isKnown() known}.
+ * Event that signals that a [Sone] was unlocked. Only
+ * [local Sones][Sone.isLocal] can be locked.
  */
-public class MarkSoneKnownEvent extends SoneEvent {
-
-	/**
-	 * Creates a new “Sone marked known” event.
-	 *
-	 * @param sone
-	 *            The Sone that was marked as known
-	 */
-	public MarkSoneKnownEvent(Sone sone) {
-		super(sone);
-	}
-
-}
+class SoneUnlockedEvent(sone: Sone) : SoneEvent(sone)

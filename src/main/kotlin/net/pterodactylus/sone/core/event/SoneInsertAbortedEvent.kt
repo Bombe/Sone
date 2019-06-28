@@ -1,5 +1,5 @@
 /*
- * Sone - SoneUnlockedEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - SoneInsertAbortedEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,24 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a {@link Sone} was unlocked. Only
- * {@link Sone#isLocal() local Sones} can be locked.
+ * Event that signals that a [Sone] insert was aborted.
  */
-public class SoneUnlockedEvent extends SoneEvent {
-
-	/**
-	 * Creates a new “Sone unlocked” event.
-	 *
-	 * @param sone
-	 *            The Sone that was unlocked
-	 */
-	public SoneUnlockedEvent(Sone sone) {
-		super(sone);
-	}
-
-}
+class SoneInsertAbortedEvent(sone: Sone, val cause: Throwable) : SoneEvent(sone)

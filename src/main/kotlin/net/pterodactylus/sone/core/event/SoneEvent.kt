@@ -1,5 +1,5 @@
 /*
- * Sone - NewSoneFoundEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - SoneEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a new remote Sone was found.
+ * Base class for Sone events.
  */
-public class NewSoneFoundEvent extends SoneEvent {
-
-	/**
-	 * Creates a new “new Sone found” event.
-	 *
-	 * @param sone
-	 *            The Sone that was found
-	 */
-	public NewSoneFoundEvent(Sone sone) {
-		super(sone);
-	}
-
-}
+abstract class SoneEvent(val sone: Sone)

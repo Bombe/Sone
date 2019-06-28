@@ -1,5 +1,5 @@
 /*
- * Sone - SoneInsertedEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - NewSoneFoundEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,30 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a {@link Sone} was inserted.
+ * Event that signals that a new remote Sone was found.
  */
-public class SoneInsertedEvent extends SoneEvent {
-
-	private final long insertDuration;
-	private final String insertFingerprint;
-
-	public SoneInsertedEvent(Sone sone, long insertDuration, String insertFingerprint) {
-		super(sone);
-		this.insertDuration = insertDuration;
-		this.insertFingerprint = insertFingerprint;
-	}
-
-	public long insertDuration() {
-		return insertDuration;
-	}
-
-	public String insertFingerprint() {
-		return insertFingerprint;
-	}
-
-}
+class NewSoneFoundEvent(sone: Sone) : SoneEvent(sone)

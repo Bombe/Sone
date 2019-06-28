@@ -1,5 +1,5 @@
 /*
- * Sone - SoneRemovedEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - SoneRemovedEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a {@link Sone} was removed.
+ * Event that signals that a [Sone] was removed.
  */
-public class SoneRemovedEvent extends SoneEvent {
-
-	/**
-	 * Creates a new “Sone removed” event.
-	 *
-	 * @param sone
-	 *            The Sone that was removed
-	 */
-	public SoneRemovedEvent(Sone sone) {
-		super(sone);
-	}
-
-}
+class SoneRemovedEvent(sone: Sone) : SoneEvent(sone)

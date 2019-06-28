@@ -768,7 +768,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void newSoneFound(NewSoneFoundEvent newSoneFoundEvent) {
-		newSoneNotification.add(newSoneFoundEvent.sone());
+		newSoneNotification.add(newSoneFoundEvent.getSone());
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(newSoneNotification);
 		}
@@ -834,7 +834,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void markSoneKnown(MarkSoneKnownEvent markSoneKnownEvent) {
-		newSoneNotification.remove(markSoneKnownEvent.sone());
+		newSoneNotification.remove(markSoneKnownEvent.getSone());
 	}
 
 	@Subscribe
@@ -849,7 +849,7 @@ public class WebInterface implements SessionProvider {
 
 	@Subscribe
 	public void soneRemoved(SoneRemovedEvent soneRemovedEvent) {
-		newSoneNotification.remove(soneRemovedEvent.sone());
+		newSoneNotification.remove(soneRemovedEvent.getSone());
 	}
 
 	@Subscribe
@@ -886,7 +886,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void soneLocked(SoneLockedEvent soneLockedEvent) {
-		final Sone sone = soneLockedEvent.sone();
+		final Sone sone = soneLockedEvent.getSone();
 		ScheduledFuture<?> tickerObject = ticker.schedule(new Runnable() {
 
 			@Override
@@ -907,8 +907,8 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void soneUnlocked(SoneUnlockedEvent soneUnlockedEvent) {
-		lockedSonesNotification.remove(soneUnlockedEvent.sone());
-		lockedSonesTickerObjects.remove(soneUnlockedEvent.sone()).cancel(false);
+		lockedSonesNotification.remove(soneUnlockedEvent.getSone());
+		lockedSonesTickerObjects.remove(soneUnlockedEvent.getSone()).cancel(false);
 	}
 
 	/**
@@ -919,9 +919,9 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void soneInserting(SoneInsertingEvent soneInsertingEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertingEvent.sone());
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertingEvent.getSone());
 		soneInsertNotification.set("soneStatus", "inserting");
-		if (soneInsertingEvent.sone().getOptions().isSoneInsertNotificationEnabled()) {
+		if (soneInsertingEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
@@ -934,10 +934,10 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void soneInserted(SoneInsertedEvent soneInsertedEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.sone());
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.getSone());
 		soneInsertNotification.set("soneStatus", "inserted");
-		soneInsertNotification.set("insertDuration", soneInsertedEvent.insertDuration() / 1000);
-		if (soneInsertedEvent.sone().getOptions().isSoneInsertNotificationEnabled()) {
+		soneInsertNotification.set("insertDuration", soneInsertedEvent.getInsertDuration() / 1000);
+		if (soneInsertedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}
@@ -950,10 +950,10 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void soneInsertAborted(SoneInsertAbortedEvent soneInsertAbortedEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.sone());
+		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.getSone());
 		soneInsertNotification.set("soneStatus", "insert-aborted");
-		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.cause());
-		if (soneInsertAbortedEvent.sone().getOptions().isSoneInsertNotificationEnabled()) {
+		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.getCause());
+		if (soneInsertAbortedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
 	}

@@ -1,5 +1,5 @@
 /*
- * Sone - SoneEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - MarkSoneKnownEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,39 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Base class for Sone events.
+ * Event that signals that a [Sone] has been marked as
+ * [known][Sone.isKnown].
  */
-public abstract class SoneEvent {
-
-	/** The Sone this event is about. */
-	private final Sone sone;
-
-	/**
-	 * Creates a new Sone event.
-	 *
-	 * @param sone
-	 *            The Sone this event is about
-	 */
-	protected SoneEvent(Sone sone) {
-		this.sone = sone;
-	}
-
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the Sone this event is about.
-	 *
-	 * @return The Sone this event is about
-	 */
-	public Sone sone() {
-		return sone;
-	}
-
-}
+class MarkSoneKnownEvent(sone: Sone) : SoneEvent(sone)

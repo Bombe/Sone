@@ -144,8 +144,8 @@ public class CoreTest {
 					mismatchDescription.appendText("is not SoneRemovedEvent");
 					return false;
 				}
-				if (((SoneRemovedEvent) item).sone() != sone) {
-					mismatchDescription.appendText("sone is ").appendValue(((SoneRemovedEvent) item).sone());
+				if (((SoneRemovedEvent) item).getSone() != sone) {
+					mismatchDescription.appendText("sone is ").appendValue(((SoneRemovedEvent) item).getSone());
 					return false;
 				}
 				return true;

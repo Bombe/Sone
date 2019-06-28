@@ -130,9 +130,9 @@ public class SoneInserterTest {
 		verify(freenetInterface).insertDirectory(eq(insertUri), any(HashMap.class), eq("index.html"));
 		verify(eventBus, times(2)).post(soneEvents.capture());
 		assertThat(soneEvents.getAllValues().get(0), instanceOf(SoneInsertingEvent.class));
-		assertThat(soneEvents.getAllValues().get(0).sone(), is(sone));
+		assertThat(soneEvents.getAllValues().get(0).getSone(), is(sone));
 		assertThat(soneEvents.getAllValues().get(1), instanceOf(SoneInsertedEvent.class));
-		assertThat(soneEvents.getAllValues().get(1).sone(), is(sone));
+		assertThat(soneEvents.getAllValues().get(1).getSone(), is(sone));
 	}
 
 	@Test
@@ -156,9 +156,9 @@ public class SoneInserterTest {
 		verify(freenetInterface).insertDirectory(eq(insertUri), any(HashMap.class), eq("index.html"));
 		verify(eventBus, times(2)).post(soneEvents.capture());
 		assertThat(soneEvents.getAllValues().get(0), instanceOf(SoneInsertingEvent.class));
-		assertThat(soneEvents.getAllValues().get(0).sone(), is(sone));
+		assertThat(soneEvents.getAllValues().get(0).getSone(), is(sone));
 		assertThat(soneEvents.getAllValues().get(1), instanceOf(SoneInsertedEvent.class));
-		assertThat(soneEvents.getAllValues().get(1).sone(), is(sone));
+		assertThat(soneEvents.getAllValues().get(1).getSone(), is(sone));
 		verify(core, never()).touchConfiguration();
 	}
 
@@ -206,9 +206,9 @@ public class SoneInserterTest {
 		verify(freenetInterface).insertDirectory(eq(insertUri), any(HashMap.class), eq("index.html"));
 		verify(eventBus, times(2)).post(soneEvents.capture());
 		assertThat(soneEvents.getAllValues().get(0), instanceOf(SoneInsertingEvent.class));
-		assertThat(soneEvents.getAllValues().get(0).sone(), is(sone));
+		assertThat(soneEvents.getAllValues().get(0).getSone(), is(sone));
 		assertThat(soneEvents.getAllValues().get(1), instanceOf(SoneInsertAbortedEvent.class));
-		assertThat(soneEvents.getAllValues().get(1).sone(), is(sone));
+		assertThat(soneEvents.getAllValues().get(1).getSone(), is(sone));
 		verify(core, never()).touchConfiguration();
 	}
 

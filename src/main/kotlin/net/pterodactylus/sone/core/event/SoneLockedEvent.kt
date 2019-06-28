@@ -1,5 +1,5 @@
 /*
- * Sone - SoneInsertingEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - SoneLockedEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.core.event;
+package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*
 
 /**
- * Event that signals that a {@link Sone} is now being inserted.
+ * Event that signals that a [Sone] was locked. Only
+ * [local Sones][Sone.isLocal] can be locked.
  */
-public class SoneInsertingEvent extends SoneEvent {
-
-	/**
-	 * Creates a new “Sone is being inserted” event.
-	 *
-	 * @param sone
-	 *            The Sone that is being inserted
-	 */
-	public SoneInsertingEvent(Sone sone) {
-		super(sone);
-	}
-
-}
+class SoneLockedEvent(sone: Sone) : SoneEvent(sone)
