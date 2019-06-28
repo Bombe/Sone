@@ -1,5 +1,5 @@
 /*
- * Sone - PostEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - PostEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,33 +17,9 @@
 
 package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.*
 
 /**
  * Base class for post events.
  */
-open class PostEvent
-/**
- * Creates a new post event.
- *
- * @param post
- * The post the event is about
- */
-protected constructor(
-		/** The post the event is about.  */
-		private val post: Post) {
-
-	//
-	// ACCESSORS
-	//
-
-	/**
-	 * Returns the post the event is about.
-	 *
-	 * @return The post the event is about
-	 */
-	fun post(): Post {
-		return post
-	}
-
-}
+abstract class PostEvent(val post: Post)

@@ -839,7 +839,7 @@ public class WebInterface implements SessionProvider {
 
 	@Subscribe
 	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
-		removePost(markPostKnownEvent.post());
+		removePost(markPostKnownEvent.getPost());
 	}
 
 	@Subscribe

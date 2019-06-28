@@ -1,5 +1,5 @@
 /*
- * Sone - MarkPostKnownEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - MarkPostKnownEvent.kt - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,17 +17,10 @@
 
 package net.pterodactylus.sone.core.event
 
-import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.*
 
 /**
  * Event that signals that a [Post] has been marked as
  * [known][Post.isKnown].
  */
-class MarkPostKnownEvent
-/**
- * Creates a new “post marked known” event.
- *
- * @param post
- * The post that was marked as known
- */
-(post: Post) : PostEvent(post)
+class MarkPostKnownEvent(post: Post) : PostEvent(post)
