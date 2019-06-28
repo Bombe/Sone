@@ -966,10 +966,10 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void updateFound(UpdateFoundEvent updateFoundEvent) {
-		newVersionNotification.set("latestVersion", updateFoundEvent.version());
-		newVersionNotification.set("latestEdition", updateFoundEvent.latestEdition());
-		newVersionNotification.set("releaseTime", updateFoundEvent.releaseTime());
-		newVersionNotification.set("disruptive", updateFoundEvent.disruptive());
+		newVersionNotification.set("latestVersion", updateFoundEvent.getVersion());
+		newVersionNotification.set("latestEdition", updateFoundEvent.getLatestEdition());
+		newVersionNotification.set("releaseTime", updateFoundEvent.getReleaseTime());
+		newVersionNotification.set("disruptive", updateFoundEvent.isDisruptive());
 		notificationManager.addNotification(newVersionNotification);
 	}
 

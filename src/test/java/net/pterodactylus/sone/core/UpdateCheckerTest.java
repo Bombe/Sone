@@ -102,9 +102,9 @@ public class UpdateCheckerTest {
 	private void verifyEventIsFired(Version version, long releaseTime, boolean disruptive) {
 		ArgumentCaptor<UpdateFoundEvent> updateFoundEvent = forClass(UpdateFoundEvent.class);
 		verify(eventBus, times(1)).post(updateFoundEvent.capture());
-		assertThat(updateFoundEvent.getValue().version(), is(version));
-		assertThat(updateFoundEvent.getValue().releaseTime(), is(releaseTime));
-		assertThat(updateFoundEvent.getValue().disruptive(), is(disruptive));
+		assertThat(updateFoundEvent.getValue().getVersion(), is(version));
+		assertThat(updateFoundEvent.getValue().getReleaseTime(), is(releaseTime));
+		assertThat(updateFoundEvent.getValue().isDisruptive(), is(disruptive));
 	}
 
 	private void verifyThatUpdateCheckerKnowsLatestVersion(Version version, long releaseTime) {
