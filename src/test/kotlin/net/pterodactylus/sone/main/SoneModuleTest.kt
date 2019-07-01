@@ -16,7 +16,7 @@ import org.junit.*
 import java.io.*
 import java.util.concurrent.atomic.*
 
-class SoneModuleCreatorTest {
+class SoneModuleTest {
 
 	private val currentDir: File = File(".")
 	private val pluginVersion = Version("", 0, 1, 2)
@@ -164,8 +164,7 @@ class SoneModuleCreatorTest {
 		assertThat(testObject.ref.get(), sameInstance(event))
 	}
 
-	private fun createInjector(): Injector = SoneModuleCreator()
-			.createModule(sonePlugin)
+	private fun createInjector(): Injector = SoneModule(sonePlugin)
 			.let { Guice.createInjector(it) }
 
 	private inline fun <reified R : Any> getInstance(annotation: Annotation? = null, injector: Injector = createInjector()): R =
