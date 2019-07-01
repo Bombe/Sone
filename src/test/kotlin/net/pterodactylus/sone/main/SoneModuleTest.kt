@@ -2,7 +2,7 @@ package net.pterodactylus.sone.main
 
 import com.google.common.base.*
 import com.google.common.eventbus.*
-import com.google.inject.*
+import com.google.inject.Guice.*
 import com.google.inject.name.Names.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
@@ -28,6 +28,8 @@ class SoneModuleTest {
 		whenever(homepage).thenReturn(pluginHomepage)
 	}
 
+	private val injector by lazy { createInjector(SoneModule(sonePlugin)) }
+
 	@After
 	fun removePropertiesFromCurrentDirectory() {
 		File(currentDir, "sone.properties").delete()
@@ -36,19 +38,19 @@ class SoneModuleTest {
 	@Test
 	fun `creator binds configuration when no file is present`() {
 		File(currentDir, "sone.properties").delete()
-		assertThat(getInstance<Configuration>(), notNullValue())
+		assertThat(injector.getInstance<Configuration>(), notNullValue())
 	}
 
 	@Test
 	fun `creator binds first start to true when no file is present`() {
 		File(currentDir, "sone.properties").delete()
-		assertThat(getInstance(named("FirstStart")), equalTo(true))
+		assertThat(injector.getInstance(named("FirstStart")), equalTo(true))
 	}
 
 	@Test
 	fun `config file is created in current directory if not present`() {
 		File(currentDir, "sone.properties").delete()
-		val configuration = getInstance<Configuration>()
+		val configuration = injector.getInstance<Configuration>()
 		configuration.save()
 		assertThat(File(currentDir, "sone.properties").exists(), equalTo(true))
 	}
@@ -56,94 +58,94 @@ class SoneModuleTest {
 	@Test
 	fun `creator binds configuration when file is present`() {
 		File(currentDir, "sone.properties").writeText("Option=old")
-		assertThat(getInstance<Configuration>().getStringValue("Option").value, equalTo("old"))
+		assertThat(injector.getInstance<Configuration>().getStringValue("Option").value, equalTo("old"))
 	}
 
 	@Test
 	fun `creator binds first start to false when file is present`() {
 		File(currentDir, "sone.properties").writeText("Option=old")
-		assertThat(getInstance(named("FirstStart")), equalTo(false))
+		assertThat(injector.getInstance(named("FirstStart")), equalTo(false))
 	}
 
 	@Test
 	fun `invalid config file leads to new config being created`() {
 		File(currentDir, "sone.properties").writeText("Option=old\nbroken")
-		val configuration = getInstance<Configuration>()
+		val configuration = injector.getInstance<Configuration>()
 		assertThat(configuration.getStringValue("Option").getValue(null), nullValue())
 	}
 
 	@Test
 	fun `invalid config file leads to new config being set to true`() {
 		File(currentDir, "sone.properties").writeText("Option=old\nbroken")
-		assertThat(getInstance(named("NewConfig")), equalTo(true))
+		assertThat(injector.getInstance(named("NewConfig")), equalTo(true))
 	}
 
 	@Test
 	fun `valid config file leads to new config being set to false`() {
 		File(currentDir, "sone.properties").writeText("Option=old")
-		assertThat(getInstance(named("NewConfig")), equalTo(false))
+		assertThat(injector.getInstance(named("NewConfig")), equalTo(false))
 	}
 
 	@Test
 	fun `event bus is bound`() {
-		assertThat(getInstance<EventBus>(), notNullValue())
+		assertThat(injector.getInstance<EventBus>(), notNullValue())
 	}
 
 	@Test
 	fun `context is bound`() {
-		assertThat(getInstance<Context>().context, equalTo("Sone"))
+		assertThat(injector.getInstance<Context>().context, equalTo("Sone"))
 	}
 
 	@Test
 	fun `optional context is bound`() {
-		assertThat(getInstance<Optional<Context>>().get().context, equalTo("Sone"))
+		assertThat(injector.getInstance<Optional<Context>>().get().context, equalTo("Sone"))
 	}
 
 	@Test
 	fun `sone plugin is bound`() {
-		assertThat(getInstance(), sameInstance(sonePlugin))
+		assertThat(injector.getInstance(), sameInstance(sonePlugin))
 	}
 
 	@Test
 	fun `version is bound`() {
-		assertThat(getInstance(), equalTo(pluginVersion))
+		assertThat(injector.getInstance(), equalTo(pluginVersion))
 	}
 
 	@Test
 	fun `plugin version is bound`() {
-		assertThat(getInstance(), equalTo(PluginVersion(pluginVersion.toString())))
+		assertThat(injector.getInstance(), equalTo(PluginVersion(pluginVersion.toString())))
 	}
 
 	@Test
 	fun `plugin year is bound`() {
-		assertThat(getInstance(), equalTo(PluginYear(pluginYear)))
+		assertThat(injector.getInstance(), equalTo(PluginYear(pluginYear)))
 	}
 
 	@Test
 	fun `plugin homepage in bound`() {
-		assertThat(getInstance(), equalTo(PluginHomepage(pluginHomepage)))
+		assertThat(injector.getInstance(), equalTo(PluginHomepage(pluginHomepage)))
 	}
 
 	@Test
 	fun `database is bound correctly`() {
-		assertThat(getInstance<Database>(), instanceOf(MemoryDatabase::class.java))
+		assertThat(injector.getInstance<Database>(), instanceOf(MemoryDatabase::class.java))
 	}
 
 	@Test
 	fun `default loader is used without dev options`() {
-		assertThat(getInstance<Loaders>(), instanceOf(DefaultLoaders::class.java))
+		assertThat(injector.getInstance<Loaders>(), instanceOf(DefaultLoaders::class.java))
 	}
 
 	@Test
 	fun `default loaders are used if no path is given`() {
 		File(currentDir, "sone.properties").writeText("Developer.LoadFromFilesystem=true")
-		assertThat(getInstance<Loaders>(), instanceOf(DefaultLoaders::class.java))
+		assertThat(injector.getInstance<Loaders>(), instanceOf(DefaultLoaders::class.java))
 	}
 
 	@Test
 	fun `debug loaders are used if path is given`() {
 		File(currentDir, "sone.properties").writeText("Developer.LoadFromFilesystem=true\nDeveloper.FilesystemPath=/tmp")
-		assertThat(getInstance<Loaders>(), instanceOf(DebugLoaders::class.java))
+		assertThat(injector.getInstance<Loaders>(), instanceOf(DebugLoaders::class.java))
 	}
 
 	class TestObject {
@@ -156,20 +158,11 @@ class SoneModuleTest {
 
 	@Test
 	fun `created objects are registered with event bus`() {
-		val injector = createInjector()
-		val eventBus: EventBus = getInstance(injector = injector)
-		val testObject = getInstance<TestObject>(injector = injector)
+		val eventBus: EventBus = injector.getInstance()
+		val testObject = injector.getInstance<TestObject>()
 		val event = Any()
 		eventBus.post(event)
 		assertThat(testObject.ref.get(), sameInstance(event))
 	}
-
-	private fun createInjector(): Injector = SoneModule(sonePlugin)
-			.let { Guice.createInjector(it) }
-
-	private inline fun <reified R : Any> getInstance(annotation: Annotation? = null, injector: Injector = createInjector()): R =
-			annotation
-					?.let { injector.getInstance(Key.get(object : TypeLiteral<R>() {}, it)) }
-					?: injector.getInstance(Key.get(object : TypeLiteral<R>() {}))
 
 }
