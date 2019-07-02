@@ -22,9 +22,4 @@ import net.pterodactylus.sone.data.Post
 /**
  * Event that signals that a [Post] was removed.
  */
-data class PostRemovedEvent(val post: Post) {
-
-	@Deprecated(message = "will go away", replaceWith = ReplaceWith("post"))
-	fun post() = post
-
-}
+data class PostRemovedEvent(val post: Post)

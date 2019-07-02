@@ -782,7 +782,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void newPostFound(NewPostFoundEvent newPostFoundEvent) {
-		Post post = newPostFoundEvent.post();
+		Post post = newPostFoundEvent.getPost();
 		boolean isLocal = post.getSone().isLocal();
 		if (isLocal) {
 			localPostNotification.add(post);
@@ -808,7 +808,7 @@ public class WebInterface implements SessionProvider {
 	 */
 	@Subscribe
 	public void newReplyFound(NewPostReplyFoundEvent newPostReplyFoundEvent) {
-		PostReply reply = newPostReplyFoundEvent.postReply();
+		PostReply reply = newPostReplyFoundEvent.getPostReply();
 		boolean isLocal = reply.getSone().isLocal();
 		if (isLocal) {
 			localReplyNotification.add(reply);
@@ -854,7 +854,7 @@ public class WebInterface implements SessionProvider {
 
 	@Subscribe
 	public void postRemoved(PostRemovedEvent postRemovedEvent) {
-		removePost(postRemovedEvent.post());
+		removePost(postRemovedEvent.getPost());
 	}
 
 	private void removePost(Post post) {
@@ -867,7 +867,7 @@ public class WebInterface implements SessionProvider {
 
 	@Subscribe
 	public void replyRemoved(PostReplyRemovedEvent postReplyRemovedEvent) {
-		removeReply(postReplyRemovedEvent.postReply());
+		removeReply(postReplyRemovedEvent.getPostReply());
 	}
 
 	private void removeReply(PostReply reply) {

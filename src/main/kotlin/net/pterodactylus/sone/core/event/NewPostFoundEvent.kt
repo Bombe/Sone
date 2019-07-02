@@ -22,9 +22,4 @@ import net.pterodactylus.sone.data.Post
 /**
  * Event that signals that a new post was found.
  */
-data class NewPostFoundEvent(val post: Post) {
-
-	@Deprecated(message = "will go away", replaceWith = ReplaceWith("post"))
-	fun post() = post
-
-}
+data class NewPostFoundEvent(val post: Post)

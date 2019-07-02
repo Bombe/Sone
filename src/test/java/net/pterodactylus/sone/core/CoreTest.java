@@ -100,8 +100,8 @@ public class CoreTest {
 					mismatchDescription.appendText("is not PostRemovedEvent");
 					return false;
 				}
-				if (((PostRemovedEvent) item).post() != post) {
-					mismatchDescription.appendText("post is ").appendValue(((PostRemovedEvent) item).post());
+				if (((PostRemovedEvent) item).getPost() != post) {
+					mismatchDescription.appendText("post is ").appendValue(((PostRemovedEvent) item).getPost());
 					return false;
 				}
 				return true;
