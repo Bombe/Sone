@@ -40,7 +40,7 @@ class CreatePostPageTest : WebPageTest(::CreatePostPage) {
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("text", "post text")
 		verifyRedirect("return.html") {
-			verify(core).createPost(currentSone, absent(), "post text")
+			verify(core).createPost(currentSone, null, "post text")
 		}
 	}
 
@@ -62,7 +62,7 @@ class CreatePostPageTest : WebPageTest(::CreatePostPage) {
 		val sender = mock<Sone>()
 		addLocalSone("sender-id", sender)
 		verifyRedirect("return.html") {
-			verify(core).createPost(sender, absent(), "post text")
+			verify(core).createPost(sender, null, "post text")
 		}
 	}
 
@@ -75,7 +75,7 @@ class CreatePostPageTest : WebPageTest(::CreatePostPage) {
 		val recipient = mock<Sone>()
 		addSone("recipient-id", recipient)
 		verifyRedirect("return.html") {
-			verify(core).createPost(currentSone, recipient.asOptional(), "post text")
+			verify(core).createPost(currentSone, recipient, "post text")
 		}
 	}
 
@@ -86,7 +86,7 @@ class CreatePostPageTest : WebPageTest(::CreatePostPage) {
 		addHttpRequestPart("text", "post http://localhost:12345/KSK@foo text")
 		addHttpRequestHeader("Host", "localhost:12345")
 		verifyRedirect("return.html") {
-			verify(core).createPost(currentSone, absent(), "post KSK@foo text")
+			verify(core).createPost(currentSone, null, "post KSK@foo text")
 		}
 	}
 
