@@ -81,4 +81,9 @@ public class Client {
 		return Objects.hashCode(name, version);
 	}
 
+	@Override
+	public String toString() {
+		return name + " " + version;
+	}
+
 }
