@@ -4,6 +4,7 @@ import com.google.common.base.*
 import com.google.common.eventbus.*
 import com.google.inject.Guice.*
 import com.google.inject.name.Names.*
+import freenet.l10n.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.wot.*
@@ -12,9 +13,9 @@ import net.pterodactylus.util.config.*
 import net.pterodactylus.util.version.Version
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.junit.*
 import java.io.*
 import java.util.concurrent.atomic.*
+import kotlin.test.*
 
 const val versionString = "v80"
 
@@ -24,15 +25,17 @@ class SoneModuleTest {
 	private val pluginVersion = Version("", 80)
 	private val pluginYear = 2019
 	private val pluginHomepage = "home://page"
+	private val l10n = deepMock<PluginL10n>()
 	private val sonePlugin = mock<SonePlugin>().apply {
 		whenever(version).thenReturn(versionString)
 		whenever(year).thenReturn(pluginYear)
 		whenever(homepage).thenReturn(pluginHomepage)
+		whenever(l10n()).thenReturn(l10n)
 	}
 
 	private val injector by lazy { createInjector(SoneModule(sonePlugin)) }
 
-	@After
+	@AfterTest
 	fun removePropertiesFromCurrentDirectory() {
 		File(currentDir, "sone.properties").delete()
 	}
@@ -131,6 +134,11 @@ class SoneModuleTest {
 	@Test
 	fun `database is bound correctly`() {
 		assertThat(injector.getInstance<Database>(), instanceOf(MemoryDatabase::class.java))
+	}
+
+	@Test
+	fun `base l10n is bound correctly`() {
+		assertThat(injector.getInstance(), sameInstance(l10n.base))
 	}
 
 	@Test

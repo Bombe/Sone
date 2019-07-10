@@ -6,6 +6,7 @@ import com.google.inject.*
 import com.google.inject.matcher.*
 import com.google.inject.name.Names.*
 import com.google.inject.spi.*
+import freenet.l10n.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.wot.*
@@ -49,6 +50,7 @@ class SoneModule(private val sonePlugin: SonePlugin) : AbstractModule() {
 		bind(PluginYear::class.java).toInstance(PluginYear(sonePlugin.year))
 		bind(PluginHomepage::class.java).toInstance(PluginHomepage(sonePlugin.homepage))
 		bind(Database::class.java).to(MemoryDatabase::class.java).`in`(Singleton::class.java)
+		bind(BaseL10n::class.java).toInstance(sonePlugin.l10n().base)
 		loaders?.let { bind(Loaders::class.java).toInstance(it) }
 
 		bindListener(Matchers.any(), object : TypeListener {
