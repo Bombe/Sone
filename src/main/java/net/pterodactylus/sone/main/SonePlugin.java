@@ -17,62 +17,27 @@
 
 package net.pterodactylus.sone.main;
 
-import static com.google.common.base.Optional.of;
-import static java.util.logging.Logger.getLogger;
+import static java.util.logging.Logger.*;
 
-import java.io.File;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.*;
 
-import javax.inject.Singleton;
+import net.pterodactylus.sone.core.*;
+import net.pterodactylus.sone.fcp.*;
+import net.pterodactylus.sone.freenet.wot.*;
+import net.pterodactylus.sone.web.*;
 
-import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.database.Database;
-import net.pterodactylus.sone.database.PostProvider;
-import net.pterodactylus.sone.database.SoneProvider;
-import net.pterodactylus.sone.database.memory.MemoryDatabase;
-import net.pterodactylus.sone.fcp.FcpInterface;
-import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
-import net.pterodactylus.sone.freenet.wot.Context;
-import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
-import net.pterodactylus.sone.web.WebInterface;
-import net.pterodactylus.sone.web.WebInterfaceModule;
-import net.pterodactylus.util.config.Configuration;
-import net.pterodactylus.util.config.ConfigurationException;
-import net.pterodactylus.util.config.MapConfigurationBackend;
-import net.pterodactylus.util.version.Version;
+import freenet.l10n.BaseL10n.*;
+import freenet.l10n.*;
+import freenet.pluginmanager.*;
+import freenet.support.*;
+import freenet.support.api.*;
 
-import com.google.common.base.Optional;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.spi.InjectionListener;
-import com.google.inject.spi.TypeEncounter;
-import com.google.inject.spi.TypeListener;
-
-import freenet.client.async.PersistenceDisabledException;
-import freenet.l10n.BaseL10n;
-import freenet.l10n.BaseL10n.LANGUAGE;
-import freenet.l10n.PluginL10n;
-import freenet.pluginmanager.FredPlugin;
-import freenet.pluginmanager.FredPluginBaseL10n;
-import freenet.pluginmanager.FredPluginFCP;
-import freenet.pluginmanager.FredPluginL10n;
-import freenet.pluginmanager.FredPluginThreadless;
-import freenet.pluginmanager.FredPluginVersioned;
-import freenet.pluginmanager.PluginReplySender;
-import freenet.pluginmanager.PluginRespirator;
-import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
+import com.google.common.annotations.*;
+import com.google.common.cache.*;
+import com.google.inject.*;
+import com.google.inject.name.*;
+import kotlin.jvm.functions.*;
 
 /**
  * This class interfaces with Freenet. It is the class that is loaded by the
@@ -129,6 +94,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	/** The logger. */
 	private static final Logger logger = getLogger(SonePlugin.class.getName());
 
+	private final Function1<Module[], Injector> injectorCreator;
+
 	/** The plugin respirator. */
 	private PluginRespirator pluginRespirator;
 
@@ -146,6 +113,15 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 	/** The web of trust connector. */
 	private WebOfTrustConnector webOfTrustConnector;
+
+	public SonePlugin() {
+		this(Guice::createInjector);
+	}
+
+	@VisibleForTesting
+	public SonePlugin(Function1<Module[], Injector> injectorCreator) {
+		this.injectorCreator = injectorCreator;
+	}
 
 	//
 	// ACCESSORS
@@ -206,92 +182,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	public void runPlugin(PluginRespirator pluginRespirator) {
 		this.pluginRespirator = pluginRespirator;
 
-		/* create a configuration. */
-		Configuration oldConfiguration;
-		Configuration newConfiguration = null;
-		boolean firstStart = !new File("sone.properties").exists();
-		boolean newConfig = false;
-		try {
-			oldConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), false));
-			newConfiguration = oldConfiguration;
-		} catch (ConfigurationException ce1) {
-			newConfig = true;
-			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…", ce1);
-			try {
-				newConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), true));
-				logger.log(Level.INFO, "Created new configuration file.");
-			} catch (ConfigurationException ce2) {
-				logger.log(Level.SEVERE, "Could not create configuration file, using Plugin Store!", ce2);
-			}
-			try {
-				oldConfiguration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
-				logger.log(Level.INFO, "Plugin store loaded.");
-			} catch (PersistenceDisabledException pde1) {
-				logger.log(Level.SEVERE, "Could not load any configuration, using empty configuration!");
-				oldConfiguration = new Configuration(new MapConfigurationBackend());
-			}
-		}
-
-		final Configuration startConfiguration;
-		if ((newConfiguration != null) && (oldConfiguration != newConfiguration)) {
-			logger.log(Level.INFO, "Setting configuration to file-based configuration.");
-			startConfiguration = newConfiguration;
-		} else {
-			startConfiguration = oldConfiguration;
-		}
-		final EventBus eventBus = new EventBus();
-
-		/* Freenet injector configuration. */
-		FreenetModule freenetModule =  new FreenetModule(pluginRespirator);
-
-		/* Sone injector configuration. */
-		AbstractModule soneModule = new AbstractModule() {
-
-			@Override
-			protected void configure() {
-				bind(EventBus.class).toInstance(eventBus);
-				bind(Configuration.class).toInstance(startConfiguration);
-				Context context = new Context("Sone");
-				bind(Context.class).toInstance(context);
-				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
-				bind(SonePlugin.class).toInstance(SonePlugin.this);
-				bind(Version.class).toInstance(Version.parse(getVersion().substring(1)));
-				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
-				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
-				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
-				bind(Database.class).to(MemoryDatabase.class).in(Singleton.class);
-				bind(BaseL10n.class).toInstance(l10n.getBase());
-				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
-				bind(PostProvider.class).to(Core.class).in(Singleton.class);
-				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
-					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
-					if (path != null) {
-						bind(Loaders.class).toInstance(new DebugLoaders(path));
-					}
-				}
-				bindListener(Matchers.any(), new TypeListener() {
-
-					@Override
-					public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {
-						typeEncounter.register(new InjectionListener<I>() {
-
-							@Override
-							public void afterInjection(I injectee) {
-								eventBus.register(injectee);
-							}
-						});
-					}
-				});
-			}
-
-			private TypeLiteral<Optional<Context>> getOptionalContextTypeLiteral() {
-				return new TypeLiteral<Optional<Context>>() {
-				};
-			}
-
-		};
-		Module webInterfaceModule = new WebInterfaceModule();
-		Injector injector = Guice.createInjector(freenetModule, soneModule, webInterfaceModule);
+		Injector injector = createInjector();
 		core = injector.getInstance(Core.class);
 
 		/* create web of trust connector. */
@@ -306,8 +197,22 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		/* start core! */
 		core.start();
 		webInterface.start();
-		webInterface.setFirstStart(firstStart);
-		webInterface.setNewConfig(newConfig);
+		webInterface.setFirstStart(injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart"))));
+		webInterface.setNewConfig(injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig"))));
+	}
+
+	@VisibleForTesting
+	protected Injector createInjector() {
+		FreenetModule freenetModule = new FreenetModule(pluginRespirator);
+		AbstractModule soneModule = new SoneModule(this);
+		Module webInterfaceModule = new WebInterfaceModule();
+
+		return createInjector(freenetModule, soneModule, webInterfaceModule);
+	}
+
+	@VisibleForTesting
+	protected Injector createInjector(Module... modules) {
+		return injectorCreator.invoke(modules);
 	}
 
 	/**
