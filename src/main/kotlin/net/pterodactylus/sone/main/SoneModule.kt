@@ -44,7 +44,7 @@ class SoneModule(private val sonePlugin: SonePlugin) : AbstractModule() {
 		bind(Context::class.java).toInstance(context)
 		bind(object : TypeLiteral<Optional<Context>>() {}).toInstance(Optional.of(context))
 		bind(SonePlugin::class.java).toInstance(sonePlugin)
-		bind(Version::class.java).toInstance(sonePlugin.version.parseVersion())
+		bind(Version::class.java).toInstance(sonePlugin.version.drop(1).parseVersion())
 		bind(PluginVersion::class.java).toInstance(PluginVersion(sonePlugin.version))
 		bind(PluginYear::class.java).toInstance(PluginYear(sonePlugin.year))
 		bind(PluginHomepage::class.java).toInstance(PluginHomepage(sonePlugin.homepage))

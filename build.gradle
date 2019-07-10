@@ -20,8 +20,8 @@ repositories {
 
 apply plugin: 'java'
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
@@ -43,7 +43,7 @@ dependencies {
     provided group: 'org.freenetproject', name: 'freenet-ext', version: '29'
     provided group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib'
+    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
     compile group: 'net.pterodactylus', name: 'utils', version: '0.12.4'
     compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
     compile group: 'com.google.guava', name: 'guava', version: '27.0.1-android'

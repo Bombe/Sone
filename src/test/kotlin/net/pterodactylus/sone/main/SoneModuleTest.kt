@@ -16,14 +16,16 @@ import org.junit.*
 import java.io.*
 import java.util.concurrent.atomic.*
 
+const val versionString = "v80"
+
 class SoneModuleTest {
 
 	private val currentDir: File = File(".")
-	private val pluginVersion = Version("", 0, 1, 2)
+	private val pluginVersion = Version("", 80)
 	private val pluginYear = 2019
 	private val pluginHomepage = "home://page"
 	private val sonePlugin = mock<SonePlugin>().apply {
-		whenever(version).thenReturn(pluginVersion.toString())
+		whenever(version).thenReturn(versionString)
 		whenever(year).thenReturn(pluginYear)
 		whenever(homepage).thenReturn(pluginHomepage)
 	}
@@ -113,7 +115,7 @@ class SoneModuleTest {
 
 	@Test
 	fun `plugin version is bound`() {
-		assertThat(injector.getInstance(), equalTo(PluginVersion(pluginVersion.toString())))
+		assertThat(injector.getInstance(), equalTo(PluginVersion(versionString)))
 	}
 
 	@Test
