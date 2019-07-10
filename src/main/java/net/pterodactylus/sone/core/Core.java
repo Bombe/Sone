@@ -98,7 +98,6 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -1063,7 +1062,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The text of the post
 	 * @return The created post
 	 */
-	public Post createPost(Sone sone, Optional<Sone> recipient, String text) {
+	public Post createPost(Sone sone, @Nullable Sone recipient, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
@@ -1072,8 +1071,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		PostBuilder postBuilder = database.newPostBuilder();
 		postBuilder.from(sone.getId()).randomId().currentTime().withText(text.trim());
-		if (recipient.isPresent()) {
-			postBuilder.to(recipient.get().getId());
+		if (recipient != null) {
+			postBuilder.to(recipient.getId());
 		}
 		final Post post = postBuilder.build();
 		database.storePost(post);

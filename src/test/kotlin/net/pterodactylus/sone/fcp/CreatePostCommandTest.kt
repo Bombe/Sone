@@ -56,7 +56,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 		parameters += "Text" to "Test"
 		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		val post = mock<Post>().apply { whenever(id).thenReturn("PostId") }
-		whenever(core.createPost(localSone, absent(), "Test")).thenReturn(post)
+		whenever(core.createPost(localSone, null, "Test")).thenReturn(post)
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters.get("Message"), equalTo("PostCreated"))
 		assertThat(response.replyParameters.get("Post"), equalTo("PostId"))
@@ -90,7 +90,7 @@ class CreatePostCommandTest : SoneCommandTest() {
 		whenever(core.getSone("LocalSoneId")).thenReturn(localSone)
 		whenever(core.getSone("RemoteSoneId")).thenReturn(remoteSone)
 		val post = mock<Post>().apply { whenever(id).thenReturn("PostId") }
-		whenever(core.createPost(localSone, of(remoteSone), "Test")).thenReturn(post)
+		whenever(core.createPost(localSone, remoteSone, "Test")).thenReturn(post)
 		val response = command.execute(parameters)
 		assertThat(response.replyParameters.get("Message"), equalTo("PostCreated"))
 		assertThat(response.replyParameters.get("Post"), equalTo("PostId"))

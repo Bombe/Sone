@@ -22,9 +22,4 @@ import net.pterodactylus.sone.data.PostReply
 /**
  * Event that signals that a new [PostReply] was found.
  */
-data class NewPostReplyFoundEvent(val postReply: PostReply) {
-
-	@Deprecated(message = "will go away", replaceWith = ReplaceWith("postReply"))
-	fun postReply() = postReply
-
-}
+data class NewPostReplyFoundEvent(val postReply: PostReply)
