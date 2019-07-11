@@ -120,6 +120,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();
 
+	private final DebugInformation debugInformation = new DebugInformation();
+
 	/** The preferences. */
 	private final Preferences preferences;
 
@@ -225,6 +227,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public long getStartupTime() {
 		return startupTime;
+	}
+
+	@Nonnull
+	public DebugInformation getDebugInformation() {
+		return debugInformation;
 	}
 
 	/**

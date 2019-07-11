@@ -10,11 +10,12 @@ import net.pterodactylus.sone.freenet.wot.event.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.util.config.*
 import org.hamcrest.*
-import org.junit.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
 import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.inOrder
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.*
 import org.mockito.hamcrest.MockitoHamcrest.*
+import kotlin.test.*
 
 /**
  * Unit test for [Core] and its subclasses.
@@ -133,6 +134,21 @@ class CoreTest {
 				description.appendText("is SoneRemovedEvent and sone is ").appendValue(sone)
 			}
 		}
+	}
+
+	@Test
+	fun `core starts without debug flags`() {
+		val configuration = mock<Configuration>()
+		val freenetInterface = mock<FreenetInterface>()
+		val identityManager = mock<IdentityManager>()
+		val soneDownloader = mock<SoneDownloader>()
+		val imageInserter = mock<ImageInserter>()
+		val updateChecker = mock<UpdateChecker>()
+		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
+		val eventBus = mock<EventBus>()
+		val database = mock<Database>()
+		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
+		assertThat(core.debugInformation.showVersionInformation, equalTo(false))
 	}
 
 }
