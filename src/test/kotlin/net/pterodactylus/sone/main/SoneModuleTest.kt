@@ -5,6 +5,9 @@ import com.google.common.eventbus.*
 import com.google.inject.Guice.*
 import com.google.inject.name.Names.*
 import freenet.l10n.*
+import freenet.node.*
+import freenet.pluginmanager.*
+import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.wot.*
@@ -33,7 +36,11 @@ class SoneModuleTest {
 		whenever(l10n()).thenReturn(l10n)
 	}
 
-	private val injector by lazy { createInjector(SoneModule(sonePlugin)) }
+	private val injector by lazy { createInjector(
+			SoneModule(sonePlugin),
+			FreenetInterface::class.isProvidedByDeepMock(),
+			PluginRespirator::class.isProvidedByDeepMock()
+	) }
 
 	@AfterTest
 	fun removePropertiesFromCurrentDirectory() {
@@ -89,6 +96,12 @@ class SoneModuleTest {
 	fun `valid config file leads to new config being set to false`() {
 		File(currentDir, "sone.properties").writeText("Option=old")
 		assertThat(injector.getInstance(named("NewConfig")), equalTo(false))
+	}
+
+	@Test
+	fun `debug information flag is read from config`() {
+		File(currentDir, "sone.properties").writeText("Debug/ShowVersionInformation=true")
+		assertThat(injector.getInstance<Core>().debugInformation.showVersionInformation, equalTo(true))
 	}
 
 	@Test
