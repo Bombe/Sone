@@ -188,4 +188,11 @@ class SoneModuleTest {
 		assertThat(testObject.ref.get(), sameInstance(event))
 	}
 
+	@Test
+	fun `core is created as singleton`() {
+		val firstCore = injector.getInstance<Core>()
+		val secondCore = injector.getInstance<Core>()
+		assertThat(secondCore, sameInstance(firstCore))
+	}
+
 }
