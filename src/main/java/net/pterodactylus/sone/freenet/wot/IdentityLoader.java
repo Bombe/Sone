@@ -17,25 +17,24 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import static java.util.Collections.emptySet;
-import static net.pterodactylus.sone.freenet.wot.Context.extractContext;
+import static java.util.concurrent.TimeUnit.*;
+import static net.pterodactylus.sone.freenet.wot.Context.*;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.logging.*;
 
-import net.pterodactylus.sone.freenet.plugin.PluginException;
+import net.pterodactylus.sone.freenet.plugin.*;
 
 import com.google.common.base.Optional;
-import com.google.inject.Inject;
+import com.google.common.base.*;
+import com.google.inject.*;
 
 /**
  * Loads {@link OwnIdentity}s and the {@link Identity}s they trust.
  */
 public class IdentityLoader {
 
+	private final Logger logger = Logger.getLogger(IdentityLoader.class.getName());
 	private final WebOfTrustConnector webOfTrustConnector;
 	private final Optional<Context> context;
 
@@ -50,7 +49,9 @@ public class IdentityLoader {
 	}
 
 	public Map<OwnIdentity, Collection<Identity>> loadIdentities() throws WebOfTrustException {
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		Collection<OwnIdentity> currentOwnIdentities = webOfTrustConnector.loadAllOwnIdentities();
+		logger.fine("Loaded " + currentOwnIdentities.size() + " own identities in " + (stopwatch.elapsed(MILLISECONDS) / 1000.0) + "s.");
 		return loadTrustedIdentitiesForOwnIdentities(currentOwnIdentities);
 	}
 
@@ -63,7 +64,9 @@ public class IdentityLoader {
 				continue;
 			}
 
+			Stopwatch stopwatch = Stopwatch.createStarted();
 			Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context.transform(extractContext));
+			logger.fine("Loaded " + trustedIdentities.size() + " identities for " + ownIdentity.getNickname() + " in " + (stopwatch.elapsed(MILLISECONDS) / 1000.0) + "s.");
 			currentIdentities.put(ownIdentity, trustedIdentities);
 		}
 
