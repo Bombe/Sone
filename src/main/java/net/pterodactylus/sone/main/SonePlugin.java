@@ -55,7 +55,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 					.build(new CacheLoader<String, Class<?>>() {
 						@Override
 						public Class<?> load(String key) throws Exception {
-							return Class.forName(key);
+							return SonePlugin.class.getClassLoader().loadClass(key);
 						}
 					});
 
