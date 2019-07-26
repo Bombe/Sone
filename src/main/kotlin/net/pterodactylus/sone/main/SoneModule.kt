@@ -16,7 +16,7 @@ import net.pterodactylus.util.config.ConfigurationException
 import net.pterodactylus.util.version.Version
 import java.io.*
 
-class SoneModule(private val sonePlugin: SonePlugin) : AbstractModule() {
+open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: EventBus) : AbstractModule() {
 
 	override fun configure() {
 		val sonePropertiesFile = File("sone.properties")
@@ -37,7 +37,6 @@ class SoneModule(private val sonePlugin: SonePlugin) : AbstractModule() {
 							.getValue(null)
 							?.let { DebugLoaders(it) }
 				}
-		val eventBus = EventBus()
 
 		bind(Configuration::class.java).toInstance(configuration)
 		bind(EventBus::class.java).toInstance(eventBus)
@@ -66,7 +65,7 @@ class SoneModule(private val sonePlugin: SonePlugin) : AbstractModule() {
 	fun getCore(configuration: Configuration, freenetInterface: FreenetInterface, identityManager: IdentityManager, soneDownloader: SoneDownloader, imageInserter: ImageInserter, updateChecker: UpdateChecker, webOfTrustUpdater: WebOfTrustUpdater, eventBus: EventBus, database: Database) =
 			Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database).apply {
 				debugInformation.showVersionInformation = configuration.getBooleanValue("Debug/ShowVersionInformation").getValue(false)
-			}
+			}.also(eventBus::register)
 
 }
 

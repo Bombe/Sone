@@ -22,6 +22,7 @@ import static java.util.logging.Logger.*;
 import java.util.logging.Logger;
 import java.util.logging.*;
 
+import com.google.common.eventbus.*;
 import net.pterodactylus.sone.core.*;
 import net.pterodactylus.sone.fcp.*;
 import net.pterodactylus.sone.freenet.wot.*;
@@ -205,7 +206,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	@VisibleForTesting
 	protected Injector createInjector() {
 		FreenetModule freenetModule = new FreenetModule(pluginRespirator);
-		AbstractModule soneModule = new SoneModule(this);
+		AbstractModule soneModule = new SoneModule(this, new EventBus());
 		Module webInterfaceModule = new WebInterfaceModule();
 
 		return createInjector(freenetModule, soneModule, webInterfaceModule);

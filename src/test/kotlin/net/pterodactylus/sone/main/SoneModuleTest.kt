@@ -16,6 +16,7 @@ import net.pterodactylus.util.config.*
 import net.pterodactylus.util.version.Version
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import org.mockito.Mockito.*
 import java.io.*
 import java.util.concurrent.atomic.*
 import kotlin.test.*
@@ -36,11 +37,13 @@ class SoneModuleTest {
 		whenever(l10n()).thenReturn(l10n)
 	}
 
-	private val injector by lazy { createInjector(
-			SoneModule(sonePlugin),
-			FreenetInterface::class.isProvidedByDeepMock(),
-			PluginRespirator::class.isProvidedByDeepMock()
-	) }
+	private val injector by lazy {
+		createInjector(
+				SoneModule(sonePlugin, EventBus()),
+				FreenetInterface::class.isProvidedByDeepMock(),
+				PluginRespirator::class.isProvidedByDeepMock()
+		)
+	}
 
 	@AfterTest
 	fun removePropertiesFromCurrentDirectory() {
@@ -193,6 +196,18 @@ class SoneModuleTest {
 		val firstCore = injector.getInstance<Core>()
 		val secondCore = injector.getInstance<Core>()
 		assertThat(secondCore, sameInstance(firstCore))
+	}
+
+	@Test
+	fun `core is registered with event bus`() {
+		val eventBus = mock<EventBus>()
+		val injector = createInjector(
+				SoneModule(sonePlugin, eventBus),
+				FreenetInterface::class.isProvidedByDeepMock(),
+				PluginRespirator::class.isProvidedByDeepMock()
+		)
+		val core = injector.getInstance<Core>()
+		verify(eventBus).register(core)
 	}
 
 }
