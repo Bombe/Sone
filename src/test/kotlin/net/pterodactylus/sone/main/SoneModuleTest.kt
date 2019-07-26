@@ -6,7 +6,6 @@ import com.google.common.eventbus.*
 import com.google.inject.Guice.*
 import com.google.inject.name.Names.*
 import freenet.l10n.*
-import freenet.node.*
 import freenet.pluginmanager.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
