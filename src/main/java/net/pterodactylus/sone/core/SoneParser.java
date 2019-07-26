@@ -257,6 +257,7 @@ public class SoneParser {
 		SimpleXML albumsXml = soneXml.getNode("albums");
 		Map<String, Image> allImages = new HashMap<>();
 		List<Album> topLevelAlbums = new ArrayList<>();
+		Map<String, Album> allAlbums = new HashMap<>();
 		if (albumsXml != null) {
 			for (SimpleXML albumXml : albumsXml.getNodes("album")) {
 				String id = albumXml.getValue("id", null);
@@ -269,7 +270,7 @@ public class SoneParser {
 				}
 				Album parent = null;
 				if (parentId != null) {
-					parent = database.getAlbum(parentId);
+					parent = allAlbums.get(parentId);
 					if (parent == null) {
 						logger.log(Level.WARNING, String.format("Downloaded Sone %s has album with invalid parent!", sone));
 						return null;
@@ -288,6 +289,7 @@ public class SoneParser {
 				} else {
 					topLevelAlbums.add(album);
 				}
+				allAlbums.put(album.getId(), album);
 				SimpleXML imagesXml = albumXml.getNode("images");
 				if (imagesXml != null) {
 					for (SimpleXML imageXml : imagesXml.getNodes("image")) {
