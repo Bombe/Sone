@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.core;
 
+import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
 import static net.pterodactylus.sone.utils.NumberParsers.parseLong;
@@ -11,6 +12,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -32,6 +34,8 @@ import net.pterodactylus.sone.database.SoneBuilder;
 import net.pterodactylus.util.xml.SimpleXML;
 import net.pterodactylus.util.xml.XML;
 
+import com.codahale.metrics.*;
+import com.google.common.base.*;
 import org.w3c.dom.Document;
 
 /**
@@ -42,15 +46,18 @@ public class SoneParser {
 	private static final Logger logger = getLogger(SoneParser.class.getName());
 	private static final int MAX_PROTOCOL_VERSION = 0;
 	private final Database database;
+	private final Histogram soneParsingDurationHistogram;
 
 	@Inject
-	public SoneParser(Database database) {
+	public SoneParser(Database database, MetricRegistry metricRegistry) {
 		this.database = database;
+		this.soneParsingDurationHistogram = metricRegistry.histogram("sone.parsing.duration");
 	}
 
 	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
 		/* TODO - impose a size limit? */
 
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		Document document;
 		/* XML parsing is not thread-safe. */
 		synchronized (this) {
@@ -335,6 +342,10 @@ public class SoneParser {
 		for (Album album : topLevelAlbums) {
 			sone.getRootAlbum().addAlbum(album);
 		}
+
+		// record the duration
+		stopwatch.stop();
+		soneParsingDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
 
 		return sone;
 

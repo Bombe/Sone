@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.core
 
+import com.codahale.metrics.*
 import com.google.common.base.Optional.*
 import freenet.crypt.*
 import freenet.keys.InsertableClientSSK.*
@@ -21,7 +22,8 @@ import kotlin.test.*
 class SoneParserTest {
 
 	private val database = MemoryDatabase(Configuration(MapConfigurationBackend()))
-	private val soneParser = SoneParser(database)
+	private val metricRegistry = MetricRegistry()
+	private val soneParser = SoneParser(database, metricRegistry)
 	private val sone = mock<Sone>()
 
 	@BeforeTest
@@ -393,6 +395,14 @@ class SoneParserTest {
 		assertThat(image.width, equalTo(1920))
 		assertThat(image.height, equalTo(1080))
 		assertThat(sone.profile.avatar, equalTo("image-id"))
+	}
+
+	@Test
+	fun `successful parsing adds histogram entry`() {
+		val inputStream = javaClass.getResourceAsStream("sone-parser-without-images.xml")
+		assertThat(soneParser.parseSone(sone, inputStream), notNullValue())
+		val histogram = metricRegistry.histogram("sone.parsing.duration")
+		assertThat(histogram.count, equalTo(1L))
 	}
 
 }
