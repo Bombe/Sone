@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.TreeMultimap
-import com.google.common.util.concurrent.AbstractService
+import com.google.common.util.concurrent.*
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import net.pterodactylus.sone.data.Album
@@ -70,6 +70,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val soneImages: Multimap<String, Image> = HashMultimap.create<String, Image>()
 	private val memoryBookmarkDatabase = MemoryBookmarkDatabase(this, configurationLoader)
 	private val memoryFriendDatabase = MemoryFriendDatabase(configurationLoader)
+	private val saveRateLimiter: RateLimiter = RateLimiter.create(1.0)
 
 	override val soneLoader get() = this::getSone
 
@@ -82,8 +83,10 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override val bookmarkedPosts get() = memoryBookmarkDatabase.bookmarkedPosts
 
 	override fun save() {
-		saveKnownPosts()
-		saveKnownPostReplies()
+		if (saveRateLimiter.tryAcquire()) {
+			saveKnownPosts()
+			saveKnownPostReplies()
+		}
 	}
 
 	override fun doStart() {

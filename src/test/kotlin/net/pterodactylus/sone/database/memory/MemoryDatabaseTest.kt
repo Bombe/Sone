@@ -38,7 +38,7 @@ import kotlin.test.*
  */
 class MemoryDatabaseTest {
 
-	private val configuration = mock<Configuration>()
+	private val configuration = deepMock<Configuration>()
 	private val memoryDatabase = MemoryDatabase(configuration)
 	private val sone = mock<Sone>()
 
@@ -407,6 +407,14 @@ class MemoryDatabaseTest {
 		memoryDatabase.setPostReplyKnown(postReply, true)
 		assertThat(configuration.getStringValue("KnownReplies/0/ID").value, equalTo("post-reply-id"))
 		assertThat(configuration.getStringValue("KnownReplies/1/ID").value, equalTo<Any>(null))
+	}
+
+	@Test
+	@Dirty("the rate limiter should be mocked")
+	fun `saving the database twice in a row only saves it once`() {
+		memoryDatabase.save()
+		memoryDatabase.save()
+		verify(configuration.getStringValue("KnownPosts/0/ID"), times(1)).value = null
 	}
 
 }
