@@ -50,6 +50,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	static {
 		/* initialize logging. */
 		soneLogger.setUseParentHandlers(false);
+		soneLogger.setLevel(Level.ALL);
 		soneLogger.addHandler(new Handler() {
 			private final LoadingCache<String, Class<?>> classCache = CacheBuilder.newBuilder()
 					.build(new CacheLoader<String, Class<?>>() {
