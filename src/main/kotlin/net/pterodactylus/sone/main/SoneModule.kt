@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.main
 
+import com.codahale.metrics.*
 import com.google.common.base.*
 import com.google.common.eventbus.*
 import com.google.inject.*
@@ -52,6 +53,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(Database::class.java).to(MemoryDatabase::class.java).`in`(Singleton::class.java)
 		bind(BaseL10n::class.java).toInstance(sonePlugin.l10n().base)
 		loaders?.let { bind(Loaders::class.java).toInstance(it) }
+		bind(MetricRegistry::class.java).`in`(Singleton::class.java)
 
 		bindListener(Matchers.any(), object : TypeListener {
 			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {

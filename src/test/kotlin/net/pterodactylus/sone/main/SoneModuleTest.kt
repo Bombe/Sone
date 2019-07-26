@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.main
 
+import com.codahale.metrics.*
 import com.google.common.base.*
 import com.google.common.eventbus.*
 import com.google.inject.Guice.*
@@ -208,6 +209,18 @@ class SoneModuleTest {
 		)
 		val core = injector.getInstance<Core>()
 		verify(eventBus).register(core)
+	}
+
+	@Test
+	fun `metrics registry can be created`() {
+		assertThat(injector.getInstance<MetricRegistry>(), notNullValue())
+	}
+
+	@Test
+	fun `metrics registry is created as singleton`() {
+		val firstMetricRegistry = injector.getInstance<MetricRegistry>()
+		val secondMetricRegistry = injector.getInstance<MetricRegistry>()
+		assertThat(firstMetricRegistry, sameInstance(secondMetricRegistry))
 	}
 
 }
