@@ -1507,8 +1507,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().getShowCustomAvatars().name());
 			configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").setValue(sone.getOptions().getLoadLinkedImages().name());
 
-			configuration.save();
-
 			webOfTrustUpdater.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 
 			logger.log(Level.INFO, String.format("Sone %s saved.", sone));
