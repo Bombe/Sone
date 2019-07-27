@@ -1,42 +1,24 @@
 package net.pterodactylus.sone.core;
 
 import static java.util.concurrent.TimeUnit.*;
-import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
-import static net.pterodactylus.sone.utils.NumberParsers.parseLong;
+import static java.util.logging.Logger.*;
+import static net.pterodactylus.sone.utils.NumberParsers.*;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.*;
+import java.util.*;
+import java.util.logging.*;
 
-import javax.inject.Inject;
+import javax.annotation.*;
+import javax.inject.*;
 
-import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Client;
-import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Profile.DuplicateField;
-import net.pterodactylus.sone.data.Profile.EmptyFieldName;
-import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.database.Database;
-import net.pterodactylus.sone.database.PostBuilder;
-import net.pterodactylus.sone.database.PostReplyBuilder;
-import net.pterodactylus.sone.database.SoneBuilder;
-import net.pterodactylus.util.xml.SimpleXML;
-import net.pterodactylus.util.xml.XML;
+import net.pterodactylus.sone.data.*;
+import net.pterodactylus.sone.data.Profile.*;
+import net.pterodactylus.sone.database.*;
+import net.pterodactylus.util.xml.*;
 
 import com.codahale.metrics.*;
 import com.google.common.base.*;
-import org.w3c.dom.Document;
+import org.w3c.dom.*;
 
 /**
  * Parses a {@link Sone} from an XML {@link InputStream}.
@@ -54,6 +36,7 @@ public class SoneParser {
 		this.soneParsingDurationHistogram = metricRegistry.histogram("sone.parsing.duration");
 	}
 
+	@Nullable
 	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
 		/* TODO - impose a size limit? */
 
