@@ -254,6 +254,10 @@ textarea {
 	text-align: right;
 }
 
+#sone td.numeric {
+	text-align: right;
+}
+
 #sone .post {
 	padding: 1ex 0px;
 	border-bottom: solid 1px #ccc;

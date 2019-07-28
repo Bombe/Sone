@@ -1,0 +1,41 @@
+<%include include/head.html>
+
+	<div class="page-id hidden">metrics</div>
+
+	<h1><%= Page.Metrics.Page.Title|l10n|html></h1>
+
+	<table>
+		<thead>
+			<tr>
+				<td>Metric</td>
+				<td>Count</td>
+				<td>Min</td>
+				<td>Max</td>
+				<td>Mean</td>
+				<td>Median</td>
+				<td>75%</td>
+				<td>95%</td>
+				<td>98%</td>
+				<td>99%</td>
+				<td>99.9%</td>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><%= Page.Metrics.SoneParsingDuration.Title|l10n|html></td>
+				<td class="numeric"><% soneParsingDurationCount|html></td>
+				<td class="numeric"><% soneParsingDurationMin|html>μs</td>
+				<td class="numeric"><% soneParsingDurationMax|html>μs</td>
+				<td class="numeric"><% soneParsingDurationMean|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationMedian|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationPercentile75|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationPercentile95|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationPercentile98|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationPercentile99|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationPercentile999|format format=='%.0f'|html>μs</td>
+			</tr>
+		</tbody>
+	</table>
+	<h2><%= Page.Metrics.SoneParsingDuration.Title|l10n|html></h2>
+
+<%include include/tail.html>

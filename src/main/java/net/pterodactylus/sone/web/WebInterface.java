@@ -113,53 +113,7 @@ import net.pterodactylus.sone.web.ajax.UnlockSoneAjaxPage;
 import net.pterodactylus.sone.web.ajax.UntrustAjaxPage;
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.sone.web.page.TemplateRenderer;
-import net.pterodactylus.sone.web.pages.AboutPage;
-import net.pterodactylus.sone.web.pages.BookmarkPage;
-import net.pterodactylus.sone.web.pages.BookmarksPage;
-import net.pterodactylus.sone.web.pages.CreateAlbumPage;
-import net.pterodactylus.sone.web.pages.CreatePostPage;
-import net.pterodactylus.sone.web.pages.CreateReplyPage;
-import net.pterodactylus.sone.web.pages.CreateSonePage;
-import net.pterodactylus.sone.web.pages.DeleteAlbumPage;
-import net.pterodactylus.sone.web.pages.DeleteImagePage;
-import net.pterodactylus.sone.web.pages.DeletePostPage;
-import net.pterodactylus.sone.web.pages.DeleteProfileFieldPage;
-import net.pterodactylus.sone.web.pages.DeleteReplyPage;
-import net.pterodactylus.sone.web.pages.DeleteSonePage;
-import net.pterodactylus.sone.web.pages.DismissNotificationPage;
-import net.pterodactylus.sone.web.pages.DistrustPage;
-import net.pterodactylus.sone.web.pages.EditAlbumPage;
-import net.pterodactylus.sone.web.pages.EditImagePage;
-import net.pterodactylus.sone.web.pages.EditProfileFieldPage;
-import net.pterodactylus.sone.web.pages.EditProfilePage;
-import net.pterodactylus.sone.web.pages.EmptyAlbumTitlePage;
-import net.pterodactylus.sone.web.pages.EmptyImageTitlePage;
-import net.pterodactylus.sone.web.pages.FollowSonePage;
-import net.pterodactylus.sone.web.pages.GetImagePage;
-import net.pterodactylus.sone.web.pages.ImageBrowserPage;
-import net.pterodactylus.sone.web.pages.IndexPage;
-import net.pterodactylus.sone.web.pages.InvalidPage;
-import net.pterodactylus.sone.web.pages.KnownSonesPage;
-import net.pterodactylus.sone.web.pages.LikePage;
-import net.pterodactylus.sone.web.pages.LockSonePage;
-import net.pterodactylus.sone.web.pages.LoginPage;
-import net.pterodactylus.sone.web.pages.LogoutPage;
-import net.pterodactylus.sone.web.pages.MarkAsKnownPage;
-import net.pterodactylus.sone.web.pages.NewPage;
-import net.pterodactylus.sone.web.pages.NoPermissionPage;
-import net.pterodactylus.sone.web.pages.OptionsPage;
-import net.pterodactylus.sone.web.pages.RescuePage;
-import net.pterodactylus.sone.web.pages.SearchPage;
-import net.pterodactylus.sone.web.pages.SoneTemplatePage;
-import net.pterodactylus.sone.web.pages.TrustPage;
-import net.pterodactylus.sone.web.pages.UnbookmarkPage;
-import net.pterodactylus.sone.web.pages.UnfollowSonePage;
-import net.pterodactylus.sone.web.pages.UnlikePage;
-import net.pterodactylus.sone.web.pages.UnlockSonePage;
-import net.pterodactylus.sone.web.pages.UntrustPage;
-import net.pterodactylus.sone.web.pages.UploadImagePage;
-import net.pterodactylus.sone.web.pages.ViewPostPage;
-import net.pterodactylus.sone.web.pages.ViewSonePage;
+import net.pterodactylus.sone.web.pages.*;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
 import net.pterodactylus.util.notify.TemplateNotification;
@@ -173,6 +127,7 @@ import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
 import freenet.l10n.BaseL10n;
 
+import com.codahale.metrics.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
@@ -222,6 +177,7 @@ public class WebInterface implements SessionProvider {
 	private final L10nFilter l10nFilter;
 
 	private final PageToadletRegistry pageToadletRegistry;
+	private final MetricRegistry metricRegistry;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -273,7 +229,7 @@ public class WebInterface implements SessionProvider {
 			ParserFilter parserFilter, ShortenFilter shortenFilter,
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
-			PageToadletRegistry pageToadletRegistry) {
+			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -286,6 +242,7 @@ public class WebInterface implements SessionProvider {
 		this.renderFilter = renderFilter;
 		this.linkedElementRenderFilter = linkedElementRenderFilter;
 		this.pageToadletRegistry = pageToadletRegistry;
+		this.metricRegistry = metricRegistry;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 		l10nFilter = new L10nFilter(getL10n());
@@ -659,6 +616,7 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new EmptyImageTitlePage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new EmptyAlbumTitlePage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new DismissNotificationPage(this, loaders, templateRenderer));
+		pageToadletRegistry.addPage(new MetricsPage(this, loaders, templateRenderer, metricRegistry));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png"));
