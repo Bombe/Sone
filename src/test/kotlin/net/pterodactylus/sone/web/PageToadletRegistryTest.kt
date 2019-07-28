@@ -101,6 +101,17 @@ class PageToadletRegistryTest {
 	}
 
 	@Test
+	fun `adding a debug page and activating debug mode twice will add it to the container once`() {
+		val toadlet = createPageToadlet()
+		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
+		pageToadletRegistry.addDebugPage(page)
+		pageToadletRegistry.registerToadlets()
+		pageToadletRegistry.activateDebugMode()
+		pageToadletRegistry.activateDebugMode()
+		verify(toadletContainer, times(1)).register(toadlet, null, "/Sone/", true, false)
+	}
+
+	@Test
 	fun `debug pages are ungegistered from the container`() {
 		val toadlet = createPageToadlet()
 		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
