@@ -138,21 +138,18 @@ class CoreTest {
 
 	@Test
 	fun `core starts with debug set to false`() {
-		val configuration = mock<Configuration>()
-		val freenetInterface = mock<FreenetInterface>()
-		val identityManager = mock<IdentityManager>()
-		val soneDownloader = mock<SoneDownloader>()
-		val imageInserter = mock<ImageInserter>()
-		val updateChecker = mock<UpdateChecker>()
-		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
-		val eventBus = mock<EventBus>()
-		val database = mock<Database>()
-		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
+		val core = createCore()
 		assertThat(core.debug, equalTo(false))
 	}
 
 	@Test
 	fun `debug flag can be set`() {
+		val core = createCore()
+		core.setDebug()
+		assertThat(core.debug, equalTo(true))
+	}
+
+	private fun createCore(): Core {
 		val configuration = mock<Configuration>()
 		val freenetInterface = mock<FreenetInterface>()
 		val identityManager = mock<IdentityManager>()
@@ -162,9 +159,7 @@ class CoreTest {
 		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
 		val eventBus = mock<EventBus>()
 		val database = mock<Database>()
-		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
-		core.setDebug()
-		assertThat(core.debug, equalTo(true))
+		return Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
 	}
 
 }
