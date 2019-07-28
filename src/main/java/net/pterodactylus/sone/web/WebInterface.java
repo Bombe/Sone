@@ -40,25 +40,7 @@ import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.ElementLoader;
-import net.pterodactylus.sone.core.event.ImageInsertAbortedEvent;
-import net.pterodactylus.sone.core.event.ImageInsertFailedEvent;
-import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
-import net.pterodactylus.sone.core.event.ImageInsertStartedEvent;
-import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
-import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
-import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
-import net.pterodactylus.sone.core.event.NewPostFoundEvent;
-import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
-import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
-import net.pterodactylus.sone.core.event.PostRemovedEvent;
-import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
-import net.pterodactylus.sone.core.event.SoneInsertedEvent;
-import net.pterodactylus.sone.core.event.SoneInsertingEvent;
-import net.pterodactylus.sone.core.event.SoneLockedEvent;
-import net.pterodactylus.sone.core.event.SoneRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
-import net.pterodactylus.sone.core.event.UpdateFoundEvent;
+import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
@@ -979,6 +961,11 @@ public class WebInterface implements SessionProvider {
 		insertingImagesNotification.remove(imageInsertFailedEvent.getImage());
 		imageInsertFailedNotification.add(imageInsertFailedEvent.getImage());
 		notificationManager.addNotification(imageInsertFailedNotification);
+	}
+
+	@Subscribe
+	public void debugActivated(@Nonnull DebugActivatedEvent debugActivatedEvent) {
+		pageToadletRegistry.activateDebugMode();
 	}
 
 }
