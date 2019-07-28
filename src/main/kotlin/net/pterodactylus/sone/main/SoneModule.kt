@@ -67,6 +67,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 	fun getCore(configuration: Configuration, freenetInterface: FreenetInterface, identityManager: IdentityManager, soneDownloader: SoneDownloader, imageInserter: ImageInserter, updateChecker: UpdateChecker, webOfTrustUpdater: WebOfTrustUpdater, eventBus: EventBus, database: Database) =
 			Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database).apply {
 				debugInformation.showVersionInformation = configuration.getBooleanValue("Debug/ShowVersionInformation").getValue(false)
+				debugInformation.showMetrics = configuration.getBooleanValue("Debug/ShowMetrics").getValue(false)
 			}.also(eventBus::register)
 
 }

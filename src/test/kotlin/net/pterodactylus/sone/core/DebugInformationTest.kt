@@ -30,4 +30,9 @@ class DebugInformationTest {
 		assertThat(debugInformation.showVersionInformation, equalTo(false))
 	}
 
+	@Test
+	fun `new debug information has show metrics set to off`() {
+		assertThat(debugInformation.showMetrics, equalTo(false))
+	}
+
 }

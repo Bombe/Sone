@@ -22,4 +22,7 @@ class DebugInformation {
 	@Volatile
 	var showVersionInformation = false
 
+	@Volatile
+	var showMetrics = false
+
 }
