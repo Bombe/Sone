@@ -616,9 +616,7 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new EmptyImageTitlePage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new EmptyAlbumTitlePage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new DismissNotificationPage(this, loaders, templateRenderer));
-		if (getCore().getDebug()) {
-			pageToadletRegistry.addPage(new MetricsPage(this, loaders, templateRenderer, metricRegistry));
-		}
+		pageToadletRegistry.addDebugPage(new MetricsPage(this, loaders, templateRenderer, metricRegistry));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("css/", "/static/css/", "text/css"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("javascript/", "/static/javascript/", "text/javascript"));
 		pageToadletRegistry.addPage(loaders.<FreenetRequest>loadStaticPage("images/", "/static/images/", "image/png"));

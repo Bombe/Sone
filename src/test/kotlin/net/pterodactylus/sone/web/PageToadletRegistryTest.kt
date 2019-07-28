@@ -9,6 +9,7 @@ import net.pterodactylus.util.web.*
 import org.junit.*
 import org.junit.rules.*
 import org.mockito.Mockito.*
+import kotlin.test.Test
 
 class PageToadletRegistryTest {
 
@@ -78,6 +79,55 @@ class PageToadletRegistryTest {
 		pageToadletRegistry.registerToadlets()
 		pageToadletRegistry.unregisterToadlets()
 		verify(toadletContainer).unregister(toadletWithMenuname)
+	}
+
+	@Test
+	fun `adding a debug page will not add it to the container`() {
+		val toadlet = createPageToadlet()
+		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
+		pageToadletRegistry.addDebugPage(page)
+		pageToadletRegistry.registerToadlets()
+		verify(toadletContainer, never()).register(toadlet, null, "/Sone/", true, false)
+	}
+
+	@Test
+	fun `adding a debug page and activating debug mode will add it to the container`() {
+		val toadlet = createPageToadlet()
+		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
+		pageToadletRegistry.addDebugPage(page)
+		pageToadletRegistry.registerToadlets()
+		pageToadletRegistry.activateDebugMode()
+		verify(toadletContainer).register(toadlet, null, "/Sone/", true, false)
+	}
+
+	@Test
+	fun `debug pages are ungegistered from the container`() {
+		val toadlet = createPageToadlet()
+		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
+		pageToadletRegistry.addDebugPage(page)
+		pageToadletRegistry.registerToadlets()
+		pageToadletRegistry.activateDebugMode()
+		pageToadletRegistry.unregisterToadlets()
+		verify(toadletContainer).unregister(toadlet)
+	}
+
+	@Test
+	fun `inactive debug pages are not ungegistered from the container`() {
+		val toadlet = createPageToadlet()
+		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
+		pageToadletRegistry.addDebugPage(page)
+		pageToadletRegistry.registerToadlets()
+		pageToadletRegistry.unregisterToadlets()
+		verify(toadletContainer, never()).unregister(toadlet)
+	}
+
+	@Test
+	fun `debug page can not be added after registering`() {
+		val toadlet = createPageToadlet()
+		whenever(pageToadletFactory.createPageToadlet(page)).thenReturn(toadlet)
+		pageToadletRegistry.registerToadlets()
+		expectedException.expect(IllegalStateException::class.java)
+		pageToadletRegistry.addDebugPage(page)
 	}
 
 	private fun createPageToadlet(menuName: String? = null) =
