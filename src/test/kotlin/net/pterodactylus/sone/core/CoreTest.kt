@@ -12,8 +12,8 @@ import net.pterodactylus.util.config.*
 import org.hamcrest.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.*
+import org.mockito.Mockito.inOrder
+import org.mockito.Mockito.verify
 import org.mockito.hamcrest.MockitoHamcrest.*
 import kotlin.test.*
 
@@ -149,7 +149,15 @@ class CoreTest {
 		assertThat(core.debug, equalTo(true))
 	}
 
-	private fun createCore(): Core {
+	@Test
+	fun `setting debug flag posts event to event bus`() {
+		val eventBus = mock<EventBus>()
+		val core = createCore(eventBus)
+		core.setDebug()
+		verify(eventBus).post(argThat(instanceOf(DebugActivatedEvent::class.java)))
+	}
+
+	private fun createCore(eventBus: EventBus = mock()): Core {
 		val configuration = mock<Configuration>()
 		val freenetInterface = mock<FreenetInterface>()
 		val identityManager = mock<IdentityManager>()
@@ -157,7 +165,6 @@ class CoreTest {
 		val imageInserter = mock<ImageInserter>()
 		val updateChecker = mock<UpdateChecker>()
 		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
-		val eventBus = mock<EventBus>()
 		val database = mock<Database>()
 		return Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
 	}

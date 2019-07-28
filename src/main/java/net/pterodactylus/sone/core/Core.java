@@ -49,19 +49,7 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
-import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
-import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
-import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
-import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
-import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
-import net.pterodactylus.sone.core.event.NewPostFoundEvent;
-import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
-import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
-import net.pterodactylus.sone.core.event.PostRemovedEvent;
-import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneLockedEvent;
-import net.pterodactylus.sone.core.event.SoneRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
+import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -237,6 +225,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 	public void setDebug() {
 		debug.set(true);
+		eventBus.post(new DebugActivatedEvent());
 	}
 
 	/**
