@@ -102,7 +102,7 @@ class SoneModuleTest {
 	}
 
 	@Test
-	fun `debug information flag is read from config`() {
+	fun `show version information debug information flag is read from config`() {
 		File(currentDir, "sone.properties").writeText("Debug/ShowVersionInformation=true")
 		assertThat(injector.getInstance<Core>().debugInformation.showVersionInformation, equalTo(true))
 	}
