@@ -7,12 +7,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -423,28 +418,24 @@ public class WebOfTrustUpdaterTest {
 
 	@Test
 	public void setTrustRequestsAreCoalesced() throws InterruptedException, PluginException {
-		final CountDownLatch trustSetTrigger = new CountDownLatch(1);
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				trustSetTrigger.countDown();
-				return null;
-			}
+		final CountDownLatch firstTrigger = new CountDownLatch(1);
+		doAnswer((Answer<Void>) invocation -> {
+			firstTrigger.countDown();
+			return null;
 		}).when(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		for (int i = 1; i <= 2; i++) {
-			/* this is so fucking volatile. */
-			if (i > 1) {
-				sleep(200);
-			}
-			new Thread(new Runnable() {
-				public void run() {
-					webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-				}
-			}).start();
-		}
+		Identity secondTrustee = when(mock(Identity.class).getId()).thenReturn("trustee-id2").getMock();
+		final CountDownLatch secondTrigger = new CountDownLatch(1);
+		doAnswer((Answer<Void>) invocation -> {
+			secondTrigger.countDown();
+			return null;
+		}).when(secondTrustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
+		webOfTrustUpdater.setTrust(ownIdentity, secondTrustee, SCORE, TRUST_COMMENT);
+		webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
 		webOfTrustUpdater.start();
-		assertThat(trustSetTrigger.await(1, SECONDS), is(true));
-		verify(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
+		assertThat(firstTrigger.await(1, SECONDS), is(true));
+		assertThat(secondTrigger.await(1, SECONDS), is(true));
+		verify(trustee, times(1)).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
 		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
 	}
 
