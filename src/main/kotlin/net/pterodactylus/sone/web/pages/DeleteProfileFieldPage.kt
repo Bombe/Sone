@@ -18,13 +18,13 @@ class DeleteProfileFieldPage @Inject constructor(webInterface: WebInterface, loa
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
-			val field = currentSone.profile.getFieldById(soneRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
+			val field = currentSone.profile.getFieldById(soneRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: redirectTo("invalid.html")
 			if (soneRequest.httpRequest.getPartAsStringFailsafe("confirm", 4) == "true") {
 				currentSone.profile = currentSone.profile.apply { removeField(field) }
 			}
-			throw RedirectException("editProfile.html#profile-fields")
+			redirectTo("editProfile.html#profile-fields")
 		}
-		val field = currentSone.profile.getFieldById(soneRequest.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
+		val field = currentSone.profile.getFieldById(soneRequest.httpRequest.getParam("field")) ?: redirectTo("invalid.html")
 		templateContext["field"] = field
 	}
 

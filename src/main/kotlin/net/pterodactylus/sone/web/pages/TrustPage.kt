@@ -21,7 +21,7 @@ class TrustPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 			soneRequest.core.getSone(soneRequest.parameters["sone"]!!)?.let { sone ->
 				soneRequest.core.trustSone(currentSone, sone)
 			}
-			throw RedirectException(soneRequest.parameters["returnPage", 256])
+			redirectTo(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

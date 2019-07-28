@@ -12,7 +12,7 @@ class DebugPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		soneRequest.core.setDebug()
-		throw RedirectException("./")
+		redirectTo("./")
 	}
 
 }

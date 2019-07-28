@@ -29,7 +29,7 @@ class CreatePostPage @Inject constructor(webInterface: WebInterface, loaders: Lo
 			val sender = soneRequest.core.getLocalSone(soneRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: currentSone
 			val recipient = soneRequest.core.getSone(soneRequest.httpRequest.getPartAsStringFailsafe("recipient", 43))
 			soneRequest.core.createPost(sender, recipient, TextFilter.filter(soneRequest.httpRequest.getHeader("Host"), text))
-			throw RedirectException(returnPage)
+			redirectTo(returnPage)
 		}
 	}
 

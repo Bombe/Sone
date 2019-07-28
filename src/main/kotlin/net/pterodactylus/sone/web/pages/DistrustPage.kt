@@ -22,7 +22,7 @@ class DistrustPage @Inject constructor(webInterface: WebInterface, loaders: Load
 		if (soneRequest.isPOST) {
 			soneRequest.core.getSone(soneRequest.httpRequest.getPartAsStringFailsafe("sone", 44))
 					?.run { soneRequest.core.distrustSone(currentSone, this) }
-			throw RedirectException(soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
+			redirectTo(soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
 		}
 	}
 

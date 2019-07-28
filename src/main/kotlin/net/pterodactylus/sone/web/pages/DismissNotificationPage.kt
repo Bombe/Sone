@@ -17,7 +17,7 @@ class DismissNotificationPage @Inject constructor(webInterface: WebInterface, lo
 		val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 		val notificationId = soneRequest.httpRequest.getPartAsStringFailsafe("notification", 36)
 		soneRequest.webInterface.getNotification(notificationId).orNull()?.takeIf { it.isDismissable }?.dismiss()
-		throw RedirectException(returnPage)
+		redirectTo(returnPage)
 	}
 
 }

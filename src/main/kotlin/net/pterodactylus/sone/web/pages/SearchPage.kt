@@ -125,7 +125,7 @@ class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer:
 						}
 					}
 
-	private fun redirect(target: String): Nothing = throw RedirectException(target)
+	private fun redirect(target: String): Nothing = redirectTo(target)
 
 	enum class Optionality {
 		OPTIONAL,

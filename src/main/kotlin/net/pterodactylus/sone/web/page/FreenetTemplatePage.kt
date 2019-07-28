@@ -98,6 +98,9 @@ open class FreenetTemplatePage(
 		/* do nothing. */
 	}
 
+	fun redirectTo(target: String?): Nothing =
+			throw RedirectException(target)
+
 	class RedirectException(val target: String?) : Exception() {
 		override fun toString(): String = format("RedirectException{target='%s'}", target)
 	}

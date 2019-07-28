@@ -21,7 +21,7 @@ class UntrustPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			soneRequest.parameters["sone", 44]!!
 					.let(soneRequest.core::getSone)
 					?.also { soneRequest.core.untrustSone(currentSone, it) }
-			throw RedirectException(soneRequest.parameters["returnPage", 256])
+			redirectTo(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

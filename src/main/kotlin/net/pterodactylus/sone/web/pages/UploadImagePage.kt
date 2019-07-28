@@ -23,11 +23,11 @@ class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: L
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
-			val parentAlbum = soneRequest.parameters["parent"]!!.let(soneRequest.core::getAlbum) ?: throw RedirectException("noPermission.html")
+			val parentAlbum = soneRequest.parameters["parent"]!!.let(soneRequest.core::getAlbum) ?: redirectTo("noPermission.html")
 			if (parentAlbum.sone != currentSone) {
-				throw RedirectException("noPermission.html")
+				redirectTo("noPermission.html")
 			}
-			val title = soneRequest.parameters["title", 200].emptyToNull ?: throw RedirectException("emptyImageTitle.html")
+			val title = soneRequest.parameters["title", 200].emptyToNull ?: redirectTo("emptyImageTitle.html")
 
 			val uploadedFile = soneRequest.httpRequest.getUploadedFile("image")
 			val bytes = uploadedFile.data.use { it.toByteArray() }
@@ -44,7 +44,7 @@ class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: L
 				setTitle(title)
 				setDescription(TextFilter.filter(soneRequest.headers["Host"], soneRequest.parameters["description", 4000]))
 			}.update()
-			throw RedirectException("imageBrowser.html?album=${parentAlbum.id}")
+			redirectTo("imageBrowser.html?album=${parentAlbum.id}")
 		}
 	}
 

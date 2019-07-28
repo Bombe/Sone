@@ -31,7 +31,7 @@ class CreateSonePage @Inject constructor(webInterface: WebInterface, loaders: Lo
 					logger.log(Level.SEVERE, "Could not create Sone for OwnIdentity: $ownIdentity")
 				}
 				setCurrentSone(soneRequest.toadletContext, sone)
-				throw RedirectException("index.html")
+				redirectTo("index.html")
 			}
 			templateContext["errorNoIdentity"] = true
 		}

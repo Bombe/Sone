@@ -24,7 +24,7 @@ class DeleteSonePage @Inject constructor(webInterface: WebInterface, loaders: Lo
 			if (soneRequest.httpRequest.isPartSet("deleteSone")) {
 				soneRequest.core.deleteSone(currentSone)
 			}
-			throw RedirectException("index.html")
+			redirectTo("index.html")
 		}
 	}
 

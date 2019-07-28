@@ -23,7 +23,7 @@ class LikePage @Inject constructor(webInterface: WebInterface, loaders: Loaders,
 					"reply" -> currentSone.addLikedReplyId(soneRequest.parameters["reply", 36]!!)
 				}
 			}
-			throw RedirectException(soneRequest.parameters["returnPage", 256]!!)
+			redirectTo(soneRequest.parameters["returnPage", 256]!!)
 		}
 	}
 

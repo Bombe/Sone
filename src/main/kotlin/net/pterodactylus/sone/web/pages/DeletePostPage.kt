@@ -18,22 +18,22 @@ class DeletePostPage @Inject constructor(webInterface: WebInterface, loaders: Lo
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
-			val post = soneRequest.core.getPost(soneRequest.httpRequest.getPartAsStringFailsafe("post", 36)) ?: throw RedirectException("noPermission.html")
+			val post = soneRequest.core.getPost(soneRequest.httpRequest.getPartAsStringFailsafe("post", 36)) ?: redirectTo("noPermission.html")
 			val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 			if (!post.sone.isLocal) {
-				throw RedirectException("noPermission.html")
+				redirectTo("noPermission.html")
 			}
 			if (soneRequest.httpRequest.isPartSet("confirmDelete")) {
 				soneRequest.core.deletePost(post)
-				throw RedirectException(returnPage)
+				redirectTo(returnPage)
 			} else if (soneRequest.httpRequest.isPartSet("abortDelete")) {
-				throw RedirectException(returnPage)
+				redirectTo(returnPage)
 			}
 			templateContext["post"] = post
 			templateContext["returnPage"] = returnPage
 			return
 		}
-		templateContext["post"] = soneRequest.core.getPost(soneRequest.httpRequest.getParam("post")) ?: throw RedirectException("noPermission.html")
+		templateContext["post"] = soneRequest.core.getPost(soneRequest.httpRequest.getParam("post")) ?: redirectTo("noPermission.html")
 		templateContext["returnPage"] = soneRequest.httpRequest.getParam("returnPage")
 	}
 

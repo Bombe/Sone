@@ -21,13 +21,13 @@ class UnbookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Lo
 				soneRequest.core.bookmarkedPosts
 						.filterNot(Post::isLoaded)
 						.forEach(soneRequest.core::unbookmarkPost)
-				throw RedirectException("bookmarks.html")
+				redirectTo("bookmarks.html")
 			}
 			soneRequest.isPOST -> {
 				soneRequest.parameters["post", 36]
 						?.let(soneRequest.core::getPost)
 						?.also(soneRequest.core::unbookmarkPost)
-				throw RedirectException(soneRequest.parameters["returnPage", 256])
+				redirectTo(soneRequest.parameters["returnPage", 256])
 			}
 		}
 	}

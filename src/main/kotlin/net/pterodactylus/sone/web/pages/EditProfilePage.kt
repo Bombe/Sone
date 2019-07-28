@@ -43,31 +43,31 @@ class EditProfilePage @Inject constructor(webInterface: WebInterface, loaders: L
 					}
 					currentSone.profile = profile
 					soneRequest.core.touchConfiguration()
-					throw RedirectException("editProfile.html")
+					redirectTo("editProfile.html")
 				} else if (soneRequest.httpRequest.getPartAsStringFailsafe("add-field", 4) == "true") {
 					val fieldName = soneRequest.httpRequest.getPartAsStringFailsafe("field-name", 100)
 					try {
 						profile.addField(fieldName)
 						currentSone.profile = profile
 						soneRequest.core.touchConfiguration()
-						throw RedirectException("editProfile.html#profile-fields")
+						redirectTo("editProfile.html#profile-fields")
 					} catch (e: DuplicateField) {
 						templateContext["fieldName"] = fieldName
 						templateContext["duplicateFieldName"] = true
 					}
 				} else profile.fields.forEach { field ->
 					if (soneRequest.httpRequest.getPartAsStringFailsafe("delete-field-${field.id}", 4) == "true") {
-						throw RedirectException("deleteProfileField.html?field=${field.id}")
+						redirectTo("deleteProfileField.html?field=${field.id}")
 					} else if (soneRequest.httpRequest.getPartAsStringFailsafe("edit-field-${field.id}", 4) == "true") {
-						throw RedirectException("editProfileField.html?field=${field.id}")
+						redirectTo("editProfileField.html?field=${field.id}")
 					} else if (soneRequest.httpRequest.getPartAsStringFailsafe("move-down-field-${field.id}", 4) == "true") {
 						profile.moveFieldDown(field)
 						currentSone.profile = profile
-						throw RedirectException("editProfile.html#profile-fields")
+						redirectTo("editProfile.html#profile-fields")
 					} else if (soneRequest.httpRequest.getPartAsStringFailsafe("move-up-field-${field.id}", 4) == "true") {
 						profile.moveFieldUp(field)
 						currentSone.profile = profile
-						throw RedirectException("editProfile.html#profile-fields")
+						redirectTo("editProfile.html#profile-fields")
 					}
 				}
 			}

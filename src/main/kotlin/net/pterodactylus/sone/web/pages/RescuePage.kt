@@ -29,7 +29,7 @@ class RescuePage @Inject constructor(webInterface: WebInterface, loaders: Loader
 			if (soneRequest.parameters["fetch", 8] == "true") {
 				soneRescuer.startNextFetch()
 			}
-			throw RedirectException("rescue.html")
+			redirectTo("rescue.html")
 		}
 	}
 

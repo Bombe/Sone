@@ -19,9 +19,9 @@ class EditImagePage @Inject constructor(webInterface: WebInterface, loaders: Loa
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
-			val image = soneRequest.core.getImage(soneRequest.httpRequest.getPartAsStringFailsafe("image", 36)) ?: throw RedirectException("invalid.html")
+			val image = soneRequest.core.getImage(soneRequest.httpRequest.getPartAsStringFailsafe("image", 36)) ?: redirectTo("invalid.html")
 			if (!image.sone.isLocal) {
-				throw RedirectException("noPermission.html")
+				redirectTo("noPermission.html")
 			}
 			soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256).let { returnPage ->
 				if (soneRequest.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {
@@ -38,10 +38,10 @@ class EditImagePage @Inject constructor(webInterface: WebInterface, loaders: Loa
 								.update()
 						soneRequest.core.touchConfiguration()
 					} catch (e: ImageTitleMustNotBeEmpty) {
-						throw RedirectException("emptyImageTitle.html")
+						redirectTo("emptyImageTitle.html")
 					}
 				}
-				throw RedirectException(returnPage)
+				redirectTo(returnPage)
 			}
 		}
 	}

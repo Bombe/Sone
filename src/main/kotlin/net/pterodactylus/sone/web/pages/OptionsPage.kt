@@ -66,7 +66,7 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 
 			if (fieldsWithErrors.isEmpty()) {
 				soneRequest.core.touchConfiguration()
-				throw RedirectException("options.html")
+				redirectTo("options.html")
 			}
 			templateContext["fieldErrors"] = fieldsWithErrors
 		}

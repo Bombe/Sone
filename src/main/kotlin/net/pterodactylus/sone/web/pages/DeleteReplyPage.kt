@@ -19,17 +19,17 @@ class DeleteReplyPage @Inject constructor(webInterface: WebInterface, loaders: L
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
 			val replyId = soneRequest.httpRequest.getPartAsStringFailsafe("reply", 36)
-			val reply = soneRequest.core.getPostReply(replyId) ?: throw RedirectException("noPermission.html")
+			val reply = soneRequest.core.getPostReply(replyId) ?: redirectTo("noPermission.html")
 			if (!reply.sone.isLocal) {
-				throw RedirectException("noPermission.html")
+				redirectTo("noPermission.html")
 			}
 			val returnPage = soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256)
 			if (soneRequest.httpRequest.isPartSet("confirmDelete")) {
 				soneRequest.core.deleteReply(reply)
-				throw RedirectException(returnPage)
+				redirectTo(returnPage)
 			}
 			if (soneRequest.httpRequest.isPartSet("abortDelete")) {
-				throw RedirectException(returnPage)
+				redirectTo(returnPage)
 			}
 			templateContext["reply"] = replyId
 			templateContext["returnPage"] = returnPage

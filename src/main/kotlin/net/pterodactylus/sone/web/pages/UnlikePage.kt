@@ -21,7 +21,7 @@ class UnlikePage @Inject constructor(webInterface: WebInterface, loaders: Loader
 				"post" -> currentSone.removeLikedPostId(soneRequest.parameters["post"]!!)
 				"reply" -> currentSone.removeLikedReplyId(soneRequest.parameters["reply"]!!)
 			}
-			throw RedirectException(soneRequest.parameters["returnPage", 256])
+			redirectTo(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

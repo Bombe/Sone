@@ -26,10 +26,10 @@ class CreateReplyPage @Inject constructor(webInterface: WebInterface, loaders: L
 				templateContext["errorTextEmpty"] = true
 				return
 			}
-			val post = soneRequest.core.getPost(postId) ?: throw RedirectException("noPermission.html")
+			val post = soneRequest.core.getPost(postId) ?: redirectTo("noPermission.html")
 			val sender = soneRequest.core.getLocalSone(soneRequest.httpRequest.getPartAsStringFailsafe("sender", 43)) ?: currentSone
 			soneRequest.core.createReply(sender, post, TextFilter.filter(soneRequest.httpRequest.getHeader("Host"), text))
-			throw RedirectException(returnPage)
+			redirectTo(returnPage)
 		}
 	}
 
