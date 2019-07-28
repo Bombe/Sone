@@ -235,6 +235,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		return debug.get();
 	}
 
+	public void setDebug() {
+		debug.set(true);
+	}
+
 	/**
 	 * Returns the options used by the core.
 	 *
