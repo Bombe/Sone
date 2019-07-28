@@ -8,7 +8,6 @@ import com.google.inject.matcher.*
 import com.google.inject.name.Names.*
 import com.google.inject.spi.*
 import freenet.l10n.*
-import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.wot.*
@@ -61,14 +60,6 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 			}
 		})
 	}
-
-	@Provides
-	@Singleton
-	fun getCore(configuration: Configuration, freenetInterface: FreenetInterface, identityManager: IdentityManager, soneDownloader: SoneDownloader, imageInserter: ImageInserter, updateChecker: UpdateChecker, webOfTrustUpdater: WebOfTrustUpdater, eventBus: EventBus, database: Database) =
-			Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database).apply {
-				debugInformation.showVersionInformation = configuration.getBooleanValue("Debug/ShowVersionInformation").getValue(false)
-				debugInformation.showMetrics = configuration.getBooleanValue("Debug/ShowMetrics").getValue(false)
-			}.also(eventBus::register)
 
 }
 

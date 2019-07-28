@@ -137,7 +137,7 @@ class CoreTest {
 	}
 
 	@Test
-	fun `core starts without debug flags`() {
+	fun `core starts with debug set to false`() {
 		val configuration = mock<Configuration>()
 		val freenetInterface = mock<FreenetInterface>()
 		val identityManager = mock<IdentityManager>()
@@ -148,7 +148,7 @@ class CoreTest {
 		val eventBus = mock<EventBus>()
 		val database = mock<Database>()
 		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
-		assertThat(core.debugInformation.showVersionInformation, equalTo(false))
+		assertThat(core.debug, equalTo(false))
 	}
 
 }

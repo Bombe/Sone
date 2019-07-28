@@ -102,18 +102,6 @@ class SoneModuleTest {
 	}
 
 	@Test
-	fun `show version information debug information flag is read from config`() {
-		File(currentDir, "sone.properties").writeText("Debug/ShowVersionInformation=true")
-		assertThat(injector.getInstance<Core>().debugInformation.showVersionInformation, equalTo(true))
-	}
-
-	@Test
-	fun `show metrics debug information flag is read from config`() {
-		File(currentDir, "sone.properties").writeText("Debug/ShowMetrics=true")
-		assertThat(injector.getInstance<Core>().debugInformation.showMetrics, equalTo(true))
-	}
-
-	@Test
 	fun `event bus is bound`() {
 		assertThat(injector.getInstance<EventBus>(), notNullValue())
 	}

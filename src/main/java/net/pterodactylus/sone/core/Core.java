@@ -37,6 +37,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -120,7 +121,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();
 
-	private final DebugInformation debugInformation = new DebugInformation();
+	private final AtomicBoolean debug = new AtomicBoolean(false);
 
 	/** The preferences. */
 	private final Preferences preferences;
@@ -230,8 +231,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	}
 
 	@Nonnull
-	public DebugInformation getDebugInformation() {
-		return debugInformation;
+	public boolean getDebug() {
+		return debug.get();
 	}
 
 	/**
