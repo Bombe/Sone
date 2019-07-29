@@ -329,6 +329,7 @@ public class SoneParser {
 		// record the duration
 		stopwatch.stop();
 		soneParsingDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
+		logger.fine(() -> "Parsed " + originalSone.getIdentity().getId() + "@" + originalSone.getLatestEdition() + " in " + stopwatch.elapsed(MICROSECONDS) + "μs.");
 
 		return sone;
 
