@@ -21,11 +21,6 @@ class RescuePage @Inject constructor(webInterface: WebInterface, loaders: Loader
 		val soneRescuer = soneRequest.core.getSoneRescuer(currentSone)
 		templateContext["soneRescuer"] = soneRescuer
 		if (soneRequest.isPOST) {
-			soneRequest.parameters["edition", 9]?.toIntOrNull()?.also {
-				if (it > -1) {
-					soneRescuer.setEdition(it.toLong())
-				}
-			}
 			if (soneRequest.parameters["fetch", 8] == "true") {
 				soneRescuer.startNextFetch()
 			}

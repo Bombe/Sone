@@ -16,9 +16,10 @@
 		<%/if>
 		<form action="rescue.html" method="post">
 			<input type="hidden" name="formPassword" value="<%formPassword|html>" />
-			<label><%= Page.Rescue.Label.NextEdition|l10n|html></label>
-			<input type="field" name="edition" value="<%soneRescuer.nextEdition>" />
-			<button type="submit" name="fetch" value="true"><%= Page.Rescue.Button.Fetch|l10n|html></button>
+			<div>
+				<%= Page.Rescue.Label.NextEdition|l10n|html>: <%soneRescuer.nextEdition>
+				<button type="submit" name="fetch" value="true"><%= Page.Rescue.Button.Fetch|l10n|html></button>
+			</div>
 		</form>
 	<%else>
 		<%if soneRescuer.lastFetchSuccessful>
