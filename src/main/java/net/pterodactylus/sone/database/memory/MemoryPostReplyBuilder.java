@@ -17,12 +17,12 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import java.util.UUID;
+import java.util.*;
 
-import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.impl.AbstractPostReplyBuilder;
-import net.pterodactylus.sone.database.PostReplyBuilder;
-import net.pterodactylus.sone.database.SoneProvider;
+import net.pterodactylus.sone.data.*;
+import net.pterodactylus.sone.data.impl.*;
+import net.pterodactylus.sone.database.*;
+import org.jetbrains.annotations.*;
 
 /**
  * {@link PostReplyBuilder} implementation that creates {@link MemoryPostReply}
@@ -30,28 +30,14 @@ import net.pterodactylus.sone.database.SoneProvider;
  */
 class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
 
-	/** The database. */
 	private final MemoryDatabase database;
-
-	/** The Sone provider. */
 	private final SoneProvider soneProvider;
 
-	/**
-	 * Creates a new {@link MemoryPostReply} builder.
-	 *
-	 * @param database
-	 *            The database
-	 * @param soneProvider
-	 *            The Sone provider
-	 */
 	public MemoryPostReplyBuilder(MemoryDatabase database, SoneProvider soneProvider) {
 		this.database = database;
 		this.soneProvider = soneProvider;
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
 	@Override
 	public PostReply build() throws IllegalStateException {
 		validate();
