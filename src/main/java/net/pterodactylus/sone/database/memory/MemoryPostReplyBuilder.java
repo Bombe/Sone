@@ -56,9 +56,7 @@ class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
 	public PostReply build() throws IllegalStateException {
 		validate();
 
-		PostReply postReply = new MemoryPostReply(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
-		postReply.setKnown(database.isPostReplyKnown(postReply));
-		return postReply;
+		return new MemoryPostReply(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
 	}
 
 }
