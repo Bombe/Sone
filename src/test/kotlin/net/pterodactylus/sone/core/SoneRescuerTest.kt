@@ -74,6 +74,7 @@ class SoneRescuerTest {
 		verify(core).updateSone(eq(fetchedSone), eq(true))
 		assertThat(soneRescuer.isLastFetchSuccessful, equalTo(true))
 		assertThat(soneRescuer.isFetching, equalTo(false))
+		assertThat(soneRescuer.currentEdition, equalTo(currentEdition - 1))
 	}
 
 	@Test
@@ -85,6 +86,7 @@ class SoneRescuerTest {
 		verify(core, never()).updateSone(any(Sone::class.java), eq(true))
 		assertThat(soneRescuer.isLastFetchSuccessful, equalTo(false))
 		assertThat(soneRescuer.isFetching, equalTo(false))
+		assertThat(soneRescuer.currentEdition, equalTo(currentEdition))
 	}
 
 	private fun returnUriOnInsert(fetchedSone: Sone?) {

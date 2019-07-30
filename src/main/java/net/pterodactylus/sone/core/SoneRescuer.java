@@ -108,17 +108,6 @@ public class SoneRescuer extends AbstractService {
 	}
 
 	/**
-	 * Sets the edition to rescue.
-	 *
-	 * @param edition
-	 *            The edition to rescue
-	 * @return This Sone rescuer
-	 */
-	public void setEdition(long edition) {
-		currentEdition = edition;
-	}
-
-	/**
 	 * Sets whether the last fetch was successful.
 	 *
 	 * @return {@code true} if the last fetch was successful, {@code false}
@@ -134,9 +123,7 @@ public class SoneRescuer extends AbstractService {
 	//
 
 	/**
-	 * Starts the next fetch. If you want to fetch a different edition than “the
-	 * next older one,” remember to call {@link #setEdition(long)} before
-	 * calling this method.
+	 * Starts the next fetch.
 	 */
 	public void startNextFetch() {
 		fetching = true;
@@ -165,6 +152,7 @@ public class SoneRescuer extends AbstractService {
 				lastFetchSuccessful = (fetchedSone != null);
 				if (lastFetchSuccessful) {
 					core.updateSone(fetchedSone, true);
+					currentEdition = getNextEdition();
 				}
 				fetching = false;
 			}
