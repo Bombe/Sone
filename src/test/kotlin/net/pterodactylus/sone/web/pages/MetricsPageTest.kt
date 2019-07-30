@@ -68,8 +68,16 @@ class MetricsPageTest : WebPageTest() {
 		verifyHistogram("soneParsingDuration")
 	}
 
+	@Test
+	fun `metrics page delivers correct histogram size`() {
+		val histogram = metricRegistry.histogram("sone.parsing.duration")
+		(0..4000).forEach(histogram::update)
+		page.handleRequest(soneRequest, templateContext)
+		assertThat(templateContext["soneParsingDurationCount"] as Long, equalTo(4001L))
+	}
+
 	private fun verifyHistogram(name: String) {
-		assertThat(templateContext["${name}Count"] as Int, equalTo(5))
+		assertThat(templateContext["${name}Count"] as Long, equalTo(5L))
 		assertThat(templateContext["${name}Min"] as Long, equalTo(1L))
 		assertThat(templateContext["${name}Max"] as Long, equalTo(10L))
 		assertThat(templateContext["${name}Median"] as Double, equalTo(8.0))

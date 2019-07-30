@@ -13,17 +13,19 @@ import javax.inject.*
 class MetricsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val metricsRegistry: MetricRegistry) : SoneTemplatePage(webInterface, loaders, templateRenderer, "Page.Metrics.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
-		metricsRegistry.histogram("sone.parsing.duration").snapshot.also { snapshot ->
-			templateContext["soneParsingDurationCount"] = snapshot.size()
-			templateContext["soneParsingDurationMin"] = snapshot.min
-			templateContext["soneParsingDurationMax"] = snapshot.max
-			templateContext["soneParsingDurationMedian"] = snapshot.median
-			templateContext["soneParsingDurationMean"] = snapshot.mean
-			templateContext["soneParsingDurationPercentile75"] = snapshot.get75thPercentile()
-			templateContext["soneParsingDurationPercentile95"] = snapshot.get95thPercentile()
-			templateContext["soneParsingDurationPercentile98"] = snapshot.get98thPercentile()
-			templateContext["soneParsingDurationPercentile99"] = snapshot.get99thPercentile()
-			templateContext["soneParsingDurationPercentile999"] = snapshot.get999thPercentile()
+		metricsRegistry.histogram("sone.parsing.duration").also { histogram ->
+			templateContext["soneParsingDurationCount"] = histogram.count
+			histogram.snapshot.also { snapshot ->
+				templateContext["soneParsingDurationMin"] = snapshot.min
+				templateContext["soneParsingDurationMax"] = snapshot.max
+				templateContext["soneParsingDurationMedian"] = snapshot.median
+				templateContext["soneParsingDurationMean"] = snapshot.mean
+				templateContext["soneParsingDurationPercentile75"] = snapshot.get75thPercentile()
+				templateContext["soneParsingDurationPercentile95"] = snapshot.get95thPercentile()
+				templateContext["soneParsingDurationPercentile98"] = snapshot.get98thPercentile()
+				templateContext["soneParsingDurationPercentile99"] = snapshot.get99thPercentile()
+				templateContext["soneParsingDurationPercentile999"] = snapshot.get999thPercentile()
+			}
 		}
 	}
 
