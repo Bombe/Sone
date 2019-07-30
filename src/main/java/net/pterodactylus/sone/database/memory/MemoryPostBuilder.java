@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.database.memory;
 
 import java.util.*;
+import javax.annotation.*;
 
 import net.pterodactylus.sone.data.*;
 import net.pterodactylus.sone.data.impl.*;
@@ -35,6 +36,7 @@ class MemoryPostBuilder extends AbstractPostBuilder {
 		database = memoryDatabase;
 	}
 
+	@Nonnull
 	@Override
 	public Post build() throws IllegalStateException {
 		validate();
