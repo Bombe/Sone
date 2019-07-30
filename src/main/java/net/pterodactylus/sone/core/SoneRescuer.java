@@ -114,9 +114,8 @@ public class SoneRescuer extends AbstractService {
 	 *            The edition to rescue
 	 * @return This Sone rescuer
 	 */
-	public SoneRescuer setEdition(long edition) {
+	public void setEdition(long edition) {
 		currentEdition = edition;
-		return this;
 	}
 
 	/**
