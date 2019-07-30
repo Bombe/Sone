@@ -25,11 +25,10 @@ import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import kotlin.test.*
 
-class MetricsPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> MetricsPage(webInterface, loaders, templateRenderer, metricRegistry) }) {
+class MetricsPageTest : WebPageTest() {
 
-	companion object {
-		val metricRegistry = MetricRegistry()
-	}
+	private val metricRegistry = MetricRegistry()
+	override val page by lazy { MetricsPage(webInterface, loaders, templateRenderer, metricRegistry) }
 
 	@Test
 	fun `page returns correct path`() {

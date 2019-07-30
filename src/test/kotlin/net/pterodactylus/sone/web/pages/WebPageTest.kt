@@ -43,7 +43,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	val l10n = webInterface.l10n!!
 	val sessionManager = mock<SessionManager>()
 
-	val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
+	open val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
 
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()
