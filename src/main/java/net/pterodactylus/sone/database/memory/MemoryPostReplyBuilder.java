@@ -18,11 +18,11 @@
 package net.pterodactylus.sone.database.memory;
 
 import java.util.*;
+import javax.annotation.*;
 
 import net.pterodactylus.sone.data.*;
 import net.pterodactylus.sone.data.impl.*;
 import net.pterodactylus.sone.database.*;
-import org.jetbrains.annotations.*;
 
 /**
  * {@link PostReplyBuilder} implementation that creates {@link MemoryPostReply}
@@ -38,6 +38,7 @@ class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
 		this.soneProvider = soneProvider;
 	}
 
+	@Nonnull
 	@Override
 	public PostReply build() throws IllegalStateException {
 		validate();
