@@ -25,7 +25,6 @@ import org.mockito.stubbing.Answer;
 public class SoneRescuerTest {
 
 	private static final long CURRENT_EDITION = 12L;
-	private static final long SOME_OTHER_EDITION = 15L;
 	private final Core core = mock(Core.class);
 	private final SoneDownloader soneDownloader = mock(SoneDownloader.class);
 	private final Sone sone = mock(Sone.class);
@@ -68,12 +67,6 @@ public class SoneRescuerTest {
 	@Test
 	public void nextEditionIsOneSmallerThanTheCurrentEdition() {
 		assertThat(soneRescuer.getNextEdition(), is(CURRENT_EDITION - 1));
-	}
-
-	@Test
-	public void currentEditionCanBeSet() {
-		soneRescuer.setEdition(SOME_OTHER_EDITION);
-		assertThat(soneRescuer.getCurrentEdition(), is(SOME_OTHER_EDITION));
 	}
 
 	@Test
@@ -126,7 +119,7 @@ public class SoneRescuerTest {
 		FreenetURI keyWithDocName = mock(FreenetURI.class);
 		FreenetURI keyWithMetaStrings = mock(FreenetURI.class);
 		when(keyWithDocName.setMetaString(eq(new String[] { "sone.xml" }))).thenReturn(keyWithMetaStrings);
-		when(sskKey.setDocName(eq("Sone-" + CURRENT_EDITION))).thenReturn(keyWithDocName);
+		when(sskKey.setDocName(eq("Sone-" + (CURRENT_EDITION - 1)))).thenReturn(keyWithDocName);
 		when(sone.getRequestUri().setKeyType(eq("SSK"))).thenReturn(sskKey);
 		return keyWithMetaStrings;
 	}

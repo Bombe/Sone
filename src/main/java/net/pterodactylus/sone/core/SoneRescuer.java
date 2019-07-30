@@ -158,7 +158,7 @@ public class SoneRescuer extends AbstractService {
 			}
 			if (fetching) {
 				core.lockSone(sone);
-				FreenetURI soneUri = sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + currentEdition).setMetaString(new String[] { "sone.xml" });
+				FreenetURI soneUri = sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + getNextEdition()).setMetaString(new String[] { "sone.xml" });
 				System.out.println("URI: " + soneUri);
 				Sone fetchedSone = soneDownloader.fetchSone(sone, soneUri, true);
 				System.out.println("Sone: " + fetchedSone);
