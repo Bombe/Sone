@@ -17,37 +17,24 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import java.util.UUID;
+import java.util.*;
 
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.impl.AbstractPostBuilder;
-import net.pterodactylus.sone.database.PostBuilder;
-import net.pterodactylus.sone.database.SoneProvider;
+import net.pterodactylus.sone.data.*;
+import net.pterodactylus.sone.data.impl.*;
+import net.pterodactylus.sone.database.*;
 
 /**
  * {@link PostBuilder} implementation that creates a {@link MemoryPost}.
  */
 class MemoryPostBuilder extends AbstractPostBuilder {
 
-	/** The database. */
 	private final MemoryDatabase database;
 
-	/**
-	 * Creates a new memory post builder.
-	 *
-	 * @param memoryDatabase
-	 *            The database
-	 * @param soneProvider
-	 *            The Sone provider
-	 */
 	public MemoryPostBuilder(MemoryDatabase memoryDatabase, SoneProvider soneProvider) {
 		super(soneProvider);
 		database = memoryDatabase;
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
 	@Override
 	public Post build() throws IllegalStateException {
 		validate();
