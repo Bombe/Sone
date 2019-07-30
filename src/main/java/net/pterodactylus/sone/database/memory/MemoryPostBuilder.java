@@ -51,9 +51,7 @@ class MemoryPostBuilder extends AbstractPostBuilder {
 	@Override
 	public Post build() throws IllegalStateException {
 		validate();
-		Post post = new MemoryPost(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
-		post.setKnown(database.isPostKnown(post));
-		return post;
+		return new MemoryPost(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
 	}
 
 }
