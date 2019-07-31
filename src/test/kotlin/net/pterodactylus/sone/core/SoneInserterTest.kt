@@ -258,7 +258,7 @@ class SoneInserterTest {
 	}
 
 	@Test
-	fun `unsuccessful insert does not update metrics`() {
+	fun `unsuccessful insert does not update histogram but records error`() {
 		val insertUri = mock<FreenetURI>()
 		createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
@@ -271,6 +271,8 @@ class SoneInserterTest {
 		soneInserter.serviceRun()
 		val histogram = metricRegistry.histogram("sone.insert.duration")
 		assertThat(histogram.count, equalTo(0L))
+		val meter = metricRegistry.meter("sone.insert.errors")
+		assertThat(meter.count, equalTo(1L))
 	}
 
 }

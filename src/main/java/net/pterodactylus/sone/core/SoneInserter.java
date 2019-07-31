@@ -109,6 +109,7 @@ public class SoneInserter extends AbstractService {
 	private final long delay;
 	private final String soneId;
 	private final Histogram soneInsertDurationHistogram;
+	private final Meter soneInsertErrorMeter;
 
 	/**
 	 * Creates a new Sone inserter.
@@ -151,6 +152,7 @@ public class SoneInserter extends AbstractService {
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.soneInsertDurationHistogram = metricRegistry.histogram("sone.insert.duration");
+		this.soneInsertErrorMeter = metricRegistry.meter("sone.insert.errors");
 		this.soneId = soneId;
 		this.soneModificationDetector = soneModificationDetector;
 		this.delay = delay;
@@ -250,6 +252,7 @@ public class SoneInserter extends AbstractService {
 						success = true;
 						logger.log(Level.INFO, String.format("Inserted Sone “%s” at %s.", sone.getName(), finalUri));
 					} catch (SoneException se1) {
+						soneInsertErrorMeter.mark();
 						eventBus.post(new SoneInsertAbortedEvent(sone, se1));
 						logger.log(Level.WARNING, String.format("Could not insert Sone “%s”!", sone.getName()), se1);
 					} finally {
