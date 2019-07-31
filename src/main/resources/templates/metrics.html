@@ -22,6 +22,19 @@
 		</thead>
 		<tbody>
 			<tr>
+				<td><%= Page.Metrics.SoneInsertDuration.Title|l10n|html></td>
+				<td class="numeric"><% soneInsertDurationCount|html></td>
+				<td class="numeric"><% soneInsertDurationMin|html>μs</td>
+				<td class="numeric"><% soneInsertDurationMax|html>μs</td>
+				<td class="numeric"><% soneInsertDurationMean|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationMedian|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationPercentile75|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationPercentile95|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationPercentile98|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationPercentile99|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationPercentile999|format format=='%.0f'|html>μs</td>
+			</tr>
+			<tr>
 				<td><%= Page.Metrics.SoneParsingDuration.Title|l10n|html></td>
 				<td class="numeric"><% soneParsingDurationCount|html></td>
 				<td class="numeric"><% soneParsingDurationMin|html>μs</td>

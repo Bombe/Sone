@@ -69,6 +69,13 @@ class MetricsPageTest : WebPageTest() {
 	}
 
 	@Test
+	fun `metrice pags lists stats about sone insert durations`() {
+		createHistogram("sone.insert.duration")
+		page.handleRequest(soneRequest, templateContext)
+		verifyHistogram("soneInsertDuration")
+	}
+
+	@Test
 	fun `metrics page delivers correct histogram size`() {
 		val histogram = metricRegistry.histogram("sone.parsing.duration")
 		(0..4000).forEach(histogram::update)
