@@ -65,6 +65,7 @@ class WebInterfaceModule : AbstractModule() {
 				addFilter("reparse", ReparseFilter())
 				addFilter("unknown", unknownDateFilter)
 				addFilter("format", FormatFilter())
+				addFilter("duration", DurationFormatFilter())
 				addFilter("sort", CollectionSortFilter())
 				addFilter("image-link", imageLinkFilter)
 				addFilter("replyGroup", ReplyGroupFilter())

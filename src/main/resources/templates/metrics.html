@@ -24,28 +24,28 @@
 			<tr>
 				<td><%= Page.Metrics.SoneInsertDuration.Title|l10n|html></td>
 				<td class="numeric"><% soneInsertDurationCount|html></td>
-				<td class="numeric"><% soneInsertDurationMin|html>μs</td>
-				<td class="numeric"><% soneInsertDurationMax|html>μs</td>
-				<td class="numeric"><% soneInsertDurationMean|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneInsertDurationMedian|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneInsertDurationPercentile75|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneInsertDurationPercentile95|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneInsertDurationPercentile98|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneInsertDurationPercentile99|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneInsertDurationPercentile999|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneInsertDurationMin|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationMax|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationMean|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationMedian|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationPercentile75|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationPercentile95|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationPercentile98|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationPercentile99|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneInsertDurationPercentile999|duration scale=="μs"|html></td>
 			</tr>
 			<tr>
 				<td><%= Page.Metrics.SoneParsingDuration.Title|l10n|html></td>
 				<td class="numeric"><% soneParsingDurationCount|html></td>
-				<td class="numeric"><% soneParsingDurationMin|html>μs</td>
-				<td class="numeric"><% soneParsingDurationMax|html>μs</td>
-				<td class="numeric"><% soneParsingDurationMean|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneParsingDurationMedian|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneParsingDurationPercentile75|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneParsingDurationPercentile95|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneParsingDurationPercentile98|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneParsingDurationPercentile99|format format=='%.0f'|html>μs</td>
-				<td class="numeric"><% soneParsingDurationPercentile999|format format=='%.0f'|html>μs</td>
+				<td class="numeric"><% soneParsingDurationMin|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationMax|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationMean|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationMedian|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationPercentile75|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationPercentile95|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationPercentile98|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationPercentile99|duration scale=="μs"|html></td>
+				<td class="numeric"><% soneParsingDurationPercentile999|duration scale=="μs"|html></td>
 			</tr>
 		</tbody>
 	</table>

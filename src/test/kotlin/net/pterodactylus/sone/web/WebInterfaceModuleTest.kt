@@ -20,6 +20,7 @@ import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
+import kotlin.test.Test
 
 class WebInterfaceModuleTest {
 
@@ -197,6 +198,11 @@ class WebInterfaceModuleTest {
 	@Test
 	fun `template context contains format filter`() {
 		verifyFilter<FormatFilter>("format")
+	}
+
+	@Test
+	fun `template context contains duration format filter`() {
+		verifyFilter<DurationFormatFilter>("duration")
 	}
 
 	@Test
