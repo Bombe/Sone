@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.core
 
+import com.codahale.metrics.*
 import com.google.common.collect.*
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
@@ -50,7 +51,8 @@ class CoreTest {
 		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
 		val eventBus = mock<EventBus>()
 		val database = mock<Database>()
-		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
+		val metricRegistry = MetricRegistry()
+		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database, metricRegistry)
 		val ownIdentity = mock<OwnIdentity>()
 		val identity = mock<Identity>()
 		whenever(identity.id).thenReturn("sone-id")
@@ -166,7 +168,8 @@ class CoreTest {
 		val updateChecker = mock<UpdateChecker>()
 		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
 		val database = mock<Database>()
-		return Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database)
+		val metricRegistry = MetricRegistry()
+		return Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database, metricRegistry)
 	}
 
 }

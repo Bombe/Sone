@@ -19,6 +19,7 @@ package net.pterodactylus.sone.core;
 
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
@@ -31,10 +32,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.codahale.metrics.*;
+import com.google.common.base.*;
 import net.pterodactylus.sone.core.SoneModificationDetector.LockableFingerprintProvider;
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
@@ -58,7 +62,6 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Charsets;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
@@ -105,6 +108,7 @@ public class SoneInserter extends AbstractService {
 	private final SoneModificationDetector soneModificationDetector;
 	private final long delay;
 	private final String soneId;
+	private final Histogram soneInsertDurationHistogram;
 
 	/**
 	 * Creates a new Sone inserter.
@@ -118,8 +122,8 @@ public class SoneInserter extends AbstractService {
 	 * @param soneId
 	 *            The ID of the Sone to insert
 	 */
-	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, final String soneId) {
-		this(core, eventBus, freenetInterface, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
+	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, final String soneId) {
+		this(core, eventBus, freenetInterface, metricRegistry, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
 			@Override
 			public boolean isLocked() {
 				Sone sone = core.getSone(soneId);
@@ -141,11 +145,12 @@ public class SoneInserter extends AbstractService {
 	}
 
 	@VisibleForTesting
-	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
 		super("Sone Inserter for “" + soneId + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
+		this.soneInsertDurationHistogram = metricRegistry.histogram("sone.insert.duration");
 		this.soneId = soneId;
 		this.soneModificationDetector = soneModificationDetector;
 		this.delay = delay;
@@ -229,8 +234,11 @@ public class SoneInserter extends AbstractService {
 						sone.setStatus(SoneStatus.inserting);
 						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
+						Stopwatch stopwatch = Stopwatch.createStarted();
 						FreenetURI finalUri = freenetInterface.insertDirectory(sone.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
-						eventBus.post(new SoneInsertedEvent(sone, currentTimeMillis() - insertTime, insertInformation.getFingerprint()));
+						stopwatch.stop();
+						soneInsertDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
+						eventBus.post(new SoneInsertedEvent(sone, stopwatch.elapsed(MILLISECONDS), insertInformation.getFingerprint()));
 						/* at this point we might already be stopped. */
 						if (shouldStop()) {
 							/* if so, bail out, don’t change anything. */

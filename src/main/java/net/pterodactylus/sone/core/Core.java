@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.codahale.metrics.*;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
@@ -174,6 +175,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The time the configuration was last touched. */
 	private volatile long lastConfigurationUpdate;
 
+	private final MetricRegistry metricRegistry;
+
 	/**
 	 * Creates a new core.
 	 *
@@ -191,7 +194,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The database
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -202,6 +205,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.database = database;
+		this.metricRegistry = metricRegistry;
 		preferences = new Preferences(eventBus);
 	}
 
@@ -618,7 +622,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
-		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, metricRegistry, ownIdentity.getId());
 		soneInserter.insertionDelayChanged(new InsertionDelayChangedEvent(preferences.getInsertionDelay()));
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {

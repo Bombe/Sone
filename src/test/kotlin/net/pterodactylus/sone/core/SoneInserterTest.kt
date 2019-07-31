@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.core
 
+import com.codahale.metrics.*
 import com.google.common.base.*
 import com.google.common.base.Optional
 import com.google.common.eventbus.*
@@ -26,12 +27,14 @@ import org.mockito.hamcrest.MockitoHamcrest.*
 import org.mockito.stubbing.*
 import java.lang.System.*
 import java.util.*
+import kotlin.test.Test
 
 /**
  * Unit test for [SoneInserter] and its subclasses.
  */
 class SoneInserterTest {
 
+	private val metricRegistry = MetricRegistry()
 	private val core = mock<Core>()
 	private val eventBus = mock<EventBus>()
 	private val freenetInterface = mock<FreenetInterface>()
@@ -46,7 +49,7 @@ class SoneInserterTest {
 	@Test
 	fun `insertion delay is forwarded to sone inserter`() {
 		val eventBus = AsyncEventBus(directExecutor())
-		eventBus.register(SoneInserter(core, eventBus, freenetInterface, "SoneId"))
+		eventBus.register(SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId"))
 		eventBus.post(InsertionDelayChangedEvent(15))
 		assertThat(SoneInserter.getInsertionDelay().get(), equalTo(15))
 	}
@@ -64,27 +67,27 @@ class SoneInserterTest {
 	fun `isModified is true if modification detector says so`() {
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isModified).thenReturn(true)
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		assertThat(soneInserter.isModified, equalTo(true))
 	}
 
 	@Test
 	fun `isModified is false if modification detector says so`() {
 		val soneModificationDetector = mock<SoneModificationDetector>()
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		assertThat(soneInserter.isModified, equalTo(false))
 	}
 
 	@Test
 	fun `last fingerprint is stored correctly`() {
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId")
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId")
 		soneInserter.lastInsertFingerprint = "last-fingerprint"
 		assertThat(soneInserter.lastInsertFingerprint, equalTo("last-fingerprint"))
 	}
 
 	@Test
 	fun `sone inserter stops when it should`() {
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId")
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId")
 		soneInserter.stop()
 		soneInserter.serviceRun()
 	}
@@ -97,7 +100,7 @@ class SoneInserterTest {
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
 		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenReturn(finalUri)
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		doAnswer {
 			soneInserter.stop()
 			null
@@ -119,7 +122,7 @@ class SoneInserterTest {
 		val sone = createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
 			soneInserter.stop()
 			finalUri
@@ -140,7 +143,7 @@ class SoneInserterTest {
 		val insertUri = mock<FreenetURI>()
 		createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		Thread(Runnable {
 			try {
 				Thread.sleep(500)
@@ -161,7 +164,7 @@ class SoneInserterTest {
 		val sone = createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		val soneException = SoneException(Exception())
 		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
 			soneInserter.stop()
@@ -181,7 +184,7 @@ class SoneInserterTest {
 	@Test
 	fun `sone inserter exits if sone is unknown`() {
 		val soneModificationDetector = mock<SoneModificationDetector>()
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
 		whenever(core.getSone("SoneId")).thenReturn(null)
 		soneInserter.serviceRun()
@@ -190,7 +193,7 @@ class SoneInserterTest {
 	@Test
 	fun `sone inserter catches exception and continues`() {
 		val soneModificationDetector = mock<SoneModificationDetector>()
-		val soneInserter = SoneInserter(core, eventBus, freenetInterface, "SoneId", soneModificationDetector, 1)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		val stopInserterAndThrowException = Answer<Optional<Sone>> {
 			soneInserter.stop()
 			throw NullPointerException()
@@ -234,6 +237,40 @@ class SoneInserterTest {
 				"plain/text; charset=utf-8",
 				"sone-inserter-faulty-manifest.txt"),
 				nullValue())
+	}
+
+	@Test
+	fun `successful insert updates metrics`() {
+		val insertUri = mock<FreenetURI>()
+		val finalUri = mock<FreenetURI>()
+		createSone(insertUri)
+		val soneModificationDetector = mock<SoneModificationDetector>()
+		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
+		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenReturn(finalUri)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry,"SoneId", soneModificationDetector, 1)
+		doAnswer {
+			soneInserter.stop()
+			null
+		}.`when`(core).touchConfiguration()
+		soneInserter.serviceRun()
+		val histogram = metricRegistry.histogram("sone.insert.duration")
+		assertThat(histogram.count, equalTo(1L))
+	}
+
+	@Test
+	fun `unsuccessful insert does not update metrics`() {
+		val insertUri = mock<FreenetURI>()
+		createSone(insertUri)
+		val soneModificationDetector = mock<SoneModificationDetector>()
+		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
+		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
+		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
+			soneInserter.stop()
+			throw SoneException(Exception())
+		}
+		soneInserter.serviceRun()
+		val histogram = metricRegistry.histogram("sone.insert.duration")
+		assertThat(histogram.count, equalTo(0L))
 	}
 
 }
