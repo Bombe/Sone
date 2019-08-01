@@ -81,6 +81,16 @@ class DurationFormatFilterTest {
 		verifyDuration(123456789, "123.5ms", "ns")
 	}
 
+	@Test
+	fun `123456 with scale ns is rendered as “123_5μs”`() {
+		verifyDuration(123456, "123.5μs", "ns")
+	}
+
+	@Test
+	fun `123 with scale ns is rendered as “123_0ns”`() {
+		verifyDuration(123, "123.0ns", "ns")
+	}
+
 	private fun verifyDuration(value: Any, expectedRendering: String, scale: String? = null) {
 		assertThat(filter.format(null, value, scale?.let { mapOf("scale" to scale) } ?: emptyMap()), equalTo<Any>(expectedRendering))
 	}

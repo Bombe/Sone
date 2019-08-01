@@ -53,7 +53,7 @@ private enum class FixedDuration {
 		override val symbol = "ms"
 	},
 	MICROS {
-		override fun number(duration: Duration) = duration.nano / 1_1000.0
+		override fun number(duration: Duration) = duration.nano / 1_000.0
 		override val symbol = "μs"
 	},
 	NANOS {
