@@ -151,7 +151,7 @@ public class SoneInserter extends AbstractService {
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
-		this.soneInsertDurationHistogram = metricRegistry.histogram("sone.insert.duration");
+		this.soneInsertDurationHistogram = metricRegistry.histogram("sone.insert.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 		this.soneInsertErrorMeter = metricRegistry.meter("sone.insert.errors");
 		this.soneId = soneId;
 		this.soneModificationDetector = soneModificationDetector;
