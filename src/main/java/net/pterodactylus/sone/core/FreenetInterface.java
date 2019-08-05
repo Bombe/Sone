@@ -327,7 +327,7 @@ public class FreenetInterface {
 		};
 		try {
 			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, requestClient);
-			uriUskCallbacks.put(uri, uskCallback);
+			uriUskCallbacks.put(USK.create(uri).clearCopy().getURI(), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
 		}
@@ -340,12 +340,12 @@ public class FreenetInterface {
 	 *            The URI to unregister the USK watcher for
 	 */
 	public void unregisterUsk(FreenetURI uri) {
-		USKCallback uskCallback = uriUskCallbacks.remove(uri);
-		if (uskCallback == null) {
-			logger.log(Level.INFO, String.format("Could not unregister unknown USK: %s", uri));
-			return;
-		}
 		try {
+			USKCallback uskCallback = uriUskCallbacks.remove(USK.create(uri).clearCopy().getURI());
+			if (uskCallback == null) {
+				logger.log(Level.INFO, String.format("Could not unregister unknown USK: %s", uri));
+				return;
+			}
 			node.clientCore.uskManager.unsubscribe(USK.create(uri), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.INFO, String.format("Could not unregister invalid USK: %s", uri), mue1);
