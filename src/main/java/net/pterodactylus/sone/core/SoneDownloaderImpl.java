@@ -183,7 +183,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	 * @return The parsed Sone, or {@code null} if the Sone could not be parsed
 	 */
 	private Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
-		logger.log(Level.FINEST, String.format("Parsing FetchResult (%d bytes, %s) for %s…", fetchResult.size(), fetchResult.getMimeType(), originalSone));
+		logger.finest(() -> format("Parsing FetchResult (%d bytes, %s) for %s…", fetchResult.size(), fetchResult.getMimeType(), originalSone));
 		Bucket soneBucket = fetchResult.asBucket();
 		InputStream soneInputStream = null;
 		try {
@@ -191,12 +191,12 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 			Sone parsedSone = soneParser.parseSone(originalSone,
 					soneInputStream);
 			if (parsedSone != null) {
-				logger.log(Level.FINER, "Sone %s was successfully parsed.", parsedSone);
+				logger.finer(() -> format("Sone %s was successfully parsed.", parsedSone));
 				parsedSone.setLatestEdition(requestUri.getEdition());
 			}
 			return parsedSone;
 		} catch (Exception e1) {
-			logger.log(Level.WARNING, String.format("Could not parse Sone from %s!", requestUri), e1);
+			logger.log(Level.WARNING, e1, () -> format("Could not parse Sone from %s!", requestUri));
 		} finally {
 			close(soneInputStream);
 			close(soneBucket);
