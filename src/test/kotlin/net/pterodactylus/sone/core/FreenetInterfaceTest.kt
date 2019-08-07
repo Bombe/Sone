@@ -32,6 +32,7 @@ import org.mockito.ArgumentMatchers.eq
 import org.mockito.Mockito.*
 import java.io.*
 import java.util.*
+import kotlin.test.Test
 
 /**
  * Unit test for [FreenetInterface].
@@ -456,6 +457,15 @@ class FreenetInterfaceTest {
 		clientGetCallback.value.onSuccess(fetchResult, mock())
 		verify(backgroundFetchCallback).failed(uri)
 		verifyNoMoreInteractions(backgroundFetchCallback)
+	}
+
+	@Test
+	fun `unregistering a registered USK with different edition unregisters USK`() {
+		val callback = mock<Callback>()
+		val uri = createRandom(randomSource, "test-123").uri.uskForSSK()
+		freenetInterface.registerUsk(uri, callback)
+		freenetInterface.unregisterUsk(uri.setSuggestedEdition(234))
+		verify(uskManager).unsubscribe(any<USK>(), any<USKCallback>())
 	}
 
 }
