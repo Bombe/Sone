@@ -21,7 +21,6 @@ import static freenet.keys.USK.create;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.freenet.Key.routingKey;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -75,6 +74,7 @@ import freenet.support.api.Bucket;
 import freenet.support.api.RandomAccessBucket;
 import freenet.support.io.ArrayBucket;
 import freenet.support.io.ResumeFailedException;
+import net.pterodactylus.sone.freenet.*;
 
 /**
  * Contains all necessary functionality for interacting with the Freenet node.
@@ -255,7 +255,7 @@ public class FreenetInterface {
 	public void registerActiveUsk(FreenetURI requestUri,
 			USKCallback uskCallback) {
 		try {
-			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			soneUskCallbacks.put(FreenetURIsKt.getRoutingKeyString(requestUri), uskCallback);
 			node.clientCore.uskManager.subscribe(create(requestUri),
 					uskCallback, true, requestClient);
 		} catch (MalformedURLException mue1) {
@@ -267,7 +267,7 @@ public class FreenetInterface {
 	public void registerPassiveUsk(FreenetURI requestUri,
 			USKCallback uskCallback) {
 		try {
-			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			soneUskCallbacks.put(FreenetURIsKt.getRoutingKeyString(requestUri), uskCallback);
 			node.clientCore
 					.uskManager
 					.subscribe(create(requestUri), uskCallback, false, requestClient);
