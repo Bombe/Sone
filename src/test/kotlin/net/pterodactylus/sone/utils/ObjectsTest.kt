@@ -1,8 +1,9 @@
 package net.pterodactylus.sone.utils
 
-import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.junit.Test
+import java.util.concurrent.*
+import kotlin.test.*
 
 /**
  * Unit test for Object utils.
@@ -19,9 +20,11 @@ class ObjectsTest {
 		assertThat(null.asList(), empty())
 	}
 
-	@Test(expected = IllegalArgumentException::class)
+	@Test
 	fun `exception is thrown for null and true condition`() {
-		null.throwOnNullIf(true) { IllegalArgumentException() }
+		assertFailsWith(IllegalArgumentException::class) {
+			null.throwOnNullIf(true) { IllegalArgumentException() }
+		}
 	}
 
 	@Test
@@ -39,6 +42,31 @@ class ObjectsTest {
 	fun `exception is not thrown for any and false condition`() {
 		val any = Any()
 		assertThat(any.throwOnNullIf(false) { IllegalArgumentException() }, equalTo(any))
+	}
+
+	@Test
+	fun `onNull is executed on null`() {
+		val called = CountDownLatch(1)
+		null.onNull { called.countDown() }
+		assertThat(called.count, equalTo(0L))
+	}
+
+	@Test
+	fun `onNull returns null when called on null`() {
+		assertThat(null.onNull {}, nullValue())
+	}
+
+	@Test
+	fun `onNull is not executed on non-null`() {
+		val called = CountDownLatch(1)
+		Any().onNull { called.countDown() }
+		assertThat(called.count, equalTo(1L))
+	}
+
+	@Test
+	fun `onNull returns object when called on non-null`() {
+		val any = Any()
+		assertThat(any.onNull {}, sameInstance(any))
 	}
 
 }
