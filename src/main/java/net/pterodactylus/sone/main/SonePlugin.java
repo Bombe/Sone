@@ -22,7 +22,6 @@ import static java.util.logging.Logger.*;
 import java.util.logging.Logger;
 import java.util.logging.*;
 
-import com.google.common.eventbus.*;
 import net.pterodactylus.sone.core.*;
 import net.pterodactylus.sone.fcp.*;
 import net.pterodactylus.sone.freenet.wot.*;
@@ -35,8 +34,10 @@ import freenet.support.*;
 import freenet.support.api.*;
 
 import com.google.common.annotations.*;
+import com.google.common.eventbus.*;
 import com.google.common.cache.*;
 import com.google.inject.*;
+import com.google.inject.Module;
 import com.google.inject.name.*;
 import kotlin.jvm.functions.*;
 
