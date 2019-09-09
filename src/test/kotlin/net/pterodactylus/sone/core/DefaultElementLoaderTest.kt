@@ -7,7 +7,7 @@ import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
 import net.pterodactylus.sone.test.capture
 import net.pterodactylus.sone.test.mock
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
@@ -22,16 +22,6 @@ import java.util.concurrent.TimeUnit
  * Unit test for [DefaultElementLoaderTest].
  */
 class DefaultElementLoaderTest {
-
-	companion object {
-		private const val IMAGE_ID = "KSK@gpl.png"
-		private val freenetURI = FreenetURI(IMAGE_ID)
-		private const val decomposedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/fru%CC%88hstu%CC%88ck.jpg"
-		private const val normalizedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/frühstück.jpg"
-		private const val textKey = "KSK@gpl.html"
-		private val sizeOkay = 2097152L
-		private val sizeNotOkay = sizeOkay + 1
-	}
 
 	private val freenetInterface = mock<FreenetInterface>()
 	private val ticker = mock<Ticker>()
@@ -53,49 +43,49 @@ class DefaultElementLoaderTest {
 
 	@Test
 	fun `element loader returns loading element on first call`() {
-		assertThat(elementLoader.loadElement(IMAGE_ID).loading, `is`(true))
+		assertThat(elementLoader.loadElement(IMAGE_ID).loading, equalTo(true))
 	}
 
 	@Test
 	fun `element loader does not cancel on image mime type with 2 mib size`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.shouldCancel(freenetURI, "image/png", sizeOkay), `is`(false))
+		assertThat(callback.value.shouldCancel(freenetURI, "image/png", sizeOkay), equalTo(false))
 	}
 
 	@Test
 	fun `element loader does cancel on image mime type with more than 2 mib size`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.shouldCancel(freenetURI, "image/png", sizeNotOkay), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "image/png", sizeNotOkay), equalTo(true))
 	}
 
 	@Test
 	fun `element loader does cancel on audio mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.shouldCancel(freenetURI, "audio/mpeg", sizeOkay), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "audio/mpeg", sizeOkay), equalTo(true))
 	}
 
 	@Test
 	fun `element loader does cancel on video mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.shouldCancel(freenetURI, "video/mkv", sizeOkay), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "video/mkv", sizeOkay), equalTo(true))
 	}
 
 	@Test
 	fun `element loader does cancel on text mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.shouldCancel(freenetURI, "text/plain", sizeOkay), `is`(true))
+		assertThat(callback.value.shouldCancel(freenetURI, "text/plain", sizeOkay), equalTo(true))
 	}
 
 	@Test
 	fun `element loader does not cancel on text html mime type`() {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
-		assertThat(callback.value.shouldCancel(freenetURI, "text/html", sizeOkay), `is`(false))
+		assertThat(callback.value.shouldCancel(freenetURI, "text/html", sizeOkay), equalTo(false))
 	}
 
 	@Test
@@ -104,14 +94,14 @@ class DefaultElementLoaderTest {
 		verify(freenetInterface).startFetch(eq(FreenetURI(decomposedKey)), callback.capture())
 		callback.value.loaded(FreenetURI(normalizedKey), "image/png", read("/static/images/unknown-image-0.png"))
 		val linkedElement = elementLoader.loadElement(decomposedKey)
-		assertThat(linkedElement, `is`(LinkedElement(normalizedKey, properties = mapOf(
+		assertThat(linkedElement, equalTo(LinkedElement(normalizedKey, properties = mapOf(
 				"type" to "image", "size" to 2451, "sizeHuman" to "2 KiB"
 		))))
 	}
 
 	@Test
 	fun `element loader can extract description from description header`() {
-	    elementLoader.loadElement(textKey)
+		elementLoader.loadElement(textKey)
 		verify(freenetInterface).startFetch(eq(FreenetURI(textKey)), callback.capture())
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
@@ -126,7 +116,7 @@ class DefaultElementLoaderTest {
 
 	@Test
 	fun `element loader can extract description from first non-heading paragraph`() {
-	    elementLoader.loadElement(textKey)
+		elementLoader.loadElement(textKey)
 		verify(freenetInterface).startFetch(eq(FreenetURI(textKey)), callback.capture())
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader2.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
@@ -141,7 +131,7 @@ class DefaultElementLoaderTest {
 
 	@Test
 	fun `element loader can not extract description if html is more complicated`() {
-	    elementLoader.loadElement(textKey)
+		elementLoader.loadElement(textKey)
 		verify(freenetInterface).startFetch(eq(FreenetURI(textKey)), callback.capture())
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader3.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
@@ -156,7 +146,7 @@ class DefaultElementLoaderTest {
 
 	@Test
 	fun `element loader can not extract title if it is missing`() {
-	    elementLoader.loadElement(textKey)
+		elementLoader.loadElement(textKey)
 		verify(freenetInterface).startFetch(eq(FreenetURI(textKey)), callback.capture())
 		callback.value.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader4.html"))
 		val linkedElement = elementLoader.loadElement(textKey)
@@ -174,7 +164,7 @@ class DefaultElementLoaderTest {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		callback.value.failed(freenetURI)
-		assertThat(elementLoader.loadElement(IMAGE_ID).failed, `is`(true))
+		assertThat(elementLoader.loadElement(IMAGE_ID).failed, equalTo(true))
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 	}
 
@@ -185,8 +175,8 @@ class DefaultElementLoaderTest {
 		callback.value.failed(freenetURI)
 		`when`(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(31))
 		val linkedElement = elementLoader.loadElement(IMAGE_ID)
-		assertThat(linkedElement.failed, `is`(false))
-		assertThat(linkedElement.loading, `is`(true))
+		assertThat(linkedElement.failed, equalTo(false))
+		assertThat(linkedElement.loading, equalTo(true))
 		verify(freenetInterface, times(2)).startFetch(eq(freenetURI), callback.capture())
 	}
 
@@ -199,3 +189,11 @@ class DefaultElementLoaderTest {
 			} ?: ByteArray(0)
 
 }
+
+private const val IMAGE_ID = "KSK@gpl.png"
+private val freenetURI = FreenetURI(IMAGE_ID)
+private const val decomposedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/fru%CC%88hstu%CC%88ck.jpg"
+private const val normalizedKey = "CHK@DCiVgTWW9nnWHJc9EVwtFJ6jAfBSVyy~rgiPvhUKbS4,mNY85V0x7dYcv7SnEYo1PCC6y2wNWMDNt-y9UWQx9fI,AAMC--8/frühstück.jpg"
+private const val textKey = "KSK@gpl.html"
+private const val sizeOkay = 2097152L
+private const val sizeNotOkay = sizeOkay + 1
