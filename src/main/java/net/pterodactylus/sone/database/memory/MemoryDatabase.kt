@@ -41,7 +41,7 @@ import net.pterodactylus.sone.database.ImageBuilder
 import net.pterodactylus.sone.database.PostBuilder
 import net.pterodactylus.sone.database.PostDatabase
 import net.pterodactylus.sone.database.PostReplyBuilder
-import net.pterodactylus.sone.utils.unit
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -71,6 +71,8 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val memoryBookmarkDatabase = MemoryBookmarkDatabase(this, configurationLoader)
 	private val memoryFriendDatabase = MemoryFriendDatabase(configurationLoader)
 	private val saveRateLimiter: RateLimiter = RateLimiter.create(1.0)
+	private val saveKnownPostsRateLimiter: RateLimiter = RateLimiter.create(1.0)
+	private val saveKnownPostRepliesRateLimiter: RateLimiter = RateLimiter.create(1.0)
 
 	override val soneLoader get() = this::getSone
 
@@ -314,15 +316,17 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 					}
 
 	private fun saveKnownPosts() =
-			try {
-				readLock.withLock {
-					knownPosts.forEachIndexed { index, knownPostId ->
-						configuration.getStringValue("KnownPosts/$index/ID").value = knownPostId
+			saveKnownPostsRateLimiter.tryAcquire().ifTrue {
+				try {
+					readLock.withLock {
+						knownPosts.forEachIndexed { index, knownPostId ->
+							configuration.getStringValue("KnownPosts/$index/ID").value = knownPostId
+						}
+						configuration.getStringValue("KnownPosts/${knownPosts.size}/ID").value = null
 					}
-					configuration.getStringValue("KnownPosts/${knownPosts.size}/ID").value = null
+				} catch (ce1: ConfigurationException) {
+					throw DatabaseException("Could not save database.", ce1)
 				}
-			} catch (ce1: ConfigurationException) {
-				throw DatabaseException("Could not save database.", ce1)
 			}
 
 	private fun loadKnownPostReplies(): Unit =
@@ -334,15 +338,17 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			}
 
 	private fun saveKnownPostReplies() =
-			try {
-				readLock.withLock {
-					knownPostReplies.forEachIndexed { index, knownPostReply ->
-						configuration.getStringValue("KnownReplies/$index/ID").value = knownPostReply
+			saveKnownPostRepliesRateLimiter.tryAcquire().ifTrue {
+				try {
+					readLock.withLock {
+						knownPostReplies.forEachIndexed { index, knownPostReply ->
+							configuration.getStringValue("KnownReplies/$index/ID").value = knownPostReply
+						}
+						configuration.getStringValue("KnownReplies/${knownPostReplies.size}/ID").value = null
 					}
-					configuration.getStringValue("KnownReplies/${knownPostReplies.size}/ID").value = null
+				} catch (ce1: ConfigurationException) {
+					throw DatabaseException("Could not save database.", ce1)
 				}
-			} catch (ce1: ConfigurationException) {
-				throw DatabaseException("Could not save database.", ce1)
 			}
 
 }
