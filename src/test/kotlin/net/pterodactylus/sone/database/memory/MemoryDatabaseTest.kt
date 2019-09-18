@@ -417,6 +417,28 @@ class MemoryDatabaseTest {
 		verify(configuration.getStringValue("KnownPosts/0/ID"), times(1)).value = null
 	}
 
+	@Test
+	@Dirty("the rate limiter should be mocked")
+	fun `setting posts as knows twice in a row only saves the database once`() {
+		prepareConfigurationValues()
+		val post = mock<Post>()
+		whenever(post.id).thenReturn("post-id")
+		memoryDatabase.setPostKnown(post, true)
+		memoryDatabase.setPostKnown(post, true)
+		verify(configuration, times(1)).getStringValue("KnownPosts/1/ID")
+	}
+
+	@Test
+	@Dirty("the rate limiter should be mocked")
+	fun `setting post replies as knows twice in a row only saves the database once`() {
+		prepareConfigurationValues()
+		val postReply = mock<PostReply>()
+		whenever(postReply.id).thenReturn("post-reply-id")
+		memoryDatabase.setPostReplyKnown(postReply, true)
+		memoryDatabase.setPostReplyKnown(postReply, true)
+		verify(configuration, times(1)).getStringValue("KnownReplies/1/ID")
+	}
+
 }
 
 private const val SONE_ID = "sone"

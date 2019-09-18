@@ -23,9 +23,9 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 
 	@Inject constructor(freenetInterface: FreenetInterface): this(freenetInterface, Ticker.systemTicker())
 
-	private val loadingLinks: Cache<String, Boolean> = CacheBuilder.newBuilder().build<String, Boolean>()
-	private val failureCache: Cache<String, Boolean> = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build<String, Boolean>()
-	private val elementCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build<String, LinkedElement>()
+	private val loadingLinks: Cache<String, Boolean> = CacheBuilder.newBuilder().build()
+	private val failureCache: Cache<String, Boolean> = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build()
+	private val elementCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build()
 	private val callback = object: FreenetInterface.BackgroundFetchCallback {
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
 			return (size > 2097152) || (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html"))
