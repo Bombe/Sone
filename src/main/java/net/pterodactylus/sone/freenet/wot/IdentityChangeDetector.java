@@ -21,8 +21,6 @@ import static com.google.common.base.Optional.absent;
 import static com.google.common.base.Optional.fromNullable;
 import static com.google.common.base.Predicates.not;
 import static com.google.common.collect.FluentIterable.from;
-import static net.pterodactylus.sone.freenet.wot.Identity.TO_CONTEXTS;
-import static net.pterodactylus.sone.freenet.wot.Identity.TO_PROPERTIES;
 
 import java.util.Collection;
 import java.util.Map;
@@ -117,23 +115,23 @@ public class IdentityChangeDetector {
 	}
 
 	private static boolean identityHasNewContexts(Identity oldIdentity, Identity newIdentity) {
-		return from(TO_CONTEXTS.apply(newIdentity)).anyMatch(notAContextOf(oldIdentity));
+		return newIdentity.getContexts().stream().anyMatch(notAContextOf(oldIdentity)::apply);
 	}
 
 	private static boolean identityHasRemovedContexts(Identity oldIdentity, Identity newIdentity) {
-		return from(TO_CONTEXTS.apply(oldIdentity)).anyMatch(notAContextOf(newIdentity));
+		return oldIdentity.getContexts().stream().anyMatch(notAContextOf(newIdentity)::apply);
 	}
 
 	private static boolean identityHasNewProperties(Identity oldIdentity, Identity newIdentity) {
-		return from(TO_PROPERTIES.apply(newIdentity).entrySet()).anyMatch(notAPropertyOf(oldIdentity));
+		return newIdentity.getProperties().entrySet().stream().anyMatch(notAPropertyOf(oldIdentity)::apply);
 	}
 
 	private static boolean identityHasRemovedProperties(Identity oldIdentity, Identity newIdentity) {
-		return from(TO_PROPERTIES.apply(oldIdentity).entrySet()).anyMatch(notAPropertyOf(newIdentity));
+		return oldIdentity.getProperties().entrySet().stream().anyMatch(notAPropertyOf(newIdentity)::apply);
 	}
 
 	private static boolean identityHasChangedProperties(Identity oldIdentity, Identity newIdentity) {
-		return from(TO_PROPERTIES.apply(oldIdentity).entrySet()).anyMatch(hasADifferentValueThanIn(newIdentity));
+		return oldIdentity.getProperties().entrySet().stream().anyMatch(hasADifferentValueThanIn(newIdentity)::apply);
 	}
 
 	private static Predicate<Identity> containedIn(final Map<String, Identity> identities) {

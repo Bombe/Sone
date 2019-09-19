@@ -31,20 +31,6 @@ import com.google.common.base.Function;
  */
 public interface Identity {
 
-	public static final Function<Identity, Set<String>> TO_CONTEXTS = new Function<Identity, Set<String>>() {
-		@Override
-		public Set<String> apply(Identity identity) {
-			return (identity == null) ? Collections.<String>emptySet() : identity.getContexts();
-		}
-	};
-
-	public static final Function<Identity, Map<String, String>> TO_PROPERTIES = new Function<Identity, Map<String, String>>() {
-		@Override
-		public Map<String, String> apply(Identity input) {
-			return (input == null) ? Collections.<String, String>emptyMap() : input.getProperties();
-		}
-	};
-
 	/**
 	 * Returns the ID of the identity.
 	 *
