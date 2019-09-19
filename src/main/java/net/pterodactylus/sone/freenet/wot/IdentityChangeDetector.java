@@ -17,19 +17,12 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Predicates.not;
-import static com.google.common.collect.FluentIterable.from;
+import java.util.*;
+import java.util.Map.*;
+import java.util.function.*;
+import java.util.stream.*;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.*;
 
 /**
  * Detects changes between two lists of {@link Identity}s. The detector can find
@@ -40,70 +33,65 @@ import com.google.common.collect.ImmutableMap;
 public class IdentityChangeDetector {
 
 	private final Map<String, Identity> oldIdentities;
-	private Optional<IdentityProcessor> onNewIdentity = absent();
-	private Optional<IdentityProcessor> onRemovedIdentity = absent();
-	private Optional<IdentityProcessor> onChangedIdentity = absent();
-	private Optional<IdentityProcessor> onUnchangedIdentity = absent();
+	private IdentityProcessor onNewIdentity;
+	private IdentityProcessor onRemovedIdentity;
+	private IdentityProcessor onChangedIdentity;
+	private IdentityProcessor onUnchangedIdentity;
 
 	public IdentityChangeDetector(Collection<? extends Identity> oldIdentities) {
 		this.oldIdentities = convertToMap(oldIdentities);
 	}
 
 	public void onNewIdentity(IdentityProcessor onNewIdentity) {
-		this.onNewIdentity = fromNullable(onNewIdentity);
+		this.onNewIdentity = onNewIdentity;
 	}
 
 	public void onRemovedIdentity(IdentityProcessor onRemovedIdentity) {
-		this.onRemovedIdentity = fromNullable(onRemovedIdentity);
+		this.onRemovedIdentity = onRemovedIdentity;
 	}
 
 	public void onChangedIdentity(IdentityProcessor onChangedIdentity) {
-		this.onChangedIdentity = fromNullable(onChangedIdentity);
+		this.onChangedIdentity = onChangedIdentity;
 	}
 
 	public void onUnchangedIdentity(IdentityProcessor onUnchangedIdentity) {
-		this.onUnchangedIdentity = fromNullable(onUnchangedIdentity);
+		this.onUnchangedIdentity = onUnchangedIdentity;
 	}
 
 	public void detectChanges(final Collection<? extends Identity> newIdentities) {
-		notifyForRemovedIdentities(from(oldIdentities.values()).filter(notContainedIn(newIdentities)));
-		notifyForNewIdentities(from(newIdentities).filter(notContainedIn(oldIdentities.values())));
-		notifyForChangedIdentities(from(newIdentities).filter(containedIn(oldIdentities)).filter(hasChanged(oldIdentities)));
-		notifyForUnchangedIdentities(from(newIdentities).filter(containedIn(oldIdentities)).filter(not(hasChanged(oldIdentities))));
+		notifyForRemovedIdentities(oldIdentities.values().stream().filter(notContainedIn(newIdentities)).collect(Collectors.toList()));
+		notifyForNewIdentities(newIdentities.stream().filter(notContainedIn(oldIdentities.values())).collect(Collectors.toList()));
+		notifyForChangedIdentities(newIdentities.stream().filter(containedIn(oldIdentities)).filter(hasChanged(oldIdentities)).collect(Collectors.toList()));
+		notifyForUnchangedIdentities(newIdentities.stream().filter(containedIn(oldIdentities)).filter(hasChanged(oldIdentities).negate()).collect(Collectors.toList()));
 	}
 
 	private void notifyForRemovedIdentities(Iterable<Identity> identities) {
 		notify(onRemovedIdentity, identities);
 	}
 
-	private void notifyForNewIdentities(FluentIterable<? extends Identity> newIdentities) {
+	private void notifyForNewIdentities(Iterable<? extends Identity> newIdentities) {
 		notify(onNewIdentity, newIdentities);
 	}
 
-	private void notifyForChangedIdentities(FluentIterable<? extends Identity> identities) {
+	private void notifyForChangedIdentities(Iterable<? extends Identity> identities) {
 		notify(onChangedIdentity, identities);
 	}
 
-	private void notifyForUnchangedIdentities(FluentIterable<? extends Identity> identities) {
+	private void notifyForUnchangedIdentities(Iterable<? extends Identity> identities) {
 		notify(onUnchangedIdentity, identities);
 	}
 
-	private void notify(Optional<IdentityProcessor> identityProcessor, Iterable<? extends Identity> identities) {
-		if (!identityProcessor.isPresent()) {
+	private void notify(IdentityProcessor identityProcessor, Iterable<? extends Identity> identities) {
+		if (identityProcessor == null) {
 			return;
 		}
 		for (Identity identity : identities) {
-			identityProcessor.get().processIdentity(identity);
+			identityProcessor.processIdentity(identity);
 		}
 	}
 
 	private static Predicate<Identity> hasChanged(final Map<String, Identity> oldIdentities) {
-		return new Predicate<Identity>() {
-			@Override
-			public boolean apply(Identity identity) {
-				return (identity != null) && identityHasChanged(oldIdentities.get(identity.getId()), identity);
-			}
-		};
+		return identity -> (identity != null) && identityHasChanged(oldIdentities.get(identity.getId()), identity);
 	}
 
 	private static boolean identityHasChanged(Identity oldIdentity, Identity newIdentity) {
@@ -115,68 +103,43 @@ public class IdentityChangeDetector {
 	}
 
 	private static boolean identityHasNewContexts(Identity oldIdentity, Identity newIdentity) {
-		return newIdentity.getContexts().stream().anyMatch(notAContextOf(oldIdentity)::apply);
+		return newIdentity.getContexts().stream().anyMatch(notAContextOf(oldIdentity));
 	}
 
 	private static boolean identityHasRemovedContexts(Identity oldIdentity, Identity newIdentity) {
-		return oldIdentity.getContexts().stream().anyMatch(notAContextOf(newIdentity)::apply);
+		return oldIdentity.getContexts().stream().anyMatch(notAContextOf(newIdentity));
 	}
 
 	private static boolean identityHasNewProperties(Identity oldIdentity, Identity newIdentity) {
-		return newIdentity.getProperties().entrySet().stream().anyMatch(notAPropertyOf(oldIdentity)::apply);
+		return newIdentity.getProperties().entrySet().stream().anyMatch(notAPropertyOf(oldIdentity));
 	}
 
 	private static boolean identityHasRemovedProperties(Identity oldIdentity, Identity newIdentity) {
-		return oldIdentity.getProperties().entrySet().stream().anyMatch(notAPropertyOf(newIdentity)::apply);
+		return oldIdentity.getProperties().entrySet().stream().anyMatch(notAPropertyOf(newIdentity));
 	}
 
 	private static boolean identityHasChangedProperties(Identity oldIdentity, Identity newIdentity) {
-		return oldIdentity.getProperties().entrySet().stream().anyMatch(hasADifferentValueThanIn(newIdentity)::apply);
+		return oldIdentity.getProperties().entrySet().stream().anyMatch(hasADifferentValueThanIn(newIdentity));
 	}
 
 	private static Predicate<Identity> containedIn(final Map<String, Identity> identities) {
-		return new Predicate<Identity>() {
-			@Override
-			public boolean apply(Identity identity) {
-				return (identity != null) && identities.containsKey(identity.getId());
-			}
-		};
+		return identity -> (identity != null) && identities.containsKey(identity.getId());
 	}
 
 	private static Predicate<String> notAContextOf(final Identity identity) {
-		return new Predicate<String>() {
-			@Override
-			public boolean apply(String context) {
-				return (identity != null) && !identity.getContexts().contains(context);
-			}
-		};
+		return context -> (identity != null) && !identity.getContexts().contains(context);
 	}
 
 	private static Predicate<Identity> notContainedIn(final Collection<? extends Identity> newIdentities) {
-		return new Predicate<Identity>() {
-			@Override
-			public boolean apply(Identity identity) {
-				return (identity != null) && !newIdentities.contains(identity);
-			}
-		};
+		return identity -> (identity != null) && !newIdentities.contains(identity);
 	}
 
 	private static Predicate<Entry<String, String>> notAPropertyOf(final Identity identity) {
-		return new Predicate<Entry<String, String>>() {
-			@Override
-			public boolean apply(Entry<String, String> property) {
-				return (property != null) && !identity.getProperties().containsKey(property.getKey());
-			}
-		};
+		return property -> (property != null) && !identity.getProperties().containsKey(property.getKey());
 	}
 
 	private static Predicate<Entry<String, String>> hasADifferentValueThanIn(final Identity newIdentity) {
-		return new Predicate<Entry<String, String>>() {
-			@Override
-			public boolean apply(Entry<String, String> property) {
-				return (property != null) && !newIdentity.getProperty(property.getKey()).equals(property.getValue());
-			}
-		};
+		return property -> (property != null) && !newIdentity.getProperty(property.getKey()).equals(property.getValue());
 	}
 
 	private static Map<String, Identity> convertToMap(Collection<? extends Identity> identities) {
