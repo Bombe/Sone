@@ -19,18 +19,21 @@ package net.pterodactylus.sone.freenet.wot;
 
 import java.util.Collection;
 import java.util.Map;
+import javax.annotation.*;
 
 /**
  * Creates {@link Identity}s and {@link OwnIdentity}s.
  */
 public class Identities {
 
+	@Nonnull
 	public static OwnIdentity createOwnIdentity(String id, Collection<String> contexts, Map<String, String> properties) {
 		DefaultOwnIdentity ownIdentity = new DefaultOwnIdentity(id, "Nickname" + id, "Request" + id, "Insert" + id);
 		setContextsAndPropertiesOnIdentity(ownIdentity, contexts, properties);
 		return ownIdentity;
 	}
 
+	@Nonnull
 	public static Identity createIdentity(String id, Collection<String> contexts, Map<String, String> properties) {
 		DefaultIdentity identity = new DefaultIdentity(id, "Nickname" + id, "Request" + id);
 		setContextsAndPropertiesOnIdentity(identity, contexts, properties);
