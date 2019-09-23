@@ -15,26 +15,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.wot;
+package net.pterodactylus.sone.freenet.wot
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-
-import org.junit.Test;
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
- * Unit test for {@link DefaultOwnIdentity}.
+ * Unit test for [DefaultOwnIdentity].
  */
-public class DefaultOwnIdentityTest extends DefaultIdentityTest {
+class DefaultOwnIdentityTest : DefaultIdentityTest() {
 
-	@Override
-	protected DefaultIdentity createIdentity() {
-		return new DefaultOwnIdentity("Id", "Nickname", "RequestURI", "InsertURI");
-	}
+	override val identity = DefaultOwnIdentity("Id", "Nickname", "RequestURI", "InsertURI")
 
 	@Test
-	public void ownIdentityCanBeCreated() {
-		assertThat(((OwnIdentity) identity).getInsertUri(), is("InsertURI"));
+	fun `own identity can be created`() {
+		assertThat((identity as OwnIdentity).insertUri, equalTo("InsertURI"))
 	}
 
 }
