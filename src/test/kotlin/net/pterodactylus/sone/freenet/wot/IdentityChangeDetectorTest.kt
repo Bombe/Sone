@@ -130,12 +130,14 @@ class IdentityChangeDetectorTest {
 	fun `no removed identities are detected without an identity processor`() {
 		identityChangeDetector.onRemovedIdentity(null)
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity3()))
+		assertThat(removedIdentities, empty())
 	}
 
 	@Test
 	fun `no added identities are detected without an identity processor`() {
 		identityChangeDetector.onNewIdentity(null)
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity2(), createIdentity3(), createIdentity4()))
+		assertThat(newIdentities, empty())
 	}
 
 	private fun createOldIdentities(): Collection<Identity> {
