@@ -17,13 +17,10 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import net.pterodactylus.sone.freenet.wot.Identities.createIdentity
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.containsInAnyOrder
-import org.hamcrest.Matchers.empty
-
-import org.junit.Before
-import org.junit.Test
+import net.pterodactylus.sone.freenet.wot.Identities.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
 
 /**
  * Unit test for [IdentityChangeDetector].
@@ -38,37 +35,37 @@ class IdentityChangeDetectorTest {
 
 	@Before
 	fun setup() {
-		identityChangeDetector.onNewIdentity { identity -> newIdentities.add(identity) }
-		identityChangeDetector.onRemovedIdentity { identity -> removedIdentities.add(identity) }
-		identityChangeDetector.onChangedIdentity { identity -> changedIdentities.add(identity) }
-		identityChangeDetector.onUnchangedIdentity { identity -> unchangedIdentities.add(identity) }
+		identityChangeDetector.onNewIdentity = { identity -> newIdentities.add(identity) }
+		identityChangeDetector.onRemovedIdentity = { identity -> removedIdentities.add(identity) }
+		identityChangeDetector.onChangedIdentity = { identity -> changedIdentities.add(identity) }
+		identityChangeDetector.onUnchangedIdentity = { identity -> unchangedIdentities.add(identity) }
 	}
 
 	@Test
 	fun `no differences are detected when sending the old identities again`() {
 		identityChangeDetector.detectChanges(createOldIdentities())
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, empty())
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2(), createIdentity3()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, empty())
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2(), createIdentity3()))
 	}
 
 	@Test
 	fun `detect that an identity was removed`() {
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity3()))
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, containsInAnyOrder(createIdentity2()))
-		assertThat<Collection<Identity>>(changedIdentities, empty())
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity3()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, containsInAnyOrder(createIdentity2()))
+		assertThat(changedIdentities, empty())
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity3()))
 	}
 
 	@Test
 	fun `detect that an identity was added`() {
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity2(), createIdentity3(), createIdentity4()))
-		assertThat<Collection<Identity>>(newIdentities, containsInAnyOrder(createIdentity4()))
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, empty())
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2(), createIdentity3()))
+		assertThat(newIdentities, containsInAnyOrder(createIdentity4()))
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, empty())
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2(), createIdentity3()))
 	}
 
 	@Test
@@ -76,10 +73,10 @@ class IdentityChangeDetectorTest {
 		val identity2 = createIdentity2()
 		identity2.removeContext("Context C")
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), identity2, createIdentity3()))
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, containsInAnyOrder(identity2))
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity3()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, containsInAnyOrder(identity2))
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity3()))
 	}
 
 	@Test
@@ -87,10 +84,10 @@ class IdentityChangeDetectorTest {
 		val identity2 = createIdentity2()
 		identity2.addContext("Context C1")
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), identity2, createIdentity3()))
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, containsInAnyOrder(identity2))
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity3()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, containsInAnyOrder(identity2))
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity3()))
 	}
 
 	@Test
@@ -98,10 +95,10 @@ class IdentityChangeDetectorTest {
 		val identity1 = createIdentity1()
 		identity1.removeProperty("Key A")
 		identityChangeDetector.detectChanges(listOf(identity1, createIdentity2(), createIdentity3()))
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, containsInAnyOrder(identity1))
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity2(), createIdentity3()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, containsInAnyOrder(identity1))
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity2(), createIdentity3()))
 	}
 
 	@Test
@@ -109,10 +106,10 @@ class IdentityChangeDetectorTest {
 		val identity3 = createIdentity3()
 		identity3.setProperty("Key A", "Value A")
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity2(), identity3))
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, containsInAnyOrder(identity3))
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, containsInAnyOrder(identity3))
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2()))
 	}
 
 	@Test
@@ -120,44 +117,39 @@ class IdentityChangeDetectorTest {
 		val identity3 = createIdentity3()
 		identity3.setProperty("Key E", "Value F")
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity2(), identity3))
-		assertThat<Collection<Identity>>(newIdentities, empty())
-		assertThat<Collection<Identity>>(removedIdentities, empty())
-		assertThat<Collection<Identity>>(changedIdentities, containsInAnyOrder(identity3))
-		assertThat<Collection<Identity>>(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2()))
+		assertThat(newIdentities, empty())
+		assertThat(removedIdentities, empty())
+		assertThat(changedIdentities, containsInAnyOrder(identity3))
+		assertThat(unchangedIdentities, containsInAnyOrder(createIdentity1(), createIdentity2()))
 	}
 
 	@Test
 	fun `no removed identities are detected without an identity processor`() {
-		identityChangeDetector.onRemovedIdentity(null)
+		identityChangeDetector.onRemovedIdentity = null
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity3()))
 		assertThat(removedIdentities, empty())
 	}
 
 	@Test
 	fun `no added identities are detected without an identity processor`() {
-		identityChangeDetector.onNewIdentity(null)
+		identityChangeDetector.onNewIdentity = null
 		identityChangeDetector.detectChanges(listOf(createIdentity1(), createIdentity2(), createIdentity3(), createIdentity4()))
 		assertThat(newIdentities, empty())
 	}
 
-	private fun createOldIdentities(): Collection<Identity> {
-		return listOf(createIdentity1(), createIdentity2(), createIdentity3())
-	}
+	private fun createOldIdentities() =
+			listOf(createIdentity1(), createIdentity2(), createIdentity3())
 
-	private fun createIdentity1(): Identity {
-		return createIdentity("Test1", listOf("Context A", "Context B"), mapOf("Key A" to "Value A", "Key B" to "Value B"))
-	}
+	private fun createIdentity1() =
+			createIdentity("Test1", listOf("Context A", "Context B"), mapOf("Key A" to "Value A", "Key B" to "Value B"))
 
-	private fun createIdentity2(): Identity {
-		return createIdentity("Test2", listOf("Context C", "Context D"), mapOf("Key C" to "Value C", "Key D" to "Value D"))
-	}
+	private fun createIdentity2() =
+			createIdentity("Test2", listOf("Context C", "Context D"), mapOf("Key C" to "Value C", "Key D" to "Value D"))
 
-	private fun createIdentity3(): Identity {
-		return createIdentity("Test3", listOf("Context E", "Context F"), mapOf("Key E" to "Value E", "Key F" to "Value F"))
-	}
+	private fun createIdentity3() =
+			createIdentity("Test3", listOf("Context E", "Context F"), mapOf("Key E" to "Value E", "Key F" to "Value F"))
 
-	private fun createIdentity4(): Identity {
-		return createIdentity("Test4", listOf("Context G", "Context H"), mapOf("Key G" to "Value G", "Key H" to "Value H"))
-	}
+	private fun createIdentity4() =
+			createIdentity("Test4", listOf("Context G", "Context H"), mapOf("Key G" to "Value G", "Key H" to "Value H"))
 
 }
