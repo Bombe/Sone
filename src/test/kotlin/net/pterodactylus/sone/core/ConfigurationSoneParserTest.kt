@@ -95,8 +95,8 @@ class ConfigurationSoneParserTest {
 		val postBuilderFactory = createPostBuilderFactory()
 		val posts = configurationSoneParser.parsePosts(postBuilderFactory)
 		assertThat(posts, containsInAnyOrder(
-				isPost("P0", 1000L, "T0", absent()),
-				isPost("P1", 1001L, "T1", of("1234567890123456789012345678901234567890123"))
+				isPost("P0", 1000L, "T0", null),
+				isPost("P1", 1001L, "T1", "1234567890123456789012345678901234567890123")
 		))
 	}
 
@@ -149,7 +149,7 @@ class ConfigurationSoneParserTest {
 	fun postWithInvalidRecipientIdIsRecognized() {
 		setupPostWithInvalidRecipientId()
 		val posts = configurationSoneParser.parsePosts(createPostBuilderFactory())
-		assertThat(posts, contains(isPost("P0", 1000L, "T0", absent())))
+		assertThat(posts, contains(isPost("P0", 1000L, "T0", null)))
 	}
 
 	private fun setupPostWithInvalidRecipientId() {

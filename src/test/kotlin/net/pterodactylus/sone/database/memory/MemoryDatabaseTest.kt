@@ -50,8 +50,8 @@ class MemoryDatabaseTest {
 	@Test
 	fun `stored sone is made available`() {
 		storeSone()
-		assertThat(memoryDatabase.getPost("post1"), isPost("post1", 1000L, "post1", absent()))
-		assertThat(memoryDatabase.getPost("post2"), isPost("post2", 2000L, "post2", of(RECIPIENT_ID)))
+		assertThat(memoryDatabase.getPost("post1"), isPost("post1", 1000L, "post1", null))
+		assertThat(memoryDatabase.getPost("post2"), isPost("post2", 2000L, "post2", RECIPIENT_ID))
 		assertThat(memoryDatabase.getPost("post3"), nullValue())
 		assertThat(memoryDatabase.getPostReply("reply1"), isPostReply("reply1", "post1", 3000L, "reply1"))
 		assertThat(memoryDatabase.getPostReply("reply2"), isPostReply("reply2", "post2", 4000L, "reply2"))

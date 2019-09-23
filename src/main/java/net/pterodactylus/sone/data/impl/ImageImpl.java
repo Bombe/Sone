@@ -16,22 +16,14 @@
  */
 package net.pterodactylus.sone.data.impl;
 
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Optional.of;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.util.*;
+import javax.annotation.*;
 
-import java.util.UUID;
+import com.google.common.hash.*;
+import net.pterodactylus.sone.data.*;
 
-import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Sone;
-
-import com.google.common.base.Optional;
-import com.google.common.hash.Hasher;
-import com.google.common.hash.Hashing;
+import static com.google.common.base.Preconditions.*;
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * Container for image metadata.
@@ -146,93 +138,94 @@ public class ImageImpl implements Image {
 	public Modifier modify() throws IllegalStateException {
 		// TODO: reenable check for local images
 		return new Modifier() {
-			private Optional<Sone> sone = absent();
-
-			private Optional<Long> creationTime = absent();
-
-			private Optional<String> key = absent();
-
-			private Optional<String> title = absent();
-
-			private Optional<String> description = absent();
-
-			private Optional<Integer> width = absent();
-
-			private Optional<Integer> height = absent();
+			@Nullable
+			private Sone sone;
+			@Nullable
+			private Long creationTime;
+			@Nullable
+			private String key;
+			@Nullable
+			private String title;
+			@Nullable
+			private String description;
+			@Nullable
+			private Integer width;
+			@Nullable
+			private Integer height;
 
 			@Override
 			public Modifier setSone(Sone sone) {
-				this.sone = fromNullable(sone);
+				this.sone = sone;
 				return this;
 			}
 
 			@Override
 			public Modifier setCreationTime(long creationTime) {
-				this.creationTime = of(creationTime);
+				this.creationTime = creationTime;
 				return this;
 			}
 
 			@Override
 			public Modifier setKey(String key) {
-				this.key = fromNullable(key);
+				this.key = key;
 				return this;
 			}
 
 			@Override
 			public Modifier setTitle(String title) {
-				this.title = fromNullable(title);
+				this.title = title;
 				return this;
 			}
 
 			@Override
 			public Modifier setDescription(String description) {
-				this.description = fromNullable(description);
+				this.description = description;
 				return this;
 			}
 
 			@Override
 			public Modifier setWidth(int width) {
-				this.width = of(width);
+				this.width = width;
 				return this;
 			}
 
 			@Override
 			public Modifier setHeight(int height) {
-				this.height = of(height);
+				this.height = height;
 				return this;
 			}
 
 			@Override
 			public Image update() throws IllegalStateException {
-				checkState(!sone.isPresent() || (ImageImpl.this.sone == null) || sone.get().equals(ImageImpl.this.sone), "can not change Sone once set");
-				checkState(!creationTime.isPresent() || ((ImageImpl.this.creationTime == 0) || (ImageImpl.this.creationTime == creationTime.get())), "can not change creation time once set");
-				checkState(!key.isPresent() || (ImageImpl.this.key == null) || key.get().equals(ImageImpl.this.key), "can not change key once set");
-				if (title.isPresent() && title.get().trim().isEmpty()) {
+				checkState(sone == null || (ImageImpl.this.sone == null) || sone.equals(ImageImpl.this.sone), "can not change Sone once set");
+				checkState(creationTime == null || ((ImageImpl.this.creationTime == 0) || (ImageImpl.this.creationTime == creationTime)), "can not change creation time once set");
+				checkState(key == null || (ImageImpl.this.key == null) || key.equals(ImageImpl.this.key), "can not change key once set");
+				if (title != null && title.trim().isEmpty()) {
 					throw new ImageTitleMustNotBeEmpty();
 				}
-				checkState(!width.isPresent() || (ImageImpl.this.width == 0) || width.get().equals(ImageImpl.this.width), "can not change width once set");
-				checkState(!height.isPresent() || (ImageImpl.this.height == 0) || height.get().equals(ImageImpl.this.height), "can not change height once set");
+				checkState(width == null || (ImageImpl.this.width == 0) || width.equals(ImageImpl.this.width), "can not change width once set");
+				checkState(height == null || (ImageImpl.this.height == 0) || height.equals(ImageImpl.this.height), "can not change height once set");
 
-				if (sone.isPresent()) {
-					ImageImpl.this.sone = sone.get();
+				if (sone != null) {
+					ImageImpl.this.sone = sone;
 				}
-				if (creationTime.isPresent()) {
-					ImageImpl.this.creationTime = creationTime.get();
+				if (creationTime != null) {
+					ImageImpl.this.creationTime = creationTime;
 				}
-				if (key.isPresent()) {
-					ImageImpl.this.key = key.get();
+				if (key != null) {
+					ImageImpl.this.key = key;
 				}
-				if (title.isPresent()) {
-					ImageImpl.this.title = title.get();
+				if (title != null) {
+					ImageImpl.this.title = title;
 				}
-				if (description.isPresent()) {
-					ImageImpl.this.description = description.get();
+				if (description != null) {
+					ImageImpl.this.description = description;
 				}
-				if (width.isPresent()) {
-					ImageImpl.this.width = width.get();
+				if (width != null) {
+					ImageImpl.this.width = width;
 				}
-				if (height.isPresent()) {
-					ImageImpl.this.height = height.get();
+				if (height != null) {
+					ImageImpl.this.height = height;
 				}
 
 				return ImageImpl.this;

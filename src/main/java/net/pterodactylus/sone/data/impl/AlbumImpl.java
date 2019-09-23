@@ -17,28 +17,17 @@
 
 package net.pterodactylus.sone.data.impl;
 
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.fromNullable;
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.util.*;
+import javax.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Sone;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicates;
-import com.google.common.collect.Collections2;
-import com.google.common.hash.Hasher;
+import com.google.common.base.*;
+import com.google.common.collect.*;
 import com.google.common.hash.Hashing;
+import com.google.common.hash.*;
+import net.pterodactylus.sone.data.*;
+
+import static com.google.common.base.Preconditions.*;
+import static java.nio.charset.StandardCharsets.*;
 
 /**
  * Container for images that can also contain nested {@link AlbumImpl}s.
@@ -258,32 +247,33 @@ public class AlbumImpl implements Album {
 	public Modifier modify() throws IllegalStateException {
 		// TODO: reenable check for local Sones
 		return new Modifier() {
-			private Optional<String> title = absent();
-
-			private Optional<String> description = absent();
+			@Nullable
+			private String title;
+			@Nullable
+			private String description;
 
 			@Override
 			public Modifier setTitle(String title) {
-				this.title = fromNullable(title);
+				this.title = title;
 				return this;
 			}
 
 			@Override
 			public Modifier setDescription(String description) {
-				this.description = fromNullable(description);
+				this.description = description;
 				return this;
 			}
 
 			@Override
 			public Album update() throws IllegalStateException {
-				if (title.isPresent() && title.get().trim().isEmpty()) {
+				if (title != null && title.trim().isEmpty()) {
 					throw new AlbumTitleMustNotBeEmpty();
 				}
-				if (title.isPresent()) {
-					AlbumImpl.this.title = title.get();
+				if (title != null) {
+					AlbumImpl.this.title = title;
 				}
-				if (description.isPresent()) {
-					AlbumImpl.this.description = description.get();
+				if (description != null) {
+					AlbumImpl.this.description = description;
 				}
 				return AlbumImpl.this;
 			}

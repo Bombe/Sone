@@ -24,7 +24,7 @@ class SoneModificationDetector {
 	private final Ticker ticker;
 	private final LockableFingerprintProvider lockableFingerprintProvider;
 	private final AtomicInteger insertionDelay;
-	private Optional<Long> lastModificationTime;
+	private Long lastModificationTime;
 	private String lastInsertFingerprint;
 	private String lastCheckFingerprint;
 
@@ -42,18 +42,18 @@ class SoneModificationDetector {
 
 	public boolean isEligibleForInsert() {
 		if (lockableFingerprintProvider.isLocked()) {
-			lastModificationTime = absent();
+			lastModificationTime = null;
 			lastCheckFingerprint = "";
 			return false;
 		}
 		String fingerprint = lockableFingerprintProvider.getFingerprint();
 		if (fingerprint.equals(lastInsertFingerprint)) {
-			lastModificationTime = absent();
+			lastModificationTime = null;
 			lastCheckFingerprint = fingerprint;
 			return false;
 		}
 		if (!Objects.equal(lastCheckFingerprint, fingerprint)) {
-			lastModificationTime = of(ticker.read());
+			lastModificationTime = ticker.read();
 			lastCheckFingerprint = fingerprint;
 			return false;
 		}
@@ -67,11 +67,11 @@ class SoneModificationDetector {
 	public void setFingerprint(String fingerprint) {
 		lastInsertFingerprint = fingerprint;
 		lastCheckFingerprint = lastInsertFingerprint;
-		lastModificationTime = absent();
+		lastModificationTime = null;
 	}
 
 	private boolean insertionDelayHasPassed() {
-		return NANOSECONDS.toSeconds(ticker.read() - lastModificationTime.get()) >= insertionDelay.get();
+		return NANOSECONDS.toSeconds(ticker.read() - lastModificationTime) >= insertionDelay.get();
 	}
 
 	public boolean isModified() {

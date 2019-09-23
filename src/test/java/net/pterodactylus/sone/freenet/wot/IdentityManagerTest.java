@@ -19,7 +19,7 @@ public class IdentityManagerTest {
 
 	private final EventBus eventBus = mock(EventBus.class);
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
-	private final IdentityManager identityManager = new IdentityManagerImpl(eventBus, webOfTrustConnector, new IdentityLoader(webOfTrustConnector, of(new Context("Test"))));
+	private final IdentityManager identityManager = new IdentityManagerImpl(eventBus, webOfTrustConnector, new IdentityLoader(webOfTrustConnector, new Context("Test")));
 
 	@Test
 	public void identityManagerPingsWotConnector() throws PluginException {

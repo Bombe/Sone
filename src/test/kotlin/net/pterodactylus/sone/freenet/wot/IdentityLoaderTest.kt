@@ -33,7 +33,7 @@ import org.mockito.Mockito.verify
 class IdentityLoaderTest {
 
 	private val webOfTrustConnector = mock<WebOfTrustConnector>()
-	private val identityLoader = IdentityLoader(webOfTrustConnector, of(Context("Test")))
+	private val identityLoader = IdentityLoader(webOfTrustConnector, Context("Test"))
 	private val identityLoaderWithoutContext = IdentityLoader(webOfTrustConnector)
 
 	@Before
@@ -84,10 +84,10 @@ class IdentityLoaderTest {
 		val ownIdentities = createOwnIdentities()
 		val identities = identityLoader.loadIdentities()
 		verify(webOfTrustConnector).loadAllOwnIdentities()
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[0]), eq(of("Test")))
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[1]), eq(of("Test")))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[0]), eq("Test"))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[1]), eq("Test"))
 		verify(webOfTrustConnector, never()).loadTrustedIdentities(eq(ownIdentities[2]), any())
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[3]), eq(of("Test")))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[3]), eq("Test"))
 		assertThat(identities.keys, hasSize(4))
 		assertThat(identities.keys, containsInAnyOrder(ownIdentities[0], ownIdentities[1], ownIdentities[2], ownIdentities[3]))
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities[0], createTrustedIdentitiesForFirstOwnIdentity())
@@ -101,10 +101,10 @@ class IdentityLoaderTest {
 		val ownIdentities = createOwnIdentities()
 		val identities = identityLoaderWithoutContext.loadIdentities()
 		verify(webOfTrustConnector).loadAllOwnIdentities()
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[0]), eq(absent()))
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[1]), eq(absent()))
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[2]), eq(absent()))
-		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[3]), eq(absent()))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[0]), eq(null))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[1]), eq(null))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[2]), eq(null))
+		verify(webOfTrustConnector).loadTrustedIdentities(eq(ownIdentities[3]), eq(null))
 		assertThat(identities.keys, hasSize(4))
 		val firstOwnIdentity = ownIdentities[0]
 		val secondOwnIdentity = ownIdentities[1]

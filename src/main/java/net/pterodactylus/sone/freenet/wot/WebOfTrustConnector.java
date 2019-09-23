@@ -28,6 +28,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.*;
+
 import net.pterodactylus.sone.freenet.plugin.PluginConnector;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.sone.freenet.plugin.event.ReceivedReplyEvent;
@@ -124,7 +126,7 @@ public class WebOfTrustConnector {
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
 	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity) throws PluginException {
-		return loadTrustedIdentities(ownIdentity, Optional.<String>absent());
+		return loadTrustedIdentities(ownIdentity, null);
 	}
 
 	/**
@@ -139,8 +141,8 @@ public class WebOfTrustConnector {
 	 * @throws PluginException
 	 *             if an error occured talking to the Web of Trust plugin
 	 */
-	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, Optional<String> context) throws PluginException {
-		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", context.or("")).put("WantTrustValues", "true").get());
+	public Set<Identity> loadTrustedIdentities(OwnIdentity ownIdentity, @Nullable String context) throws PluginException {
+		Reply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.getId()).put("Selection", "+").put("Context", (context ==null) ? "" : context).put("WantTrustValues", "true").get());
 		SimpleFieldSet fields = reply.getFields();
 		Set<Identity> identities = new HashSet<>();
 		int identityCounter = -1;

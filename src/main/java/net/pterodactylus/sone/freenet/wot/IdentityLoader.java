@@ -17,17 +17,15 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import static java.util.concurrent.TimeUnit.*;
-import static net.pterodactylus.sone.freenet.wot.Context.*;
-
 import java.util.*;
 import java.util.logging.*;
+import javax.annotation.*;
 
-import net.pterodactylus.sone.freenet.plugin.*;
-
-import com.google.common.base.Optional;
 import com.google.common.base.*;
 import com.google.inject.*;
+import net.pterodactylus.sone.freenet.plugin.*;
+
+import static java.util.concurrent.TimeUnit.*;
 
 /**
  * Loads {@link OwnIdentity}s and the {@link Identity}s they trust.
@@ -36,14 +34,15 @@ public class IdentityLoader {
 
 	private final Logger logger = Logger.getLogger(IdentityLoader.class.getName());
 	private final WebOfTrustConnector webOfTrustConnector;
-	private final Optional<Context> context;
+	@Nullable
+	private final Context context;
 
 	public IdentityLoader(WebOfTrustConnector webOfTrustConnector) {
-		this(webOfTrustConnector, Optional.<Context>absent());
+		this(webOfTrustConnector, null);
 	}
 
 	@Inject
-	public IdentityLoader(WebOfTrustConnector webOfTrustConnector, Optional<Context> context) {
+	public IdentityLoader(WebOfTrustConnector webOfTrustConnector, @Nullable Context context) {
 		this.webOfTrustConnector = webOfTrustConnector;
 		this.context = context;
 	}
@@ -65,7 +64,7 @@ public class IdentityLoader {
 			}
 
 			Stopwatch stopwatch = Stopwatch.createStarted();
-			Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, context.transform(extractContext));
+			Set<Identity> trustedIdentities = webOfTrustConnector.loadTrustedIdentities(ownIdentity, (context == null) ? null : context.getContext());
 			logger.fine("Loaded " + trustedIdentities.size() + " identities for " + ownIdentity.getNickname() + " in " + (stopwatch.elapsed(MILLISECONDS) / 1000.0) + "s.");
 			currentIdentities.put(ownIdentity, trustedIdentities);
 		}
@@ -74,7 +73,7 @@ public class IdentityLoader {
 	}
 
 	private boolean identityDoesNotHaveTheCorrectContext(OwnIdentity ownIdentity) {
-		return context.isPresent() && !ownIdentity.hasContext(context.transform(extractContext).get());
+		return (context != null) && !ownIdentity.hasContext(context.getContext());
 	}
 
 }
