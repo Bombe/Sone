@@ -84,8 +84,8 @@ public class DefaultOwnIdentity extends DefaultIdentity implements OwnIdentity {
 	}
 
 	@Override
-	public boolean equals(Object object) {
-		return super.equals(object);
+	public boolean equals(Object other) {
+		return super.equals(other);
 	}
 
 }
