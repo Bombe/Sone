@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.freenet.wot
 
 import com.google.common.eventbus.*
-import net.pterodactylus.sone.freenet.wot.Identities.*
 import net.pterodactylus.sone.freenet.wot.event.*
 import net.pterodactylus.sone.test.*
 import org.junit.*
@@ -32,15 +31,15 @@ class IdentityChangeEventSenderTest {
 
 	private val eventBus = mock<EventBus>()
 	private val ownIdentities = listOf(
-			createOwnIdentity("O1", listOf("Test"), mapOf("KeyA" to "ValueA")),
-			createOwnIdentity("O2", listOf("Test2"), mapOf("KeyB" to "ValueB")),
-			createOwnIdentity("O3", listOf("Test3"), mapOf("KeyC" to "ValueC"))
+			createOwnIdentity("O1", listOf("Test"), "KeyA" to "ValueA"),
+			createOwnIdentity("O2", listOf("Test2"), "KeyB" to "ValueB"),
+			createOwnIdentity("O3", listOf("Test3"), "KeyC" to "ValueC")
 	)
 	private val identities = listOf(
-			createIdentity("I1", listOf(), mapOf()),
-			createIdentity("I2", listOf(), mapOf()),
-			createIdentity("I3", listOf(), mapOf()),
-			createIdentity("I2", listOf("Test"), mapOf())
+			createIdentity("I1", listOf()),
+			createIdentity("I2", listOf()),
+			createIdentity("I3", listOf()),
+			createIdentity("I2", listOf("Test"))
 	)
 	private val identityChangeEventSender = IdentityChangeEventSender(eventBus, createOldIdentities())
 
