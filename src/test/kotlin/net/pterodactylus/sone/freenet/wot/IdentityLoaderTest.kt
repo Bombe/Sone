@@ -70,7 +70,7 @@ class IdentityLoaderTest {
 	private fun createOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: String, contexts: List<String>, properties: Map<String, String>): OwnIdentity =
 			DefaultOwnIdentity(id, nickname, requestUri, insertUri).apply {
 				setContexts(contexts)
-				this.setProperties(properties)
+				this.properties = properties
 			}
 
 	private fun createIdentity(id: String, nickname: String, requestUri: String, contexts: List<String>, properties: Map<String, String>): Identity =
