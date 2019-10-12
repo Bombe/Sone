@@ -17,7 +17,7 @@ import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
 import org.junit.Before
 import org.junit.Test
@@ -86,7 +86,7 @@ class ProfileAccessorTest {
 	@Test
 	fun `avatar ID is returned if profile belongs to local sone`() {
 		whenever(remoteSone.isLocal).thenReturn(true)
-		assertThat(accessor.get(templateContext, profile, "avatar"), `is`<Any>("avatar-id"))
+		assertThat(accessor.get(templateContext, profile, "avatar"), equalTo<Any>("avatar-id"))
 	}
 
 	@Test
@@ -98,14 +98,14 @@ class ProfileAccessorTest {
 	@Test
 	fun `avatar ID is returned if sone is configure to always show avatars`() {
 		currentSone.options.showCustomAvatars = ALWAYS
-		assertThat(accessor.get(templateContext, profile, "avatar"), `is`<Any>("avatar-id"))
+		assertThat(accessor.get(templateContext, profile, "avatar"), equalTo<Any>("avatar-id"))
 	}
 
 	@Test
 	fun `avatar ID is returned if sone is configure to show avatars of followed sones and remote sone is followed`() {
 		currentSone.options.showCustomAvatars = FOLLOWED
 		whenever(currentSone.hasFriend("remote-sone")).thenReturn(true)
-		assertThat(accessor.get(templateContext, profile, "avatar"), `is`<Any>("avatar-id"))
+		assertThat(accessor.get(templateContext, profile, "avatar"), equalTo<Any>("avatar-id"))
 	}
 
 	@Test
@@ -142,7 +142,7 @@ class ProfileAccessorTest {
 	fun `avatar ID is returned if sone is configure to show avatars based on manual trust and explicit trust is one`() {
 		currentSone.options.showCustomAvatars = MANUALLY_TRUSTED
 		setTrust(Trust(1, null, null))
-		assertThat(accessor.get(templateContext, profile, "avatar"), `is`<Any>("avatar-id"))
+		assertThat(accessor.get(templateContext, profile, "avatar"), equalTo<Any>("avatar-id"))
 	}
 
 	@Test
@@ -156,7 +156,7 @@ class ProfileAccessorTest {
 	fun `avatar ID is returned if sone is configure to show avatars based on trust and explicit trust is one`() {
 		currentSone.options.showCustomAvatars = TRUSTED
 		setTrust(Trust(1, null, null))
-		assertThat(accessor.get(templateContext, profile, "avatar"), `is`<Any>("avatar-id"))
+		assertThat(accessor.get(templateContext, profile, "avatar"), equalTo<Any>("avatar-id"))
 	}
 
 	@Test
@@ -177,12 +177,12 @@ class ProfileAccessorTest {
 	fun `avatar ID is returned if sone is configure to show avatars based on trust and implicit trust is one`() {
 		currentSone.options.showCustomAvatars = TRUSTED
 		setTrust(Trust(0, 1, null))
-		assertThat(accessor.get(templateContext, profile, "avatar"), `is`<Any>("avatar-id"))
+		assertThat(accessor.get(templateContext, profile, "avatar"), equalTo<Any>("avatar-id"))
 	}
 
 	@Test
 	fun `accessing other members uses reflection accessor`() {
-		assertThat(accessor.get(templateContext, profile, "hashCode"), `is`<Any>(profile.hashCode()))
+		assertThat(accessor.get(templateContext, profile, "hashCode"), equalTo<Any>(profile.hashCode()))
 	}
 
 }

@@ -104,7 +104,7 @@ class SoneInserterTest {
 		doAnswer {
 			soneInserter.stop()
 			null
-		}.`when`(core).touchConfiguration()
+		}.whenever(core).touchConfiguration()
 		soneInserter.serviceRun()
 		val soneEvents = ArgumentCaptor.forClass(SoneEvent::class.java)
 		verify(freenetInterface).insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))
@@ -251,7 +251,7 @@ class SoneInserterTest {
 		doAnswer {
 			soneInserter.stop()
 			null
-		}.`when`(core).touchConfiguration()
+		}.whenever(core).touchConfiguration()
 		soneInserter.serviceRun()
 		val histogram = metricRegistry.histogram("sone.insert.duration")
 		assertThat(histogram.count, equalTo(1L))

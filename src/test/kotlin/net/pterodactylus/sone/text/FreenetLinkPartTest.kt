@@ -1,7 +1,7 @@
 package net.pterodactylus.sone.text
 
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 
 /**
@@ -11,7 +11,7 @@ class FreenetLinkPartTest {
 
 	@Test
 	fun linkIsUsedAsTitleIfNoTextIsGiven() {
-		assertThat(FreenetLinkPart("link", "text", true).title, `is`("link"))
+		assertThat(FreenetLinkPart("link", "text", true).title, equalTo("link"))
 	}
 
 }

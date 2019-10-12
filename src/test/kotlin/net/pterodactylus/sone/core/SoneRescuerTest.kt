@@ -94,7 +94,7 @@ class SoneRescuerTest {
 		doAnswer {
 			soneRescuer.stop()
 			fetchedSone
-		}.`when`(soneDownloader).fetchSone(eq(sone), eq(keyWithMetaStrings), eq(true))
+		}.whenever(soneDownloader).fetchSone(eq(sone), eq(keyWithMetaStrings), eq(true))
 	}
 
 	private fun setupFreenetUri(): FreenetURI {

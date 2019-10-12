@@ -88,7 +88,7 @@ class FreenetInterfaceTest {
 
 	@Before
 	fun setupCallbackCaptorAndUskManager() {
-		doNothing().`when`(uskManager).subscribe(any(USK::class.java), callbackCaptor.capture(), anyBoolean(), any(RequestClient::class.java))
+		doNothing().whenever(uskManager).subscribe(any(USK::class.java), callbackCaptor.capture(), anyBoolean(), any(RequestClient::class.java))
 	}
 
 	@Test

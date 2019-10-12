@@ -10,7 +10,7 @@ import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.MANUALLY_TRUS
 import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent.TRUSTED
 import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.freenet.wot.Trust
-import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.FreenetLinkPart
 import net.pterodactylus.sone.text.LinkPart
 import net.pterodactylus.sone.text.Part
@@ -21,7 +21,6 @@ import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.emptyIterable
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito.`when`
 
 /**
  * Unit test for [LinkedElementsFilter].
@@ -44,14 +43,14 @@ class LinkedElementsFilterTest {
 
 	@Before
 	fun setupSone() {
-		`when`(sone.options).thenReturn(DefaultSoneOptions())
+		whenever(sone.options).thenReturn(DefaultSoneOptions())
 	}
 
 	@Before
 	fun setupImageLoader() {
-		`when`(imageLoader.loadElement("KSK@link")).thenReturn(LinkedElement("KSK@link", failed = true))
-		`when`(imageLoader.loadElement("KSK@loading.png")).thenReturn(LinkedElement("KSK@loading.png", loading = true))
-		`when`(imageLoader.loadElement("KSK@link.png")).thenReturn(LinkedElement("KSK@link.png"))
+		whenever(imageLoader.loadElement("KSK@link")).thenReturn(LinkedElement("KSK@link", failed = true))
+		whenever(imageLoader.loadElement("KSK@loading.png")).thenReturn(LinkedElement("KSK@loading.png", loading = true))
+		whenever(imageLoader.loadElement("KSK@link.png")).thenReturn(LinkedElement("KSK@link.png"))
 	}
 
 	@Test
@@ -89,7 +88,7 @@ class LinkedElementsFilterTest {
 	fun `filter finds images if the remote sone is local`() {
 		sone.options.loadLinkedImages = MANUALLY_TRUSTED
 		templateContext.set("currentSone", sone)
-		`when`(remoteSone.isLocal).thenReturn(true)
+		whenever(remoteSone.isLocal).thenReturn(true)
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
 	}
@@ -106,7 +105,7 @@ class LinkedElementsFilterTest {
 	fun `filter does not find images if local sone requires manual trust and remote sone has only implicit trust`() {
 		sone.options.loadLinkedImages = MANUALLY_TRUSTED
 		templateContext.set("currentSone", sone)
-		`when`(remoteSone.identity.getTrust(this.sone.identity as OwnIdentity)).thenReturn(Trust(null, 100, null))
+		whenever(remoteSone.identity.getTrust(this.sone.identity as OwnIdentity)).thenReturn(Trust(null, 100, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesAreNotPresent()
 	}
@@ -115,7 +114,7 @@ class LinkedElementsFilterTest {
 	fun `filter does not find images if local sone requires manual trust and remote sone has explicit trust of zero`() {
 		sone.options.loadLinkedImages = MANUALLY_TRUSTED
 		templateContext.set("currentSone", sone)
-		`when`(remoteSone.identity.getTrust(this.sone.identity as OwnIdentity)).thenReturn(Trust(0, null, null))
+		whenever(remoteSone.identity.getTrust(this.sone.identity as OwnIdentity)).thenReturn(Trust(0, null, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesAreNotPresent()
 	}
@@ -124,7 +123,7 @@ class LinkedElementsFilterTest {
 	fun `filter finds images if local sone requires manual trust and remote sone has explicit trust of one`() {
 		sone.options.loadLinkedImages = MANUALLY_TRUSTED
 		templateContext.set("currentSone", sone)
-		`when`(remoteSone.identity.getTrust(this.sone.identity as OwnIdentity)).thenReturn(Trust(1, null, null))
+		whenever(remoteSone.identity.getTrust(this.sone.identity as OwnIdentity)).thenReturn(Trust(1, null, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
 	}
@@ -140,7 +139,7 @@ class LinkedElementsFilterTest {
 	@Test
 	fun `filter finds images if local sone requires following and remote sone is followed`() {
 	    sone.options.loadLinkedImages = FOLLOWED
-		`when`(sone.hasFriend("remote-id")).thenReturn(true)
+		whenever(sone.hasFriend("remote-id")).thenReturn(true)
 		templateContext["currentSone"] = sone
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
@@ -158,7 +157,7 @@ class LinkedElementsFilterTest {
 	fun `filter finds images if following is required and remote sone is a local sone`() {
 		sone.options.loadLinkedImages = FOLLOWED
 		templateContext["currentSone"] = sone
-		`when`(remoteSone.isLocal).thenReturn(true)
+		whenever(remoteSone.isLocal).thenReturn(true)
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
 	}
@@ -175,7 +174,7 @@ class LinkedElementsFilterTest {
 	fun `filter does not find images if any trust is required and remote sone has implicit trust of zero`() {
 	    sone.options.loadLinkedImages = TRUSTED
 		templateContext["currentSone"] = sone
-		`when`(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(null, 0, null))
+		whenever(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(null, 0, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesAreNotPresent()
 	}
@@ -184,7 +183,7 @@ class LinkedElementsFilterTest {
 	fun `filter finds images if any trust is required and remote sone has implicit trust of one`() {
 	    sone.options.loadLinkedImages = TRUSTED
 		templateContext["currentSone"] = sone
-		`when`(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(null, 1, null))
+		whenever(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(null, 1, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
 	}
@@ -193,7 +192,7 @@ class LinkedElementsFilterTest {
 	fun `filter does not find images if any trust is required and remote sone has explicit trust of zero but implicit trust of one`() {
 		sone.options.loadLinkedImages = TRUSTED
 		templateContext["currentSone"] = sone
-		`when`(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(0, 1, null))
+		whenever(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(0, 1, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesAreNotPresent()
 	}
@@ -202,7 +201,7 @@ class LinkedElementsFilterTest {
 	fun `filter finds images if any trust is required and remote sone has explicit trust of one but no implicit trust`() {
 		sone.options.loadLinkedImages = TRUSTED
 		templateContext["currentSone"] = sone
-		`when`(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(1, null, null))
+		whenever(remoteSone.identity.getTrust(sone.identity as OwnIdentity)).thenReturn(Trust(1, null, null))
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
 	}
@@ -211,7 +210,7 @@ class LinkedElementsFilterTest {
 	fun `filter finds images if any trust is required and remote sone is a local sone`() {
 		sone.options.loadLinkedImages = TRUSTED
 		templateContext["currentSone"] = sone
-		`when`(remoteSone.isLocal).thenReturn(true)
+		whenever(remoteSone.isLocal).thenReturn(true)
 		parameters["sone"] = remoteSone
 		verifyThatImagesArePresent()
 	}
@@ -238,9 +237,9 @@ class LinkedElementsFilterTest {
 
 	private fun createSone(id: String = "sone-id"): Sone {
 		val sone = mock<Sone>()
-		`when`(sone.id).thenReturn(id)
-		`when`(sone.options).thenReturn(DefaultSoneOptions())
-		`when`(sone.identity).thenReturn(mock<OwnIdentity>())
+		whenever(sone.id).thenReturn(id)
+		whenever(sone.options).thenReturn(DefaultSoneOptions())
+		whenever(sone.identity).thenReturn(mock<OwnIdentity>())
 		return sone
 	}
 

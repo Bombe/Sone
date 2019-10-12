@@ -4,15 +4,12 @@ import com.google.common.base.Ticker
 import com.google.common.io.ByteStreams
 import freenet.keys.FreenetURI
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
-import net.pterodactylus.sone.test.capture
-import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import java.io.ByteArrayOutputStream
@@ -173,7 +170,7 @@ class DefaultElementLoaderTest {
 		elementLoader.loadElement(IMAGE_ID)
 		verify(freenetInterface).startFetch(eq(freenetURI), callback.capture())
 		callback.value.failed(freenetURI)
-		`when`(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(31))
+		whenever(ticker.read()).thenReturn(TimeUnit.MINUTES.toNanos(31))
 		val linkedElement = elementLoader.loadElement(IMAGE_ID)
 		assertThat(linkedElement.failed, equalTo(false))
 		assertThat(linkedElement.loading, equalTo(true))
