@@ -1,5 +1,5 @@
 /*
- * Sone - OwnIdentityRemovedEvent.java - Copyright © 2013–2019 David Roden
+ * Sone - OwnIdentityAddedEvent.java - Copyright © 2013–2019 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,23 +15,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.wot.event;
+package net.pterodactylus.sone.freenet.wot.event
 
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity
 
 /**
- * Event that signals that an {@link OwnIdentity} was removed.
+ * Event that signals that an [OwnIdentity] was added.
  */
-public class OwnIdentityRemovedEvent extends OwnIdentityEvent {
-
-	/**
-	 * Creates a new “own identity removed” event.
-	 *
-	 * @param ownIdentity
-	 *            The own identity that was removed
-	 */
-	public OwnIdentityRemovedEvent(OwnIdentity ownIdentity) {
-		super(ownIdentity);
-	}
-
-}
+data class OwnIdentityAddedEvent(val ownIdentity: OwnIdentity)

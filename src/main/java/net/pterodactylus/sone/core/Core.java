@@ -1582,7 +1582,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void ownIdentityAdded(OwnIdentityAddedEvent ownIdentityAddedEvent) {
-		OwnIdentity ownIdentity = ownIdentityAddedEvent.ownIdentity();
+		OwnIdentity ownIdentity = ownIdentityAddedEvent.getOwnIdentity();
 		logger.log(Level.FINEST, String.format("Adding OwnIdentity: %s", ownIdentity));
 		if (ownIdentity.hasContext("Sone")) {
 			addLocalSone(ownIdentity);
@@ -1597,7 +1597,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void ownIdentityRemoved(OwnIdentityRemovedEvent ownIdentityRemovedEvent) {
-		OwnIdentity ownIdentity = ownIdentityRemovedEvent.ownIdentity();
+		OwnIdentity ownIdentity = ownIdentityRemovedEvent.getOwnIdentity();
 		logger.log(Level.FINEST, String.format("Removing OwnIdentity: %s", ownIdentity));
 		trustedIdentities.removeAll(ownIdentity);
 	}
@@ -1610,9 +1610,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityAdded(IdentityAddedEvent identityAddedEvent) {
-		Identity identity = identityAddedEvent.identity();
+		Identity identity = identityAddedEvent.getIdentity();
 		logger.log(Level.FINEST, String.format("Adding Identity: %s", identity));
-		trustedIdentities.put(identityAddedEvent.ownIdentity(), identity);
+		trustedIdentities.put(identityAddedEvent.getOwnIdentity(), identity);
 		addRemoteSone(identity);
 	}
 
@@ -1624,7 +1624,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityUpdated(IdentityUpdatedEvent identityUpdatedEvent) {
-		Identity identity = identityUpdatedEvent.identity();
+		Identity identity = identityUpdatedEvent.getIdentity();
 		final Sone sone = getRemoteSone(identity.getId());
 		if (sone.isLocal()) {
 			return;
@@ -1648,8 +1648,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityRemoved(IdentityRemovedEvent identityRemovedEvent) {
-		OwnIdentity ownIdentity = identityRemovedEvent.ownIdentity();
-		Identity identity = identityRemovedEvent.identity();
+		OwnIdentity ownIdentity = identityRemovedEvent.getOwnIdentity();
+		Identity identity = identityRemovedEvent.getIdentity();
 		trustedIdentities.remove(ownIdentity, identity);
 		for (Entry<OwnIdentity, Collection<Identity>> trustedIdentity : trustedIdentities.asMap().entrySet()) {
 			if (trustedIdentity.getKey().equals(ownIdentity)) {
