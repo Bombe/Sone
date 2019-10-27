@@ -10,6 +10,7 @@ import freenet.pluginmanager.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
+import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.util.config.*
@@ -41,7 +42,7 @@ class SoneModuleTest {
 		createInjector(
 				SoneModule(sonePlugin, EventBus()),
 				FreenetInterface::class.isProvidedByDeepMock(),
-				PluginRespirator::class.isProvidedByDeepMock()
+				PluginRespiratorFacade::class.isProvidedByDeepMock()
 		)
 	}
 
@@ -198,7 +199,7 @@ class SoneModuleTest {
 		val injector = createInjector(
 				SoneModule(sonePlugin, eventBus),
 				FreenetInterface::class.isProvidedByDeepMock(),
-				PluginRespirator::class.isProvidedByDeepMock()
+				PluginRespiratorFacade::class.isProvidedByDeepMock()
 		)
 		val core = injector.getInstance<Core>()
 		verify(eventBus).register(core)

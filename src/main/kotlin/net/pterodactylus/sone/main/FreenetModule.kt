@@ -5,6 +5,7 @@ import freenet.client.*
 import freenet.clients.http.*
 import freenet.node.*
 import freenet.pluginmanager.*
+import net.pterodactylus.sone.freenet.plugin.*
 import javax.inject.Provider
 import javax.inject.Singleton
 
@@ -14,7 +15,7 @@ import javax.inject.Singleton
 class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 
 	override fun configure(binder: Binder): Unit = binder.run {
-		bind(PluginRespirator::class.java).toProvider(Provider<PluginRespirator> { pluginRespirator })
+		bind(PluginRespiratorFacade::class.java).toProvider(Provider { FredPluginRespiratorFacade(pluginRespirator) }).`in`(Singleton::class.java)
 		pluginRespirator.node!!.let { node -> bind(Node::class.java).toProvider(Provider<Node> { node }) }
 		bind(HighLevelSimpleClient::class.java).toProvider(Provider<HighLevelSimpleClient> { pluginRespirator.hlSimpleClient!! })
 		bind(ToadletContainer::class.java).toProvider(Provider<ToadletContainer> { pluginRespirator.toadletContainer })
