@@ -93,7 +93,7 @@ class FreenetModuleTest {
 	}
 
 	@Test
-	fun `page maker is returned as singleten`() {
+	fun `page maker is returned as singleton`() {
 		verifySingletonInstance<PageMaker>()
 	}
 
