@@ -28,15 +28,30 @@ import net.pterodactylus.sone.freenet.plugin.event.*
  * Interface for talking to other plugins. Other plugins are identified by their
  * name and a unique connection identifier.
  */
-@Singleton
-class PluginConnector @Inject constructor(
+interface PluginConnector {
+
+	/**
+	 * Sends a message to another plugin running in the same node.
+	 *
+	 * @param pluginName The fully qualified name of the plugin
+	 * @param identifier The unique identifier of the request
+	 * @param fields The message being sent
+	 * @param data Optional data
+	 */
+	@Throws(PluginException::class)
+	fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket? = null): Unit
+
+}
+
+/**
+ * Fred-based [PluginConnector] implementation.
+ */
+class FredPluginConnector @Inject constructor(
 		private val eventBus: EventBus,
 		private val pluginRespiratorFacade: PluginRespiratorFacade
-) : FredPluginTalker {
+) : PluginConnector, FredPluginTalker {
 
-	@Throws(PluginException::class)
-	@JvmOverloads
-	fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket? = null) =
+	override fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket?) =
 			getPluginTalker(pluginName, identifier).send(fields, data)
 
 	private fun getPluginTalker(pluginName: String, identifier: String) =

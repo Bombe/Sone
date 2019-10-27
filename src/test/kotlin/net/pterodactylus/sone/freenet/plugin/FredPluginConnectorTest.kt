@@ -39,7 +39,7 @@ class PluginConnectorTest {
 					}.also { call1Parameters += Call1Parameters(pluginTalker, pluginName, identifier) }
 				}
 	}
-	private val pluginConnector = PluginConnector(eventBus, pluginRespirator)
+	private val pluginConnector = FredPluginConnector(eventBus, pluginRespirator)
 
 	@Test
 	fun `sending request calls correct method on plugin respirator`() {

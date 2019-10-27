@@ -16,6 +16,7 @@ class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 
 	override fun configure(binder: Binder): Unit = binder.run {
 		bind(PluginRespiratorFacade::class.java).toProvider(Provider { FredPluginRespiratorFacade(pluginRespirator) }).`in`(Singleton::class.java)
+		bind(PluginConnector::class.java).to(FredPluginConnector::class.java).`in`(Singleton::class.java)
 		bind(Node::class.java).toProvider(Provider { pluginRespirator.node })
 		bind(HighLevelSimpleClient::class.java).toProvider(Provider<HighLevelSimpleClient> { pluginRespirator.hlSimpleClient!! })
 		bind(ToadletContainer::class.java).toProvider(Provider<ToadletContainer> { pluginRespirator.toadletContainer })

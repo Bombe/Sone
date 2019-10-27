@@ -109,4 +109,14 @@ class FreenetModuleTest {
 		verifySingletonInstance<PluginRespiratorFacade>()
 	}
 
+	@Test
+	fun `plugin connector is returned correctly`() {
+		assertThat(injector.getInstance<PluginConnector>(), notNullValue())
+	}
+
+	@Test
+	fun `plugin connector facade is returned as singleton`() {
+		verifySingletonInstance<PluginConnector>()
+	}
+
 }

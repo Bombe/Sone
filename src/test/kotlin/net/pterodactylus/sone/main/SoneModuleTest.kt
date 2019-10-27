@@ -42,7 +42,8 @@ class SoneModuleTest {
 		createInjector(
 				SoneModule(sonePlugin, EventBus()),
 				FreenetInterface::class.isProvidedByDeepMock(),
-				PluginRespiratorFacade::class.isProvidedByDeepMock()
+				PluginRespiratorFacade::class.isProvidedByDeepMock(),
+				PluginConnector::class.isProvidedByDeepMock()
 		)
 	}
 
@@ -199,7 +200,8 @@ class SoneModuleTest {
 		val injector = createInjector(
 				SoneModule(sonePlugin, eventBus),
 				FreenetInterface::class.isProvidedByDeepMock(),
-				PluginRespiratorFacade::class.isProvidedByDeepMock()
+				PluginRespiratorFacade::class.isProvidedByDeepMock(),
+				PluginConnector::class.isProvidedByDeepMock()
 		)
 		val core = injector.getInstance<Core>()
 		verify(eventBus).register(core)
