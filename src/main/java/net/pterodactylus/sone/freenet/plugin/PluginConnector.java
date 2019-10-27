@@ -25,8 +25,6 @@ import com.google.inject.Singleton;
 
 import freenet.pluginmanager.FredPluginTalker;
 import freenet.pluginmanager.PluginNotFoundException;
-import freenet.pluginmanager.PluginRespirator;
-import freenet.pluginmanager.PluginTalker;
 import freenet.support.SimpleFieldSet;
 import freenet.support.api.Bucket;
 
@@ -41,20 +39,20 @@ public class PluginConnector implements FredPluginTalker {
 	private final EventBus eventBus;
 
 	/** The plugin respirator. */
-	private final PluginRespirator pluginRespirator;
+	private final PluginRespiratorFacade pluginRespiratorFacade;
 
 	/**
 	 * Creates a new plugin connector.
 	 *
 	 * @param eventBus
 	 *            The event bus
-	 * @param pluginRespirator
+	 * @param pluginRespiratorFacade
 	 *            The plugin respirator
 	 */
 	@Inject
-	public PluginConnector(EventBus eventBus, PluginRespirator pluginRespirator) {
+	public PluginConnector(EventBus eventBus, PluginRespiratorFacade pluginRespiratorFacade) {
 		this.eventBus = eventBus;
-		this.pluginRespirator = pluginRespirator;
+		this.pluginRespiratorFacade = pluginRespiratorFacade;
 	}
 
 	//
@@ -110,9 +108,9 @@ public class PluginConnector implements FredPluginTalker {
 	 * @throws PluginException
 	 *             if the plugin can not be found
 	 */
-	private PluginTalker getPluginTalker(String pluginName, String identifier) throws PluginException {
+	private PluginTalkerFacade getPluginTalker(String pluginName, String identifier) throws PluginException {
 		try {
-			return pluginRespirator.getPluginTalker(this, pluginName, identifier);
+			return pluginRespiratorFacade.getPluginTalker(this, pluginName, identifier);
 		} catch (PluginNotFoundException pnfe1) {
 			throw new PluginException(pnfe1);
 		}
