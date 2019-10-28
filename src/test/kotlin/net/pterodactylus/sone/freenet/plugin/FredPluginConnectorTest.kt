@@ -1,112 +1,77 @@
-/* EventBus and Subscribe are marked @Beta, ignore that. And Fred stuff is
- * often marked as deprecated even though there is no replacement. */
-@file:Suppress("UnstableApiUsage", "DEPRECATION")
+/**
+ * Sone - FredPluginConnectorTest.kt - Copyright © 2019 David ‘Bombe’ Roden
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/* Fred-based plugin stuff is mostly deprecated. ¯\_(ツ)_/¯ */
+@file:Suppress("DEPRECATION")
 
 package net.pterodactylus.sone.freenet.plugin
 
-import com.google.common.eventbus.*
 import freenet.pluginmanager.*
 import freenet.support.*
 import freenet.support.api.*
 import freenet.support.io.*
+import kotlinx.coroutines.*
 import net.pterodactylus.sone.freenet.*
-import net.pterodactylus.sone.freenet.plugin.event.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
 import org.junit.rules.*
+import kotlin.concurrent.*
 
-/**
- * Unit test for [PluginConnector].
- */
-class PluginConnectorTest {
+class FredPluginConnectorTest {
 
 	@Rule
 	@JvmField
 	val expectedException = ExpectedException.none()!!
 
-	private val eventBus = EventBus()
-	private val pluginRespirator = object : PluginRespiratorFacade {
-		val call1Parameters = mutableListOf<Call1Parameters>()
-		val call2Parameters = mutableListOf<Call2Parameters>()
-		override fun getPluginTalker(pluginTalker: FredPluginTalker, pluginName: String, identifier: String) =
-				if ("wrong" in pluginName) {
-					throw PluginNotFoundException()
-				} else {
-					object : PluginTalkerFacade {
-						override fun send(pluginParameters: SimpleFieldSet, data: Bucket?) = Unit
-								.also { call2Parameters += Call2Parameters(pluginParameters, data) }
-					}.also { call1Parameters += Call1Parameters(pluginTalker, pluginName, identifier) }
-				}
-	}
-	private val pluginConnector = FredPluginConnector(eventBus, pluginRespirator)
-
 	@Test
-	fun `sending request calls correct method on plugin respirator`() {
-		pluginConnector.sendRequest("test.plugin", "test-request-1", fields)
-		assertThat(pluginRespirator.call1Parameters, hasSize(1))
-		assertThat(pluginRespirator.call1Parameters[0].pluginTalker, sameInstance<FredPluginTalker>(pluginConnector))
-		assertThat(pluginRespirator.call1Parameters[0].pluginName, equalTo("test.plugin"))
-		assertThat(pluginRespirator.call1Parameters[0].identifier, equalTo("test-request-1"))
-	}
-
-	@Test
-	fun `sending request with bucket calls correct method on plugin respirator`() {
-		pluginConnector.sendRequest("test.plugin", "test-request-1", fields, data)
-		assertThat(pluginRespirator.call1Parameters, hasSize(1))
-		assertThat(pluginRespirator.call1Parameters[0].pluginTalker, sameInstance<FredPluginTalker>(pluginConnector))
-		assertThat(pluginRespirator.call1Parameters[0].pluginName, equalTo("test.plugin"))
-		assertThat(pluginRespirator.call1Parameters[0].identifier, equalTo("test-request-1"))
-	}
-
-	@Test
-	fun `sending request to incorrect plugin translates exception correctly`() {
+	fun `connector throws exception if plugin can not be found`() = runBlocking {
+		val pluginConnector = FredPluginConnector(pluginRespiratorFacade)
 		expectedException.expect(PluginException::class.java)
-		pluginConnector.sendRequest("wrong.plugin", "test-request-1", fields)
+		pluginConnector.sendRequest("wrong.plugin", "", requestFields, requestData)
+		Unit
 	}
 
 	@Test
-	fun `sending request with bucket to incorrect plugin translates exception correctly`() {
-		expectedException.expect(PluginException::class.java)
-		pluginConnector.sendRequest("wrong.plugin", "test-request-1", fields, data)
-	}
-
-	@Test
-	fun `sending request calls correct method on plugin talker`() {
-		pluginConnector.sendRequest("test.plugin", "test-request-1", fields)
-		assertThat(pluginRespirator.call2Parameters, hasSize(1))
-		assertThat(pluginRespirator.call2Parameters[0].pluginParameters, equalTo(fields))
-		assertThat(pluginRespirator.call2Parameters[0].data, nullValue())
-	}
-
-	@Test
-	fun `sending request with bucket calls correct method on plugin talker`() {
-		pluginConnector.sendRequest("test.plugin", "test-request-1", fields, data)
-		assertThat(pluginRespirator.call2Parameters, hasSize(1))
-		assertThat(pluginRespirator.call2Parameters[0].pluginParameters, equalTo(fields))
-		assertThat(pluginRespirator.call2Parameters[0].data, equalTo<Bucket?>(data))
-	}
-
-	@Test
-	fun `reply is sent to event bus correctly`() {
-		val listener = object {
-			val receivedReplyEvents = mutableListOf<ReceivedReplyEvent>()
-			@Subscribe
-			fun onReply(receivedReplyEvent: ReceivedReplyEvent) = Unit.also { receivedReplyEvents += receivedReplyEvent }
-		}
-		eventBus.register(listener)
-		pluginConnector.onReply("test.plugin", "test-request-1", fields, data)
-		assertThat(listener.receivedReplyEvents, hasSize(1))
-		assertThat(listener.receivedReplyEvents[0].pluginName(), equalTo("test.plugin"))
-		assertThat(listener.receivedReplyEvents[0].identifier(), equalTo("test-request-1"))
-		assertThat(listener.receivedReplyEvents[0].fieldSet(), equalTo(fields))
-		assertThat(listener.receivedReplyEvents[0].data(), equalTo<Bucket?>(data))
+	fun `connector returns correct fields and data`() = runBlocking {
+		val pluginConnector = FredPluginConnector(pluginRespiratorFacade)
+		val reply = pluginConnector.sendRequest("test.plugin", "", requestFields, requestData)
+		assertThat(reply.fields, equalTo(responseFields))
+		assertThat(reply.data, equalTo(responseData))
 	}
 
 }
 
-private val fields = SimpleFieldSetBuilder().put("foo", "bar").get()
-private val data = ArrayBucket(byteArrayOf(1, 2))
+private val requestFields = SimpleFieldSetBuilder().put("foo", "bar").get()
+private val requestData: Bucket? = ArrayBucket(byteArrayOf(1, 2))
+private val responseFields = SimpleFieldSetBuilder().put("baz", "quo").get()
+private val responseData: Bucket? = ArrayBucket(byteArrayOf(3, 4))
 
-private data class Call1Parameters(val pluginTalker: FredPluginTalker, val pluginName: String, val identifier: String)
-private data class Call2Parameters(val pluginParameters: SimpleFieldSet, val data: Bucket?)
+private val pluginRespiratorFacade = object : PluginRespiratorFacade {
+	override fun getPluginTalker(pluginTalker: FredPluginTalker, pluginName: String, identifier: String) =
+			if (pluginName == "test.plugin") {
+				object : PluginTalkerFacade {
+					override fun send(pluginParameters: SimpleFieldSet, data: Bucket?) {
+						if ((pluginParameters == requestFields) && (data == requestData)) {
+							thread { pluginTalker.onReply(pluginName, identifier, responseFields, responseData) }
+						}
+					}
+				}
+			} else {
+				throw PluginNotFoundException()
+			}
+}

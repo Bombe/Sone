@@ -17,12 +17,8 @@
 
 package net.pterodactylus.sone.freenet.plugin
 
-import com.google.common.eventbus.*
-import com.google.inject.*
-import freenet.pluginmanager.*
 import freenet.support.*
 import freenet.support.api.*
-import net.pterodactylus.sone.freenet.plugin.event.*
 
 /**
  * Interface for talking to other plugins. Other plugins are identified by their
@@ -34,34 +30,14 @@ interface PluginConnector {
 	 * Sends a message to another plugin running in the same node.
 	 *
 	 * @param pluginName The fully qualified name of the plugin
-	 * @param identifier The unique identifier of the request
 	 * @param fields The message being sent
 	 * @param data Optional data
+	 * @return The reply from the plugin
+	 * @throws PluginException if the plugin identified by [pluginName] does not exist
 	 */
 	@Throws(PluginException::class)
-	fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket? = null): Unit
+	fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket? = null): PluginReply
 
 }
 
-/**
- * Fred-based [PluginConnector] implementation.
- */
-class FredPluginConnector @Inject constructor(
-		private val eventBus: EventBus,
-		private val pluginRespiratorFacade: PluginRespiratorFacade
-) : PluginConnector, FredPluginTalker {
-
-	override fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket?) =
-			getPluginTalker(pluginName, identifier).send(fields, data)
-
-	private fun getPluginTalker(pluginName: String, identifier: String) =
-			try {
-				pluginRespiratorFacade.getPluginTalker(this, pluginName, identifier)
-			} catch (pnfe1: PluginNotFoundException) {
-				throw PluginException(pnfe1)
-			}
-
-	override fun onReply(pluginName: String, identifier: String, params: SimpleFieldSet, data: Bucket) =
-			eventBus.post(ReceivedReplyEvent(this, pluginName, identifier, params, data))
-
-}
+data class PluginReply(val fields: SimpleFieldSet, val data: Bucket?)
