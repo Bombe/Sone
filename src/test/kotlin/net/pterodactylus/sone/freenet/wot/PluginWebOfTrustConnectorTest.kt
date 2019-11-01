@@ -99,11 +99,11 @@ class PluginWebOfTrustConnectorTest {
 		assertThat(trustedIdentities, contains(
 				allOf(
 						isIdentity("id0", "nickname0", "request-uri0", empty<String>(), isEmptyMap()),
-						isTrusted(ownIdentity, isTrust(null, 0, 0))
+						isTrusted(ownIdentity, isTrust(null, null, null))
 				),
 				allOf(
 						isIdentity("id1", "nickname1", "request-uri1", empty<String>(), isEmptyMap()),
-						isTrusted(ownIdentity, isTrust(null, 0, 0))
+						isTrusted(ownIdentity, isTrust(null, null, null))
 				)
 		))
 	}

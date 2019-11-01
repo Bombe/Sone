@@ -21,9 +21,7 @@ import com.google.inject.*
 import freenet.support.*
 import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.plugin.*
-import net.pterodactylus.sone.utils.NumberParsers.*
 import java.lang.String.*
-import java.util.*
 import java.util.logging.*
 import java.util.logging.Logger
 import java.util.logging.Logger.*
@@ -35,42 +33,17 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 
 	private val logger: Logger = getLogger(PluginWebOfTrustConnector::class.java.name)
 
-	override fun loadAllOwnIdentities(): Set<OwnIdentity> {
-		val (fields) = performRequest(SimpleFieldSetBuilder().put("Message", "GetOwnIdentities").get())
-		var ownIdentityCounter = -1
-		val ownIdentities = HashSet<OwnIdentity>()
-		while (true) {
-			val id = fields.get("Identity" + ++ownIdentityCounter) ?: break
-			val requestUri = fields.get("RequestURI$ownIdentityCounter")
-			val insertUri = fields.get("InsertURI$ownIdentityCounter")
-			val nickname = fields.get("Nickname$ownIdentityCounter")
-			val ownIdentity = DefaultOwnIdentity(id, nickname, requestUri, insertUri)
-			ownIdentity.contexts = fields.contexts("Contexts$ownIdentityCounter.")
-			ownIdentity.properties = fields.properties("Properties$ownIdentityCounter.")
-			ownIdentities.add(ownIdentity)
-		}
-		return ownIdentities
-	}
+	@Throws(PluginException::class)
+	override fun loadAllOwnIdentities(): Set<OwnIdentity> =
+			performRequest(SimpleFieldSetBuilder().put("Message", "GetOwnIdentities").get())
+					.fields
+					.parseIdentities { parseOwnIdentity(it) }
 
-	override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?): Set<Identity> {
-		val (fields) = performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.id).put("Selection", "+").put("Context", context ?: "").put("WantTrustValues", "true").get())
-		val identities = HashSet<Identity>()
-		var identityCounter = -1
-		while (true) {
-			val id = fields.get("Identity" + ++identityCounter) ?: break
-			val nickname = fields.get("Nickname$identityCounter")
-			val requestUri = fields.get("RequestURI$identityCounter")
-			val identity = DefaultIdentity(id, nickname, requestUri)
-			identity.contexts = fields.contexts("Contexts$identityCounter.")
-			identity.properties = fields.properties("Properties$identityCounter.")
-			val trust = parseInt(fields.get("Trust$identityCounter"), null)
-			val score = parseInt(fields.get("Score$identityCounter"), 0)!!
-			val rank = parseInt(fields.get("Rank$identityCounter"), 0)!!
-			identity.setTrust(ownIdentity, Trust(trust, score, rank))
-			identities.add(identity)
-		}
-		return identities
-	}
+	@Throws(PluginException::class)
+	override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?): Set<Identity> =
+			performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.id).put("Selection", "+").put("Context", context ?: "").put("WantTrustValues", "true").get())
+					.fields
+					.parseIdentities { parseTrustedIdentity(it, ownIdentity) }
 
 	@Throws(PluginException::class)
 	override fun addContext(ownIdentity: OwnIdentity, context: String) {
@@ -90,34 +63,10 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 		performRequest(SimpleFieldSetBuilder().put("Message", "RemoveProperty").put("Identity", ownIdentity.id).put("Property", name).get())
 	}
 
-	override fun getTrust(ownIdentity: OwnIdentity, identity: Identity): Trust {
-		val (fields) = performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentity").put("Truster", ownIdentity.id).put("Identity", identity.id).get())
-		val trust = fields.get("Trust")
-		val score = fields.get("Score")
-		val rank = fields.get("Rank")
-		var explicit: Int? = null
-		var implicit: Int? = null
-		var distance: Int? = null
-		try {
-			explicit = Integer.valueOf(trust)
-		} catch (nfe1: NumberFormatException) {
-			/* ignore. */
-		}
-
-		try {
-			implicit = Integer.valueOf(score)
-		} catch (nfe1: NumberFormatException) {
-			/* ignore. */
-		}
-
-		try {
-			distance = Integer.valueOf(rank)
-		} catch (nfe1: NumberFormatException) {
-			/* ignore. */
-		}
-
-		return Trust(explicit, implicit, distance)
-	}
+	override fun getTrust(ownIdentity: OwnIdentity, identity: Identity) =
+			performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentity").put("Truster", ownIdentity.id).put("Identity", identity.id).get())
+					.fields
+					.parseTrust()
 
 	override fun setTrust(ownIdentity: OwnIdentity, identity: Identity, trust: Int, comment: String) {
 		performRequest(SimpleFieldSetBuilder().put("Message", "SetTrust").put("Truster", ownIdentity.id).put("Trustee", identity.id).put("Value", trust.toString()).put("Comment", comment).get())
@@ -133,26 +82,50 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 
 	private fun performRequest(fields: SimpleFieldSet): PluginReply {
 		logger.log(Level.FINE, format("Sending FCP Request: %s", fields.get("Message")))
-		val pluginReply = pluginConnector.sendRequest(WOT_PLUGIN_NAME, "", fields)
-		logger.log(Level.FINEST, format("Received FCP Response for %s: %s", fields.get("Message"), pluginReply.fields.get("Message")))
-		if ("Error" == pluginReply.fields.get("Message")) {
-			throw PluginException("Could not perform request for " + fields.get("Message"))
+		return pluginConnector.sendRequest(WOT_PLUGIN_NAME, "", fields).also {
+			logger.log(Level.FINEST, format("Received FCP Response for %s: %s", fields.get("Message"), it.fields.get("Message")))
+			if ("Error" == it.fields.get("Message")) {
+				throw PluginException("Could not perform request for " + fields.get("Message"))
+			}
 		}
-		return pluginReply
 	}
 
 }
 
 private const val WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust"
 
+private fun <I> SimpleFieldSet.parseIdentities(parser: SimpleFieldSet.(Int) -> I) =
+		scanPrefix { "Identity$it" }
+				.map { parser(this, it) }
+				.toSet()
+
+private fun SimpleFieldSet.parseOwnIdentity(index: Int) =
+		DefaultOwnIdentity(get("Identity$index"), get("Nickname$index"), get("RequestURI$index"), get("InsertURI$index"))
+				.setContextsAndProperties(this@parseOwnIdentity, index)
+
+private fun SimpleFieldSet.parseTrustedIdentity(index: Int, ownIdentity: OwnIdentity) =
+		DefaultIdentity(get("Identity$index"), get("Nickname$index"), get("RequestURI$index"))
+				.setContextsAndProperties(this@parseTrustedIdentity, index)
+				.apply { setTrust(ownIdentity, this@parseTrustedIdentity.parseTrust(index.toString())) }
+
+private fun <I : Identity> I.setContextsAndProperties(simpleFieldSet: SimpleFieldSet, index: Int) = apply {
+	contexts = simpleFieldSet.contexts("Contexts$index.")
+	properties = simpleFieldSet.properties("Properties$index.")
+}
+
+private fun SimpleFieldSet.parseTrust(index: String = "") =
+		Trust(get("Trust$index")?.toIntOrNull(), get("Score$index")?.toIntOrNull(), get("Rank$index")?.toIntOrNull())
+
 private fun SimpleFieldSet.contexts(prefix: String) =
-		generateSequence(0, Int::inc)
+		scanPrefix { "${prefix}Context$it" }
 				.map { get("${prefix}Context$it") }
-				.takeWhile { it != null }
 				.toSet()
 
 private fun SimpleFieldSet.properties(prefix: String) =
-		generateSequence(0, Int::inc)
-				.takeWhile { get("${prefix}Property${it}.Name") != null }
+		scanPrefix { "${prefix}Property${it}.Name" }
 				.map { get("${prefix}Property${it}.Name") to get("${prefix}Property${it}.Value") }
 				.toMap()
+
+private fun SimpleFieldSet.scanPrefix(prefix: (Int) -> String) =
+		generateSequence(0, Int::inc)
+				.takeWhile { get(prefix(it)) != null }
