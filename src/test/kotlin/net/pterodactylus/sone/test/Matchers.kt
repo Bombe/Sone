@@ -1,7 +1,9 @@
 package net.pterodactylus.sone.test
 
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.*
+import org.hamcrest.Matchers.*
 
 fun hasHeader(name: String, value: String) = object : TypeSafeDiagnosingMatcher<Header>() {
 	override fun matchesSafely(item: Header, mismatchDescription: Description) =
@@ -18,4 +20,15 @@ fun hasHeader(name: String, value: String) = object : TypeSafeDiagnosingMatcher<
 fun <T : Any> compare(value: T, comparison: (T) -> Boolean, onError: (T) -> Unit) =
 		false.takeUnless { comparison(value) }
 				?.also { onError(value) }
+
+fun <K, V> isEmptyMap() = object : TypeSafeDiagnosingMatcher<Map<K, V>>() {
+	override fun describeTo(description: Description) {
+		description.appendText("empty map")
+	}
+
+	override fun matchesSafely(item: Map<K, V>, mismatchDescription: Description) =
+			item.isEmpty().onFalse {
+				mismatchDescription.appendText("was ").appendValue(item)
+			}
+}
 
