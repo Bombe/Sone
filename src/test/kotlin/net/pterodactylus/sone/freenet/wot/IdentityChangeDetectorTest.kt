@@ -140,15 +140,15 @@ class IdentityChangeDetectorTest {
 			listOf(createIdentity1(), createIdentity2(), createIdentity3())
 
 	private fun createIdentity1() =
-			createIdentity("Test1", listOf("Context A", "Context B"), "Key A" to "Value A", "Key B" to "Value B")
+			createIdentity("Test1", setOf("Context A", "Context B"), "Key A" to "Value A", "Key B" to "Value B")
 
 	private fun createIdentity2() =
-			createIdentity("Test2", listOf("Context C", "Context D"), "Key C" to "Value C", "Key D" to "Value D")
+			createIdentity("Test2", setOf("Context C", "Context D"), "Key C" to "Value C", "Key D" to "Value D")
 
 	private fun createIdentity3() =
-			createIdentity("Test3", listOf("Context E", "Context F"), "Key E" to "Value E", "Key F" to "Value F")
+			createIdentity("Test3", setOf("Context E", "Context F"), "Key E" to "Value E", "Key F" to "Value F")
 
 	private fun createIdentity4() =
-			createIdentity("Test4", listOf("Context G", "Context H"), "Key G" to "Value G", "Key H" to "Value H")
+			createIdentity("Test4", setOf("Context G", "Context H"), "Key G" to "Value G", "Key H" to "Value H")
 
 }

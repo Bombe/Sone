@@ -64,7 +64,7 @@ open class DefaultIdentityTest {
 	@Test
 	fun `contexts are set correctly in bulk`() {
 		identity.addContext("Test")
-		identity.setContexts(listOf("Test1", "Test2"))
+		identity.contexts = setOf("Test1", "Test2")
 		assertThat(identity.contexts, containsInAnyOrder("Test1", "Test2"))
 		assertThat(identity.hasContext("Test"), equalTo(false))
 		assertThat(identity.hasContext("Test1"), equalTo(true))

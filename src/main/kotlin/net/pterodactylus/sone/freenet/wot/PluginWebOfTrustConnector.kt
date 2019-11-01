@@ -45,7 +45,7 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 			val insertUri = fields.get("InsertURI$ownIdentityCounter")
 			val nickname = fields.get("Nickname$ownIdentityCounter")
 			val ownIdentity = DefaultOwnIdentity(id, nickname, requestUri, insertUri)
-			ownIdentity.setContexts(fields.contexts("Contexts$ownIdentityCounter."))
+			ownIdentity.contexts = fields.contexts("Contexts$ownIdentityCounter.")
 			ownIdentity.properties = fields.properties("Properties$ownIdentityCounter.")
 			ownIdentities.add(ownIdentity)
 		}
@@ -61,7 +61,7 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 			val nickname = fields.get("Nickname$identityCounter")
 			val requestUri = fields.get("RequestURI$identityCounter")
 			val identity = DefaultIdentity(id, nickname, requestUri)
-			identity.setContexts(fields.contexts("Contexts$identityCounter."))
+			identity.contexts = fields.contexts("Contexts$identityCounter.")
 			identity.properties = fields.properties("Properties$identityCounter.")
 			val trust = parseInt(fields.get("Trust$identityCounter"), null)
 			val score = parseInt(fields.get("Score$identityCounter"), 0)!!
@@ -149,7 +149,7 @@ private fun SimpleFieldSet.contexts(prefix: String) =
 		generateSequence(0, Int::inc)
 				.map { get("${prefix}Context$it") }
 				.takeWhile { it != null }
-				.toList()
+				.toSet()
 
 private fun SimpleFieldSet.properties(prefix: String) =
 		generateSequence(0, Int::inc)

@@ -31,15 +31,15 @@ class IdentityChangeEventSenderTest {
 
 	private val eventBus = mock<EventBus>()
 	private val ownIdentities = listOf(
-			createOwnIdentity("O1", listOf("Test"), "KeyA" to "ValueA"),
-			createOwnIdentity("O2", listOf("Test2"), "KeyB" to "ValueB"),
-			createOwnIdentity("O3", listOf("Test3"), "KeyC" to "ValueC")
+			createOwnIdentity("O1", setOf("Test"), "KeyA" to "ValueA"),
+			createOwnIdentity("O2", setOf("Test2"), "KeyB" to "ValueB"),
+			createOwnIdentity("O3", setOf("Test3"), "KeyC" to "ValueC")
 	)
 	private val identities = listOf(
-			createIdentity("I1", listOf()),
-			createIdentity("I2", listOf()),
-			createIdentity("I3", listOf()),
-			createIdentity("I2", listOf("Test"))
+			createIdentity("I1", setOf()),
+			createIdentity("I2", setOf()),
+			createIdentity("I3", setOf()),
+			createIdentity("I2", setOf("Test"))
 	)
 	private val identityChangeEventSender = IdentityChangeEventSender(eventBus, createOldIdentities())
 

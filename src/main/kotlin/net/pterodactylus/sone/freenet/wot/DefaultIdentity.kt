@@ -35,7 +35,7 @@ open class DefaultIdentity(private val id: String, private val nickname: String,
 
 	override fun hasContext(context: String) = context in contexts
 
-	override fun setContexts(contexts: Collection<String>) {
+	override fun setContexts(contexts: Set<String>) {
 		synchronized(this.contexts) {
 			this.contexts.clear()
 			this.contexts.addAll(contexts)

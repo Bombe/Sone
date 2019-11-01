@@ -83,7 +83,7 @@ public interface Identity {
 	 * @param contexts
 	 *            All contexts of the identity
 	 */
-	public void setContexts(Collection<String> contexts);
+	public void setContexts(Set<String> contexts);
 
 	/**
 	 * Removes the given context from this identity.

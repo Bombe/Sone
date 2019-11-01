@@ -70,33 +70,33 @@ class IdentityLoaderTest {
 }
 
 private fun createOwnIdentities() = listOf(
-		createOwnIdentity("O1", "ON1", "OR1", "OI1", listOf("Test", "Test2"), mapOf("KeyA" to "ValueA", "KeyB" to "ValueB")),
-		createOwnIdentity("O2", "ON2", "OR2", "OI2", listOf("Test"), mapOf("KeyC" to "ValueC")),
-		createOwnIdentity("O3", "ON3", "OR3", "OI3", listOf("Test2"), mapOf("KeyE" to "ValueE", "KeyD" to "ValueD")),
-		createOwnIdentity("O4", "ON4", "OR$", "OI4", listOf("Test"), mapOf("KeyA" to "ValueA", "KeyD" to "ValueD"))
+		createOwnIdentity("O1", "ON1", "OR1", "OI1", setOf("Test", "Test2"), mapOf("KeyA" to "ValueA", "KeyB" to "ValueB")),
+		createOwnIdentity("O2", "ON2", "OR2", "OI2", setOf("Test"), mapOf("KeyC" to "ValueC")),
+		createOwnIdentity("O3", "ON3", "OR3", "OI3", setOf("Test2"), mapOf("KeyE" to "ValueE", "KeyD" to "ValueD")),
+		createOwnIdentity("O4", "ON4", "OR$", "OI4", setOf("Test"), mapOf("KeyA" to "ValueA", "KeyD" to "ValueD"))
 )
 
 private fun createTrustedIdentitiesForFirstOwnIdentity() = setOf(
-		createIdentity("I11", "IN11", "IR11", listOf("Test"), mapOf("KeyA" to "ValueA"))
+		createIdentity("I11", "IN11", "IR11", setOf("Test"), mapOf("KeyA" to "ValueA"))
 )
 
 private fun createTrustedIdentitiesForSecondOwnIdentity() = setOf(
-		createIdentity("I21", "IN21", "IR21", listOf("Test", "Test2"), mapOf("KeyB" to "ValueB"))
+		createIdentity("I21", "IN21", "IR21", setOf("Test", "Test2"), mapOf("KeyB" to "ValueB"))
 )
 
 private fun createTrustedIdentitiesForThirdOwnIdentity() = setOf(
-		createIdentity("I31", "IN31", "IR31", listOf("Test", "Test3"), mapOf("KeyC" to "ValueC"))
+		createIdentity("I31", "IN31", "IR31", setOf("Test", "Test3"), mapOf("KeyC" to "ValueC"))
 )
 
 private fun createTrustedIdentitiesForFourthOwnIdentity(): Set<Identity> = emptySet()
 
-private fun createOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: String, contexts: List<String>, properties: Map<String, String>): OwnIdentity =
+private fun createOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: String, contexts: Set<String>, properties: Map<String, String>): OwnIdentity =
 		DefaultOwnIdentity(id, nickname, requestUri, insertUri).apply {
 			setContexts(contexts)
 			this.properties = properties
 		}
 
-private fun createIdentity(id: String, nickname: String, requestUri: String, contexts: List<String>, properties: Map<String, String>): Identity =
+private fun createIdentity(id: String, nickname: String, requestUri: String, contexts: Set<String>, properties: Map<String, String>): Identity =
 		DefaultIdentity(id, nickname, requestUri).apply {
 			setContexts(contexts)
 			this.properties = properties

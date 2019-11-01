@@ -17,19 +17,19 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-fun createOwnIdentity(id: String, contexts: Collection<String>, vararg properties: Pair<String, String>): OwnIdentity {
+fun createOwnIdentity(id: String, contexts: Set<String>, vararg properties: Pair<String, String>): OwnIdentity {
 	val ownIdentity = DefaultOwnIdentity(id, "Nickname$id", "Request$id", "Insert$id")
 	setContextsAndPropertiesOnIdentity(ownIdentity, contexts, mapOf(*properties))
 	return ownIdentity
 }
 
-fun createIdentity(id: String, contexts: Collection<String>, vararg properties: Pair<String, String>): Identity {
+fun createIdentity(id: String, contexts: Set<String>, vararg properties: Pair<String, String>): Identity {
 	val identity = DefaultIdentity(id, "Nickname$id", "Request$id")
 	setContextsAndPropertiesOnIdentity(identity, contexts, mapOf(*properties))
 	return identity
 }
 
-private fun setContextsAndPropertiesOnIdentity(identity: Identity, contexts: Collection<String>, properties: Map<String, String>) {
-	identity.setContexts(contexts)
+private fun setContextsAndPropertiesOnIdentity(identity: Identity, contexts: Set<String>, properties: Map<String, String>) {
+	identity.contexts = contexts
 	identity.properties = properties
 }
