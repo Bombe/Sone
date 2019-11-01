@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.test
 
+import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.*
@@ -31,4 +32,10 @@ fun <K, V> isEmptyMap() = object : TypeSafeDiagnosingMatcher<Map<K, V>>() {
 				mismatchDescription.appendText("was ").appendValue(item)
 			}
 }
+
+fun isTrust(trust: Int?, score: Int?, rank: Int?) =
+		AttributeMatcher<Trust>("trust")
+				.addAttribute("trust", trust, Trust::explicit)
+				.addAttribute("score", score, Trust::implicit)
+				.addAttribute("rank", rank, Trust::distance)
 
