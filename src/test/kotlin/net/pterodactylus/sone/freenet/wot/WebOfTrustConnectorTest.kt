@@ -51,25 +51,25 @@ class WebOfTrustConnectorTest {
 
 	@Test
 	fun `trusted identities are requested with correct own identity`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Truster", equalTo("id")))
+		createPluginConnector("GetIdentitiesByScore", hasField("Truster", equalTo("id")))
 				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `trusted identities are requested with correct selection parameter`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Selection", equalTo("+")))
+		createPluginConnector("GetIdentitiesByScore", hasField("Selection", equalTo("+")))
 				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `trusted identities are requested with empty context if null context requested`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Context", equalTo("")))
+		createPluginConnector("GetIdentitiesByScore", hasField("Context", equalTo("")))
 				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `trusted identities are requested with context if context requested`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Context", equalTo("TestContext")))
+		createPluginConnector("GetIdentitiesByScore", hasField("Context", equalTo("TestContext")))
 				.connect { loadTrustedIdentities(ownIdentity, "TestContext") }
 	}
 
