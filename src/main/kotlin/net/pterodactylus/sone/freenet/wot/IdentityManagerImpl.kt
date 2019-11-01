@@ -20,6 +20,7 @@ package net.pterodactylus.sone.freenet.wot
 import com.google.common.eventbus.*
 import com.google.inject.*
 import net.pterodactylus.util.service.*
+import java.util.concurrent.TimeUnit.*
 import java.util.logging.*
 import java.util.logging.Logger.*
 
@@ -71,7 +72,7 @@ class IdentityManagerImpl @Inject constructor(
 			}
 
 			/* wait a minute before checking again. */
-			sleep((60 * 1000).toLong())
+			sleep(SECONDS.toMillis(60))
 		}
 	}
 
