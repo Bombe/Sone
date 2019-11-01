@@ -45,8 +45,8 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 			val insertUri = fields.get("InsertURI$ownIdentityCounter")
 			val nickname = fields.get("Nickname$ownIdentityCounter")
 			val ownIdentity = DefaultOwnIdentity(id, nickname, requestUri, insertUri)
-			ownIdentity.setContexts(parseContexts("Contexts$ownIdentityCounter.", fields))
-			ownIdentity.properties = parseProperties("Properties$ownIdentityCounter.", fields)
+			ownIdentity.setContexts(fields.contexts("Contexts$ownIdentityCounter."))
+			ownIdentity.properties = fields.properties("Properties$ownIdentityCounter.")
 			ownIdentities.add(ownIdentity)
 		}
 		return ownIdentities
@@ -61,8 +61,8 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 			val nickname = fields.get("Nickname$identityCounter")
 			val requestUri = fields.get("RequestURI$identityCounter")
 			val identity = DefaultIdentity(id, nickname, requestUri)
-			identity.setContexts(parseContexts("Contexts$identityCounter.", fields))
-			identity.properties = parseProperties("Properties$identityCounter.", fields)
+			identity.setContexts(fields.contexts("Contexts$identityCounter."))
+			identity.properties = fields.properties("Properties$identityCounter.")
 			val trust = parseInt(fields.get("Trust$identityCounter"), null)
 			val score = parseInt(fields.get("Score$identityCounter"), 0)!!
 			val rank = parseInt(fields.get("Rank$identityCounter"), 0)!!
@@ -145,23 +145,14 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 
 private const val WOT_PLUGIN_NAME = "plugins.WebOfTrust.WebOfTrust"
 
-private fun parseContexts(prefix: String, fields: SimpleFieldSet): Set<String> {
-	val contexts = HashSet<String>()
-	var contextCounter = -1
-	while (true) {
-		val context = fields.get(prefix + "Context" + ++contextCounter) ?: break
-		contexts.add(context)
-	}
-	return contexts
-}
+private fun SimpleFieldSet.contexts(prefix: String) =
+		generateSequence(0, Int::inc)
+				.map { get("${prefix}Context$it") }
+				.takeWhile { it != null }
+				.toList()
 
-private fun parseProperties(prefix: String, fields: SimpleFieldSet): Map<String, String> {
-	val properties = HashMap<String, String>()
-	var propertiesCounter = -1
-	while (true) {
-		val propertyName = fields.get(prefix + "Property" + ++propertiesCounter + ".Name") ?: break
-		val propertyValue = fields.get(prefix + "Property" + propertiesCounter + ".Value")
-		properties[propertyName] = propertyValue
-	}
-	return properties
-}
+private fun SimpleFieldSet.properties(prefix: String) =
+		generateSequence(0, Int::inc)
+				.takeWhile { get("${prefix}Property${it}.Name") != null }
+				.map { get("${prefix}Property${it}.Name") to get("${prefix}Property${it}.Value") }
+				.toMap()
