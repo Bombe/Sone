@@ -233,6 +233,10 @@ public class WebOfTrustConnector {
 		}
 		try {
 			implicit = Integer.valueOf(score);
+		} catch (NumberFormatException nfe1) {
+			/* ignore. */
+		}
+		try {
 			distance = Integer.valueOf(rank);
 		} catch (NumberFormatException nfe1) {
 			/* ignore. */
