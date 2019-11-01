@@ -4,10 +4,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'info.solidsoft.gradle.pitest', name: 'gradle-pitest-plugin', version: '1.4.0'
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
         classpath group: 'org.jetbrains.kotlin', name: 'kotlin-noarg', version: kotlinVersion
     }
+}
+
+plugins {
+    id 'info.solidsoft.pitest' version '1.4.5'
 }
 
 group = 'net.pterodactylus'
@@ -95,9 +98,8 @@ jacoco {
 
 jacocoTestReport.dependsOn test
 
-apply plugin: 'info.solidsoft.pitest'
-
 pitest {
+    pitestVersion = '1.4.10'
     outputFormats = ['HTML', 'XML']
     timestampedReports = false
     timeoutFactor = 3.0
