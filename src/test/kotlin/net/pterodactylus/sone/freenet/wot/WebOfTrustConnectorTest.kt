@@ -197,6 +197,18 @@ class WebOfTrustConnectorTest {
 				.connect { setProperty(ownIdentity, "TestProperty", "TestValue") }
 	}
 
+	@Test
+	fun `removing a property sends the correct identity id`() {
+		createPluginConnector("RemoveProperty", hasField("Identity", equalTo(ownIdentity.id)))
+				.connect { removeProperty(ownIdentity, "TestProperty") }
+	}
+
+	@Test
+	fun `removing a property sends the correct property name`() {
+		createPluginConnector("RemoveProperty", hasField("Property", equalTo("TestProperty")))
+				.connect { removeProperty(ownIdentity, "TestProperty") }
+	}
+
 }
 
 private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
