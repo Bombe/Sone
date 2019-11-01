@@ -262,6 +262,30 @@ class WebOfTrustConnectorTest {
 		assertThat(trust, isTrust(12, 34, null))
 	}
 
+	@Test
+	fun `setting trust sends correct own identity id`() {
+		createPluginConnector("SetTrust", hasField("Truster", equalTo(ownIdentity.id)))
+				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
+	}
+
+	@Test
+	fun `setting trust sends correct identity id`() {
+		createPluginConnector("SetTrust", hasField("Trustee", equalTo(identity.id)))
+				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
+	}
+
+	@Test
+	fun `setting trust sends correct trust value`() {
+		createPluginConnector("SetTrust", hasField("Value", equalTo("123")))
+				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
+	}
+
+	@Test
+	fun `setting trust sends correct comment`() {
+		createPluginConnector("SetTrust", hasField("Comment", equalTo("Test Trust")))
+				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
+	}
+
 }
 
 private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
