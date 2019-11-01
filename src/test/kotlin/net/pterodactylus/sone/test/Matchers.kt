@@ -39,3 +39,29 @@ fun isTrust(trust: Int?, score: Int?, rank: Int?) =
 				.addAttribute("score", score, Trust::implicit)
 				.addAttribute("rank", rank, Trust::distance)
 
+fun isTrusted(ownIdentity: OwnIdentity, trust: Matcher<Trust>) = object : TypeSafeDiagnosingMatcher<Identity>() {
+	override fun matchesSafely(item: Identity, mismatchDescription: Description) =
+			item.getTrust(ownIdentity)?.let { foundTrust ->
+				trust.matches(foundTrust).onFalse {
+					trust.describeMismatch(foundTrust, mismatchDescription)
+				}
+			} ?: {
+				mismatchDescription.appendText("not trusted")
+				false
+			}()
+
+	override fun describeTo(description: Description) {
+		description
+				.appendText("trusted by ").appendValue(ownIdentity)
+				.appendText(" with ").appendValue(trust)
+	}
+}
+
+fun isIdentity(id: String, nickname: String, requestUri: String, contexts: Matcher<out Iterable<String>>, properties: Matcher<out Map<out String, String>>) =
+		AttributeMatcher<Identity>("identity")
+				.addAttribute("id", id, Identity::getId)
+				.addAttribute("nickname", nickname, Identity::getNickname)
+				.addAttribute("requestUri", requestUri, Identity::getRequestUri)
+				.addAttribute("contexts", Identity::getContexts, contexts)
+				.addAttribute("properties", Identity::getProperties, properties)
+
