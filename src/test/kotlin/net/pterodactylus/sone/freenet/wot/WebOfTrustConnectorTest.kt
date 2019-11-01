@@ -286,6 +286,18 @@ class WebOfTrustConnectorTest {
 				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
 	}
 
+	@Test
+	fun `removing trust sends correct own identity id`() {
+		createPluginConnector("RemoveTrust", hasField("Truster", equalTo(ownIdentity.id)))
+				.connect { removeTrust(ownIdentity, identity) }
+	}
+
+	@Test
+	fun `removing trust sends correct identity id`() {
+		createPluginConnector("RemoveTrust", hasField("Trustee", equalTo(identity.id)))
+				.connect { removeTrust(ownIdentity, identity) }
+	}
+
 }
 
 private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
