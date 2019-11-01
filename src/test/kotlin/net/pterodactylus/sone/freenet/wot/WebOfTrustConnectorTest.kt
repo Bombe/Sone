@@ -20,14 +20,13 @@ class WebOfTrustConnectorTest {
 
 	@Test
 	fun `wot plugin can be pinged`() {
-		val pluginConnector = createPluginConnector("Ping")
-		val connector = WebOfTrustConnector(pluginConnector)
-		connector.ping()
+		createPluginConnector("Ping")
+				.connect { ping() }
 	}
 
 	@Test
 	fun `own identities are returned correctly`() {
-		val pluginConnector = createPluginConnector("GetOwnIdentities") {
+		val ownIdentities = createPluginConnector("GetOwnIdentities") {
 			put("Identity0", "id-0")
 			put("RequestURI0", "request-uri-0")
 			put("InsertURI0", "insert-uri-0")
@@ -42,9 +41,7 @@ class WebOfTrustConnectorTest {
 			put("Contexts1.Context0", "id-1-context-0")
 			put("Properties1.Property0.Name", "id-1-property-0-name")
 			put("Properties1.Property0.Value", "id-1-property-0-value")
-		}
-		val connector = WebOfTrustConnector(pluginConnector)
-		val ownIdentities = connector.loadAllOwnIdentities()
+		}.connect { loadAllOwnIdentities() }
 		assertThat(ownIdentities, containsInAnyOrder(
 				isOwnIdentity("id-0", "nickname-0", "request-uri-0", "insert-uri-0", contains("id-0-context-0"), hasEntry("id-0-property-0-name", "id-0-property-0-value")),
 				isOwnIdentity("id-1", "nickname-1", "request-uri-1", "insert-uri-1", contains("id-1-context-0"), hasEntry("id-1-property-0-name", "id-1-property-0-value"))
@@ -54,58 +51,50 @@ class WebOfTrustConnectorTest {
 	@Test
 	fun `trusted identities are requested with correct own identity`() {
 		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Truster", equalTo("id")))
-		val connector = WebOfTrustConnector(pluginConnector)
-		connector.loadTrustedIdentities(ownIdentity)
+				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `trusted identities are requested with correct selection parameter`() {
 		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Selection", equalTo("+")))
-		val connector = WebOfTrustConnector(pluginConnector)
-		connector.loadTrustedIdentities(ownIdentity)
+				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `trusted identities are requested with empty context if null context requested`() {
 		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Context", equalTo("")))
-		val connector = WebOfTrustConnector(pluginConnector)
-		connector.loadTrustedIdentities(ownIdentity)
+				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `trusted identities are requested with context if context requested`() {
 		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("Context", equalTo("TestContext")))
-		val connector = WebOfTrustConnector(pluginConnector)
-		connector.loadTrustedIdentities(ownIdentity, "TestContext")
+				.connect { loadTrustedIdentities(ownIdentity, "TestContext") }
 	}
 
 	@Test
 	fun `trusted identities are requested with trust values`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore", hasField("WantTrustValues", equalTo("true")))
-		val connector = WebOfTrustConnector(pluginConnector)
-		val trustedIdentities = connector.loadTrustedIdentities(ownIdentity)
+		createPluginConnector("GetIdentitiesByScore", hasField("WantTrustValues", equalTo("true")))
+				.connect { loadTrustedIdentities(ownIdentity) }
 	}
 
 	@Test
 	fun `empty list of trusted identities is returned correctly`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore")
-		val connector = WebOfTrustConnector(pluginConnector)
-		val trustedIdentities = connector.loadTrustedIdentities(ownIdentity)
+		val trustedIdentities = createPluginConnector("GetIdentitiesByScore")
+				.connect { loadTrustedIdentities(ownIdentity) }
 		assertThat(trustedIdentities, empty())
 	}
 
 	@Test
 	fun `trusted identities without context, properties, or trust value are returned correctly`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore") {
+		val trustedIdentities = createPluginConnector("GetIdentitiesByScore") {
 			put("Identity0", "id0")
 			put("Nickname0", "nickname0")
 			put("RequestURI0", "request-uri0")
 			put("Identity1", "id1")
 			put("Nickname1", "nickname1")
 			put("RequestURI1", "request-uri1")
-		}
-		val connector = WebOfTrustConnector(pluginConnector)
-		val trustedIdentities = connector.loadTrustedIdentities(ownIdentity)
+		}.connect { loadTrustedIdentities(ownIdentity) }
 		assertThat(trustedIdentities, contains(
 				allOf(
 						isIdentity("id0", "nickname0", "request-uri0", empty<String>(), isEmptyMap()),
@@ -120,15 +109,13 @@ class WebOfTrustConnectorTest {
 
 	@Test
 	fun `trusted identity with contexts is returned correctly`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore") {
+		val trustedIdentities = createPluginConnector("GetIdentitiesByScore") {
 			put("Identity0", "id0")
 			put("Nickname0", "nickname0")
 			put("RequestURI0", "request-uri0")
 			put("Contexts0.Context0", "Context0")
 			put("Contexts0.Context1", "Context1")
-		}
-		val connector = WebOfTrustConnector(pluginConnector)
-		val trustedIdentities = connector.loadTrustedIdentities(ownIdentity)
+		}.connect { loadTrustedIdentities(ownIdentity) }
 		assertThat(trustedIdentities, contains(
 				isIdentity("id0", "nickname0", "request-uri0", containsInAnyOrder("Context0", "Context1"), isEmptyMap())
 		))
@@ -136,7 +123,7 @@ class WebOfTrustConnectorTest {
 
 	@Test
 	fun `trusted identity with properties is returned correctly`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore") {
+		val trustedIdentities = createPluginConnector("GetIdentitiesByScore") {
 			put("Identity0", "id0")
 			put("Nickname0", "nickname0")
 			put("RequestURI0", "request-uri0")
@@ -144,9 +131,7 @@ class WebOfTrustConnectorTest {
 			put("Properties0.Property0.Value", "bar")
 			put("Properties0.Property1.Name", "baz")
 			put("Properties0.Property1.Value", "quo")
-		}
-		val connector = WebOfTrustConnector(pluginConnector)
-		val trustedIdentities = connector.loadTrustedIdentities(ownIdentity)
+		}.connect { loadTrustedIdentities(ownIdentity) }
 		assertThat(trustedIdentities, contains(
 				isIdentity("id0", "nickname0", "request-uri0", empty(), allOf(hasEntry("foo", "bar"), hasEntry("baz", "quo")))
 		))
@@ -154,16 +139,14 @@ class WebOfTrustConnectorTest {
 
 	@Test
 	fun `trusted identity with trust value is returned correctly`() {
-		val pluginConnector = createPluginConnector("GetIdentitiesByScore") {
+		val trustedIdentities = createPluginConnector("GetIdentitiesByScore") {
 			put("Identity0", "id0")
 			put("Nickname0", "nickname0")
 			put("RequestURI0", "request-uri0")
 			put("Trust0", "12")
 			put("Score0", "34")
 			put("Rank0", "56")
-		}
-		val connector = WebOfTrustConnector(pluginConnector)
-		val trustedIdentities = connector.loadTrustedIdentities(ownIdentity)
+		}.connect { loadTrustedIdentities(ownIdentity) }
 		assertThat(trustedIdentities, contains(
 				allOf(
 						isIdentity("id0", "nickname0", "request-uri0", empty(), isEmptyMap()),
@@ -173,6 +156,9 @@ class WebOfTrustConnectorTest {
 	}
 
 }
+
+private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
+		WebOfTrustConnector(this).let(block)
 
 fun createPluginConnector(message: String, fieldsMatcher: Matcher<SimpleFieldSet> = IsAnything<SimpleFieldSet>(), build: SimpleFieldSetBuilder.() -> Unit = {}) =
 		object : PluginConnector {
