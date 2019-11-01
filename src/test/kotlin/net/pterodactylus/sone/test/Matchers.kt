@@ -65,6 +65,15 @@ fun isIdentity(id: String, nickname: String, requestUri: String, contexts: Match
 				.addAttribute("contexts", Identity::getContexts, contexts)
 				.addAttribute("properties", Identity::getProperties, properties)
 
+fun isOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: String, contexts: Matcher<Iterable<String>>, properties: Matcher<Map<out String, String>>) =
+		AttributeMatcher<OwnIdentity>("own identity")
+				.addAttribute("id", id, OwnIdentity::getId)
+				.addAttribute("nickname", nickname, OwnIdentity::getNickname)
+				.addAttribute("request uri", requestUri, OwnIdentity::getRequestUri)
+				.addAttribute("insert uri", insertUri, OwnIdentity::getInsertUri)
+				.addAttribute("contexts", OwnIdentity::getContexts, contexts)
+				.addAttribute("properties", OwnIdentity::getProperties, properties)
+
 /**
  * [TypeSafeDiagnosingMatcher] implementation that aims to cut down boilerplate on verifying the attributes
  * of typical container objects.
