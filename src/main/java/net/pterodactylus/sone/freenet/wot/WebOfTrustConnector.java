@@ -177,22 +177,6 @@ public class WebOfTrustConnector {
 	}
 
 	/**
-	 * Returns the value of the property with the given name.
-	 *
-	 * @param identity
-	 *            The identity whose properties to check
-	 * @param name
-	 *            The name of the property to return
-	 * @return The value of the property, or {@code null} if there is no value
-	 * @throws PluginException
-	 *             if an error occured talking to the Web of Trust plugin
-	 */
-	public String getProperty(Identity identity, String name) throws PluginException {
-		PluginReply reply = performRequest(SimpleFieldSetConstructor.create().put("Message", "GetProperty").put("Identity", identity.getId()).put("Property", name).get());
-		return reply.getFields().get("Property");
-	}
-
-	/**
 	 * Sets the property with the given name to the given value.
 	 *
 	 * @param ownIdentity
