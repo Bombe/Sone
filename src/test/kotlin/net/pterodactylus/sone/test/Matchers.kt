@@ -65,3 +65,58 @@ fun isIdentity(id: String, nickname: String, requestUri: String, contexts: Match
 				.addAttribute("contexts", Identity::getContexts, contexts)
 				.addAttribute("properties", Identity::getProperties, properties)
 
+/**
+ * [TypeSafeDiagnosingMatcher] implementation that aims to cut down boilerplate on verifying the attributes
+ * of typical container objects.
+ */
+class AttributeMatcher<T>(private val objectName: String) : TypeSafeDiagnosingMatcher<T>() {
+
+	private data class AttributeToMatch<T, V>(
+			val name: String,
+			val getter: (T) -> V,
+			val matcher: Matcher<out V>
+	)
+
+	private val attributesToMatch = mutableListOf<AttributeToMatch<T, *>>()
+
+	/**
+	 * Adds an attribute to check for equality, returning `this`.
+	 */
+	fun <V> addAttribute(name: String, expected: V, getter: (T) -> V): AttributeMatcher<T> = apply {
+		attributesToMatch.add(AttributeToMatch(name, getter, describedAs("$name %0", equalTo(expected), expected)))
+	}
+
+	/**
+	 * Adds an attribute to check with the given [hamcrest matcher][Matcher].
+	 */
+	fun <V> addAttribute(name: String, getter: (T) -> V, matcher: Matcher<out V>) = apply {
+		attributesToMatch.add(AttributeToMatch(name, getter, matcher))
+	}
+
+	override fun describeTo(description: Description) {
+		attributesToMatch.forEachIndexed { index, attributeToMatch ->
+			if (index == 0) {
+				description.appendText("$objectName with ")
+			} else {
+				description.appendText(", ")
+			}
+			attributeToMatch.matcher.describeTo(description)
+		}
+	}
+
+	override fun matchesSafely(item: T, mismatchDescription: Description): Boolean =
+			attributesToMatch.fold(true) { matches, attributeToMatch ->
+				if (!matches) {
+					false
+				} else {
+					if (!attributeToMatch.matcher.matches(attributeToMatch.getter(item))) {
+						mismatchDescription.appendText("but ${attributeToMatch.name} ")
+						attributeToMatch.matcher.describeMismatch(attributeToMatch.getter(item), mismatchDescription)
+						false
+					} else {
+						true
+					}
+				}
+			}
+
+}
