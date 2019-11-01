@@ -155,6 +155,18 @@ class WebOfTrustConnectorTest {
 		))
 	}
 
+	@Test
+	fun `adding a context sends the correct own identity id`() {
+		createPluginConnector("AddContext", hasField("Identity", equalTo(ownIdentity.id)))
+				.connect { addContext(ownIdentity, "TestContext") }
+	}
+
+	@Test
+	fun `adding a context sends the correct context`() {
+		createPluginConnector("AddContext", hasField("Context", equalTo("TestContext")))
+				.connect { addContext(ownIdentity, "TestContext") }
+	}
+
 }
 
 private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
