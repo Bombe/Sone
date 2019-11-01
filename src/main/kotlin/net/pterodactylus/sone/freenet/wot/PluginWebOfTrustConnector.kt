@@ -19,7 +19,6 @@ package net.pterodactylus.sone.freenet.wot
 
 import com.google.inject.*
 import freenet.support.*
-import freenet.support.api.*
 import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.utils.NumberParsers.*
@@ -132,9 +131,9 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 		performRequest(SimpleFieldSetBuilder().put("Message", "Ping").get())
 	}
 
-	private fun performRequest(fields: SimpleFieldSet, data: Bucket? = null): PluginReply {
+	private fun performRequest(fields: SimpleFieldSet): PluginReply {
 		logger.log(Level.FINE, format("Sending FCP Request: %s", fields.get("Message")))
-		val pluginReply = pluginConnector.sendRequest(WOT_PLUGIN_NAME, "", fields, data)
+		val pluginReply = pluginConnector.sendRequest(WOT_PLUGIN_NAME, "", fields)
 		logger.log(Level.FINEST, format("Received FCP Response for %s: %s", fields.get("Message"), pluginReply.fields.get("Message")))
 		if ("Error" == pluginReply.fields.get("Message")) {
 			throw PluginException("Could not perform request for " + fields.get("Message"))
