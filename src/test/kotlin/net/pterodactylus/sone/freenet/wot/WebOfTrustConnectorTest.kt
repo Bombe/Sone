@@ -167,6 +167,18 @@ class WebOfTrustConnectorTest {
 				.connect { addContext(ownIdentity, "TestContext") }
 	}
 
+	@Test
+	fun `removing a context sends the correct own identity id`() {
+		createPluginConnector("RemoveContext", hasField("Identity", equalTo(ownIdentity.id)))
+				.connect { removeContext(ownIdentity, "TestContext") }
+	}
+
+	@Test
+	fun `removing a context sends the correct context`() {
+		createPluginConnector("RemoveContext", hasField("Context", equalTo("TestContext")))
+				.connect { removeContext(ownIdentity, "TestContext") }
+	}
+
 }
 
 private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
