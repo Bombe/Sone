@@ -179,6 +179,24 @@ class WebOfTrustConnectorTest {
 				.connect { removeContext(ownIdentity, "TestContext") }
 	}
 
+	@Test
+	fun `setting a property sends the correct identity id`() {
+		createPluginConnector("SetProperty", hasField("Identity", equalTo(ownIdentity.id)))
+				.connect { setProperty(ownIdentity, "TestProperty", "TestValue") }
+	}
+
+	@Test
+	fun `setting a property sends the correct property name`() {
+		createPluginConnector("SetProperty", hasField("Property", equalTo("TestProperty")))
+				.connect { setProperty(ownIdentity, "TestProperty", "TestValue") }
+	}
+
+	@Test
+	fun `setting a property sends the correct property value`() {
+		createPluginConnector("SetProperty", hasField("Value", equalTo("TestValue")))
+				.connect { setProperty(ownIdentity, "TestProperty", "TestValue") }
+	}
+
 }
 
 private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
