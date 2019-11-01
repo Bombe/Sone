@@ -53,6 +53,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(BaseL10n::class.java).toInstance(sonePlugin.l10n().base)
 		loaders?.let { bind(Loaders::class.java).toInstance(it) }
 		bind(MetricRegistry::class.java).`in`(Singleton::class.java)
+		bind(WebOfTrustConnector::class.java).to(PluginWebOfTrustConnector::class.java).`in`(Singleton::class.java)
 
 		bindListener(Matchers.any(), object : TypeListener {
 			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {

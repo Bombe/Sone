@@ -12,9 +12,9 @@ import org.hamcrest.core.*
 import kotlin.test.*
 
 /**
- * Unit test for [WebOfTrustConnector].
+ * Unit test for [PluginWebOfTrustConnector].
  */
-class WebOfTrustConnectorTest {
+class PluginWebOfTrustConnectorTest {
 
 	private val ownIdentity = DefaultOwnIdentity("id", "nickname", "requestUri", "insertUri")
 	private val identity = DefaultIdentity("id-a", "alpha", "url://alpha")
@@ -300,8 +300,8 @@ class WebOfTrustConnectorTest {
 
 }
 
-private fun <R> PluginConnector.connect(block: WebOfTrustConnector.() -> R) =
-		WebOfTrustConnector(this).let(block)
+private fun <R> PluginConnector.connect(block: PluginWebOfTrustConnector.() -> R) =
+		PluginWebOfTrustConnector(this).let(block)
 
 fun createPluginConnector(message: String, fieldsMatcher: Matcher<SimpleFieldSet> = IsAnything<SimpleFieldSet>(), build: SimpleFieldSetBuilder.() -> Unit = {}) =
 		object : PluginConnector {

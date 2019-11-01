@@ -219,4 +219,16 @@ class SoneModuleTest {
 		assertThat(firstMetricRegistry, sameInstance(secondMetricRegistry))
 	}
 
+	@Test
+	fun `wot connector can be created`() {
+		assertThat(injector.getInstance<WebOfTrustConnector>(), notNullValue())
+	}
+
+	@Test
+	fun `wot connector is created as singleton`() {
+		val firstWebOfTrustConnector = injector.getInstance<WebOfTrustConnector>()
+		val secondWebOfTrustConnector = injector.getInstance<WebOfTrustConnector>()
+		assertThat(firstWebOfTrustConnector, sameInstance(secondWebOfTrustConnector))
+	}
+
 }
