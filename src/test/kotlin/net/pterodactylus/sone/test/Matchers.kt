@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.test
 
+import freenet.support.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.web.*
@@ -73,6 +74,19 @@ fun isOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: S
 				.addAttribute("insert uri", insertUri, OwnIdentity::getInsertUri)
 				.addAttribute("contexts", OwnIdentity::getContexts, contexts)
 				.addAttribute("properties", OwnIdentity::getProperties, properties)
+
+fun hasField(name: String, valueMatcher: Matcher<String>) = object : TypeSafeDiagnosingMatcher<SimpleFieldSet>() {
+	override fun matchesSafely(item: SimpleFieldSet, mismatchDescription: Description) =
+			valueMatcher.matches(item.get(name)).onFalse {
+				valueMatcher.describeMismatch(item, mismatchDescription)
+			}
+
+	override fun describeTo(description: Description) {
+		description
+				.appendText("simple field set with key ").appendValue(name)
+				.appendText(", value ").appendValue(valueMatcher)
+	}
+}
 
 /**
  * [TypeSafeDiagnosingMatcher] implementation that aims to cut down boilerplate on verifying the attributes
