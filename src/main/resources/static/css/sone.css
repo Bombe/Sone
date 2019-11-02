@@ -419,16 +419,8 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .trust button {
-	color: rgb(0, 128, 0);
-}
-
-#sone .post .distrust button {
-	color: rgb(255, 0, 0);
-}
-
 #sone .post .untrust button {
-	color: rgb(64, 64, 64);
+	color: rgb(255, 0, 0);
 }
 
 #sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover, #sone .post .bookmark button:hover, #sone .post .unbookmark button:hover {
