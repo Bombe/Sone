@@ -30,7 +30,7 @@ class FredPluginConnector @Inject constructor(private val pluginRespiratorFacade
 				receivedReply.receive()
 			}
 		} catch (e: PluginNotFoundException) {
-			throw PluginException(e)
+			throw PluginException(cause = e)
 		}
 	}
 

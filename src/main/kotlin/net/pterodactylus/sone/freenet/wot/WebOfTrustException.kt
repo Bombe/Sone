@@ -15,51 +15,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package net.pterodactylus.sone.freenet.wot;
+package net.pterodactylus.sone.freenet.wot
 
 /**
  * Exception that signals an error processing web of trust identities, mostly
  * when communicating with the web of trust plugin.
  */
-public class WebOfTrustException extends Exception {
-
-	/**
-	 * Creates a new web of trust exception.
-	 */
-	public WebOfTrustException() {
-		super();
-	}
-
-	/**
-	 * Creates a new web of trust exception.
-	 *
-	 * @param message
-	 *            The message of the exception
-	 */
-	public WebOfTrustException(String message) {
-		super(message);
-	}
-
-	/**
-	 * Creates a new web of trust exception.
-	 *
-	 * @param cause
-	 *            The cause of the exception
-	 */
-	public WebOfTrustException(Throwable cause) {
-		super(cause);
-	}
-
-	/**
-	 * Creates a new web of trust exception.
-	 *
-	 * @param message
-	 *            The message of the exception
-	 * @param cause
-	 *            The cause of the exception
-	 */
-	public WebOfTrustException(String message, Throwable cause) {
-		super(message, cause);
-	}
-
-}
+open class WebOfTrustException(message: String? = null, cause: Throwable?) : Exception(message, cause)
