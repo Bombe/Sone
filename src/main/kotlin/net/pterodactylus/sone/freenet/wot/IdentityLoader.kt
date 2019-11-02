@@ -31,7 +31,7 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 	private val logger: Logger = Logger.getLogger(IdentityLoader::class.java.name)
 
 	@Throws(WebOfTrustException::class)
-	fun loadIdentities(): Map<OwnIdentity, Collection<Identity>> =
+	fun loadIdentities() =
 			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 				webOfTrustConnector.loadAllOwnIdentities()
 			}.let(this::loadTrustedIdentitiesForOwnIdentities)
@@ -40,7 +40,7 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 	private fun loadTrustedIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
 			ownIdentities.associateWith { ownIdentity ->
 				if (ownIdentity.doesNotHaveCorrectContext()) {
-					emptySet<Identity>()
+					emptySet()
 				} else {
 					time({ stopwatch, identities -> "Loaded ${identities.size} identities for ${ownIdentity.nickname} in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 						webOfTrustConnector.loadTrustedIdentities(ownIdentity, context?.context)
@@ -51,7 +51,7 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 	private fun OwnIdentity.doesNotHaveCorrectContext() =
 			context?.let { it.context !in contexts } ?: false
 
-	private fun <R> time(logMessage: (Stopwatch, Collection<R>) -> String, loader: () -> Collection<R>): Collection<R> =
+	private fun <R> time(logMessage: (Stopwatch, R) -> String, loader: () -> R) =
 			Stopwatch.createStarted().let { stopwatch ->
 				loader().also { logger.fine(logMessage(stopwatch, it)) }
 			}
