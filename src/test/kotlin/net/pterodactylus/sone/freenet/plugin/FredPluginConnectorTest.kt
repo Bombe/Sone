@@ -42,14 +42,14 @@ class FredPluginConnectorTest {
 	fun `connector throws exception if plugin can not be found`() = runBlocking {
 		val pluginConnector = FredPluginConnector(pluginRespiratorFacade)
 		expectedException.expect(PluginException::class.java)
-		pluginConnector.sendRequest("wrong.plugin", "", requestFields, requestData)
+		pluginConnector.sendRequest("wrong.plugin", requestFields, requestData)
 		Unit
 	}
 
 	@Test
 	fun `connector returns correct fields and data`() = runBlocking {
 		val pluginConnector = FredPluginConnector(pluginRespiratorFacade)
-		val reply = pluginConnector.sendRequest("test.plugin", "", requestFields, requestData)
+		val reply = pluginConnector.sendRequest("test.plugin", requestFields, requestData)
 		assertThat(reply.fields, equalTo(responseFields))
 		assertThat(reply.data, equalTo(responseData))
 	}

@@ -36,7 +36,7 @@ interface PluginConnector {
 	 * @throws PluginException if the plugin identified by [pluginName] does not exist
 	 */
 	@Throws(PluginException::class)
-	fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket? = null): PluginReply
+	fun sendRequest(pluginName: String, fields: SimpleFieldSet, data: Bucket? = null): PluginReply
 
 }
 

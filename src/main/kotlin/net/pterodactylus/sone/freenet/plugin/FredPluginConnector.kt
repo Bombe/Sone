@@ -16,7 +16,7 @@ import javax.inject.*
  */
 class FredPluginConnector @Inject constructor(private val pluginRespiratorFacade: PluginRespiratorFacade) : PluginConnector {
 
-	override fun sendRequest(pluginName: String, identifier: String, fields: SimpleFieldSet, data: Bucket?): PluginReply {
+	override fun sendRequest(pluginName: String, fields: SimpleFieldSet, data: Bucket?): PluginReply {
 		val receivedReply = Channel<PluginReply>()
 		val responseReceiver = FredPluginTalker { _, _, responseFields, responseData ->
 			GlobalScope.launch {
