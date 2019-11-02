@@ -39,7 +39,9 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 	@Throws(PluginException::class)
 	private fun loadTrustedIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
 			ownIdentities.associateWith { ownIdentity ->
+				logger.fine { "Getting trusted identities for ${ownIdentities.size} own identities..."}
 				if (ownIdentity.doesNotHaveCorrectContext()) {
+					logger.fine { "Skipping $ownIdentity because of incorrect context."}
 					emptySet()
 				} else {
 					time({ stopwatch, identities -> "Loaded ${identities.size} identities for ${ownIdentity.nickname} in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
