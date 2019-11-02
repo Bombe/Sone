@@ -49,7 +49,7 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 			}
 
 	private fun OwnIdentity.doesNotHaveCorrectContext() =
-			context != null && !hasContext(context.context)
+			context?.let { it.context !in contexts } ?: false
 
 	private fun <R> time(logMessage: (Stopwatch, Collection<R>) -> String, loader: () -> Collection<R>): Collection<R> =
 			Stopwatch.createStarted().let { stopwatch ->
