@@ -22,7 +22,7 @@ import java.util.Collections.*
 /**
  * A Web of Trust identity.
  */
-open class DefaultIdentity(private val id: String, private val nickname: String, private val requestUri: String) : Identity {
+open class DefaultIdentity(private val id: String, private val nickname: String?, private val requestUri: String) : Identity {
 
 	private val contexts = mutableSetOf<String>().synchronized()
 	private val properties = mutableMapOf<String, String>().synchronized()

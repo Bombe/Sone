@@ -58,7 +58,7 @@ fun isTrusted(ownIdentity: OwnIdentity, trust: Matcher<Trust>) = object : TypeSa
 	}
 }
 
-fun isIdentity(id: String, nickname: String, requestUri: String, contexts: Matcher<out Iterable<String>>, properties: Matcher<out Map<out String, String>>) =
+fun isIdentity(id: String, nickname: String?, requestUri: String, contexts: Matcher<out Iterable<String>>, properties: Matcher<out Map<out String, String>>) =
 		AttributeMatcher<Identity>("identity")
 				.addAttribute("id", id, Identity::getId)
 				.addAttribute("nickname", nickname, Identity::getNickname)

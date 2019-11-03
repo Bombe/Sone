@@ -109,6 +109,20 @@ class PluginWebOfTrustConnectorTest {
 	}
 
 	@Test
+	fun `trusted identity without nickname is returned correctly`() {
+		val trustedIdentities = createPluginConnector("GetIdentitiesByScore") {
+			put("Identity0", "id0")
+			put("RequestURI0", "request-uri0")
+		}.connect { loadTrustedIdentities(ownIdentity) }
+		assertThat(trustedIdentities, contains(
+				allOf(
+						isIdentity("id0", null, "request-uri0", empty<String>(), isEmptyMap()),
+						isTrusted(ownIdentity, isTrust(null, null, null))
+				)
+		))
+	}
+
+	@Test
 	fun `trusted identity with contexts is returned correctly`() {
 		val trustedIdentities = createPluginConnector("GetIdentitiesByScore") {
 			put("Identity0", "id0")
