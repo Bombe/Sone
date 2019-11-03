@@ -48,7 +48,12 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 						} else {
 							logger.fine { "Loading trusted identities for $ownIdentity from WoT..." }
 							time({ stopwatch, identities -> "Loaded ${identities.size} identities for ${ownIdentity.nickname} in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
-								webOfTrustConnector.loadTrustedIdentities(ownIdentity, context?.context)
+								try {
+									webOfTrustConnector.loadTrustedIdentities(ownIdentity, context?.context)
+								} catch (e: Exception) {
+									logger.warning { "Caught $e on loading trusted identities for $ownIdentity."}
+									throw e
+								}
 							}
 						}
 					}
