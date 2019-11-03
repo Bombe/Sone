@@ -69,6 +69,8 @@ class IdentityManagerImpl @Inject constructor(
 				}
 			} catch (wote1: WebOfTrustException) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1)
+			} catch (e: Exception) {
+				logger.log(Level.SEVERE, "Uncaught exception in IdentityManager thread!", e)
 			}
 
 			/* wait a minute before checking again. */
