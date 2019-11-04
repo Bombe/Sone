@@ -12,7 +12,7 @@
 		<%if soneRescuer.lastFetchSuccessful>
 			<p><%= Page.Rescue.Text.Fetched|l10n 0=soneRescuer.currentEdition|html></p>
 		<%else>
-			<p><%= Page.Rescue.Text.NotFetched|l10n 0=soneRescuer.currentEdition|html></p>
+			<p><%= Page.Rescue.Text.NotFetched|l10n 0=soneRescuer.nextEdition|html></p>
 		<%/if>
 		<form action="rescue.html" method="post">
 			<input type="hidden" name="formPassword" value="<%formPassword|html>" />
