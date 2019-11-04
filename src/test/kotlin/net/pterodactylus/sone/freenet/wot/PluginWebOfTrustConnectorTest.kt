@@ -319,7 +319,7 @@ private fun <R> PluginConnector.connect(block: PluginWebOfTrustConnector.() -> R
 
 fun createPluginConnector(message: String, fieldsMatcher: Matcher<SimpleFieldSet> = IsAnything<SimpleFieldSet>(), build: SimpleFieldSetBuilder.() -> Unit = {}) =
 		object : PluginConnector {
-			override fun sendRequest(pluginName: String, fields: SimpleFieldSet, data: Bucket?) =
+			override suspend fun sendRequest(pluginName: String, fields: SimpleFieldSet, data: Bucket?) =
 					if ((pluginName != wotPluginName) || (fields.get("Message") != message)) {
 						throw PluginException()
 					} else {
