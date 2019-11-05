@@ -130,6 +130,15 @@ public class SoneRescuer extends AbstractService {
 		notifySyncObject();
 	}
 
+	/**
+	 * Starts the next fetch.
+	 */
+	public void startNextFetchWithSkip() {
+		currentEdition--;
+		fetching = true;
+		notifySyncObject();
+	}
+
 	//
 	// SERVICE METHODS
 	//
