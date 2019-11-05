@@ -631,6 +631,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		loadSone(sone);
 		database.storeSone(sone);
 		sone.setStatus(SoneStatus.idle);
+		if (sone.getPosts().isEmpty() && sone.getReplies().isEmpty()) {
+			// dirty hack
+			lockSone(sone);
+		}
 		soneInserter.start();
 		return sone;
 	}
