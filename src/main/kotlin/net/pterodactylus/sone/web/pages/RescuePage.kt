@@ -23,6 +23,8 @@ class RescuePage @Inject constructor(webInterface: WebInterface, loaders: Loader
 		if (soneRequest.isPOST) {
 			if (soneRequest.parameters["fetch", 8] == "true") {
 				soneRescuer.startNextFetch()
+			} else if (soneRequest.parameters["fetchSkip"] == "true") {
+				soneRescuer.startNextFetchWithSkip()
 			}
 			redirectTo("rescue.html")
 		}

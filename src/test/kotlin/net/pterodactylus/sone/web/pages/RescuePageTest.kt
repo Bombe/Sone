@@ -63,6 +63,15 @@ class RescuePageTest : WebPageTest(::RescuePage) {
 	}
 
 	@Test
+	fun `post request with skipping fetch starts next skipping fetch`() {
+		setMethod(POST)
+		addHttpRequestPart("fetchSkip", "true")
+		verifyRedirect("rescue.html") {
+			verify(soneRescuer).startNextFetchWithSkip()
+		}
+	}
+
+	@Test
 	fun `page can be created by dependency injection`() {
 		assertThat(baseInjector.getInstance<RescuePage>(), notNullValue())
 	}
