@@ -54,20 +54,34 @@ class RescuePageTest : WebPageTest(::RescuePage) {
 	}
 
 	@Test
-	fun `post request with fetch starts next fetch`() {
+	fun `post request with fetch and invalid edition starts next fetch`() {
 		setMethod(POST)
 		addHttpRequestPart("fetch", "true")
 		verifyRedirect("rescue.html") {
+			verify(soneRescuer, never()).setEdition(anyLong())
 			verify(soneRescuer).startNextFetch()
 		}
 	}
 
 	@Test
-	fun `post request with skipping fetch starts next skipping fetch`() {
+	fun `post request with fetch and valid edition sets edition and starts next fetch`() {
 		setMethod(POST)
-		addHttpRequestPart("fetchSkip", "true")
+		addHttpRequestPart("fetch", "true")
+		addHttpRequestPart("edition", "123")
 		verifyRedirect("rescue.html") {
-			verify(soneRescuer).startNextFetchWithSkip()
+			verify(soneRescuer).setEdition(123L)
+			verify(soneRescuer).startNextFetch()
+		}
+	}
+
+	@Test
+	fun `post request with negative edition will not set edition`() {
+		setMethod(POST)
+		addHttpRequestPart("fetch", "true")
+		addHttpRequestPart("edition", "-123")
+		verifyRedirect("rescue.html") {
+			verify(soneRescuer, never()).setEdition(anyLong())
+			verify(soneRescuer).startNextFetch()
 		}
 	}
 

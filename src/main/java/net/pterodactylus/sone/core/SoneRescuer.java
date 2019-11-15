@@ -108,6 +108,18 @@ public class SoneRescuer extends AbstractService {
 	}
 
 	/**
+	 * Sets the edition to rescue.
+	 *
+	 * @param edition
+	 *            The edition to rescue
+	 * @return This Sone rescuer
+	 */
+	public SoneRescuer setEdition(long edition) {
+		currentEdition = edition;
+		return this;
+	}
+
+	/**
 	 * Sets whether the last fetch was successful.
 	 *
 	 * @return {@code true} if the last fetch was successful, {@code false}
@@ -123,18 +135,11 @@ public class SoneRescuer extends AbstractService {
 	//
 
 	/**
-	 * Starts the next fetch.
+	 * Starts the next fetch. If you want to fetch a different edition than “the
+	 * next older one,” remember to call {@link #setEdition(long)} before
+	 * calling this method.
 	 */
 	public void startNextFetch() {
-		fetching = true;
-		notifySyncObject();
-	}
-
-	/**
-	 * Starts the next fetch.
-	 */
-	public void startNextFetchWithSkip() {
-		currentEdition--;
 		fetching = true;
 		notifySyncObject();
 	}
@@ -154,14 +159,13 @@ public class SoneRescuer extends AbstractService {
 			}
 			if (fetching) {
 				core.lockSone(sone);
-				FreenetURI soneUri = sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + getNextEdition()).setMetaString(new String[] { "sone.xml" });
+				FreenetURI soneUri = sone.getRequestUri().setKeyType("SSK").setDocName("Sone-" + currentEdition).setMetaString(new String[] { "sone.xml" });
 				System.out.println("URI: " + soneUri);
 				Sone fetchedSone = soneDownloader.fetchSone(sone, soneUri, true);
 				System.out.println("Sone: " + fetchedSone);
 				lastFetchSuccessful = (fetchedSone != null);
 				if (lastFetchSuccessful) {
 					core.updateSone(fetchedSone, true);
-					currentEdition = getNextEdition();
 				}
 				fetching = false;
 			}
