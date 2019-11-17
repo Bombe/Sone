@@ -129,8 +129,10 @@ public class ListNotification<T> extends TemplateNotification {
 	 *            The new element
 	 */
 	public void add(T element) {
-		elements.add(element);
-		touch();
+		if (!elements.contains(element)) {
+			elements.add(element);
+			touch();
+		}
 	}
 
 	/**
