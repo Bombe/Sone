@@ -88,6 +88,7 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -176,6 +177,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private volatile long lastConfigurationUpdate;
 
 	private final MetricRegistry metricRegistry;
+	private final Histogram configurationSaveTimeHistogram;
 
 	/**
 	 * Creates a new core.
@@ -207,6 +209,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.database = database;
 		this.metricRegistry = metricRegistry;
 		preferences = new Preferences(eventBus);
+		this.configurationSaveTimeHistogram = metricRegistry.histogram("configuration.save.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
 
 	//
@@ -1546,7 +1549,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			database.save();
 
 			/* now save it. */
+			Stopwatch stopwatch = Stopwatch.createStarted();
 			configuration.save();
+			configurationSaveTimeHistogram.update(stopwatch.elapsed(TimeUnit.MICROSECONDS));
 
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
