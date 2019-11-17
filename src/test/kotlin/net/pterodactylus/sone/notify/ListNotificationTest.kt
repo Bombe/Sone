@@ -37,6 +37,12 @@ class ListNotificationTest {
 	}
 
 	@Test
+	fun `list notification deduplicates set elements`() {
+		listNotification.setElements(listOf("a", "b", "a"))
+		assertThat(listNotification.elements, contains("a", "b"))
+	}
+
+	@Test
 	fun `list notification retains added elements`() {
 		listNotification.add("a")
 		listNotification.add("b")

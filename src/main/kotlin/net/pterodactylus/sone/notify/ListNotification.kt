@@ -52,7 +52,7 @@ class ListNotification<T> : TemplateNotification {
 
 	fun setElements(elements: Collection<T>) {
 		realElements.clear()
-		realElements.addAll(elements)
+		realElements.addAll(elements.distinct())
 		touch()
 	}
 
