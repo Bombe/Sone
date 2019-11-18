@@ -10,6 +10,7 @@ import freenet.pluginmanager.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
+import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
@@ -151,6 +152,11 @@ class SoneModuleTest {
 	@Test
 	fun `base l10n is bound correctly`() {
 		assertThat(injector.getInstance(), sameInstance(l10n.base))
+	}
+
+	@Test
+	fun `translation is bound correctly`() {
+		assertThat(injector.getInstance<Translation>(), notNullValue())
 	}
 
 	@Test

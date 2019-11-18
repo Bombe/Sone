@@ -10,6 +10,7 @@ import com.google.inject.spi.*
 import freenet.l10n.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
+import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.util.config.*
 import net.pterodactylus.util.config.ConfigurationException
@@ -50,6 +51,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(PluginYear::class.java).toInstance(PluginYear(sonePlugin.year))
 		bind(PluginHomepage::class.java).toInstance(PluginHomepage(sonePlugin.homepage))
 		bind(Database::class.java).to(MemoryDatabase::class.java).`in`(Singleton::class.java)
+		bind(Translation::class.java).toInstance(BaseL10nTranslation(sonePlugin.l10n().base))
 		bind(BaseL10n::class.java).toInstance(sonePlugin.l10n().base)
 		loaders?.let { bind(Loaders::class.java).toInstance(it) }
 		bind(MetricRegistry::class.java).`in`(Singleton::class.java)
