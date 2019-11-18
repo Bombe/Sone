@@ -1,27 +1,22 @@
 package net.pterodactylus.sone.freenet
 
-import freenet.l10n.*
-import freenet.l10n.BaseL10n.LANGUAGE.*
-import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.mockito.ArgumentMatchers.*
+import java.util.*
+import kotlin.collections.*
 
 /**
  * Unit test for [L10nFilter].
  */
 class L10nFilterTest {
 
-	private val l10n = mock<BaseL10n>()
-	private val filter = L10nFilter(l10n)
 	private val translations = mutableMapOf<String, String>()
-
-	@Before
-	fun setupL10n() {
-		whenever(l10n.selectedLanguage).thenReturn(ENGLISH)
-		whenever(l10n.getString(anyString())).then { translations[it.arguments[0]] }
+	private val translation = object : Translation {
+		override val currentLocale = Locale.ENGLISH
+		override fun translate(key: String): String = translations[key] ?: ""
 	}
+	private val filter = L10nFilter(translation)
 
 	@Test
 	fun `translation without parameters returns translated string`() {

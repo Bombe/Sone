@@ -17,24 +17,22 @@
 
 package net.pterodactylus.sone.freenet
 
-import freenet.l10n.*
 import net.pterodactylus.util.template.*
 import java.text.*
-import java.util.*
 
 /**
  * [Filter] implementation replaces [String] values with their
  * translated equivalents.
  */
-class L10nFilter(private val l10n: BaseL10n) : Filter {
+class L10nFilter(private val translation: Translation) : Filter {
 
 	override fun format(templateContext: TemplateContext?, data: Any?, parameters: Map<String, Any>?): String {
 		val parameterValues = getParameters(data, parameters)
 		val text = getText(data)
 		return if (parameterValues.isEmpty()) {
-			l10n.getString(text)
+			translation.translate(text)
 		} else
-			MessageFormat(l10n.getString(text), Locale(l10n.selectedLanguage.shortCode)).format(parameterValues.toTypedArray())
+			MessageFormat(translation.translate(text), translation.currentLocale).format(parameterValues.toTypedArray())
 	}
 
 	private fun getText(data: Any?) = (data as? L10nText)?.text ?: data.toString()
