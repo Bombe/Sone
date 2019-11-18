@@ -62,17 +62,26 @@ class MetricsPageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `metrics page lists stats about sone parsing durations`() {
-		createHistogram("sone.parsing.duration")
+	fun `metrics page auto-converts histogram name`() {
+		createHistogram("sone.random.duration")
 		page.handleRequest(soneRequest, templateContext)
-		verifyHistogram("soneParsingDuration")
+		verifyHistogram("soneRandomDuration")
 	}
 
 	@Test
-	fun `metrics page lists stats about sone insert durations`() {
-		createHistogram("sone.insert.duration")
+	@Suppress("UNCHECKED_CAST")
+	fun `metrics page stores histogram keys in template`() {
+		createHistogram("sone.random.duration2")
+		createHistogram("sone.random.duration1")
 		page.handleRequest(soneRequest, templateContext)
-		verifyHistogram("soneInsertDuration")
+		assertThat(templateContext["histogramKeys"] as Iterable<String>, contains("soneRandomDuration1", "soneRandomDuration2"))
+	}
+
+	@Test
+	fun `metrics page stores i18n names for histogram keys`() {
+		createHistogram("sone.random.duration1")
+		page.handleRequest(soneRequest, templateContext)
+		assertThat(templateContext["soneRandomDuration1I18n"] as String, equalTo("SoneRandomDuration1"))
 	}
 
 	@Test

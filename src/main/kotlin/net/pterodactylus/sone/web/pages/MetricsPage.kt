@@ -13,12 +13,17 @@ import javax.inject.*
 class MetricsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val metricsRegistry: MetricRegistry) : SoneTemplatePage(webInterface, loaders, templateRenderer, "Page.Metrics.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
-		addHistogram(templateContext, "sone.parsing.duration", "soneParsingDuration")
-		addHistogram(templateContext, "sone.insert.duration", "soneInsertDuration")
+		metricsRegistry.histograms
+				.mapKeys { it.key to it.key.toI18n() }
+				.onEach { addHistogram(templateContext, it.key.first, it.key.second) }
+				.keys
+				.map(Pair<*, String>::second)
+				.let { templateContext["histogramKeys"] = it }
 	}
 
 	private fun addHistogram(templateContext: TemplateContext, metricName: String, variablePrefix: String) {
 		metricsRegistry.histogram(metricName).also { histogram ->
+			templateContext["${variablePrefix}I18n"] = variablePrefix.capitalizeFirst()
 			templateContext["${variablePrefix}Count"] = histogram.count
 			histogram.snapshot.also { snapshot ->
 				templateContext["${variablePrefix}Min"] = snapshot.min
@@ -35,3 +40,14 @@ class MetricsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 	}
 
 }
+
+private fun String.toI18n() = split(".")
+		.mapIndexed { index, s -> if (index > 0) s.capitalizeFirst() else s }
+		.joinToString("")
+
+private fun String.capitalizeFirst() =
+		get(0).toUpperCase() + if (length > 0) {
+			substring(1)
+		} else {
+			""
+		}
