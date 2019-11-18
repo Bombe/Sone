@@ -69,7 +69,7 @@ class MetricsPageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `metrice pags lists stats about sone insert durations`() {
+	fun `metrics page lists stats about sone insert durations`() {
 		createHistogram("sone.insert.duration")
 		page.handleRequest(soneRequest, templateContext)
 		verifyHistogram("soneInsertDuration")
