@@ -21,6 +21,14 @@ class ListNotificationTest {
 	}
 
 	@Test
+	@Suppress("UNCHECKED_CAST")
+	fun `list in template context gets updated when elements are added`() {
+		listNotification.add("a")
+		listNotification.add("b")
+		assertThat(template.initialContext.get(KEY) as Iterable<String>, contains("a", "b"))
+	}
+
+	@Test
 	fun `new list notification has no element`() {
 		assertThat(listNotification.elements, emptyIterable())
 	}

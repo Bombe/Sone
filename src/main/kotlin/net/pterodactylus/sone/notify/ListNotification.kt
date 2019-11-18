@@ -41,13 +41,13 @@ class ListNotification<T> : TemplateNotification {
 	@JvmOverloads
 	constructor(id: String, key: String, template: Template, dismissable: Boolean = true) : super(id, currentTimeMillis(), currentTimeMillis(), dismissable, template) {
 		this.key = key
-		template.initialContext.set(key, elements)
+		template.initialContext.set(key, realElements)
 	}
 
 	constructor(listNotification: ListNotification<T>) : super(listNotification.id, listNotification.createdTime, listNotification.lastUpdatedTime, listNotification.isDismissable, Template()) {
 		this.key = listNotification.key
 		template.add(listNotification.template)
-		template.initialContext.set(key, elements)
+		template.initialContext.set(key, realElements)
 	}
 
 	fun setElements(elements: Collection<T>) {
