@@ -150,11 +150,6 @@ class SoneModuleTest {
 	}
 
 	@Test
-	fun `base l10n is bound correctly`() {
-		assertThat(injector.getInstance(), sameInstance(l10n.base))
-	}
-
-	@Test
 	fun `translation is bound correctly`() {
 		assertThat(injector.getInstance<Translation>(), notNullValue())
 	}
