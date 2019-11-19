@@ -19,9 +19,7 @@ package net.pterodactylus.sone.web;
 
 import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.util.template.TemplateParser.parse;
 
-import java.io.StringReader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
