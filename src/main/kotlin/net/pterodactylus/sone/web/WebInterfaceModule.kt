@@ -72,6 +72,7 @@ class WebInterfaceModule : AbstractModule() {
 				addFilter("unique", UniqueElementFilter())
 				addFilter("mod", ModFilter())
 				addFilter("paginate", PaginationFilter())
+				addFilter("render-histogram", HistogramRenderer())
 
 				addProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER)
 				addProvider(loaders.templateProvider)

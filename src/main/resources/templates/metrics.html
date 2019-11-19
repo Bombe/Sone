@@ -21,20 +21,8 @@
 			</tr>
 		</thead>
 		<tbody>
-			<%foreach histogramKeys histogramKey>
-				<tr>
-					<td><%= "Page.Metrics.<%= '<%histogramKey>I18n'|parse>.Title"|parse|l10n|html></td>
-					<td class="numeric"><% "<%histogramKey>Count"|parse|html></td>
-					<td class="numeric"><% "<%histogramKey>Min"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Max"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Mean"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Median"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Percentile75"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Percentile95"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Percentile98"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Percentile99"|parse|duration scale=="μs"|html></td>
-					<td class="numeric"><% "<%histogramKey>Percentile999"|parse|duration scale=="μs"|html></td>
-				</tr>
+			<%foreach histograms histogram>
+				<% histogram.value|render-histogram name=histogram.key>
 			<%/foreach>
 		</tbody>
 	</table>

@@ -13,41 +13,7 @@ import javax.inject.*
 class MetricsPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, private val metricsRegistry: MetricRegistry) : SoneTemplatePage(webInterface, loaders, templateRenderer, "Page.Metrics.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
-		metricsRegistry.histograms
-				.mapKeys { it.key to it.key.toI18n() }
-				.onEach { addHistogram(templateContext, it.key.first, it.key.second) }
-				.keys
-				.map(Pair<*, String>::second)
-				.let { templateContext["histogramKeys"] = it }
-	}
-
-	private fun addHistogram(templateContext: TemplateContext, metricName: String, variablePrefix: String) {
-		metricsRegistry.histogram(metricName).also { histogram ->
-			templateContext["${variablePrefix}I18n"] = variablePrefix.capitalizeFirst()
-			templateContext["${variablePrefix}Count"] = histogram.count
-			histogram.snapshot.also { snapshot ->
-				templateContext["${variablePrefix}Min"] = snapshot.min
-				templateContext["${variablePrefix}Max"] = snapshot.max
-				templateContext["${variablePrefix}Median"] = snapshot.median
-				templateContext["${variablePrefix}Mean"] = snapshot.mean
-				templateContext["${variablePrefix}Percentile75"] = snapshot.get75thPercentile()
-				templateContext["${variablePrefix}Percentile95"] = snapshot.get95thPercentile()
-				templateContext["${variablePrefix}Percentile98"] = snapshot.get98thPercentile()
-				templateContext["${variablePrefix}Percentile99"] = snapshot.get99thPercentile()
-				templateContext["${variablePrefix}Percentile999"] = snapshot.get999thPercentile()
-			}
-		}
+		templateContext["histograms"] = metricsRegistry.histograms
 	}
 
 }
-
-private fun String.toI18n() = split(".")
-		.mapIndexed { index, s -> if (index > 0) s.capitalizeFirst() else s }
-		.joinToString("")
-
-private fun String.capitalizeFirst() =
-		get(0).toUpperCase() + if (length > 0) {
-			substring(1)
-		} else {
-			""
-		}

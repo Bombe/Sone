@@ -62,46 +62,16 @@ class MetricsPageTest : WebPageTest() {
 	}
 
 	@Test
-	fun `metrics page auto-converts histogram name`() {
-		createHistogram("sone.random.duration")
-		page.handleRequest(soneRequest, templateContext)
-		verifyHistogram("soneRandomDuration")
-	}
-
-	@Test
 	@Suppress("UNCHECKED_CAST")
-	fun `metrics page stores histogram keys in template`() {
+	fun `metrics page stores histograms in template context`() {
 		createHistogram("sone.random.duration2")
 		createHistogram("sone.random.duration1")
 		page.handleRequest(soneRequest, templateContext)
-		assertThat(templateContext["histogramKeys"] as Iterable<String>, contains("soneRandomDuration1", "soneRandomDuration2"))
-	}
-
-	@Test
-	fun `metrics page stores i18n names for histogram keys`() {
-		createHistogram("sone.random.duration1")
-		page.handleRequest(soneRequest, templateContext)
-		assertThat(templateContext["soneRandomDuration1I18n"] as String, equalTo("SoneRandomDuration1"))
-	}
-
-	@Test
-	fun `metrics page delivers correct histogram size`() {
-		val histogram = metricRegistry.histogram("sone.parsing.duration")
-		(0..4000).forEach(histogram::update)
-		page.handleRequest(soneRequest, templateContext)
-		assertThat(templateContext["soneParsingDurationCount"] as Long, equalTo(4001L))
-	}
-
-	private fun verifyHistogram(name: String) {
-		assertThat(templateContext["${name}Count"] as Long, equalTo(5L))
-		assertThat(templateContext["${name}Min"] as Long, equalTo(1L))
-		assertThat(templateContext["${name}Max"] as Long, equalTo(10L))
-		assertThat(templateContext["${name}Median"] as Double, equalTo(8.0))
-		assertThat(templateContext["${name}Percentile75"] as Double, equalTo(9.0))
-		assertThat(templateContext["${name}Percentile95"] as Double, equalTo(10.0))
-		assertThat(templateContext["${name}Percentile98"] as Double, equalTo(10.0))
-		assertThat(templateContext["${name}Percentile99"] as Double, equalTo(10.0))
-		assertThat(templateContext["${name}Percentile999"] as Double, equalTo(10.0))
+		val histograms = templateContext["histograms"] as Map<String, Histogram>
+		assertThat(histograms.entries.map { it.key to it.value }, containsInAnyOrder(
+				"sone.random.duration1" to metricRegistry.histogram("sone.random.duration1"),
+				"sone.random.duration2" to metricRegistry.histogram("sone.random.duration2")
+		))
 	}
 
 	private fun createHistogram(name: String) = metricRegistry.histogram(name).run {

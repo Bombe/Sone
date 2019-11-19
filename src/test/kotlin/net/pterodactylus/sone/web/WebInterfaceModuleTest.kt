@@ -243,6 +243,11 @@ class WebInterfaceModuleTest {
 		verifyFilter<PaginationFilter>("paginate")
 	}
 
+	@Test
+	fun `template context histogram renderer`() {
+		verifyFilter<HistogramRenderer>("render-histogram")
+	}
+
 	private inline fun <reified F : Filter> verifyFilter(name: String) {
 		assertThat(getFilter(name), instanceOf(F::class.java))
 	}
