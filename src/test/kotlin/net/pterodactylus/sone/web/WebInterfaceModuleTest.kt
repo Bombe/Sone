@@ -20,17 +20,21 @@ import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
+import java.util.*
 import kotlin.test.Test
 
 class WebInterfaceModuleTest {
 
 	private val webInterfaceModule = WebInterfaceModule()
-	private val l10n = mock<BaseL10n>()
 	private val loaders = mock<Loaders>()
+	private val translation = object : Translation {
+		override val currentLocale = Locale.ENGLISH
+		override fun translate(key: String) = if (key == "View.Sone.Text.UnknownDate") "unknown" else key
+	}
 	private val additionalModules = arrayOf(
 			Core::class.isProvidedByMock(),
 			SoneProvider::class.isProvidedByMock(),
-			BaseL10n::class.isProvidedBy(l10n),
+			Translation::class.isProvidedBy(translation),
 			SoneTextParser::class.isProvidedByMock(),
 			ElementLoader::class.isProvidedByMock(),
 			Loaders::class.isProvidedBy(loaders),
@@ -191,7 +195,6 @@ class WebInterfaceModuleTest {
 
 	@Test
 	fun `unknown date filter uses correct l10n key`() {
-		whenever(l10n.getString("View.Sone.Text.UnknownDate")).thenReturn("unknown")
 		assertThat(getFilter("unknown")!!.format(null, 0L, emptyMap()), equalTo<Any>("unknown"))
 	}
 

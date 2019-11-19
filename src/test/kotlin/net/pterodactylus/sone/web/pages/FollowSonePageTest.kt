@@ -30,7 +30,7 @@ class FollowSonePageTest : WebPageTest(::FollowSonePage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.FollowSone.Title")).thenReturn("follow sone page title")
+		addTranslation("Page.FollowSone.Title", "follow sone page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("follow sone page title"))
 	}
 

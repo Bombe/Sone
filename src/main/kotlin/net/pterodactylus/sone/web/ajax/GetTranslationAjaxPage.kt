@@ -16,6 +16,6 @@ class GetTranslationAjaxPage @Inject constructor(webInterface: WebInterface) : J
 
 	override fun createJsonObject(request: FreenetRequest) =
 			createSuccessJsonObject()
-					.put("value", webInterface.l10n.getString(request.parameters["key"]))
+					.put("value", webInterface.translation.translate(request.parameters["key"] ?: ""))
 
 }

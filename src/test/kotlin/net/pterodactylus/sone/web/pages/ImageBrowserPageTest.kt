@@ -26,7 +26,7 @@ class ImageBrowserPageTest : WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.ImageBrowser.Title")).thenReturn("image browser page title")
+		addTranslation("Page.ImageBrowser.Title", "image browser page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("image browser page title"))
 	}
 

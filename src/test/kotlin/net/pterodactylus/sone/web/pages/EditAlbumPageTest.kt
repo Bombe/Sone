@@ -45,7 +45,7 @@ class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.EditAlbum.Title")).thenReturn("edit album page")
+		addTranslation("Page.EditAlbum.Title", "edit album page")
 		assertThat(page.getPageTitle(soneRequest), equalTo("edit album page"))
 	}
 

@@ -44,6 +44,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
+import net.pterodactylus.sone.freenet.Translation;
 import net.pterodactylus.sone.main.Loaders;
 import net.pterodactylus.sone.main.PluginHomepage;
 import net.pterodactylus.sone.main.PluginVersion;
@@ -105,7 +106,6 @@ import net.pterodactylus.util.web.TemplatePage;
 import freenet.clients.http.SessionManager;
 import freenet.clients.http.SessionManager.Session;
 import freenet.clients.http.ToadletContext;
-import freenet.l10n.BaseL10n;
 
 import com.codahale.metrics.*;
 import com.google.common.base.Optional;
@@ -158,6 +158,7 @@ public class WebInterface implements SessionProvider {
 
 	private final PageToadletRegistry pageToadletRegistry;
 	private final MetricRegistry metricRegistry;
+	private final Translation translation;
 
 	/** The “new Sone” notification. */
 	private final ListNotification<Sone> newSoneNotification;
@@ -209,7 +210,7 @@ public class WebInterface implements SessionProvider {
 			ParserFilter parserFilter, ShortenFilter shortenFilter,
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
-			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry) {
+			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -223,9 +224,10 @@ public class WebInterface implements SessionProvider {
 		this.linkedElementRenderFilter = linkedElementRenderFilter;
 		this.pageToadletRegistry = pageToadletRegistry;
 		this.metricRegistry = metricRegistry;
+		this.l10nFilter = l10nFilter;
+		this.translation = translation;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
-		l10nFilter = new L10nFilter(getL10n());
 
 		this.templateContextFactory = templateContextFactory;
 		templateContextFactory.addTemplateObject("webInterface", this);
@@ -379,13 +381,8 @@ public class WebInterface implements SessionProvider {
 		return listNotificationFilter.filterNotifications(notificationManager.getNotifications(), currentSone);
 	}
 
-	/**
-	 * Returns the l10n helper of the node.
-	 *
-	 * @return The node’s l10n helper
-	 */
-	public BaseL10n getL10n() {
-		return sonePlugin.l10n().getBase();
+	public Translation getTranslation() {
+		return translation;
 	}
 
 	/**

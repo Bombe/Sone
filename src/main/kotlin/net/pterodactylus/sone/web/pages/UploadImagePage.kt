@@ -33,7 +33,7 @@ class UploadImagePage @Inject constructor(webInterface: WebInterface, loaders: L
 			val bytes = uploadedFile.data.use { it.toByteArray() }
 			val bufferedImage = bytes.toImage()
 			if (bufferedImage == null) {
-				templateContext["messages"] = soneRequest.l10n.getString("Page.UploadImage.Error.InvalidImage")
+				templateContext["messages"] = translation.translate("Page.UploadImage.Error.InvalidImage")
 				return
 			}
 

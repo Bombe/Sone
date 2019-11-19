@@ -26,7 +26,7 @@ class DeleteSonePageTest : WebPageTest(::DeleteSonePage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.DeleteSone.Title")).thenReturn("delete sone page")
+		addTranslation("Page.DeleteSone.Title", "delete sone page")
 		assertThat(page.getPageTitle(soneRequest), equalTo("delete sone page"))
 	}
 

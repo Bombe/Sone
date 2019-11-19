@@ -28,7 +28,7 @@ class DismissNotificationPageTest : WebPageTest(::DismissNotificationPage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.DismissNotification.Title")).thenReturn("dismiss notification page")
+		addTranslation("Page.DismissNotification.Title", "dismiss notification page")
 		assertThat(page.getPageTitle(soneRequest), equalTo("dismiss notification page"))
 	}
 

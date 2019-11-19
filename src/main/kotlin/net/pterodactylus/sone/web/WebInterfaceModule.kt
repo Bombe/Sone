@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.web
 
 import com.google.inject.*
-import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
@@ -99,8 +98,8 @@ class WebInterfaceModule : AbstractModule() {
 			ProfileAccessor(core)
 
 	@Provides
-	fun getL10nFilter(l10n: BaseL10n) =
-			L10nFilter(l10n)
+	fun getL10nFilter(translation: Translation) =
+			L10nFilter(translation)
 
 	@Provides
 	fun getParserFilter(core: Core, soneTextParser: SoneTextParser) =
@@ -115,8 +114,8 @@ class WebInterfaceModule : AbstractModule() {
 			LinkedElementsFilter(elementLoader)
 
 	@Provides
-	fun getUnknownDateFilter(l10n: BaseL10n) =
-			UnknownDateFilter(l10n, "View.Sone.Text.UnknownDate")
+	fun getUnknownDateFilter(translation: Translation) =
+			UnknownDateFilter(translation, "View.Sone.Text.UnknownDate")
 
 	@Provides
 	fun getImageLinkFilter(core: Core) =

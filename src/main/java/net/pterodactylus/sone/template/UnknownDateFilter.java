@@ -19,18 +19,18 @@ package net.pterodactylus.sone.template;
 
 import java.util.Map;
 
+import net.pterodactylus.sone.freenet.Translation;
 import net.pterodactylus.util.template.Filter;
 import net.pterodactylus.util.template.TemplateContext;
-import freenet.l10n.BaseL10n;
 
 /**
  * {@link Filter} implementation that replaces a {@link Long} with a value of
- * {@code 0} by a {@link String} from an {@link BaseL10n l10n handler}.
+ * {@code 0} by a {@link String} from a {@link Translation translation}.
  */
 public class UnknownDateFilter implements Filter {
 
-	/** The l10n handler. */
-	private BaseL10n l10nHandler;
+	/** The translation. */
+	private final Translation translation;
 
 	/** The key for the text to show. */
 	private final String unknownKey;
@@ -38,13 +38,11 @@ public class UnknownDateFilter implements Filter {
 	/**
 	 * Creates a new unknown date filter.
 	 *
-	 * @param l10nHandler
-	 *            The l10n handler
-	 * @param unknownKey
-	 *            The key of the text to show
+	 * @param translation The translation
+	 * @param unknownKey  The key of the text to show
 	 */
-	public UnknownDateFilter(BaseL10n l10nHandler, String unknownKey) {
-		this.l10nHandler = l10nHandler;
+	public UnknownDateFilter(Translation translation, String unknownKey) {
+		this.translation = translation;
 		this.unknownKey = unknownKey;
 	}
 
@@ -55,7 +53,7 @@ public class UnknownDateFilter implements Filter {
 	public Object format(TemplateContext templateContext, Object data, Map<String, Object> parameters) {
 		if (data instanceof Long) {
 			if ((Long) data == 0) {
-				return l10nHandler.getString(unknownKey);
+				return translation.translate(unknownKey);
 			}
 		}
 		return data;

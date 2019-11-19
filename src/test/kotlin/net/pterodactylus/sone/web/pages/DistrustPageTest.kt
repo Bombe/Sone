@@ -26,7 +26,7 @@ class DistrustPageTest : WebPageTest(::DistrustPage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.Distrust.Title")).thenReturn("distrust page title")
+		addTranslation("Page.Distrust.Title", "distrust page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("distrust page title"))
 	}
 
