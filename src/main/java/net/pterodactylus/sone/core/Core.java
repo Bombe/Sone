@@ -1370,7 +1370,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (soneInserters) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
 				soneInserter.getValue().stop();
-				saveSone(soneInserter.getKey());
+				Sone latestSone = getLocalSone(soneInserter.getKey().getId());
+				saveSone(latestSone);
 			}
 		}
 		synchronized (soneRescuers) {
