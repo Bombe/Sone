@@ -401,7 +401,7 @@ class SoneParserTest {
 	fun `unsuccessful parsing does not add a histogram entry`() {
 		val inputStream = javaClass.getResourceAsStream("sone-parser-with-invalid-image-height.xml")
 		assertThat(soneParser.parseSone(sone, inputStream), nullValue())
-		val histogram = metricRegistry.histogram("sone.parsing.duration")
+		val histogram = metricRegistry.histogram("sone.parse.duration")
 		assertThat(histogram.count, equalTo(0L))
 	}
 
@@ -409,7 +409,7 @@ class SoneParserTest {
 	fun `successful parsing adds histogram entry`() {
 		val inputStream = javaClass.getResourceAsStream("sone-parser-without-images.xml")
 		assertThat(soneParser.parseSone(sone, inputStream), notNullValue())
-		val histogram = metricRegistry.histogram("sone.parsing.duration")
+		val histogram = metricRegistry.histogram("sone.parse.duration")
 		assertThat(histogram.count, equalTo(1L))
 	}
 

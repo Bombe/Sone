@@ -33,7 +33,7 @@ public class SoneParser {
 	@Inject
 	public SoneParser(Database database, MetricRegistry metricRegistry) {
 		this.database = database;
-		this.soneParsingDurationHistogram = metricRegistry.histogram("sone.parsing.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
+		this.soneParsingDurationHistogram = metricRegistry.histogram("sone.parse.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
 
 	@Nullable
