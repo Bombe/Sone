@@ -12,7 +12,7 @@ class HistogramRenderer : Filter {
 	override fun format(templateContext: TemplateContext, data: Any?, parameters: Map<String, Any?>?): Any? {
 		templateContext["metricName"] = (parameters?.get("name") as String?)?.dotToCamel()?.let { "Page.Metrics.$it.Title" }
 		(data as? Histogram)?.snapshot?.run {
-			templateContext["count"] = size()
+			templateContext["count"] = data.count
 			templateContext["min"] = min
 			templateContext["max"] = max
 			templateContext["mean"] = mean

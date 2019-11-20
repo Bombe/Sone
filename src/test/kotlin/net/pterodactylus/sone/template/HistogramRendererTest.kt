@@ -72,7 +72,7 @@ class HistogramRendererTest {
 	@Test
 	fun `second column contains count`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[1].text(), equalTo("1001"))
+			assertThat(it.getElementsByTag("td")[1].text(), equalTo("2001"))
 		}
 	}
 
@@ -84,7 +84,7 @@ class HistogramRendererTest {
 	@Test
 	fun `third column contains min value`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[2].text(), equalTo("3.4ms"))
+			assertThat(it.getElementsByTag("td")[2].text(), equalTo("2.0ms"))
 		}
 	}
 
@@ -96,7 +96,7 @@ class HistogramRendererTest {
 	@Test
 	fun `fourth column contains max value`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[3].text(), equalTo("998.9ms"))
+			assertThat(it.getElementsByTag("td")[3].text(), equalTo("998.0ms"))
 		}
 	}
 
@@ -108,7 +108,7 @@ class HistogramRendererTest {
 	@Test
 	fun `fifth column contains mean value`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[4].text(), equalTo("503.4ms"))
+			assertThat(it.getElementsByTag("td")[4].text(), equalTo("492.7ms"))
 		}
 	}
 
@@ -120,7 +120,7 @@ class HistogramRendererTest {
 	@Test
 	fun `sixth column contains median value`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[5].text(), equalTo("501.0ms"))
+			assertThat(it.getElementsByTag("td")[5].text(), equalTo("483.6ms"))
 		}
 	}
 
@@ -132,7 +132,7 @@ class HistogramRendererTest {
 	@Test
 	fun `seventh column contains 75th percentile`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[6].text(), equalTo("757.8ms"))
+			assertThat(it.getElementsByTag("td")[6].text(), equalTo("740.9ms"))
 		}
 	}
 
@@ -144,7 +144,7 @@ class HistogramRendererTest {
 	@Test
 	fun `eighth column contains 95th percentile`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[7].text(), equalTo("948.6ms"))
+			assertThat(it.getElementsByTag("td")[7].text(), equalTo("940.9ms"))
 		}
 	}
 
@@ -156,7 +156,7 @@ class HistogramRendererTest {
 	@Test
 	fun `ninth column contains 98th percentile`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[8].text(), equalTo("972.7ms"))
+			assertThat(it.getElementsByTag("td")[8].text(), equalTo("975.6ms"))
 		}
 	}
 
@@ -168,7 +168,7 @@ class HistogramRendererTest {
 	@Test
 	fun `tenth column contains 99th percentile`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[9].text(), equalTo("986.4ms"))
+			assertThat(it.getElementsByTag("td")[9].text(), equalTo("991.6ms"))
 		}
 	}
 
@@ -180,7 +180,7 @@ class HistogramRendererTest {
 	@Test
 	fun `eleventh column contains 99,9th percentile`() {
 		createAndVerifyTableRow {
-			assertThat(it.getElementsByTag("td")[10].text(), equalTo("998.5ms"))
+			assertThat(it.getElementsByTag("td")[10].text(), equalTo("998.0ms"))
 		}
 	}
 
@@ -199,6 +199,6 @@ class HistogramRendererTest {
 }
 
 private val random = Random(1)
-private val histogram = MetricRegistry().histogram("test.histogram").apply {
-	(0..1000).map { random.nextInt(1_000_000) }.forEach(this::update)
+private val histogram = MetricRegistry().histogram("test.histogram") { Histogram(SlidingWindowReservoir(1028)) }.apply {
+	(0..2000).map { random.nextInt(1_000_000) }.forEach(this::update)
 }
