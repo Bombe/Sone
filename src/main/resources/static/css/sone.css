@@ -929,3 +929,7 @@ textarea {
 #sone form#options li {
 	list-style-type: none;
 }
+
+#sone table thead tr {
+	font-weight: bold;
+}
