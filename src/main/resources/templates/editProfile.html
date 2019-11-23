@@ -59,7 +59,7 @@
 						});
 						confirmButton.click(function() {
 							confirmButton.fadeOut("slow");
-							buttonName = confirmButton.attr("name");
+							buttonName = confirmButton.prop("name");
 							fieldId = buttonName.substring("delete-field-".length);
 							deleteProfileField(fieldId);
 							recheckMoveButtons();
@@ -85,10 +85,10 @@
 						fieldNameElement.removeClass("hidden");
 					};
 					confirmButton.click(function() {
-						inputField.attr("disabled", "disabled");
-						confirmButton.attr("disabled", "disabled");
-						cancelButton.attr("disabled", "disabled");
-						editProfileField(confirmButton.parents(".profile-field").attr("id"), inputField.val(), function() {
+						inputField.prop("disabled", "disabled");
+						confirmButton.prop("disabled", "disabled");
+						cancelButton.prop("disabled", "disabled");
+						editProfileField(confirmButton.parents(".profile-field").prop("id"), inputField.val(), function() {
 							fieldNameElement.text(inputField.val());
 							cleanUp(editButton, inputField, confirmButton, cancelButton, fieldNameElement);
 						});
@@ -108,7 +108,7 @@
 						}
 					});
 					editButton.click(function() {
-						editButton.attr("disabled", "disabled");
+						editButton.prop("disabled", "disabled");
 						fieldNameElement.addClass("hidden");
 						inputField.removeAttr("disabled").val(fieldNameElement.text()).removeClass("hidden").focus().select();
 						confirmButton.removeAttr("disabled").removeClass("hidden");
@@ -121,7 +121,7 @@
 			/* ajaxify “move up” and “move down” buttons. */
 			$("#sone .profile-field .move-down-field button").click(function() {
 				profileField = $(this).parents(".profile-field");
-				moveProfileFieldDown(profileField.attr("id"), function() {
+				moveProfileFieldDown(profileField.prop("id"), function() {
 					next = profileField.next();
 					current = profileField.insertAfter(next);
 					recheckMoveButtons();
@@ -130,7 +130,7 @@
 			});
 			$("#sone .profile-field .move-up-field button").click(function() {
 				profileField = $(this).parents(".profile-field");
-				moveProfileFieldUp(profileField.attr("id"), function() {
+				moveProfileFieldUp(profileField.prop("id"), function() {
 					previous = profileField.prev();
 					current = profileField.insertBefore(previous);
 					recheckMoveButtons();
