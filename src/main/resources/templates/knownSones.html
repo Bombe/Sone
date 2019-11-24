@@ -6,7 +6,7 @@
 
 		$(document).ready(function() {
 			$("select[name=sort]").change(function() {
-				value = $(this).val();
+				const value = $(this).val();
 				if ((value === "activity") || (value === "posts") || (value === "images")) {
 					$("select[name=order]").val("desc");
 				} else if (value === "name") {

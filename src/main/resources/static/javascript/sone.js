@@ -22,10 +22,10 @@ function ajaxGet(url, data, successCallback, errorCallback) {
 
 function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, optional, dontUseTextarea) {
 	$(inputElement).each(function() {
-		var textarea = $(dontUseTextarea ? "<input type=\"text\" name=\"" + inputFieldName + "\">" : "<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
+		const textarea = $(dontUseTextarea ? "<input type=\"text\" name=\"" + inputFieldName + "\">" : "<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
 			if ($(this).val() === "") {
 				$(this).hide();
-				var inputField = $(this).data("inputField");
+				const inputField = $(this).data("inputField");
 				inputField.show().removeAttr("disabled").addClass("default");
 				inputField.val(defaultText);
 			}
@@ -68,10 +68,10 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 		return;
 	}
 	(function(postId, author, insertAfterThisElement) {
-		var separator = $("<span> · </span>").addClass("separator");
+		const separator = $("<span> · </span>").addClass("separator");
 		getTranslation("WebInterface.Button.Comment", function(text) {
-			var commentElement = $("<div><span>" + text + "</span></div>").addClass("show-reply-form").click(function() {
-				var replyElement = sone.find(".post#post-" + postId + " .create-reply");
+			const commentElement = $("<div><span>" + text + "</span></div>").addClass("show-reply-form").click(function() {
+				const replyElement = sone.find(".post#post-" + postId + " .create-reply");
 				replyElement.removeClass("hidden");
 				replyElement.removeClass("light");
 				(function(replyElement) {
@@ -83,7 +83,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 						replyElement.removeClass("light");
 					});
 				})(replyElement);
-				var textArea = replyElement.find(":input.reply-input").focus().data("textarea");
+				const textArea = replyElement.find(":input.reply-input").focus().data("textarea");
 				if (author !== getCurrentSoneId()) {
 					textArea.val(textArea.val() + "@sone://" + author + " ");
 				}
@@ -94,7 +94,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 	})(postId, author, insertAfterThisElement);
 }
 
-var translations = {};
+const translations = {};
 
 /**
  * Retrieves the translation for the given key and calls the callback function.
@@ -145,7 +145,7 @@ function filterSoneId(soneId) {
  *            The date and time of the last update (formatted for display)
  */
 function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, lastUpdatedText) {
-    var updateSone = sone.find(".sone." + filterSoneId(soneId));
+	const updateSone = sone.find(".sone." + filterSoneId(soneId));
 	updateSone.toggleClass("unknown", status === "unknown").
 		toggleClass("idle", status === "idle").
 		toggleClass("inserting", status === "inserting").
@@ -175,7 +175,7 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, l
  */
 function enhanceDeleteButton(button, text, deleteCallback) {
 	(function(button) {
-		var newButton = $("<button></button>").addClass("confirm").hide().text(text).click(function() {
+		const newButton = $("<button></button>").addClass("confirm").hide().text(text).click(function() {
 			$(this).fadeOut("slow");
 			deleteCallback();
 			return false;
@@ -647,7 +647,7 @@ function ajaxifySone(soneElement) {
 	 * nicer.
 	 */
 	$(".follow", soneElement).submit(function() {
-		var followElement = this;
+		const followElement = this;
 		ajaxGet("followSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 			$(followElement).addClass("hidden");
 			$(followElement).parent().find(".unfollow").removeClass("hidden");
@@ -655,7 +655,7 @@ function ajaxifySone(soneElement) {
 		return false;
 	});
 	$(".unfollow", soneElement).submit(function() {
-		var unfollowElement = this;
+		const unfollowElement = this;
 		ajaxGet("unfollowSone.ajax", { "sone": getSoneId(this), "formPassword": getFormPassword() }, function() {
 			$(unfollowElement).addClass("hidden");
 			$(unfollowElement).parent().find(".follow").removeClass("hidden");
@@ -663,7 +663,7 @@ function ajaxifySone(soneElement) {
 		return false;
 	});
 	$(".lock", soneElement).submit(function() {
-		var lockElement = this;
+		const lockElement = this;
 		ajaxGet("lockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
 			$(lockElement).addClass("hidden");
 			$(lockElement).parent().find(".unlock").removeClass("hidden");
@@ -671,7 +671,7 @@ function ajaxifySone(soneElement) {
 		return false;
 	});
 	$(".unlock", soneElement).submit(function() {
-		var unlockElement = this;
+		const unlockElement = this;
 		ajaxGet("unlockSone.ajax", { "sone" : getSoneId(this), "formPassword" : getFormPassword() }, function() {
 			$(unlockElement).addClass("hidden");
 			$(unlockElement).parent().find(".lock").removeClass("hidden");
@@ -696,12 +696,12 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
-		var button = $(this);
+		const button = $(this);
 		button.prop("disabled", "disabled");
-		var sender = $(this.form).find(":input[name=sender]").val();
-		var inputField = $(this.form).find(":input[name=text]:enabled").get(0);
-		var postId = getPostId(this);
-		var text = $(inputField).val();
+		const sender = $(this.form).find(":input[name=sender]").val();
+		const inputField = $(this.form).find(":input[name=text]:enabled").get(0);
+		const postId = getPostId(this);
+		const text = $(inputField).val();
 		(function(sender, postId, text, inputField) {
 			postReply(sender, postId, text, function(success, error, replyId, soneId) {
 				if (success) {
@@ -724,7 +724,7 @@ function ajaxifyPost(postElement) {
 	/* replace all “delete” buttons with javascript. */
 	(function(postElement) {
 		getTranslation("WebInterface.Confirmation.DeletePostButton", function(deletePostText) {
-			var postId = getPostId(postElement);
+			const postId = getPostId(postElement);
 			enhanceDeletePostButton($(postElement).find(".delete-post button"), postId, deletePostText);
 		});
 	})(postElement);
@@ -766,8 +766,8 @@ function ajaxifyPost(postElement) {
 	/* convert “show source” link into javascript function. */
 	$(postElement).find(".show-source").each(function() {
 		$("a", this).click(function() {
-			var post = getPostElement(this);
-			var rawPostText = $(".post-text.raw-text", post);
+			const post = getPostElement(this);
+			const rawPostText = $(".post-text.raw-text", post);
 			rawPostText.toggleClass("hidden");
 			if (rawPostText.hasClass("hidden")) {
 				$(".post-text.short-text", post).removeClass("hidden");
@@ -807,7 +807,7 @@ function ajaxifyPost(postElement) {
 	/* ajaxify author/post links */
 	$(".post-status-line .permalink a", postElement).click(function() {
 		if (!$(".create-reply", postElement).hasClass("hidden")) {
-			var textArea = $(":input.reply-input", postElement).focus().data("textarea");
+			const textArea = $(":input.reply-input", postElement).focus().data("textarea");
 			$(textArea).replaceSelection($(this).prop("href"));
 		}
 		return false;
@@ -817,7 +817,7 @@ function ajaxifyPost(postElement) {
 	addCommentLink(getPostId(postElement), getPostAuthor(postElement), postElement, $(postElement).find(".post-status-line .permalink-author"));
 
 	/* process all replies. */
-	var replyIds = [];
+	const replyIds = [];
 	$(postElement).find(".reply").each(function() {
 		replyIds.push(getReplyId(this));
 		ajaxifyReply(this);
@@ -871,9 +871,9 @@ function ajaxifyPost(postElement) {
 		}
 	});
 	(function(postElement) {
-		var soneId = $(".sone-menu-id:first", postElement).text();
+		const soneId = $(".sone-menu-id:first", postElement).text();
 		$(".sone-post-menu .follow", postElement).click(function() {
-			var followElement = this;
+			const followElement = this;
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
@@ -887,7 +887,7 @@ function ajaxifyPost(postElement) {
 			return false;
 		});
 		$(".sone-post-menu .unfollow", postElement).click(function() {
-			var unfollowElement = this;
+			const unfollowElement = this;
 			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
@@ -929,7 +929,7 @@ function ajaxifyReply(replyElement) {
 	/* ajaxify author links */
 	$(".reply-status-line .permalink a", replyElement).click(function() {
 		if (!$(".create-reply", getPostElement(replyElement)).hasClass("hidden")) {
-			var textArea = $(":input.reply-input", getPostElement(replyElement)).focus().data("textarea");
+			const textArea = $(":input.reply-input", getPostElement(replyElement)).focus().data("textarea");
 			$(textArea).replaceSelection($(this).prop("href"));
 		}
 		return false;
@@ -940,8 +940,8 @@ function ajaxifyReply(replyElement) {
 	/* convert “show source” link into javascript function. */
 	$(replyElement).find(".show-reply-source").each(function() {
 		$("a", this).click(function() {
-			var reply = getReplyElement(this);
-			var rawReplyText = $(".reply-text.raw-text", reply);
+			const reply = getReplyElement(this);
+			const rawReplyText = $(".reply-text.raw-text", reply);
 			rawReplyText.toggleClass("hidden");
 			if (rawReplyText.hasClass("hidden")) {
 				$(".reply-text.short-text", reply).removeClass("hidden");
@@ -1010,9 +1010,9 @@ function ajaxifyReply(replyElement) {
 		}
 	});
 	(function(replyElement) {
-		var soneId = $(".sone-menu-id", replyElement).text();
+		const soneId = $(".sone-menu-id", replyElement).text();
 		$(".sone-menu .follow", replyElement).click(function() {
-			var followElement = this;
+			const followElement = this;
 			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
@@ -1026,7 +1026,7 @@ function ajaxifyReply(replyElement) {
 			return false;
 		});
 		$(".sone-menu .unfollow", replyElement).click(function() {
-			var unfollowElement = this;
+			const followElement = this;
 			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
@@ -1058,16 +1058,16 @@ function ajaxifyNotification(notification) {
 		notification.find(".text").addClass("hidden");
 	}
 	notification.find("form.mark-as-read button").click(function() {
-		var allIds = $(":input[name=id]", this.form).val().split(" ");
-		for (var index = 0; index < allIds.length; index += 16) {
-			var ids = allIds.slice(index, index + 16).join(" ");
+		const allIds = $(":input[name=id]", this.form).val().split(" ");
+		for (let index = 0; index < allIds.length; index += 16) {
+			const ids = allIds.slice(index, index + 16).join(" ");
 			ajaxGet("markAsKnown.ajax", {"formPassword": getFormPassword(), "type": $(":input[name=type]", this.form).val(), "id": ids});
 		}
 	});
 	notification.find("a[class^='link-']").each(function() {
-		var linkElement = $(this);
+		const linkElement = $(this);
 		if (linkElement.is("[href^='viewPost']")) {
-			var id = linkElement.prop("class").substr(5);
+			const id = linkElement.prop("class").substr(5);
 			if (hasPost(id)) {
 				linkElement.prop("href", "#post-" + id).addClass("in-page-link");
 			}
@@ -1112,7 +1112,7 @@ function setNotificationHash(notificationHash) {
  * @returns All extracted IDs
  */
 function getElementIds(notification, selector) {
-	var elementIds = [];
+	const elementIds = [];
 	$(selector, notification).each(function() {
 		elementIds.push($(this).text());
 	});
@@ -1132,8 +1132,8 @@ function checkForRemovedSones(oldNotification, newNotification) {
 	if (getNotificationId(oldNotification) !== "new-sone-notification") {
 		return;
 	}
-	var oldIds = getElementIds(oldNotification, ".new-sone-id");
-	var newIds = getElementIds(newNotification, ".new-sone-id");
+	const oldIds = getElementIds(oldNotification, ".new-sone-id");
+	const newIds = getElementIds(newNotification, ".new-sone-id");
 	$.each(oldIds, function(index, value) {
 		if ($.inArray(value, newIds) === -1) {
 			markSoneAsKnown(getSone(value), true);
@@ -1154,8 +1154,8 @@ function checkForRemovedPosts(oldNotification, newNotification) {
 	if (getNotificationId(oldNotification) !== "new-post-notification") {
 		return;
 	}
-	var oldIds = getElementIds(oldNotification, ".post-id");
-	var newIds = getElementIds(newNotification, ".post-id");
+	const oldIds = getElementIds(oldNotification, ".post-id");
+	const newIds = getElementIds(newNotification, ".post-id");
 	$.each(oldIds, function(index, value) {
 		if ($.inArray(value, newIds) === -1) {
 			markPostAsKnown(getPost(value), true);
@@ -1177,8 +1177,8 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 	if (getNotificationId(oldNotification) !== "new-reply-notification") {
 		return;
 	}
-	var oldIds = getElementIds(oldNotification, ".reply-id");
-	var newIds = getElementIds(newNotification, ".reply-id");
+	const oldIds = getElementIds(oldNotification, ".reply-id");
+	const newIds = getElementIds(newNotification, ".reply-id");
 	$.each(oldIds, function(index, value) {
 		if ($.inArray(value, newIds) === -1) {
 			markReplyAsKnown(getReply(value), true);
@@ -1187,7 +1187,7 @@ function checkForRemovedReplies(oldNotification, newNotification) {
 }
 
 function getStatus() {
-	var parameters = isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {};
+	const parameters = isViewSonePage() ? {"soneIds": getShownSoneId()} : isKnownSonesPage() ? {"soneIds": getShownSoneIds()} : {};
 	$.extend(parameters, {
 		"elements": JSON.stringify($(".linked-element.not-loaded").map(function () {
 			return $(this).prop("title");
@@ -1235,8 +1235,8 @@ function requestNotifications() {
 		if (data && data.success) {
 			/* search for removed notifications. */
 			sone.find("#notification-area .notification").each(function() {
-				var notificationId = $(this).prop("id");
-				var foundNotification = false;
+				const notificationId = $(this).prop("id");
+				let foundNotification = false;
 				$.each(data.notifications, function(index, value) {
 					if (value.id === notificationId) {
 						foundNotification = true;
@@ -1246,17 +1246,17 @@ function requestNotifications() {
 				if (!foundNotification) {
 					if (notificationId === "new-sone-notification" && (data.options["ShowNotification/NewSones"] === true)) {
 						$(".new-sone-id", this).each(function() {
-							var soneId = $(this).text();
+							const soneId = $(this).text();
 							markSoneAsKnown(getSone(soneId), true);
 						});
 					} else if (notificationId === "new-post-notification" && (data.options["ShowNotification/NewPosts"] === true)) {
 						$(".post-id", this).each(function() {
-							var postId = $(this).text();
+							const postId = $(this).text();
 							markPostAsKnown(getPost(postId), true);
 						});
 					} else if (notificationId === "new-reply-notification" && (data.options["ShowNotification/NewReplies"] === true)) {
 						$(".reply-id", this).each(function() {
-							var replyId = $(this).text();
+							const replyId = $(this).text();
 							markReplyAsKnown(getReply(replyId), true);
 						});
 					}
@@ -1271,11 +1271,11 @@ function requestNotifications() {
 			});
 			/* process notifications. */
 			$.each(data.notifications, function(index, value) {
-				var oldNotification = getNotification(value.id);
-				var notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
+				const oldNotification = getNotification(value.id);
+				const notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
 				if (oldNotification.length !== 0) {
 					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
-						var opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
+						const opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
 						notification.find(".short-text").toggleClass("hidden", opened);
 						notification.find(".text").toggleClass("hidden", !opened);
 					}
@@ -1334,7 +1334,7 @@ function isIndexPage() {
  * @returns The current page of the pagination
  */
 function getPage(paginationSelector) {
-	var pagination = $(paginationSelector);
+	const pagination = $(paginationSelector);
 	if (pagination.length > 0) {
 		return $(".current-page", paginationSelector).text();
 	}
@@ -1368,7 +1368,7 @@ function getShownSoneId() {
  * @returns The ID of the currently shown Sones
  */
 function getShownSoneIds() {
-	var soneIds = [];
+	const soneIds = [];
 	sone.find("#known-sones .sone .id").each(function() {
 		soneIds.push($(this).text());
 	});
@@ -1451,14 +1451,14 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() === data.post.sone) || (getShownSoneId() === data.post.recipient) || (getPage(".post-navigation") > 1)))) {
 				return;
 			}
-			var firstOlderPost = null;
+			let firstOlderPost = null;
 			sone.find(".post").each(function() {
 				if (getPostTime(this) < data.post.time) {
 					firstOlderPost = $(this);
 					return false;
 				}
 			});
-			var newPost = $(data.post.html).addClass("hidden");
+			const newPost = $(data.post.html).addClass("hidden");
 			if ($(".post-author-local", newPost).text() === "true") {
 				newPost.removeClass("new");
 			}
@@ -1487,14 +1487,14 @@ function loadNewReply(replyId, soneId, postId) {
 				return;
 			}
 			sone.find(".post#post-" + data.reply.postId).each(function() {
-				var firstNewerReply = null;
+				let firstNewerReply = null;
 				$(this).find(".replies .reply").each(function() {
 					if (getReplyTime(this) > data.reply.time) {
 						firstNewerReply = $(this);
 						return false;
 					}
 				});
-				var newReply = $(data.reply.html).addClass("hidden");
+				const newReply = $(data.reply.html).addClass("hidden");
 				if ($(".reply-author-local", newReply).text() === "true") {
 					newReply.removeClass("new");
 					(function(newReply) {
@@ -1523,7 +1523,7 @@ function loadNewReply(replyId, soneId, postId) {
 }
 
 function loadLinkedElements(links) {
-	var failedElements = links.filter(function(element) {
+	const failedElements = links.filter(function(element) {
 		return element.failed;
 	});
 	if (failedElements.length > 0) {
@@ -1533,7 +1533,7 @@ function loadLinkedElements(links) {
 			});
 		});
 	}
-	var loadedElements = links.filter(function(element) {
+	const loadedElements = links.filter(function(element) {
 		return !element.loading && !element.failed;
 	});
 	if (loadedElements.length > 0) {
@@ -1578,7 +1578,7 @@ function markSoneAsKnown(soneElement, skipRequest) {
 
 function markPostAsKnown(postElements, skipRequest) {
 	$(postElements).each(function() {
-		var postElement = this;
+		const postElement = this;
 		if ($(postElement).hasClass("new") || ((typeof skipRequest != "undefined"))) {
 			(function(postElement) {
 				$(postElement).removeClass("new");
@@ -1595,7 +1595,7 @@ function markPostAsKnown(postElements, skipRequest) {
 
 function markReplyAsKnown(replyElements, skipRequest) {
 	$(replyElements).each(function() {
-		var replyElement = this;
+		const replyElement = this;
 		if ($(replyElement).hasClass("new") || ((typeof skipRequest != "undefined"))) {
 			(function(replyElement) {
 				$(replyElement).removeClass("new");
@@ -1690,7 +1690,7 @@ function updateReplyTimes(replyIds) {
 }
 
 function resetActivity() {
-	var title = document.title;
+	const title = document.title;
 	if (title.indexOf('(') === 0) {
 		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
@@ -1699,7 +1699,7 @@ function resetActivity() {
 
 function setActivity() {
 	if (!focus) {
-		var title = document.title;
+		const title = document.title;
 		if (title.indexOf('(') !== 0) {
 			setTitle("(!) " + title);
 		}
@@ -1723,10 +1723,10 @@ function setTitle(title) {
 }
 
 /** Whether the icon is currently showing activity. */
-var iconActive = false;
+let iconActive = false;
 
 /** Whether the icon is currently supposed to blink. */
-var iconBlinking = false;
+let iconBlinking = false;
 
 /**
  * Toggles the icon. If the window has gained focus and the icon is still
@@ -1770,9 +1770,9 @@ function changeIcon(iconUrl) {
  *            user
  */
 function createNotification(id, lastUpdatedTime, text, dismissable) {
-	var notification = $("<div></div>").addClass("notification").prop("id", id).prop("lastUpdatedTime", lastUpdatedTime);
+	const notification = $("<div></div>").addClass("notification").prop("id", id).prop("lastUpdatedTime", lastUpdatedTime);
 	if (dismissable) {
-		var dismissForm = sone.find("#notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id");
+		const dismissForm = sone.find("#notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id");
 		dismissForm.find("input[name=notification]").val(id);
 		notification.append(dismissForm);
 	}
@@ -1865,7 +1865,7 @@ function moveProfileFieldDown(fieldId, successFunction) {
 	moveProfileField(fieldId, "down", successFunction);
 }
 
-var statusRequestQueued = true;
+let statusRequestQueued = true;
 
 /**
  * Sets the status of the web interface as offline.
@@ -1908,24 +1908,24 @@ function showOfflineMarker(visible) {
 // EVERYTHING BELOW HERE IS EXECUTED AFTER LOADING THE PAGE
 //
 
-var sone = $("#sone");
-var focus = true;
-var online = true;
-var initiallyLoggedIn = sone.find("#loggedIn").text() === "true";
-var notLoggedIn = !initiallyLoggedIn;
+const sone = $("#sone");
+let focus = true;
+let online = true;
+const initiallyLoggedIn = sone.find("#loggedIn").text() === "true";
+let notLoggedIn = !initiallyLoggedIn;
 
 /** ID of the next-to-show Sone context menu. */
-var currentSoneMenuId;
+let currentSoneMenuId;
 
 /** Timeout handler for the next-to-show Sone context menu. */
-var currentSoneMenuTimeoutHandler;
+let currentSoneMenuTimeoutHandler;
 
 $(document).ready(function() {
 
 	/* rip out the status update textarea. */
 	sone.find(".rip-out").each(function() {
-		var oldElement = $(this);
-		var newElement = $("<input type='text'/>");
+		const oldElement = $(this);
+		const newElement = $("<input type='text'/>");
 		newElement.prop("class", oldElement.prop("class")).prop("name", oldElement.prop("name"));
 		oldElement.before(newElement).remove();
 	});
@@ -1941,13 +1941,13 @@ $(document).ready(function() {
 			return false;
 		});
 		sone.find("#update-status").submit(function() {
-			var button = $("button:submit", this);
+			const button = $("button:submit", this);
 			button.prop("disabled", "disabled");
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
-			var sender = $(this).find(":input[name=sender]").val();
-			var text = $(this).find(":input[name=text]:enabled").val();
+			const sender = $(this).find(":input[name=sender]").val();
+			const text = $(this).find(":input[name=text]:enabled").val();
 			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function() {
 				button.removeAttr("disabled");
 			});
@@ -1975,8 +1975,8 @@ $(document).ready(function() {
 			return false;
 		});
 		sone.find("#post-message").submit(function() {
-			var sender = $(this).find(":input[name=sender]").val();
-			var text = $(this).find(":input[name=text]:enabled").val();
+			const sender = $(this).find(":input[name=sender]").val();
+			const text = $(this).find(":input[name=text]:enabled").val();
 			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "recipient": getShownSoneId(), "sender": sender, "text": text });
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
 			$(this).find(":input[name=text]:enabled").val("").blur();
@@ -2001,7 +2001,7 @@ $(document).ready(function() {
 	});
 
 	/* update post times. */
-	var postIds = [];
+	const postIds = [];
 	sone.find(".post").each(function() {
 		postIds.push(getPostId(this));
 	});
@@ -2011,14 +2011,14 @@ $(document).ready(function() {
 	if (!isViewPostPage()) {
 		getTranslation("WebInterface.ClickToShow.Replies", function(text) {
 			sone.find(".post .replies").each(function() {
-				var allReplies = $(this).find(".reply");
+				const allReplies = $(this).find(".reply");
 				if (allReplies.length > 2) {
-					var newHidden = false;
-					for (var replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
+					let newHidden = false;
+					for (let replyIndex = 0; replyIndex < (allReplies.length - 2); ++replyIndex) {
 						$(allReplies[replyIndex]).addClass("hidden");
 						newHidden |= $(allReplies[replyIndex]).hasClass("new");
 					}
-					var clickToShowElement = $("<div></div>").addClass("click-to-show");
+					const clickToShowElement = $("<div></div>").addClass("click-to-show");
 					if (newHidden) {
 						clickToShowElement.addClass("new");
 					}

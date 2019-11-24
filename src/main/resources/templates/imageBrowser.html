@@ -21,7 +21,7 @@
 		}
 
 		/* ID of the image currently being edited. */
-		var editingImageId = null;
+		let editingImageId = null;
 
 		/**
 		 * Shows the form for editing an image.
@@ -74,10 +74,10 @@
 		 * @param destinationId The ID of the destionation image
 		 */
 		function swapImage(sourceId, destinationId) {
-			sourceElement = getImage(sourceId);
-			destinationElement = getImage(destinationId);
-			sourceParent = sourceElement.closest(".image-row");
-			sourcePrevSibling = sourceElement.prev();
+			const sourceElement = getImage(sourceId);
+			const destinationElement = getImage(destinationId);
+			const sourceParent = sourceElement.closest(".image-row");
+			const sourcePrevSibling = sourceElement.prev();
 			sourceElement.detach();
 			destinationElement.before(sourceElement);
 			if (sourcePrevSibling.get(0) !== destinationElement.get(0)) {
@@ -99,7 +99,7 @@
 		 */
 		function prepareImages() {
 			$(".image").each(function() {
-				imageId = $(this).closest(".image").find(".image-id").text();
+				const imageId = $(this).closest(".image").find(".image-id").text();
 				(function(element, imageId) {
 					$(".show-data", element).click(function() {
 						editImage(imageId);
@@ -113,12 +113,12 @@
 						return false;
 					});
 					$("button[name='submit']", element).click(function() {
-						title = $(":input[name='title']:enabled", this.form).val();
-						description = $(":input[name='description']:enabled", this.form).val();
+						const title = $(":input[name='title']:enabled", this.form).val();
+						const description = $(":input[name='description']:enabled", this.form).val();
 						ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "title": title, "description": description }, function(data) {
-                            var imageElement = getImage(data.imageId);
-                            var imageTitleInput = imageElement.find(":input[name='title']");
-                            var imageDescriptionInput = imageElement.find(":input[name='description']");
+							const imageElement = getImage(data.imageId);
+							const imageTitleInput = imageElement.find(":input[name='title']");
+							const imageDescriptionInput = imageElement.find(":input[name='description']");
                             if (data && data.success) {
 								imageElement.find(".image-title").text(data.title);
 								imageElement.find(".image-description").html(data.parsedDescription);
@@ -138,7 +138,7 @@
 		}
 
 		/* ID of the album currently being edited. */
-		var editingAlbumId = null;
+		let editingAlbumId = null;
 
 		/**
 		 * Shows the form for editing an album.
@@ -196,10 +196,10 @@
 		 * @param destinationId The ID of the destionation album
 		 */
 		function swapAlbum(sourceId, destinationId) {
-			sourceElement = getAlbum(sourceId);
-			destinationElement = getAlbum(destinationId);
-			sourceParent = sourceElement.closest(".album-row");
-			sourcePrevSibling = sourceElement.prev();
+			const sourceElement = getAlbum(sourceId);
+			const destinationElement = getAlbum(destinationId);
+			const sourceParent = sourceElement.closest(".album-row");
+			const sourcePrevSibling = sourceElement.prev();
 			sourceElement.detach();
 			destinationElement.before(sourceElement);
 			if (sourcePrevSibling.get(0) !== destinationElement.get(0)) {
@@ -221,7 +221,7 @@
 		 */
 		function prepareAlbums() {
 			$(".album").each(function() {
-				albumId = $(this).closest(".album").find(".album-id").text();
+				const albumId = $(this).closest(".album").find(".album-id").text();
 				(function(element, albumId) {
 					$(".show-data", element).click(function() {
 						console.log("show-data");
@@ -236,12 +236,12 @@
 						return false;
 					});
 					$("button[name='submit']", element).click(function() {
-						title = $(":input[name='title']:enabled", this.form).val();
-						description = $(":input[name='description']:enabled", this.form).val();
+						const title = $(":input[name='title']:enabled", this.form).val();
+						const description = $(":input[name='description']:enabled", this.form).val();
 						ajaxGet("editAlbum.ajax", { "formPassword": getFormPassword(), "album": albumId, "title": title, "description": description }, function(data) {
 							if (data) {
-                                var albumTitleField = getAlbum(data.albumId).find(".album-title");
-                                var albumDescriptionField = getAlbum(data.albumId).find(".album-description");
+								const albumTitleField = getAlbum(data.albumId).find(".album-title");
+								const albumDescriptionField = getAlbum(data.albumId).find(".album-description");
                                 if (data.success) {
                                     albumTitleField.text(data.title);
                                     albumDescriptionField.text(data.description);

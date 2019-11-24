@@ -41,7 +41,7 @@
 			/* ajaxify the delete buttons. */
 			getTranslation("Page.EditProfile.Fields.Button.ReallyDelete", function(reallyDeleteText) {
 				$("#sone #edit-profile .delete-field-name button").each(function() {
-					confirmButton = $(this).clone().addClass("hidden").addClass("confirm").text(reallyDeleteText).insertAfter(this);
+					const confirmButton = $(this).clone().addClass("hidden").addClass("confirm").text(reallyDeleteText).insertAfter(this);
 					(function(deleteButton, confirmButton) {
 						deleteButton.click(function() {
 							deleteButton.fadeOut("slow", function() {
@@ -59,8 +59,8 @@
 						});
 						confirmButton.click(function() {
 							confirmButton.fadeOut("slow");
-							buttonName = confirmButton.prop("name");
-							fieldId = buttonName.substring("delete-field-".length);
+							const buttonName = confirmButton.prop("name");
+							const fieldId = buttonName.substring("delete-field-".length);
 							deleteProfileField(fieldId);
 							recheckMoveButtons();
 							return false;
@@ -71,13 +71,13 @@
 
 			/* ajaxify the edit button. */
 			$("#sone #edit-profile .edit-field-name button").each(function() {
-				profileField = $(this).parents(".profile-field");
-				fieldNameElement = profileField.find(".name");
-				inputField = $("input[type=text].short", profileField);
-				confirmButton = $("button.confirm", profileField);
-				cancelButton = $("button.cancel", profileField);
+				const profileField = $(this).parents(".profile-field");
+				const fieldNameElement = profileField.find(".name");
+				const inputField = $("input[type=text].short", profileField);
+				const confirmButton = $("button.confirm", profileField);
+				const cancelButton = $("button.cancel", profileField);
 				(function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
-					cleanUp = function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
+					const cleanUp = function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
 						editButton.removeAttr("disabled");
 						inputField.addClass("hidden");
 						confirmButton.addClass("hidden");
@@ -120,19 +120,17 @@
 
 			/* ajaxify “move up” and “move down” buttons. */
 			$("#sone .profile-field .move-down-field button").click(function() {
-				profileField = $(this).parents(".profile-field");
+				const profileField = $(this).parents(".profile-field");
 				moveProfileFieldDown(profileField.prop("id"), function() {
-					next = profileField.next();
-					current = profileField.insertAfter(next);
+					profileField.insertAfter(profileField.next());
 					recheckMoveButtons();
 				});
 				return false;
 			});
 			$("#sone .profile-field .move-up-field button").click(function() {
-				profileField = $(this).parents(".profile-field");
+				const profileField = $(this).parents(".profile-field");
 				moveProfileFieldUp(profileField.prop("id"), function() {
-					previous = profileField.prev();
-					current = profileField.insertBefore(previous);
+					profileField.insertBefore(profileField.prev());
 					recheckMoveButtons();
 				});
 				return false;
