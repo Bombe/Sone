@@ -297,21 +297,14 @@ function getMenuSone(element) {
 
 /**
  * Generates a list of Sones by concatening the names of the given sones with a
- * new line character (“\n”).
+ * comma.
  *
  * @param sones
  *            The sones to format
  * @returns {String} The created string
  */
 function generateSoneList(sones) {
-	var soneList = "";
-	$.each(sones, function() {
-		if (soneList != "") {
-			soneList += ", ";
-		}
-		soneList += this.name;
-	});
-	return soneList;
+	return sones.reduce((soneList, sone) => soneList + ", " + sone.name, "").substring(2)
 }
 
 /**
