@@ -29,7 +29,7 @@
 		 * @param imageId The ID of the image to edit.
 		 */
 		function editImage(imageId) {
-			if (editingImageId != imageId) {
+			if (editingImageId !== imageId) {
 				cancelImageEditing();
 			} else {
 				return;
@@ -38,7 +38,7 @@
 			$(".show-data", getImage(imageId)).hide();
 			$(".edit-data", getImage(imageId)).show();
 			$(document).bind("click.sone", function(event) {
-				if ($(event.target).closest("#image-" + imageId).size() == 0) {
+				if ($(event.target).closest("#image-" + imageId).size() === 0) {
 					cancelImageEditing();
 				}
 			});
@@ -80,15 +80,15 @@
 			sourcePrevSibling = sourceElement.prev();
 			sourceElement.detach();
 			destinationElement.before(sourceElement);
-			if (sourcePrevSibling.get(0) != destinationElement.get(0)) {
+			if (sourcePrevSibling.get(0) !== destinationElement.get(0)) {
 				destinationElement.detach();
 				(sourcePrevSibling.size() > 0) ? sourcePrevSibling.after(destinationElement) : sourceParent.prepend(destinationElement);
 			}
-			if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") != $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
+			if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") !== $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
 				$("button[name='moveLeft']", sourceElement).toggleClass("hidden");
 				$("button[name='moveLeft']", destinationElement).toggleClass("hidden");
 			}
-			if ($("button[name='moveRight']", sourceElement).hasClass("hidden") != $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
+			if ($("button[name='moveRight']", sourceElement).hasClass("hidden") !== $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
 				$("button[name='moveRight']", sourceElement).toggleClass("hidden");
 				$("button[name='moveRight']", destinationElement).toggleClass("hidden");
 			}
@@ -105,7 +105,7 @@
 						editImage(imageId);
 					});
 					$("button[name='moveLeft'], button[name='moveRight']", element).click(function() {
-						ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "moveLeft": this.name == "moveLeft", "moveRight": this.name == "moveRight" }, function(data) {
+						ajaxGet("editImage.ajax", { "formPassword": getFormPassword(), "image": imageId, "moveLeft": this.name === "moveLeft", "moveRight": this.name === "moveRight" }, function(data) {
 							if (data && data.success) {
 								swapImage(data.sourceImageId, data.destinationImageId);
 							}
@@ -146,7 +146,7 @@
 		 * @param albumId The ID of the album to edit.
 		 */
 		function editAlbum(albumId) {
-			if (editingAlbumId != albumId) {
+			if (editingAlbumId !== albumId) {
 				if (editingAlbumId != null) {
 					cancelAlbumEditing();
 				}
@@ -159,7 +159,7 @@
 			$(".edit-data", getAlbum(albumId)).show();
 			console.log(getAlbum(albumId));
 			$(document).bind("click.sone", function(event) {
-				if ($(event.target).closest("#album-" + albumId).size() == 0) {
+				if ($(event.target).closest("#album-" + albumId).size() === 0) {
 					cancelAlbumEditing();
 				}
 			});
@@ -202,15 +202,15 @@
 			sourcePrevSibling = sourceElement.prev();
 			sourceElement.detach();
 			destinationElement.before(sourceElement);
-			if (sourcePrevSibling.get(0) != destinationElement.get(0)) {
+			if (sourcePrevSibling.get(0) !== destinationElement.get(0)) {
 				destinationElement.detach();
 				(sourcePrevSibling.size() > 0) ? sourcePrevSibling.after(destinationElement) : sourceParent.prepend(destinationElement);
 			}
-			if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") != $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
+			if ($("button[name='moveLeft']", sourceElement).hasClass("hidden") !== $("button[name='moveLeft']", destinationElement).hasClass("hidden")) {
 				$("button[name='moveLeft']", sourceElement).toggleClass("hidden");
 				$("button[name='moveLeft']", destinationElement).toggleClass("hidden");
 			}
-			if ($("button[name='moveRight']", sourceElement).hasClass("hidden") != $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
+			if ($("button[name='moveRight']", sourceElement).hasClass("hidden") !== $("button[name='moveRight']", destinationElement).hasClass("hidden")) {
 				$("button[name='moveRight']", sourceElement).toggleClass("hidden");
 				$("button[name='moveRight']", destinationElement).toggleClass("hidden");
 			}
@@ -228,7 +228,7 @@
 						editAlbum(albumId);
 					});
 					$("button[name='moveLeft'], button[name='moveRight']", element).click(function() {
-						ajaxGet("editAlbum.ajax", { "formPassword": getFormPassword(), "album": albumId, "moveLeft": this.name == "moveLeft", "moveRight": this.name == "moveRight" }, function(data) {
+						ajaxGet("editAlbum.ajax", { "formPassword": getFormPassword(), "album": albumId, "moveLeft": this.name === "moveLeft", "moveRight": this.name === "moveRight" }, function(data) {
 							if (data && data.success) {
 								swapAlbum(data.sourceAlbumId, data.destinationAlbumId);
 							}

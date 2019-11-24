@@ -8,7 +8,7 @@ function ajaxGet(url, data, successCallback, errorCallback) {
 				successCallback(data, textStatus);
 			}
 		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
-			if (xmlHttpRequest.status == 403) {
+			if (xmlHttpRequest.status === 403) {
 				notLoggedIn = true;
 			}
 			if (typeof errorCallback != "undefined") {
@@ -23,7 +23,7 @@ function ajaxGet(url, data, successCallback, errorCallback) {
 function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, optional, dontUseTextarea) {
 	$(inputElement).each(function() {
 		var textarea = $(dontUseTextarea ? "<input type=\"text\" name=\"" + inputFieldName + "\">" : "<textarea name=\"" + inputFieldName + "\"></textarea>").blur(function() {
-			if ($(this).val() == "") {
+			if ($(this).val() === "") {
 				$(this).hide();
 				var inputField = $(this).data("inputField");
 				inputField.show().removeAttr("disabled").addClass("default");
@@ -37,7 +37,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 				/* no, show(), “display: block” is not what I need. */
 				textarea.prop("style", "display: inline").focus();
 			});
-			if (inputField.val() == "") {
+			if (inputField.val() === "") {
 				inputField.addClass("default");
 				inputField.val(defaultText);
 			} else {
@@ -46,7 +46,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 			}
 			$(inputField.get(0).form).submit(function() {
 				inputField.prop("disabled", "disabled");
-				if (!optional && (textarea.val() == "")) {
+				if (!optional && (textarea.val() === "")) {
 					inputField.removeAttr("disabled").focus();
 					return false;
 				}
@@ -64,7 +64,7 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
  *            The element to add a “comment” link to
  */
 function addCommentLink(postId, author, element, insertAfterThisElement) {
-	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length == 0)) {
+	if (($(element).find(".show-reply-form").length > 0) || (getPostElement(element).find(".create-reply").length === 0)) {
 		return;
 	}
 	(function(postId, author, insertAfterThisElement) {
@@ -84,7 +84,7 @@ function addCommentLink(postId, author, element, insertAfterThisElement) {
 					});
 				})(replyElement);
 				var textArea = replyElement.find(":input.reply-input").focus().data("textarea");
-				if (author != getCurrentSoneId()) {
+				if (author !== getCurrentSoneId()) {
 					textArea.val(textArea.val() + "@sone://" + author + " ");
 				}
 			});
@@ -146,10 +146,10 @@ function filterSoneId(soneId) {
  */
 function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, lastUpdatedText) {
     var updateSone = sone.find(".sone." + filterSoneId(soneId));
-	updateSone.toggleClass("unknown", status == "unknown").
-		toggleClass("idle", status == "idle").
-		toggleClass("inserting", status == "inserting").
-		toggleClass("downloading", status == "downloading").
+	updateSone.toggleClass("unknown", status === "unknown").
+		toggleClass("idle", status === "idle").
+		toggleClass("inserting", status === "inserting").
+		toggleClass("downloading", status === "downloading").
 		toggleClass("modified", modified);
 	updateSone.find(".lock").toggleClass("hidden", locked);
 	updateSone.find(".unlock").toggleClass("hidden", !locked);
@@ -185,7 +185,7 @@ function enhanceDeleteButton(button, text, deleteCallback) {
 				button.fadeOut("slow", function() {
 					newButton.fadeIn("slow");
 					$(document).one("click", function() {
-						if (this != newButton.get(0)) {
+						if (this !== newButton.get(0)) {
 							newButton.fadeOut(function() {
 								button.fadeIn();
 							});
@@ -216,12 +216,12 @@ function enhanceDeletePostButton(button, postId, text) {
 			}
 			if (data.success) {
 				sone.find(".post#post-" + postId).slideUp();
-			} else if (data.error == "invalid-post-id") {
+			} else if (data.error === "invalid-post-id") {
 				/* pretend the post is already gone. */
 				getPost(postId).slideUp();
-			} else if (data.error == "auth-required") {
+			} else if (data.error === "auth-required") {
 				alert("You need to be logged in.");
-			} else if (data.error == "not-authorized") {
+			} else if (data.error === "not-authorized") {
 				alert("You are not allowed to delete this post.");
 			}
 		}, function(xmlHttpRequest, textStatus, error) {
@@ -248,12 +248,12 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 			}
 			if (data.success) {
 				sone.find(".reply#reply-" + replyId).slideUp();
-			} else if (data.error == "invalid-reply-id") {
+			} else if (data.error === "invalid-reply-id") {
 				/* pretend the reply is already gone. */
 				getReply(replyId).slideUp();
-			} else if (data.error == "auth-required") {
+			} else if (data.error === "auth-required") {
 				alert("You need to be logged in.");
-			} else if (data.error == "not-authorized") {
+			} else if (data.error === "not-authorized") {
 				alert("You are not allowed to delete this reply.");
 			}
 		}, function(xmlHttpRequest, textStatus, error) {
@@ -275,7 +275,7 @@ function getFormPassword() {
  */
 function getSone(soneId) {
 	return sone.find(".sone").filter(function(index) {
-		return $(".id", this).text() == soneId;
+		return $(".id", this).text() === soneId;
 	});
 }
 
@@ -466,7 +466,7 @@ function unlikePost(postId) {
 function updatePostLikes(postId) {
 	ajaxGet("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
+			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes === 0);
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes > span").prop("title", generateSoneList(data.sones));
 		}
@@ -554,14 +554,14 @@ function untrustSone(soneId) {
  */
 function updateTrustControls(soneId, trustValue) {
 	sone.find(".post").each(function() {
-		if (getPostAuthor(this) == soneId) {
+		if (getPostAuthor(this) === soneId) {
 			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
 			getPostElement(this).find(".post-distrust").toggleClass("hidden", trustValue != null);
 			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
 		}
 	});
 	sone.find(".reply").each(function() {
-		if (getReplyAuthor(this) == soneId) {
+		if (getReplyAuthor(this) === soneId) {
 			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
 			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", trustValue != null);
 			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
@@ -604,7 +604,7 @@ function unbookmarkPost(postId) {
 function updateReplyLikes(replyId) {
 	ajaxGet("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
 		if ((data != null) && data.success) {
-			sone.find(".reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
+			sone.find(".reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes === 0);
 			sone.find(".reply#reply-" + replyId + " .status-line .likes span.like-count").text(data.likes);
 			sone.find(".reply#reply-" + replyId + " .status-line .likes > span").prop("title", generateSoneList(data.sones));
 		}
@@ -862,7 +862,7 @@ function ajaxifyPost(postElement) {
 
 	/* show Sone menu when hovering over the avatar. */
 	$(postElement).find(".post-avatar").mouseover(function() {
-		if (typeof currentSoneMenuTimeoutHandler != undefined) {
+		if (typeof currentSoneMenuTimeoutHandler !== undefined) {
 			clearTimeout(currentSoneMenuTimeoutHandler);
 		}
 		currentSoneMenuId = getPostId(this);
@@ -873,7 +873,7 @@ function ajaxifyPost(postElement) {
 			}).fadeIn();
 		}, 1000);
 	}).mouseleave(function() {
-		if (currentSoneMenuId == getPostId(this)) {
+		if (currentSoneMenuId === getPostId(this)) {
 			clearTimeout(currentSoneMenuTimeoutHandler);
 		}
 	});
@@ -885,7 +885,7 @@ function ajaxifyPost(postElement) {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
 				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) == soneId) {
+					if (getMenuSone(this) === soneId) {
 						$(".follow", this).toggleClass("hidden", true);
 						$(".unfollow", this).toggleClass("hidden", false);
 					}
@@ -899,7 +899,7 @@ function ajaxifyPost(postElement) {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
 				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) == soneId) {
+					if (getMenuSone(this) === soneId) {
 						$(".follow", this).toggleClass("hidden", false);
 						$(".unfollow", this).toggleClass("hidden", true);
 					}
@@ -1001,7 +1001,7 @@ function ajaxifyReply(replyElement) {
 
 	/* show Sone menu when hovering over the avatar. */
 	$(replyElement).find(".reply-avatar").mouseover(function() {
-		if (typeof currentSoneMenuTimeoutHandler != undefined) {
+		if (typeof currentSoneMenuTimeoutHandler !== undefined) {
 			clearTimeout(currentSoneMenuTimeoutHandler);
 		}
 		currentSoneMenuId = getPostId(this) + "-" + getReplyId(this);
@@ -1012,7 +1012,7 @@ function ajaxifyReply(replyElement) {
 			}).fadeIn();
 		}, 1000);
 	}).mouseleave(function() {
-		if (currentSoneMenuId == getPostId(this) + "-" + getReplyId(this)) {
+		if (currentSoneMenuId === getPostId(this) + "-" + getReplyId(this)) {
 			clearTimeout(currentSoneMenuTimeoutHandler);
 		}
 	});
@@ -1024,7 +1024,7 @@ function ajaxifyReply(replyElement) {
 				$(followElement).addClass("hidden");
 				$(followElement).parent().find(".unfollow").removeClass("hidden");
 				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) == soneId) {
+					if (getMenuSone(this) === soneId) {
 						$(".follow", this).toggleClass("hidden", true);
 						$(".unfollow", this).toggleClass("hidden", false);
 					}
@@ -1038,7 +1038,7 @@ function ajaxifyReply(replyElement) {
 				$(unfollowElement).addClass("hidden");
 				$(unfollowElement).parent().find(".follow").removeClass("hidden");
 				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) == soneId) {
+					if (getMenuSone(this) === soneId) {
 						$(".follow", this).toggleClass("hidden", false);
 						$(".unfollow", this).toggleClass("hidden", true);
 					}
@@ -1136,13 +1136,13 @@ function getElementIds(notification, selector) {
  *            The new notification element
  */
 function checkForRemovedSones(oldNotification, newNotification) {
-	if (getNotificationId(oldNotification) != "new-sone-notification") {
+	if (getNotificationId(oldNotification) !== "new-sone-notification") {
 		return;
 	}
 	var oldIds = getElementIds(oldNotification, ".new-sone-id");
 	var newIds = getElementIds(newNotification, ".new-sone-id");
 	$.each(oldIds, function(index, value) {
-		if ($.inArray(value, newIds) == -1) {
+		if ($.inArray(value, newIds) === -1) {
 			markSoneAsKnown(getSone(value), true);
 		}
 	});
@@ -1158,13 +1158,13 @@ function checkForRemovedSones(oldNotification, newNotification) {
  *            The new notification element
  */
 function checkForRemovedPosts(oldNotification, newNotification) {
-	if (getNotificationId(oldNotification) != "new-post-notification") {
+	if (getNotificationId(oldNotification) !== "new-post-notification") {
 		return;
 	}
 	var oldIds = getElementIds(oldNotification, ".post-id");
 	var newIds = getElementIds(newNotification, ".post-id");
 	$.each(oldIds, function(index, value) {
-		if ($.inArray(value, newIds) == -1) {
+		if ($.inArray(value, newIds) === -1) {
 			markPostAsKnown(getPost(value), true);
 		}
 	});
@@ -1181,13 +1181,13 @@ function checkForRemovedPosts(oldNotification, newNotification) {
  *            The new notification element
  */
 function checkForRemovedReplies(oldNotification, newNotification) {
-	if (getNotificationId(oldNotification) != "new-reply-notification") {
+	if (getNotificationId(oldNotification) !== "new-reply-notification") {
 		return;
 	}
 	var oldIds = getElementIds(oldNotification, ".reply-id");
 	var newIds = getElementIds(newNotification, ".reply-id");
 	$.each(oldIds, function(index, value) {
-		if ($.inArray(value, newIds) == -1) {
+		if ($.inArray(value, newIds) === -1) {
 			markReplyAsKnown(getReply(value), true);
 		}
 	});
@@ -1210,7 +1210,7 @@ function getStatus() {
 			if (!notLoggedIn) {
 				showOfflineMarker(!online);
 			}
-			if (data.notificationHash != getNotificationHash()) {
+			if (data.notificationHash !== getNotificationHash()) {
 				console.log("Old hash: ", getNotificationHash(), ", new hash: ", data.notificationHash);
 				requestNotifications();
 				/* process new posts. */
@@ -1245,23 +1245,23 @@ function requestNotifications() {
 				var notificationId = $(this).prop("id");
 				var foundNotification = false;
 				$.each(data.notifications, function(index, value) {
-					if (value.id == notificationId) {
+					if (value.id === notificationId) {
 						foundNotification = true;
 						return false;
 					}
 				});
 				if (!foundNotification) {
-					if (notificationId == "new-sone-notification" && (data.options["ShowNotification/NewSones"] == true)) {
+					if (notificationId === "new-sone-notification" && (data.options["ShowNotification/NewSones"] === true)) {
 						$(".new-sone-id", this).each(function(index, element) {
 							var soneId = $(this).text();
 							markSoneAsKnown(getSone(soneId), true);
 						});
-					} else if (notificationId == "new-post-notification" && (data.options["ShowNotification/NewPosts"] == true)) {
+					} else if (notificationId === "new-post-notification" && (data.options["ShowNotification/NewPosts"] === true)) {
 						$(".post-id", this).each(function(index, element) {
 							var postId = $(this).text();
 							markPostAsKnown(getPost(postId), true);
 						});
-					} else if (notificationId == "new-reply-notification" && (data.options["ShowNotification/NewReplies"] == true)) {
+					} else if (notificationId === "new-reply-notification" && (data.options["ShowNotification/NewReplies"] === true)) {
 						$(".reply-id", this).each(function(index, element) {
 							var replyId = $(this).text();
 							markReplyAsKnown(getReply(replyId), true);
@@ -1270,7 +1270,7 @@ function requestNotifications() {
 					$(this).slideUp("normal", function() {
 						$(this).remove();
 						/* remove activity when no notifications are visible. */
-						if (sone.find("#notification-area .notification").length == 0) {
+						if (sone.find("#notification-area .notification").length === 0) {
 							resetActivity();
 						}
 					});
@@ -1280,7 +1280,7 @@ function requestNotifications() {
 			$.each(data.notifications, function(index, value) {
 				var oldNotification = getNotification(value.id);
 				var notification = ajaxifyNotification(createNotification(value.id, value.lastUpdatedTime, value.text, value.dismissable)).hide();
-				if (oldNotification.length != 0) {
+				if (oldNotification.length !== 0) {
 					if ((oldNotification.find(".short-text").length > 0) && (notification.find(".short-text").length > 0)) {
 						var opened = oldNotification.is(":visible") && oldNotification.find(".short-text").hasClass("hidden");
 						notification.find(".short-text").toggleClass("hidden", opened);
@@ -1292,7 +1292,7 @@ function requestNotifications() {
 					oldNotification.replaceWith(notification.show());
 				} else {
 					sone.find("#notification-area").append(notification);
-					if (value.id.substring(0, 5) != "local") {
+					if (value.id.substring(0, 5) !== "local") {
 						notification.slideDown();
 						setActivity();
 					}
@@ -1329,7 +1329,7 @@ function getPageId() {
  *          <code>false</code> otherwise
  */
 function isIndexPage() {
-	return getPageId() == "index";
+	return getPageId() === "index";
 }
 
 /**
@@ -1355,7 +1355,7 @@ function getPage(paginationSelector) {
  *          page, <code>false</code> otherwise
  */
 function isViewSonePage() {
-	return getPageId() == "view-sone";
+	return getPageId() === "view-sone";
 }
 
 /**
@@ -1389,7 +1389,7 @@ function getShownSoneIds() {
  *          page, <code>false</code> otherwise
  */
 function isViewPostPage() {
-	return getPageId() == "view-post";
+	return getPageId() === "view-post";
 }
 
 /**
@@ -1409,7 +1409,7 @@ function getShownPostId() {
  *          Sones” page, <code>false</code> otherwise
  */
 function isKnownSonesPage() {
-	return getPageId() == "known-sones";
+	return getPageId() === "known-sones";
 }
 
 /**
@@ -1441,8 +1441,8 @@ function loadNewPost(postId, soneId, recipientId, time) {
 		return;
 	}
 	if (!isIndexPage() || (getPage(".pagination-index") > 1)) {
-		if (!isViewPostPage() || (getShownPostId() != postId)) {
-			if (!isViewSonePage() || ((getShownSoneId() != soneId) && (getShownSoneId() != recipientId)) || (getPage(".post-navigation") > 1)) {
+		if (!isViewPostPage() || (getShownPostId() !== postId)) {
+			if (!isViewSonePage() || ((getShownSoneId() !== soneId) && (getShownSoneId() !== recipientId)) || (getPage(".post-navigation") > 1)) {
 				return;
 			}
 		}
@@ -1455,7 +1455,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 			if (hasPost(data.post.id)) {
 				return;
 			}
-			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() == data.post.sone) || (getShownSoneId() == data.post.recipient) || (getPage(".post-navigation") > 1)))) {
+			if ((!isIndexPage() || (getPage(".pagination-index") > 1)) && !(isViewSonePage() && ((getShownSoneId() === data.post.sone) || (getShownSoneId() === data.post.recipient) || (getPage(".post-navigation") > 1)))) {
 				return;
 			}
 			var firstOlderPost = null;
@@ -1466,7 +1466,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 				}
 			});
 			var newPost = $(data.post.html).addClass("hidden");
-			if ($(".post-author-local", newPost).text() == "true") {
+			if ($(".post-author-local", newPost).text() === "true") {
 				newPost.removeClass("new");
 			}
 			if (firstOlderPost != null) {
@@ -1502,7 +1502,7 @@ function loadNewReply(replyId, soneId, postId, postSoneId) {
 					}
 				});
 				var newReply = $(data.reply.html).addClass("hidden");
-				if ($(".reply-author-local", newReply).text() == "true") {
+				if ($(".reply-author-local", newReply).text() === "true") {
 					newReply.removeClass("new");
 					(function(newReply) {
 						setTimeout(function() {
@@ -1646,7 +1646,7 @@ function updatePostTime(postId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updatePostTimes(postIds) {
-	if (postIds != "") {
+	if (postIds !== "") {
         ajaxGet("getTimes.ajax", {"posts": postIds}, function (data, textStatus) {
             if ((data != null) && data.success) {
                 $.each(data.postTimes, function (index, value) {
@@ -1685,7 +1685,7 @@ function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
  *            Comma-separated post IDs
  */
 function updateReplyTimes(replyIds) {
-	if (replyIds != "") {
+	if (replyIds !== "") {
         ajaxGet("getTimes.ajax", {"replies": replyIds}, function (data, textStatus) {
             if ((data != null) && data.success) {
                 $.each(data.replyTimes, function (index, value) {
@@ -1698,7 +1698,7 @@ function updateReplyTimes(replyIds) {
 
 function resetActivity() {
 	var title = document.title;
-	if (title.indexOf('(') == 0) {
+	if (title.indexOf('(') === 0) {
 		setTitle(title.substr(title.indexOf(' ') + 1));
 	}
 	iconBlinking = false;
@@ -1707,7 +1707,7 @@ function resetActivity() {
 function setActivity() {
 	if (!focus) {
 		var title = document.title;
-		if (title.indexOf('(') != 0) {
+		if (title.indexOf('(') !== 0) {
 			setTitle("(!) " + title);
 		}
 		if (!iconBlinking) {
@@ -1918,7 +1918,7 @@ function showOfflineMarker(visible) {
 var sone = $("#sone");
 var focus = true;
 var online = true;
-var initiallyLoggedIn = sone.find("#loggedIn").text() == "true";
+var initiallyLoggedIn = sone.find("#loggedIn").text() === "true";
 var notLoggedIn = !initiallyLoggedIn;
 
 /** ID of the next-to-show Sone context menu. */

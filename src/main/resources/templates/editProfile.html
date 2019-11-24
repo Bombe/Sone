@@ -3,8 +3,8 @@
 	<script language="javascript">
 		function recheckMoveButtons() {
 			$("#sone .profile-field").each(function() {
-				$(".move-up-field", this).toggleClass("hidden", $(this).prev(".profile-field").length == 0);
-				$(".move-down-field", this).toggleClass("hidden", $(this).next(".profile-field").length == 0);
+				$(".move-up-field", this).toggleClass("hidden", $(this).prev(".profile-field").length === 0);
+				$(".move-down-field", this).toggleClass("hidden", $(this).next(".profile-field").length === 0);
 			});
 		}
 
@@ -47,7 +47,7 @@
 							deleteButton.fadeOut("slow", function() {
 								confirmButton.fadeIn("slow");
 								$(document).one("click", function() {
-									if (this != confirmButton.get(0)) {
+									if (this !== confirmButton.get(0)) {
 										confirmButton.fadeOut("slow", function() {
 											deleteButton.fadeIn("slow");
 										});
@@ -99,10 +99,10 @@
 						return false;
 					});
 					inputField.keypress(function(event) {
-						if (event.which == 13) {
+						if (event.which === 13) {
 							confirmButton.click();
 							return false;
-						} else if (event.which == 27) {
+						} else if (event.which === 27) {
 							cancelButton.click();
 							return false;
 						}
