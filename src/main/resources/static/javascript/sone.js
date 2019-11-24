@@ -1273,7 +1273,7 @@ function getCurrentSoneId() {
 /**
  * Returns the content of the page-id attribute.
  *
- * @returns The page ID
+ * @returns String The page ID
  */
 function getPageId() {
 	return sone.find(".page-id").text();
@@ -1617,7 +1617,7 @@ function updatePostTimes(postIds) {
 /**
  * Updates the time of the reply with the given ID.
  *
- * @param postId
+ * @param replyId
  *            The ID of the reply to update
  * @param timeText
  *            The text of the time to show
@@ -1638,7 +1638,7 @@ function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
 /**
  * Requests new rendered times for the posts with the given IDs.
  *
- * @param postIds
+ * @param replyIds
  *            Comma-separated post IDs
  */
 function updateReplyTimes(replyIds) {
