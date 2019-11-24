@@ -2,7 +2,7 @@
 
 	<div class="page-id hidden">image-browser</div>
 
-	<script language="javascript">
+	<script type="application/javascript">
 
 		/* hide all those forms. */
 		function hideAndShowBlock(blockElement, clickToShowElement, clickToHideElement) {
@@ -275,7 +275,7 @@
 		<%else>
 
 			<%if album.sone.local>
-				<script language="javascript">
+				<script type="application/javascript">
 
 					$(function() {
 						getTranslation("WebInterface.DefaultText.UploadImage.Title", function(text) {
@@ -473,7 +473,7 @@
 		<%else>
 
 			<%if image.sone.local>
-				<script language="javascript">
+				<script type="application/javascript">
 					$(function() {
 						getTranslation("WebInterface.DefaultText.EditImage.Title", function(text) {
 							$("#edit-image input[name='title']").each(function() {
@@ -547,7 +547,7 @@
 	<%elseif soneRequested>
 
 		<%if sone.local>
-			<script language="javascript">
+			<script type="application/javascript">
 				$(function() {
 					getTranslation("WebInterface.DefaultText.CreateAlbum.Name", function(text) {
 						$("#create-album input[name='name']").each(function() {
