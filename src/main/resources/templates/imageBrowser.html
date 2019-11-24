@@ -122,12 +122,12 @@
                             if (data && data.success) {
 								imageElement.find(".image-title").text(data.title);
 								imageElement.find(".image-description").html(data.parsedDescription);
-								imageTitleInput.attr("defaultValue", data.title);
-								imageDescriptionInput.attr("defaultValue", data.description);
+								imageTitleInput.prop("defaultValue", data.title);
+								imageDescriptionInput.prop("defaultValue", data.description);
 								cancelImageEditing();
 							} else if (data && !data.success) {
-								imageTitleInput.attr("value", imageTitleInput.attr("defaultValue"));
-                                imageDescriptionInput.attr("value", imageDescriptionInput.attr("defaultValue"));
+								imageTitleInput.prop("value", imageTitleInput.prop("defaultValue"));
+                                imageDescriptionInput.prop("value", imageDescriptionInput.prop("defaultValue"));
                                 cancelImageEditing();
                             }
 						});
@@ -245,11 +245,11 @@
                                 if (data.success) {
                                     albumTitleField.text(data.title);
                                     albumDescriptionField.text(data.description);
-                                    getAlbum(data.albumId).find(":input[name='title']").attr("defaultValue", title);
-                                    getAlbum(data.albumId).find(":input[name='description']").attr("defaultValue", description);
+                                    getAlbum(data.albumId).find(":input[name='title']").prop("defaultValue", title);
+                                    getAlbum(data.albumId).find(":input[name='description']").prop("defaultValue", description);
                                 } else {
-                                    albumTitleField.attr("value", albumTitleField.attr("defaultValue"));
-                                    albumDescriptionField.attr("value", albumDescriptionField.attr("defaultValue"));
+                                    albumTitleField.prop("value", albumTitleField.prop("defaultValue"));
+                                    albumDescriptionField.prop("value", albumDescriptionField.prop("defaultValue"));
                                 }
                                 cancelAlbumEditing();
                             }

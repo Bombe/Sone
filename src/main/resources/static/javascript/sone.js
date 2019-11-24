@@ -33,19 +33,19 @@ function registerInputTextareaSwap(inputElement, defaultText, inputFieldName, op
 		$(this).data("textarea", textarea).after(textarea);
 		(function(inputField, textarea) {
 			inputField.focus(function() {
-				$(this).hide().attr("disabled", "disabled");
+				$(this).hide().prop("disabled", "disabled");
 				/* no, show(), “display: block” is not what I need. */
-				textarea.attr("style", "display: inline").focus();
+				textarea.prop("style", "display: inline").focus();
 			});
 			if (inputField.val() == "") {
 				inputField.addClass("default");
 				inputField.val(defaultText);
 			} else {
-				inputField.hide().attr("disabled", "disabled");
+				inputField.hide().prop("disabled", "disabled");
 				textarea.show();
 			}
 			$(inputField.get(0).form).submit(function() {
-				inputField.attr("disabled", "disabled");
+				inputField.prop("disabled", "disabled");
 				if (!optional && (textarea.val() == "")) {
 					inputField.removeAttr("disabled").focus();
 					return false;
@@ -154,7 +154,7 @@ function updateSoneStatus(soneId, name, status, modified, locked, lastUpdated, l
 	updateSone.find(".lock").toggleClass("hidden", locked);
 	updateSone.find(".unlock").toggleClass("hidden", !locked);
 	if (lastUpdated != null) {
-		updateSone.find(".last-update span.time").attr("title", lastUpdated).text(lastUpdatedText);
+		updateSone.find(".last-update span.time").prop("title", lastUpdated).text(lastUpdatedText);
 	} else {
 		getTranslation("View.Sone.Text.UnknownDate", function(unknown) {
 			updateSone.find(".last-update span.time").text(unknown);
@@ -341,7 +341,7 @@ function getPostElement(element) {
 }
 
 function getPostId(element) {
-	return getPostElement(element).attr("id").substr(5);
+	return getPostElement(element).prop("id").substr(5);
 }
 
 function getPostTime(element) {
@@ -375,7 +375,7 @@ function getReplyElement(element) {
 }
 
 function getReplyId(element) {
-	return getReplyElement(element).attr("id").substr(6);
+	return getReplyElement(element).prop("id").substr(6);
 }
 
 function getReplyTime(element) {
@@ -423,7 +423,7 @@ function getNotificationElement(element) {
  * @returns The ID of the notification
  */
 function getNotificationId(notificationElement) {
-	return $(notificationElement).attr("id");
+	return $(notificationElement).prop("id");
 }
 
 /**
@@ -434,7 +434,7 @@ function getNotificationId(notificationElement) {
  * @returns The last update time of the notification
  */
 function getNotificationLastUpdatedTime(notificationElement) {
-	return $(notificationElement).attr("lastUpdatedTime");
+	return $(notificationElement).prop("lastUpdatedTime");
 }
 
 function likePost(postId) {
@@ -468,7 +468,7 @@ function updatePostLikes(postId) {
 		if ((data != null) && data.success) {
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes == 0);
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
-			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes > span").prop("title", generateSoneList(data.sones));
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -606,7 +606,7 @@ function updateReplyLikes(replyId) {
 		if ((data != null) && data.success) {
 			sone.find(".reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes == 0);
 			sone.find(".reply#reply-" + replyId + " .status-line .likes span.like-count").text(data.likes);
-			sone.find(".reply#reply-" + replyId + " .status-line .likes > span").attr("title", generateSoneList(data.sones));
+			sone.find(".reply#reply-" + replyId + " .status-line .likes > span").prop("title", generateSoneList(data.sones));
 		}
 	}, function(xmlHttpRequest, textStatus, error) {
 		/* ignore error. */
@@ -704,7 +704,7 @@ function ajaxifyPost(postElement) {
 	});
 	$(postElement).find(".create-reply button:submit").click(function() {
 		var button = $(this);
-		button.attr("disabled", "disabled");
+		button.prop("disabled", "disabled");
 		var sender = $(this.form).find(":input[name=sender]").val();
 		var inputField = $(this.form).find(":input[name=text]:enabled").get(0);
 		var postId = getPostId(this);
@@ -815,7 +815,7 @@ function ajaxifyPost(postElement) {
 	$(".post-status-line .permalink a", postElement).click(function() {
 		if (!$(".create-reply", postElement).hasClass("hidden")) {
 			var textArea = $(":input.reply-input", postElement).focus().data("textarea");
-			$(textArea).replaceSelection($(this).attr("href"));
+			$(textArea).replaceSelection($(this).prop("href"));
 		}
 		return false;
 	});
@@ -937,7 +937,7 @@ function ajaxifyReply(replyElement) {
 	$(".reply-status-line .permalink a", replyElement).click(function() {
 		if (!$(".create-reply", getPostElement(replyElement)).hasClass("hidden")) {
 			var textArea = $(":input.reply-input", getPostElement(replyElement)).focus().data("textarea");
-			$(textArea).replaceSelection($(this).attr("href"));
+			$(textArea).replaceSelection($(this).prop("href"));
 		}
 		return false;
 	});
@@ -1074,14 +1074,14 @@ function ajaxifyNotification(notification) {
 	notification.find("a[class^='link-']").each(function() {
 		var linkElement = $(this);
 		if (linkElement.is("[href^='viewPost']")) {
-			var id = linkElement.attr("class").substr(5);
+			var id = linkElement.prop("class").substr(5);
 			if (hasPost(id)) {
-				linkElement.attr("href", "#post-" + id).addClass("in-page-link");
+				linkElement.prop("href", "#post-" + id).addClass("in-page-link");
 			}
 		}
 	});
 	notification.find("form.dismiss button").click(function() {
-		ajaxGet("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.attr("id") }, function(data, textStatus) {
+		ajaxGet("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.prop("id") }, function(data, textStatus) {
 			/* dismiss in case of error, too. */
 			notification.slideUp();
 		}, function(xmlHttpRequest, textStatus, error) {
@@ -1197,7 +1197,7 @@ function getStatus() {
 	var parameters = isViewSonePage() ? {"soneIds": getShownSoneId() } : isKnownSonesPage() ? {"soneIds": getShownSoneIds() } : {};
 	$.extend(parameters, {
 		"elements": JSON.stringify($(".linked-element.not-loaded").map(function () {
-			return $(this).attr("title");
+			return $(this).prop("title");
 		}).toArray())
 	});
 	ajaxGet("getStatus.ajax", parameters, function(data, textStatus) {
@@ -1242,7 +1242,7 @@ function requestNotifications() {
 		if (data && data.success) {
 			/* search for removed notifications. */
 			sone.find("#notification-area .notification").each(function() {
-				var notificationId = $(this).attr("id");
+				var notificationId = $(this).prop("id");
 				var foundNotification = false;
 				$.each(data.notifications, function(index, value) {
 					if (value.id == notificationId) {
@@ -1631,7 +1631,7 @@ function updatePostTime(postId, timeText, refreshTime, tooltip) {
 	if (!getPost(postId).is(":visible")) {
 		return;
 	}
-	getPost(postId).find(".post-status-line > .time a").html(timeText).attr("title", tooltip);
+	getPost(postId).find(".post-status-line > .time a").html(timeText).prop("title", tooltip);
 	(function(postId, refreshTime) {
 		setTimeout(function() {
 			updatePostTimes(postId);
@@ -1670,7 +1670,7 @@ function updatePostTimes(postIds) {
  *            The tooltip to show
  */
 function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
-	getReply(replyId).find(".reply-status-line > .time").html(timeText).attr("title", tooltip);
+	getReply(replyId).find(".reply-status-line > .time").html(timeText).prop("title", tooltip);
 	(function(replyId, refreshTime) {
 		setTimeout(function() {
 			updateReplyTimes(replyId);
@@ -1761,7 +1761,7 @@ function toggleIcon() {
  */
 function changeIcon(iconUrl) {
 	$("link[rel=icon]").remove();
-	$("head").append($("<link>").attr("rel", "icon").attr("type", "image/png").attr("href", iconUrl));
+	$("head").append($("<link>").prop("rel", "icon").prop("type", "image/png").prop("href", iconUrl));
 	$("iframe[id=icon-update]")[0].src += "";
 }
 
@@ -1777,7 +1777,7 @@ function changeIcon(iconUrl) {
  *            user
  */
 function createNotification(id, lastUpdatedTime, text, dismissable) {
-	var notification = $("<div></div>").addClass("notification").attr("id", id).attr("lastUpdatedTime", lastUpdatedTime);
+	var notification = $("<div></div>").addClass("notification").prop("id", id).prop("lastUpdatedTime", lastUpdatedTime);
 	if (dismissable) {
 		var dismissForm = sone.find("#notification-area #notification-dismiss-template").clone().removeClass("hidden").removeAttr("id");
 		dismissForm.find("input[name=notification]").val(id);
@@ -1933,7 +1933,7 @@ $(document).ready(function() {
 	sone.find(".rip-out").each(function() {
 		var oldElement = $(this);
 		var newElement = $("<input type='text'/>");
-		newElement.attr("class", oldElement.attr("class")).attr("name", oldElement.attr("name"));
+		newElement.prop("class", oldElement.prop("class")).prop("name", oldElement.prop("name"));
 		oldElement.before(newElement).remove();
 	});
 
@@ -1949,7 +1949,7 @@ $(document).ready(function() {
 		});
 		sone.find("#update-status").submit(function() {
 			var button = $("button:submit", this);
-			button.attr("disabled", "disabled");
+			button.prop("disabled", "disabled");
 			if ($(this).find(":input.default:enabled").length > 0) {
 				return false;
 			}
