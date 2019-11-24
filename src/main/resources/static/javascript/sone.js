@@ -685,6 +685,36 @@ function ajaxifySone(soneElement) {
 	});
 }
 
+const followSone = function(soneId) {
+	const followElement = this;
+	ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
+		$(followElement).addClass("hidden");
+		$(followElement).parent().find(".unfollow").removeClass("hidden");
+		sone.find(".sone-menu").each(function() {
+			if (getMenuSone(this) === soneId) {
+				$(".follow", this).toggleClass("hidden", true);
+				$(".unfollow", this).toggleClass("hidden", false);
+			}
+		});
+	});
+	return false;
+};
+
+const unfollowSone = function (soneId) {
+	const unfollowElement = this;
+	ajaxGet("unfollowSone.ajax", {"sone": soneId, "formPassword": getFormPassword()}, function () {
+		$(unfollowElement).addClass("hidden");
+		$(unfollowElement).parent().find(".follow").removeClass("hidden");
+		sone.find(".sone-menu").each(function () {
+			if (getMenuSone(this) === soneId) {
+				$(".follow", this).toggleClass("hidden", false);
+				$(".unfollow", this).toggleClass("hidden", true);
+			}
+		});
+	});
+	return false;
+};
+
 /**
  * Ajaxifies the given post by enhancing all eligible elements with AJAX.
  *
@@ -785,7 +815,7 @@ function ajaxifyPost(postElement) {
 	});
 
 	/* convert “show more” link into javascript function. */
-	$(postElement).find(".expand-post-text").each(function() {
+	const toggleShowMore = function() {
 		$(this).click(function() {
 			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
 			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
@@ -793,16 +823,9 @@ function ajaxifyPost(postElement) {
 			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
 			return false;
 		});
-	});
-	$(postElement).find(".shrink-post-text").each(function() {
-		$(this).click(function() {
-			$(".post-text.text", getPostElement(this)).toggleClass("hidden");
-			$(".post-text.short-text", getPostElement(this)).toggleClass("hidden");
-			$(".expand-post-text", getPostElement(this)).toggleClass("hidden");
-			$(".shrink-post-text", getPostElement(this)).toggleClass("hidden");
-			return false;
-		});
-	});
+	};
+	$(postElement).find(".expand-post-text").each(toggleShowMore);
+	$(postElement).find(".shrink-post-text").each(toggleShowMore);
 
 	/* ajaxify author/post links */
 	$(".post-status-line .permalink a", postElement).click(function() {
@@ -872,34 +895,8 @@ function ajaxifyPost(postElement) {
 	});
 	(function(postElement) {
 		const soneId = $(".sone-menu-id:first", postElement).text();
-		$(".sone-post-menu .follow", postElement).click(function() {
-			const followElement = this;
-			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
-				$(followElement).addClass("hidden");
-				$(followElement).parent().find(".unfollow").removeClass("hidden");
-				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) === soneId) {
-						$(".follow", this).toggleClass("hidden", true);
-						$(".unfollow", this).toggleClass("hidden", false);
-					}
-				});
-			});
-			return false;
-		});
-		$(".sone-post-menu .unfollow", postElement).click(function() {
-			const unfollowElement = this;
-			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
-				$(unfollowElement).addClass("hidden");
-				$(unfollowElement).parent().find(".follow").removeClass("hidden");
-				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) === soneId) {
-						$(".follow", this).toggleClass("hidden", false);
-						$(".unfollow", this).toggleClass("hidden", true);
-					}
-				});
-			});
-			return false;
-		});
+		$(".sone-post-menu .follow", postElement).click(followSone(soneId));
+		$(".sone-post-menu .unfollow", postElement).click(unfollowSone(soneId));
 	})(postElement);
 }
 
@@ -959,7 +956,7 @@ function ajaxifyReply(replyElement) {
 	});
 
 	/* convert “show more” link into javascript function. */
-	$(replyElement).find(".expand-reply-text").each(function() {
+	const toggleShowMore = function() {
 		$(this).click(function() {
 			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
 			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
@@ -967,16 +964,9 @@ function ajaxifyReply(replyElement) {
 			$(".shrink-reply-text", getReplyElement(this)).toggleClass("hidden");
 			return false;
 		});
-	});
-	$(replyElement).find(".shrink-reply-text").each(function() {
-		$(this).click(function() {
-			$(".reply-text.text", getReplyElement(this)).toggleClass("hidden");
-			$(".reply-text.short-text", getReplyElement(this)).toggleClass("hidden");
-			$(".expand-reply-text", getReplyElement(this)).toggleClass("hidden");
-			$(".shrink-reply-text", getReplyElement(this)).toggleClass("hidden");
-			return false;
-		});
-	});
+	};
+	$(replyElement).find(".expand-reply-text").each(toggleShowMore);
+	$(replyElement).find(".shrink-reply-text").each(toggleShowMore);
 
 	/* convert trust control buttons to javascript functions. */
 	$(replyElement).find(".reply-trust").submit(function() {
@@ -1011,34 +1001,8 @@ function ajaxifyReply(replyElement) {
 	});
 	(function(replyElement) {
 		const soneId = $(".sone-menu-id", replyElement).text();
-		$(".sone-menu .follow", replyElement).click(function() {
-			const followElement = this;
-			ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
-				$(followElement).addClass("hidden");
-				$(followElement).parent().find(".unfollow").removeClass("hidden");
-				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) === soneId) {
-						$(".follow", this).toggleClass("hidden", true);
-						$(".unfollow", this).toggleClass("hidden", false);
-					}
-				});
-			});
-			return false;
-		});
-		$(".sone-menu .unfollow", replyElement).click(function() {
-			const followElement = this;
-			ajaxGet("unfollowSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
-				$(unfollowElement).addClass("hidden");
-				$(unfollowElement).parent().find(".follow").removeClass("hidden");
-				sone.find(".sone-menu").each(function() {
-					if (getMenuSone(this) === soneId) {
-						$(".follow", this).toggleClass("hidden", false);
-						$(".unfollow", this).toggleClass("hidden", true);
-					}
-				});
-			});
-			return false;
-		});
+		$(".sone-menu .follow", replyElement).click(followSone(soneId));
+		$(".sone-menu .unfollow", replyElement).click(unfollowSone(soneId));
 	})(replyElement);
 }
 
