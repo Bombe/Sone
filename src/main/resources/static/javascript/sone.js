@@ -304,7 +304,7 @@ function getMenuSone(element) {
  * @returns {String} The created string
  */
 function generateSoneList(sones) {
-	return sones.reduce((soneList, sone) => soneList + ", " + sone.name, "").substring(2)
+	return sones.map(sone => sone.name).join(", ")
 }
 
 /**
