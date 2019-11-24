@@ -2,12 +2,12 @@
 
 function ajaxGet(url, data, successCallback, errorCallback) {
 	(function(url, data, successCallback, errorCallback) {
-		$.ajax({"cache": false, "type": "GET", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus, xmlHttpRequest) {
+		$.ajax({"cache": false, "type": "GET", "url": url, "data": data, "dataType": "json", "success": function(data, textStatus) {
 			ajaxSuccess();
 			if (typeof successCallback != "undefined") {
 				successCallback(data, textStatus);
 			}
-		}, "error": function(xmlHttpRequest, textStatus, errorThrown) {
+		}, "error": function(xmlHttpRequest) {
 			if (xmlHttpRequest.status === 403) {
 				notLoggedIn = true;
 			}
@@ -110,7 +110,7 @@ function getTranslation(key, callback) {
 		callback(translations[key]);
 		return;
 	}
-	ajaxGet("getTranslation.ajax", {"key": key}, function(data, textStatus) {
+	ajaxGet("getTranslation.ajax", {"key": key}, function(data) {
 		if ((data != null) && data.success) {
 			translations[key] = data.value;
 			callback(data.value);
@@ -210,7 +210,7 @@ function enhanceDeleteButton(button, text, deleteCallback) {
  */
 function enhanceDeletePostButton(button, postId, text) {
 	enhanceDeleteButton(button, text, function() {
-		ajaxGet("deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+		ajaxGet("deletePost.ajax", { "post": postId, "formPassword": getFormPassword() }, function(data) {
 			if (data == null) {
 				return;
 			}
@@ -224,7 +224,7 @@ function enhanceDeletePostButton(button, postId, text) {
 			} else if (data.error === "not-authorized") {
 				alert("You are not allowed to delete this post.");
 			}
-		}, function(xmlHttpRequest, textStatus, error) {
+		}, function() {
 			/* ignore error. */
 		});
 	});
@@ -242,7 +242,7 @@ function enhanceDeletePostButton(button, postId, text) {
  */
 function enhanceDeleteReplyButton(button, replyId, text) {
 	enhanceDeleteButton(button, text, function() {
-		ajaxGet("deleteReply.ajax", { "reply": replyId, "formPassword": sone.find("#formPassword").text() }, function(data, textStatus) {
+		ajaxGet("deleteReply.ajax", { "reply": replyId, "formPassword": sone.find("#formPassword").text() }, function(data) {
 			if (data == null) {
 				return;
 			}
@@ -256,7 +256,7 @@ function enhanceDeleteReplyButton(button, replyId, text) {
 			} else if (data.error === "not-authorized") {
 				alert("You are not allowed to delete this reply.");
 			}
-		}, function(xmlHttpRequest, textStatus, error) {
+		}, function() {
 			/* ignore error. */
 		});
 	});
@@ -274,7 +274,7 @@ function getFormPassword() {
  * @returns All Sone elements with the given ID
  */
 function getSone(soneId) {
-	return sone.find(".sone").filter(function(index) {
+	return sone.find(".sone").filter(function() {
 		return $(".id", this).text() === soneId;
 	});
 }
@@ -438,65 +438,65 @@ function getNotificationLastUpdatedTime(notificationElement) {
 }
 
 function likePost(postId) {
-	ajaxGet("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("like.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data) {
 		if ((data == null) || !data.success) {
 			return;
 		}
 		sone.find(".post#post-" + postId + " > .inner-part > .status-line .like").addClass("hidden");
 		sone.find(".post#post-" + postId + " > .inner-part > .status-line .unlike").removeClass("hidden");
 		updatePostLikes(postId);
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
 
 function unlikePost(postId) {
-	ajaxGet("unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("unlike.ajax", { "type": "post", "post" : postId, "formPassword": getFormPassword() }, function(data) {
 		if ((data == null) || !data.success) {
 			return;
 		}
 		sone.find(".post#post-" + postId + " > .inner-part > .status-line .unlike").addClass("hidden");
 		sone.find(".post#post-" + postId + " > .inner-part > .status-line .like").removeClass("hidden");
 		updatePostLikes(postId);
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
 
 function updatePostLikes(postId) {
-	ajaxGet("getLikes.ajax", { "type": "post", "post": postId }, function(data, textStatus) {
+	ajaxGet("getLikes.ajax", { "type": "post", "post": postId }, function(data) {
 		if ((data != null) && data.success) {
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes").toggleClass("hidden", data.likes === 0);
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes span.like-count").text(data.likes);
 			sone.find(".post#post-" + postId + " > .inner-part > .status-line .likes > span").prop("title", generateSoneList(data.sones));
 		}
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
 
 function likeReply(replyId) {
-	ajaxGet("like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("like.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data) {
 		if ((data == null) || !data.success) {
 			return;
 		}
 		sone.find(".reply#reply-" + replyId + " .status-line .like").addClass("hidden");
 		sone.find(".reply#reply-" + replyId + " .status-line .unlike").removeClass("hidden");
 		updateReplyLikes(replyId);
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
 
 function unlikeReply(replyId) {
-	ajaxGet("unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data, textStatus) {
+	ajaxGet("unlike.ajax", { "type": "reply", "reply" : replyId, "formPassword": getFormPassword() }, function(data) {
 		if ((data == null) || !data.success) {
 			return;
 		}
 		sone.find(".reply#reply-" + replyId + " .status-line .unlike").addClass("hidden");
 		sone.find(".reply#reply-" + replyId + " .status-line .like").removeClass("hidden");
 		updateReplyLikes(replyId);
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
@@ -508,7 +508,7 @@ function unlikeReply(replyId) {
  *            The ID of the Sone to trust
  */
 function trustSone(soneId) {
-	ajaxGet("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+	ajaxGet("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data) {
 		if ((data != null) && data.success) {
 			updateTrustControls(soneId, data.trustValue);
 		}
@@ -522,7 +522,7 @@ function trustSone(soneId) {
  *            The ID of the Sone to distrust
  */
 function distrustSone(soneId) {
-	ajaxGet("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+	ajaxGet("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data) {
 		if ((data != null) && data.success) {
 			updateTrustControls(soneId, data.trustValue);
 		}
@@ -536,7 +536,7 @@ function distrustSone(soneId) {
  *            The ID of the Sone to untrust
  */
 function untrustSone(soneId) {
-	ajaxGet("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data, textStatus) {
+	ajaxGet("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data) {
 		if ((data != null) && data.success) {
 			updateTrustControls(soneId, data.trustValue);
 		}
@@ -577,7 +577,7 @@ function updateTrustControls(soneId, trustValue) {
  */
 function bookmarkPost(postId) {
 	(function(postId) {
-		ajaxGet("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+		ajaxGet("bookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data) {
 			if ((data != null) && data.success) {
 				getPost(postId).find(".bookmark").toggleClass("hidden", true);
 				getPost(postId).find(".unbookmark").toggleClass("hidden", false);
@@ -593,7 +593,7 @@ function bookmarkPost(postId) {
  *            The ID of the post to unbookmark
  */
 function unbookmarkPost(postId) {
-	ajaxGet("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data, textStatus) {
+	ajaxGet("unbookmark.ajax", {"formPassword": getFormPassword(), "type": "post", "post": postId}, function(data) {
 		if ((data != null) && data.success) {
 			getPost(postId).find(".bookmark").toggleClass("hidden", false);
 			getPost(postId).find(".unbookmark").toggleClass("hidden", true);
@@ -602,13 +602,13 @@ function unbookmarkPost(postId) {
 }
 
 function updateReplyLikes(replyId) {
-	ajaxGet("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data, textStatus) {
+	ajaxGet("getLikes.ajax", { "type": "reply", "reply": replyId }, function(data) {
 		if ((data != null) && data.success) {
 			sone.find(".reply#reply-" + replyId + " .status-line .likes").toggleClass("hidden", data.likes === 0);
 			sone.find(".reply#reply-" + replyId + " .status-line .likes span.like-count").text(data.likes);
 			sone.find(".reply#reply-" + replyId + " .status-line .likes > span").prop("title", generateSoneList(data.sones));
 		}
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
@@ -627,7 +627,7 @@ function updateReplyLikes(replyId) {
  *            parameters: success, error, replyId)
  */
 function postReply(sender, postId, text, callbackFunction) {
-	ajaxGet("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data, textStatus) {
+	ajaxGet("createReply.ajax", { "formPassword" : getFormPassword(), "sender": sender, "post" : postId, "text": text }, function(data) {
 		if (data == null) {
 			/* TODO - show error */
 			return;
@@ -637,7 +637,7 @@ function postReply(sender, postId, text, callbackFunction) {
 		} else {
 			callbackFunction(false, data.error);
 		}
-	}, function(xmlHttpRequest, textStatus, error) {
+	}, function() {
 		/* ignore error. */
 	});
 }
@@ -1081,10 +1081,10 @@ function ajaxifyNotification(notification) {
 		}
 	});
 	notification.find("form.dismiss button").click(function() {
-		ajaxGet("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.prop("id") }, function(data, textStatus) {
+		ajaxGet("dismissNotification.ajax", { "formPassword" : getFormPassword(), "notification" : notification.prop("id") }, function() {
 			/* dismiss in case of error, too. */
 			notification.slideUp();
-		}, function(xmlHttpRequest, textStatus, error) {
+		}, function() {
 			/* ignore error. */
 		});
 	});
@@ -1200,7 +1200,7 @@ function getStatus() {
 			return $(this).prop("title");
 		}).toArray())
 	});
-	ajaxGet("getStatus.ajax", parameters, function(data, textStatus) {
+	ajaxGet("getStatus.ajax", parameters, function(data) {
 		if ((data != null) && data.success) {
 			/* process Sone information. */
 			$.each(data.sones, function(index, value) {
@@ -1219,7 +1219,7 @@ function getStatus() {
 				});
 				/* process new replies. */
 				$.each(data.newReplies, function(index, value) {
-					loadNewReply(value.id, value.sone, value.post, value.postSone);
+					loadNewReply(value.id, value.sone, value.post);
 				});
 			}
 			if (data.linkedElements) {
@@ -1238,7 +1238,7 @@ function getStatus() {
 }
 
 function requestNotifications() {
-	ajaxGet("getNotifications.ajax", {}, function(data, textStatus) {
+	ajaxGet("getNotifications.ajax", {}, function(data) {
 		if (data && data.success) {
 			/* search for removed notifications. */
 			sone.find("#notification-area .notification").each(function() {
@@ -1252,17 +1252,17 @@ function requestNotifications() {
 				});
 				if (!foundNotification) {
 					if (notificationId === "new-sone-notification" && (data.options["ShowNotification/NewSones"] === true)) {
-						$(".new-sone-id", this).each(function(index, element) {
+						$(".new-sone-id", this).each(function() {
 							var soneId = $(this).text();
 							markSoneAsKnown(getSone(soneId), true);
 						});
 					} else if (notificationId === "new-post-notification" && (data.options["ShowNotification/NewPosts"] === true)) {
-						$(".post-id", this).each(function(index, element) {
+						$(".post-id", this).each(function() {
 							var postId = $(this).text();
 							markPostAsKnown(getPost(postId), true);
 						});
 					} else if (notificationId === "new-reply-notification" && (data.options["ShowNotification/NewReplies"] === true)) {
-						$(".reply-id", this).each(function(index, element) {
+						$(".reply-id", this).each(function() {
 							var replyId = $(this).text();
 							markReplyAsKnown(getReply(replyId), true);
 						});
@@ -1450,7 +1450,7 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	if (getPostTime(sone.find(".post").last()) > time) {
 		return;
 	}
-	ajaxGet("getPost.ajax", { "post" : postId }, function(data, textStatus) {
+	ajaxGet("getPost.ajax", { "post" : postId }, function(data) {
 		if ((data != null) && data.success) {
 			if (hasPost(data.post.id)) {
 				return;
@@ -1480,14 +1480,14 @@ function loadNewPost(postId, soneId, recipientId, time) {
 	});
 }
 
-function loadNewReply(replyId, soneId, postId, postSoneId) {
+function loadNewReply(replyId, soneId, postId) {
 	if (hasReply(replyId)) {
 		return;
 	}
 	if (!hasPost(postId)) {
 		return;
 	}
-	ajaxGet("getReply.ajax", { "reply": replyId }, function(data, textStatus) {
+	ajaxGet("getReply.ajax", { "reply": replyId }, function(data) {
 		/* find post. */
 		if ((data != null) && data.success) {
 			if (hasReply(data.reply.id)) {
@@ -1548,7 +1548,7 @@ function loadLinkedElements(links) {
 			"elements": JSON.stringify(loadedElements.map(function(element) {
 				return element.link;
 			}))
-		}, function (data, textStatus) {
+		}, function (data) {
 			if ((data != null) && (data.success)) {
 				data.linkedElements.forEach(function (linkedElement) {
 					getLinkedElements(linkedElement.link).each(function() {
@@ -1647,7 +1647,7 @@ function updatePostTime(postId, timeText, refreshTime, tooltip) {
  */
 function updatePostTimes(postIds) {
 	if (postIds !== "") {
-        ajaxGet("getTimes.ajax", {"posts": postIds}, function (data, textStatus) {
+        ajaxGet("getTimes.ajax", {"posts": postIds}, function (data) {
             if ((data != null) && data.success) {
                 $.each(data.postTimes, function (index, value) {
                     updatePostTime(index, value.timeText, value.refreshTime, value.tooltip);
@@ -1686,7 +1686,7 @@ function updateReplyTime(replyId, timeText, refreshTime, tooltip) {
  */
 function updateReplyTimes(replyIds) {
 	if (replyIds !== "") {
-        ajaxGet("getTimes.ajax", {"replies": replyIds}, function (data, textStatus) {
+        ajaxGet("getTimes.ajax", {"replies": replyIds}, function (data) {
             if ((data != null) && data.success) {
                 $.each(data.replyTimes, function (index, value) {
                     updateReplyTime(index, value.timeText, value.refreshTime, value.tooltip);
@@ -1805,7 +1805,7 @@ function showNotificationDetails(notificationId) {
  *            The ID of the field to delete
  */
 function deleteProfileField(fieldId) {
-	ajaxGet("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data, textStatus) {
+	ajaxGet("deleteProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId}, function(data) {
 		if (data && data.success) {
 			sone.find(".profile-field#" + data.field.id).slideUp();
 		}
@@ -1823,7 +1823,7 @@ function deleteProfileField(fieldId) {
  *            Called when the renaming was successful
  */
 function editProfileField(fieldId, newName, successFunction) {
-	ajaxGet("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data, textStatus) {
+	ajaxGet("editProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "name": newName}, function(data) {
 		if (data && data.success) {
 			successFunction();
 		}
@@ -1841,7 +1841,7 @@ function editProfileField(fieldId, newName, successFunction) {
  *            Function to call on success
  */
 function moveProfileField(fieldId, direction, successFunction) {
-	ajaxGet("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data, textStatus) {
+	ajaxGet("moveProfileField.ajax", {"formPassword": getFormPassword(), "field": fieldId, "direction": direction}, function(data) {
 		if (data && data.success) {
 			successFunction();
 		}
@@ -1955,7 +1955,7 @@ $(document).ready(function() {
 			}
 			var sender = $(this).find(":input[name=sender]").val();
 			var text = $(this).find(":input[name=text]:enabled").val();
-			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function(data, textStatus) {
+			ajaxGet("createPost.ajax", { "formPassword": getFormPassword(), "sender": sender, "text": text }, function() {
 				button.removeAttr("disabled");
 			});
 			$(this).find(":input[name=sender]").val(getCurrentSoneId());
