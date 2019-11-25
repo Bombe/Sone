@@ -685,34 +685,38 @@ function ajaxifySone(soneElement) {
 	});
 }
 
-const followSone = function(soneId) {
-	const followElement = this;
-	ajaxGet("followSone.ajax", { "sone": soneId, "formPassword": getFormPassword() }, function() {
-		$(followElement).addClass("hidden");
-		$(followElement).parent().find(".unfollow").removeClass("hidden");
-		sone.find(".sone-menu").each(function() {
-			if (getMenuSone(this) === soneId) {
-				$(".follow", this).toggleClass("hidden", true);
-				$(".unfollow", this).toggleClass("hidden", false);
-			}
+function followSone(soneId) {
+	return function() {
+		const followElement = this;
+		ajaxGet("followSone.ajax", {"sone": soneId, "formPassword": getFormPassword()}, function () {
+			$(followElement).addClass("hidden");
+			$(followElement).parent().find(".unfollow").removeClass("hidden");
+			sone.find(".sone-menu").each(function () {
+				if (getMenuSone(this) === soneId) {
+					$(".follow", this).toggleClass("hidden", true);
+					$(".unfollow", this).toggleClass("hidden", false);
+				}
+			});
 		});
-	});
-	return false;
-};
+		return false;
+	}
+}
 
-const unfollowSone = function (soneId) {
-	const unfollowElement = this;
-	ajaxGet("unfollowSone.ajax", {"sone": soneId, "formPassword": getFormPassword()}, function () {
-		$(unfollowElement).addClass("hidden");
-		$(unfollowElement).parent().find(".follow").removeClass("hidden");
-		sone.find(".sone-menu").each(function () {
-			if (getMenuSone(this) === soneId) {
-				$(".follow", this).toggleClass("hidden", false);
-				$(".unfollow", this).toggleClass("hidden", true);
-			}
+function unfollowSone(soneId) {
+	return function() {
+		const unfollowElement = this;
+		ajaxGet("unfollowSone.ajax", {"sone": soneId, "formPassword": getFormPassword()}, function () {
+			$(unfollowElement).addClass("hidden");
+			$(unfollowElement).parent().find(".follow").removeClass("hidden");
+			sone.find(".sone-menu").each(function () {
+				if (getMenuSone(this) === soneId) {
+					$(".follow", this).toggleClass("hidden", false);
+					$(".unfollow", this).toggleClass("hidden", true);
+				}
+			});
 		});
-	});
-	return false;
+		return false;
+	}
 };
 
 /**
