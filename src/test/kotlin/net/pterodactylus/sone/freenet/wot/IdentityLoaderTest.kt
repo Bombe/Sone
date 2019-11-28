@@ -110,9 +110,6 @@ private open class TestWebOfTrustConnector : WebOfTrustConnector {
 	override fun removeContext(ownIdentity: OwnIdentity, context: String) = Unit
 	override fun setProperty(ownIdentity: OwnIdentity, name: String, value: String) = Unit
 	override fun removeProperty(ownIdentity: OwnIdentity, name: String) = Unit
-	override fun getTrust(ownIdentity: OwnIdentity, identity: Identity) = Trust(null, null, null)
-	override fun setTrust(ownIdentity: OwnIdentity, identity: Identity, trust: Int, comment: String) = Unit
-	override fun removeTrust(ownIdentity: OwnIdentity, identity: Identity) = Unit
 	override fun ping() = Unit
 
 }

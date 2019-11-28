@@ -17,7 +17,6 @@ import kotlin.test.*
 class PluginWebOfTrustConnectorTest {
 
 	private val ownIdentity = DefaultOwnIdentity("id", "nickname", "requestUri", "insertUri")
-	private val identity = DefaultIdentity("id-a", "alpha", "url://alpha")
 
 	@Test
 	fun `wot plugin can be pinged`() {
@@ -222,94 +221,6 @@ class PluginWebOfTrustConnectorTest {
 	fun `removing a property sends the correct property name`() {
 		createPluginConnector("RemoveProperty", hasField("Property", equalTo("TestProperty")))
 				.connect { removeProperty(ownIdentity, "TestProperty") }
-	}
-
-	@Test
-	fun `getting trust sends correct own identity id`() {
-		createPluginConnector("GetIdentity", hasField("Truster", equalTo(ownIdentity.id)))
-				.connect { getTrust(ownIdentity, identity) }
-	}
-
-	@Test
-	fun `getting trust sends correct identity id`() {
-		createPluginConnector("GetIdentity", hasField("Identity", equalTo(identity.id)))
-				.connect { getTrust(ownIdentity, identity) }
-	}
-
-	@Test
-	fun `getting trust returns correct trust values`() {
-		val trust = createPluginConnector("GetIdentity", hasField("Identity", equalTo(identity.id))) {
-			put("Trust", "12")
-			put("Score", "34")
-			put("Rank", "56")
-		}.connect { getTrust(ownIdentity, identity) }
-		assertThat(trust, isTrust(12, 34, 56))
-	}
-
-	@Test
-	fun `getting trust reads incorrect numbers for trust as null`() {
-		val trust = createPluginConnector("GetIdentity", hasField("Identity", equalTo(identity.id))) {
-			put("Trust", "incorrect")
-			put("Score", "34")
-			put("Rank", "56")
-		}.connect { getTrust(ownIdentity, identity) }
-		assertThat(trust, isTrust(null, 34, 56))
-	}
-
-	@Test
-	fun `getting trust reads incorrect numbers for score as null`() {
-		val trust = createPluginConnector("GetIdentity", hasField("Identity", equalTo(identity.id))) {
-			put("Trust", "12")
-			put("Score", "incorrect")
-			put("Rank", "56")
-		}.connect { getTrust(ownIdentity, identity) }
-		assertThat(trust, isTrust(12, null, 56))
-	}
-
-	@Test
-	fun `getting trust reads incorrect numbers for rank as null`() {
-		val trust = createPluginConnector("GetIdentity", hasField("Identity", equalTo(identity.id))) {
-			put("Trust", "12")
-			put("Score", "34")
-			put("Rank", "incorrect")
-		}.connect { getTrust(ownIdentity, identity) }
-		assertThat(trust, isTrust(12, 34, null))
-	}
-
-	@Test
-	fun `setting trust sends correct own identity id`() {
-		createPluginConnector("SetTrust", hasField("Truster", equalTo(ownIdentity.id)))
-				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
-	}
-
-	@Test
-	fun `setting trust sends correct identity id`() {
-		createPluginConnector("SetTrust", hasField("Trustee", equalTo(identity.id)))
-				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
-	}
-
-	@Test
-	fun `setting trust sends correct trust value`() {
-		createPluginConnector("SetTrust", hasField("Value", equalTo("123")))
-				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
-	}
-
-	@Test
-	fun `setting trust sends correct comment`() {
-		createPluginConnector("SetTrust", hasField("Comment", equalTo("Test Trust")))
-				.connect { setTrust(ownIdentity, identity, 123, "Test Trust") }
-	}
-
-	@Test
-	fun `removing trust sends correct own identity id`() {
-		createPluginConnector("RemoveTrust", hasField("Truster", equalTo(ownIdentity.id)))
-				.connect { removeTrust(ownIdentity, identity) }
-	}
-
-	@Test
-	fun `removing trust sends correct identity id`() {
-		createPluginConnector("RemoveTrust", hasField("Trustee", equalTo(identity.id)))
-				.connect { removeTrust(ownIdentity, identity) }
 	}
 
 }

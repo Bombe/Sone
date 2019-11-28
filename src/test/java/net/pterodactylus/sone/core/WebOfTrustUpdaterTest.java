@@ -14,15 +14,12 @@ import java.util.concurrent.CountDownLatch;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.AddContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.RemoveContextJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.SetPropertyJob;
-import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.SetTrustJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.WebOfTrustContextUpdateJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.WebOfTrustUpdateJob;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
 import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
-import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 
 import org.junit.Test;
 import org.mockito.invocation.InvocationOnMock;
@@ -34,9 +31,6 @@ import org.mockito.stubbing.Answer;
 public class WebOfTrustUpdaterTest {
 
 	private static final String CONTEXT = "test-context";
-	private static final Integer SCORE = 50;
-	private static final Integer OTHER_SCORE = 25;
-	private static final String TRUST_COMMENT = "set in a test";
 	private static final String PROPERTY_NAME = "test-property";
 	private final WebOfTrustConnector webOfTrustConnector = mock(WebOfTrustConnector.class);
 	private final WebOfTrustUpdaterImpl webOfTrustUpdater = new WebOfTrustUpdaterImpl(webOfTrustConnector);
@@ -46,7 +40,6 @@ public class WebOfTrustUpdaterTest {
 	private final WebOfTrustContextUpdateJob contextUpdateJob = webOfTrustUpdater.new WebOfTrustContextUpdateJob(ownIdentity, CONTEXT);
 	private final AddContextJob addContextJob = webOfTrustUpdater.new AddContextJob(ownIdentity, CONTEXT);
 	private final RemoveContextJob removeContextJob = webOfTrustUpdater.new RemoveContextJob(ownIdentity, CONTEXT);
-	private final Identity trustee = when(mock(Identity.class).getId()).thenReturn("trustee-id").getMock();
 
 	private WebOfTrustUpdateJob createWebOfTrustUpdateJob(final boolean success) {
 		return webOfTrustUpdater.new WebOfTrustUpdateJob() {
@@ -230,81 +223,6 @@ public class WebOfTrustUpdaterTest {
 	}
 
 	@Test
-	public void setTrustJobSetsTrust() throws PluginException {
-		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		setTrustJob.run();
-		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
-		verify(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		assertThat(setTrustJob.waitForCompletion(), is(true));
-	}
-
-	@Test
-	public void settingNullTrustRemovesTrust() throws WebOfTrustException {
-		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, null, TRUST_COMMENT);
-		setTrustJob.run();
-		verify(webOfTrustConnector).removeTrust(eq(ownIdentity), eq(trustee));
-		verify(trustee).removeTrust(eq(ownIdentity));
-		assertThat(setTrustJob.waitForCompletion(), is(true));
-	}
-
-	@Test
-	public void exceptionWhileSettingTrustIsCaught() throws PluginException {
-		doThrow(PluginException.class).when(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
-		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		setTrustJob.run();
-		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
-		verify(trustee, never()).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		assertThat(setTrustJob.waitForCompletion(), is(false));
-	}
-
-	@Test
-	public void setTrustJobsWithDifferentClassesAreNotEqual() {
-		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT) {
-		};
-		assertThat(firstSetTrustJob, not(is(secondSetTrustJob)));
-		assertThat(secondSetTrustJob, not(is(firstSetTrustJob)));
-	}
-
-	@Test
-	public void setTrustJobsWithDifferentTrustersAreNotEqual() {
-		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(mock(OwnIdentity.class), trustee, SCORE, TRUST_COMMENT);
-		assertThat(firstSetTrustJob, not(is(secondSetTrustJob)));
-		assertThat(secondSetTrustJob, not(is(firstSetTrustJob)));
-	}
-
-	@Test
-	public void setTrustJobsWithDifferentTrusteesAreNotEqual() {
-		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, mock(Identity.class), SCORE, TRUST_COMMENT);
-		assertThat(firstSetTrustJob, not(is(secondSetTrustJob)));
-		assertThat(secondSetTrustJob, not(is(firstSetTrustJob)));
-	}
-
-	@Test
-	public void setTrustJobsWithDifferentScoreAreEqual() {
-		SetTrustJob firstSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		SetTrustJob secondSetTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, OTHER_SCORE, TRUST_COMMENT);
-		assertThat(firstSetTrustJob, is(secondSetTrustJob));
-		assertThat(secondSetTrustJob, is(firstSetTrustJob));
-		assertThat(firstSetTrustJob.hashCode(), is(secondSetTrustJob.hashCode()));
-	}
-
-	@Test
-	public void setTrustJobDoesNotEqualNull() {
-		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		assertThat(setTrustJob, not(is((Object) null)));
-	}
-
-	@Test
-	public void toStringOfSetTrustJobContainsIdsOfTrusterAndTrustee() {
-		SetTrustJob setTrustJob = webOfTrustUpdater.new SetTrustJob(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		assertThat(setTrustJob.toString(), containsString(ownIdentity.getId()));
-		assertThat(setTrustJob.toString(), containsString(trustee.getId()));
-	}
-
-	@Test
 	public void webOfTrustUpdaterStopsWhenItShould() {
 		webOfTrustUpdater.stop();
 		webOfTrustUpdater.serviceRun();
@@ -397,46 +315,6 @@ public class WebOfTrustUpdaterTest {
 		assertThat(contextRemovedTrigger.await(1, SECONDS), is(true));
 		verify(webOfTrustConnector).removeContext(eq(ownIdentity), eq(CONTEXT));
 		verify(ownIdentity).removeContext(eq(CONTEXT));
-	}
-
-	@Test
-	public void setTrustSetsTrust() throws InterruptedException, PluginException {
-		final CountDownLatch trustSetTrigger = new CountDownLatch(1);
-		doAnswer(new Answer<Void>() {
-			@Override
-			public Void answer(InvocationOnMock invocation) throws Throwable {
-				trustSetTrigger.countDown();
-				return null;
-			}
-		}).when(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		webOfTrustUpdater.start();
-		webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		assertThat(trustSetTrigger.await(1, SECONDS), is(true));
-		verify(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
-	}
-
-	@Test
-	public void setTrustRequestsAreCoalesced() throws InterruptedException, PluginException {
-		final CountDownLatch firstTrigger = new CountDownLatch(1);
-		doAnswer((Answer<Void>) invocation -> {
-			firstTrigger.countDown();
-			return null;
-		}).when(trustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		Identity secondTrustee = when(mock(Identity.class).getId()).thenReturn("trustee-id2").getMock();
-		final CountDownLatch secondTrigger = new CountDownLatch(1);
-		doAnswer((Answer<Void>) invocation -> {
-			secondTrigger.countDown();
-			return null;
-		}).when(secondTrustee).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		webOfTrustUpdater.setTrust(ownIdentity, secondTrustee, SCORE, TRUST_COMMENT);
-		webOfTrustUpdater.setTrust(ownIdentity, trustee, SCORE, TRUST_COMMENT);
-		webOfTrustUpdater.start();
-		assertThat(firstTrigger.await(1, SECONDS), is(true));
-		assertThat(secondTrigger.await(1, SECONDS), is(true));
-		verify(trustee, times(1)).setTrust(eq(ownIdentity), eq(new Trust(SCORE, null, 0)));
-		verify(webOfTrustConnector).setTrust(eq(ownIdentity), eq(trustee), eq(SCORE), eq(TRUST_COMMENT));
 	}
 
 }
