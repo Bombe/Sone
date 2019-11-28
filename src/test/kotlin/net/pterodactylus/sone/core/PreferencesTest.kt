@@ -180,69 +180,6 @@ class PreferencesTest {
 	}
 
 	@Test
-	fun `preferences retain positive trust`() {
-		preferences.newPositiveTrust = 15
-		assertThat(preferences.positiveTrust, equalTo(15))
-	}
-
-	@Test(expected = IllegalArgumentException::class)
-	fun `invalid positive trust is rejected`() {
-		preferences.newPositiveTrust = -15
-	}
-
-	@Test
-	fun `preferences return default value when positive trust is set to null`() {
-		preferences.newPositiveTrust = null
-		assertThat(preferences.positiveTrust, equalTo(75))
-	}
-
-	@Test
-	fun `preferences start with positive trust default value`() {
-		assertThat(preferences.positiveTrust, equalTo(75))
-	}
-
-	@Test
-	fun `preferences retain negative trust`() {
-		preferences.newNegativeTrust = -15
-		assertThat(preferences.negativeTrust, equalTo(-15))
-	}
-
-	@Test(expected = IllegalArgumentException::class)
-	fun `invalid negative trust is rejected`() {
-		preferences.newNegativeTrust = 150
-	}
-
-	@Test
-	fun `preferences return default value when negative trust is set to null`() {
-		preferences.newNegativeTrust = null
-		assertThat(preferences.negativeTrust, equalTo(-25))
-	}
-
-	@Test
-	fun `preferences start with negative trust default value`() {
-		assertThat(preferences.negativeTrust, equalTo(-25))
-	}
-
-	@Test
-	fun `preferences retain trust comment`() {
-		preferences.newTrustComment = "Trust"
-		assertThat(preferences.trustComment, equalTo("Trust"))
-	}
-
-	@Test
-	fun `preferences return default value when trust comment is set to null`() {
-		preferences.newTrustComment = null
-		assertThat(preferences.trustComment,
-				equalTo("Set from Sone Web Interface"))
-	}
-
-	@Test
-	fun `preferences start with trust comment default value`() {
-		assertThat(preferences.trustComment,
-				equalTo("Set from Sone Web Interface"))
-	}
-
-	@Test
 	fun `preferences retain fcp interface active of true`() {
 		preferences.newFcpInterfaceActive = true
 		assertThat(preferences.fcpInterfaceActive, equalTo(true))

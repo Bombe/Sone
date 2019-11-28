@@ -23,9 +23,6 @@ public class PreferencesLoader {
 		loadCharactersPerPost(configuration);
 		loadPostCutOffLength(configuration);
 		loadRequireFullAccess(configuration);
-		loadPositiveTrust(configuration);
-		loadNegativeTrust(configuration);
-		loadTrustComment(configuration);
 		loadFcpInterfaceActive(configuration);
 		loadFcpFullAccessRequired(configuration);
 	}
@@ -66,24 +63,6 @@ public class PreferencesLoader {
 	private void loadRequireFullAccess(Configuration configuration) {
 		preferences.setNewRequireFullAccess(
 				configuration.getBooleanValue("Option/RequireFullAccess")
-						.getValue(null));
-	}
-
-	private void loadPositiveTrust(Configuration configuration) {
-		preferences.setNewPositiveTrust(
-				configuration.getIntValue("Option/PositiveTrust")
-						.getValue(null));
-	}
-
-	private void loadNegativeTrust(Configuration configuration) {
-		preferences.setNewNegativeTrust(
-				configuration.getIntValue("Option/NegativeTrust")
-						.getValue(null));
-	}
-
-	private void loadTrustComment(Configuration configuration) {
-		preferences.setNewTrustComment(
-				configuration.getStringValue("Option/TrustComment")
 						.getValue(null));
 	}
 

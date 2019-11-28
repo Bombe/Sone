@@ -33,10 +33,6 @@ public class PreferencesLoaderTest {
 		setupIntValue("CharactersPerPost", 150);
 		setupIntValue("PostCutOffLength", 300);
 		setupBooleanValue("RequireFullAccess", true);
-		setupIntValue("PositiveTrust", 50);
-		setupIntValue("NegativeTrust", -50);
-		when(configuration.getStringValue("Option/TrustComment")).thenReturn(
-				TestValue.from("Trusted"));
 		setupBooleanValue("ActivateFcpInterface", true);
 		setupIntValue("FcpFullAccessRequired", 1);
 	}
@@ -62,9 +58,6 @@ public class PreferencesLoaderTest {
 		assertThat(preferences.getCharactersPerPost(), is(150));
 		assertThat(preferences.getPostCutOffLength(), is(300));
 		assertThat(preferences.getRequireFullAccess(), is(true));
-		assertThat(preferences.getPositiveTrust(), is(50));
-		assertThat(preferences.getNegativeTrust(), is(-50));
-		assertThat(preferences.getTrustComment(), is("Trusted"));
 		assertThat(preferences.getFcpInterfaceActive(), is(true));
 		assertThat(preferences.getFcpFullAccessRequired(), is(WRITING));
 	}

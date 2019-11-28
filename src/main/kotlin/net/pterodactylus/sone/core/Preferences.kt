@@ -77,24 +77,6 @@ class Preferences(private val eventBus: EventBus) {
 		get() = unsupported
 		set(value) = _requireFullAccess.set(value)
 
-	private val _positiveTrust = DefaultOption(75, range(0, 100))
-	val positiveTrust: Int get() = _positiveTrust.get()
-	var newPositiveTrust: Int?
-		get() = unsupported
-		set(value) = _positiveTrust.set(value)
-
-	private val _negativeTrust = DefaultOption(-25, range(-100, 100))
-	val negativeTrust: Int get() = _negativeTrust.get()
-	var newNegativeTrust: Int?
-		get() = unsupported
-		set(value) = _negativeTrust.set(value)
-
-	private val _trustComment = DefaultOption("Set from Sone Web Interface")
-	val trustComment: String get() = _trustComment.get()
-	var newTrustComment: String?
-		get() = unsupported
-		set(value) = _trustComment.set(value)
-
 	private val _fcpInterfaceActive = DefaultOption(false)
 	val fcpInterfaceActive: Boolean get() = _fcpInterfaceActive.get()
 	var newFcpInterfaceActive: Boolean?
@@ -125,9 +107,6 @@ class Preferences(private val eventBus: EventBus) {
 		configuration.getIntValue("Option/CharactersPerPost").value = _charactersPerPost.real
 		configuration.getIntValue("Option/PostCutOffLength").value = _postCutOffLength.real
 		configuration.getBooleanValue("Option/RequireFullAccess").value = _requireFullAccess.real
-		configuration.getIntValue("Option/PositiveTrust").value = _positiveTrust.real
-		configuration.getIntValue("Option/NegativeTrust").value = _negativeTrust.real
-		configuration.getStringValue("Option/TrustComment").value = _trustComment.real
 		configuration.getBooleanValue("Option/ActivateFcpInterface").value = _fcpInterfaceActive.real
 		configuration.getIntValue("Option/FcpFullAccessRequired").value = toInt(_fcpFullAccessRequired.real)
 	}
