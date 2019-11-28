@@ -495,74 +495,6 @@ function unlikeReply(replyId) {
 }
 
 /**
- * Trusts the Sone with the given ID.
- *
- * @param soneId
- *            The ID of the Sone to trust
- */
-function trustSone(soneId) {
-	ajaxGet("trustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data) {
-		if ((data != null) && data.success) {
-			updateTrustControls(soneId, data.trustValue);
-		}
-	});
-}
-
-/**
- * Distrusts the Sone with the given ID, i.e. assigns a negative trust value.
- *
- * @param soneId
- *            The ID of the Sone to distrust
- */
-function distrustSone(soneId) {
-	ajaxGet("distrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data) {
-		if ((data != null) && data.success) {
-			updateTrustControls(soneId, data.trustValue);
-		}
-	});
-}
-
-/**
- * Untrusts the Sone with the given ID, i.e. removes any trust assignment.
- *
- * @param soneId
- *            The ID of the Sone to untrust
- */
-function untrustSone(soneId) {
-	ajaxGet("untrustSone.ajax", { "formPassword" : getFormPassword(), "sone" : soneId }, function(data) {
-		if ((data != null) && data.success) {
-			updateTrustControls(soneId, data.trustValue);
-		}
-	});
-}
-
-/**
- * Updates the trust controls for all posts and replies of the given Sone,
- * according to the given trust value.
- *
- * @param soneId
- *            The ID of the Sone to update all trust controls for
- * @param trustValue
- *            The trust value for the Sone
- */
-function updateTrustControls(soneId, trustValue) {
-	sone.find(".post").each(function() {
-		if (getPostAuthor(this) === soneId) {
-			getPostElement(this).find(".post-trust").toggleClass("hidden", trustValue != null);
-			getPostElement(this).find(".post-distrust").toggleClass("hidden", trustValue != null);
-			getPostElement(this).find(".post-untrust").toggleClass("hidden", trustValue == null);
-		}
-	});
-	sone.find(".reply").each(function() {
-		if (getReplyAuthor(this) === soneId) {
-			getReplyElement(this).find(".reply-trust").toggleClass("hidden", trustValue != null);
-			getReplyElement(this).find(".reply-distrust").toggleClass("hidden", trustValue != null);
-			getReplyElement(this).find(".reply-untrust").toggleClass("hidden", trustValue == null);
-		}
-	});
-}
-
-/**
  * Bookmarks the post with the given ID.
  *
  * @param postId
@@ -773,20 +705,6 @@ function ajaxifyPost(postElement) {
 		return false;
 	});
 
-	/* convert trust control buttons to javascript functions. */
-	$(postElement).find(".post-trust").submit(function() {
-		trustSone(getPostAuthor(this));
-		return false;
-	});
-	$(postElement).find(".post-distrust").submit(function() {
-		distrustSone(getPostAuthor(this));
-		return false;
-	});
-	$(postElement).find(".post-untrust").submit(function() {
-		untrustSone(getPostAuthor(this));
-		return false;
-	});
-
 	/* convert bookmark/unbookmark buttons to javascript functions. */
 	$(postElement).find(".bookmark").submit(function() {
 		bookmarkPost(getPostId(this));
@@ -971,20 +889,6 @@ function ajaxifyReply(replyElement) {
 	};
 	$(replyElement).find(".expand-reply-text").each(toggleShowMore);
 	$(replyElement).find(".shrink-reply-text").each(toggleShowMore);
-
-	/* convert trust control buttons to javascript functions. */
-	$(replyElement).find(".reply-trust").submit(function() {
-		trustSone(getReplyAuthor(this));
-		return false;
-	});
-	$(replyElement).find(".reply-distrust").submit(function() {
-		distrustSone(getReplyAuthor(this));
-		return false;
-	});
-	$(replyElement).find(".reply-untrust").submit(function() {
-		untrustSone(getReplyAuthor(this));
-		return false;
-	});
 
 	/* show Sone menu when hovering over the avatar. */
 	$(replyElement).find(".reply-avatar").mouseover(function() {
