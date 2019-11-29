@@ -41,7 +41,7 @@ dependencies {
 
     compile group: 'net.pterodactylus', name: 'utils', version: '0.13.1'
     compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
-    compile group: 'com.google.guava', name: 'guava', version: '27.0.1-android'
+    compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.1'
     compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
