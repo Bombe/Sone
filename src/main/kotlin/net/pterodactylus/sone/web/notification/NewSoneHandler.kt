@@ -29,7 +29,7 @@ import net.pterodactylus.util.template.*
  */
 class NewSoneHandler(private val notificationManager: NotificationManager, template: Template) {
 
-	private val notification = ListNotification<Sone>("new-sone-notification", "", template)
+	private val notification = ListNotification<Sone>("new-sone-notification", "sones", template, dismissable = false)
 
 	@Subscribe
 	fun newSoneFound(newSoneFoundEvent: NewSoneFoundEvent) {
@@ -37,6 +37,16 @@ class NewSoneHandler(private val notificationManager: NotificationManager, templ
 			notification.add(newSoneFoundEvent.sone)
 			notificationManager.addNotification(notification)
 		}
+	}
+
+	@Subscribe
+	fun markedSoneKnown(markSoneKnownEvent: MarkSoneKnownEvent) {
+		notification.remove(markSoneKnownEvent.sone)
+	}
+
+	@Subscribe
+	fun soneRemoved(soneRemovedEvent: SoneRemovedEvent) {
+		notification.remove(soneRemovedEvent.sone)
 	}
 
 }

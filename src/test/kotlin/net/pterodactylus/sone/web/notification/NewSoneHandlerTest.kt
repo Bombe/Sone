@@ -21,8 +21,9 @@ import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
-import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import java.io.*
@@ -33,7 +34,7 @@ class NewSoneHandlerTest {
 	@Suppress("UnstableApiUsage")
 	private val eventBus = EventBus()
 	private val notificationManager = NotificationManager()
-	private val handler = NewSoneHandler(notificationManager, Template())
+	private val handler = NewSoneHandler(notificationManager, "<% sones>".asTemplate())
 
 	init {
 		eventBus.register(handler)
@@ -54,6 +55,20 @@ class NewSoneHandlerTest {
 	}
 
 	@Test
+	fun `handler sets correct key for sones`() {
+		eventBus.post(NewSoneFoundEvent(sone))
+		val notification = notificationManager.notifications.single() as ListNotification<*>
+		assertThat(notification.render(), equalTo(listOf(sone).toString()))
+	}
+
+	@Test
+	fun `handler creates non-dismissable notification`() {
+		eventBus.post(NewSoneFoundEvent(sone))
+		val notification = notificationManager.notifications.single() as ListNotification<*>
+		assertThat(notification, matches("is not dismissable") { !it.isDismissable })
+	}
+
+	@Test
 	fun `handler does not add notification on new sone event if first-start notification is present`() {
 		notificationManager.addNotification(object : AbstractNotification("first-start-notification") {
 			override fun render(writer: Writer) = Unit
@@ -61,6 +76,22 @@ class NewSoneHandlerTest {
 		eventBus.post(NewSoneFoundEvent(sone))
 		val notification = notificationManager.notifications.single()
 		assertThat(notification.id, equalTo("first-start-notification"))
+	}
+
+	@Test
+	fun `handler removes sone from notification if sone is marked as known`() {
+		eventBus.post(NewSoneFoundEvent(sone))
+		val notification = notificationManager.notifications.single() as ListNotification<*>
+		eventBus.post(MarkSoneKnownEvent(sone))
+		assertThat(notification.elements, emptyIterable())
+	}
+
+	@Test
+	fun `handler removes sone from notification if sone is removed`() {
+		eventBus.post(NewSoneFoundEvent(sone))
+		val notification = notificationManager.notifications.single() as ListNotification<*>
+		eventBus.post(SoneRemovedEvent(sone))
+		assertThat(notification.elements, emptyIterable())
 	}
 
 }

@@ -157,9 +157,6 @@ public class WebInterface implements SessionProvider {
 	private final MetricRegistry metricRegistry;
 	private final Translation translation;
 
-	/** The “new Sone” notification. */
-	private final ListNotification<Sone> newSoneNotification;
-
 	/** The “new post” notification. */
 	private final ListNotification<Post> newPostNotification;
 
@@ -233,9 +230,6 @@ public class WebInterface implements SessionProvider {
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template newSoneNotificationTemplate = loaders.loadTemplate("/templates/notify/newSoneNotification.html");
-		newSoneNotification = new ListNotification<>("new-sone-notification", "sones", newSoneNotificationTemplate, false);
-
 		Template newPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
 		newPostNotification = new ListNotification<>("new-post-notification", "posts", newPostNotificationTemplate, false);
 
@@ -690,20 +684,6 @@ public class WebInterface implements SessionProvider {
 	//
 
 	/**
-	 * Notifies the web interface that a new {@link Sone} was found.
-	 *
-	 * @param newSoneFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void newSoneFound(NewSoneFoundEvent newSoneFoundEvent) {
-		newSoneNotification.add(newSoneFoundEvent.getSone());
-		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newSoneNotification);
-		}
-	}
-
-	/**
 	 * Notifies the web interface that a new {@link Post} was found.
 	 *
 	 * @param newPostFoundEvent
@@ -755,17 +735,6 @@ public class WebInterface implements SessionProvider {
 		}
 	}
 
-	/**
-	 * Notifies the web interface that a {@link Sone} was marked as known.
-	 *
-	 * @param markSoneKnownEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void markSoneKnown(MarkSoneKnownEvent markSoneKnownEvent) {
-		newSoneNotification.remove(markSoneKnownEvent.getSone());
-	}
-
 	@Subscribe
 	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
 		removePost(markPostKnownEvent.getPost());
@@ -774,11 +743,6 @@ public class WebInterface implements SessionProvider {
 	@Subscribe
 	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
 		removeReply(markPostReplyKnownEvent.getPostReply());
-	}
-
-	@Subscribe
-	public void soneRemoved(SoneRemovedEvent soneRemovedEvent) {
-		newSoneNotification.remove(soneRemovedEvent.getSone());
 	}
 
 	@Subscribe

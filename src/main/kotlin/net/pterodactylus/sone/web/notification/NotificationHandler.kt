@@ -29,8 +29,11 @@ import javax.inject.*
 class NotificationHandler @Inject constructor(private val eventBus: EventBus, private val loaders: Loaders, private val notificationManager: NotificationManager) {
 
 	fun start() {
-		SoneLockedOnStartupHandler(notificationManager, loaders.loadTemplate("/templates/notify/soneLockedOnStartupNotification.html"))
-				.also(eventBus::register)
+		register { SoneLockedOnStartupHandler(it, loaders.loadTemplate("/templates/notify/soneLockedOnStartupNotification.html")) }
+		register { NewSoneHandler(it, loaders.loadTemplate("/templates/notify/newSoneNotification.html")) }
 	}
+
+	private fun register(handler: (NotificationManager) -> Any) =
+			handler(notificationManager).also(eventBus::register)
 
 }

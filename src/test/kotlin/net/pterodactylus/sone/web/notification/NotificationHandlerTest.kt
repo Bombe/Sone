@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.web.notification
 
 import com.google.common.eventbus.*
-import com.google.inject.*
 import com.google.inject.Guice.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.*
@@ -52,13 +51,25 @@ class NotificationHandlerTest {
 	@Test
 	fun `notification handler registers handler for sone-locked event`() {
 		handler.start()
-		assertThat(eventBus.registeredObjects.any { it.javaClass == SoneLockedOnStartupHandler::class.java }, equalTo(true))
+		assertThat(eventBus.registeredObjects, hasItem<Any>(matches { it.javaClass == SoneLockedOnStartupHandler::class.java }))
 	}
 
 	@Test
 	fun `notification handler loads sone-locked notification template`() {
 		handler.start()
-		assertThat(loaders.requestedTemplatePaths.any { it == "/templates/notify/soneLockedOnStartupNotification.html" }, equalTo(true))
+		assertThat(loaders.requestedTemplatePaths, hasItem("/templates/notify/soneLockedOnStartupNotification.html"))
+	}
+
+	@Test
+	fun `notification handler registers handler for new sone events`() {
+		handler.start()
+		assertThat(eventBus.registeredObjects, hasItem<Any>(matches { it.javaClass == NewSoneHandler::class.java }))
+	}
+
+	@Test
+	fun `notification handler loads new sone notification template`() {
+		handler.start()
+		assertThat(loaders.requestedTemplatePaths, hasItem("/templates/notify/newSoneNotification.html"))
 	}
 
 }
