@@ -14,6 +14,7 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.web.notification.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
@@ -289,6 +290,18 @@ class WebInterfaceModuleTest {
 		val firstNotificationManager = injector.getInstance<NotificationManager>()
 		val secondNotificationManager = injector.getInstance<NotificationManager>()
 		assertThat(firstNotificationManager, sameInstance(secondNotificationManager))
+	}
+
+	@Test
+	fun `notification handler can be created`() {
+		assertThat(injector.getInstance<NotificationHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `notification handler is created as singleton`() {
+		val firstNotificationHandler = injector.getInstance<NotificationHandler>()
+		val secondNotificationHandler = injector.getInstance<NotificationHandler>()
+		assertThat(firstNotificationHandler, sameInstance(secondNotificationHandler))
 	}
 
 }
