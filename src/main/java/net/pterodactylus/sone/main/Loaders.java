@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.main;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.web.Page;
@@ -13,8 +15,8 @@ import com.google.inject.ImplementedBy;
 @ImplementedBy(DefaultLoaders.class)
 public interface Loaders {
 
-	Template loadTemplate(String path);
-	<REQ extends Request> Page<REQ> loadStaticPage(String basePath, String prefix, String mimeType);
-	TemplateProvider getTemplateProvider();
+	@Nonnull Template loadTemplate(@Nonnull String path);
+	@Nonnull <REQ extends Request> Page<REQ> loadStaticPage(@Nonnull String basePath, @Nonnull String prefix, @Nonnull String mimeType);
+	@Nonnull TemplateProvider getTemplateProvider();
 
 }

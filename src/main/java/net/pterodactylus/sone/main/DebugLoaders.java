@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.main;
 
 import java.io.File;
+import javax.annotation.Nonnull;
 
 import net.pterodactylus.sone.template.FilesystemTemplate;
 import net.pterodactylus.sone.web.pages.ReloadingPage;
@@ -21,16 +22,19 @@ public class DebugLoaders implements Loaders {
 		this.filesystemPath = filesystemPath;
 	}
 
+	@Nonnull
 	@Override
-	public Template loadTemplate(String path) {
+	public Template loadTemplate(@Nonnull String path) {
 		return new FilesystemTemplate(new File(filesystemPath, path).getAbsolutePath());
 	}
 
+	@Nonnull
 	@Override
-	public <REQ extends Request> Page<REQ> loadStaticPage(String basePath, String prefix, String mimeType) {
+	public <REQ extends Request> Page<REQ> loadStaticPage(@Nonnull String basePath, @Nonnull String prefix, @Nonnull String mimeType) {
 		return new ReloadingPage<>(basePath, new File(filesystemPath, prefix).getAbsolutePath(), mimeType);
 	}
 
+	@Nonnull
 	@Override
 	public TemplateProvider getTemplateProvider() {
 		return new FilesystemTemplateProvider(new File(filesystemPath, "/templates/").getAbsolutePath());
