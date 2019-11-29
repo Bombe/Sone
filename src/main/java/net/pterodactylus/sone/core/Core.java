@@ -638,6 +638,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		if (sone.getPosts().isEmpty() && sone.getReplies().isEmpty() && getAllImages(sone.getRootAlbum()).isEmpty()) {
 			// dirty hack
 			lockSone(sone);
+			eventBus.post(new SoneLockedOnStartup(sone));
 		}
 		soneInserter.start();
 		return sone;
