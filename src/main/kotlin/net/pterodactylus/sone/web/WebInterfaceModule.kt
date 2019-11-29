@@ -10,6 +10,7 @@ import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.text.*
+import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import javax.inject.*
 import javax.inject.Singleton
@@ -125,5 +126,10 @@ class WebInterfaceModule : AbstractModule() {
 	@Provides
 	@Named("toadletPathPrefix")
 	fun getPathPrefix(): String = "/Sone/"
+
+	@Provides
+	@Singleton
+	fun getNotificationManager() =
+			NotificationManager()
 
 }

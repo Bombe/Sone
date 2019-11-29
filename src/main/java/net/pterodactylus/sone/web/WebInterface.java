@@ -124,7 +124,7 @@ public class WebInterface implements SessionProvider {
 	private final Loaders loaders;
 
 	/** The notification manager. */
-	private final NotificationManager notificationManager = new NotificationManager();
+	private final NotificationManager notificationManager;
 
 	/** The Sone plugin. */
 	private final SonePlugin sonePlugin;
@@ -207,7 +207,8 @@ public class WebInterface implements SessionProvider {
 			ParserFilter parserFilter, ShortenFilter shortenFilter,
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
-			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter) {
+			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
+			NotificationManager notificationManager) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -223,6 +224,7 @@ public class WebInterface implements SessionProvider {
 		this.metricRegistry = metricRegistry;
 		this.l10nFilter = l10nFilter;
 		this.translation = translation;
+		this.notificationManager = notificationManager;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 
