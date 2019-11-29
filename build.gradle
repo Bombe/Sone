@@ -39,7 +39,7 @@ dependencies {
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
     compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.0-RC'
 
-    compile group: 'net.pterodactylus', name: 'utils', version: '0.12.4'
+    compile group: 'net.pterodactylus', name: 'utils', version: '0.13.1'
     compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
     compile group: 'com.google.guava', name: 'guava', version: '27.0.1-android'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
