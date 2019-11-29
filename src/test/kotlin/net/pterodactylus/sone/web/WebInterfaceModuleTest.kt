@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web
 import com.google.inject.Guice.*
 import freenet.client.*
 import freenet.clients.http.*
-import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
@@ -21,9 +20,8 @@ import net.pterodactylus.util.template.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.junit.*
 import java.util.*
-import kotlin.test.Test
+import kotlin.test.*
 
 class WebInterfaceModuleTest {
 

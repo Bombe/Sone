@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.main;
 
-import static net.pterodactylus.util.template.TemplateParser.parse;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -16,6 +14,8 @@ import net.pterodactylus.util.template.TemplateProvider;
 import net.pterodactylus.util.web.Page;
 import net.pterodactylus.util.web.Request;
 import net.pterodactylus.util.web.StaticPage;
+
+import static net.pterodactylus.util.template.TemplateParser.parse;
 
 /**
  * Default {@link Loaders} implementation that loads resources from the classpath.
