@@ -3,8 +3,7 @@ package net.pterodactylus.sone.web.ajax
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.SoneOptions
 import net.pterodactylus.sone.main.SonePlugin
-import net.pterodactylus.sone.utils.jsonArray
-import net.pterodactylus.sone.utils.jsonObject
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
@@ -74,5 +73,3 @@ private val SoneOptions?.asJsonObject
 				"ShowNotification/NewReplies" to options.isShowNewReplyNotifications
 		)
 	} ?: jsonObject {}
-
-private fun Notification.render() = StringWriter().use { it.also { render(it) } }.toString()

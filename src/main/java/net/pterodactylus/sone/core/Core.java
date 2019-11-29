@@ -24,6 +24,7 @@ import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.data.AlbumsKt.getAllImages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -634,9 +635,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		loadSone(sone);
 		database.storeSone(sone);
 		sone.setStatus(SoneStatus.idle);
-		if (sone.getPosts().isEmpty() && sone.getReplies().isEmpty()) {
+		if (sone.getPosts().isEmpty() && sone.getReplies().isEmpty() && getAllImages(sone.getRootAlbum()).isEmpty()) {
 			// dirty hack
 			lockSone(sone);
+			eventBus.post(new SoneLockedOnStartup(sone));
 		}
 		soneInserter.start();
 		return sone;

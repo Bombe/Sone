@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.web
 
+import com.google.common.eventbus.*
 import com.google.inject.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
@@ -10,6 +11,8 @@ import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.web.notification.*
+import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import javax.inject.*
 import javax.inject.Singleton
@@ -125,5 +128,15 @@ class WebInterfaceModule : AbstractModule() {
 	@Provides
 	@Named("toadletPathPrefix")
 	fun getPathPrefix(): String = "/Sone/"
+
+	@Provides
+	@Singleton
+	fun getNotificationManager() =
+			NotificationManager()
+
+	@Provides
+	@Singleton
+	fun getNotificationHandler(eventBus: EventBus, loaders: Loaders, notificationManager: NotificationManager) =
+			NotificationHandler(eventBus, loaders, notificationManager)
 
 }

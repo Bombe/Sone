@@ -10,6 +10,7 @@ import net.pterodactylus.sone.fcp.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
+import net.pterodactylus.sone.web.notification.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.mockito.Mockito.*
@@ -64,6 +65,12 @@ class SonePluginTest {
 		assertThat(injector.getInstance<WebOfTrustConnector>(), notNullValue())
 	}
 
+	@Test
+	fun `notification handler can be created`() {
+		val injector: Injector = runSonePluginWithRealInjector()
+		assertThat(injector.getInstance<NotificationHandler>(), notNullValue())
+	}
+
 	private fun runSonePluginWithRealInjector(): Injector {
 		lateinit var injector: Injector
 		val sonePlugin = SonePlugin {
@@ -81,6 +88,13 @@ class SonePluginTest {
 		sonePlugin.runPlugin(pluginRespirator)
 		val core = injector.getInstance<Core>()
 		verify(core).start()
+	}
+
+	@Test
+	fun `notification handler is being started`() {
+		sonePlugin.runPlugin(pluginRespirator)
+		val notificationHandler = injector.getInstance<NotificationHandler>()
+		verify(notificationHandler).start()
 	}
 
 }
