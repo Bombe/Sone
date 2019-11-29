@@ -26,11 +26,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
-import net.pterodactylus.sone.freenet.wot.WebOfTrustException;
 import net.pterodactylus.util.service.AbstractService;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -72,34 +69,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 	//
 	// ACTIONS
 	//
-
-	/**
-	 * Updates the trust relation between the truster and the trustee. This method
-	 * will return immediately and perform a trust update in the background.
-	 *
-	 * @param truster
-	 * 		The identity giving the trust
-	 * @param trustee
-	 * 		The identity receiving the trust
-	 * @param score
-	 * 		The new level of trust (from -100 to 100, may be {@code null} to remove
-	 * 		the trust completely)
-	 * @param comment
-	 * 		The comment of the trust relation
-	 */
-	@Override
-	public void setTrust(OwnIdentity truster, Identity trustee, Integer score, String comment) {
-		SetTrustJob setTrustJob = new SetTrustJob(truster, trustee, score, comment);
-		if (updateJobs.contains(setTrustJob)) {
-			updateJobs.remove(setTrustJob);
-		}
-		logger.log(Level.FINER, "Adding Trust Update Job: " + setTrustJob);
-		try {
-			updateJobs.put(setTrustJob);
-		} catch (InterruptedException e) {
-			/* the queue is unbounded so it should never block. */
-		}
-	}
 
 	/**
 	 * Adds the given context to the given own identity, waiting for completion of
@@ -292,91 +261,6 @@ public class WebOfTrustUpdaterImpl extends AbstractService implements WebOfTrust
 				this.success = success;
 				syncObject.notifyAll();
 			}
-		}
-
-	}
-
-	/**
-	 * Update job that sets the trust relation between two identities.
-	 */
-	@VisibleForTesting
-	class SetTrustJob extends WebOfTrustUpdateJob {
-
-		/** The identity giving the trust. */
-		private final OwnIdentity truster;
-
-		/** The identity receiving the trust. */
-		private final Identity trustee;
-
-		/** The score of the relation. */
-		private final Integer score;
-
-		/** The comment of the relation. */
-		private final String comment;
-
-		/**
-		 * Creates a new set trust job.
-		 *
-		 * @param truster
-		 * 		The identity giving the trust
-		 * @param trustee
-		 * 		The identity receiving the trust
-		 * @param score
-		 * 		The score of the trust (from -100 to 100, may be {@code null} to remote
-		 * 		the trust relation completely)
-		 * @param comment
-		 * 		The comment of the trust relation
-		 */
-		public SetTrustJob(OwnIdentity truster, Identity trustee, Integer score, String comment) {
-			this.truster = checkNotNull(truster, "truster must not be null");
-			this.trustee = checkNotNull(trustee, "trustee must not be null");
-			this.score = score;
-			this.comment = comment;
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		@SuppressWarnings("synthetic-access")
-		public void run() {
-			try {
-				if (score != null) {
-					webOfTrustConnector.setTrust(truster, trustee, score, comment);
-					trustee.setTrust(truster, new Trust(score, null, 0));
-				} else {
-					webOfTrustConnector.removeTrust(truster, trustee);
-					trustee.removeTrust(truster);
-				}
-				finish(true);
-			} catch (WebOfTrustException wote1) {
-				logger.log(Level.WARNING, "Could not set Trust value for " + truster + " -> " + trustee + " to " + score + " (" + comment + ")!", wote1);
-				finish(false);
-			}
-		}
-
-		//
-		// OBJECT METHODS
-		//
-
-		/** {@inheritDoc} */
-		@Override
-		public boolean equals(Object object) {
-			if ((object == null) || !object.getClass().equals(getClass())) {
-				return false;
-			}
-			SetTrustJob updateJob = (SetTrustJob) object;
-			return updateJob.truster.equals(truster) && updateJob.trustee.equals(trustee);
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public int hashCode() {
-			return getClass().hashCode() ^ truster.hashCode() ^ trustee.hashCode();
-		}
-
-		/** {@inheritDoc} */
-		@Override
-		public String toString() {
-			return String.format("%s[truster=%s,trustee=%s]", getClass().getSimpleName(), truster.getId(), trustee.getId());
 		}
 
 	}

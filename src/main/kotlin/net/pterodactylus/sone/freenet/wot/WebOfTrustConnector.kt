@@ -70,41 +70,6 @@ interface WebOfTrustConnector {
 	fun removeProperty(ownIdentity: OwnIdentity, name: String)
 
 	/**
-	 * Returns the trust for the given identity assigned to it by the given own
-	 * identity.
-	 *
-	 * @param ownIdentity The own identity
-	 * @param identity The identity to get the trust for
-	 * @return The trust for the given identity
-	 * @throws PluginException if an error occured talking to the Web of Trust plugin
-	 */
-	@Throws(PluginException::class)
-	fun getTrust(ownIdentity: OwnIdentity, identity: Identity): Trust
-
-	/**
-	 * Sets the trust for the given identity.
-	 *
-	 * @param ownIdentity The trusting identity
-	 * @param identity The trusted identity
-	 * @param trust The amount of trust (-100 thru 100)
-	 * @param comment The comment or explanation of the trust value
-	 * @throws PluginException if an error occured talking to the Web of Trust plugin
-	 */
-	@Throws(PluginException::class)
-	fun setTrust(ownIdentity: OwnIdentity, identity: Identity, trust: Int, comment: String)
-
-	/**
-	 * Removes any trust assignment of the given own identity for the given
-	 * identity.
-	 *
-	 * @param ownIdentity The own identity
-	 * @param identity The identity to remove all trust for
-	 * @throws WebOfTrustException if an error occurs
-	 */
-	@Throws(WebOfTrustException::class)
-	fun removeTrust(ownIdentity: OwnIdentity, identity: Identity)
-
-	/**
 	 * Pings the Web of Trust plugin. If the plugin can not be reached, a
 	 * [PluginException] is thrown.
 	 *

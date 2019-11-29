@@ -391,7 +391,7 @@ textarea {
 	color: #666;
 }
 
-#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .trust, #sone .post .distrust, #sone .post .untrust {
+#sone .post .delete, #sone .post .likes, #sone .post .like, #sone .post .unlike, #sone .post .wot-link {
 	display: inline;
 	font: inherit;
 	margin: 0px;
@@ -401,11 +401,11 @@ textarea {
 	display: none;
 }
 
-#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .trust.hidden, #sone .post .distrust.hidden, #sone .post .untrust.hidden, #sone .post .bookmark.hidden, #sone .post .unbookmark.hidden {
+#sone .post .like.hidden, #sone .post .unlike.hidden, #sone .post .bookmark.hidden, #sone .post .unbookmark.hidden {
 	display: none;
 }
 
-#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .trust button, #sone .post .distrust button, #sone .post .untrust button, #sone .post .bookmark button, #sone .post .unbookmark button {
+#sone .post .delete button, #sone .post .like button, #sone .post .unlike button, #sone .post .bookmark button, #sone .post .unbookmark button {
 	border: 0px;
 	background: none;
 	padding: 0px;
@@ -419,11 +419,7 @@ textarea {
 	font-weight: bold;
 }
 
-#sone .post .untrust button {
-	color: rgb(255, 0, 0);
-}
-
-#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .trust button:hover, #sone .post .distrust button:hover, #sone .post .untrust button:hover, #sone .post .bookmark button:hover, #sone .post .unbookmark button:hover {
+#sone .post .delete button:hover, #sone .post .like button:hover, #sone .post .unlike button:hover, #sone .post .bookmark button:hover, #sone .post .unbookmark button:hover {
 	border: 0px;
 	background: none;
 	padding: 0px;

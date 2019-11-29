@@ -64,19 +64,6 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 		performRequest(SimpleFieldSetBuilder().put("Message", "RemoveProperty").put("Identity", ownIdentity.id).put("Property", name).get())
 	}
 
-	override fun getTrust(ownIdentity: OwnIdentity, identity: Identity) =
-			performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentity").put("Truster", ownIdentity.id).put("Identity", identity.id).get())
-					.fields
-					.parseTrust()
-
-	override fun setTrust(ownIdentity: OwnIdentity, identity: Identity, trust: Int, comment: String) {
-		performRequest(SimpleFieldSetBuilder().put("Message", "SetTrust").put("Truster", ownIdentity.id).put("Trustee", identity.id).put("Value", trust.toString()).put("Comment", comment).get())
-	}
-
-	override fun removeTrust(ownIdentity: OwnIdentity, identity: Identity) {
-		performRequest(SimpleFieldSetBuilder().put("Message", "RemoveTrust").put("Truster", ownIdentity.id).put("Trustee", identity.id).get())
-	}
-
 	override fun ping() {
 		performRequest(SimpleFieldSetBuilder().put("Message", "Ping").get())
 	}

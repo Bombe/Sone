@@ -102,11 +102,6 @@ class AllPagesTest {
 	}
 
 	@Test
-	fun `distrust page can be injected`() {
-		assertThat(allPages.distrustPage, instanceOf<DistrustPage>())
-	}
-
-	@Test
 	fun `edit album page can be injected`() {
 		assertThat(allPages.editAlbumPage, instanceOf<EditAlbumPage>())
 	}
@@ -197,11 +192,6 @@ class AllPagesTest {
 	}
 
 	@Test
-	fun `trust page can be injected`() {
-		assertThat(allPages.trustPage, instanceOf<TrustPage>())
-	}
-
-	@Test
 	fun `unbookmark page can be injected`() {
 		assertThat(allPages.unbookmarkPage, instanceOf<UnbookmarkPage>())
 	}
@@ -219,11 +209,6 @@ class AllPagesTest {
 	@Test
 	fun `unlock sone page can be injected`() {
 		assertThat(allPages.unlockSonePage, instanceOf<UnlockSonePage>())
-	}
-
-	@Test
-	fun `untrust page can be injected`() {
-		assertThat(allPages.untrustPage, instanceOf<UntrustPage>())
 	}
 
 	@Test

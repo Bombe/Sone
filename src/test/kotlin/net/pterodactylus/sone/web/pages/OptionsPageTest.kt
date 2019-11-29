@@ -25,11 +25,8 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 		core.preferences.newImagesPerPage = 4
 		core.preferences.newFcpInterfaceActive = true
 		core.preferences.newRequireFullAccess = true
-		core.preferences.newNegativeTrust = 7
-		core.preferences.newPositiveTrust = 8
 		core.preferences.newPostCutOffLength = 51
 		core.preferences.newPostsPerPage = 10
-		core.preferences.newTrustComment = "11"
 	}
 
 	@Before
@@ -77,11 +74,8 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 			assertThat(templateContext["images-per-page"], equalTo<Any>(4))
 			assertThat(templateContext["fcp-interface-active"], equalTo<Any>(true))
 			assertThat(templateContext["require-full-access"], equalTo<Any>(true))
-			assertThat(templateContext["negative-trust"], equalTo<Any>(7))
-			assertThat(templateContext["positive-trust"], equalTo<Any>(8))
 			assertThat(templateContext["post-cut-off-length"], equalTo<Any>(51))
 			assertThat(templateContext["posts-per-page"], equalTo<Any>(10))
-			assertThat(templateContext["trust-comment"], equalTo<Any>("11"))
 		}
 	}
 
@@ -284,56 +278,6 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	}
 
 	@Test
-	fun `negative trust can not be set to -101`() {
-		verifyThatWrongValueForPreferenceIsDetected("negative-trust", "-101")
-	}
-
-	@Test
-	fun `negative trust can be set to -100`() {
-		verifyThatPreferencesCanBeSet("negative-trust", "-100", -100) { core.preferences.negativeTrust }
-	}
-
-	@Test
-	fun `negative trust can be set to 100`() {
-		verifyThatPreferencesCanBeSet("negative-trust", "100", 100) { core.preferences.negativeTrust }
-	}
-
-	@Test
-	fun `negative trust can not be set to 101`() {
-		verifyThatWrongValueForPreferenceIsDetected("negative-trust", "101")
-	}
-
-	@Test
-	fun `negative trust is set to default on invalid value`() {
-		verifyThatPreferencesCanBeSet("negative-trust", "invalid", -25) { core.preferences.negativeTrust }
-	}
-
-	@Test
-	fun `positive trust can not be set to -1`() {
-		verifyThatWrongValueForPreferenceIsDetected("positive-trust", "-1")
-	}
-
-	@Test
-	fun `positive trust can be set to 0`() {
-		verifyThatPreferencesCanBeSet("positive-trust", "0", 0) { core.preferences.positiveTrust }
-	}
-
-	@Test
-	fun `positive trust can be set to 100`() {
-		verifyThatPreferencesCanBeSet("positive-trust", "100", 100) { core.preferences.positiveTrust }
-	}
-
-	@Test
-	fun `positive trust can not be set to 101`() {
-		verifyThatWrongValueForPreferenceIsDetected("positive-trust", "101")
-	}
-
-	@Test
-	fun `positive trust is set to default on invalid value`() {
-		verifyThatPreferencesCanBeSet("positive-trust", "invalid", 75) { core.preferences.positiveTrust }
-	}
-
-	@Test
 	fun `post cut off length can not be set to -49`() {
 		verifyThatWrongValueForPreferenceIsDetected("post-cut-off-length", "-49")
 	}
@@ -361,16 +305,6 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	@Test
 	fun `posts per page is set to default on invalid value`() {
 		verifyThatPreferencesCanBeSet("posts-per-page", "invalid", 10) { core.preferences.postsPerPage }
-	}
-
-	@Test
-	fun `trust comment can be set`() {
-		verifyThatPreferencesCanBeSet("trust-comment", "trust", "trust") { core.preferences.trustComment }
-	}
-
-	@Test
-	fun `trust comment is set to default when set to empty value`() {
-		verifyThatPreferencesCanBeSet("trust-comment", "", "Set from Sone Web Interface") { core.preferences.trustComment }
 	}
 
 	@Test

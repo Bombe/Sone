@@ -50,9 +50,6 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			val imagesPerPage = soneRequest.parameters["images-per-page"]?.toIntOrNull()
 			val insertionDelay = soneRequest.parameters["insertion-delay"]?.toIntOrNull()
 			val fcpFullAccessRequired = soneRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
-			val negativeTrust = soneRequest.parameters["negative-trust"]?.toIntOrNull()
-			val positiveTrust = soneRequest.parameters["positive-trust"]?.toIntOrNull()
-			val trustComment = soneRequest.parameters["trust-comment"]?.emptyToNull
 
 			if (cantSetOption { soneRequest.core.preferences.newPostsPerPage = postsPerPage }) fieldsWithErrors += "posts-per-page"
 			if (cantSetOption { soneRequest.core.preferences.newCharactersPerPost = charactersPerPost }) fieldsWithErrors += "characters-per-post"
@@ -60,9 +57,6 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			if (cantSetOption { soneRequest.core.preferences.newImagesPerPage = imagesPerPage }) fieldsWithErrors += "images-per-page"
 			if (cantSetOption { soneRequest.core.preferences.newInsertionDelay = insertionDelay }) fieldsWithErrors += "insertion-delay"
 			fcpFullAccessRequired?.also { if (cantSetOption { soneRequest.core.preferences.newFcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
-			if (cantSetOption { soneRequest.core.preferences.newNegativeTrust = negativeTrust }) fieldsWithErrors += "negative-trust"
-			if (cantSetOption { soneRequest.core.preferences.newPositiveTrust = positiveTrust }) fieldsWithErrors += "positive-trust"
-			if (cantSetOption { soneRequest.core.preferences.newTrustComment = trustComment }) fieldsWithErrors += "trust-comment"
 
 			if (fieldsWithErrors.isEmpty()) {
 				soneRequest.core.touchConfiguration()
@@ -86,11 +80,8 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			templateContext["images-per-page"] = preferences.imagesPerPage
 			templateContext["fcp-interface-active"] = preferences.fcpInterfaceActive
 			templateContext["require-full-access"] = preferences.requireFullAccess
-			templateContext["negative-trust"] = preferences.negativeTrust
-			templateContext["positive-trust"] = preferences.positiveTrust
 			templateContext["post-cut-off-length"] = preferences.postCutOffLength
 			templateContext["posts-per-page"] = preferences.postsPerPage
-			templateContext["trust-comment"] = preferences.trustComment
 		}
 	}
 
