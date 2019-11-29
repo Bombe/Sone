@@ -6,6 +6,7 @@ import net.pterodactylus.sone.fcp.FcpInterface.*
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.*
 import net.pterodactylus.sone.fcp.event.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.util.config.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
@@ -61,6 +62,13 @@ class PreferencesTest {
 	@Test
 	fun `preferences start with insertion delay default value`() {
 		assertThat(preferences.insertionDelay, equalTo(60))
+	}
+
+	@Test
+	fun `preferences saves null for default insertion delay setting`() {
+		val configuration = Configuration(MapConfigurationBackend())
+		preferences.saveTo(configuration)
+		assertThat(configuration.getIntValue("Option/InsertionDelay").getValue(null), nullValue())
 	}
 
 	@Test
