@@ -33,7 +33,7 @@ class NewSoneHandler(private val notificationManager: NotificationManager, templ
 
 	@Subscribe
 	fun newSoneFound(newSoneFoundEvent: NewSoneFoundEvent) {
-		if (!notificationManager.hasNotification("first-start-notification")) {
+		if (!notificationManager.hasFirstStartNotification()) {
 			notification.add(newSoneFoundEvent.sone)
 			notificationManager.addNotification(notification)
 		}
@@ -50,6 +50,3 @@ class NewSoneHandler(private val notificationManager: NotificationManager, templ
 	}
 
 }
-
-private fun NotificationManager.hasNotification(id: String) =
-		getNotification(id) != null
