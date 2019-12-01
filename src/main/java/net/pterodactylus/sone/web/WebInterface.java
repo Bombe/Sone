@@ -704,8 +704,6 @@ public class WebInterface implements SessionProvider {
 				mentionNotification.add(post);
 				notificationManager.addNotification(mentionNotification);
 			}
-		} else {
-			getCore().markPostKnown(post);
 		}
 	}
 
