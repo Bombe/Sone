@@ -695,11 +695,11 @@ public class WebInterface implements SessionProvider {
 		boolean isLocal = post.getSone().isLocal();
 		if (isLocal) {
 			localPostNotification.add(post);
-		} else {
-			newPostNotification.add(post);
 		}
 		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(isLocal ? localPostNotification : newPostNotification);
+			if (isLocal) {
+				notificationManager.addNotification(localPostNotification);
+			}
 			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
 				mentionNotification.add(post);
 				notificationManager.addNotification(mentionNotification);
