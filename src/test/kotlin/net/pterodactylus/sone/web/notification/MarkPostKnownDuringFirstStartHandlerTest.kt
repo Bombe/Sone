@@ -24,7 +24,6 @@ import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import java.io.*
-import java.util.concurrent.atomic.*
 import kotlin.test.*
 
 /**
@@ -35,8 +34,8 @@ class MarkPostKnownDuringFirstStartHandlerTest {
 
 	private val eventBus = EventBus()
 	private val notificationManager = NotificationManager()
-	private val markedPostAsKnown = AtomicBoolean()
-	private val handler = MarkPostKnownDuringFirstStartHandler(notificationManager) { if (it == post) markedPostAsKnown.set(true) }
+	private val markedPosts = mutableListOf<Post>()
+	private val handler = MarkPostKnownDuringFirstStartHandler(notificationManager) { markedPosts += it }
 
 	init {
 		eventBus.register(handler)
@@ -45,7 +44,7 @@ class MarkPostKnownDuringFirstStartHandlerTest {
 	@Test
 	fun `post is not marked as known if not during first start`() {
 		eventBus.post(NewPostFoundEvent(post))
-		assertThat(markedPostAsKnown.get(), equalTo(false))
+		assertThat(markedPosts, emptyIterable())
 	}
 
 	@Test
@@ -54,7 +53,7 @@ class MarkPostKnownDuringFirstStartHandlerTest {
 			override fun render(writer: Writer?) = Unit
 		})
 		eventBus.post(NewPostFoundEvent(post))
-		assertThat(markedPostAsKnown.get(), equalTo(true))
+		assertThat(markedPosts, contains(post))
 	}
 
 }
