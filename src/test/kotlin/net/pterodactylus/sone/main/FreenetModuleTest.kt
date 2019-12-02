@@ -34,12 +34,6 @@ class FreenetModuleTest {
 	private val module = FreenetModule(pluginRespirator)
 	private val injector = Guice.createInjector(module)
 
-	private inline fun <reified T : Any> verifySingletonInstance() {
-		val firstInstance = injector.getInstance<T>()
-		val secondInstance = injector.getInstance<T>()
-		assertThat(firstInstance, sameInstance(secondInstance))
-	}
-
 	@Test
 	fun `plugin respirator is not bound`() {
 		expectedException.expect(Exception::class.java)
@@ -53,7 +47,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `node is returned as singleton`() {
-		verifySingletonInstance<Node>()
+		injector.verifySingletonInstance<Node>()
 	}
 
 	@Test
@@ -63,7 +57,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `high level simply client is returned as singleton`() {
-		verifySingletonInstance<HighLevelSimpleClient>()
+		injector.verifySingletonInstance<HighLevelSimpleClient>()
 	}
 
 	@Test
@@ -73,7 +67,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `session manager is returned as singleton`() {
-		verifySingletonInstance<SessionManager>()
+		injector.verifySingletonInstance<SessionManager>()
 		verify(pluginRespirator).getSessionManager("Sone")
 	}
 
@@ -84,7 +78,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `toadlet container is returned as singleten`() {
-		verifySingletonInstance<ToadletContainer>()
+		injector.verifySingletonInstance<ToadletContainer>()
 	}
 
 	@Test
@@ -94,7 +88,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `page maker is returned as singleton`() {
-		verifySingletonInstance<PageMaker>()
+		injector.verifySingletonInstance<PageMaker>()
 	}
 
 	@Test
@@ -106,7 +100,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `plugin respirator facade is returned as singleton`() {
-		verifySingletonInstance<PluginRespiratorFacade>()
+		injector.verifySingletonInstance<PluginRespiratorFacade>()
 	}
 
 	@Test
@@ -116,7 +110,7 @@ class FreenetModuleTest {
 
 	@Test
 	fun `plugin connector facade is returned as singleton`() {
-		verifySingletonInstance<PluginConnector>()
+		injector.verifySingletonInstance<PluginConnector>()
 	}
 
 }

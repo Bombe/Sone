@@ -256,9 +256,7 @@ class WebInterfaceModuleTest {
 
 	@Test
 	fun `template context factory is created as singleton`() {
-	    val factory1 = injector.getInstance<TemplateContextFactory>()
-	    val factory2 = injector.getInstance<TemplateContextFactory>()
-		assertThat(factory1, sameInstance(factory2))
+		injector.verifySingletonInstance<TemplateContextFactory>()
 	}
 
 	@Test
@@ -285,9 +283,7 @@ class WebInterfaceModuleTest {
 
 	@Test
 	fun `notification manager is created as singleton`() {
-		val firstNotificationManager = injector.getInstance<NotificationManager>()
-		val secondNotificationManager = injector.getInstance<NotificationManager>()
-		assertThat(firstNotificationManager, sameInstance(secondNotificationManager))
+		injector.verifySingletonInstance<NotificationManager>()
 	}
 
 	@Test
@@ -297,9 +293,7 @@ class WebInterfaceModuleTest {
 
 	@Test
 	fun `notification handler is created as singleton`() {
-		val firstNotificationHandler = injector.getInstance<NotificationHandler>()
-		val secondNotificationHandler = injector.getInstance<NotificationHandler>()
-		assertThat(firstNotificationHandler, sameInstance(secondNotificationHandler))
+		injector.verifySingletonInstance<NotificationHandler>()
 	}
 
 }

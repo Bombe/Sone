@@ -2,6 +2,8 @@ package net.pterodactylus.sone.test
 
 import com.google.inject.*
 import com.google.inject.name.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
 import org.mockito.*
 import javax.inject.Provider
 import kotlin.reflect.*
@@ -16,6 +18,13 @@ inline fun <reified T : Any> KClass<T>.isProvidedByDeepMock() = Module { it.bind
 inline fun <reified T : Any> Injector.getInstance(annotation: Annotation? = null): T = annotation
 		?.let { getInstance(Key.get(object : TypeLiteral<T>() {}, it)) }
 		?: getInstance(Key.get(object : TypeLiteral<T>() {}))
+
+
+inline fun <reified T : Any> Injector.verifySingletonInstance() {
+	val firstInstance = getInstance<T>()
+	val secondInstance = getInstance<T>()
+	assertThat(firstInstance, sameInstance(secondInstance))
+}
 
 fun <T : Any> supply(javaClass: Class<T>): Source<T> = object : Source<T> {
 	override fun fromInstance(instance: T) = Module { it.bind(javaClass).toInstance(instance) }
