@@ -17,23 +17,13 @@
 
 package net.pterodactylus.sone.web.notification
 
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.main.*
-import net.pterodactylus.util.notify.*
 import javax.inject.*
 
 /**
- * Handler for notifications that can create notifications and register them with an event bus.
+ * Container that causes notification handlers to be created and (more importantly) registered
+ * on creation with the event bus.
  */
-@Suppress("UnstableApiUsage")
-class NotificationHandler @Inject constructor(private val eventBus: EventBus, private val loaders: Loaders, private val notificationManager: NotificationManager) {
-
-	fun start() {
-		register { SoneLockedOnStartupHandler(it, loaders.loadTemplate("/templates/notify/soneLockedOnStartupNotification.html")) }
-		register { NewSoneHandler(it, loaders.loadTemplate("/templates/notify/newSoneNotification.html")) }
-	}
-
-	private fun register(handler: (NotificationManager) -> Any) =
-			handler(notificationManager).also(eventBus::register)
-
-}
+@Suppress("UNUSED_PARAMETER")
+class NotificationHandler @Inject constructor(
+		markPostKnownDuringFirstStartHandler: MarkPostKnownDuringFirstStartHandler
+)
