@@ -27,6 +27,7 @@ import net.pterodactylus.sone.fcp.*;
 import net.pterodactylus.sone.freenet.wot.*;
 import net.pterodactylus.sone.web.*;
 import net.pterodactylus.sone.web.notification.NotificationHandler;
+import net.pterodactylus.sone.web.notification.NotificationHandlerModule;
 
 import freenet.l10n.BaseL10n.*;
 import freenet.l10n.*;
@@ -197,7 +198,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 		/* create the web interface. */
 		webInterface = injector.getInstance(WebInterface.class);
-		NotificationHandler notificationHandler = injector.getInstance(NotificationHandler.class);
+
+		/* we need to request this to install all notification handlers. */
+		injector.getInstance(NotificationHandler.class);
 
 		/* start core! */
 		core.start();
@@ -206,7 +209,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		webInterface.start();
 		webInterface.setFirstStart(injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart"))));
 		webInterface.setNewConfig(injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig"))));
-		notificationHandler.start();
 	}
 
 	@VisibleForTesting
@@ -214,8 +216,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		FreenetModule freenetModule = new FreenetModule(pluginRespirator);
 		AbstractModule soneModule = new SoneModule(this, new EventBus());
 		Module webInterfaceModule = new WebInterfaceModule();
+		Module notificationHandlerModule = new NotificationHandlerModule();
 
-		return createInjector(freenetModule, soneModule, webInterfaceModule);
+		return createInjector(freenetModule, soneModule, webInterfaceModule, notificationHandlerModule);
 	}
 
 	@VisibleForTesting

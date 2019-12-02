@@ -22,7 +22,6 @@ import kotlin.test.*
 @Dirty
 class SonePluginTest {
 
-	private var injector = mockInjector()
 	private val sonePlugin by lazy { SonePlugin { injector } }
 	private val pluginRespirator = deepMock<PluginRespirator>()
 	private val node = deepMock<Node>()
@@ -91,27 +90,31 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `notification handler is being started`() {
+	fun `notification handler is being requested`() {
 		sonePlugin.runPlugin(pluginRespirator)
-		val notificationHandler = injector.getInstance<NotificationHandler>()
-		verify(notificationHandler).start()
+		assertThat(getInjected(NotificationHandler::class.java), notNullValue())
 	}
 
-}
+	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =
+			injected[TypeLiteral.get(clazz) to annotation] as? T
 
-private fun mockInjector() = mock<Injector>().apply {
-	val injected = mutableMapOf<Pair<TypeLiteral<*>, Annotation?>, Any>()
-	fun mockValue(clazz: Class<*>) = false.takeIf { clazz.name == java.lang.Boolean::class.java.name } ?: mock(clazz)
-	whenever(getInstance(any<Key<*>>())).then {
-		injected.getOrPut((it.getArgument(0) as Key<*>).let { it.typeLiteral to it.annotation }) {
-			it.getArgument<Key<*>>(0).typeLiteral.type.typeName.toClass().let(::mockValue)
+	private val injected =
+			mutableMapOf<Pair<TypeLiteral<*>, Annotation?>, Any>()
+
+	private val injector = mock<Injector>().apply {
+		fun mockValue(clazz: Class<*>) = false.takeIf { clazz.name == java.lang.Boolean::class.java.name } ?: mock(clazz)
+		whenever(getInstance(any<Key<*>>())).then {
+			injected.getOrPut((it.getArgument(0) as Key<*>).let { it.typeLiteral to it.annotation }) {
+				it.getArgument<Key<*>>(0).typeLiteral.type.typeName.toClass().let(::mockValue)
+			}
+		}
+		whenever(getInstance(any<Class<*>>())).then {
+			injected.getOrPut(TypeLiteral.get(it.getArgument(0) as Class<*>) to null) {
+				it.getArgument<Class<*>>(0).let(::mockValue)
+			}
 		}
 	}
-	whenever(getInstance(any<Class<*>>())).then {
-		injected.getOrPut(TypeLiteral.get(it.getArgument(0) as Class<*>) to null) {
-			it.getArgument<Class<*>>(0).let(::mockValue)
-		}
-	}
+
 }
 
 private fun String.toClass(): Class<*> = SonePlugin::class.java.classLoader.loadClass(this)
