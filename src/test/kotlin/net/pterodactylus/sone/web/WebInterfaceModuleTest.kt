@@ -278,7 +278,7 @@ class WebInterfaceModuleTest {
 	@Test
 	fun `page toadlet factory is created with correct prefix`() {
 		val page = mock<Page<FreenetRequest>>()
-	    assertThat(injector.getInstance<PageToadletFactory>().createPageToadlet(page).path(), startsWith("/Sone/"))
+		assertThat(injector.getInstance<PageToadletFactory>().createPageToadlet(page).path(), startsWith("/Sone/"))
 	}
 
 	@Test
