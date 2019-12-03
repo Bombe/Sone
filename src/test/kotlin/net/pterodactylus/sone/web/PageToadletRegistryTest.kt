@@ -5,7 +5,6 @@ import freenet.clients.http.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.page.*
-import net.pterodactylus.util.web.*
 import org.junit.*
 import org.junit.rules.*
 import org.mockito.Mockito.*
@@ -36,7 +35,7 @@ class PageToadletRegistryTest {
 		verify(pageMaker).addNavigationCategory("/Sone/index.html", "Navigation.Menu.Sone.Name", "Navigation.Menu.Sone.Tooltip", sonePlugin)
 	}
 
-	private val page = TestPage()
+	private val page = TestPage<FreenetRequest>()
 
 	@Test
 	fun `adding a page without menuname will add it correctly`() {
@@ -146,11 +145,5 @@ class PageToadletRegistryTest {
 				whenever(this.path()).thenReturn("/Sone/")
 				whenever(this.menuName).thenReturn(menuName)
 			}
-
-	private class TestPage : Page<FreenetRequest> {
-		override fun getPath() = ""
-		override fun isPrefixPage() = false
-		override fun handleRequest(freenetRequest: FreenetRequest, response: Response) = response
-	}
 
 }
