@@ -19,10 +19,15 @@ package net.pterodactylus.sone.web.notification
 
 import com.google.inject.*
 import com.google.inject.Guice.*
+import com.google.inject.name.Names.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.notify.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
@@ -37,15 +42,22 @@ class NotificationHandlerModuleTest {
 
 	private val core = mock<Core>()
 	private val notificationManager = NotificationManager()
+	private val loaders = TestLoaders()
 	private val injector: Injector = createInjector(
 			Core::class.isProvidedBy(core),
 			NotificationManager::class.isProvidedBy(notificationManager),
+			Loaders::class.isProvidedBy(loaders),
 			NotificationHandlerModule()
 	)
 
 	@Test
 	fun `module can create notification handler`() {
 		assertThat(injector.getInstance<NotificationHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `notification handler is created as singleton`() {
+		injector.verifySingletonInstance<NotificationHandler>()
 	}
 
 	@Test
@@ -62,6 +74,43 @@ class NotificationHandlerModuleTest {
 		val post = mock<Post>()
 		handler.newPostFound(NewPostFoundEvent(post))
 		verify(core).markPostKnown(post)
+	}
+
+	@Test
+	fun `module can create sone-locked-on-startup handler`() {
+		assertThat(injector.getInstance<SoneLockedOnStartupHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `sone-locked-on-startup handler is created as singleton`() {
+		injector.verifySingletonInstance<SoneLockedOnStartupHandler>()
+	}
+
+	@Test
+	fun `module can create sone-locked-on-startup notification with correct id`() {
+		val notification = injector.getInstance<ListNotification<Sone>>(named("soneLockedOnStartup"))
+		assertThat(notification.id, equalTo("sone-locked-on-startup"))
+	}
+
+	@Test
+	fun `sone-locked-on-startup notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Sone>>(named("soneLockedOnStartup"))
+	}
+
+	@Test
+	fun `module can create sone-locked-on-startup notification with correct template and key`() {
+		loaders.templates += "/templates/notify/soneLockedOnStartupNotification.html" to "<% sones>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Sone>>(named("soneLockedOnStartup"))
+		val sone1 = IdOnlySone("sone1")
+		val sone2 = IdOnlySone("sone2")
+		notification.add(sone1)
+		notification.add(sone2)
+		assertThat(notification.render(), equalTo(listOf(sone1, sone2).toString()))
+	}
+
+	@Test
+	fun `sone-locked-on-startup notification is dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Sone>>(named("soneLockedOnStartup")).isDismissable, equalTo(true))
 	}
 
 }

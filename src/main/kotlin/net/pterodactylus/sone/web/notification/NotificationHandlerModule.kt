@@ -19,15 +19,35 @@ package net.pterodactylus.sone.web.notification
 
 import com.google.inject.*
 import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.main.*
+import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
+import javax.inject.Singleton
 
 /**
  * Guice module for creating all notification handlers.
  */
 class NotificationHandlerModule : AbstractModule() {
 
+	override fun configure() {
+		bind(NotificationHandler::class.java).`in`(Singleton::class.java)
+	}
+
 	@Provides
 	fun getMarkPostKnownDuringFirstStartHandler(core: Core, notificationManager: NotificationManager) =
 			MarkPostKnownDuringFirstStartHandler(notificationManager, core::markPostKnown)
+
+	@Provides
+	@Singleton
+	fun getSoneLockedOnStartupHandler(notificationManager: NotificationManager, @Named("soneLockedOnStartup") notification: ListNotification<Sone>) =
+			SoneLockedOnStartupHandler(notificationManager, notification)
+
+	@Provides
+	@Singleton
+	@Named("soneLockedOnStartup")
+	fun getSoneLockedOnStartupNotification(loaders: Loaders) =
+			ListNotification<Sone>("sone-locked-on-startup", "sones", loaders.loadTemplate("/templates/notify/soneLockedOnStartupNotification.html"))
 
 }

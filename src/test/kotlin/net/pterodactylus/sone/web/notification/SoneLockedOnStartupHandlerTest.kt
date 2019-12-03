@@ -19,10 +19,11 @@ package net.pterodactylus.sone.web.notification
 
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.notify.*
-import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
+import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import kotlin.test.*
@@ -35,29 +36,24 @@ class SoneLockedOnStartupHandlerTest {
 	@Suppress("UnstableApiUsage")
 	private val eventBus = EventBus()
 	private val manager = NotificationManager()
-	private val notification by lazy { manager.notifications.single() as ListNotification<*> }
+	private val notification = ListNotification<Sone>("", "", Template())
 
 	init {
-		SoneLockedOnStartupHandler(manager, template).also(eventBus::register)
-		eventBus.post(SoneLockedOnStartup(sone))
-	}
-
-	@Test
-	fun `notification has correct id`() {
-		assertThat(notification.id, equalTo("sone-locked-on-startup"))
+		SoneLockedOnStartupHandler(manager, notification).also(eventBus::register)
 	}
 
 	@Test
 	fun `handler adds sone to notification when event is posted`() {
+		eventBus.post(SoneLockedOnStartup(sone))
 		assertThat(notification.elements, contains<Any>(sone))
 	}
 
 	@Test
-	fun `handler creates notification with correct key`() {
-		assertThat(notification.render(), equalTo(listOf(sone).toString()))
+	fun `handler adds notification to manager`() {
+		eventBus.post(SoneLockedOnStartup(sone))
+		assertThat(manager.notifications, contains<Notification>(notification))
 	}
 
 }
 
 private val sone = IdOnlySone("sone-id")
-private val template = "<% sones>".asTemplate()

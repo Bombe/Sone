@@ -286,14 +286,4 @@ class WebInterfaceModuleTest {
 		injector.verifySingletonInstance<NotificationManager>()
 	}
 
-	@Test
-	fun `notification handler can be created`() {
-		assertThat(injector.getInstance<NotificationHandler>(), notNullValue())
-	}
-
-	@Test
-	fun `notification handler is created as singleton`() {
-		injector.verifySingletonInstance<NotificationHandler>()
-	}
-
 }
