@@ -20,9 +20,9 @@ inline fun <reified T : Any> Injector.getInstance(annotation: Annotation? = null
 		?: getInstance(Key.get(object : TypeLiteral<T>() {}))
 
 
-inline fun <reified T : Any> Injector.verifySingletonInstance() {
-	val firstInstance = getInstance<T>()
-	val secondInstance = getInstance<T>()
+inline fun <reified T : Any> Injector.verifySingletonInstance(annotation: Annotation? = null) {
+	val firstInstance = getInstance<T>(annotation)
+	val secondInstance = getInstance<T>(annotation)
 	assertThat(firstInstance, sameInstance(secondInstance))
 }
 
