@@ -19,11 +19,11 @@ package net.pterodactylus.sone.web.notification
 
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.notify.*
-import net.pterodactylus.sone.test.*
-import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
+import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import java.io.*
@@ -34,7 +34,8 @@ class NewSoneHandlerTest {
 	@Suppress("UnstableApiUsage")
 	private val eventBus = EventBus()
 	private val notificationManager = NotificationManager()
-	private val handler = NewSoneHandler(notificationManager, "<% sones>".asTemplate())
+	private val notification = ListNotification<Sone>("", "", Template())
+	private val handler = NewSoneHandler(notificationManager, notification)
 
 	init {
 		eventBus.register(handler)
@@ -43,29 +44,13 @@ class NewSoneHandlerTest {
 	@Test
 	fun `handler adds notification if new sone event is fired`() {
 		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single() as ListNotification<*>
-		assertThat(notification.id, equalTo("new-sone-notification"))
+		assertThat(notificationManager.notifications, contains<Notification>(notification))
 	}
 
 	@Test
 	fun `handler adds sone to notification`() {
 		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single() as ListNotification<*>
-		assertThat(notification.elements, contains<Any>(sone))
-	}
-
-	@Test
-	fun `handler sets correct key for sones`() {
-		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single() as ListNotification<*>
-		assertThat(notification.render(), equalTo(listOf(sone).toString()))
-	}
-
-	@Test
-	fun `handler creates non-dismissable notification`() {
-		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single() as ListNotification<*>
-		assertThat(notification, matches("is not dismissable") { !it.isDismissable })
+		assertThat(notification.elements, contains(sone))
 	}
 
 	@Test
@@ -74,26 +59,23 @@ class NewSoneHandlerTest {
 			override fun render(writer: Writer) = Unit
 		})
 		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single()
-		assertThat(notification.id, equalTo("first-start-notification"))
+		assertThat(notificationManager.notifications.single().id, equalTo("first-start-notification"))
 	}
 
 	@Test
 	fun `handler removes sone from notification if sone is marked as known`() {
-		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single() as ListNotification<*>
+		notification.add(sone)
 		eventBus.post(MarkSoneKnownEvent(sone))
 		assertThat(notification.elements, emptyIterable())
 	}
 
 	@Test
 	fun `handler removes sone from notification if sone is removed`() {
-		eventBus.post(NewSoneFoundEvent(sone))
-		val notification = notificationManager.notifications.single() as ListNotification<*>
+		notification.add(sone)
 		eventBus.post(SoneRemovedEvent(sone))
 		assertThat(notification.elements, emptyIterable())
 	}
 
 }
 
-private val sone = IdOnlySone("sone-id")
+private val sone: Sone = IdOnlySone("sone-id")

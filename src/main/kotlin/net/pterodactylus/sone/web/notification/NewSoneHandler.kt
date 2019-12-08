@@ -22,14 +22,11 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
-import net.pterodactylus.util.template.*
 
 /**
  * Notification handler for “new Sone discovered” events.
  */
-class NewSoneHandler(private val notificationManager: NotificationManager, template: Template) {
-
-	private val notification = ListNotification<Sone>("new-sone-notification", "sones", template, dismissable = false)
+class NewSoneHandler(private val notificationManager: NotificationManager, private val notification: ListNotification<Sone>) {
 
 	@Subscribe
 	fun newSoneFound(newSoneFoundEvent: NewSoneFoundEvent) {

@@ -50,4 +50,14 @@ class NotificationHandlerModule : AbstractModule() {
 	fun getSoneLockedOnStartupNotification(loaders: Loaders) =
 			ListNotification<Sone>("sone-locked-on-startup", "sones", loaders.loadTemplate("/templates/notify/soneLockedOnStartupNotification.html"))
 
+	@Provides
+	@Singleton
+	fun getNewSoneHandler(notificationManager: NotificationManager, @Named("newSone") notification: ListNotification<Sone>) =
+			NewSoneHandler(notificationManager, notification)
+
+	@Provides
+	@Named("newSone")
+	fun getNewSoneNotification(loaders: Loaders) =
+			ListNotification<Sone>("new-sone-notification", "sones", loaders.loadTemplate("/templates/notify/newSoneNotification.html"), dismissable = false)
+
 }

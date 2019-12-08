@@ -113,4 +113,33 @@ class NotificationHandlerModuleTest {
 		assertThat(injector.getInstance<ListNotification<Sone>>(named("soneLockedOnStartup")).isDismissable, equalTo(true))
 	}
 
+	@Test
+	fun `new-sone handler can be created`() {
+		assertThat(injector.getInstance<NewSoneHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `new-sone handler is created as singleton`() {
+		injector.verifySingletonInstance<NewSoneHandler>()
+	}
+
+	@Test
+	fun `new-sone notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Sone>>(named("newSone")).id, equalTo("new-sone-notification"))
+	}
+
+	@Test
+	fun `new-sone notification has correct key and template`() {
+		loaders.templates += "/templates/notify/newSoneNotification.html" to "<% sones>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Sone>>(named("newSone"))
+		val sones = listOf(IdOnlySone("sone1"), IdOnlySone("sone2"))
+		sones.forEach(notification::add)
+		assertThat(notification.render(), equalTo(sones.toString()))
+	}
+
+	@Test
+	fun `new-sone notification is not dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Sone>>(named("newSone")).isDismissable, equalTo(false))
+	}
+
 }
