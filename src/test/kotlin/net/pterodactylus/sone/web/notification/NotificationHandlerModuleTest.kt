@@ -23,6 +23,7 @@ import com.google.inject.name.Names.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Post.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
@@ -63,6 +64,11 @@ class NotificationHandlerModuleTest {
 	@Test
 	fun `module can create mark-post-known-during-first-start handler`() {
 		assertThat(injector.getInstance<MarkPostKnownDuringFirstStartHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `mark-post-known-during-first-start handler is created as singleton`() {
+		injector.verifySingletonInstance<MarkPostKnownDuringFirstStartHandler>()
 	}
 
 	@Test
@@ -140,6 +146,45 @@ class NotificationHandlerModuleTest {
 	@Test
 	fun `new-sone notification is not dismissable`() {
 		assertThat(injector.getInstance<ListNotification<Sone>>(named("newSone")).isDismissable, equalTo(false))
+	}
+
+	@Test
+	fun `new-remote-post handler can be created`() {
+		assertThat(injector.getInstance<NewRemotePostHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `new-remote-post handler is created as singleton`() {
+		injector.verifySingletonInstance<NewRemotePostHandler>()
+	}
+
+	@Test
+	fun `new-remote-post notification can be created`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("newRemotePost")), notNullValue())
+	}
+
+	@Test
+	fun `new-remote-post notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Post>>(named("newRemotePost"))
+	}
+
+	@Test
+	fun `new-remote-post notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("newRemotePost")).id, equalTo("new-post-notification"))
+	}
+
+	@Test
+	fun `new-remote-post notification is not dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("newRemotePost")).isDismissable, equalTo(false))
+	}
+
+	@Test
+	fun `new-remote-post notification has correct key and template`() {
+		loaders.templates += "/templates/notify/newPostNotification.html" to "<% posts>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Post>>(named("newRemotePost"))
+		val posts = listOf(EmptyPost("post1"), EmptyPost("post2"))
+		posts.forEach(notification::add)
+		assertThat(notification.render(), equalTo(posts.toString()))
 	}
 
 }

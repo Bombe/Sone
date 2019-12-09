@@ -36,6 +36,7 @@ class NotificationHandlerModule : AbstractModule() {
 	}
 
 	@Provides
+	@Singleton
 	fun getMarkPostKnownDuringFirstStartHandler(core: Core, notificationManager: NotificationManager) =
 			MarkPostKnownDuringFirstStartHandler(notificationManager, core::markPostKnown)
 
@@ -59,5 +60,16 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("newSone")
 	fun getNewSoneNotification(loaders: Loaders) =
 			ListNotification<Sone>("new-sone-notification", "sones", loaders.loadTemplate("/templates/notify/newSoneNotification.html"), dismissable = false)
+
+	@Provides
+	@Singleton
+	fun getNewRemotePostHandler(notificationManager: NotificationManager, @Named("newRemotePost") newPostNotification: ListNotification<Post>) =
+			NewRemotePostHandler(notificationManager, newPostNotification)
+
+	@Provides
+	@Singleton
+	@Named("newRemotePost")
+	fun getNewPostNotification(loaders: Loaders) =
+			ListNotification<Post>("new-post-notification", "posts", loaders.loadTemplate("/templates/notify/newPostNotification.html"), dismissable = false)
 
 }
