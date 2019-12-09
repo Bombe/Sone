@@ -26,5 +26,7 @@ import javax.inject.*
 @Suppress("UNUSED_PARAMETER")
 class NotificationHandler @Inject constructor(
 		markPostKnownDuringFirstStartHandler: MarkPostKnownDuringFirstStartHandler,
-		newRemotePostHandler: NewRemotePostHandler
+		newSoneHandler: NewSoneHandler,
+		newRemotePostHandler: NewRemotePostHandler,
+		soneLockedOnStartupHandler: SoneLockedOnStartupHandler
 )
