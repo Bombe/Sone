@@ -20,6 +20,8 @@ package net.pterodactylus.sone.web.notification
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.Post.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
@@ -44,15 +46,27 @@ class NewRemotePostHandlerTest {
 	}
 
 	@Test
-	fun `handler adds post to new-post notification`() {
-		eventBus.post(NewPostFoundEvent(post))
-		assertThat(notification.elements, contains(post))
+	fun `handler adds remote post to new-post notification`() {
+		eventBus.post(NewPostFoundEvent(remotePost))
+		assertThat(notification.elements, contains(remotePost))
 	}
 
 	@Test
-	fun `handler adds notification to notification manager`() {
-		eventBus.post(NewPostFoundEvent(post))
+	fun `handler does not add local post to new-post notification`() {
+		eventBus.post(NewPostFoundEvent(localPost))
+		assertThat(notification.elements, emptyIterable())
+	}
+
+	@Test
+	fun `handler adds notification for remote post to notification manager`() {
+		eventBus.post(NewPostFoundEvent(remotePost))
 		assertThat(notificationManager.notifications, contains<Notification>(notification))
+	}
+
+	@Test
+	fun `handler does not add notification for local post to notification manager`() {
+		eventBus.post(NewPostFoundEvent(localPost))
+		assertThat(notificationManager.notifications, emptyIterable())
 	}
 
 	@Test
@@ -60,10 +74,20 @@ class NewRemotePostHandlerTest {
 		notificationManager.addNotification(object : AbstractNotification("first-start-notification") {
 			override fun render(writer: Writer?) = Unit
 		})
-		eventBus.post(NewPostFoundEvent(post))
+		eventBus.post(NewPostFoundEvent(remotePost))
 		assertThat(notificationManager.notifications, not(hasItem(notification)))
 	}
 
 }
 
-private val post: Post = Post.EmptyPost("post")
+private val remoteSone: Sone = IdOnlySone("remote-sone")
+private val remotePost: Post = object : EmptyPost("remote-post") {
+	override fun getSone() = remoteSone
+}
+
+private val localSone: Sone = object : IdOnlySone("local-sone") {
+	override fun isLocal() = true
+}
+private val localPost: Post = object : EmptyPost("local-post") {
+	override fun getSone() = localSone
+}

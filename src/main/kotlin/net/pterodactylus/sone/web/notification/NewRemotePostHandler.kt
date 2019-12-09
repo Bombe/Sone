@@ -31,9 +31,11 @@ class NewRemotePostHandler(private val notificationManager: NotificationManager,
 
 	@Subscribe
 	fun newPostFound(newPostFoundEvent: NewPostFoundEvent) {
-		notification.add(newPostFoundEvent.post)
-		if (!notificationManager.hasFirstStartNotification()) {
-			notificationManager.addNotification(notification)
+		if (!newPostFoundEvent.post.sone.isLocal) {
+			notification.add(newPostFoundEvent.post)
+			if (!notificationManager.hasFirstStartNotification()) {
+				notificationManager.addNotification(notification)
+			}
 		}
 	}
 
