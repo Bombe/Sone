@@ -35,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Named;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.ElementLoader;
@@ -205,7 +206,7 @@ public class WebInterface implements SessionProvider {
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
 			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
-			NotificationManager notificationManager) {
+			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -222,6 +223,7 @@ public class WebInterface implements SessionProvider {
 		this.l10nFilter = l10nFilter;
 		this.translation = translation;
 		this.notificationManager = notificationManager;
+		this.newPostNotification = newPostNotification;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 
@@ -230,9 +232,6 @@ public class WebInterface implements SessionProvider {
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template newPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
-		newPostNotification = new ListNotification<>("new-post-notification", "posts", newPostNotificationTemplate, false);
-
 		Template localPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
 		localPostNotification = new ListNotification<>("local-post-notification", "posts", localPostNotificationTemplate, false);
 
@@ -394,16 +393,6 @@ public class WebInterface implements SessionProvider {
 	 */
 	public String getFormPassword() {
 		return formPassword;
-	}
-
-	/**
-	 * Returns the posts that have been announced as new in the
-	 * {@link #newPostNotification}.
-	 *
-	 * @return The new posts
-	 */
-	public Set<Post> getNewPosts() {
-		return ImmutableSet.<Post> builder().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).build();
 	}
 
 	@Nonnull
