@@ -23,11 +23,11 @@ import javax.inject.*
  * Container that causes notification handlers to be created and (more importantly) registered
  * on creation with the event bus.
  */
-@Suppress("UNUSED_PARAMETER")
+@Suppress("unused")
 class NotificationHandler @Inject constructor(
-		markPostKnownDuringFirstStartHandler: MarkPostKnownDuringFirstStartHandler,
-		newSoneHandler: NewSoneHandler,
-		newRemotePostHandler: NewRemotePostHandler,
-		soneLockedOnStartupHandler: SoneLockedOnStartupHandler,
-		soneLockedHandler: SoneLockedHandler
+		val markPostKnownDuringFirstStartHandler: MarkPostKnownDuringFirstStartHandler,
+		val newSoneHandler: NewSoneHandler,
+		val newRemotePostHandler: NewRemotePostHandler,
+		val soneLockedOnStartupHandler: SoneLockedOnStartupHandler,
+		val soneLockedHandler: SoneLockedHandler
 )
