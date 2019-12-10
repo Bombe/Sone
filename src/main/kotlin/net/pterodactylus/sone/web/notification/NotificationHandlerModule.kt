@@ -39,6 +39,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<MarkPostKnownDuringFirstStartHandler>().asSingleton()
 		bind<SoneLockedOnStartupHandler>().asSingleton()
 		bind<NewSoneHandler>().asSingleton()
+		bind<NewRemotePostHandler>().asSingleton()
 	}
 
 	@Provides
@@ -54,11 +55,6 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("newSone")
 	fun getNewSoneNotification(loaders: Loaders) =
 			ListNotification<Sone>("new-sone-notification", "sones", loaders.loadTemplate("/templates/notify/newSoneNotification.html"), dismissable = false)
-
-	@Provides
-	@Singleton
-	fun getNewRemotePostHandler(notificationManager: NotificationManager, @Named("newRemotePost") newPostNotification: ListNotification<Post>) =
-			NewRemotePostHandler(notificationManager, newPostNotification)
 
 	@Provides
 	@Singleton

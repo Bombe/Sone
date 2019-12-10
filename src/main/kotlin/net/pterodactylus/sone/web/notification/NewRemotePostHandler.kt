@@ -22,12 +22,13 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handler for [NewPostFoundEvent]s that adds the new post to the “new posts” notification and
  * displays the notification if the “first start” notification is not being shown.
  */
-class NewRemotePostHandler(private val notificationManager: NotificationManager, private val notification: ListNotification<Post>) {
+class NewRemotePostHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("newRemotePost") private val notification: ListNotification<Post>) {
 
 	@Subscribe
 	fun newPostFound(newPostFoundEvent: NewPostFoundEvent) {
