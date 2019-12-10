@@ -14,8 +14,10 @@ import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.util.config.*
 import net.pterodactylus.util.config.ConfigurationException
+import net.pterodactylus.util.logging.*
 import net.pterodactylus.util.version.Version
 import java.io.*
+import java.util.logging.*
 
 open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: EventBus) : AbstractModule() {
 
@@ -58,10 +60,15 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 
 		bindListener(Matchers.any(), object : TypeListener {
 			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {
-				typeEncounter.register(InjectionListener { injectee -> eventBus.register(injectee) })
+				typeEncounter.register(InjectionListener { injectee ->
+					logger.fine { "Injecting $injectee..." }
+					eventBus.register(injectee)
+				})
 			}
 		})
 	}
+
+	private val logger: Logger = Logging.getLogger(javaClass)
 
 }
 
