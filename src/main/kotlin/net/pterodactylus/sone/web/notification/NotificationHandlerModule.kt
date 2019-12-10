@@ -38,6 +38,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind(NotificationHandler::class.java).`in`(Singleton::class.java)
 		bind<MarkPostKnownDuringFirstStartHandler>().asSingleton()
 		bind<SoneLockedOnStartupHandler>().asSingleton()
+		bind<NewSoneHandler>().asSingleton()
 	}
 
 	@Provides
@@ -48,11 +49,6 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("soneLockedOnStartup")
 	fun getSoneLockedOnStartupNotification(loaders: Loaders) =
 			ListNotification<Sone>("sone-locked-on-startup", "sones", loaders.loadTemplate("/templates/notify/soneLockedOnStartupNotification.html"))
-
-	@Provides
-	@Singleton
-	fun getNewSoneHandler(notificationManager: NotificationManager, @Named("newSone") notification: ListNotification<Sone>) =
-			NewSoneHandler(notificationManager, notification)
 
 	@Provides
 	@Named("newSone")

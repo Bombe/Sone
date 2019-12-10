@@ -22,11 +22,12 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Notification handler for “new Sone discovered” events.
  */
-class NewSoneHandler(private val notificationManager: NotificationManager, private val notification: ListNotification<Sone>) {
+class NewSoneHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("newSone") private val notification: ListNotification<Sone>) {
 
 	@Subscribe
 	fun newSoneFound(newSoneFoundEvent: NewSoneFoundEvent) {
