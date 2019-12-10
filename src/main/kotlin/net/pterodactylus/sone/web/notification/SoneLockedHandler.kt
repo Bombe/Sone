@@ -40,25 +40,25 @@ class SoneLockedHandler @Inject constructor(
 	@Subscribe
 	fun soneLocked(soneLockedEvent: SoneLockedEvent) {
 		synchronized(future) {
-			future.get()?.also { cancelPreviousFuture(it, soneLockedEvent.sone) }
-			future.set(executor.schedule(showNotification(soneLockedEvent.sone), 5, TimeUnit.MINUTES))
+			notification.add(soneLockedEvent.sone)
+			future.get()?.also(this::cancelPreviousFuture)
+			future.set(executor.schedule(::showNotification, 5, TimeUnit.MINUTES))
 		}
 	}
 
 	@Subscribe
 	fun soneUnlocked(soneUnlockedEvent: SoneUnlockedEvent) {
 		synchronized(future) {
-			future.get()?.also { cancelPreviousFuture(it, soneUnlockedEvent.sone) }
+			notification.remove(soneUnlockedEvent.sone)
+			future.get()?.also(::cancelPreviousFuture)
 		}
 	}
 
-	private fun cancelPreviousFuture(future: ScheduledFuture<*>, sone: Sone) {
-		notification.remove(sone)
+	private fun cancelPreviousFuture(future: ScheduledFuture<*>) {
 		future.cancel(true)
 	}
 
-	private fun showNotification(sone: Sone): () -> Unit = {
-		notification.add(sone)
+	private fun showNotification() {
 		notificationManager.addNotification(notification)
 	}
 

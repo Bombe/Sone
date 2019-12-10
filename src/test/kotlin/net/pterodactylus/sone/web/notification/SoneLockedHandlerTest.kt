@@ -44,16 +44,18 @@ class SoneLockedHandlerTest {
 		SoneLockedHandler(notificationManager, notification, executor).also(eventBus::register)
 	}
 
+	@AfterTest
+	fun shutdownExecutor() = executor.shutdown()
+
 	@Test
-	fun `notification is not added during the first five minutes`() {
+	fun `notification is not added before the command is run`() {
 		eventBus.post(SoneLockedEvent(sone))
 		assertThat(notificationManager.notifications, emptyIterable())
 	}
 
 	@Test
-	fun `sone is added to notification from command`() {
+	fun `sone is added to notification immediately`() {
 		eventBus.post(SoneLockedEvent(sone))
-		executor.scheduledDelay.single().command.run()
 		assertThat(notification.elements, contains(sone))
 	}
 
