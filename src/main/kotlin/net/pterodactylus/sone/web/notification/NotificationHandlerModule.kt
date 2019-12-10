@@ -37,15 +37,11 @@ class NotificationHandlerModule : AbstractModule() {
 	override fun configure() {
 		bind(NotificationHandler::class.java).`in`(Singleton::class.java)
 		bind<MarkPostKnownDuringFirstStartHandler>().asSingleton()
+		bind<SoneLockedOnStartupHandler>().asSingleton()
 	}
 
 	@Provides
 	fun getMarkPostKnownHandler(core: Core): Consumer<Post> = Consumer { core.markPostKnown(it) }
-
-	@Provides
-	@Singleton
-	fun getSoneLockedOnStartupHandler(notificationManager: NotificationManager, @Named("soneLockedOnStartup") notification: ListNotification<Sone>) =
-			SoneLockedOnStartupHandler(notificationManager, notification)
 
 	@Provides
 	@Singleton

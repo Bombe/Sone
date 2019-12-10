@@ -22,12 +22,13 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handler for [SoneLockedOnStartup][net.pterodactylus.sone.core.event.SoneLockedOnStartup] events
  * that adds the appropriate notification to the [NotificationManager].
  */
-class SoneLockedOnStartupHandler(private val notificationManager: NotificationManager, private val notification: ListNotification<Sone>) {
+class SoneLockedOnStartupHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("soneLockedOnStartup") private val notification: ListNotification<Sone>) {
 
 	@Subscribe
 	@Suppress("UnstableApiUsage")
