@@ -40,6 +40,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<NewSoneHandler>().asSingleton()
 		bind<NewRemotePostHandler>().asSingleton()
 		bind<SoneLockedHandler>().asSingleton()
+		bind<LocalPostHandler>().asSingleton()
 	}
 
 	@Provides
@@ -71,6 +72,12 @@ class NotificationHandlerModule : AbstractModule() {
 	@Provides
 	fun getScheduledExecutorService() =
 			newScheduledThreadPool(1)
+
+	@Provides
+	@Singleton
+	@Named("localPost")
+	fun getLocalPostNotification(loaders: Loaders) =
+			ListNotification<Post>("local-post-notification", "posts", loaders.loadTemplate("/templates/notify/newPostNotification.html"), dismissable = false)
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

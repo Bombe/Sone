@@ -226,4 +226,43 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<SoneLockedHandler>()
 	}
 
+	@Test
+	fun `local-post notification can be created`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("localPost")), notNullValue())
+	}
+
+	@Test
+	fun `local-post notification is not dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("localPost")).isDismissable, equalTo(false))
+	}
+
+	@Test
+	fun `local-post notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("localPost")).id, equalTo("local-post-notification"))
+	}
+
+	@Test
+	fun `local-post notification has correct key and template`() {
+		loaders.templates += "/templates/notify/newPostNotification.html" to "<% posts>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Post>>(named("localPost"))
+		val posts = listOf(EmptyPost("post1"), EmptyPost("post2"))
+		posts.forEach(notification::add)
+		assertThat(notification.render(), equalTo(posts.toString()))
+	}
+
+	@Test
+	fun `local-post notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Post>>(named("localPost"))
+	}
+
+	@Test
+	fun `local-post handler can be created`() {
+		assertThat(injector.getInstance<LocalPostHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `local-post handler is created as singleton`() {
+		injector.verifySingletonInstance<LocalPostHandler>()
+	}
+
 }

@@ -203,7 +203,8 @@ public class WebInterface implements SessionProvider {
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
 			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
-			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification) {
+			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification,
+			@Named("localPost") ListNotification<Post> localPostNotification) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -221,6 +222,7 @@ public class WebInterface implements SessionProvider {
 		this.translation = translation;
 		this.notificationManager = notificationManager;
 		this.newPostNotification = newPostNotification;
+		this.localPostNotification = localPostNotification;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 		soneTextParser = new SoneTextParser(getCore(), getCore());
 
@@ -229,9 +231,6 @@ public class WebInterface implements SessionProvider {
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template localPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
-		localPostNotification = new ListNotification<>("local-post-notification", "posts", localPostNotificationTemplate, false);
-
 		Template newReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
 		newReplyNotification = new ListNotification<>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
 
@@ -676,13 +675,7 @@ public class WebInterface implements SessionProvider {
 	public void newPostFound(NewPostFoundEvent newPostFoundEvent) {
 		Post post = newPostFoundEvent.getPost();
 		boolean isLocal = post.getSone().isLocal();
-		if (isLocal) {
-			localPostNotification.add(post);
-		}
 		if (!hasFirstStartNotification()) {
-			if (isLocal) {
-				notificationManager.addNotification(localPostNotification);
-			}
 			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
 				mentionNotification.add(post);
 				notificationManager.addNotification(mentionNotification);
@@ -733,7 +726,6 @@ public class WebInterface implements SessionProvider {
 
 	private void removePost(Post post) {
 		newPostNotification.remove(post);
-		localPostNotification.remove(post);
 		if (!localSoneMentionedInNewPostOrReply(post)) {
 			mentionNotification.remove(post);
 		}

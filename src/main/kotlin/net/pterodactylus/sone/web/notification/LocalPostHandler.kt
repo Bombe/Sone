@@ -22,11 +22,12 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handler for local posts.
  */
-class LocalPostHandler(private val notificationManager: NotificationManager, private val notification: ListNotification<Post>) {
+class LocalPostHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("localPost") private val notification: ListNotification<Post>) {
 
 	@Subscribe
 	fun newPostFound(newPostFoundEvent: NewPostFoundEvent) {
