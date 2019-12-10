@@ -7,7 +7,6 @@ import com.google.inject.*
 import com.google.inject.matcher.*
 import com.google.inject.name.Names.*
 import com.google.inject.spi.*
-import freenet.l10n.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.*
