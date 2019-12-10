@@ -23,7 +23,6 @@ import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
-import net.pterodactylus.util.notify.*
 import java.util.concurrent.Executors.*
 import java.util.function.*
 import javax.inject.*
@@ -40,6 +39,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<SoneLockedOnStartupHandler>().asSingleton()
 		bind<NewSoneHandler>().asSingleton()
 		bind<NewRemotePostHandler>().asSingleton()
+		bind<SoneLockedHandler>().asSingleton()
 	}
 
 	@Provides
@@ -69,9 +69,8 @@ class NotificationHandlerModule : AbstractModule() {
 			ListNotification<Sone>("sones-locked-notification", "sones", loaders.loadTemplate("/templates/notify/lockedSonesNotification.html"), dismissable = true)
 
 	@Provides
-	@Singleton
-	fun getSoneLockedHandler(notificationManager: NotificationManager, @Named("soneLocked") soneLockedNotification: ListNotification<Sone>) =
-			SoneLockedHandler(notificationManager, soneLockedNotification, newScheduledThreadPool(1))
+	fun getScheduledExecutorService() =
+			newScheduledThreadPool(1)
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

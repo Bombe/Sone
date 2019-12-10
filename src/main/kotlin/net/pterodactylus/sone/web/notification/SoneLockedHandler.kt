@@ -24,12 +24,16 @@ import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
 import java.util.concurrent.atomic.*
+import javax.inject.*
 
 /**
  * Handler for [SoneLockedEvent]s and [SoneUnlockedEvent]s that can schedule notifications after
  * a certain timeout.
  */
-class SoneLockedHandler(private val notificationManager: NotificationManager, private val notification: ListNotification<Sone>, private val executor: ScheduledExecutorService) {
+class SoneLockedHandler @Inject constructor(
+		private val notificationManager: NotificationManager,
+		@Named("soneLocked") private val notification: ListNotification<Sone>,
+		private val executor: ScheduledExecutorService) {
 
 	private val future: AtomicReference<ScheduledFuture<*>> = AtomicReference()
 
