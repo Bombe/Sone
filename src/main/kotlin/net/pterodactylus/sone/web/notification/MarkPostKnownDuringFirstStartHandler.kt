@@ -21,7 +21,9 @@ import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
+import java.util.function.*
 import javax.inject.*
 
 /**
@@ -29,7 +31,7 @@ import javax.inject.*
  * the [notification manager][NotificationManager] shows a [first start notification]
  * [NotificationManager.hasFirstStartNotification].
  */
-class MarkPostKnownDuringFirstStartHandler(private val notificationManager: NotificationManager, private val markPostAsKnown: (Post) -> Unit) {
+class MarkPostKnownDuringFirstStartHandler @Inject constructor(private val notificationManager: NotificationManager, private val markPostAsKnown: Consumer<Post>) {
 
 	@Subscribe
 	fun newPostFound(newPostFoundEvent: NewPostFoundEvent) {

@@ -24,6 +24,7 @@ import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import java.io.*
+import java.util.function.Consumer
 import kotlin.test.*
 
 /**
@@ -35,7 +36,7 @@ class MarkPostKnownDuringFirstStartHandlerTest {
 	private val eventBus = EventBus()
 	private val notificationManager = NotificationManager()
 	private val markedPosts = mutableListOf<Post>()
-	private val handler = MarkPostKnownDuringFirstStartHandler(notificationManager) { markedPosts += it }
+	private val handler = MarkPostKnownDuringFirstStartHandler(notificationManager, Consumer { markedPosts += it })
 
 	init {
 		eventBus.register(handler)

@@ -18,12 +18,14 @@
 package net.pterodactylus.sone.web.notification
 
 import com.google.inject.*
+import com.google.inject.binder.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.Executors.*
+import java.util.function.*
 import javax.inject.*
 import javax.inject.Singleton
 
@@ -34,12 +36,11 @@ class NotificationHandlerModule : AbstractModule() {
 
 	override fun configure() {
 		bind(NotificationHandler::class.java).`in`(Singleton::class.java)
+		bind<MarkPostKnownDuringFirstStartHandler>().asSingleton()
 	}
 
 	@Provides
-	@Singleton
-	fun getMarkPostKnownDuringFirstStartHandler(core: Core, notificationManager: NotificationManager) =
-			MarkPostKnownDuringFirstStartHandler(notificationManager, core::markPostKnown)
+	fun getMarkPostKnownHandler(core: Core): Consumer<Post> = Consumer { core.markPostKnown(it) }
 
 	@Provides
 	@Singleton
@@ -83,5 +84,8 @@ class NotificationHandlerModule : AbstractModule() {
 	@Singleton
 	fun getSoneLockedHandler(notificationManager: NotificationManager, @Named("soneLocked") soneLockedNotification: ListNotification<Sone>) =
 			SoneLockedHandler(notificationManager, soneLockedNotification, newScheduledThreadPool(1))
+
+	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
+	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)
 
 }
