@@ -179,9 +179,6 @@ public class WebInterface implements SessionProvider {
 	/** Sone locked notification ticker objects. */
 	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
 
-	/** The “Sone locked” notification. */
-	private final ListNotification<Sone> lockedSonesNotification;
-
 	/** The “new version” notification. */
 	private final TemplateNotification newVersionNotification;
 
@@ -243,9 +240,6 @@ public class WebInterface implements SessionProvider {
 
 		Template mentionNotificationTemplate = loaders.loadTemplate("/templates/notify/mentionNotification.html");
 		mentionNotification = new ListNotification<>("mention-notification", "posts", mentionNotificationTemplate, false);
-
-		Template lockedSonesTemplate = loaders.loadTemplate("/templates/notify/lockedSonesNotification.html");
-		lockedSonesNotification = new ListNotification<>("sones-locked-notification", "sones", lockedSonesTemplate);
 
 		Template newVersionTemplate = loaders.loadTemplate("/templates/notify/newVersionNotification.html");
 		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
@@ -756,39 +750,6 @@ public class WebInterface implements SessionProvider {
 		if (reply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
 			mentionNotification.remove(reply.getPost().get());
 		}
-	}
-
-	/**
-	 * Notifies the web interface that a Sone was locked.
-	 *
-	 * @param soneLockedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneLocked(SoneLockedEvent soneLockedEvent) {
-		final Sone sone = soneLockedEvent.getSone();
-		ScheduledFuture<?> tickerObject = ticker.schedule(new Runnable() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void run() {
-				lockedSonesNotification.add(sone);
-				notificationManager.addNotification(lockedSonesNotification);
-			}
-		}, 5, TimeUnit.MINUTES);
-		lockedSonesTickerObjects.put(sone, tickerObject);
-	}
-
-	/**
-	 * Notifies the web interface that a Sone was unlocked.
-	 *
-	 * @param soneUnlockedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneUnlocked(SoneUnlockedEvent soneUnlockedEvent) {
-		lockedSonesNotification.remove(soneUnlockedEvent.getSone());
-		lockedSonesTickerObjects.remove(soneUnlockedEvent.getSone()).cancel(false);
 	}
 
 	/**

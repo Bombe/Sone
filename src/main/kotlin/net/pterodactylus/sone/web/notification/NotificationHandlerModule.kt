@@ -23,6 +23,7 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import java.util.concurrent.Executors.*
 import javax.inject.*
 import javax.inject.Singleton
 
@@ -71,5 +72,16 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("newRemotePost")
 	fun getNewPostNotification(loaders: Loaders) =
 			ListNotification<Post>("new-post-notification", "posts", loaders.loadTemplate("/templates/notify/newPostNotification.html"), dismissable = false)
+
+	@Provides
+	@Singleton
+	@Named("soneLocked")
+	fun getSoneLockedNotification(loaders: Loaders) =
+			ListNotification<Sone>("sones-locked-notification", "sones", loaders.loadTemplate("/templates/notify/lockedSonesNotification.html"), dismissable = true)
+
+	@Provides
+	@Singleton
+	fun getSoneLockedHandler(notificationManager: NotificationManager, @Named("soneLocked") soneLockedNotification: ListNotification<Sone>) =
+			SoneLockedHandler(notificationManager, soneLockedNotification, newScheduledThreadPool(1))
 
 }

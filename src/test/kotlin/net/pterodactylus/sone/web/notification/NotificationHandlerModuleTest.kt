@@ -187,4 +187,43 @@ class NotificationHandlerModuleTest {
 		assertThat(notification.render(), equalTo(posts.toString()))
 	}
 
+	@Test
+	fun `sone-locked notification can be created`() {
+		assertThat(injector.getInstance<ListNotification<Sone>>(named("soneLocked")), notNullValue())
+	}
+
+	@Test
+	fun `sone-locked notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Sone>>(named("soneLocked"))
+	}
+
+	@Test
+	fun `sone-locked notification is dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Sone>>(named("soneLocked")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `sone-locked notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Sone>>(named("soneLocked")).id, equalTo("sones-locked-notification"))
+	}
+
+	@Test
+	fun `sone-locked notification has correct key and template`() {
+		loaders.templates += "/templates/notify/lockedSonesNotification.html" to "<% sones>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Sone>>(named("soneLocked"))
+		val sones = listOf(IdOnlySone("sone1"), IdOnlySone("sone2"))
+		sones.forEach(notification::add)
+		assertThat(notification.render(), equalTo(sones.toString()))
+	}
+
+	@Test
+	fun `sone-locked handler can be created`() {
+		assertThat(injector.getInstance<SoneLockedHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `sone-locked handler is created as singleton`() {
+		injector.verifySingletonInstance<SoneLockedHandler>()
+	}
+
 }
