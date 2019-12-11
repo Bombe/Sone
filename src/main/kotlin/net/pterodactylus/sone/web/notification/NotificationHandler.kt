@@ -29,5 +29,6 @@ class NotificationHandler @Inject constructor(
 		newSoneHandler: NewSoneHandler,
 		newRemotePostHandler: NewRemotePostHandler,
 		soneLockedOnStartupHandler: SoneLockedOnStartupHandler,
-		soneLockedHandler: SoneLockedHandler
+		soneLockedHandler: SoneLockedHandler,
+		newVersionHandler: NewVersionHandler
 )

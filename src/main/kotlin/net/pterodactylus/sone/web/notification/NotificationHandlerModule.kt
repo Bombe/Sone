@@ -23,6 +23,7 @@ import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
+import net.pterodactylus.util.notify.*
 import java.util.concurrent.Executors.*
 import java.util.function.*
 import javax.inject.*
@@ -41,6 +42,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<NewRemotePostHandler>().asSingleton()
 		bind<SoneLockedHandler>().asSingleton()
 		bind<LocalPostHandler>().asSingleton()
+		bind<NewVersionHandler>().asSingleton()
 	}
 
 	@Provides
@@ -78,6 +80,12 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("localPost")
 	fun getLocalPostNotification(loaders: Loaders) =
 			ListNotification<Post>("local-post-notification", "posts", loaders.loadTemplate("/templates/notify/newPostNotification.html"), dismissable = false)
+
+	@Provides
+	@Singleton
+	@Named("newVersion")
+	fun getNewVersionNotification(loaders: Loaders) =
+			TemplateNotification("new-version-notification", loaders.loadTemplate("/templates/notify/newVersionNotification.html"))
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

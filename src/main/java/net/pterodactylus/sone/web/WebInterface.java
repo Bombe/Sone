@@ -179,9 +179,6 @@ public class WebInterface implements SessionProvider {
 	/** Sone locked notification ticker objects. */
 	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
 
-	/** The “new version” notification. */
-	private final TemplateNotification newVersionNotification;
-
 	/** The “inserting images” notification. */
 	private final ListNotification<Image> insertingImagesNotification;
 
@@ -239,9 +236,6 @@ public class WebInterface implements SessionProvider {
 
 		Template mentionNotificationTemplate = loaders.loadTemplate("/templates/notify/mentionNotification.html");
 		mentionNotification = new ListNotification<>("mention-notification", "posts", mentionNotificationTemplate, false);
-
-		Template newVersionTemplate = loaders.loadTemplate("/templates/notify/newVersionNotification.html");
-		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
 
 		Template insertingImagesTemplate = loaders.loadTemplate("/templates/notify/inserting-images-notification.html");
 		insertingImagesNotification = new ListNotification<>("inserting-images-notification", "images", insertingImagesTemplate);
@@ -789,21 +783,6 @@ public class WebInterface implements SessionProvider {
 		if (soneInsertAbortedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
-	}
-
-	/**
-	 * Notifies the web interface that a new Sone version was found.
-	 *
-	 * @param updateFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void updateFound(UpdateFoundEvent updateFoundEvent) {
-		newVersionNotification.set("latestVersion", updateFoundEvent.getVersion());
-		newVersionNotification.set("latestEdition", updateFoundEvent.getLatestEdition());
-		newVersionNotification.set("releaseTime", updateFoundEvent.getReleaseTime());
-		newVersionNotification.set("disruptive", updateFoundEvent.isDisruptive());
-		notificationManager.addNotification(newVersionNotification);
 	}
 
 	/**

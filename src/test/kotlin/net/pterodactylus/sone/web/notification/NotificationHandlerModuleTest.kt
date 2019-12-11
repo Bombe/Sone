@@ -265,4 +265,36 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<LocalPostHandler>()
 	}
 
+	@Test
+	fun `new-version notification is created as singleton`() {
+		injector.verifySingletonInstance<TemplateNotification>(named("newVersion"))
+	}
+
+	@Test
+	fun `new-version notification has correct ID`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("newVersion")).id, equalTo("new-version-notification"))
+	}
+
+	@Test
+	fun `new-version notification is dismissable`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("newVersion")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `new-version notification loads correct template`() {
+		loaders.templates += "/templates/notify/newVersionNotification.html" to "1".asTemplate()
+		val notification = injector.getInstance<TemplateNotification>(named("newVersion"))
+		assertThat(notification.render(), equalTo("1"))
+	}
+
+	@Test
+	fun `new-version handler can be created`() {
+		assertThat(injector.getInstance<NewVersionHandler>(), notNullValue())
+	}
+
+	@Test
+	fun `new-version handler is created as singleton`() {
+		injector.verifySingletonInstance<NewVersionHandler>()
+	}
+
 }

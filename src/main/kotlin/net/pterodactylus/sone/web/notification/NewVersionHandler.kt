@@ -20,11 +20,12 @@ package net.pterodactylus.sone.web.notification
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handler for the “new version” notification.
  */
-class NewVersionHandler(private val notificationManager: NotificationManager, private val notification: TemplateNotification) {
+class NewVersionHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("newVersion") private val notification: TemplateNotification) {
 
 	@Subscribe
 	fun newVersionFound(updateFoundEvent: UpdateFoundEvent) {
