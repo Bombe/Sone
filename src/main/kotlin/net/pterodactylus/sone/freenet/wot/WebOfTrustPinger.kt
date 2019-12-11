@@ -20,14 +20,19 @@ package net.pterodactylus.sone.freenet.wot
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.freenet.plugin.*
+import net.pterodactylus.sone.utils.*
 import java.util.concurrent.atomic.*
+import javax.inject.*
 
 /**
  * [Runnable] that is scheduled via an [Executor][java.util.concurrent.Executor],
  * checks whether the web of trust plugin can be communicated with, sends
  * events if its status changes and reschedules itself.
  */
-class WebOfTrustPinger(private val eventBus: EventBus, private val webOfTrustReacher: () -> Unit, private val reschedule: () -> Unit) : Runnable {
+class WebOfTrustPinger @Inject constructor(
+		private val eventBus: EventBus,
+		@Named("webOfTrustReacher") private val webOfTrustReacher: Runnable,
+		@Named("webOfTrustReschedule") private val reschedule: Runnable) : Runnable {
 
 	private val lastState = AtomicBoolean(false)
 

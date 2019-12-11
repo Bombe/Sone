@@ -33,9 +33,9 @@ class WebOfTrustPingerTest {
 
 	private val eventBus = EventBus()
 	private val webOfTrustReachable = AtomicBoolean()
-	private val webOfTrustReacher: () -> Unit = { webOfTrustReachable.get().onFalse { throw PluginException() } }
+	private val webOfTrustReacher = Runnable { webOfTrustReachable.get().onFalse { throw PluginException() } }
 	private val rescheduled = AtomicBoolean()
-	private val reschedule: () -> Unit = { rescheduled.set(true) }
+	private val reschedule = Runnable { rescheduled.set(true) }
 	private val pinger = WebOfTrustPinger(eventBus, webOfTrustReacher, reschedule)
 
 	@Test
