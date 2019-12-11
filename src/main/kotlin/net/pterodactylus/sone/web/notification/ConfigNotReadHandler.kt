@@ -20,11 +20,12 @@ package net.pterodactylus.sone.web.notification
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handler for [ConfigNotRead] events.
  */
-class ConfigNotReadHandler(private val notificationManager: NotificationManager, private val notification: TemplateNotification) {
+class ConfigNotReadHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("configNotRead") private val notification: TemplateNotification) {
 
 	@Subscribe
 	fun configNotRead(configNotRead: ConfigNotRead) {

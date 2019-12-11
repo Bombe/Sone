@@ -343,4 +343,31 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<FirstStartHandler>()
 	}
 
+	@Test
+	fun `config-not-read notification is created as singleton`() {
+		injector.verifySingletonInstance<TemplateNotification>(named("configNotRead"))
+	}
+
+	@Test
+	fun `config-not-read notification has correct ID `() {
+		assertThat(injector.getInstance<TemplateNotification>(named("configNotRead")).id, equalTo("config-not-read-notification"))
+	}
+
+	@Test
+	fun `config-not-read notification is dismissable`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("configNotRead")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `config-not-read notification loads correct template`() {
+		loaders.templates += "/templates/notify/configNotReadNotification.html" to "1".asTemplate()
+		val notification = injector.getInstance<TemplateNotification>(named("configNotRead"))
+		assertThat(notification.render(), equalTo("1"))
+	}
+
+	@Test
+	fun `config-not-read handler is created as singleton`() {
+		injector.verifySingletonInstance<ConfigNotReadHandler>()
+	}
+
 }

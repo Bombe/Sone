@@ -386,21 +386,6 @@ public class WebInterface implements SessionProvider {
 		return from(allNewReplies).filter(replyVisibilityFilter.isVisible(currentSone)).toSet();
 	}
 
-	/**
-	 * Sets whether Sone was started with a fresh configuration file.
-	 *
-	 * @param newConfig
-	 *            {@code true} if Sone was started with a fresh configuration,
-	 *            {@code false} if the existing configuration could be read
-	 */
-	public void setNewConfig(boolean newConfig) {
-		if (newConfig && !hasFirstStartNotification()) {
-			Template configNotReadNotificationTemplate = loaders.loadTemplate("/templates/notify/configNotReadNotification.html");
-			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
-			notificationManager.addNotification(configNotReadNotification);
-		}
-	}
-
 	//
 	// PRIVATE ACCESSORS
 	//

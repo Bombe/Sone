@@ -45,6 +45,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<NewVersionHandler>().asSingleton()
 		bind<ImageInsertHandler>().asSingleton()
 		bind<FirstStartHandler>().asSingleton()
+		bind<ConfigNotReadHandler>().asSingleton()
 	}
 
 	@Provides
@@ -112,6 +113,12 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("firstStart")
 	fun getFirstStartNotification(loaders: Loaders) =
 			TemplateNotification("first-start-notification", loaders.loadTemplate("/templates/notify/firstStartNotification.html"))
+
+	@Provides
+	@Singleton
+	@Named("configNotRead")
+	fun getConfigNotReadNotification(loaders: Loaders) =
+			TemplateNotification("config-not-read-notification", loaders.loadTemplate("/templates/notify/configNotReadNotification.html"))
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)
