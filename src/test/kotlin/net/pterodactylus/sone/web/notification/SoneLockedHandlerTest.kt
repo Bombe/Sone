@@ -22,6 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
@@ -62,7 +63,7 @@ class SoneLockedHandlerTest {
 	@Test
 	fun `notification is added to notification manager from command`() {
 		eventBus.post(SoneLockedEvent(sone))
-		executor.scheduleds.single().command.run()
+		executor.scheduleds.single().command()
 		assertThat(notificationManager.notifications, contains<Any>(notification))
 	}
 
@@ -91,7 +92,7 @@ class SoneLockedHandlerTest {
 	@Test
 	fun `unlocking sone after showing the notification will remove the sone from the notification`() {
 		eventBus.post(SoneLockedEvent(sone))
-		executor.scheduleds.single().command.run()
+		executor.scheduleds.single().command()
 		eventBus.post(SoneUnlockedEvent(sone))
 		assertThat(notification.elements, emptyIterable())
 	}
