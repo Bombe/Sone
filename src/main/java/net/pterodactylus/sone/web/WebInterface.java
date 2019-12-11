@@ -21,7 +21,6 @@ import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,7 +29,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
@@ -175,9 +173,6 @@ public class WebInterface implements SessionProvider {
 
 	/** Notifications for sone inserts. */
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
-
-	/** Sone locked notification ticker objects. */
-	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
 
 	/** The “inserting images” notification. */
 	private final ListNotification<Image> insertingImagesNotification;
