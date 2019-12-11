@@ -62,14 +62,14 @@ class SoneLockedHandlerTest {
 	@Test
 	fun `notification is added to notification manager from command`() {
 		eventBus.post(SoneLockedEvent(sone))
-		executor.scheduledDelay.single().command.run()
+		executor.scheduleds.single().command.run()
 		assertThat(notificationManager.notifications, contains<Any>(notification))
 	}
 
 	@Test
 	fun `command is registered with a delay of five minutes`() {
 		eventBus.post(SoneLockedEvent(sone))
-		with(executor.scheduledDelay.single()) {
+		with(executor.scheduleds.single()) {
 			assertThat(timeUnit.toNanos(delay), equalTo(TimeUnit.MINUTES.toNanos(5)))
 		}
 	}
@@ -78,7 +78,7 @@ class SoneLockedHandlerTest {
 	fun `unlocking sone after locking will cancel the future`() {
 		eventBus.post(SoneLockedEvent(sone))
 		eventBus.post(SoneUnlockedEvent(sone))
-		assertThat(executor.scheduledDelay.first().future.isCancelled, equalTo(true))
+		assertThat(executor.scheduleds.first().future.isCancelled, equalTo(true))
 	}
 
 	@Test
@@ -91,7 +91,7 @@ class SoneLockedHandlerTest {
 	@Test
 	fun `unlocking sone after showing the notification will remove the sone from the notification`() {
 		eventBus.post(SoneLockedEvent(sone))
-		executor.scheduledDelay.single().command.run()
+		executor.scheduleds.single().command.run()
 		eventBus.post(SoneUnlockedEvent(sone))
 		assertThat(notification.elements, emptyIterable())
 	}
@@ -100,28 +100,16 @@ class SoneLockedHandlerTest {
 	fun `locking two sones will cancel the first command`() {
 		eventBus.post(SoneLockedEvent(sone))
 		eventBus.post(SoneLockedEvent(sone))
-		assertThat(executor.scheduledDelay.first().future.isCancelled, equalTo(true))
+		assertThat(executor.scheduleds.first().future.isCancelled, equalTo(true))
 	}
 
 	@Test
 	fun `locking two sones will schedule a second command`() {
 		eventBus.post(SoneLockedEvent(sone))
 		eventBus.post(SoneLockedEvent(sone))
-		assertThat(executor.scheduledDelay[1], notNullValue())
+		assertThat(executor.scheduleds[1], notNullValue())
 	}
 
 }
 
 private val sone: Sone = IdOnlySone("sone")
-
-private data class Scheduled(val command: Runnable, val delay: Long, val timeUnit: TimeUnit, val future: ScheduledFuture<*>)
-
-private class TestScheduledThreadPoolExecutor : ScheduledThreadPoolExecutor(1) {
-
-	val scheduledDelay = mutableListOf<Scheduled>()
-
-	override fun schedule(command: Runnable, delay: Long, unit: TimeUnit): ScheduledFuture<*> =
-			super.schedule(command, delay, unit)
-					.also { scheduledDelay += Scheduled(command, delay, unit, it) }
-
-}
