@@ -221,6 +221,8 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 				eventBus.post(new ConfigNotRead());
 			}
 		}
+
+		eventBus.post(new Startup());
 	}
 
 	@VisibleForTesting

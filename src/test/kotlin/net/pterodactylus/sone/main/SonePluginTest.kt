@@ -180,6 +180,24 @@ class SonePluginTest {
 		}
 	}
 
+	private class StartupListener(private val startupReceived: () -> Unit) {
+		@Subscribe
+		fun startup(startup: Startup) {
+			startupReceived()
+		}
+	}
+
+	@Test
+	fun `startup event is sent to event bus`() {
+		val startupReceived = AtomicBoolean()
+		runSonePluginWithRealInjector {
+			val eventBus = it.getInstance(EventBus::class.java)
+			eventBus.register(StartupListener { startupReceived.set(true) })
+		}
+		sonePlugin.runPlugin(pluginRespirator)
+		assertThat(startupReceived.get(), equalTo(true))
+	}
+
 	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =
 			injected[TypeLiteral.get(clazz) to annotation] as? T
 
