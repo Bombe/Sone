@@ -22,6 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Notification handler for the various image-insert-related events.
@@ -31,11 +32,11 @@ import net.pterodactylus.util.notify.*
  * @see ImageInsertFailedEvent
  * @see ImageInsertFinishedEvent
  */
-class ImageInsertHandler(
+class ImageInsertHandler @Inject constructor(
 		private val notificationManager: NotificationManager,
-		private val imageInsertingNotification: ListNotification<Image>,
-		private val imageFailedNotification: ListNotification<Image>,
-		private val imageInsertedNotification: ListNotification<Image>) {
+		@Named("imageInserting") private val imageInsertingNotification: ListNotification<Image>,
+		@Named("imageFailed") private val imageFailedNotification: ListNotification<Image>,
+		@Named("imageInserted") private val imageInsertedNotification: ListNotification<Image>) {
 
 	@Subscribe
 	fun imageInsertStarted(imageInsertStartedEvent: ImageInsertStartedEvent) {

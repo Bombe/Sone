@@ -38,7 +38,6 @@ import javax.inject.Named;
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.*;
-import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
@@ -174,15 +173,6 @@ public class WebInterface implements SessionProvider {
 	/** Notifications for sone inserts. */
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
 
-	/** The “inserting images” notification. */
-	private final ListNotification<Image> insertingImagesNotification;
-
-	/** The “inserted images” notification. */
-	private final ListNotification<Image> insertedImagesNotification;
-
-	/** The “image insert failed” notification. */
-	private final ListNotification<Image> imageInsertFailedNotification;
-
 	/** Scheduled executor for time-based notifications. */
 	private final ScheduledExecutorService ticker = Executors.newScheduledThreadPool(1);
 
@@ -231,15 +221,6 @@ public class WebInterface implements SessionProvider {
 
 		Template mentionNotificationTemplate = loaders.loadTemplate("/templates/notify/mentionNotification.html");
 		mentionNotification = new ListNotification<>("mention-notification", "posts", mentionNotificationTemplate, false);
-
-		Template insertingImagesTemplate = loaders.loadTemplate("/templates/notify/inserting-images-notification.html");
-		insertingImagesNotification = new ListNotification<>("inserting-images-notification", "images", insertingImagesTemplate);
-
-		Template insertedImagesTemplate = loaders.loadTemplate("/templates/notify/inserted-images-notification.html");
-		insertedImagesNotification = new ListNotification<>("inserted-images-notification", "images", insertedImagesTemplate);
-
-		Template imageInsertFailedTemplate = loaders.loadTemplate("/templates/notify/image-insert-failed-notification.html");
-		imageInsertFailedNotification = new ListNotification<>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
 	}
 
 	//
@@ -778,55 +759,6 @@ public class WebInterface implements SessionProvider {
 		if (soneInsertAbortedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
 			notificationManager.addNotification(soneInsertNotification);
 		}
-	}
-
-	/**
-	 * Notifies the web interface that an image insert was started
-	 *
-	 * @param imageInsertStartedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertStarted(ImageInsertStartedEvent imageInsertStartedEvent) {
-		insertingImagesNotification.add(imageInsertStartedEvent.getImage());
-		notificationManager.addNotification(insertingImagesNotification);
-	}
-
-	/**
-	 * Notifies the web interface that an {@link Image} insert was aborted.
-	 *
-	 * @param imageInsertAbortedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertAborted(ImageInsertAbortedEvent imageInsertAbortedEvent) {
-		insertingImagesNotification.remove(imageInsertAbortedEvent.getImage());
-	}
-
-	/**
-	 * Notifies the web interface that an {@link Image} insert is finished.
-	 *
-	 * @param imageInsertFinishedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
-		insertingImagesNotification.remove(imageInsertFinishedEvent.getImage());
-		insertedImagesNotification.add(imageInsertFinishedEvent.getImage());
-		notificationManager.addNotification(insertedImagesNotification);
-	}
-
-	/**
-	 * Notifies the web interface that an {@link Image} insert has failed.
-	 *
-	 * @param imageInsertFailedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertFailed(ImageInsertFailedEvent imageInsertFailedEvent) {
-		insertingImagesNotification.remove(imageInsertFailedEvent.getImage());
-		imageInsertFailedNotification.add(imageInsertFailedEvent.getImage());
-		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 
 	@Subscribe

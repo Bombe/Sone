@@ -43,6 +43,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<SoneLockedHandler>().asSingleton()
 		bind<LocalPostHandler>().asSingleton()
 		bind<NewVersionHandler>().asSingleton()
+		bind<ImageInsertHandler>().asSingleton()
 	}
 
 	@Provides
@@ -86,6 +87,24 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("newVersion")
 	fun getNewVersionNotification(loaders: Loaders) =
 			TemplateNotification("new-version-notification", loaders.loadTemplate("/templates/notify/newVersionNotification.html"))
+
+	@Provides
+	@Singleton
+	@Named("imageInserting")
+	fun getImageInsertingNotification(loaders: Loaders) =
+			ListNotification<Image>("inserting-images-notification", "images", loaders.loadTemplate("/templates/notify/inserting-images-notification.html"), dismissable = true)
+
+	@Provides
+	@Singleton
+	@Named("imageFailed")
+	fun getImageInsertingFailedNotification(loaders: Loaders) =
+			ListNotification<Image>("image-insert-failed-notification", "images", loaders.loadTemplate("/templates/notify/image-insert-failed-notification.html"), dismissable = true)
+
+	@Provides
+	@Singleton
+	@Named("imageInserted")
+	fun getImageInsertedNotification(loaders: Loaders) =
+			ListNotification<Image>("inserted-images-notification", "images", loaders.loadTemplate("/templates/notify/inserted-images-notification.html"), dismissable = true)
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

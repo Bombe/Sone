@@ -242,4 +242,78 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<NewVersionHandler>()
 	}
 
+	@Test
+	fun `inserting-image notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Image>>(named("imageInserting"))
+	}
+
+	@Test
+	fun `inserting-image notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Image>>(named("imageInserting")).id, equalTo("inserting-images-notification"))
+	}
+
+	@Test
+	fun `inserting-image notification is dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Image>>(named("imageInserting")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `inserting-image notification loads correct template`() {
+		loaders.templates += "/templates/notify/inserting-images-notification.html" to "<% images>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Image>>(named("imageInserting"))
+		val images = listOf(ImageImpl(), ImageImpl()).onEach(notification::add)
+		assertThat(notification.render(), equalTo(images.toString()))
+	}
+
+	@Test
+	fun `inserting-image-failed notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Image>>(named("imageFailed"))
+	}
+
+	@Test
+	fun `inserting-image-failed notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Image>>(named("imageFailed")).id, equalTo("image-insert-failed-notification"))
+	}
+
+	@Test
+	fun `inserting-image-failed notification is dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Image>>(named("imageFailed")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `inserting-image-failed notification loads correct template`() {
+		loaders.templates += "/templates/notify/image-insert-failed-notification.html" to "<% images>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Image>>(named("imageFailed"))
+		val images = listOf(ImageImpl(), ImageImpl()).onEach(notification::add)
+		assertThat(notification.render(), equalTo(images.toString()))
+	}
+
+	@Test
+	fun `inserted-image notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Image>>(named("imageInserted"))
+	}
+
+	@Test
+	fun `inserted-image notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Image>>(named("imageInserted")).id, equalTo("inserted-images-notification"))
+	}
+
+	@Test
+	fun `inserted-image notification is dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Image>>(named("imageInserted")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `inserted-image notification loads correct template`() {
+		loaders.templates += "/templates/notify/inserted-images-notification.html" to "<% images>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Image>>(named("imageInserted"))
+		val images = listOf(ImageImpl(), ImageImpl()).onEach(notification::add)
+		assertThat(notification.render(), equalTo(images.toString()))
+	}
+
+	@Test
+	fun `image insert handler is created as singleton`() {
+		injector.verifySingletonInstance<ImageInsertHandler>()
+	}
+
 }
