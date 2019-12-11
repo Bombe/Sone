@@ -24,6 +24,7 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
+import java.util.concurrent.*
 import java.util.concurrent.Executors.*
 import java.util.function.*
 import javax.inject.*
@@ -75,7 +76,7 @@ class NotificationHandlerModule : AbstractModule() {
 			ListNotification<Sone>("sones-locked-notification", "sones", loaders.loadTemplate("/templates/notify/lockedSonesNotification.html"), dismissable = true)
 
 	@Provides
-	fun getScheduledExecutorService() =
+	fun getScheduledExecutorService(): ScheduledExecutorService =
 			newScheduledThreadPool(1)
 
 	@Provides
