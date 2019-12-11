@@ -52,18 +52,8 @@ class NotificationHandlerModuleTest {
 	)
 
 	@Test
-	fun `module can create notification handler`() {
-		assertThat(injector.getInstance<NotificationHandler>(), notNullValue())
-	}
-
-	@Test
 	fun `notification handler is created as singleton`() {
 		injector.verifySingletonInstance<NotificationHandler>()
-	}
-
-	@Test
-	fun `module can create mark-post-known-during-first-start handler`() {
-		assertThat(injector.getInstance<MarkPostKnownDuringFirstStartHandler>(), notNullValue())
 	}
 
 	@Test
@@ -80,11 +70,6 @@ class NotificationHandlerModuleTest {
 		val post = mock<Post>()
 		handler.newPostFound(NewPostFoundEvent(post))
 		verify(core).markPostKnown(post)
-	}
-
-	@Test
-	fun `module can create sone-locked-on-startup handler`() {
-		assertThat(injector.getInstance<SoneLockedOnStartupHandler>(), notNullValue())
 	}
 
 	@Test
@@ -120,11 +105,6 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
-	fun `new-sone handler can be created`() {
-		assertThat(injector.getInstance<NewSoneHandler>(), notNullValue())
-	}
-
-	@Test
 	fun `new-sone handler is created as singleton`() {
 		injector.verifySingletonInstance<NewSoneHandler>()
 	}
@@ -149,18 +129,8 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
-	fun `new-remote-post handler can be created`() {
-		assertThat(injector.getInstance<NewRemotePostHandler>(), notNullValue())
-	}
-
-	@Test
 	fun `new-remote-post handler is created as singleton`() {
 		injector.verifySingletonInstance<NewRemotePostHandler>()
-	}
-
-	@Test
-	fun `new-remote-post notification can be created`() {
-		assertThat(injector.getInstance<ListNotification<Post>>(named("newRemotePost")), notNullValue())
 	}
 
 	@Test
@@ -188,11 +158,6 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
-	fun `sone-locked notification can be created`() {
-		assertThat(injector.getInstance<ListNotification<Sone>>(named("soneLocked")), notNullValue())
-	}
-
-	@Test
 	fun `sone-locked notification is created as singleton`() {
 		injector.verifySingletonInstance<ListNotification<Sone>>(named("soneLocked"))
 	}
@@ -217,18 +182,8 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
-	fun `sone-locked handler can be created`() {
-		assertThat(injector.getInstance<SoneLockedHandler>(), notNullValue())
-	}
-
-	@Test
 	fun `sone-locked handler is created as singleton`() {
 		injector.verifySingletonInstance<SoneLockedHandler>()
-	}
-
-	@Test
-	fun `local-post notification can be created`() {
-		assertThat(injector.getInstance<ListNotification<Post>>(named("localPost")), notNullValue())
 	}
 
 	@Test
@@ -256,11 +211,6 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
-	fun `local-post handler can be created`() {
-		assertThat(injector.getInstance<LocalPostHandler>(), notNullValue())
-	}
-
-	@Test
 	fun `local-post handler is created as singleton`() {
 		injector.verifySingletonInstance<LocalPostHandler>()
 	}
@@ -285,11 +235,6 @@ class NotificationHandlerModuleTest {
 		loaders.templates += "/templates/notify/newVersionNotification.html" to "1".asTemplate()
 		val notification = injector.getInstance<TemplateNotification>(named("newVersion"))
 		assertThat(notification.render(), equalTo("1"))
-	}
-
-	@Test
-	fun `new-version handler can be created`() {
-		assertThat(injector.getInstance<NewVersionHandler>(), notNullValue())
 	}
 
 	@Test
