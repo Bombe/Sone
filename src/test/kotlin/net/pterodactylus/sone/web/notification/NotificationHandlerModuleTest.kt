@@ -370,4 +370,31 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<ConfigNotReadHandler>()
 	}
 
+	@Test
+	fun `startup notification can be created`() {
+		injector.verifySingletonInstance<TemplateNotification>(named("startup"))
+	}
+
+	@Test
+	fun `startup notification has correct ID`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("startup")).id, equalTo("startup-notification"))
+	}
+
+	@Test
+	fun `startup notification is dismissable`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("startup")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `startup notification loads correct template`() {
+		loaders.templates += "/templates/notify/startupNotification.html" to "1".asTemplate()
+		val notification = injector.getInstance<TemplateNotification>(named("startup"))
+		assertThat(notification.render(), equalTo("1"))
+	}
+
+	@Test
+	fun `startup handler is created as singleton`() {
+		injector.verifySingletonInstance<StartupHandler>()
+	}
+
 }

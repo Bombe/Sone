@@ -411,19 +411,6 @@ public class WebInterface implements SessionProvider {
 		registerToadlets();
 
 		/* notification templates. */
-		Template startupNotificationTemplate = loaders.loadTemplate("/templates/notify/startupNotification.html");
-
-		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
-		notificationManager.addNotification(startupNotification);
-
-		ticker.schedule(new Runnable() {
-
-			@Override
-			public void run() {
-				startupNotification.dismiss();
-			}
-		}, 2, TimeUnit.MINUTES);
-
 		Template wotMissingNotificationTemplate = loaders.loadTemplate("/templates/notify/wotMissingNotification.html");
 		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
 		ticker.scheduleAtFixedRate(new Runnable() {

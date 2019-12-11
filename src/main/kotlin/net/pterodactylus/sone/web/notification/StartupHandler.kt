@@ -22,11 +22,15 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
 import java.util.concurrent.TimeUnit.*
+import javax.inject.*
 
 /**
  * Handler for the [Startup] event notification.
  */
-class StartupHandler(private val notificationManager: NotificationManager, private val notification: TemplateNotification, val ticker: ScheduledExecutorService) {
+class StartupHandler @Inject constructor(
+		private val notificationManager: NotificationManager,
+		@Named("startup") private val notification: TemplateNotification,
+		private val ticker: ScheduledExecutorService) {
 
 	@Subscribe
 	fun startup(startup: Startup) {

@@ -33,5 +33,6 @@ class NotificationHandler @Inject constructor(
 		newVersionHandler: NewVersionHandler,
 		imageInsertHandler: ImageInsertHandler,
 		firstStartHandler: FirstStartHandler,
-		configNotReadHandler: ConfigNotReadHandler
+		configNotReadHandler: ConfigNotReadHandler,
+		startupHandler: StartupHandler
 )
