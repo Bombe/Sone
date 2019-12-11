@@ -133,6 +133,53 @@ class SonePluginTest {
 		}
 	}
 
+	private class ConfigNotReadListener(private val configNotReadReceiver: AtomicBoolean) {
+		@Subscribe
+		fun configNotRead(configNotRead: ConfigNotRead) {
+			configNotReadReceiver.set(true)
+		}
+	}
+
+	@Test
+	fun `config-not-read event is sent to event bus when new config is true`() {
+		File("sone.properties").deleteAfter {
+			writeText("Invalid")
+			val configNotReadReceived = AtomicBoolean()
+			runSonePluginWithRealInjector {
+				val eventBus = it.getInstance(EventBus::class.java)
+				eventBus.register(ConfigNotReadListener(configNotReadReceived))
+			}
+			sonePlugin.runPlugin(pluginRespirator)
+			assertThat(configNotReadReceived.get(), equalTo(true))
+		}
+	}
+
+	@Test
+	fun `config-not-read event is not sent to event bus when first start is true`() {
+		File("sone.properties").delete()
+		val configNotReadReceived = AtomicBoolean()
+		runSonePluginWithRealInjector {
+			val eventBus = it.getInstance(EventBus::class.java)
+			eventBus.register(ConfigNotReadListener(configNotReadReceived))
+		}
+		sonePlugin.runPlugin(pluginRespirator)
+		assertThat(configNotReadReceived.get(), equalTo(false))
+	}
+
+	@Test
+	fun `config-not-read event is not sent to event bus when new config is false`() {
+		File("sone.properties").deleteAfter {
+			writeText("# comment")
+			val configNotReadReceived = AtomicBoolean()
+			runSonePluginWithRealInjector {
+				val eventBus = it.getInstance(EventBus::class.java)
+				eventBus.register(ConfigNotReadListener(configNotReadReceived))
+			}
+			sonePlugin.runPlugin(pluginRespirator)
+			assertThat(configNotReadReceived.get(), equalTo(false))
+		}
+	}
+
 	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =
 			injected[TypeLiteral.get(clazz) to annotation] as? T
 
