@@ -22,6 +22,8 @@ import static java.util.logging.Logger.*;
 import java.util.logging.Logger;
 import java.util.logging.*;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.core.*;
 import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.fcp.*;
@@ -60,7 +62,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			private final LoadingCache<String, Class<?>> classCache = CacheBuilder.newBuilder()
 					.build(new CacheLoader<String, Class<?>>() {
 						@Override
-						public Class<?> load(String key) throws Exception {
+						public Class<?> load(@Nonnull String key) throws Exception {
 							return SonePlugin.class.getClassLoader().loadClass(key);
 						}
 					});
