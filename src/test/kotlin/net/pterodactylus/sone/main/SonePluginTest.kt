@@ -100,18 +100,20 @@ class SonePluginTest {
 		assertThat(getInjected(NotificationHandler::class.java), notNullValue())
 	}
 
+	private class FirstStartListener(private val firstStartReceived: AtomicBoolean) {
+		@Subscribe
+		fun firstStart(firstStart: FirstStart) {
+			firstStartReceived.set(true)
+		}
+	}
+
 	@Test
 	fun `first-start event is sent to event bus when first start is true`() {
 		File("sone.properties").delete()
 		val firstStartReceived = AtomicBoolean()
 		runSonePluginWithRealInjector {
 			val eventBus = it.getInstance(EventBus::class.java)
-			eventBus.register(object : Any() {
-				@Subscribe
-				fun firstStart(firstStart: FirstStart) {
-					firstStartReceived.set(true)
-				}
-			})
+			eventBus.register(FirstStartListener(firstStartReceived))
 		}
 		sonePlugin.runPlugin(pluginRespirator)
 		assertThat(firstStartReceived.get(), equalTo(true))
@@ -124,12 +126,7 @@ class SonePluginTest {
 			val firstStartReceived = AtomicBoolean()
 			runSonePluginWithRealInjector {
 				val eventBus = it.getInstance(EventBus::class.java)
-				eventBus.register(object : Any() {
-					@Subscribe
-					fun firstStart(firstStart: FirstStart) {
-						firstStartReceived.set(true)
-					}
-				})
+				eventBus.register(FirstStartListener(firstStartReceived))
 			}
 			sonePlugin.runPlugin(pluginRespirator)
 			assertThat(firstStartReceived.get(), equalTo(false))
