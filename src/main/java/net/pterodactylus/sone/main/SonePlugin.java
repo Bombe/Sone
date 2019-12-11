@@ -209,13 +209,16 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		/* start the web interface! */
 		webInterface.start();
 
+		/* send some events on startup */
+		EventBus eventBus = injector.getInstance(EventBus.class);
+
 		/* first start? */
 		if (injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart")))) {
-			injector.getInstance(EventBus.class).post(new FirstStart());
+			eventBus.post(new FirstStart());
 		} else {
 			/* new config? */
 			if (injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig")))) {
-				injector.getInstance(EventBus.class).post(new ConfigNotRead());
+				eventBus.post(new ConfigNotRead());
 			}
 		}
 	}
