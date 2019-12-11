@@ -1,11 +1,13 @@
 package net.pterodactylus.sone.main
 
+import com.google.common.eventbus.*
 import com.google.inject.*
 import freenet.client.async.*
 import freenet.l10n.BaseL10n.LANGUAGE.*
 import freenet.node.*
 import freenet.pluginmanager.*
 import net.pterodactylus.sone.core.*
+import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.fcp.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
@@ -14,6 +16,8 @@ import net.pterodactylus.sone.web.notification.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.mockito.Mockito.*
+import java.io.*
+import java.util.concurrent.atomic.*
 import kotlin.test.*
 
 /**
@@ -70,11 +74,12 @@ class SonePluginTest {
 		assertThat(injector.getInstance<NotificationHandler>(), notNullValue())
 	}
 
-	private fun runSonePluginWithRealInjector(): Injector {
+	private fun runSonePluginWithRealInjector(injectorConsumer: (Injector) -> Unit = {}): Injector {
 		lateinit var injector: Injector
 		val sonePlugin = SonePlugin {
 			Guice.createInjector(*it).also {
 				injector = it
+				injectorConsumer(it)
 			}
 		}
 		sonePlugin.setLanguage(ENGLISH)
@@ -93,6 +98,42 @@ class SonePluginTest {
 	fun `notification handler is being requested`() {
 		sonePlugin.runPlugin(pluginRespirator)
 		assertThat(getInjected(NotificationHandler::class.java), notNullValue())
+	}
+
+	@Test
+	fun `first-start event is sent to event bus when first start is true`() {
+		File("sone.properties").delete()
+		val firstStartReceived = AtomicBoolean()
+		runSonePluginWithRealInjector {
+			val eventBus = it.getInstance(EventBus::class.java)
+			eventBus.register(object : Any() {
+				@Subscribe
+				fun firstStart(firstStart: FirstStart) {
+					firstStartReceived.set(true)
+				}
+			})
+		}
+		sonePlugin.runPlugin(pluginRespirator)
+		assertThat(firstStartReceived.get(), equalTo(true))
+	}
+
+	@Test
+	fun `first-start event is not sent to event bus when first start is false`() {
+		File("sone.properties").deleteAfter {
+			writeText("# empty")
+			val firstStartReceived = AtomicBoolean()
+			runSonePluginWithRealInjector {
+				val eventBus = it.getInstance(EventBus::class.java)
+				eventBus.register(object : Any() {
+					@Subscribe
+					fun firstStart(firstStart: FirstStart) {
+						firstStartReceived.set(true)
+					}
+				})
+			}
+			sonePlugin.runPlugin(pluginRespirator)
+			assertThat(firstStartReceived.get(), equalTo(false))
+		}
 	}
 
 	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =
@@ -118,3 +159,9 @@ class SonePluginTest {
 }
 
 private fun String.toClass(): Class<*> = SonePlugin::class.java.classLoader.loadClass(this)
+
+private fun File.deleteAfter(action: File.() -> Unit) = try {
+	action(this)
+} finally {
+	this.delete()
+}

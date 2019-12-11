@@ -23,6 +23,7 @@ import java.util.logging.Logger;
 import java.util.logging.*;
 
 import net.pterodactylus.sone.core.*;
+import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.fcp.*;
 import net.pterodactylus.sone.freenet.wot.*;
 import net.pterodactylus.sone.web.*;
@@ -209,6 +210,11 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		webInterface.start();
 		webInterface.setFirstStart(injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart"))));
 		webInterface.setNewConfig(injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig"))));
+
+		/* first start? */
+		if (injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart")))) {
+			injector.getInstance(EventBus.class).post(new FirstStart());
+		}
 	}
 
 	@VisibleForTesting
