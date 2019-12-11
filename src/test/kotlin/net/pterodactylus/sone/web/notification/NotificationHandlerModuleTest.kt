@@ -316,4 +316,31 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<ImageInsertHandler>()
 	}
 
+	@Test
+	fun `first-start notification is created as singleton`() {
+		injector.verifySingletonInstance<TemplateNotification>(named("firstStart"))
+	}
+
+	@Test
+	fun `first-start notification has correct ID`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("firstStart")).id, equalTo("first-start-notification"))
+	}
+
+	@Test
+	fun `first-start notification is dismissable`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("firstStart")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `first-start notification loads correct template`() {
+		loaders.templates += "/templates/notify/firstStartNotification.html" to "1".asTemplate()
+		val notification = injector.getInstance<TemplateNotification>(named("firstStart"))
+		assertThat(notification.render(), equalTo("1"))
+	}
+
+	@Test
+	fun `first-start handler is created as singleton`() {
+		injector.verifySingletonInstance<FirstStartHandler>()
+	}
+
 }

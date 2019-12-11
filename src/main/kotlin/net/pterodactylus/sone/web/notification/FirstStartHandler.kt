@@ -20,11 +20,12 @@ package net.pterodactylus.sone.web.notification
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handles the notification shown on first start of Sone.
  */
-class FirstStartHandler(private val notificationManager: NotificationManager, private val notification: TemplateNotification) {
+class FirstStartHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("firstStart") private val notification: TemplateNotification) {
 
 	@Subscribe
 	fun firstStart(firstStart: FirstStart) {

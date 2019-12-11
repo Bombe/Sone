@@ -387,22 +387,6 @@ public class WebInterface implements SessionProvider {
 	}
 
 	/**
-	 * Sets whether the current start of the plugin is the first start. It is
-	 * considered a first start if the configuration file does not exist.
-	 *
-	 * @param firstStart
-	 *            {@code true} if no configuration file existed when Sone was
-	 *            loaded, {@code false} otherwise
-	 */
-	public void setFirstStart(boolean firstStart) {
-		if (firstStart) {
-			Template firstStartNotificationTemplate = loaders.loadTemplate("/templates/notify/firstStartNotification.html");
-			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
-			notificationManager.addNotification(firstStartNotification);
-		}
-	}
-
-	/**
 	 * Sets whether Sone was started with a fresh configuration file.
 	 *
 	 * @param newConfig

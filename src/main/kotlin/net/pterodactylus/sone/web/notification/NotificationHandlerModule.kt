@@ -44,6 +44,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<LocalPostHandler>().asSingleton()
 		bind<NewVersionHandler>().asSingleton()
 		bind<ImageInsertHandler>().asSingleton()
+		bind<FirstStartHandler>().asSingleton()
 	}
 
 	@Provides
@@ -105,6 +106,12 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("imageInserted")
 	fun getImageInsertedNotification(loaders: Loaders) =
 			ListNotification<Image>("inserted-images-notification", "images", loaders.loadTemplate("/templates/notify/inserted-images-notification.html"), dismissable = true)
+
+	@Provides
+	@Singleton
+	@Named("firstStart")
+	fun getFirstStartNotification(loaders: Loaders) =
+			TemplateNotification("first-start-notification", loaders.loadTemplate("/templates/notify/firstStartNotification.html"))
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

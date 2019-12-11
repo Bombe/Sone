@@ -208,7 +208,6 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 		/* start the web interface! */
 		webInterface.start();
-		webInterface.setFirstStart(injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart"))));
 		webInterface.setNewConfig(injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig"))));
 
 		/* first start? */
