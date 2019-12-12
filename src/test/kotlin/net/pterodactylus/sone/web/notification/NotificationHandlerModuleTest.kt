@@ -34,6 +34,7 @@ import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.mockito.Mockito.*
 import java.io.*
+import java.util.concurrent.*
 import kotlin.test.*
 
 /**
@@ -42,12 +43,14 @@ import kotlin.test.*
 class NotificationHandlerModuleTest {
 
 	private val core = mock<Core>()
+	private val ticker = mock<ScheduledExecutorService>()
 	private val notificationManager = NotificationManager()
 	private val loaders = TestLoaders()
 	private val injector: Injector = createInjector(
 			Core::class.isProvidedBy(core),
 			NotificationManager::class.isProvidedBy(notificationManager),
 			Loaders::class.isProvidedBy(loaders),
+			ScheduledExecutorService::class.withNameIsProvidedBy(ticker, "notification"),
 			NotificationHandlerModule()
 	)
 

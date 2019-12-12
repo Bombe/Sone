@@ -33,7 +33,7 @@ import javax.inject.*
 class SoneLockedHandler @Inject constructor(
 		private val notificationManager: NotificationManager,
 		@Named("soneLocked") private val notification: ListNotification<Sone>,
-		private val executor: ScheduledExecutorService) {
+		@Named("notification") private val executor: ScheduledExecutorService) {
 
 	private val future: AtomicReference<ScheduledFuture<*>> = AtomicReference()
 

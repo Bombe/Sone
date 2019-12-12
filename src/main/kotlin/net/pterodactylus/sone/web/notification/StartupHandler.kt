@@ -30,7 +30,7 @@ import javax.inject.*
 class StartupHandler @Inject constructor(
 		private val notificationManager: NotificationManager,
 		@Named("startup") private val notification: TemplateNotification,
-		private val ticker: ScheduledExecutorService) {
+		@Named("notification") private val ticker: ScheduledExecutorService) {
 
 	@Subscribe
 	fun startup(startup: Startup) {

@@ -77,10 +77,6 @@ class NotificationHandlerModule : AbstractModule() {
 			ListNotification<Sone>("sones-locked-notification", "sones", loaders.loadTemplate("/templates/notify/lockedSonesNotification.html"), dismissable = true)
 
 	@Provides
-	fun getScheduledExecutorService(): ScheduledExecutorService =
-			newScheduledThreadPool(1)
-
-	@Provides
 	@Singleton
 	@Named("localPost")
 	fun getLocalPostNotification(loaders: Loaders) =
