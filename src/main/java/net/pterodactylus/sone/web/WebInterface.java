@@ -27,8 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -171,9 +169,6 @@ public class WebInterface implements SessionProvider {
 
 	/** Notifications for sone inserts. */
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
-
-	/** Scheduled executor for time-based notifications. */
-	private final ScheduledExecutorService ticker = Executors.newScheduledThreadPool(1);
 
 	@Inject
 	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter,
@@ -415,7 +410,6 @@ public class WebInterface implements SessionProvider {
 	 */
 	public void stop() {
 		pageToadletRegistry.unregisterToadlets();
-		ticker.shutdownNow();
 	}
 
 	//
