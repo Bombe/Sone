@@ -24,6 +24,7 @@ import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import java.util.concurrent.TimeUnit.*
 import kotlin.test.*
 
 /**
@@ -50,9 +51,9 @@ class StartupHandlerTest {
 	}
 
 	@Test
-	fun `handler registers command on startup`() {
+	fun `handler registers command on with 2-minute delay`() {
 		eventBus.post(Startup())
-		assertThat(executor.scheduleds, hasSize(1))
+		assertThat(with(executor.scheduleds.single()) { timeUnit.toNanos(delay) }, equalTo(MINUTES.toNanos(2)))
 	}
 
 	@Test
