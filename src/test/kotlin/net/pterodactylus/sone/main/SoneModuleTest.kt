@@ -190,9 +190,7 @@ class SoneModuleTest {
 
 	@Test
 	fun `core is created as singleton`() {
-		val firstCore = injector.getInstance<Core>()
-		val secondCore = injector.getInstance<Core>()
-		assertThat(secondCore, sameInstance(firstCore))
+		injector.verifySingletonInstance<Core>()
 	}
 
 	@Test
@@ -209,27 +207,13 @@ class SoneModuleTest {
 	}
 
 	@Test
-	fun `metrics registry can be created`() {
-		assertThat(injector.getInstance<MetricRegistry>(), notNullValue())
-	}
-
-	@Test
 	fun `metrics registry is created as singleton`() {
-		val firstMetricRegistry = injector.getInstance<MetricRegistry>()
-		val secondMetricRegistry = injector.getInstance<MetricRegistry>()
-		assertThat(firstMetricRegistry, sameInstance(secondMetricRegistry))
-	}
-
-	@Test
-	fun `wot connector can be created`() {
-		assertThat(injector.getInstance<WebOfTrustConnector>(), notNullValue())
+		injector.verifySingletonInstance<MetricRegistry>()
 	}
 
 	@Test
 	fun `wot connector is created as singleton`() {
-		val firstWebOfTrustConnector = injector.getInstance<WebOfTrustConnector>()
-		val secondWebOfTrustConnector = injector.getInstance<WebOfTrustConnector>()
-		assertThat(firstWebOfTrustConnector, sameInstance(secondWebOfTrustConnector))
+		injector.verifySingletonInstance<WebOfTrustConnector>()
 	}
 
 }
