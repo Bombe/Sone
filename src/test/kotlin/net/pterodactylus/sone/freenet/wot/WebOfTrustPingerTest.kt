@@ -24,6 +24,7 @@ import net.pterodactylus.sone.utils.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import java.util.concurrent.atomic.*
+import java.util.function.*
 import kotlin.test.*
 
 /**
@@ -35,7 +36,7 @@ class WebOfTrustPingerTest {
 	private val webOfTrustReachable = AtomicBoolean()
 	private val webOfTrustReacher = Runnable { webOfTrustReachable.get().onFalse { throw PluginException() } }
 	private val rescheduled = AtomicBoolean()
-	private val reschedule = Runnable { rescheduled.set(true) }
+	private val reschedule: Consumer<Runnable> = Consumer { if (it == pinger) rescheduled.set(true) }
 	private val pinger = WebOfTrustPinger(eventBus, webOfTrustReacher, reschedule)
 
 	@Test

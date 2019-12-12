@@ -22,6 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.utils.*
 import java.util.concurrent.atomic.*
+import java.util.function.*
 import javax.inject.*
 
 /**
@@ -32,7 +33,7 @@ import javax.inject.*
 class WebOfTrustPinger @Inject constructor(
 		private val eventBus: EventBus,
 		@Named("webOfTrustReacher") private val webOfTrustReacher: Runnable,
-		@Named("webOfTrustReschedule") private val reschedule: Runnable) : Runnable {
+		@Named("webOfTrustReschedule") private val reschedule: Consumer<Runnable>) : Runnable {
 
 	private val lastState = AtomicBoolean(false)
 
@@ -49,7 +50,7 @@ class WebOfTrustPinger @Inject constructor(
 				lastState.set(false)
 			}
 		}
-		reschedule()
+		reschedule(this)
 	}
 
 }
