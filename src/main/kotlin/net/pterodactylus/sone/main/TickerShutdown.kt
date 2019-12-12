@@ -20,12 +20,13 @@ package net.pterodactylus.sone.main
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import java.util.concurrent.*
+import javax.inject.*
 
 /**
  * Wrapper around all [tickers][ScheduledExecutorService] used in Sone,
  * ensuring proper shutdown.
  */
-class TickerShutdown(private val notificationTicker: ScheduledExecutorService) {
+class TickerShutdown @Inject constructor(@Named("notification") private val notificationTicker: ScheduledExecutorService) {
 
 	@Subscribe
 	fun shutdown(shutdown: Shutdown) {

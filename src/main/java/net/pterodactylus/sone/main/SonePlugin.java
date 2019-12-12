@@ -208,6 +208,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		/* we need to request this to install all notification handlers. */
 		injector.getInstance(NotificationHandler.class);
 
+		/* and this is required to shutdown all tickers. */
+		injector.getInstance(TickerShutdown.class);
+
 		/* start core! */
 		core.start();
 

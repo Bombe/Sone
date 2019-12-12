@@ -222,4 +222,9 @@ class SoneModuleTest {
 		injector.verifySingletonInstance<ScheduledExecutorService>(named("notification"))
 	}
 
+	@Test
+	fun `ticker shutdown is created as singleton`() {
+		injector.verifySingletonInstance<TickerShutdown>()
+	}
+
 }

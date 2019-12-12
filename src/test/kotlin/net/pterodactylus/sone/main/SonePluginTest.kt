@@ -100,6 +100,12 @@ class SonePluginTest {
 		assertThat(getInjected(NotificationHandler::class.java), notNullValue())
 	}
 
+	@Test
+	fun `ticker shutdown is being requested`() {
+		sonePlugin.runPlugin(pluginRespirator)
+		assertThat(getInjected(TickerShutdown::class.java), notNullValue())
+	}
+
 	private class FirstStartListener(private val firstStartReceived: AtomicBoolean) {
 		@Subscribe
 		fun firstStart(firstStart: FirstStart) {
