@@ -20,6 +20,7 @@ import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.mockito.Mockito.*
 import java.io.*
+import java.util.concurrent.*
 import java.util.concurrent.atomic.*
 import kotlin.test.*
 
@@ -214,6 +215,11 @@ class SoneModuleTest {
 	@Test
 	fun `wot connector is created as singleton`() {
 		injector.verifySingletonInstance<WebOfTrustConnector>()
+	}
+
+	@Test
+	fun `notification ticker is created as singleton`() {
+		injector.verifySingletonInstance<ScheduledExecutorService>(named("notification"))
 	}
 
 }

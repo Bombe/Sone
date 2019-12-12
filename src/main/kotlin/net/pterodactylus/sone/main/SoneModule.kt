@@ -16,7 +16,11 @@ import net.pterodactylus.util.config.ConfigurationException
 import net.pterodactylus.util.logging.*
 import net.pterodactylus.util.version.Version
 import java.io.*
+import java.util.concurrent.*
+import java.util.concurrent.Executors.*
 import java.util.logging.*
+import javax.inject.*
+import javax.inject.Singleton
 
 open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: EventBus) : AbstractModule() {
 
@@ -66,6 +70,12 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 			}
 		})
 	}
+
+	@Provides
+	@Singleton
+	@Named("notification")
+	fun getNotificationTicker(): ScheduledExecutorService =
+			newSingleThreadScheduledExecutor()
 
 	private val logger: Logger = Logging.getLogger(javaClass)
 
