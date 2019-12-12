@@ -20,12 +20,13 @@ package net.pterodactylus.sone.web.notification
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
+import javax.inject.*
 
 /**
  * Handler for web of trust-related notifications and the [WebOfTrustAppeared]
  * and [WebOfTrustDisappeared] events.
  */
-class WebOfTrustHandler(private val notificationManager: NotificationManager, private val notification: TemplateNotification) {
+class WebOfTrustHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("webOfTrust") private val notification: TemplateNotification) {
 
 	@Subscribe
 	fun webOfTrustAppeared(webOfTrustAppeared: WebOfTrustAppeared) {

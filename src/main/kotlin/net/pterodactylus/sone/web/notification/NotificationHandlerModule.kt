@@ -21,11 +21,12 @@ import com.google.inject.*
 import com.google.inject.binder.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
-import java.util.concurrent.Executors.*
+import java.util.concurrent.TimeUnit.*
 import java.util.function.*
 import javax.inject.*
 import javax.inject.Singleton
@@ -48,6 +49,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<FirstStartHandler>().asSingleton()
 		bind<ConfigNotReadHandler>().asSingleton()
 		bind<StartupHandler>().asSingleton()
+		bind<WebOfTrustHandler>().asSingleton()
 	}
 
 	@Provides
@@ -123,6 +125,24 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("startup")
 	fun getStartupNotification(loaders: Loaders) =
 			TemplateNotification("startup-notification", loaders.loadTemplate("/templates/notify/startupNotification.html"))
+
+	@Provides
+	@Singleton
+	@Named("webOfTrust")
+	fun getWebOfTrustNotification(loaders: Loaders) =
+			TemplateNotification("wot-missing-notification", loaders.loadTemplate("/templates/notify/wotMissingNotification.html"))
+
+	@Provides
+	@Singleton
+	@Named("webOfTrustReacher")
+	fun getWebOfTrustReacher(webOfTrustConnector: WebOfTrustConnector): Runnable =
+			Runnable { webOfTrustConnector.ping() }
+
+	@Provides
+	@Singleton
+	@Named("webOfTrustReschedule")
+	fun getWebOfTrustReschedule(@Named("notification") ticker: ScheduledExecutorService) =
+			Consumer<Runnable> { ticker.schedule(it, 15, SECONDS) }
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

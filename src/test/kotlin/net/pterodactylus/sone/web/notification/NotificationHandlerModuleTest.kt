@@ -25,16 +25,21 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.Post.*
 import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
+import org.mockito.*
 import org.mockito.Mockito.*
 import java.io.*
 import java.util.concurrent.*
+import java.util.concurrent.TimeUnit.*
+import java.util.function.*
 import kotlin.test.*
 
 /**
@@ -43,6 +48,7 @@ import kotlin.test.*
 class NotificationHandlerModuleTest {
 
 	private val core = mock<Core>()
+	private val webOfTrustConnector = mock<WebOfTrustConnector>()
 	private val ticker = mock<ScheduledExecutorService>()
 	private val notificationManager = NotificationManager()
 	private val loaders = TestLoaders()
@@ -50,6 +56,7 @@ class NotificationHandlerModuleTest {
 			Core::class.isProvidedBy(core),
 			NotificationManager::class.isProvidedBy(notificationManager),
 			Loaders::class.isProvidedBy(loaders),
+			WebOfTrustConnector::class.isProvidedBy(webOfTrustConnector),
 			ScheduledExecutorService::class.withNameIsProvidedBy(ticker, "notification"),
 			NotificationHandlerModule()
 	)
@@ -398,6 +405,56 @@ class NotificationHandlerModuleTest {
 	@Test
 	fun `startup handler is created as singleton`() {
 		injector.verifySingletonInstance<StartupHandler>()
+	}
+
+	@Test
+	fun `web-of-trust notification is created as singleton`() {
+		injector.verifySingletonInstance<TemplateNotification>(named("webOfTrust"))
+	}
+
+	@Test
+	fun `web-of-trust notification has correct ID`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("webOfTrust")).id, equalTo("wot-missing-notification"))
+	}
+
+	@Test
+	fun `web-of-trust notification is dismissable`() {
+		assertThat(injector.getInstance<TemplateNotification>(named("webOfTrust")).isDismissable, equalTo(true))
+	}
+
+	@Test
+	fun `web-of-trust notification loads correct template`() {
+		loaders.templates += "/templates/notify/wotMissingNotification.html" to "1".asTemplate()
+		val notification = injector.getInstance<TemplateNotification>(named("webOfTrust"))
+		assertThat(notification.render(), equalTo("1"))
+	}
+
+	@Test
+	fun `web-of-trust handler is created as singleton`() {
+		injector.verifySingletonInstance<TemplateNotification>(named("webOfTrust"))
+	}
+
+	@Test
+	fun `web-of-trust reacher is created as singleton`() {
+		injector.verifySingletonInstance<Runnable>(named("webOfTrustReacher"))
+	}
+
+	@Test
+	fun `web-of-trust reacher access the wot connector`() {
+		injector.getInstance<Runnable>(named("webOfTrustReacher")).run()
+		verify(webOfTrustConnector).ping()
+	}
+
+	@Test
+	fun `web-of-trust reschedule is created as singleton`() {
+		injector.verifySingletonInstance<Consumer<Runnable>>(named("webOfTrustReschedule"))
+	}
+
+	@Test
+	fun `web-of-trust reschedule schedules at the correct delay`() {
+		val webOfTrustPinger = injector.getInstance<WebOfTrustPinger>()
+		injector.getInstance<Consumer<Runnable>>(named("webOfTrustReschedule"))(webOfTrustPinger)
+		verify(ticker).schedule(ArgumentMatchers.eq(webOfTrustPinger), ArgumentMatchers.eq(15L), ArgumentMatchers.eq(SECONDS))
 	}
 
 }

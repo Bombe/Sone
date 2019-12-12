@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.web.notification
 
+import net.pterodactylus.sone.freenet.wot.*
 import javax.inject.*
 
 /**
@@ -34,5 +35,7 @@ class NotificationHandler @Inject constructor(
 		imageInsertHandler: ImageInsertHandler,
 		firstStartHandler: FirstStartHandler,
 		configNotReadHandler: ConfigNotReadHandler,
-		startupHandler: StartupHandler
+		startupHandler: StartupHandler,
+		webOfTrustPinger: WebOfTrustPinger,
+		webOfTrustHandler: WebOfTrustHandler
 )

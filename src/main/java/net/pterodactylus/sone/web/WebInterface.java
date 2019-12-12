@@ -29,7 +29,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -409,23 +408,6 @@ public class WebInterface implements SessionProvider {
 	 */
 	public void start() {
 		registerToadlets();
-
-		/* notification templates. */
-		Template wotMissingNotificationTemplate = loaders.loadTemplate("/templates/notify/wotMissingNotification.html");
-		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
-		ticker.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void run() {
-				if (getCore().getIdentityManager().isConnected()) {
-					wotMissingNotification.dismiss();
-				} else {
-					notificationManager.addNotification(wotMissingNotification);
-				}
-			}
-
-		}, 15, 15, TimeUnit.SECONDS);
 	}
 
 	/**
