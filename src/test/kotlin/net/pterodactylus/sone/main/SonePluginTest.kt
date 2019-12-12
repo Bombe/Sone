@@ -26,7 +26,7 @@ import kotlin.test.*
 @Dirty
 class SonePluginTest {
 
-	private val sonePlugin by lazy { SonePlugin { injector } }
+	private var sonePlugin = SonePlugin { injector }
 	private val pluginRespirator = deepMock<PluginRespirator>()
 	private val node = deepMock<Node>()
 	private val clientCore = deepMock<NodeClientCore>()
@@ -76,7 +76,7 @@ class SonePluginTest {
 
 	private fun runSonePluginWithRealInjector(injectorConsumer: (Injector) -> Unit = {}): Injector {
 		lateinit var injector: Injector
-		val sonePlugin = SonePlugin {
+		sonePlugin = SonePlugin {
 			Guice.createInjector(*it).also {
 				injector = it
 				injectorConsumer(it)
@@ -190,6 +190,24 @@ class SonePluginTest {
 			eventBus.register(StartupListener { startupReceived.set(true) })
 		}
 		assertThat(startupReceived.get(), equalTo(true))
+	}
+
+	private class ShutdownListener(private val shutdownReceived: () -> Unit) {
+		@Subscribe
+		fun shutdown(shutdown: Shutdown) {
+			shutdownReceived()
+		}
+	}
+
+	@Test
+	fun `shutdown event is sent to event bus on terminate`() {
+		val shutdownReceived = AtomicBoolean()
+		runSonePluginWithRealInjector {
+			val eventBus = it.getInstance(EventBus::class.java)
+			eventBus.register(ShutdownListener { shutdownReceived.set(true) })
+		}
+		sonePlugin.terminate()
+		assertThat(shutdownReceived.get(), equalTo(true))
 	}
 
 	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =

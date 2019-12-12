@@ -110,6 +110,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	/** The core. */
 	private Core core;
 
+	/** The event bus. */
+	private EventBus eventBus;
+
 	/** The web interface. */
 	private WebInterface webInterface;
 
@@ -212,7 +215,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		webInterface.start();
 
 		/* send some events on startup */
-		EventBus eventBus = injector.getInstance(EventBus.class);
+		eventBus = injector.getInstance(EventBus.class);
 
 		/* first start? */
 		if (injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart")))) {
@@ -247,6 +250,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
+		/* send shutdown event. */
+		eventBus.post(new Shutdown());
+
 		try {
 			/* stop the web interface. */
 			webInterface.stop();
