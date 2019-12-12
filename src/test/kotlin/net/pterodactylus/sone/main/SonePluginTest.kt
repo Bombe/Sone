@@ -115,7 +115,6 @@ class SonePluginTest {
 			val eventBus = it.getInstance(EventBus::class.java)
 			eventBus.register(FirstStartListener(firstStartReceived))
 		}
-		sonePlugin.runPlugin(pluginRespirator)
 		assertThat(firstStartReceived.get(), equalTo(true))
 	}
 
@@ -128,7 +127,6 @@ class SonePluginTest {
 				val eventBus = it.getInstance(EventBus::class.java)
 				eventBus.register(FirstStartListener(firstStartReceived))
 			}
-			sonePlugin.runPlugin(pluginRespirator)
 			assertThat(firstStartReceived.get(), equalTo(false))
 		}
 	}
@@ -149,7 +147,6 @@ class SonePluginTest {
 				val eventBus = it.getInstance(EventBus::class.java)
 				eventBus.register(ConfigNotReadListener(configNotReadReceived))
 			}
-			sonePlugin.runPlugin(pluginRespirator)
 			assertThat(configNotReadReceived.get(), equalTo(true))
 		}
 	}
@@ -162,7 +159,6 @@ class SonePluginTest {
 			val eventBus = it.getInstance(EventBus::class.java)
 			eventBus.register(ConfigNotReadListener(configNotReadReceived))
 		}
-		sonePlugin.runPlugin(pluginRespirator)
 		assertThat(configNotReadReceived.get(), equalTo(false))
 	}
 
@@ -175,7 +171,6 @@ class SonePluginTest {
 				val eventBus = it.getInstance(EventBus::class.java)
 				eventBus.register(ConfigNotReadListener(configNotReadReceived))
 			}
-			sonePlugin.runPlugin(pluginRespirator)
 			assertThat(configNotReadReceived.get(), equalTo(false))
 		}
 	}
@@ -194,7 +189,6 @@ class SonePluginTest {
 			val eventBus = it.getInstance(EventBus::class.java)
 			eventBus.register(StartupListener { startupReceived.set(true) })
 		}
-		sonePlugin.runPlugin(pluginRespirator)
 		assertThat(startupReceived.get(), equalTo(true))
 	}
 
