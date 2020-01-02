@@ -34,13 +34,21 @@ class PostAccessor(private val core: Core) : ReflectionAccessor() {
 	override fun get(templateContext: TemplateContext?, `object`: Any?, member: String): Any? =
 			(`object` as Post).let { post ->
 				when (member) {
-					"replies" -> core.getReplies(post.id).filter { Reply.FUTURE_REPLY_FILTER.apply(it) }
+					"replies" -> core.getReplies(post)
 					"likes" -> core.getLikes(post)
-					"liked" -> (templateContext?.get("currentSone") as? Sone)?.isLikedPostId(post.id) ?: false
+					"liked" -> templateContext.currentSone?.isLikedPostId(post.id) ?: false
 					"new" -> !post.isKnown
 					"bookmarked" -> core.isBookmarked(post)
+					"replySone" -> core.getReplies(post)
+							.lastOrNull { it.sone.isLocal }
+							?.sone
+							?: post.sone.takeIf { it.isLocal }
+							?: templateContext.currentSone
 					else -> super.get(templateContext, `object`, member)
 				}
 			}
 
 }
+
+private fun Core.getReplies(post: Post) = getReplies(post.id).filter { Reply.FUTURE_REPLY_FILTER.apply(it) }
+private val TemplateContext?.currentSone: Sone? get() = this?.get("currentSone") as? Sone

@@ -95,8 +95,93 @@ class PostAccessorTest {
 	}
 
 	@Test
+	fun `reply sone for remote post without replies is current sone`() {
+		val post = mockPostFrom(remoteSone)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(currentSone))
+	}
+
+	@Test
+	fun `reply sone for remote post with remote replies is current sone`() {
+		val post = mockPostFrom(remoteSone)
+		val replies = listOf(mockReplyFrom(remoteSone), mockReplyFrom(remoteSone))
+		whenever(core.getReplies("post-id")).thenReturn(replies)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(currentSone))
+	}
+
+	@Test
+	fun `reply sone for remote post with remote and one local replies is sone of local reply`() {
+		val post = mockPostFrom(remoteSone)
+		val localSone = mockLocalSone()
+		val replies = listOf(mockReplyFrom(remoteSone), mockReplyFrom(localSone))
+		whenever(core.getReplies("post-id")).thenReturn(replies)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone))
+	}
+
+	@Test
+	fun `reply sone for remote post with remote and several local replies is sone of latest local reply`() {
+		val post = mockPostFrom(remoteSone)
+		val localSone1 = mockLocalSone()
+		val localSone2 = mockLocalSone()
+		val replies = listOf(mockReplyFrom(remoteSone), mockReplyFrom(localSone1), mockReplyFrom(localSone2))
+		whenever(core.getReplies("post-id")).thenReturn(replies)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone2))
+	}
+
+	@Test
+	fun `reply sone for local post without replies is post sone`() {
+		val localSone = mockLocalSone()
+		val post = mockPostFrom(localSone)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone))
+	}
+
+	@Test
+	fun `reply sone for local post with remote replies is local sone`() {
+		val localSone = mockLocalSone()
+		val post = mockPostFrom(localSone)
+		val replies = listOf(mockReplyFrom(remoteSone), mockReplyFrom(remoteSone))
+		whenever(core.getReplies("post-id")).thenReturn(replies)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone))
+	}
+
+	@Test
+	fun `reply sone for local post with remote and one local replies is local reply sone`() {
+		val localSone1 = mockLocalSone()
+		val post = mockPostFrom(localSone1)
+		val localSone2 = mockLocalSone()
+		val replies = listOf(mockReplyFrom(remoteSone), mockReplyFrom(localSone2))
+		whenever(core.getReplies("post-id")).thenReturn(replies)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone2))
+	}
+
+	@Test
+	fun `reply sone for local post with remote and several local replies is latest local reply sone`() {
+		val localSone1 = mockLocalSone()
+		val post = mockPostFrom(localSone1)
+		val localSone2 = mockLocalSone()
+		val localSone3 = mockLocalSone()
+		val replies = listOf(mockReplyFrom(remoteSone), mockReplyFrom(localSone2), mockReplyFrom(localSone3))
+		whenever(core.getReplies("post-id")).thenReturn(replies)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone3))
+	}
+
+	@Test
 	fun `accessor returns other properties`() {
 		assertThat(accessor[null, post, "hashCode"], equalTo<Any>(post.hashCode()))
 	}
 
 }
+
+private val currentSone = mock<Sone>()
+private val remoteSone = mock<Sone>()
+private fun mockLocalSone() = mock<Sone>().apply { whenever(isLocal).thenReturn(true) }
+
+private val templateContext = TemplateContext().apply {
+	this["currentSone"] = currentSone
+}
+
+private fun mockPostFrom(sone: Sone) = mock<Post>().apply {
+	whenever(id).thenReturn("post-id")
+	whenever(this.sone).thenReturn(sone)
+}
+
+private fun mockReplyFrom(sone: Sone) = mock<PostReply>().apply { whenever(this.sone).thenReturn(sone) }
