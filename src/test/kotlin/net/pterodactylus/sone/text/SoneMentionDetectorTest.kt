@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.text
 
+import com.google.common.base.*
+import com.google.common.base.Optional.*
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
@@ -89,6 +91,51 @@ class SoneMentionDetectorTest {
 		assertThat(capturedEvents, emptyIterable())
 	}
 
+	@Test
+	fun `detector does not emit event for reply that contains no sones`() {
+		val reply = emptyPostReply()
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedEvents, emptyIterable())
+	}
+
+	@Test
+	fun `detector does not emit event for reply that contains two links to remote sones`() {
+		val reply = emptyPostReply("text mentions sone://${remoteSone1.id} and sone://${remoteSone2.id}.")
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedEvents, emptyIterable())
+	}
+
+	@Test
+	fun `detector emits event on reply that contains links to a remote and a local sone`() {
+		val post = createPost()
+		val reply = emptyPostReply("text mentions sone://${remoteSone1.id} and sone://${localSone1.id}.", post)
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+	}
+
+	@Test
+	fun `detector emits one event on reply that contains two links to the same local sone`() {
+		val post = createPost()
+		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone1.id}.", post)
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+	}
+
+	@Test
+	fun `detector emits one event on reply that contains two links to local sones`() {
+		val post = createPost()
+		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post)
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+	}
+
+	@Test
+	fun `detector does not emit event for reply by local sone`() {
+		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", sone = localSone1)
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedEvents, emptyIterable())
+	}
+
 }
 
 private val remoteSone1 = createRemoteSone()
@@ -121,4 +168,15 @@ private class TestPostProvider : PostProvider {
 	override fun getPosts(soneId: String): Collection<Post> = emptyList()
 	override fun getDirectedPosts(recipientId: String): Collection<Post> = emptyList()
 
+}
+
+private fun emptyPostReply(text: String = "", post: Post = createPost(), sone: Sone = remoteSone1) = object : PostReply {
+	override val id = "reply-id"
+	override fun getSone() = sone
+	override fun getPostId() = post.id
+	override fun getPost(): Optional<Post> = of(post)
+	override fun getTime() = 1L
+	override fun getText() = text
+	override fun isKnown() = false
+	override fun setKnown(known: Boolean): PostReply = this
 }

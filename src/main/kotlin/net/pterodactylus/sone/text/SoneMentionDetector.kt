@@ -41,4 +41,15 @@ class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, pr
 		}
 	}
 
+	@Subscribe
+	fun onNewPostReply(event: NewPostReplyFoundEvent) {
+		event.postReply.let { postReply ->
+			postReply.sone.isLocal.onFalse {
+				if (soneTextParser.parse(postReply.text, null).filterIsInstance<SonePart>().any { it.sone.isLocal }) {
+					postReply.post.let(::LocalSoneMentionedInPostEvent).also(eventBus::post)
+				}
+			}
+		}
+	}
+
 }
