@@ -17,6 +17,8 @@
 
 package net.pterodactylus.sone.web.notification
 
+import net.pterodactylus.util.notify.*
+import java.io.*
 import java.util.concurrent.*
 
 /** Information about a scheduled runnable. */
@@ -34,4 +36,10 @@ class TestScheduledThreadPoolExecutor : ScheduledThreadPoolExecutor(1) {
 			super.schedule(command, delay, unit)
 					.also { scheduleds += Scheduled(command, delay, unit, it) }
 
+}
+
+fun NotificationManager.firstStart() {
+	addNotification(object : AbstractNotification("first-start-notification") {
+		override fun render(writer: Writer?) = Unit
+	})
 }

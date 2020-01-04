@@ -26,7 +26,6 @@ import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import java.io.*
 import kotlin.test.*
 
 /**
@@ -62,9 +61,7 @@ class LocalPostHandlerTest {
 
 	@Test
 	fun `handler does not add notification during first start`() {
-		notificationManager.addNotification(object : AbstractNotification("first-start-notification") {
-			override fun render(writer: Writer?) = Unit
-		})
+		notificationManager.firstStart()
 		eventBus.post(NewPostFoundEvent(remotePost))
 		assertThat(notificationManager.notifications, not(hasItem<Notification>(notification)))
 	}

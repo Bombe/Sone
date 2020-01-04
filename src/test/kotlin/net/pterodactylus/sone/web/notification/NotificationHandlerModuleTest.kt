@@ -37,7 +37,6 @@ import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.mockito.*
 import org.mockito.Mockito.*
-import java.io.*
 import java.util.concurrent.*
 import java.util.concurrent.TimeUnit.*
 import java.util.function.*
@@ -75,9 +74,7 @@ class NotificationHandlerModuleTest {
 
 	@Test
 	fun `mark-post-known-during-first-start handler is created with correct action`() {
-		notificationManager.addNotification(object : AbstractNotification("first-start-notification") {
-			override fun render(writer: Writer?) = Unit
-		})
+		notificationManager.firstStart()
 		val handler = injector.getInstance<MarkPostKnownDuringFirstStartHandler>()
 		val post = mock<Post>()
 		handler.newPostFound(NewPostFoundEvent(post))

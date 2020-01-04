@@ -23,7 +23,6 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import java.io.*
 import java.util.function.Consumer
 import kotlin.test.*
 
@@ -50,9 +49,7 @@ class MarkPostKnownDuringFirstStartHandlerTest {
 
 	@Test
 	fun `new post is marked as known during first start`() {
-		notificationManager.addNotification(object : AbstractNotification("first-start-notification") {
-			override fun render(writer: Writer?) = Unit
-		})
+		notificationManager.firstStart()
 		eventBus.post(NewPostFoundEvent(post))
 		assertThat(markedPosts, contains(post))
 	}

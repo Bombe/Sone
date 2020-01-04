@@ -26,7 +26,6 @@ import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import java.io.*
 import kotlin.test.*
 
 class NewSoneHandlerTest {
@@ -55,9 +54,7 @@ class NewSoneHandlerTest {
 
 	@Test
 	fun `handler does not add notification on new sone event if first-start notification is present`() {
-		notificationManager.addNotification(object : AbstractNotification("first-start-notification") {
-			override fun render(writer: Writer) = Unit
-		})
+		notificationManager.firstStart()
 		eventBus.post(NewSoneFoundEvent(sone))
 		assertThat(notificationManager.notifications.single().id, equalTo("first-start-notification"))
 	}
