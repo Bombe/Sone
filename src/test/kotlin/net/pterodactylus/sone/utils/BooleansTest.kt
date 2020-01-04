@@ -30,6 +30,26 @@ class BooleansTest {
 	}
 
 	@Test
+	fun `onTrue returns true on true`() {
+		assertThat(true.onTrue {}, equalTo(true))
+	}
+
+	@Test
+	fun `onTrue returns false on false`() {
+		assertThat(false.onTrue {}, equalTo(false))
+	}
+
+	@Test
+	fun `onTrue is not executed on false`() {
+		assertThat(false.onTrue { throw RuntimeException() }, equalTo(false))
+	}
+
+	@Test(expected = RuntimeException::class)
+	fun `onTrue is executed on true`() {
+		true.onTrue { throw RuntimeException() }
+	}
+
+	@Test
 	fun `onFalse returns true on true`() {
 		assertThat(true.onFalse {}, equalTo(true))
 	}
