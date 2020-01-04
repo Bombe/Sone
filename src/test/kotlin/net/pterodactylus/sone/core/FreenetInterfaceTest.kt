@@ -10,7 +10,6 @@ import freenet.keys.*
 import freenet.keys.InsertableClientSSK.*
 import freenet.node.*
 import freenet.node.RequestStarter.*
-import freenet.support.Base64
 import freenet.support.api.*
 import freenet.support.io.*
 import net.pterodactylus.sone.core.FreenetInterface.*
@@ -20,6 +19,7 @@ import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.test.Matchers.*
 import net.pterodactylus.sone.test.TestUtil.*
+import net.pterodactylus.sone.utils.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -82,7 +82,7 @@ class FreenetInterfaceTest {
 	@Before
 	fun setupSone() {
 		val insertSsk = createRandom(randomSource, "test-0")
-		whenever(sone.id).thenReturn(Base64.encode(insertSsk.uri.routingKey))
+		whenever(sone.id).thenReturn(insertSsk.uri.routingKey.asFreenetBase64)
 		whenever(sone.requestUri).thenReturn(insertSsk.uri.uskForSSK())
 	}
 

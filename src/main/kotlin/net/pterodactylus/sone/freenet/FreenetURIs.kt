@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.freenet
 
 import freenet.keys.*
-import freenet.support.Base64.*
+import net.pterodactylus.sone.utils.*
 
-val FreenetURI.routingKeyString: String get() = encode(routingKey)
+val FreenetURI.routingKeyString: String get() = routingKey.asFreenetBase64
