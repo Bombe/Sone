@@ -1,5 +1,5 @@
 /**
- * Sone - LocalSoneMentionedInPostEvent.kt - Copyright © 2019 David ‘Bombe’ Roden
+ * Sone - MentionOfLocalSoneFoundEvent.kt - Copyright © 2019 David ‘Bombe’ Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,4 +24,4 @@ import net.pterodactylus.sone.data.*
  * Sone, which happens if the [SoneTextParser] locates a [SonePart] in a post
  * or reply.
  */
-data class LocalSoneMentionedInPostEvent(val post: Post)
+data class MentionOfLocalSoneFoundEvent(val post: Post)

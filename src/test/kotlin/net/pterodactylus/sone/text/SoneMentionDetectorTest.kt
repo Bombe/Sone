@@ -37,14 +37,14 @@ class SoneMentionDetectorTest {
 	private val soneProvider = TestSoneProvider()
 	private val postProvider = TestPostProvider()
 	private val soneTextParser = SoneTextParser(soneProvider, postProvider)
-	private val capturedEvents = mutableListOf<LocalSoneMentionedInPostEvent>()
+	private val capturedEvents = mutableListOf<MentionOfLocalSoneFoundEvent>()
 
 	init {
 		eventBus.register(SoneMentionDetector(eventBus, soneTextParser))
 		eventBus.register(object : Any() {
 			@Subscribe
-			fun captureEvent(localSoneMentionedInPostEvent: LocalSoneMentionedInPostEvent) {
-				capturedEvents += localSoneMentionedInPostEvent
+			fun captureEvent(mentionOfLocalSoneFoundEvent: MentionOfLocalSoneFoundEvent) {
+				capturedEvents += mentionOfLocalSoneFoundEvent
 			}
 		})
 	}
@@ -67,21 +67,21 @@ class SoneMentionDetectorTest {
 	fun `detector emits event on post that contains links to a remote and a local sone`() {
 		val post = createPost("text mentions sone://${localSone1.id} and sone://${remoteSone2.id}.")
 		eventBus.post(NewPostFoundEvent(post))
-		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+		assertThat(capturedEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test
 	fun `detector emits one event on post that contains two links to the same local sone`() {
 		val post = createPost("text mentions sone://${localSone1.id} and sone://${localSone1.id}.")
 		eventBus.post(NewPostFoundEvent(post))
-		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+		assertThat(capturedEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test
 	fun `detector emits one event on post that contains links to two local sones`() {
 		val post = createPost("text mentions sone://${localSone1.id} and sone://${localSone2.id}.")
 		eventBus.post(NewPostFoundEvent(post))
-		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+		assertThat(capturedEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test
@@ -110,7 +110,7 @@ class SoneMentionDetectorTest {
 		val post = createPost()
 		val reply = emptyPostReply("text mentions sone://${remoteSone1.id} and sone://${localSone1.id}.", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
-		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+		assertThat(capturedEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test
@@ -118,7 +118,7 @@ class SoneMentionDetectorTest {
 		val post = createPost()
 		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone1.id}.", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
-		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+		assertThat(capturedEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test
@@ -126,7 +126,7 @@ class SoneMentionDetectorTest {
 		val post = createPost()
 		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post)
 		eventBus.post(NewPostReplyFoundEvent(reply))
-		assertThat(capturedEvents, contains(LocalSoneMentionedInPostEvent(post)))
+		assertThat(capturedEvents, contains(MentionOfLocalSoneFoundEvent(post)))
 	}
 
 	@Test

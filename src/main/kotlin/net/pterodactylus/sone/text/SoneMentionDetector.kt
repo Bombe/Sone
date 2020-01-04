@@ -24,7 +24,7 @@ import javax.inject.*
 
 /**
  * Listens to [NewPostFoundEvent]s and [NewPostReplyFoundEvent], parses the
- * texts and emits a [LocalSoneMentionedInPostEvent] if a [SoneTextParser]
+ * texts and emits a [MentionOfLocalSoneFoundEvent] if a [SoneTextParser]
  * finds a [SonePart] that points to a local [Sone].
  */
 class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, private val soneTextParser: SoneTextParser) {
@@ -35,7 +35,7 @@ class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, pr
 			post.sone.isLocal.onFalse {
 				val parts = soneTextParser.parse(post.text, null)
 				if (parts.filterIsInstance<SonePart>().any { it.sone.isLocal }) {
-					eventBus.post(LocalSoneMentionedInPostEvent(post))
+					eventBus.post(MentionOfLocalSoneFoundEvent(post))
 				}
 			}
 		}
@@ -46,7 +46,7 @@ class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, pr
 		event.postReply.let { postReply ->
 			postReply.sone.isLocal.onFalse {
 				if (soneTextParser.parse(postReply.text, null).filterIsInstance<SonePart>().any { it.sone.isLocal }) {
-					postReply.post.let(::LocalSoneMentionedInPostEvent).also(eventBus::post)
+					postReply.post.let(::MentionOfLocalSoneFoundEvent).also(eventBus::post)
 				}
 			}
 		}
