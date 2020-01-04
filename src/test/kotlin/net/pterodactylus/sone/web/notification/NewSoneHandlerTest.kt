@@ -56,7 +56,7 @@ class NewSoneHandlerTest {
 	fun `handler does not add notification on new sone event if first-start notification is present`() {
 		notificationManager.firstStart()
 		eventBus.post(NewSoneFoundEvent(sone))
-		assertThat(notificationManager.notifications.single().id, equalTo("first-start-notification"))
+		assertThat(notificationManager.notifications, not(contains<Notification>(notification)))
 	}
 
 	@Test
