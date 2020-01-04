@@ -24,6 +24,7 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.text.*
 import net.pterodactylus.util.notify.*
 import java.util.concurrent.*
 import java.util.concurrent.TimeUnit.*
@@ -50,6 +51,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<ConfigNotReadHandler>().asSingleton()
 		bind<StartupHandler>().asSingleton()
 		bind<WebOfTrustHandler>().asSingleton()
+		bind<SoneMentionDetector>().asSingleton()
 	}
 
 	@Provides

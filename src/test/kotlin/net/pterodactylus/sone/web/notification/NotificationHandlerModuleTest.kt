@@ -29,6 +29,7 @@ import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
@@ -58,6 +59,7 @@ class NotificationHandlerModuleTest {
 			Loaders::class.isProvidedBy(loaders),
 			WebOfTrustConnector::class.isProvidedBy(webOfTrustConnector),
 			ScheduledExecutorService::class.withNameIsProvidedBy(ticker, "notification"),
+			SoneTextParser::class.isProvidedByMock(),
 			NotificationHandlerModule()
 	)
 
@@ -455,6 +457,11 @@ class NotificationHandlerModuleTest {
 		val webOfTrustPinger = injector.getInstance<WebOfTrustPinger>()
 		injector.getInstance<Consumer<Runnable>>(named("webOfTrustReschedule"))(webOfTrustPinger)
 		verify(ticker).schedule(ArgumentMatchers.eq(webOfTrustPinger), ArgumentMatchers.eq(15L), ArgumentMatchers.eq(SECONDS))
+	}
+
+	@Test
+	fun `sone mention detector is created as singleton`() {
+		assertThat(injector.getInstance<SoneMentionDetector>(), notNullValue())
 	}
 
 }

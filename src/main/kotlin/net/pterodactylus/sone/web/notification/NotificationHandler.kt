@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.web.notification
 
 import net.pterodactylus.sone.freenet.wot.*
+import net.pterodactylus.sone.text.*
 import javax.inject.*
 
 /**
@@ -37,5 +38,6 @@ class NotificationHandler @Inject constructor(
 		configNotReadHandler: ConfigNotReadHandler,
 		startupHandler: StartupHandler,
 		webOfTrustPinger: WebOfTrustPinger,
-		webOfTrustHandler: WebOfTrustHandler
+		webOfTrustHandler: WebOfTrustHandler,
+		soneMentionDetector: SoneMentionDetector
 )
