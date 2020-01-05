@@ -52,6 +52,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<StartupHandler>().asSingleton()
 		bind<WebOfTrustHandler>().asSingleton()
 		bind<SoneMentionDetector>().asSingleton()
+		bind<SoneMentionedHandler>().asSingleton()
 	}
 
 	@Provides
@@ -145,6 +146,12 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("webOfTrustReschedule")
 	fun getWebOfTrustReschedule(@Named("notification") ticker: ScheduledExecutorService) =
 			Consumer<Runnable> { ticker.schedule(it, 15, SECONDS) }
+
+	@Provides
+	@Singleton
+	@Named("soneMentioned")
+	fun getSoneMentionedNotification(loaders: Loaders) =
+			ListNotification<Post>("mention-notification", "posts", loaders.loadTemplate("/templates/notify/mentionNotification.html"), dismissable = false)
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)

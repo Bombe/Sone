@@ -463,4 +463,32 @@ class NotificationHandlerModuleTest {
 		assertThat(injector.getInstance<SoneMentionDetector>(), notNullValue())
 	}
 
+	@Test
+	fun `sone-mentioned notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<Post>>(named("soneMentioned"))
+	}
+
+	@Test
+	fun `sone-mentioned notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("soneMentioned")).id, equalTo("mention-notification"))
+	}
+
+	@Test
+	fun `sone-mentioned notification is not dismissable`() {
+		assertThat(injector.getInstance<ListNotification<Post>>(named("soneMentioned")).isDismissable, equalTo(false))
+	}
+
+	@Test
+	fun `sone-mentioned notification loads correct template`() {
+		loaders.templates += "/templates/notify/mentionNotification.html" to "<% posts>".asTemplate()
+		val notification = injector.getInstance<ListNotification<Post>>(named("soneMentioned"))
+		val posts = listOf(EmptyPost("1"), EmptyPost("2")).onEach(notification::add)
+		assertThat(notification.render(), equalTo(posts.toString()))
+	}
+
+	@Test
+	fun `sone-mentioned handler is created as singleton`() {
+		injector.verifySingletonInstance<SoneMentionedHandler>()
+	}
+
 }

@@ -22,7 +22,6 @@ import static java.util.logging.Logger.getLogger;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -53,9 +52,6 @@ import net.pterodactylus.sone.template.LinkedElementRenderFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.RenderFilter;
 import net.pterodactylus.sone.template.ShortenFilter;
-import net.pterodactylus.sone.text.Part;
-import net.pterodactylus.sone.text.SonePart;
-import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
@@ -101,7 +97,6 @@ import freenet.clients.http.ToadletContext;
 
 import com.codahale.metrics.*;
 import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -130,9 +125,6 @@ public class WebInterface implements SessionProvider {
 	/** The template context factory. */
 	private final TemplateContextFactory templateContextFactory;
 	private final TemplateRenderer templateRenderer;
-
-	/** The Sone text parser. */
-	private final SoneTextParser soneTextParser;
 
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
@@ -163,9 +155,6 @@ public class WebInterface implements SessionProvider {
 
 	/** The invisible “local reply” notification. */
 	private final ListNotification<PostReply> localReplyNotification;
-
-	/** The “you have been mentioned” notification. */
-	private final ListNotification<Post> mentionNotification;
 
 	/** Notifications for sone inserts. */
 	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
@@ -200,7 +189,6 @@ public class WebInterface implements SessionProvider {
 		this.newPostNotification = newPostNotification;
 		this.localPostNotification = localPostNotification;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
-		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		this.templateContextFactory = templateContextFactory;
 		templateContextFactory.addTemplateObject("webInterface", this);
@@ -212,9 +200,6 @@ public class WebInterface implements SessionProvider {
 
 		Template localReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
 		localReplyNotification = new ListNotification<>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
-
-		Template mentionNotificationTemplate = loaders.loadTemplate("/templates/notify/mentionNotification.html");
-		mentionNotification = new ListNotification<>("mention-notification", "posts", mentionNotificationTemplate, false);
 	}
 
 	//
@@ -506,26 +491,6 @@ public class WebInterface implements SessionProvider {
 	}
 
 	/**
-	 * Returns all {@link Sone#isLocal() local Sone}s that are referenced by
-	 * {@link SonePart}s in the given text (after parsing it using
-	 * {@link SoneTextParser}).
-	 *
-	 * @param text
-	 *            The text to parse
-	 * @return All mentioned local Sones
-	 */
-	private Collection<Sone> getMentionedSones(String text) {
-		/* we need no context to find mentioned Sones. */
-		Set<Sone> mentionedSones = new HashSet<>();
-		for (Part part : soneTextParser.parse(text, null)) {
-			if (part instanceof SonePart) {
-				mentionedSones.add(((SonePart) part).getSone());
-			}
-		}
-		return Collections2.filter(mentionedSones, Sone.LOCAL_SONE_FILTER);
-	}
-
-	/**
 	 * Returns the Sone insert notification for the given Sone. If no
 	 * notification for the given Sone exists, a new notification is created and
 	 * cached.
@@ -546,44 +511,9 @@ public class WebInterface implements SessionProvider {
 		}
 	}
 
-	private boolean localSoneMentionedInNewPostOrReply(Post post) {
-		if (!post.getSone().isLocal()) {
-			if (!getMentionedSones(post.getText()).isEmpty() && !post.isKnown()) {
-				return true;
-			}
-		}
-		for (PostReply postReply : getCore().getReplies(post.getId())) {
-			if (postReply.getSone().isLocal()) {
-				continue;
-			}
-			if (!getMentionedSones(postReply.getText()).isEmpty() && !postReply.isKnown()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	//
 	// EVENT HANDLERS
 	//
-
-	/**
-	 * Notifies the web interface that a new {@link Post} was found.
-	 *
-	 * @param newPostFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void newPostFound(NewPostFoundEvent newPostFoundEvent) {
-		Post post = newPostFoundEvent.getPost();
-		boolean isLocal = post.getSone().isLocal();
-		if (!hasFirstStartNotification()) {
-			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
-				mentionNotification.add(post);
-				notificationManager.addNotification(mentionNotification);
-			}
-		}
-	}
 
 	/**
 	 * Notifies the web interface that a new {@link PostReply} was found.
@@ -602,10 +532,6 @@ public class WebInterface implements SessionProvider {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (reply.getPost().isPresent() && localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
-				mentionNotification.add(reply.getPost().get());
-				notificationManager.addNotification(mentionNotification);
-			}
 		} else {
 			getCore().markReplyKnown(reply);
 		}
@@ -628,9 +554,6 @@ public class WebInterface implements SessionProvider {
 
 	private void removePost(Post post) {
 		newPostNotification.remove(post);
-		if (!localSoneMentionedInNewPostOrReply(post)) {
-			mentionNotification.remove(post);
-		}
 	}
 
 	@Subscribe
@@ -641,9 +564,6 @@ public class WebInterface implements SessionProvider {
 	private void removeReply(PostReply reply) {
 		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
-		if (reply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
-			mentionNotification.remove(reply.getPost().get());
-		}
 	}
 
 	/**

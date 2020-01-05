@@ -39,5 +39,6 @@ class NotificationHandler @Inject constructor(
 		startupHandler: StartupHandler,
 		webOfTrustPinger: WebOfTrustPinger,
 		webOfTrustHandler: WebOfTrustHandler,
-		soneMentionDetector: SoneMentionDetector
+		soneMentionDetector: SoneMentionDetector,
+		soneMentionedHandler: SoneMentionedHandler
 )
