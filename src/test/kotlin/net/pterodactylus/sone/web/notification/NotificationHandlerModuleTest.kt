@@ -25,6 +25,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.Post.*
 import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.notify.*
@@ -59,6 +60,7 @@ class NotificationHandlerModuleTest {
 			WebOfTrustConnector::class.isProvidedBy(webOfTrustConnector),
 			ScheduledExecutorService::class.withNameIsProvidedBy(ticker, "notification"),
 			SoneTextParser::class.isProvidedByMock(),
+			PostReplyProvider::class.isProvidedByMock(),
 			NotificationHandlerModule()
 	)
 

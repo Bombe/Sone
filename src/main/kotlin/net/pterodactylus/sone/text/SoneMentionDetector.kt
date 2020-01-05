@@ -19,6 +19,8 @@ package net.pterodactylus.sone.text
 
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
+import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.utils.*
 import javax.inject.*
 
@@ -27,14 +29,14 @@ import javax.inject.*
  * texts and emits a [MentionOfLocalSoneFoundEvent] if a [SoneTextParser]
  * finds a [SonePart] that points to a local [Sone].
  */
-class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, private val soneTextParser: SoneTextParser) {
+class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, private val soneTextParser: SoneTextParser, private val postReplyProvider: PostReplyProvider) {
 
 	@Subscribe
 	fun onNewPost(newPostFoundEvent: NewPostFoundEvent) {
 		newPostFoundEvent.post.let { post ->
 			post.sone.isLocal.onFalse {
-				val parts = soneTextParser.parse(post.text, null)
-				if (parts.filterIsInstance<SonePart>().any { it.sone.isLocal }) {
+				if (post.text.hasLinksToLocalSones()) {
+					mentionedPosts += post
 					eventBus.post(MentionOfLocalSoneFoundEvent(post))
 				}
 			}
@@ -45,11 +47,47 @@ class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, pr
 	fun onNewPostReply(event: NewPostReplyFoundEvent) {
 		event.postReply.let { postReply ->
 			postReply.sone.isLocal.onFalse {
-				if (soneTextParser.parse(postReply.text, null).filterIsInstance<SonePart>().any { it.sone.isLocal }) {
-					postReply.post.let(::MentionOfLocalSoneFoundEvent).also(eventBus::post)
+				if (postReply.text.hasLinksToLocalSones()) {
+					postReply.post
+							.also { mentionedPosts += it }
+							.let(::MentionOfLocalSoneFoundEvent).also(eventBus::post)
 				}
 			}
 		}
 	}
+
+	@Subscribe
+	fun onPostRemoved(event: PostRemovedEvent) {
+		unmentionPost(event.post)
+	}
+
+	@Subscribe
+	fun onPostMarkedKnown(event: MarkPostKnownEvent) {
+		unmentionPost(event.post)
+	}
+
+	@Subscribe
+	fun onReplyRemoved(event: PostReplyRemovedEvent) {
+		event.postReply.post.let {
+			if ((!it.text.hasLinksToLocalSones() || it.isKnown) && (it.replies.filterNot { it == event.postReply }.none { it.text.hasLinksToLocalSones() && !it.isKnown })) {
+				unmentionPost(it)
+			}
+		}
+	}
+
+	private fun unmentionPost(post: Post) {
+		if (post in mentionedPosts) {
+			eventBus.post(MentionOfLocalSoneRemovedEvent(post))
+			mentionedPosts -= post
+		}
+	}
+
+	private val mentionedPosts = mutableSetOf<Post>()
+
+	private fun String.hasLinksToLocalSones() = soneTextParser.parse(this, null)
+			.filterIsInstance<SonePart>()
+			.any { it.sone.isLocal }
+
+	private val Post.replies get() = postReplyProvider.getReplies(id)
 
 }
