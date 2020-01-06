@@ -23,7 +23,7 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import java.util.function.Consumer
+import java.util.function.*
 import kotlin.test.*
 
 /**

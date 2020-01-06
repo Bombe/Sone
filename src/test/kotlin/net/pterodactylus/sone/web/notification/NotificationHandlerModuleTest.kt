@@ -34,7 +34,6 @@ import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import org.hamcrest.MatcherAssert.*
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 import org.mockito.*
 import org.mockito.Mockito.*
