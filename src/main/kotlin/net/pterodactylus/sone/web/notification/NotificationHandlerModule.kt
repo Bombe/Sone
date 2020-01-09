@@ -40,6 +40,7 @@ class NotificationHandlerModule : AbstractModule() {
 	override fun configure() {
 		bind(NotificationHandler::class.java).`in`(Singleton::class.java)
 		bind<MarkPostKnownDuringFirstStartHandler>().asSingleton()
+		bind<MarkPostReplyKnownDuringFirstStartHandler>().asSingleton()
 		bind<SoneLockedOnStartupHandler>().asSingleton()
 		bind<NewSoneHandler>().asSingleton()
 		bind<NewRemotePostHandler>().asSingleton()
@@ -57,6 +58,9 @@ class NotificationHandlerModule : AbstractModule() {
 
 	@Provides
 	fun getMarkPostKnownHandler(core: Core): Consumer<Post> = Consumer { core.markPostKnown(it) }
+
+	@Provides
+	fun getMarkPostReplyKnownHandler(core: Core): Consumer<PostReply> = Consumer { core.markReplyKnown(it) }
 
 	@Provides
 	@Singleton

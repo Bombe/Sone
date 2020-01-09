@@ -83,6 +83,20 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
+	fun `mark-post-reply-known-during-first-start handler is created as singleton`() {
+		injector.verifySingletonInstance<MarkPostReplyKnownDuringFirstStartHandler>()
+	}
+
+	@Test
+	fun `mark-post-reply-known-during-first-start handler is created with correct action`() {
+		notificationManager.firstStart()
+		val handler = injector.getInstance<MarkPostReplyKnownDuringFirstStartHandler>()
+		val postReply = mock<PostReply>()
+		handler.newPostReply(NewPostReplyFoundEvent(postReply))
+		verify(core).markReplyKnown(postReply)
+	}
+
+	@Test
 	fun `sone-locked-on-startup handler is created as singleton`() {
 		injector.verifySingletonInstance<SoneLockedOnStartupHandler>()
 	}

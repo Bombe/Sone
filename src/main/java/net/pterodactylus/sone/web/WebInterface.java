@@ -532,8 +532,6 @@ public class WebInterface implements SessionProvider {
 		}
 		if (!hasFirstStartNotification()) {
 			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-		} else {
-			getCore().markReplyKnown(reply);
 		}
 	}
 
