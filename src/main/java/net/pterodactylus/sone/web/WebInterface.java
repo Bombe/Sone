@@ -169,6 +169,7 @@ public class WebInterface implements SessionProvider {
 			LinkedElementRenderFilter linkedElementRenderFilter,
 			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
 			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification,
+			@Named("newRemotePostReply") ListNotification<PostReply> newReplyNotification,
 			@Named("localPost") ListNotification<Post> localPostNotification) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
@@ -187,6 +188,7 @@ public class WebInterface implements SessionProvider {
 		this.translation = translation;
 		this.notificationManager = notificationManager;
 		this.newPostNotification = newPostNotification;
+		this.newReplyNotification = newReplyNotification;
 		this.localPostNotification = localPostNotification;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
@@ -195,9 +197,6 @@ public class WebInterface implements SessionProvider {
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
 
 		/* create notifications. */
-		Template newReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
-		newReplyNotification = new ListNotification<>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
-
 		Template localReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
 		localReplyNotification = new ListNotification<>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 	}
@@ -527,11 +526,9 @@ public class WebInterface implements SessionProvider {
 		boolean isLocal = reply.getSone().isLocal();
 		if (isLocal) {
 			localReplyNotification.add(reply);
-		} else {
-			newReplyNotification.add(reply);
-		}
-		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
+			if (!hasFirstStartNotification()) {
+				notificationManager.addNotification(localReplyNotification);
+			}
 		}
 	}
 
@@ -560,7 +557,6 @@ public class WebInterface implements SessionProvider {
 	}
 
 	private void removeReply(PostReply reply) {
-		newReplyNotification.remove(reply);
 		localReplyNotification.remove(reply);
 	}
 

@@ -182,6 +182,35 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
+	fun `remote-post handler is created as singleton`() {
+		injector.verifySingletonInstance<RemotePostReplyHandler>()
+	}
+
+	@Test
+	fun `new-remote-post-reply notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<PostReply>>(named("newRemotePostReply"))
+	}
+
+	@Test
+	fun `new-remote-post-reply notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<PostReply>>(named("newRemotePostReply")).id, equalTo("new-reply-notification"))
+	}
+
+	@Test
+	fun `new-remote-post-reply notification is not dismissable`() {
+		assertThat(injector.getInstance<ListNotification<PostReply>>(named("newRemotePostReply")).isDismissable, equalTo(false))
+	}
+
+	@Test
+	fun `new-remote-post-reply notification has correct key and template`() {
+		loaders.templates += "/templates/notify/newReplyNotification.html" to "<% replies>".asTemplate()
+		val notification = injector.getInstance<ListNotification<PostReply>>(named("newRemotePostReply"))
+		val postReplies = listOf(emptyPostReply(), emptyPostReply())
+		postReplies.forEach(notification::add)
+		assertThat(notification.render(), equalTo(postReplies.toString()))
+	}
+
+	@Test
 	fun `sone-locked notification is created as singleton`() {
 		injector.verifySingletonInstance<ListNotification<Sone>>(named("soneLocked"))
 	}
