@@ -17,10 +17,19 @@
 
 package net.pterodactylus.sone.test
 
+import com.google.common.base.*
 import freenet.crypt.*
 import freenet.keys.*
+import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.utils.*
+
+val remoteSone1 = createRemoteSone()
+val remoteSone2 = createRemoteSone()
+
+val localSone1 = createLocalSone()
+val localSone2 = createLocalSone()
 
 fun createId() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri.routingKey.asFreenetBase64
 
@@ -28,3 +37,22 @@ fun createLocalSone(id: String? = createId()) = object : IdOnlySone(id) {
 	override fun isLocal() = true
 }
 fun createRemoteSone(id: String? = createId()) = IdOnlySone(id)
+
+fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false): Post.EmptyPost {
+	return object : Post.EmptyPost("post-id") {
+		override fun getSone() = sone
+		override fun getText() = text
+		override fun isKnown() = known
+	}
+}
+
+fun emptyPostReply(text: String = "", post: Post = createPost(), sone: Sone = remoteSone1, known: Boolean = false) = object : PostReply {
+	override val id = "reply-id"
+	override fun getSone() = sone
+	override fun getPostId() = post.id
+	override fun getPost(): Optional<Post> = Optional.of(post)
+	override fun getTime() = 1L
+	override fun getText() = text
+	override fun isKnown() = known
+	override fun setKnown(known: Boolean): PostReply = this
+}

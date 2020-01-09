@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.text
 
-import com.google.common.base.*
-import com.google.common.base.Optional.*
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
@@ -226,20 +224,6 @@ class SoneMentionDetectorTest {
 
 }
 
-private val remoteSone1 = createRemoteSone()
-private val remoteSone2 = createRemoteSone()
-
-private val localSone1 = createLocalSone()
-private val localSone2 = createLocalSone()
-
-private fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false): Post.EmptyPost {
-	return object : Post.EmptyPost("post-id") {
-		override fun getSone() = sone
-		override fun getText() = text
-		override fun isKnown() = known
-	}
-}
-
 private class TestSoneProvider : SoneProvider {
 
 	override val sones: Collection<Sone> get() = remoteSones + localSones
@@ -267,15 +251,4 @@ private class TestPostReplyProvider : PostReplyProvider {
 	override fun getPostReply(id: String) = replies[id]
 	override fun getReplies(postId: String) = postReplies[postId] ?: emptyList()
 
-}
-
-private fun emptyPostReply(text: String = "", post: Post = createPost(), sone: Sone = remoteSone1, known: Boolean = false) = object : PostReply {
-	override val id = "reply-id"
-	override fun getSone() = sone
-	override fun getPostId() = post.id
-	override fun getPost(): Optional<Post> = of(post)
-	override fun getTime() = 1L
-	override fun getText() = text
-	override fun isKnown() = known
-	override fun setKnown(known: Boolean): PostReply = this
 }
