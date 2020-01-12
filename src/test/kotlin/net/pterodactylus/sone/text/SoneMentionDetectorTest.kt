@@ -32,7 +32,8 @@ import kotlin.test.*
 @Suppress("UnstableApiUsage")
 class SoneMentionDetectorTest {
 
-	private val eventBus = EventBus()
+	private val caughtExceptions = mutableListOf<Throwable>()
+	private val eventBus = EventBus { exception, _ -> caughtExceptions += exception }
 	private val soneProvider = TestSoneProvider()
 	private val postProvider = TestPostProvider()
 	private val soneTextParser = SoneTextParser(soneProvider, postProvider)
@@ -139,6 +140,14 @@ class SoneMentionDetectorTest {
 	fun `detector does not emit event for reply by local sone`() {
 		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", sone = localSone1)
 		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(capturedFoundEvents, emptyIterable())
+	}
+
+	@Test
+	fun `detector does not emit event for reply without post`() {
+		val reply = emptyPostReply("text mentions sone://${localSone1.id} and sone://${localSone2.id}.", post = null)
+		eventBus.post(NewPostReplyFoundEvent(reply))
+		assertThat(caughtExceptions, emptyIterable())
 		assertThat(capturedFoundEvents, emptyIterable())
 	}
 

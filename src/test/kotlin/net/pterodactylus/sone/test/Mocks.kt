@@ -46,11 +46,11 @@ fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = fal
 	}
 }
 
-fun emptyPostReply(text: String = "", post: Post = createPost(), sone: Sone = remoteSone1, known: Boolean = false) = object : PostReply {
+fun emptyPostReply(text: String = "", post: Post? = createPost(), sone: Sone = remoteSone1, known: Boolean = false) = object : PostReply {
 	override val id = "reply-id"
 	override fun getSone() = sone
-	override fun getPostId() = post.id
-	override fun getPost(): Optional<Post> = Optional.of(post)
+	override fun getPostId() = post!!.id
+	override fun getPost(): Optional<Post> = Optional.fromNullable(post)
 	override fun getTime() = 1L
 	override fun getText() = text
 	override fun isKnown() = known

@@ -50,7 +50,8 @@ class SoneMentionDetector @Inject constructor(private val eventBus: EventBus, pr
 				if (postReply.text.hasLinksToLocalSones()) {
 					postReply.post
 							.also { mentionedPosts += it }
-							.let(::MentionOfLocalSoneFoundEvent).also(eventBus::post)
+							.let(::MentionOfLocalSoneFoundEvent)
+							?.also(eventBus::post)
 				}
 			}
 		}
