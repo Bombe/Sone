@@ -3,6 +3,7 @@ package net.pterodactylus.sone.template
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
@@ -165,6 +166,14 @@ class PostAccessorTest {
 	}
 
 	@Test
+	fun `reply sone for post directed at local sone is local sone`() {
+		val localSone = mockLocalSone()
+		val post = mockPostFrom(remoteSone, localSone)
+		assertThat(accessor[templateContext, post, "replySone"], equalTo<Any>(localSone))
+	}
+
+
+	@Test
 	fun `accessor returns other properties`() {
 		assertThat(accessor[null, post, "hashCode"], equalTo<Any>(post.hashCode()))
 	}
@@ -179,9 +188,10 @@ private val templateContext = TemplateContext().apply {
 	this["currentSone"] = currentSone
 }
 
-private fun mockPostFrom(sone: Sone) = mock<Post>().apply {
+private fun mockPostFrom(sone: Sone, recipient: Sone? = null) = mock<Post>().apply {
 	whenever(id).thenReturn("post-id")
 	whenever(this.sone).thenReturn(sone)
+	whenever(this.recipient).thenReturn(recipient.asOptional())
 }
 
 private fun mockReplyFrom(sone: Sone) = mock<PostReply>().apply { whenever(this.sone).thenReturn(sone) }

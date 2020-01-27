@@ -18,6 +18,7 @@ package net.pterodactylus.sone.template
 
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.template.*
 
 /**
@@ -39,9 +40,8 @@ class PostAccessor(private val core: Core) : ReflectionAccessor() {
 					"liked" -> templateContext.currentSone?.isLikedPostId(post.id) ?: false
 					"new" -> !post.isKnown
 					"bookmarked" -> core.isBookmarked(post)
-					"replySone" -> core.getReplies(post)
-							.lastOrNull { it.sone.isLocal }
-							?.sone
+					"replySone" -> core.getReplies(post).lastOrNull { it.sone.isLocal }?.sone
+							?: post.recipient.let { it.takeIf { it.isLocal } }
 							?: post.sone.takeIf { it.isLocal }
 							?: templateContext.currentSone
 					else -> super.get(templateContext, `object`, member)
