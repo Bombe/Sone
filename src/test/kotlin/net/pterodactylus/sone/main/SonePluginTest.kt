@@ -15,6 +15,7 @@ import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.notification.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import org.junit.experimental.categories.*
 import org.mockito.Mockito.*
 import java.io.*
 import java.util.concurrent.atomic.*
@@ -24,6 +25,7 @@ import kotlin.test.*
  * Unit test for [SonePlugin].
  */
 @Dirty
+@Category(NotParallel::class)
 class SonePluginTest {
 
 	private var sonePlugin = SonePlugin { injector }

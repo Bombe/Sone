@@ -17,6 +17,7 @@ import net.pterodactylus.util.config.*
 import net.pterodactylus.util.version.Version
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import org.junit.experimental.categories.*
 import org.mockito.Mockito.*
 import java.io.*
 import java.util.concurrent.*
@@ -25,6 +26,7 @@ import kotlin.test.*
 
 const val versionString = "v80"
 
+@Category(NotParallel::class)
 class SoneModuleTest {
 
 	private val currentDir: File = File(".")
