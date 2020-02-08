@@ -170,7 +170,8 @@ public class WebInterface implements SessionProvider {
 			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
 			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification,
 			@Named("newRemotePostReply") ListNotification<PostReply> newReplyNotification,
-			@Named("localPost") ListNotification<Post> localPostNotification) {
+			@Named("localPost") ListNotification<Post> localPostNotification,
+			@Named("localReply") ListNotification<PostReply> localReplyNotification) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -190,15 +191,12 @@ public class WebInterface implements SessionProvider {
 		this.newPostNotification = newPostNotification;
 		this.newReplyNotification = newReplyNotification;
 		this.localPostNotification = localPostNotification;
+		this.localReplyNotification = localReplyNotification;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
 		this.templateContextFactory = templateContextFactory;
 		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
-
-		/* create notifications. */
-		Template localReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
-		localReplyNotification = new ListNotification<>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
 	}
 
 	//
@@ -514,32 +512,9 @@ public class WebInterface implements SessionProvider {
 	// EVENT HANDLERS
 	//
 
-	/**
-	 * Notifies the web interface that a new {@link PostReply} was found.
-	 *
-	 * @param newPostReplyFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void newReplyFound(NewPostReplyFoundEvent newPostReplyFoundEvent) {
-		PostReply reply = newPostReplyFoundEvent.getPostReply();
-		boolean isLocal = reply.getSone().isLocal();
-		if (isLocal) {
-			localReplyNotification.add(reply);
-			if (!hasFirstStartNotification()) {
-				notificationManager.addNotification(localReplyNotification);
-			}
-		}
-	}
-
 	@Subscribe
 	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
 		removePost(markPostKnownEvent.getPost());
-	}
-
-	@Subscribe
-	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
-		removeReply(markPostReplyKnownEvent.getPostReply());
 	}
 
 	@Subscribe
@@ -549,15 +524,6 @@ public class WebInterface implements SessionProvider {
 
 	private void removePost(Post post) {
 		newPostNotification.remove(post);
-	}
-
-	@Subscribe
-	public void replyRemoved(PostReplyRemovedEvent postReplyRemovedEvent) {
-		removeReply(postReplyRemovedEvent.getPostReply());
-	}
-
-	private void removeReply(PostReply reply) {
-		localReplyNotification.remove(reply);
 	}
 
 	/**

@@ -47,6 +47,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<RemotePostReplyHandler>().asSingleton()
 		bind<SoneLockedHandler>().asSingleton()
 		bind<LocalPostHandler>().asSingleton()
+		bind<LocalReplyHandler>().asSingleton()
 		bind<NewVersionHandler>().asSingleton()
 		bind<ImageInsertHandler>().asSingleton()
 		bind<FirstStartHandler>().asSingleton()
@@ -97,6 +98,12 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("localPost")
 	fun getLocalPostNotification(loaders: Loaders) =
 			ListNotification<Post>("local-post-notification", "posts", loaders.loadTemplate("/templates/notify/newPostNotification.html"), dismissable = false)
+
+	@Provides
+	@Singleton
+	@Named("localReply")
+	fun getLocalReplyNotification(loaders: Loaders) =
+			ListNotification<PostReply>("local-reply-notification", "replies", loaders.loadTemplate("/templates/notify/newReplyNotification.html"), dismissable = false)
 
 	@Provides
 	@Singleton

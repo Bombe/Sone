@@ -269,6 +269,35 @@ class NotificationHandlerModuleTest {
 	}
 
 	@Test
+	fun `local-reply notification is not dismissable`() {
+		assertThat(injector.getInstance<ListNotification<PostReply>>(named("localReply")).isDismissable, equalTo(false))
+	}
+
+	@Test
+	fun `local-reply notification has correct ID`() {
+		assertThat(injector.getInstance<ListNotification<PostReply>>(named("localReply")).id, equalTo("local-reply-notification"))
+	}
+
+	@Test
+	fun `local-reply notification has correct key and template`() {
+		loaders.templates += "/templates/notify/newReplyNotification.html" to "<% replies>".asTemplate()
+		val notification = injector.getInstance<ListNotification<PostReply>>(named("localReply"))
+		val replies = listOf(emptyPostReply("reply1"), emptyPostReply("reply2"))
+		replies.forEach(notification::add)
+		assertThat(notification.render(), equalTo(replies.toString()))
+	}
+
+	@Test
+	fun `local-reply notification is created as singleton`() {
+		injector.verifySingletonInstance<ListNotification<PostReply>>(named("localReply"))
+	}
+
+	@Test
+	fun `local-reply handler is created as singleton`() {
+		injector.verifySingletonInstance<LocalReplyHandler>()
+	}
+
+	@Test
 	fun `new-version notification is created as singleton`() {
 		injector.verifySingletonInstance<TemplateNotification>(named("newVersion"))
 	}

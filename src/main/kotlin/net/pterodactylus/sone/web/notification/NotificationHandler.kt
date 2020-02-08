@@ -35,6 +35,7 @@ class NotificationHandler @Inject constructor(
 		soneLockedOnStartupHandler: SoneLockedOnStartupHandler,
 		soneLockedHandler: SoneLockedHandler,
 		localPostHandler: LocalPostHandler,
+		localReplyHandler: LocalReplyHandler,
 		newVersionHandler: NewVersionHandler,
 		imageInsertHandler: ImageInsertHandler,
 		firstStartHandler: FirstStartHandler,
