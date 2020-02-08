@@ -21,6 +21,7 @@ import com.google.common.base.*
 import freenet.crypt.*
 import freenet.keys.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.SoneOptions.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.utils.*
@@ -34,6 +35,8 @@ val localSone2 = createLocalSone()
 fun createId() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri.routingKey.asFreenetBase64
 
 fun createLocalSone(id: String? = createId()) = object : IdOnlySone(id) {
+	private val options = DefaultSoneOptions()
+	override fun getOptions() = options
 	override fun isLocal() = true
 }
 fun createRemoteSone(id: String? = createId()) = IdOnlySone(id)

@@ -21,8 +21,6 @@ import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -85,7 +83,6 @@ import net.pterodactylus.sone.web.page.TemplateRenderer;
 import net.pterodactylus.sone.web.pages.*;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
-import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.web.RedirectPage;
@@ -155,9 +152,6 @@ public class WebInterface implements SessionProvider {
 
 	/** The invisible “local reply” notification. */
 	private final ListNotification<PostReply> localReplyNotification;
-
-	/** Notifications for sone inserts. */
-	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
 
 	@Inject
 	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter,
@@ -485,74 +479,6 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new MoveProfileFieldAjaxPage(this));
 
 		pageToadletRegistry.registerToadlets();
-	}
-
-	/**
-	 * Returns the Sone insert notification for the given Sone. If no
-	 * notification for the given Sone exists, a new notification is created and
-	 * cached.
-	 *
-	 * @param sone
-	 *            The Sone to get the insert notification for
-	 * @return The Sone insert notification
-	 */
-	private TemplateNotification getSoneInsertNotification(Sone sone) {
-		synchronized (soneInsertNotifications) {
-			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
-			if (templateNotification == null) {
-				templateNotification = new TemplateNotification(loaders.loadTemplate("/templates/notify/soneInsertNotification.html"));
-				templateNotification.set("insertSone", sone);
-				soneInsertNotifications.put(sone, templateNotification);
-			}
-			return templateNotification;
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} is being inserted.
-	 *
-	 * @param soneInsertingEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneInserting(SoneInsertingEvent soneInsertingEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertingEvent.getSone());
-		soneInsertNotification.set("soneStatus", "inserting");
-		if (soneInsertingEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
-			notificationManager.addNotification(soneInsertNotification);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} was inserted.
-	 *
-	 * @param soneInsertedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneInserted(SoneInsertedEvent soneInsertedEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.getSone());
-		soneInsertNotification.set("soneStatus", "inserted");
-		soneInsertNotification.set("insertDuration", soneInsertedEvent.getInsertDuration() / 1000);
-		if (soneInsertedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
-			notificationManager.addNotification(soneInsertNotification);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} insert was aborted.
-	 *
-	 * @param soneInsertAbortedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneInsertAborted(SoneInsertAbortedEvent soneInsertAbortedEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.getSone());
-		soneInsertNotification.set("soneStatus", "insert-aborted");
-		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.getCause());
-		if (soneInsertAbortedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
-			notificationManager.addNotification(soneInsertNotification);
-		}
 	}
 
 	@Subscribe

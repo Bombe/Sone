@@ -562,4 +562,50 @@ class NotificationHandlerModuleTest {
 		injector.verifySingletonInstance<SoneMentionedHandler>()
 	}
 
+	@Test
+	fun `sone insert notification supplier is created as singleton`() {
+		injector.verifySingletonInstance<SoneInsertNotificationSupplier>()
+	}
+
+	@Test
+	fun `sone insert notification template is loaded correctly`() {
+		loaders.templates += "/templates/notify/soneInsertNotification.html" to "foo".asTemplate()
+		injector.getInstance<SoneInsertNotificationSupplier>()
+				.invoke(createRemoteSone())
+				.render()
+				.let { assertThat(it, equalTo("foo")) }
+	}
+
+	@Test
+	fun `sone notification supplier returns different notifications for different sones`() {
+		val supplier = injector.getInstance<SoneInsertNotificationSupplier>()
+		listOf(createRemoteSone(), createRemoteSone(), createRemoteSone())
+				.map(supplier)
+				.distinct()
+				.let { assertThat(it, hasSize(3)) }
+	}
+
+	@Test
+	fun `sone notification supplier caches notifications for a sone`() {
+		val supplier = injector.getInstance<SoneInsertNotificationSupplier>()
+		val sone = createRemoteSone()
+		listOf(sone, sone, sone)
+				.map(supplier)
+				.distinct()
+				.let { assertThat(it, hasSize(1)) }
+	}
+
+	@Test
+	fun `sone notification supplier sets sone in notification template`() {
+		val supplier = injector.getInstance<SoneInsertNotificationSupplier>()
+		val sone = createRemoteSone()
+		val templateNotification = supplier(sone)
+		assertThat(templateNotification["insertSone"], sameInstance<Any>(sone))
+	}
+
+	@Test
+	fun `sone insert handler is created as singleton`() {
+		injector.verifySingletonInstance<SoneInsertHandler>()
+	}
+
 }

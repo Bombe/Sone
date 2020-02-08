@@ -56,6 +56,7 @@ class NotificationHandlerModule : AbstractModule() {
 		bind<WebOfTrustHandler>().asSingleton()
 		bind<SoneMentionDetector>().asSingleton()
 		bind<SoneMentionedHandler>().asSingleton()
+		bind<SoneInsertHandler>().asSingleton()
 	}
 
 	@Provides
@@ -170,6 +171,20 @@ class NotificationHandlerModule : AbstractModule() {
 	@Named("soneMentioned")
 	fun getSoneMentionedNotification(loaders: Loaders) =
 			ListNotification<Post>("mention-notification", "posts", loaders.loadTemplate("/templates/notify/mentionNotification.html"), dismissable = false)
+
+	@Provides
+	@Singleton
+	fun getSoneNotificationSupplier(loaders: Loaders): SoneInsertNotificationSupplier =
+			mutableMapOf<Sone, TemplateNotification>()
+					.let { cache ->
+						{ sone ->
+							cache.computeIfAbsent(sone) {
+								loaders.loadTemplate("/templates/notify/soneInsertNotification.html")
+										.let(::TemplateNotification)
+										.also { it["insertSone"] = sone }
+							}
+						}
+					}
 
 	private inline fun <reified T> bind(): AnnotatedBindingBuilder<T> = bind(T::class.java)
 	private fun ScopedBindingBuilder.asSingleton() = `in`(Singleton::class.java)
