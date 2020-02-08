@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.web.notification
 
-import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.Post.*
@@ -35,44 +34,38 @@ import kotlin.test.*
 @Suppress("UnstableApiUsage")
 class NewRemotePostHandlerTest {
 
-	private val eventBus = EventBus()
-	private val notificationManager = NotificationManager()
 	private val notification = ListNotification<Post>("", "", Template())
-	private val handler = NewRemotePostHandler(notificationManager, notification)
-
-	init {
-		eventBus.register(handler)
-	}
+	private val remotePostHandlerTest = NotificationHandlerTester { NewRemotePostHandler(it, notification) }
 
 	@Test
 	fun `handler adds remote post to new-post notification`() {
-		eventBus.post(NewPostFoundEvent(remotePost))
+		remotePostHandlerTest.sendEvent(NewPostFoundEvent(remotePost))
 		assertThat(notification.elements, contains(remotePost))
 	}
 
 	@Test
 	fun `handler does not add local post to new-post notification`() {
-		eventBus.post(NewPostFoundEvent(localPost))
+		remotePostHandlerTest.sendEvent(NewPostFoundEvent(localPost))
 		assertThat(notification.elements, emptyIterable())
 	}
 
 	@Test
 	fun `handler adds notification for remote post to notification manager`() {
-		eventBus.post(NewPostFoundEvent(remotePost))
-		assertThat(notificationManager.notifications, contains<Notification>(notification))
+		remotePostHandlerTest.sendEvent(NewPostFoundEvent(remotePost))
+		assertThat(remotePostHandlerTest.notifications, contains<Notification>(notification))
 	}
 
 	@Test
 	fun `handler does not add notification for local post to notification manager`() {
-		eventBus.post(NewPostFoundEvent(localPost))
-		assertThat(notificationManager.notifications, emptyIterable())
+		remotePostHandlerTest.sendEvent(NewPostFoundEvent(localPost))
+		assertThat(remotePostHandlerTest.notifications, emptyIterable())
 	}
 
 	@Test
 	fun `handler does not add notification to notification manager during first start`() {
-		notificationManager.firstStart()
-		eventBus.post(NewPostFoundEvent(remotePost))
-		assertThat(notificationManager.notifications, not(hasItem(notification)))
+		remotePostHandlerTest.firstStart()
+		remotePostHandlerTest.sendEvent(NewPostFoundEvent(remotePost))
+		assertThat(remotePostHandlerTest.notifications, not(hasItem(notification)))
 	}
 
 }
