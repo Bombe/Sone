@@ -337,16 +337,6 @@ public class WebInterface implements SessionProvider {
 		return from(allNewPosts).filter(postVisibilityFilter.isVisible(currentSone)).toSet();
 	}
 
-	/**
-	 * Returns the replies that have been announced as new in the
-	 * {@link #newReplyNotification}.
-	 *
-	 * @return The new replies
-	 */
-	public Set<PostReply> getNewReplies() {
-		return ImmutableSet.<PostReply> builder().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).build();
-	}
-
 	@Nonnull
 	public Collection<PostReply> getNewReplies(@Nullable Sone currentSone) {
 		Set<PostReply> allNewReplies = ImmutableSet.<PostReply>builder()
@@ -354,20 +344,6 @@ public class WebInterface implements SessionProvider {
 				.addAll(localReplyNotification.getElements())
 				.build();
 		return from(allNewReplies).filter(replyVisibilityFilter.isVisible(currentSone)).toSet();
-	}
-
-	//
-	// PRIVATE ACCESSORS
-	//
-
-	/**
-	 * Returns whether the first start notification is currently displayed.
-	 *
-	 * @return {@code true} if the first-start notification is currently
-	 *         displayed, {@code false} otherwise
-	 */
-	private boolean hasFirstStartNotification() {
-		return notificationManager.getNotification("first-start-notification") != null;
 	}
 
 	//
