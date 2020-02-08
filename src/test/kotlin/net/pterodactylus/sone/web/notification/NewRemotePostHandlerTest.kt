@@ -68,6 +68,20 @@ class NewRemotePostHandlerTest {
 		assertThat(remotePostHandlerTest.notifications, not(hasItem(notification)))
 	}
 
+	@Test
+	fun `handler removes post from notification if post is removed`() {
+		notification.add(remotePost)
+		remotePostHandlerTest.sendEvent(PostRemovedEvent(remotePost))
+		assertThat(notification.elements, not(hasItem(remotePost)))
+	}
+
+	@Test
+	fun `handler removes post from notification if post is marked as known`() {
+		notification.add(remotePost)
+		remotePostHandlerTest.sendEvent(MarkPostKnownEvent(remotePost))
+		assertThat(notification.elements, not(hasItem(remotePost)))
+	}
+
 }
 
 private val remoteSone: Sone = IdOnlySone("remote-sone")

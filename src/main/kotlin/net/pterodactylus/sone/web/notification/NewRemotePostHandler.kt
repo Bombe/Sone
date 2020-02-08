@@ -40,4 +40,14 @@ class NewRemotePostHandler @Inject constructor(private val notificationManager: 
 		}
 	}
 
+	@Subscribe
+	fun postRemoved(event: PostRemovedEvent) {
+		notification.remove(event.post)
+	}
+
+	@Subscribe
+	fun postMarkedKnown(event: MarkPostKnownEvent) {
+		notification.remove(event.post)
+	}
+
 }

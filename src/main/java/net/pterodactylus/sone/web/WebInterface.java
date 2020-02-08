@@ -508,24 +508,6 @@ public class WebInterface implements SessionProvider {
 		}
 	}
 
-	//
-	// EVENT HANDLERS
-	//
-
-	@Subscribe
-	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
-		removePost(markPostKnownEvent.getPost());
-	}
-
-	@Subscribe
-	public void postRemoved(PostRemovedEvent postRemovedEvent) {
-		removePost(postRemovedEvent.getPost());
-	}
-
-	private void removePost(Post post) {
-		newPostNotification.remove(post);
-	}
-
 	/**
 	 * Notifies the web interface that a {@link Sone} is being inserted.
 	 *
