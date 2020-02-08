@@ -54,15 +54,21 @@ class LocalPostHandlerTest {
 	}
 
 	@Test
-	fun `handler adds notification to manager`() {
+	fun `handler does not add notification to manager for post by remote sone`() {
 		eventBus.post(NewPostFoundEvent(remotePost))
+		assertThat(notificationManager.notifications, not(hasItem<Notification>(notification)))
+	}
+
+	@Test
+	fun `handler adds notification to manager`() {
+		eventBus.post(NewPostFoundEvent(localPost))
 		assertThat(notificationManager.notifications, contains<Notification>(notification))
 	}
 
 	@Test
 	fun `handler does not add notification during first start`() {
 		notificationManager.firstStart()
-		eventBus.post(NewPostFoundEvent(remotePost))
+		eventBus.post(NewPostFoundEvent(localPost))
 		assertThat(notificationManager.notifications, not(hasItem<Notification>(notification)))
 	}
 

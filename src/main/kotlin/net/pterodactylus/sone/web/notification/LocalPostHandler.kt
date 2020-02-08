@@ -33,9 +33,9 @@ class LocalPostHandler @Inject constructor(private val notificationManager: Noti
 	fun newPostFound(newPostFoundEvent: NewPostFoundEvent) {
 		newPostFoundEvent.post.onLocal { post ->
 			notification.add(post)
-		}
-		if (!notificationManager.hasFirstStartNotification()) {
-			notificationManager.addNotification(notification)
+			if (!notificationManager.hasFirstStartNotification()) {
+				notificationManager.addNotification(notification)
+			}
 		}
 	}
 
