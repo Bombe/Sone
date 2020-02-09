@@ -110,7 +110,7 @@ class SonePluginTest {
 
 	private class FirstStartListener(private val firstStartReceived: AtomicBoolean) {
 		@Subscribe
-		fun firstStart(firstStart: FirstStart) {
+		fun firstStart(@Suppress("UNUSED_PARAMETER") firstStart: FirstStart) {
 			firstStartReceived.set(true)
 		}
 	}
@@ -141,7 +141,7 @@ class SonePluginTest {
 
 	private class ConfigNotReadListener(private val configNotReadReceiver: AtomicBoolean) {
 		@Subscribe
-		fun configNotRead(configNotRead: ConfigNotRead) {
+		fun configNotRead(@Suppress("UNUSED_PARAMETER") configNotRead: ConfigNotRead) {
 			configNotReadReceiver.set(true)
 		}
 	}
@@ -185,7 +185,7 @@ class SonePluginTest {
 
 	private class StartupListener(private val startupReceived: () -> Unit) {
 		@Subscribe
-		fun startup(startup: Startup) {
+		fun startup(@Suppress("UNUSED_PARAMETER") startup: Startup) {
 			startupReceived()
 		}
 	}
@@ -202,7 +202,7 @@ class SonePluginTest {
 
 	private class ShutdownListener(private val shutdownReceived: () -> Unit) {
 		@Subscribe
-		fun shutdown(shutdown: Shutdown) {
+		fun shutdown(@Suppress("UNUSED_PARAMETER") shutdown: Shutdown) {
 			shutdownReceived()
 		}
 	}

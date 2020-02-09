@@ -105,14 +105,14 @@ class WebOfTrustPingerTest {
 
 private class WebOfTrustAppearedCatcher(private val received: () -> Unit) {
 	@Subscribe
-	fun webOfTrustAppeared(webOfTrustAppeared: WebOfTrustAppeared) {
+	fun webOfTrustAppeared(@Suppress("UNUSED_PARAMETER") webOfTrustAppeared: WebOfTrustAppeared) {
 		received()
 	}
 }
 
 private class WebOfTrustDisappearedCatcher(private val received: () -> Unit) {
 	@Subscribe
-	fun webOfTrustDisappeared(webOfTrustDisappeared: WebOfTrustDisappeared) {
+	fun webOfTrustDisappeared(@Suppress("UNUSED_PARAMETER") webOfTrustDisappeared: WebOfTrustDisappeared) {
 		received()
 	}
 }

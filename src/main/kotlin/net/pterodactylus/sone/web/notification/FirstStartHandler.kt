@@ -28,7 +28,7 @@ import javax.inject.*
 class FirstStartHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("firstStart") private val notification: TemplateNotification) {
 
 	@Subscribe
-	fun firstStart(firstStart: FirstStart) {
+	fun firstStart(@Suppress("UNUSED_PARAMETER") firstStart: FirstStart) {
 		notificationManager.addNotification(notification)
 	}
 

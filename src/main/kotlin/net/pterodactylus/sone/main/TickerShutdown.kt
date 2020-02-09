@@ -29,7 +29,7 @@ import javax.inject.*
 class TickerShutdown @Inject constructor(@Named("notification") private val notificationTicker: ScheduledExecutorService) {
 
 	@Subscribe
-	fun shutdown(shutdown: Shutdown) {
+	fun shutdown(@Suppress("UNUSED_PARAMETER") shutdown: Shutdown) {
 		notificationTicker.shutdown()
 	}
 

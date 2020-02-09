@@ -29,12 +29,12 @@ import javax.inject.*
 class WebOfTrustHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("webOfTrust") private val notification: TemplateNotification) {
 
 	@Subscribe
-	fun webOfTrustAppeared(webOfTrustAppeared: WebOfTrustAppeared) {
+	fun webOfTrustAppeared(@Suppress("UNUSED_PARAMETER") webOfTrustAppeared: WebOfTrustAppeared) {
 		notificationManager.removeNotification(notification)
 	}
 
 	@Subscribe
-	fun webOfTrustDisappeared(webOfTrustDisappeared: WebOfTrustDisappeared) {
+	fun webOfTrustDisappeared(@Suppress("UNUSED_PARAMETER") webOfTrustDisappeared: WebOfTrustDisappeared) {
 		notificationManager.addNotification(notification)
 	}
 

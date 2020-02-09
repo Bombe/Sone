@@ -28,7 +28,7 @@ import javax.inject.*
 class ConfigNotReadHandler @Inject constructor(private val notificationManager: NotificationManager, @Named("configNotRead") private val notification: TemplateNotification) {
 
 	@Subscribe
-	fun configNotRead(configNotRead: ConfigNotRead) {
+	fun configNotRead(@Suppress("UNUSED_PARAMETER") configNotRead: ConfigNotRead) {
 		notificationManager.addNotification(notification)
 	}
 

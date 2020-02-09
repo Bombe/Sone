@@ -33,7 +33,7 @@ class StartupHandler @Inject constructor(
 		@Named("notification") private val ticker: ScheduledExecutorService) {
 
 	@Subscribe
-	fun startup(startup: Startup) {
+	fun startup(@Suppress("UNUSED_PARAMETER") startup: Startup) {
 		notificationManager.addNotification(notification)
 		ticker.schedule({ notificationManager.removeNotification(notification) }, 2, MINUTES)
 	}
