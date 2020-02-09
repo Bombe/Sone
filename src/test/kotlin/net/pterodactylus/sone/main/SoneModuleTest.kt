@@ -6,7 +6,6 @@ import com.google.common.eventbus.*
 import com.google.inject.Guice.*
 import com.google.inject.name.Names.*
 import freenet.l10n.*
-import freenet.pluginmanager.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
@@ -18,13 +17,16 @@ import net.pterodactylus.util.config.*
 import net.pterodactylus.util.version.Version
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import org.junit.experimental.categories.*
 import org.mockito.Mockito.*
 import java.io.*
+import java.util.concurrent.*
 import java.util.concurrent.atomic.*
 import kotlin.test.*
 
 const val versionString = "v80"
 
+@Category(NotParallel::class)
 class SoneModuleTest {
 
 	private val currentDir: File = File(".")
@@ -190,9 +192,7 @@ class SoneModuleTest {
 
 	@Test
 	fun `core is created as singleton`() {
-		val firstCore = injector.getInstance<Core>()
-		val secondCore = injector.getInstance<Core>()
-		assertThat(secondCore, sameInstance(firstCore))
+		injector.verifySingletonInstance<Core>()
 	}
 
 	@Test
@@ -209,27 +209,23 @@ class SoneModuleTest {
 	}
 
 	@Test
-	fun `metrics registry can be created`() {
-		assertThat(injector.getInstance<MetricRegistry>(), notNullValue())
-	}
-
-	@Test
 	fun `metrics registry is created as singleton`() {
-		val firstMetricRegistry = injector.getInstance<MetricRegistry>()
-		val secondMetricRegistry = injector.getInstance<MetricRegistry>()
-		assertThat(firstMetricRegistry, sameInstance(secondMetricRegistry))
-	}
-
-	@Test
-	fun `wot connector can be created`() {
-		assertThat(injector.getInstance<WebOfTrustConnector>(), notNullValue())
+		injector.verifySingletonInstance<MetricRegistry>()
 	}
 
 	@Test
 	fun `wot connector is created as singleton`() {
-		val firstWebOfTrustConnector = injector.getInstance<WebOfTrustConnector>()
-		val secondWebOfTrustConnector = injector.getInstance<WebOfTrustConnector>()
-		assertThat(firstWebOfTrustConnector, sameInstance(secondWebOfTrustConnector))
+		injector.verifySingletonInstance<WebOfTrustConnector>()
+	}
+
+	@Test
+	fun `notification ticker is created as singleton`() {
+		injector.verifySingletonInstance<ScheduledExecutorService>(named("notification"))
+	}
+
+	@Test
+	fun `ticker shutdown is created as singleton`() {
+		injector.verifySingletonInstance<TickerShutdown>()
 	}
 
 }

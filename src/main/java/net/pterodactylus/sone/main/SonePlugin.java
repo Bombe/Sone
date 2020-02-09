@@ -22,11 +22,15 @@ import static java.util.logging.Logger.*;
 import java.util.logging.Logger;
 import java.util.logging.*;
 
+import javax.annotation.Nonnull;
+
 import net.pterodactylus.sone.core.*;
+import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.fcp.*;
 import net.pterodactylus.sone.freenet.wot.*;
 import net.pterodactylus.sone.web.*;
 import net.pterodactylus.sone.web.notification.NotificationHandler;
+import net.pterodactylus.sone.web.notification.NotificationHandlerModule;
 
 import freenet.l10n.BaseL10n.*;
 import freenet.l10n.*;
@@ -58,7 +62,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 			private final LoadingCache<String, Class<?>> classCache = CacheBuilder.newBuilder()
 					.build(new CacheLoader<String, Class<?>>() {
 						@Override
-						public Class<?> load(String key) throws Exception {
+						public Class<?> load(@Nonnull String key) throws Exception {
 							return SonePlugin.class.getClassLoader().loadClass(key);
 						}
 					});
@@ -105,6 +109,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 	/** The core. */
 	private Core core;
+
+	/** The event bus. */
+	private EventBus eventBus;
 
 	/** The web interface. */
 	private WebInterface webInterface;
@@ -197,16 +204,33 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 		/* create the web interface. */
 		webInterface = injector.getInstance(WebInterface.class);
-		NotificationHandler notificationHandler = injector.getInstance(NotificationHandler.class);
+
+		/* we need to request this to install all notification handlers. */
+		injector.getInstance(NotificationHandler.class);
+
+		/* and this is required to shutdown all tickers. */
+		injector.getInstance(TickerShutdown.class);
 
 		/* start core! */
 		core.start();
 
 		/* start the web interface! */
 		webInterface.start();
-		webInterface.setFirstStart(injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart"))));
-		webInterface.setNewConfig(injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig"))));
-		notificationHandler.start();
+
+		/* send some events on startup */
+		eventBus = injector.getInstance(EventBus.class);
+
+		/* first start? */
+		if (injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart")))) {
+			eventBus.post(new FirstStart());
+		} else {
+			/* new config? */
+			if (injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig")))) {
+				eventBus.post(new ConfigNotRead());
+			}
+		}
+
+		eventBus.post(new Startup());
 	}
 
 	@VisibleForTesting
@@ -214,8 +238,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		FreenetModule freenetModule = new FreenetModule(pluginRespirator);
 		AbstractModule soneModule = new SoneModule(this, new EventBus());
 		Module webInterfaceModule = new WebInterfaceModule();
+		Module notificationHandlerModule = new NotificationHandlerModule();
 
-		return createInjector(freenetModule, soneModule, webInterfaceModule);
+		return createInjector(freenetModule, soneModule, webInterfaceModule, notificationHandlerModule);
 	}
 
 	@VisibleForTesting
@@ -228,6 +253,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
+		/* send shutdown event. */
+		eventBus.post(new Shutdown());
+
 		try {
 			/* stop the web interface. */
 			webInterface.stop();

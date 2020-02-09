@@ -17,11 +17,14 @@
 
 package net.pterodactylus.sone.database
 
+import com.google.inject.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.database.memory.*
 
 /**
  * Interface for objects that can provide [PostReply]s.
  */
+@ImplementedBy(MemoryDatabase::class)
 interface PostReplyProvider {
 
 	fun getPostReply(id: String): PostReply?

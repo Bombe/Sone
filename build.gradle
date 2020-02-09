@@ -57,8 +57,23 @@ dependencies {
 
 apply from: 'version.gradle'
 
-test {
+task parallelTest(type: Test) {
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+    useJUnit {
+        excludeCategories 'net.pterodactylus.sone.test.NotParallel'
+    }
+}
+
+task notParallelTest(type: Test) {
+    maxParallelForks = 1
+    useJUnit {
+        includeCategories 'net.pterodactylus.sone.test.NotParallel'
+    }
+}
+
+test {
+    exclude '**'
+    dependsOn parallelTest, notParallelTest
 }
 
 task fatJar(type: Jar) {

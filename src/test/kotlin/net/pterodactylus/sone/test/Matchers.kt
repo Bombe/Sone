@@ -5,7 +5,26 @@ import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.*
+import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
+
+/**
+ * Returns a [hamcrest matcher][Matcher] constructed from the given predicate.
+ */
+fun <T> matches(description: String? = null, predicate: (T) -> Boolean) = object : TypeSafeDiagnosingMatcher<T>() {
+
+	override fun matchesSafely(item: T, mismatchDescription: Description) =
+			predicate(item).onFalse {
+				mismatchDescription.appendValue(item).appendText(" did not match predicate")
+			}
+
+	override fun describeTo(description: Description) {
+		description.appendText("matches predicate ").appendValue(predicate)
+	}
+
+}.let { matcher ->
+	description?.let { describedAs(description, matcher) } ?: matcher
+}
 
 fun hasHeader(name: String, value: String) = object : TypeSafeDiagnosingMatcher<Header>() {
 	override fun matchesSafely(item: Header, mismatchDescription: Description) =

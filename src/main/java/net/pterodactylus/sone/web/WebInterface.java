@@ -21,25 +21,17 @@ import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Named;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.*;
-import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
@@ -58,9 +50,6 @@ import net.pterodactylus.sone.template.LinkedElementRenderFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.RenderFilter;
 import net.pterodactylus.sone.template.ShortenFilter;
-import net.pterodactylus.sone.text.Part;
-import net.pterodactylus.sone.text.SonePart;
-import net.pterodactylus.sone.text.SoneTextParser;
 import net.pterodactylus.sone.text.TimeTextConverter;
 import net.pterodactylus.sone.web.ajax.BookmarkAjaxPage;
 import net.pterodactylus.sone.web.ajax.CreatePostAjaxPage;
@@ -94,7 +83,6 @@ import net.pterodactylus.sone.web.page.TemplateRenderer;
 import net.pterodactylus.sone.web.pages.*;
 import net.pterodactylus.util.notify.Notification;
 import net.pterodactylus.util.notify.NotificationManager;
-import net.pterodactylus.util.notify.TemplateNotification;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.web.RedirectPage;
@@ -106,7 +94,6 @@ import freenet.clients.http.ToadletContext;
 
 import com.codahale.metrics.*;
 import com.google.common.base.Optional;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
@@ -136,9 +123,6 @@ public class WebInterface implements SessionProvider {
 	private final TemplateContextFactory templateContextFactory;
 	private final TemplateRenderer templateRenderer;
 
-	/** The Sone text parser. */
-	private final SoneTextParser soneTextParser;
-
 	/** The parser filter. */
 	private final ParserFilter parserFilter;
 	private final ShortenFilter shortenFilter;
@@ -157,9 +141,6 @@ public class WebInterface implements SessionProvider {
 	private final MetricRegistry metricRegistry;
 	private final Translation translation;
 
-	/** The “new Sone” notification. */
-	private final ListNotification<Sone> newSoneNotification;
-
 	/** The “new post” notification. */
 	private final ListNotification<Post> newPostNotification;
 
@@ -172,33 +153,6 @@ public class WebInterface implements SessionProvider {
 	/** The invisible “local reply” notification. */
 	private final ListNotification<PostReply> localReplyNotification;
 
-	/** The “you have been mentioned” notification. */
-	private final ListNotification<Post> mentionNotification;
-
-	/** Notifications for sone inserts. */
-	private final Map<Sone, TemplateNotification> soneInsertNotifications = new HashMap<>();
-
-	/** Sone locked notification ticker objects. */
-	private final Map<Sone, ScheduledFuture<?>> lockedSonesTickerObjects = Collections.synchronizedMap(new HashMap<Sone, ScheduledFuture<?>>());
-
-	/** The “Sone locked” notification. */
-	private final ListNotification<Sone> lockedSonesNotification;
-
-	/** The “new version” notification. */
-	private final TemplateNotification newVersionNotification;
-
-	/** The “inserting images” notification. */
-	private final ListNotification<Image> insertingImagesNotification;
-
-	/** The “inserted images” notification. */
-	private final ListNotification<Image> insertedImagesNotification;
-
-	/** The “image insert failed” notification. */
-	private final ListNotification<Image> imageInsertFailedNotification;
-
-	/** Scheduled executor for time-based notifications. */
-	private final ScheduledExecutorService ticker = Executors.newScheduledThreadPool(1);
-
 	@Inject
 	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter,
 			PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter,
@@ -208,7 +162,10 @@ public class WebInterface implements SessionProvider {
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
 			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
-			NotificationManager notificationManager) {
+			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification,
+			@Named("newRemotePostReply") ListNotification<PostReply> newReplyNotification,
+			@Named("localPost") ListNotification<Post> localPostNotification,
+			@Named("localReply") ListNotification<PostReply> localReplyNotification) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
@@ -225,46 +182,15 @@ public class WebInterface implements SessionProvider {
 		this.l10nFilter = l10nFilter;
 		this.translation = translation;
 		this.notificationManager = notificationManager;
+		this.newPostNotification = newPostNotification;
+		this.newReplyNotification = newReplyNotification;
+		this.localPostNotification = localPostNotification;
+		this.localReplyNotification = localReplyNotification;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
-		soneTextParser = new SoneTextParser(getCore(), getCore());
 
 		this.templateContextFactory = templateContextFactory;
 		templateContextFactory.addTemplateObject("webInterface", this);
 		templateContextFactory.addTemplateObject("formPassword", formPassword);
-
-		/* create notifications. */
-		Template newSoneNotificationTemplate = loaders.loadTemplate("/templates/notify/newSoneNotification.html");
-		newSoneNotification = new ListNotification<>("new-sone-notification", "sones", newSoneNotificationTemplate, false);
-
-		Template newPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
-		newPostNotification = new ListNotification<>("new-post-notification", "posts", newPostNotificationTemplate, false);
-
-		Template localPostNotificationTemplate = loaders.loadTemplate("/templates/notify/newPostNotification.html");
-		localPostNotification = new ListNotification<>("local-post-notification", "posts", localPostNotificationTemplate, false);
-
-		Template newReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
-		newReplyNotification = new ListNotification<>("new-reply-notification", "replies", newReplyNotificationTemplate, false);
-
-		Template localReplyNotificationTemplate = loaders.loadTemplate("/templates/notify/newReplyNotification.html");
-		localReplyNotification = new ListNotification<>("local-reply-notification", "replies", localReplyNotificationTemplate, false);
-
-		Template mentionNotificationTemplate = loaders.loadTemplate("/templates/notify/mentionNotification.html");
-		mentionNotification = new ListNotification<>("mention-notification", "posts", mentionNotificationTemplate, false);
-
-		Template lockedSonesTemplate = loaders.loadTemplate("/templates/notify/lockedSonesNotification.html");
-		lockedSonesNotification = new ListNotification<>("sones-locked-notification", "sones", lockedSonesTemplate);
-
-		Template newVersionTemplate = loaders.loadTemplate("/templates/notify/newVersionNotification.html");
-		newVersionNotification = new TemplateNotification("new-version-notification", newVersionTemplate);
-
-		Template insertingImagesTemplate = loaders.loadTemplate("/templates/notify/inserting-images-notification.html");
-		insertingImagesNotification = new ListNotification<>("inserting-images-notification", "images", insertingImagesTemplate);
-
-		Template insertedImagesTemplate = loaders.loadTemplate("/templates/notify/inserted-images-notification.html");
-		insertedImagesNotification = new ListNotification<>("inserted-images-notification", "images", insertedImagesTemplate);
-
-		Template imageInsertFailedTemplate = loaders.loadTemplate("/templates/notify/image-insert-failed-notification.html");
-		imageInsertFailedNotification = new ListNotification<>("image-insert-failed-notification", "images", imageInsertFailedTemplate);
 	}
 
 	//
@@ -402,16 +328,6 @@ public class WebInterface implements SessionProvider {
 		return formPassword;
 	}
 
-	/**
-	 * Returns the posts that have been announced as new in the
-	 * {@link #newPostNotification}.
-	 *
-	 * @return The new posts
-	 */
-	public Set<Post> getNewPosts() {
-		return ImmutableSet.<Post> builder().addAll(newPostNotification.getElements()).addAll(localPostNotification.getElements()).build();
-	}
-
 	@Nonnull
 	public Collection<Post> getNewPosts(@Nullable Sone currentSone) {
 		Set<Post> allNewPosts = ImmutableSet.<Post> builder()
@@ -419,16 +335,6 @@ public class WebInterface implements SessionProvider {
 				.addAll(localPostNotification.getElements())
 				.build();
 		return from(allNewPosts).filter(postVisibilityFilter.isVisible(currentSone)).toSet();
-	}
-
-	/**
-	 * Returns the replies that have been announced as new in the
-	 * {@link #newReplyNotification}.
-	 *
-	 * @return The new replies
-	 */
-	public Set<PostReply> getNewReplies() {
-		return ImmutableSet.<PostReply> builder().addAll(newReplyNotification.getElements()).addAll(localReplyNotification.getElements()).build();
 	}
 
 	@Nonnull
@@ -440,51 +346,6 @@ public class WebInterface implements SessionProvider {
 		return from(allNewReplies).filter(replyVisibilityFilter.isVisible(currentSone)).toSet();
 	}
 
-	/**
-	 * Sets whether the current start of the plugin is the first start. It is
-	 * considered a first start if the configuration file does not exist.
-	 *
-	 * @param firstStart
-	 *            {@code true} if no configuration file existed when Sone was
-	 *            loaded, {@code false} otherwise
-	 */
-	public void setFirstStart(boolean firstStart) {
-		if (firstStart) {
-			Template firstStartNotificationTemplate = loaders.loadTemplate("/templates/notify/firstStartNotification.html");
-			Notification firstStartNotification = new TemplateNotification("first-start-notification", firstStartNotificationTemplate);
-			notificationManager.addNotification(firstStartNotification);
-		}
-	}
-
-	/**
-	 * Sets whether Sone was started with a fresh configuration file.
-	 *
-	 * @param newConfig
-	 *            {@code true} if Sone was started with a fresh configuration,
-	 *            {@code false} if the existing configuration could be read
-	 */
-	public void setNewConfig(boolean newConfig) {
-		if (newConfig && !hasFirstStartNotification()) {
-			Template configNotReadNotificationTemplate = loaders.loadTemplate("/templates/notify/configNotReadNotification.html");
-			Notification configNotReadNotification = new TemplateNotification("config-not-read-notification", configNotReadNotificationTemplate);
-			notificationManager.addNotification(configNotReadNotification);
-		}
-	}
-
-	//
-	// PRIVATE ACCESSORS
-	//
-
-	/**
-	 * Returns whether the first start notification is currently displayed.
-	 *
-	 * @return {@code true} if the first-start notification is currently
-	 *         displayed, {@code false} otherwise
-	 */
-	private boolean hasFirstStartNotification() {
-		return notificationManager.getNotification("first-start-notification") != null;
-	}
-
 	//
 	// ACTIONS
 	//
@@ -494,36 +355,6 @@ public class WebInterface implements SessionProvider {
 	 */
 	public void start() {
 		registerToadlets();
-
-		/* notification templates. */
-		Template startupNotificationTemplate = loaders.loadTemplate("/templates/notify/startupNotification.html");
-
-		final TemplateNotification startupNotification = new TemplateNotification("startup-notification", startupNotificationTemplate);
-		notificationManager.addNotification(startupNotification);
-
-		ticker.schedule(new Runnable() {
-
-			@Override
-			public void run() {
-				startupNotification.dismiss();
-			}
-		}, 2, TimeUnit.MINUTES);
-
-		Template wotMissingNotificationTemplate = loaders.loadTemplate("/templates/notify/wotMissingNotification.html");
-		final TemplateNotification wotMissingNotification = new TemplateNotification("wot-missing-notification", wotMissingNotificationTemplate);
-		ticker.scheduleAtFixedRate(new Runnable() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void run() {
-				if (getCore().getIdentityManager().isConnected()) {
-					wotMissingNotification.dismiss();
-				} else {
-					notificationManager.addNotification(wotMissingNotification);
-				}
-			}
-
-		}, 15, 15, TimeUnit.SECONDS);
 	}
 
 	/**
@@ -531,7 +362,6 @@ public class WebInterface implements SessionProvider {
 	 */
 	public void stop() {
 		pageToadletRegistry.unregisterToadlets();
-		ticker.shutdownNow();
 	}
 
 	//
@@ -625,330 +455,6 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new MoveProfileFieldAjaxPage(this));
 
 		pageToadletRegistry.registerToadlets();
-	}
-
-	/**
-	 * Returns all {@link Sone#isLocal() local Sone}s that are referenced by
-	 * {@link SonePart}s in the given text (after parsing it using
-	 * {@link SoneTextParser}).
-	 *
-	 * @param text
-	 *            The text to parse
-	 * @return All mentioned local Sones
-	 */
-	private Collection<Sone> getMentionedSones(String text) {
-		/* we need no context to find mentioned Sones. */
-		Set<Sone> mentionedSones = new HashSet<>();
-		for (Part part : soneTextParser.parse(text, null)) {
-			if (part instanceof SonePart) {
-				mentionedSones.add(((SonePart) part).getSone());
-			}
-		}
-		return Collections2.filter(mentionedSones, Sone.LOCAL_SONE_FILTER);
-	}
-
-	/**
-	 * Returns the Sone insert notification for the given Sone. If no
-	 * notification for the given Sone exists, a new notification is created and
-	 * cached.
-	 *
-	 * @param sone
-	 *            The Sone to get the insert notification for
-	 * @return The Sone insert notification
-	 */
-	private TemplateNotification getSoneInsertNotification(Sone sone) {
-		synchronized (soneInsertNotifications) {
-			TemplateNotification templateNotification = soneInsertNotifications.get(sone);
-			if (templateNotification == null) {
-				templateNotification = new TemplateNotification(loaders.loadTemplate("/templates/notify/soneInsertNotification.html"));
-				templateNotification.set("insertSone", sone);
-				soneInsertNotifications.put(sone, templateNotification);
-			}
-			return templateNotification;
-		}
-	}
-
-	private boolean localSoneMentionedInNewPostOrReply(Post post) {
-		if (!post.getSone().isLocal()) {
-			if (!getMentionedSones(post.getText()).isEmpty() && !post.isKnown()) {
-				return true;
-			}
-		}
-		for (PostReply postReply : getCore().getReplies(post.getId())) {
-			if (postReply.getSone().isLocal()) {
-				continue;
-			}
-			if (!getMentionedSones(postReply.getText()).isEmpty() && !postReply.isKnown()) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	//
-	// EVENT HANDLERS
-	//
-
-	/**
-	 * Notifies the web interface that a new {@link Sone} was found.
-	 *
-	 * @param newSoneFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void newSoneFound(NewSoneFoundEvent newSoneFoundEvent) {
-		newSoneNotification.add(newSoneFoundEvent.getSone());
-		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(newSoneNotification);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a new {@link Post} was found.
-	 *
-	 * @param newPostFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void newPostFound(NewPostFoundEvent newPostFoundEvent) {
-		Post post = newPostFoundEvent.getPost();
-		boolean isLocal = post.getSone().isLocal();
-		if (isLocal) {
-			localPostNotification.add(post);
-		} else {
-			newPostNotification.add(post);
-		}
-		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(isLocal ? localPostNotification : newPostNotification);
-			if (!getMentionedSones(post.getText()).isEmpty() && !isLocal) {
-				mentionNotification.add(post);
-				notificationManager.addNotification(mentionNotification);
-			}
-		} else {
-			getCore().markPostKnown(post);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a new {@link PostReply} was found.
-	 *
-	 * @param newPostReplyFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void newReplyFound(NewPostReplyFoundEvent newPostReplyFoundEvent) {
-		PostReply reply = newPostReplyFoundEvent.getPostReply();
-		boolean isLocal = reply.getSone().isLocal();
-		if (isLocal) {
-			localReplyNotification.add(reply);
-		} else {
-			newReplyNotification.add(reply);
-		}
-		if (!hasFirstStartNotification()) {
-			notificationManager.addNotification(isLocal ? localReplyNotification : newReplyNotification);
-			if (reply.getPost().isPresent() && localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
-				mentionNotification.add(reply.getPost().get());
-				notificationManager.addNotification(mentionNotification);
-			}
-		} else {
-			getCore().markReplyKnown(reply);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} was marked as known.
-	 *
-	 * @param markSoneKnownEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void markSoneKnown(MarkSoneKnownEvent markSoneKnownEvent) {
-		newSoneNotification.remove(markSoneKnownEvent.getSone());
-	}
-
-	@Subscribe
-	public void markPostKnown(MarkPostKnownEvent markPostKnownEvent) {
-		removePost(markPostKnownEvent.getPost());
-	}
-
-	@Subscribe
-	public void markReplyKnown(MarkPostReplyKnownEvent markPostReplyKnownEvent) {
-		removeReply(markPostReplyKnownEvent.getPostReply());
-	}
-
-	@Subscribe
-	public void soneRemoved(SoneRemovedEvent soneRemovedEvent) {
-		newSoneNotification.remove(soneRemovedEvent.getSone());
-	}
-
-	@Subscribe
-	public void postRemoved(PostRemovedEvent postRemovedEvent) {
-		removePost(postRemovedEvent.getPost());
-	}
-
-	private void removePost(Post post) {
-		newPostNotification.remove(post);
-		localPostNotification.remove(post);
-		if (!localSoneMentionedInNewPostOrReply(post)) {
-			mentionNotification.remove(post);
-		}
-	}
-
-	@Subscribe
-	public void replyRemoved(PostReplyRemovedEvent postReplyRemovedEvent) {
-		removeReply(postReplyRemovedEvent.getPostReply());
-	}
-
-	private void removeReply(PostReply reply) {
-		newReplyNotification.remove(reply);
-		localReplyNotification.remove(reply);
-		if (reply.getPost().isPresent() && !localSoneMentionedInNewPostOrReply(reply.getPost().get())) {
-			mentionNotification.remove(reply.getPost().get());
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a Sone was locked.
-	 *
-	 * @param soneLockedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneLocked(SoneLockedEvent soneLockedEvent) {
-		final Sone sone = soneLockedEvent.getSone();
-		ScheduledFuture<?> tickerObject = ticker.schedule(new Runnable() {
-
-			@Override
-			@SuppressWarnings("synthetic-access")
-			public void run() {
-				lockedSonesNotification.add(sone);
-				notificationManager.addNotification(lockedSonesNotification);
-			}
-		}, 5, TimeUnit.MINUTES);
-		lockedSonesTickerObjects.put(sone, tickerObject);
-	}
-
-	/**
-	 * Notifies the web interface that a Sone was unlocked.
-	 *
-	 * @param soneUnlockedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneUnlocked(SoneUnlockedEvent soneUnlockedEvent) {
-		lockedSonesNotification.remove(soneUnlockedEvent.getSone());
-		lockedSonesTickerObjects.remove(soneUnlockedEvent.getSone()).cancel(false);
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} is being inserted.
-	 *
-	 * @param soneInsertingEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneInserting(SoneInsertingEvent soneInsertingEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertingEvent.getSone());
-		soneInsertNotification.set("soneStatus", "inserting");
-		if (soneInsertingEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
-			notificationManager.addNotification(soneInsertNotification);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} was inserted.
-	 *
-	 * @param soneInsertedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneInserted(SoneInsertedEvent soneInsertedEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertedEvent.getSone());
-		soneInsertNotification.set("soneStatus", "inserted");
-		soneInsertNotification.set("insertDuration", soneInsertedEvent.getInsertDuration() / 1000);
-		if (soneInsertedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
-			notificationManager.addNotification(soneInsertNotification);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a {@link Sone} insert was aborted.
-	 *
-	 * @param soneInsertAbortedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void soneInsertAborted(SoneInsertAbortedEvent soneInsertAbortedEvent) {
-		TemplateNotification soneInsertNotification = getSoneInsertNotification(soneInsertAbortedEvent.getSone());
-		soneInsertNotification.set("soneStatus", "insert-aborted");
-		soneInsertNotification.set("insert-error", soneInsertAbortedEvent.getCause());
-		if (soneInsertAbortedEvent.getSone().getOptions().isSoneInsertNotificationEnabled()) {
-			notificationManager.addNotification(soneInsertNotification);
-		}
-	}
-
-	/**
-	 * Notifies the web interface that a new Sone version was found.
-	 *
-	 * @param updateFoundEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void updateFound(UpdateFoundEvent updateFoundEvent) {
-		newVersionNotification.set("latestVersion", updateFoundEvent.getVersion());
-		newVersionNotification.set("latestEdition", updateFoundEvent.getLatestEdition());
-		newVersionNotification.set("releaseTime", updateFoundEvent.getReleaseTime());
-		newVersionNotification.set("disruptive", updateFoundEvent.isDisruptive());
-		notificationManager.addNotification(newVersionNotification);
-	}
-
-	/**
-	 * Notifies the web interface that an image insert was started
-	 *
-	 * @param imageInsertStartedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertStarted(ImageInsertStartedEvent imageInsertStartedEvent) {
-		insertingImagesNotification.add(imageInsertStartedEvent.getImage());
-		notificationManager.addNotification(insertingImagesNotification);
-	}
-
-	/**
-	 * Notifies the web interface that an {@link Image} insert was aborted.
-	 *
-	 * @param imageInsertAbortedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertAborted(ImageInsertAbortedEvent imageInsertAbortedEvent) {
-		insertingImagesNotification.remove(imageInsertAbortedEvent.getImage());
-	}
-
-	/**
-	 * Notifies the web interface that an {@link Image} insert is finished.
-	 *
-	 * @param imageInsertFinishedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
-		insertingImagesNotification.remove(imageInsertFinishedEvent.getImage());
-		insertedImagesNotification.add(imageInsertFinishedEvent.getImage());
-		notificationManager.addNotification(insertedImagesNotification);
-	}
-
-	/**
-	 * Notifies the web interface that an {@link Image} insert has failed.
-	 *
-	 * @param imageInsertFailedEvent
-	 *            The event
-	 */
-	@Subscribe
-	public void imageInsertFailed(ImageInsertFailedEvent imageInsertFailedEvent) {
-		insertingImagesNotification.remove(imageInsertFailedEvent.getImage());
-		imageInsertFailedNotification.add(imageInsertFailedEvent.getImage());
-		notificationManager.addNotification(imageInsertFailedNotification);
 	}
 
 	@Subscribe
