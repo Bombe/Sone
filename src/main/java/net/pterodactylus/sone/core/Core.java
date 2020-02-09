@@ -1,5 +1,5 @@
 /*
- * Sone - Core.java - Copyright © 2010–2019 David Roden
+ * Sone - Core.java - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.data.AlbumsKt.getAllImages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,30 +38,20 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.codahale.metrics.*;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidImageFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidParentAlbumFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
-import net.pterodactylus.sone.core.event.ImageInsertFinishedEvent;
-import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
-import net.pterodactylus.sone.core.event.MarkPostKnownEvent;
-import net.pterodactylus.sone.core.event.MarkPostReplyKnownEvent;
-import net.pterodactylus.sone.core.event.MarkSoneKnownEvent;
-import net.pterodactylus.sone.core.event.NewPostFoundEvent;
-import net.pterodactylus.sone.core.event.NewPostReplyFoundEvent;
-import net.pterodactylus.sone.core.event.NewSoneFoundEvent;
-import net.pterodactylus.sone.core.event.PostRemovedEvent;
-import net.pterodactylus.sone.core.event.PostReplyRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneLockedEvent;
-import net.pterodactylus.sone.core.event.SoneRemovedEvent;
-import net.pterodactylus.sone.core.event.SoneUnlockedEvent;
+import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
@@ -98,7 +89,7 @@ import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Optional;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
@@ -120,6 +111,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 
 	/** The start time. */
 	private final long startupTime = System.currentTimeMillis();
+
+	private final AtomicBoolean debug = new AtomicBoolean(false);
 
 	/** The preferences. */
 	private final Preferences preferences;
@@ -184,6 +177,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	/** The time the configuration was last touched. */
 	private volatile long lastConfigurationUpdate;
 
+	private final MetricRegistry metricRegistry;
+	private final Histogram configurationSaveTimeHistogram;
+
 	/**
 	 * Creates a new core.
 	 *
@@ -201,7 +197,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The database
 	 */
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -212,7 +208,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.webOfTrustUpdater = webOfTrustUpdater;
 		this.eventBus = eventBus;
 		this.database = database;
+		this.metricRegistry = metricRegistry;
 		preferences = new Preferences(eventBus);
+		this.configurationSaveTimeHistogram = metricRegistry.histogram("configuration.save.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
 
 	//
@@ -226,6 +224,16 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public long getStartupTime() {
 		return startupTime;
+	}
+
+	@Nonnull
+	public boolean getDebug() {
+		return debug.get();
+	}
+
+	public void setDebug() {
+		debug.set(true);
+		eventBus.post(new DebugActivatedEvent());
 	}
 
 	/**
@@ -618,7 +626,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
-		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, ownIdentity.getId());
+		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, metricRegistry, ownIdentity.getId());
 		soneInserter.insertionDelayChanged(new InsertionDelayChangedEvent(preferences.getInsertionDelay()));
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
@@ -627,6 +635,11 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		loadSone(sone);
 		database.storeSone(sone);
 		sone.setStatus(SoneStatus.idle);
+		if (sone.getPosts().isEmpty() && sone.getReplies().isEmpty() && getAllImages(sone.getRootAlbum()).isEmpty()) {
+			// dirty hack
+			lockSone(sone);
+			eventBus.post(new SoneLockedOnStartup(sone));
+		}
 		soneInserter.start();
 		return sone;
 	}
@@ -735,75 +748,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		checkNotNull(soneId, "soneId must not be null");
 		database.removeFriend(sone, soneId);
 		touchConfiguration();
-	}
-
-	/**
-	 * Sets the trust value of the given origin Sone for the target Sone.
-	 *
-	 * @param origin
-	 *            The origin Sone
-	 * @param target
-	 *            The target Sone
-	 * @param trustValue
-	 *            The trust value (from {@code -100} to {@code 100})
-	 */
-	public void setTrust(Sone origin, Sone target, int trustValue) {
-		checkNotNull(origin, "origin must not be null");
-		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin must be a local Sone");
-		checkNotNull(target, "target must not be null");
-		checkArgument((trustValue >= -100) && (trustValue <= 100), "trustValue must be within [-100, 100]");
-		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), trustValue, preferences.getTrustComment());
-	}
-
-	/**
-	 * Removes any trust assignment for the given target Sone.
-	 *
-	 * @param origin
-	 *            The trust origin
-	 * @param target
-	 *            The trust target
-	 */
-	public void removeTrust(Sone origin, Sone target) {
-		checkNotNull(origin, "origin must not be null");
-		checkNotNull(target, "target must not be null");
-		checkArgument(origin.getIdentity() instanceof OwnIdentity, "origin must be a local Sone");
-		webOfTrustUpdater.setTrust((OwnIdentity) origin.getIdentity(), target.getIdentity(), null, null);
-	}
-
-	/**
-	 * Assigns the configured positive trust value for the given target.
-	 *
-	 * @param origin
-	 *            The trust origin
-	 * @param target
-	 *            The trust target
-	 */
-	public void trustSone(Sone origin, Sone target) {
-		setTrust(origin, target, preferences.getPositiveTrust());
-	}
-
-	/**
-	 * Assigns the configured negative trust value for the given target.
-	 *
-	 * @param origin
-	 *            The trust origin
-	 * @param target
-	 *            The trust target
-	 */
-	public void distrustSone(Sone origin, Sone target) {
-		setTrust(origin, target, preferences.getNegativeTrust());
-	}
-
-	/**
-	 * Removes the trust assignment for the given target.
-	 *
-	 * @param origin
-	 *            The trust origin
-	 * @param target
-	 *            The trust target
-	 */
-	public void untrustSone(Sone origin, Sone target) {
-		removeTrust(origin, target);
 	}
 
 	/**
@@ -1063,7 +1007,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 *            The text of the post
 	 * @return The created post
 	 */
-	public Post createPost(Sone sone, Optional<Sone> recipient, String text) {
+	public Post createPost(Sone sone, @Nullable Sone recipient, String text) {
 		checkNotNull(text, "text must not be null");
 		checkArgument(text.trim().length() > 0, "text must not be empty");
 		if (!sone.isLocal()) {
@@ -1072,8 +1016,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		PostBuilder postBuilder = database.newPostBuilder();
 		postBuilder.from(sone.getId()).randomId().currentTime().withText(text.trim());
-		if (recipient.isPresent()) {
-			postBuilder.to(recipient.get().getId());
+		if (recipient != null) {
+			postBuilder.to(recipient.getId());
 		}
 		final Post post = postBuilder.build();
 		database.storePost(post);
@@ -1359,7 +1303,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		synchronized (soneInserters) {
 			for (Entry<Sone, SoneInserter> soneInserter : soneInserters.entrySet()) {
 				soneInserter.getValue().stop();
-				saveSone(soneInserter.getKey());
+				Sone latestSone = getLocalSone(soneInserter.getKey().getId());
+				saveSone(latestSone);
 			}
 		}
 		synchronized (soneRescuers) {
@@ -1501,8 +1446,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().getShowCustomAvatars().name());
 			configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").setValue(sone.getOptions().getLoadLinkedImages().name());
 
-			configuration.save();
-
 			webOfTrustUpdater.setProperty((OwnIdentity) sone.getIdentity(), "Sone.LatestEdition", String.valueOf(sone.getLatestEdition()));
 
 			logger.log(Level.INFO, String.format("Sone %s saved.", sone));
@@ -1540,7 +1483,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			database.save();
 
 			/* now save it. */
+			Stopwatch stopwatch = Stopwatch.createStarted();
 			configuration.save();
+			configurationSaveTimeHistogram.update(stopwatch.elapsed(TimeUnit.MICROSECONDS));
 
 		} catch (ConfigurationException ce1) {
 			logger.log(Level.SEVERE, "Could not store configuration!", ce1);
@@ -1580,7 +1525,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void ownIdentityAdded(OwnIdentityAddedEvent ownIdentityAddedEvent) {
-		OwnIdentity ownIdentity = ownIdentityAddedEvent.ownIdentity();
+		OwnIdentity ownIdentity = ownIdentityAddedEvent.getOwnIdentity();
 		logger.log(Level.FINEST, String.format("Adding OwnIdentity: %s", ownIdentity));
 		if (ownIdentity.hasContext("Sone")) {
 			addLocalSone(ownIdentity);
@@ -1595,7 +1540,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void ownIdentityRemoved(OwnIdentityRemovedEvent ownIdentityRemovedEvent) {
-		OwnIdentity ownIdentity = ownIdentityRemovedEvent.ownIdentity();
+		OwnIdentity ownIdentity = ownIdentityRemovedEvent.getOwnIdentity();
 		logger.log(Level.FINEST, String.format("Removing OwnIdentity: %s", ownIdentity));
 		trustedIdentities.removeAll(ownIdentity);
 	}
@@ -1608,9 +1553,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityAdded(IdentityAddedEvent identityAddedEvent) {
-		Identity identity = identityAddedEvent.identity();
+		Identity identity = identityAddedEvent.getIdentity();
 		logger.log(Level.FINEST, String.format("Adding Identity: %s", identity));
-		trustedIdentities.put(identityAddedEvent.ownIdentity(), identity);
+		trustedIdentities.put(identityAddedEvent.getOwnIdentity(), identity);
 		addRemoteSone(identity);
 	}
 
@@ -1622,7 +1567,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityUpdated(IdentityUpdatedEvent identityUpdatedEvent) {
-		Identity identity = identityUpdatedEvent.identity();
+		Identity identity = identityUpdatedEvent.getIdentity();
 		final Sone sone = getRemoteSone(identity.getId());
 		if (sone.isLocal()) {
 			return;
@@ -1646,8 +1591,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void identityRemoved(IdentityRemovedEvent identityRemovedEvent) {
-		OwnIdentity ownIdentity = identityRemovedEvent.ownIdentity();
-		Identity identity = identityRemovedEvent.identity();
+		OwnIdentity ownIdentity = identityRemovedEvent.getOwnIdentity();
+		Identity identity = identityRemovedEvent.getIdentity();
 		trustedIdentities.remove(ownIdentity, identity);
 		for (Entry<OwnIdentity, Collection<Identity>> trustedIdentity : trustedIdentities.asMap().entrySet()) {
 			if (trustedIdentity.getKey().equals(ownIdentity)) {
@@ -1680,9 +1625,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	@Subscribe
 	public void imageInsertFinished(ImageInsertFinishedEvent imageInsertFinishedEvent) {
-		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", imageInsertFinishedEvent.image(), imageInsertFinishedEvent.resultingUri()));
-		imageInsertFinishedEvent.image().modify().setKey(imageInsertFinishedEvent.resultingUri().toString()).update();
-		deleteTemporaryImage(imageInsertFinishedEvent.image().getId());
+		logger.log(Level.WARNING, String.format("Image insert finished for %s: %s", imageInsertFinishedEvent.getImage(), imageInsertFinishedEvent.getResultingUri()));
+		imageInsertFinishedEvent.getImage().modify().setKey(imageInsertFinishedEvent.getResultingUri().toString()).update();
+		deleteTemporaryImage(imageInsertFinishedEvent.getImage().getId());
 		touchConfiguration();
 	}
 

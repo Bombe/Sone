@@ -1,5 +1,5 @@
 /*
- * Sone - PageToadlet.java - Copyright © 2010–2019 David Roden
+ * Sone - PageToadlet.java - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,6 @@ import freenet.clients.http.SessionManager;
 import freenet.clients.http.Toadlet;
 import freenet.clients.http.ToadletContext;
 import freenet.clients.http.ToadletContextClosedException;
-import freenet.l10n.NodeL10n;
 import freenet.support.MultiValueTable;
 import freenet.support.api.HTTPRequest;
 
@@ -107,7 +106,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodGET(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext, NodeL10n.getBase(), sessionManager));
+		handleRequest(new FreenetRequest(uri, Method.GET, httpRequest, toadletContext, sessionManager));
 	}
 
 	/**
@@ -125,7 +124,7 @@ public class PageToadlet extends Toadlet implements LinkEnabledCallback, LinkFil
 	 *             if the toadlet context is closed
 	 */
 	public void handleMethodPOST(URI uri, HTTPRequest httpRequest, ToadletContext toadletContext) throws IOException, ToadletContextClosedException {
-		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext, NodeL10n.getBase(), sessionManager));
+		handleRequest(new FreenetRequest(uri, Method.POST, httpRequest, toadletContext, sessionManager));
 	}
 
 	/**

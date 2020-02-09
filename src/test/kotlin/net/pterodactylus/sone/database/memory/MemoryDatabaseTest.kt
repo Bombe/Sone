@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryDatabaseTest.kt - Copyright © 2013–2019 David Roden
+ * Sone - MemoryDatabaseTest.kt - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ import kotlin.test.*
  */
 class MemoryDatabaseTest {
 
-	private val configuration = mock<Configuration>()
+	private val configuration = deepMock<Configuration>()
 	private val memoryDatabase = MemoryDatabase(configuration)
 	private val sone = mock<Sone>()
 
@@ -50,8 +50,8 @@ class MemoryDatabaseTest {
 	@Test
 	fun `stored sone is made available`() {
 		storeSone()
-		assertThat(memoryDatabase.getPost("post1"), isPost("post1", 1000L, "post1", absent()))
-		assertThat(memoryDatabase.getPost("post2"), isPost("post2", 2000L, "post2", of(RECIPIENT_ID)))
+		assertThat(memoryDatabase.getPost("post1"), isPost("post1", 1000L, "post1", null))
+		assertThat(memoryDatabase.getPost("post2"), isPost("post2", 2000L, "post2", RECIPIENT_ID))
 		assertThat(memoryDatabase.getPost("post3"), nullValue())
 		assertThat(memoryDatabase.getPostReply("reply1"), isPostReply("reply1", "post1", 3000L, "reply1"))
 		assertThat(memoryDatabase.getPostReply("reply2"), isPostReply("reply2", "post2", 4000L, "reply2"))
@@ -407,6 +407,36 @@ class MemoryDatabaseTest {
 		memoryDatabase.setPostReplyKnown(postReply, true)
 		assertThat(configuration.getStringValue("KnownReplies/0/ID").value, equalTo("post-reply-id"))
 		assertThat(configuration.getStringValue("KnownReplies/1/ID").value, equalTo<Any>(null))
+	}
+
+	@Test
+	@Dirty("the rate limiter should be mocked")
+	fun `saving the database twice in a row only saves it once`() {
+		memoryDatabase.save()
+		memoryDatabase.save()
+		verify(configuration.getStringValue("KnownPosts/0/ID"), times(1)).value = null
+	}
+
+	@Test
+	@Dirty("the rate limiter should be mocked")
+	fun `setting posts as knows twice in a row only saves the database once`() {
+		prepareConfigurationValues()
+		val post = mock<Post>()
+		whenever(post.id).thenReturn("post-id")
+		memoryDatabase.setPostKnown(post, true)
+		memoryDatabase.setPostKnown(post, true)
+		verify(configuration, times(1)).getStringValue("KnownPosts/1/ID")
+	}
+
+	@Test
+	@Dirty("the rate limiter should be mocked")
+	fun `setting post replies as knows twice in a row only saves the database once`() {
+		prepareConfigurationValues()
+		val postReply = mock<PostReply>()
+		whenever(postReply.id).thenReturn("post-reply-id")
+		memoryDatabase.setPostReplyKnown(postReply, true)
+		memoryDatabase.setPostReplyKnown(postReply, true)
+		verify(configuration, times(1)).getStringValue("KnownReplies/1/ID")
 	}
 
 }

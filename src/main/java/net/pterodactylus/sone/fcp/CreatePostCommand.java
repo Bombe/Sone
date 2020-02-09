@@ -1,5 +1,5 @@
 /*
- * Sone - CreatePostCommand.java - Copyright © 2011–2019 David Roden
+ * Sone - CreatePostCommand.java - Copyright © 2011–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ import freenet.support.SimpleFieldSet;
 /**
  * FCP command that creates a new {@link Post}.
  *
- * @see Core#createPost(Sone, Optional, String)
+ * @see Core#createPost(Sone, Sone, String)
  */
 public class CreatePostCommand extends AbstractSoneCommand {
 
@@ -57,7 +57,7 @@ public class CreatePostCommand extends AbstractSoneCommand {
 		if (sone.equals(recipient)) {
 			return new ErrorResponse("Sone and Recipient must not be the same.");
 		}
-		Post post = getCore().createPost(sone, Optional.fromNullable(recipient), text);
+		Post post = getCore().createPost(sone, recipient, text);
 		return new Response("PostCreated", new SimpleFieldSetBuilder().put("Post", post.getId()).get());
 	}
 

@@ -19,7 +19,7 @@ class UnfollowSonePage @Inject constructor(webInterface: WebInterface, loaders: 
 		if (soneRequest.isPOST) {
 			soneRequest.parameters["sone"]!!.split(Regex("[ ,]+"))
 					.forEach { soneRequest.core.unfollowSone(currentSone, it) }
-			throw RedirectException(soneRequest.parameters["returnPage", 256])
+			redirectTo(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

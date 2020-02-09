@@ -1,5 +1,5 @@
 /*
- * Sone - FreenetRequest.kt - Copyright © 2011–2019 David Roden
+ * Sone - FreenetRequest.kt - Copyright © 2011–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
 import freenet.clients.http.SessionManager.*
-import freenet.l10n.*
 import freenet.support.api.*
+import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.util.web.*
 import java.net.*
 import java.util.UUID.*
@@ -28,7 +28,6 @@ import java.util.UUID.*
 open class FreenetRequest(uri: URI, method: Method,
 		val httpRequest: HTTPRequest,
 		val toadletContext: ToadletContext,
-		val l10n: BaseL10n,
 		val sessionManager: SessionManager
 ) : Request(uri, method) {
 

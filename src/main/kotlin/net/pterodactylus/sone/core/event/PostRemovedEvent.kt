@@ -1,5 +1,5 @@
 /*
- * Sone - PostRemovedEvent.kt - Copyright © 2013–2019 David Roden
+ * Sone - PostRemovedEvent.kt - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,4 @@ import net.pterodactylus.sone.data.Post
 /**
  * Event that signals that a [Post] was removed.
  */
-data class PostRemovedEvent(val post: Post) {
-
-	@Deprecated(message = "will go away", replaceWith = ReplaceWith("post"))
-	fun post() = post
-
-}
+data class PostRemovedEvent(val post: Post)

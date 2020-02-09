@@ -35,7 +35,7 @@ class EditProfileFieldPageTest : WebPageTest(::EditProfileFieldPage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.EditProfileField.Title")).thenReturn("edit profile field title")
+		addTranslation("Page.EditProfileField.Title", "edit profile field title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("edit profile field title"))
 	}
 

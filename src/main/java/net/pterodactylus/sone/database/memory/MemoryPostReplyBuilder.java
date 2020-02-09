@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryPostReplyBuilder.java - Copyright © 2013–2019 David Roden
+ * Sone - MemoryPostReplyBuilder.java - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import java.util.UUID;
+import java.util.*;
+import javax.annotation.*;
 
-import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.impl.AbstractPostReplyBuilder;
-import net.pterodactylus.sone.database.PostReplyBuilder;
-import net.pterodactylus.sone.database.SoneProvider;
+import net.pterodactylus.sone.data.*;
+import net.pterodactylus.sone.data.impl.*;
+import net.pterodactylus.sone.database.*;
 
 /**
  * {@link PostReplyBuilder} implementation that creates {@link MemoryPostReply}
@@ -30,35 +30,20 @@ import net.pterodactylus.sone.database.SoneProvider;
  */
 class MemoryPostReplyBuilder extends AbstractPostReplyBuilder {
 
-	/** The database. */
 	private final MemoryDatabase database;
-
-	/** The Sone provider. */
 	private final SoneProvider soneProvider;
 
-	/**
-	 * Creates a new {@link MemoryPostReply} builder.
-	 *
-	 * @param database
-	 *            The database
-	 * @param soneProvider
-	 *            The Sone provider
-	 */
 	public MemoryPostReplyBuilder(MemoryDatabase database, SoneProvider soneProvider) {
 		this.database = database;
 		this.soneProvider = soneProvider;
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	@Nonnull
 	@Override
 	public PostReply build() throws IllegalStateException {
 		validate();
 
-		PostReply postReply = new MemoryPostReply(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
-		postReply.setKnown(database.isPostReplyKnown(postReply));
-		return postReply;
+		return new MemoryPostReply(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, currentTime ? System.currentTimeMillis() : time, text, postId);
 	}
 
 }

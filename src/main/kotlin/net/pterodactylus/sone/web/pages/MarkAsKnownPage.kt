@@ -22,9 +22,9 @@ class MarkAsKnownPage @Inject constructor(webInterface: WebInterface, loaders: L
 			"sone" -> ids.mapNotNull(soneRequest.core::getSone).forEach(soneRequest.core::markSoneKnown)
 			"post" -> ids.mapNotNull(soneRequest.core::getPost).forEach(soneRequest.core::markPostKnown)
 			"reply" -> ids.mapNotNull(soneRequest.core::getPostReply).forEach(soneRequest.core::markReplyKnown)
-			else -> throw RedirectException("invalid.html")
+			else -> redirectTo("invalid.html")
 		}
-		throw RedirectException(soneRequest.parameters["returnPage", 256]!!)
+		redirectTo(soneRequest.parameters["returnPage", 256]!!)
 	}
 
 }

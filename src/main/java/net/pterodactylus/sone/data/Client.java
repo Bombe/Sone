@@ -1,5 +1,5 @@
 /*
- * Sone - Client.java - Copyright © 2010–2019 David Roden
+ * Sone - Client.java - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,6 +79,11 @@ public class Client {
 	@Override
 	public int hashCode() {
 		return Objects.hashCode(name, version);
+	}
+
+	@Override
+	public String toString() {
+		return name + " " + version;
 	}
 
 }

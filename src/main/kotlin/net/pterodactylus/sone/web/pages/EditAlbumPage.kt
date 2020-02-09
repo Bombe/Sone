@@ -18,16 +18,16 @@ class EditAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loa
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		if (soneRequest.isPOST) {
-			val album = soneRequest.core.getAlbum(soneRequest.httpRequest.getPartAsStringFailsafe("album", 36)) ?: throw RedirectException("invalid.html")
-			album.takeUnless { it.sone.isLocal }?.run { throw RedirectException("noPermission.html") }
+			val album = soneRequest.core.getAlbum(soneRequest.httpRequest.getPartAsStringFailsafe("album", 36)) ?: redirectTo("invalid.html")
+			album.takeUnless { it.sone.isLocal }?.run { redirectTo("noPermission.html") }
 			if (soneRequest.httpRequest.getPartAsStringFailsafe("moveLeft", 4) == "true") {
 				album.parent?.moveAlbumUp(album)
 				soneRequest.core.touchConfiguration()
-				throw RedirectException("imageBrowser.html?album=${album.parent?.id}")
+				redirectTo("imageBrowser.html?album=${album.parent?.id}")
 			} else if (soneRequest.httpRequest.getPartAsStringFailsafe("moveRight", 4) == "true") {
 				album.parent?.moveAlbumDown(album)
 				soneRequest.core.touchConfiguration()
-				throw RedirectException("imageBrowser.html?album=${album.parent?.id}")
+				redirectTo("imageBrowser.html?album=${album.parent?.id}")
 			} else {
 				try {
 					album.modify()
@@ -35,10 +35,10 @@ class EditAlbumPage @Inject constructor(webInterface: WebInterface, loaders: Loa
 							.setDescription(soneRequest.httpRequest.getPartAsStringFailsafe("description", 1000))
 							.update()
 				} catch (e: AlbumTitleMustNotBeEmpty) {
-					throw RedirectException("emptyAlbumTitle.html")
+					redirectTo("emptyAlbumTitle.html")
 				}
 				soneRequest.core.touchConfiguration()
-				throw RedirectException("imageBrowser.html?album=${album.id}")
+				redirectTo("imageBrowser.html?album=${album.id}")
 			}
 		}
 	}

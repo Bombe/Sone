@@ -51,7 +51,7 @@ class ViewSonePage @Inject constructor(webInterface: WebInterface, loaders: Load
 
 	override fun getPageTitle(soneRequest: SoneRequest): String =
 			soneRequest.parameters["sone"]!!.let(soneRequest.core::getSone)?.let { sone ->
-				"${SoneAccessor.getNiceName(sone)} - ${soneRequest.l10n.getString("Page.ViewSone.Title")}"
-			} ?: soneRequest.l10n.getString("Page.ViewSone.Page.TitleWithoutSone")
+				"${SoneAccessor.getNiceName(sone)} - ${translation.translate("Page.ViewSone.Title")}"
+			} ?: translation.translate("Page.ViewSone.Page.TitleWithoutSone")
 
 }

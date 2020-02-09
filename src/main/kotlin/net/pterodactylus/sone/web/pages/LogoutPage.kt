@@ -17,7 +17,7 @@ class LogoutPage @Inject constructor(webInterface: WebInterface, loaders: Loader
 
 	override fun handleRequest(soneRequest: SoneRequest, currentSone: Sone, templateContext: TemplateContext) {
 		setCurrentSone(soneRequest.toadletContext, null)
-		throw RedirectException("index.html")
+		redirectTo("index.html")
 	}
 
 	override fun isEnabled(soneRequest: SoneRequest): Boolean =

@@ -23,7 +23,6 @@ class AllPages {
 	@Inject lateinit var deleteReplyPage: DeleteReplyPage
 	@Inject lateinit var deleteSonePage: DeleteSonePage
 	@Inject lateinit var dismissNotificationPage: DismissNotificationPage
-	@Inject lateinit var distrustPage: DistrustPage
 	@Inject lateinit var editAlbumPage: EditAlbumPage
 	@Inject lateinit var editImagePage: EditImagePage
 	@Inject lateinit var editProfileFieldPage: EditProfileFieldPage
@@ -42,12 +41,10 @@ class AllPages {
 	@Inject lateinit var optionsPage: OptionsPage
 	@Inject lateinit var rescuePage: RescuePage
 	@Inject lateinit var searchPage: SearchPage
-	@Inject lateinit var trustPage: TrustPage
 	@Inject lateinit var unbookmarkPage: UnbookmarkPage
 	@Inject lateinit var unfollowSonePage: UnfollowSonePage
 	@Inject lateinit var unlikePage: UnlikePage
 	@Inject lateinit var unlockSonePage: UnlockSonePage
-	@Inject lateinit var untrustPage: UntrustPage
 	@Inject lateinit var uploadImagePage: UploadImagePage
 	@Inject lateinit var viewPostPage: ViewPostPage
 	@Inject lateinit var viewSonePage: ViewSonePage

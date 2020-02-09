@@ -3,20 +3,17 @@ package net.pterodactylus.sone.template
 import com.google.inject.Guice
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.isProvidedByMock
-import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.SoneTextParser
 import net.pterodactylus.sone.text.SoneTextParserContext
 import net.pterodactylus.util.template.TemplateContext
 import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.emptyIterable
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.sameInstance
 import org.junit.Test
 import org.mockito.ArgumentCaptor.forClass
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.eq
 import org.mockito.Mockito.verify
 
@@ -38,8 +35,8 @@ class ParserFilterTest {
 
 	private fun setupSone(identity: String): Sone {
 		val sone = mock<Sone>()
-		`when`(sone.id).thenReturn(identity)
-		`when`(core.getSone(identity)).thenReturn(sone)
+		whenever(sone.id).thenReturn(identity)
+		whenever(core.getSone(identity)).thenReturn(sone)
 		return sone
 	}
 
@@ -63,7 +60,7 @@ class ParserFilterTest {
 		filter.format(templateContext, "text", parameters)
 		val context = forClass(SoneTextParserContext::class.java)
 		verify(soneTextParser).parse(eq<String>("text") ?: "", context.capture())
-		assertThat(context.value.postingSone, `is`(sone))
+		assertThat(context.value.postingSone, equalTo(sone))
 	}
 
 	@Test

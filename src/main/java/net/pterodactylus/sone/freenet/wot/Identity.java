@@ -1,5 +1,5 @@
 /*
- * Sone - Identity.java - Copyright © 2010–2019 David Roden
+ * Sone - Identity.java - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,20 +30,6 @@ import com.google.common.base.Function;
  * and will not perform any updating in the WebOfTrust plugin itself.
  */
 public interface Identity {
-
-	public static final Function<Identity, Set<String>> TO_CONTEXTS = new Function<Identity, Set<String>>() {
-		@Override
-		public Set<String> apply(Identity identity) {
-			return (identity == null) ? Collections.<String>emptySet() : identity.getContexts();
-		}
-	};
-
-	public static final Function<Identity, Map<String, String>> TO_PROPERTIES = new Function<Identity, Map<String, String>>() {
-		@Override
-		public Map<String, String> apply(Identity input) {
-			return (input == null) ? Collections.<String, String>emptyMap() : input.getProperties();
-		}
-	};
 
 	/**
 	 * Returns the ID of the identity.
@@ -97,7 +83,7 @@ public interface Identity {
 	 * @param contexts
 	 *            All contexts of the identity
 	 */
-	public void setContexts(Collection<String> contexts);
+	public void setContexts(Set<String> contexts);
 
 	/**
 	 * Removes the given context from this identity.

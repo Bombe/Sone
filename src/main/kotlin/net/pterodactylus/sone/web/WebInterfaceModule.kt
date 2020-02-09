@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.web
 
 import com.google.inject.*
-import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
@@ -11,6 +10,7 @@ import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.text.*
+import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import javax.inject.*
 import javax.inject.Singleton
@@ -65,6 +65,7 @@ class WebInterfaceModule : AbstractModule() {
 				addFilter("reparse", ReparseFilter())
 				addFilter("unknown", unknownDateFilter)
 				addFilter("format", FormatFilter())
+				addFilter("duration", DurationFormatFilter())
 				addFilter("sort", CollectionSortFilter())
 				addFilter("image-link", imageLinkFilter)
 				addFilter("replyGroup", ReplyGroupFilter())
@@ -72,6 +73,7 @@ class WebInterfaceModule : AbstractModule() {
 				addFilter("unique", UniqueElementFilter())
 				addFilter("mod", ModFilter())
 				addFilter("paginate", PaginationFilter())
+				addFilter("render-histogram", HistogramRenderer())
 
 				addProvider(TemplateProvider.TEMPLATE_CONTEXT_PROVIDER)
 				addProvider(loaders.templateProvider)
@@ -98,8 +100,8 @@ class WebInterfaceModule : AbstractModule() {
 			ProfileAccessor(core)
 
 	@Provides
-	fun getL10nFilter(l10n: BaseL10n) =
-			L10nFilter(l10n)
+	fun getL10nFilter(translation: Translation) =
+			L10nFilter(translation)
 
 	@Provides
 	fun getParserFilter(core: Core, soneTextParser: SoneTextParser) =
@@ -114,8 +116,8 @@ class WebInterfaceModule : AbstractModule() {
 			LinkedElementsFilter(elementLoader)
 
 	@Provides
-	fun getUnknownDateFilter(l10n: BaseL10n) =
-			UnknownDateFilter(l10n, "View.Sone.Text.UnknownDate")
+	fun getUnknownDateFilter(translation: Translation) =
+			UnknownDateFilter(translation, "View.Sone.Text.UnknownDate")
 
 	@Provides
 	fun getImageLinkFilter(core: Core) =
@@ -124,5 +126,10 @@ class WebInterfaceModule : AbstractModule() {
 	@Provides
 	@Named("toadletPathPrefix")
 	fun getPathPrefix(): String = "/Sone/"
+
+	@Provides
+	@Singleton
+	fun getNotificationManager() =
+			NotificationManager()
 
 }

@@ -24,7 +24,7 @@ class FollowSonePage @Inject constructor(webInterface: WebInterface, loaders: Lo
 						soneRequest.core.followSone(currentSone, sone.first)
 						soneRequest.core.markSoneKnown(sone.second)
 					}
-			throw RedirectException(soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
+			redirectTo(soneRequest.httpRequest.getPartAsStringFailsafe("returnPage", 256))
 		}
 	}
 

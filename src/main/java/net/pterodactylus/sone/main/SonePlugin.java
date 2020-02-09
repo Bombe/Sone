@@ -1,5 +1,5 @@
 /*
- * Sone - SonePlugin.java - Copyright © 2010–2019 David Roden
+ * Sone - SonePlugin.java - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,62 +17,34 @@
 
 package net.pterodactylus.sone.main;
 
-import static com.google.common.base.Optional.of;
-import static java.util.logging.Logger.getLogger;
+import static java.util.logging.Logger.*;
 
-import java.io.File;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
+import java.util.logging.*;
 
-import javax.inject.Singleton;
+import javax.annotation.Nonnull;
 
-import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.database.Database;
-import net.pterodactylus.sone.database.PostProvider;
-import net.pterodactylus.sone.database.SoneProvider;
-import net.pterodactylus.sone.database.memory.MemoryDatabase;
-import net.pterodactylus.sone.fcp.FcpInterface;
-import net.pterodactylus.sone.freenet.PluginStoreConfigurationBackend;
-import net.pterodactylus.sone.freenet.wot.Context;
-import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
-import net.pterodactylus.sone.web.WebInterface;
-import net.pterodactylus.sone.web.WebInterfaceModule;
-import net.pterodactylus.util.config.Configuration;
-import net.pterodactylus.util.config.ConfigurationException;
-import net.pterodactylus.util.config.MapConfigurationBackend;
-import net.pterodactylus.util.version.Version;
+import net.pterodactylus.sone.core.*;
+import net.pterodactylus.sone.core.event.*;
+import net.pterodactylus.sone.fcp.*;
+import net.pterodactylus.sone.freenet.wot.*;
+import net.pterodactylus.sone.web.*;
+import net.pterodactylus.sone.web.notification.NotificationHandler;
+import net.pterodactylus.sone.web.notification.NotificationHandlerModule;
 
-import com.google.common.base.Optional;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.eventbus.EventBus;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import freenet.l10n.BaseL10n.*;
+import freenet.l10n.*;
+import freenet.pluginmanager.*;
+import freenet.support.*;
+import freenet.support.api.*;
+
+import com.google.common.annotations.*;
+import com.google.common.eventbus.*;
+import com.google.common.cache.*;
+import com.google.inject.*;
 import com.google.inject.Module;
-import com.google.inject.TypeLiteral;
-import com.google.inject.matcher.Matchers;
-import com.google.inject.spi.InjectionListener;
-import com.google.inject.spi.TypeEncounter;
-import com.google.inject.spi.TypeListener;
-
-import freenet.client.async.PersistenceDisabledException;
-import freenet.l10n.BaseL10n;
-import freenet.l10n.BaseL10n.LANGUAGE;
-import freenet.l10n.PluginL10n;
-import freenet.pluginmanager.FredPlugin;
-import freenet.pluginmanager.FredPluginBaseL10n;
-import freenet.pluginmanager.FredPluginFCP;
-import freenet.pluginmanager.FredPluginL10n;
-import freenet.pluginmanager.FredPluginThreadless;
-import freenet.pluginmanager.FredPluginVersioned;
-import freenet.pluginmanager.PluginReplySender;
-import freenet.pluginmanager.PluginRespirator;
-import freenet.support.SimpleFieldSet;
-import freenet.support.api.Bucket;
+import com.google.inject.name.*;
+import kotlin.jvm.functions.*;
 
 /**
  * This class interfaces with Freenet. It is the class that is loaded by the
@@ -85,12 +57,13 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	static {
 		/* initialize logging. */
 		soneLogger.setUseParentHandlers(false);
+		soneLogger.setLevel(Level.ALL);
 		soneLogger.addHandler(new Handler() {
 			private final LoadingCache<String, Class<?>> classCache = CacheBuilder.newBuilder()
 					.build(new CacheLoader<String, Class<?>>() {
 						@Override
-						public Class<?> load(String key) throws Exception {
-							return Class.forName(key);
+						public Class<?> load(@Nonnull String key) throws Exception {
+							return SonePlugin.class.getClassLoader().loadClass(key);
 						}
 					});
 
@@ -122,18 +95,23 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	}
 
 	/** The current year at time of release. */
-	private static final int YEAR = 2019;
+	private static final int YEAR = 2020;
 	private static final String SONE_HOMEPAGE = "USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/";
-	private static final int LATEST_EDITION = 79;
+	private static final int LATEST_EDITION = 80;
 
 	/** The logger. */
 	private static final Logger logger = getLogger(SonePlugin.class.getName());
+
+	private final Function1<Module[], Injector> injectorCreator;
 
 	/** The plugin respirator. */
 	private PluginRespirator pluginRespirator;
 
 	/** The core. */
 	private Core core;
+
+	/** The event bus. */
+	private EventBus eventBus;
 
 	/** The web interface. */
 	private WebInterface webInterface;
@@ -146,6 +124,15 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 
 	/** The web of trust connector. */
 	private WebOfTrustConnector webOfTrustConnector;
+
+	public SonePlugin() {
+		this(Guice::createInjector);
+	}
+
+	@VisibleForTesting
+	public SonePlugin(Function1<Module[], Injector> injectorCreator) {
+		this.injectorCreator = injectorCreator;
+	}
 
 	//
 	// ACCESSORS
@@ -206,92 +193,7 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	public void runPlugin(PluginRespirator pluginRespirator) {
 		this.pluginRespirator = pluginRespirator;
 
-		/* create a configuration. */
-		Configuration oldConfiguration;
-		Configuration newConfiguration = null;
-		boolean firstStart = !new File("sone.properties").exists();
-		boolean newConfig = false;
-		try {
-			oldConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), false));
-			newConfiguration = oldConfiguration;
-		} catch (ConfigurationException ce1) {
-			newConfig = true;
-			logger.log(Level.INFO, "Could not load configuration file, trying plugin store…", ce1);
-			try {
-				newConfiguration = new Configuration(new MapConfigurationBackend(new File("sone.properties"), true));
-				logger.log(Level.INFO, "Created new configuration file.");
-			} catch (ConfigurationException ce2) {
-				logger.log(Level.SEVERE, "Could not create configuration file, using Plugin Store!", ce2);
-			}
-			try {
-				oldConfiguration = new Configuration(new PluginStoreConfigurationBackend(pluginRespirator));
-				logger.log(Level.INFO, "Plugin store loaded.");
-			} catch (PersistenceDisabledException pde1) {
-				logger.log(Level.SEVERE, "Could not load any configuration, using empty configuration!");
-				oldConfiguration = new Configuration(new MapConfigurationBackend());
-			}
-		}
-
-		final Configuration startConfiguration;
-		if ((newConfiguration != null) && (oldConfiguration != newConfiguration)) {
-			logger.log(Level.INFO, "Setting configuration to file-based configuration.");
-			startConfiguration = newConfiguration;
-		} else {
-			startConfiguration = oldConfiguration;
-		}
-		final EventBus eventBus = new EventBus();
-
-		/* Freenet injector configuration. */
-		FreenetModule freenetModule =  new FreenetModule(pluginRespirator);
-
-		/* Sone injector configuration. */
-		AbstractModule soneModule = new AbstractModule() {
-
-			@Override
-			protected void configure() {
-				bind(EventBus.class).toInstance(eventBus);
-				bind(Configuration.class).toInstance(startConfiguration);
-				Context context = new Context("Sone");
-				bind(Context.class).toInstance(context);
-				bind(getOptionalContextTypeLiteral()).toInstance(of(context));
-				bind(SonePlugin.class).toInstance(SonePlugin.this);
-				bind(Version.class).toInstance(Version.parse(getVersion().substring(1)));
-				bind(PluginVersion.class).toInstance(new PluginVersion(getVersion()));
-				bind(PluginYear.class).toInstance(new PluginYear(getYear()));
-				bind(PluginHomepage.class).toInstance(new PluginHomepage(getHomepage()));
-				bind(Database.class).to(MemoryDatabase.class).in(Singleton.class);
-				bind(BaseL10n.class).toInstance(l10n.getBase());
-				bind(SoneProvider.class).to(Core.class).in(Singleton.class);
-				bind(PostProvider.class).to(Core.class).in(Singleton.class);
-				if (startConfiguration.getBooleanValue("Developer.LoadFromFilesystem").getValue(false)) {
-					String path = startConfiguration.getStringValue("Developer.FilesystemPath").getValue(null);
-					if (path != null) {
-						bind(Loaders.class).toInstance(new DebugLoaders(path));
-					}
-				}
-				bindListener(Matchers.any(), new TypeListener() {
-
-					@Override
-					public <I> void hear(TypeLiteral<I> typeLiteral, TypeEncounter<I> typeEncounter) {
-						typeEncounter.register(new InjectionListener<I>() {
-
-							@Override
-							public void afterInjection(I injectee) {
-								eventBus.register(injectee);
-							}
-						});
-					}
-				});
-			}
-
-			private TypeLiteral<Optional<Context>> getOptionalContextTypeLiteral() {
-				return new TypeLiteral<Optional<Context>>() {
-				};
-			}
-
-		};
-		Module webInterfaceModule = new WebInterfaceModule();
-		Injector injector = Guice.createInjector(freenetModule, soneModule, webInterfaceModule);
+		Injector injector = createInjector();
 		core = injector.getInstance(Core.class);
 
 		/* create web of trust connector. */
@@ -303,11 +205,47 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 		/* create the web interface. */
 		webInterface = injector.getInstance(WebInterface.class);
 
+		/* we need to request this to install all notification handlers. */
+		injector.getInstance(NotificationHandler.class);
+
+		/* and this is required to shutdown all tickers. */
+		injector.getInstance(TickerShutdown.class);
+
 		/* start core! */
 		core.start();
+
+		/* start the web interface! */
 		webInterface.start();
-		webInterface.setFirstStart(firstStart);
-		webInterface.setNewConfig(newConfig);
+
+		/* send some events on startup */
+		eventBus = injector.getInstance(EventBus.class);
+
+		/* first start? */
+		if (injector.getInstance(Key.get(Boolean.class, Names.named("FirstStart")))) {
+			eventBus.post(new FirstStart());
+		} else {
+			/* new config? */
+			if (injector.getInstance(Key.get(Boolean.class, Names.named("NewConfig")))) {
+				eventBus.post(new ConfigNotRead());
+			}
+		}
+
+		eventBus.post(new Startup());
+	}
+
+	@VisibleForTesting
+	protected Injector createInjector() {
+		FreenetModule freenetModule = new FreenetModule(pluginRespirator);
+		AbstractModule soneModule = new SoneModule(this, new EventBus());
+		Module webInterfaceModule = new WebInterfaceModule();
+		Module notificationHandlerModule = new NotificationHandlerModule();
+
+		return createInjector(freenetModule, soneModule, webInterfaceModule, notificationHandlerModule);
+	}
+
+	@VisibleForTesting
+	protected Injector createInjector(Module... modules) {
+		return injectorCreator.invoke(modules);
 	}
 
 	/**
@@ -315,6 +253,9 @@ public class SonePlugin implements FredPlugin, FredPluginFCP, FredPluginL10n, Fr
 	 */
 	@Override
 	public void terminate() {
+		/* send shutdown event. */
+		eventBus.post(new Shutdown());
+
 		try {
 			/* stop the web interface. */
 			webInterface.stop();

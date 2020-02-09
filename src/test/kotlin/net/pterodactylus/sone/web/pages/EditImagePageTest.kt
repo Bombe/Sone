@@ -43,7 +43,7 @@ class EditImagePageTest : WebPageTest(::EditImagePage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.EditImage.Title")).thenReturn("edit image page title")
+		addTranslation("Page.EditImage.Title", "edit image page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("edit image page title"))
 	}
 

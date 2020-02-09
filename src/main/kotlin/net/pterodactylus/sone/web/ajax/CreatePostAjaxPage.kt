@@ -19,7 +19,7 @@ class CreatePostAjaxPage @Inject constructor(webInterface: WebInterface) : Logge
 					?.let { text ->
 						val sender = request.parameters["sender"].emptyToNull?.let(core::getSone) ?: currentSone
 						val recipient = request.parameters["recipient"]?.let(core::getSone)
-						core.createPost(sender, recipient.asOptional(), text).let { post ->
+						core.createPost(sender, recipient, text).let { post ->
 							createSuccessJsonObject().apply {
 								put("postId", post.id)
 								put("sone", sender.id)

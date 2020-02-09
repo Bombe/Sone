@@ -1,0 +1,30 @@
+<%include include/head.html>
+
+	<div class="page-id hidden">metrics</div>
+
+	<h1><%= Page.Metrics.Page.Title|l10n|html></h1>
+
+	<table>
+		<thead>
+			<tr>
+				<td>Metric</td>
+				<td class="numeric">Count</td>
+				<td class="numeric">Min</td>
+				<td class="numeric">Max</td>
+				<td class="numeric">Mean</td>
+				<td class="numeric">Median</td>
+				<td class="numeric">75%</td>
+				<td class="numeric">95%</td>
+				<td class="numeric">98%</td>
+				<td class="numeric">99%</td>
+				<td class="numeric">99.9%</td>
+			</tr>
+		</thead>
+		<tbody>
+			<%foreach histograms histogram>
+				<% histogram.value|render-histogram name=histogram.key>
+			<%/foreach>
+		</tbody>
+	</table>
+
+<%include include/tail.html>

@@ -21,7 +21,7 @@ class BookmarkPage @Inject constructor(webInterface: WebInterface, loaders: Load
 			soneRequest.core.getPost(postId)?.let {
 				soneRequest.core.bookmarkPost(it)
 			}
-			throw RedirectException(returnPage)
+			redirectTo(returnPage)
 		}
 	}
 

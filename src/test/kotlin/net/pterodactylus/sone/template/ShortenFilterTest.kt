@@ -2,7 +2,7 @@ package net.pterodactylus.sone.template
 
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.test.mock
+import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.FreenetLinkPart
 import net.pterodactylus.sone.text.Part
 import net.pterodactylus.sone.text.PlainTextPart
@@ -10,7 +10,6 @@ import net.pterodactylus.sone.text.SonePart
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.junit.Test
-import org.mockito.Mockito.`when`
 
 /**
  * Unit test for [ShortenFilter].
@@ -76,7 +75,7 @@ class ShortenFilterTest {
 	@Test
 	fun `sone parts are added but their length is ignored`() {
 		val sone = mock<Sone>()
-		`when`(sone.profile).thenReturn(Profile(sone))
+		whenever(sone.profile).thenReturn(Profile(sone))
 		assertThat(shortenParts(15, 10, SonePart(sone), PlainTextPart("This is a long text.")), contains<Part>(
 				SonePart(sone),
 				PlainTextPart("This is a …")
@@ -86,7 +85,7 @@ class ShortenFilterTest {
 	@Test
 	fun `additional sone parts are ignored`() {
 		val sone = mock<Sone>()
-		`when`(sone.profile).thenReturn(Profile(sone))
+		whenever(sone.profile).thenReturn(Profile(sone))
 		assertThat(shortenParts(15, 10, PlainTextPart("This is a long text."), SonePart(sone)), contains<Part>(
 				PlainTextPart("This is a …")
 		))

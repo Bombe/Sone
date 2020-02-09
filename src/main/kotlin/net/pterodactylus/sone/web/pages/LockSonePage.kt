@@ -19,7 +19,7 @@ class LockSonePage @Inject constructor(webInterface: WebInterface, loaders: Load
 			soneRequest.parameters["sone", 44]!!
 					.let { soneRequest.core.getLocalSone(it) }
 					?.let { soneRequest.core.lockSone(it) }
-			throw RedirectException(returnPage)
+			redirectTo(returnPage)
 		}
 	}
 

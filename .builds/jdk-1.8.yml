@@ -9,7 +9,7 @@ tasks:
       ./gradlew clean
   - build: |
       cd sone
-      ./gradlew build
+      ./gradlew -x findbugsTest build
   - test: |
       cd sone
       ./gradlew test

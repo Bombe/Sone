@@ -1,38 +1,24 @@
 package net.pterodactylus.sone.core;
 
-import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.utils.NumberParsers.parseInt;
-import static net.pterodactylus.sone.utils.NumberParsers.parseLong;
+import static java.util.concurrent.TimeUnit.*;
+import static java.util.logging.Logger.*;
+import static net.pterodactylus.sone.utils.NumberParsers.*;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.*;
+import java.util.*;
+import java.util.logging.*;
 
-import javax.inject.Inject;
+import javax.annotation.*;
+import javax.inject.*;
 
-import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Client;
-import net.pterodactylus.sone.data.Image;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
-import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Profile.DuplicateField;
-import net.pterodactylus.sone.data.Profile.EmptyFieldName;
-import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.database.Database;
-import net.pterodactylus.sone.database.PostBuilder;
-import net.pterodactylus.sone.database.PostReplyBuilder;
-import net.pterodactylus.sone.database.SoneBuilder;
-import net.pterodactylus.util.xml.SimpleXML;
-import net.pterodactylus.util.xml.XML;
+import net.pterodactylus.sone.data.*;
+import net.pterodactylus.sone.data.Profile.*;
+import net.pterodactylus.sone.database.*;
+import net.pterodactylus.util.xml.*;
 
-import org.w3c.dom.Document;
+import com.codahale.metrics.*;
+import com.google.common.base.*;
+import org.w3c.dom.*;
 
 /**
  * Parses a {@link Sone} from an XML {@link InputStream}.
@@ -42,15 +28,19 @@ public class SoneParser {
 	private static final Logger logger = getLogger(SoneParser.class.getName());
 	private static final int MAX_PROTOCOL_VERSION = 0;
 	private final Database database;
+	private final Histogram soneParsingDurationHistogram;
 
 	@Inject
-	public SoneParser(Database database) {
+	public SoneParser(Database database, MetricRegistry metricRegistry) {
 		this.database = database;
+		this.soneParsingDurationHistogram = metricRegistry.histogram("sone.parse.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
 
+	@Nullable
 	public Sone parseSone(Sone originalSone, InputStream soneInputStream) throws SoneException {
 		/* TODO - impose a size limit? */
 
+		Stopwatch stopwatch = Stopwatch.createStarted();
 		Document document;
 		/* XML parsing is not thread-safe. */
 		synchronized (this) {
@@ -257,6 +247,7 @@ public class SoneParser {
 		SimpleXML albumsXml = soneXml.getNode("albums");
 		Map<String, Image> allImages = new HashMap<>();
 		List<Album> topLevelAlbums = new ArrayList<>();
+		Map<String, Album> allAlbums = new HashMap<>();
 		if (albumsXml != null) {
 			for (SimpleXML albumXml : albumsXml.getNodes("album")) {
 				String id = albumXml.getValue("id", null);
@@ -269,7 +260,7 @@ public class SoneParser {
 				}
 				Album parent = null;
 				if (parentId != null) {
-					parent = database.getAlbum(parentId);
+					parent = allAlbums.get(parentId);
 					if (parent == null) {
 						logger.log(Level.WARNING, String.format("Downloaded Sone %s has album with invalid parent!", sone));
 						return null;
@@ -288,6 +279,7 @@ public class SoneParser {
 				} else {
 					topLevelAlbums.add(album);
 				}
+				allAlbums.put(album.getId(), album);
 				SimpleXML imagesXml = albumXml.getNode("images");
 				if (imagesXml != null) {
 					for (SimpleXML imageXml : imagesXml.getNodes("image")) {
@@ -333,6 +325,11 @@ public class SoneParser {
 		for (Album album : topLevelAlbums) {
 			sone.getRootAlbum().addAlbum(album);
 		}
+
+		// record the duration
+		stopwatch.stop();
+		soneParsingDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
+		logger.fine(() -> "Parsed " + originalSone.getIdentity().getId() + "@" + originalSone.getLatestEdition() + " in " + stopwatch.elapsed(MICROSECONDS) + "μs.");
 
 		return sone;
 

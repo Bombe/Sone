@@ -20,23 +20,23 @@ class EditProfileFieldPage @Inject constructor(webInterface: WebInterface, loade
 		currentSone.profile.let { profile ->
 			if (soneRequest.isPOST) {
 				if (soneRequest.httpRequest.getPartAsStringFailsafe("cancel", 4) == "true") {
-					throw RedirectException("editProfile.html#profile-fields")
+					redirectTo("editProfile.html#profile-fields")
 				}
-				val field = profile.getFieldById(soneRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: throw RedirectException("invalid.html")
+				val field = profile.getFieldById(soneRequest.httpRequest.getPartAsStringFailsafe("field", 36)) ?: redirectTo("invalid.html")
 				soneRequest.httpRequest.getPartAsStringFailsafe("name", 256).let { name ->
 					try {
 						if (name != field.name) {
 							field.name = name
 							currentSone.profile = profile
 						}
-						throw RedirectException("editProfile.html#profile-fields")
+						redirectTo("editProfile.html#profile-fields")
 					} catch (e: IllegalArgumentException) {
 						templateContext["duplicateFieldName"] = true
 						return
 					}
 				}
 			}
-			templateContext["field"] = profile.getFieldById(soneRequest.httpRequest.getParam("field")) ?: throw RedirectException("invalid.html")
+			templateContext["field"] = profile.getFieldById(soneRequest.httpRequest.getParam("field")) ?: redirectTo("invalid.html")
 		}
 	}
 

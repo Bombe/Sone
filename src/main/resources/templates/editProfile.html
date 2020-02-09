@@ -1,10 +1,10 @@
 <%include include/head.html>
 
-	<script language="javascript">
+	<script type="application/javascript">
 		function recheckMoveButtons() {
 			$("#sone .profile-field").each(function() {
-				$(".move-up-field", this).toggleClass("hidden", $(this).prev(".profile-field").length == 0);
-				$(".move-down-field", this).toggleClass("hidden", $(this).next(".profile-field").length == 0);
+				$(".move-up-field", this).toggleClass("hidden", $(this).prev(".profile-field").length === 0);
+				$(".move-down-field", this).toggleClass("hidden", $(this).next(".profile-field").length === 0);
 			});
 		}
 
@@ -41,13 +41,13 @@
 			/* ajaxify the delete buttons. */
 			getTranslation("Page.EditProfile.Fields.Button.ReallyDelete", function(reallyDeleteText) {
 				$("#sone #edit-profile .delete-field-name button").each(function() {
-					confirmButton = $(this).clone().addClass("hidden").addClass("confirm").text(reallyDeleteText).insertAfter(this);
+					const confirmButton = $(this).clone().addClass("hidden").addClass("confirm").text(reallyDeleteText).insertAfter(this);
 					(function(deleteButton, confirmButton) {
 						deleteButton.click(function() {
 							deleteButton.fadeOut("slow", function() {
 								confirmButton.fadeIn("slow");
 								$(document).one("click", function() {
-									if (this != confirmButton.get(0)) {
+									if (this !== confirmButton.get(0)) {
 										confirmButton.fadeOut("slow", function() {
 											deleteButton.fadeIn("slow");
 										});
@@ -59,8 +59,8 @@
 						});
 						confirmButton.click(function() {
 							confirmButton.fadeOut("slow");
-							buttonName = confirmButton.attr("name");
-							fieldId = buttonName.substring("delete-field-".length);
+							const buttonName = confirmButton.prop("name");
+							const fieldId = buttonName.substring("delete-field-".length);
 							deleteProfileField(fieldId);
 							recheckMoveButtons();
 							return false;
@@ -71,13 +71,13 @@
 
 			/* ajaxify the edit button. */
 			$("#sone #edit-profile .edit-field-name button").each(function() {
-				profileField = $(this).parents(".profile-field");
-				fieldNameElement = profileField.find(".name");
-				inputField = $("input[type=text].short", profileField);
-				confirmButton = $("button.confirm", profileField);
-				cancelButton = $("button.cancel", profileField);
+				const profileField = $(this).parents(".profile-field");
+				const fieldNameElement = profileField.find(".name");
+				const inputField = $("input[type=text].short", profileField);
+				const confirmButton = $("button.confirm", profileField);
+				const cancelButton = $("button.cancel", profileField);
 				(function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
-					cleanUp = function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
+					const cleanUp = function(editButton, inputField, confirmButton, cancelButton, fieldNameElement) {
 						editButton.removeAttr("disabled");
 						inputField.addClass("hidden");
 						confirmButton.addClass("hidden");
@@ -85,10 +85,10 @@
 						fieldNameElement.removeClass("hidden");
 					};
 					confirmButton.click(function() {
-						inputField.attr("disabled", "disabled");
-						confirmButton.attr("disabled", "disabled");
-						cancelButton.attr("disabled", "disabled");
-						editProfileField(confirmButton.parents(".profile-field").attr("id"), inputField.val(), function() {
+						inputField.prop("disabled", "disabled");
+						confirmButton.prop("disabled", "disabled");
+						cancelButton.prop("disabled", "disabled");
+						editProfileField(confirmButton.parents(".profile-field").prop("id"), inputField.val(), function() {
 							fieldNameElement.text(inputField.val());
 							cleanUp(editButton, inputField, confirmButton, cancelButton, fieldNameElement);
 						});
@@ -99,16 +99,16 @@
 						return false;
 					});
 					inputField.keypress(function(event) {
-						if (event.which == 13) {
+						if (event.which === 13) {
 							confirmButton.click();
 							return false;
-						} else if (event.which == 27) {
+						} else if (event.which === 27) {
 							cancelButton.click();
 							return false;
 						}
 					});
 					editButton.click(function() {
-						editButton.attr("disabled", "disabled");
+						editButton.prop("disabled", "disabled");
 						fieldNameElement.addClass("hidden");
 						inputField.removeAttr("disabled").val(fieldNameElement.text()).removeClass("hidden").focus().select();
 						confirmButton.removeAttr("disabled").removeClass("hidden");
@@ -120,19 +120,17 @@
 
 			/* ajaxify “move up” and “move down” buttons. */
 			$("#sone .profile-field .move-down-field button").click(function() {
-				profileField = $(this).parents(".profile-field");
-				moveProfileFieldDown(profileField.attr("id"), function() {
-					next = profileField.next();
-					current = profileField.insertAfter(next);
+				const profileField = $(this).parents(".profile-field");
+				moveProfileFieldDown(profileField.prop("id"), function() {
+					profileField.insertAfter(profileField.next());
 					recheckMoveButtons();
 				});
 				return false;
 			});
 			$("#sone .profile-field .move-up-field button").click(function() {
-				profileField = $(this).parents(".profile-field");
-				moveProfileFieldUp(profileField.attr("id"), function() {
-					previous = profileField.prev();
-					current = profileField.insertBefore(previous);
+				const profileField = $(this).parents(".profile-field");
+				moveProfileFieldUp(profileField.prop("id"), function() {
+					profileField.insertBefore(profileField.prev());
 					recheckMoveButtons();
 				});
 				return false;

@@ -10,9 +10,9 @@
 	<div class="inner-menu">
 		<div>
 			<a class="author" href="viewSone.html?sone=<%sone.id|html>"><%sone.niceName|html></a>
-			(<%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size><%if ! sone.allImages.size|match value==0>, <%= View.Sone.Stats.Images|l10n 0=sone.allImages.size><%/if>)
+			(<%= View.Sone.Stats.Posts|l10n 0=sone.posts.size>, <%= View.Sone.Stats.Replies|l10n 0=sone.replies.size><%if ! sone.allImages.size|match value==0>, <%= View.Sone.Stats.Images|l10n 0=sone.allImages.size><%/if><%if core.debug>, <% sone.client|html><%/if>)
 		</div>
-		<div><a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>">» <% =View.Post.WebOfTrustLink|l10n|html></a></div>
+		<div><a href="/WebOfTrust/ShowIdentity?id=<%sone.id|html>">» <% =View.SoneMenu.WebOfTrustLink|l10n|html></a></div>
 		<%foreach sone.albums album>
 			<%first>
 				<div><a href="imageBrowser.html?sone=<% sone.id|html>">» <% =View.SoneMenu.Link.AllAlbums|l10n|html></a></div>

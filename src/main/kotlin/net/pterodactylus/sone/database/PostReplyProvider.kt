@@ -1,5 +1,5 @@
 /*
- * Sone - PostReplyProvider.kt - Copyright © 2013–2019 David Roden
+ * Sone - PostReplyProvider.kt - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,11 +17,14 @@
 
 package net.pterodactylus.sone.database
 
+import com.google.inject.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.database.memory.*
 
 /**
  * Interface for objects that can provide [PostReply]s.
  */
+@ImplementedBy(MemoryDatabase::class)
 interface PostReplyProvider {
 
 	fun getPostReply(id: String): PostReply?

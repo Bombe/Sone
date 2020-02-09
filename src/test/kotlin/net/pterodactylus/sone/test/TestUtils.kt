@@ -1,5 +1,6 @@
 package net.pterodactylus.sone.test
 
+import org.junit.rules.*
 import java.lang.reflect.*
 
 private val modifiers = Field::class.java.getDeclaredField("modifiers").apply {
@@ -17,3 +18,5 @@ fun setField(instance: Any, name: String, value: Any?) {
 				field.set(instance, value)
 			}
 }
+
+inline fun <reified T : Throwable> ExpectedException.expect() = expect(T::class.java)

@@ -18,12 +18,19 @@ class PageToadletRegistry @Inject constructor(
 ) {
 
 	private val pages = mutableListOf<Page<FreenetRequest>>()
+	private val debugPages = mutableListOf<Page<FreenetRequest>>()
 	private val registeredToadlets = mutableListOf<PageToadlet>()
 	private val registered = AtomicBoolean(false)
+	private val debugActivated = AtomicBoolean(false)
 
 	fun addPage(page: Page<FreenetRequest>) {
 		if (registered.get()) throw IllegalStateException()
 		pages += page
+	}
+
+	fun addDebugPage(page: Page<FreenetRequest>) {
+		if (registered.get()) throw IllegalStateException()
+		debugPages += page
 	}
 
 	fun registerToadlets() {
@@ -32,7 +39,7 @@ class PageToadletRegistry @Inject constructor(
 		addPages()
 	}
 
-	private fun addPages() =
+	private fun addPages(pages: List<Page<FreenetRequest>> = this.pages) =
 			pages
 					.map { pageToadletFactory.createPageToadlet(it) }
 					.onEach(registeredToadlets::plusAssign)
@@ -53,6 +60,13 @@ class PageToadletRegistry @Inject constructor(
 	fun unregisterToadlets() {
 		pageMaker.removeNavigationCategory(soneMenuName)
 		registeredToadlets.forEach(toadletContainer::unregister)
+	}
+
+	fun activateDebugMode() {
+		if (!debugActivated.get()) {
+			addPages(debugPages)
+			debugActivated.set(true)
+		}
 	}
 
 }

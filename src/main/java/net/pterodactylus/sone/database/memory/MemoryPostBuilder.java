@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryPostBuilder.java - Copyright © 2013–2019 David Roden
+ * Sone - MemoryPostBuilder.java - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,43 +17,30 @@
 
 package net.pterodactylus.sone.database.memory;
 
-import java.util.UUID;
+import java.util.*;
+import javax.annotation.*;
 
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.impl.AbstractPostBuilder;
-import net.pterodactylus.sone.database.PostBuilder;
-import net.pterodactylus.sone.database.SoneProvider;
+import net.pterodactylus.sone.data.*;
+import net.pterodactylus.sone.data.impl.*;
+import net.pterodactylus.sone.database.*;
 
 /**
  * {@link PostBuilder} implementation that creates a {@link MemoryPost}.
  */
 class MemoryPostBuilder extends AbstractPostBuilder {
 
-	/** The database. */
 	private final MemoryDatabase database;
 
-	/**
-	 * Creates a new memory post builder.
-	 *
-	 * @param memoryDatabase
-	 *            The database
-	 * @param soneProvider
-	 *            The Sone provider
-	 */
 	public MemoryPostBuilder(MemoryDatabase memoryDatabase, SoneProvider soneProvider) {
 		super(soneProvider);
 		database = memoryDatabase;
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
+	@Nonnull
 	@Override
 	public Post build() throws IllegalStateException {
 		validate();
-		Post post = new MemoryPost(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
-		post.setKnown(database.isPostKnown(post));
-		return post;
+		return new MemoryPost(database, soneProvider, randomId ? UUID.randomUUID().toString() : id, senderId, recipientId, currentTime ? System.currentTimeMillis() : time, text);
 	}
 
 }

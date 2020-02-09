@@ -35,10 +35,10 @@ class CreateAlbumPage @Inject constructor(webInterface: WebInterface, loaders: L
 					setDescription(TextFilter.filter(soneRequest.httpRequest.getHeader("Host"), description))
 				}.update()
 			} catch (e: AlbumTitleMustNotBeEmpty) {
-				throw RedirectException("emptyAlbumTitle.html")
+				redirectTo("emptyAlbumTitle.html")
 			}
 			soneRequest.core.touchConfiguration()
-			throw RedirectException("imageBrowser.html?album=${album.id}")
+			redirectTo("imageBrowser.html?album=${album.id}")
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Sone - NewPostReplyFoundEvent.kt - Copyright © 2013–2019 David Roden
+ * Sone - NewPostReplyFoundEvent.kt - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,9 +22,4 @@ import net.pterodactylus.sone.data.PostReply
 /**
  * Event that signals that a new [PostReply] was found.
  */
-data class NewPostReplyFoundEvent(val postReply: PostReply) {
-
-	@Deprecated(message = "will go away", replaceWith = ReplaceWith("postReply"))
-	fun postReply() = postReply
-
-}
+data class NewPostReplyFoundEvent(val postReply: PostReply)

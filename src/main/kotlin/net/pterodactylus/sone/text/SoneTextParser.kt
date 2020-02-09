@@ -7,6 +7,7 @@ import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.text.LinkType.*
 import net.pterodactylus.sone.text.LinkType.USK
+import net.pterodactylus.sone.utils.*
 import org.bitpedia.util.*
 import java.net.*
 import javax.inject.*
@@ -71,7 +72,7 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 							?.takeIf { (it.size > 1) || ((it.size == 1) && (it.single() != "")) }
 							?.lastOrNull()
 							?: uri.docName
-							?: "${uri.keyType}@${uri.routingKey.freenetBase64}"
+							?: "${uri.keyType}@${uri.routingKey.asFreenetBase64}"
 				}.let { FreenetLinkPart(linkWithoutBacklink.removeSuffix("/"), it, trusted = context?.routingKey?.contentEquals(FreenetURI(linkWithoutBacklink).routingKey) == true) }
 			} catch (e: MalformedURLException) {
 				PlainTextPart(linkWithoutBacklink)
@@ -115,7 +116,7 @@ private fun List<Part>.mergeAdjacentPlainTextParts() = fold(emptyList<Part>()) {
 
 private fun List<Part>.removeEmptyPlainTextParts() = filterNot { it == PlainTextPart("") }
 
-private val String.decodedId: String get() = Base64.encode(Base32.decode(this))
+private val String.decodedId: String get() = Base32.decode(this).asFreenetBase64
 private val String.withoutProtocol get() = substring(indexOf("//") + 2)
 private val String.withoutUrlParameters get() = split('?').first()
 
@@ -138,7 +139,7 @@ private val String.withoutMiddlePathComponents
 	}
 private val String.withoutTrailingSlash get() = if (endsWith("/")) substring(0, length - 1) else this
 private val SoneTextParserContext.routingKey: ByteArray? get() = postingSone?.routingKey
-private val Sone.routingKey: ByteArray get() = Base64.decode(id)
+private val Sone.routingKey: ByteArray get() = id.fromFreenetBase64
 
 private enum class LinkType(private val scheme: String, private val freenetLink: Boolean) {
 
@@ -199,5 +200,3 @@ private fun isPunctuation(char: Char) = char in punctuationChars
 private val whitespace = Regex("[\\u000a\u0020\u00a0\u1680\u180e\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u200c\u200d\u202f\u205f\u2060\u2800\u3000]")
 
 private data class NextLink(val position: Int, val linkType: LinkType, val link: String, val remainder: String)
-
-private val ByteArray.freenetBase64 get() = Base64.encode(this)!!

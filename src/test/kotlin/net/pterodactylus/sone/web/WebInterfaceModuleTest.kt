@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web
 import com.google.inject.Guice.*
 import freenet.client.*
 import freenet.clients.http.*
-import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
@@ -14,22 +13,28 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.*
+import net.pterodactylus.sone.web.notification.*
 import net.pterodactylus.sone.web.page.*
+import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
-import org.junit.*
+import java.util.*
+import kotlin.test.*
 
 class WebInterfaceModuleTest {
 
 	private val webInterfaceModule = WebInterfaceModule()
-	private val l10n = mock<BaseL10n>()
 	private val loaders = mock<Loaders>()
+	private val translation = object : Translation {
+		override val currentLocale = Locale.ENGLISH
+		override fun translate(key: String) = if (key == "View.Sone.Text.UnknownDate") "unknown" else key
+	}
 	private val additionalModules = arrayOf(
 			Core::class.isProvidedByMock(),
 			SoneProvider::class.isProvidedByMock(),
-			BaseL10n::class.isProvidedBy(l10n),
+			Translation::class.isProvidedBy(translation),
 			SoneTextParser::class.isProvidedByMock(),
 			ElementLoader::class.isProvidedByMock(),
 			Loaders::class.isProvidedBy(loaders),
@@ -190,13 +195,17 @@ class WebInterfaceModuleTest {
 
 	@Test
 	fun `unknown date filter uses correct l10n key`() {
-		whenever(l10n.getString("View.Sone.Text.UnknownDate")).thenReturn("unknown")
 		assertThat(getFilter("unknown")!!.format(null, 0L, emptyMap()), equalTo<Any>("unknown"))
 	}
 
 	@Test
 	fun `template context contains format filter`() {
 		verifyFilter<FormatFilter>("format")
+	}
+
+	@Test
+	fun `template context contains duration format filter`() {
+		verifyFilter<DurationFormatFilter>("duration")
 	}
 
 	@Test
@@ -234,6 +243,11 @@ class WebInterfaceModuleTest {
 		verifyFilter<PaginationFilter>("paginate")
 	}
 
+	@Test
+	fun `template context histogram renderer`() {
+		verifyFilter<HistogramRenderer>("render-histogram")
+	}
+
 	private inline fun <reified F : Filter> verifyFilter(name: String) {
 		assertThat(getFilter(name), instanceOf(F::class.java))
 	}
@@ -242,9 +256,7 @@ class WebInterfaceModuleTest {
 
 	@Test
 	fun `template context factory is created as singleton`() {
-	    val factory1 = injector.getInstance<TemplateContextFactory>()
-	    val factory2 = injector.getInstance<TemplateContextFactory>()
-		assertThat(factory1, sameInstance(factory2))
+		injector.verifySingletonInstance<TemplateContextFactory>()
 	}
 
 	@Test
@@ -266,7 +278,12 @@ class WebInterfaceModuleTest {
 	@Test
 	fun `page toadlet factory is created with correct prefix`() {
 		val page = mock<Page<FreenetRequest>>()
-	    assertThat(injector.getInstance<PageToadletFactory>().createPageToadlet(page).path(), startsWith("/Sone/"))
+		assertThat(injector.getInstance<PageToadletFactory>().createPageToadlet(page).path(), startsWith("/Sone/"))
+	}
+
+	@Test
+	fun `notification manager is created as singleton`() {
+		injector.verifySingletonInstance<NotificationManager>()
 	}
 
 }

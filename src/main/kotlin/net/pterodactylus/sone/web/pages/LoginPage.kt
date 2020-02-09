@@ -23,7 +23,7 @@ class LoginPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 			soneRequest.core.getLocalSone(soneId)?.let { sone ->
 				setCurrentSone(soneRequest.toadletContext, sone)
 				val target = soneRequest.httpRequest.getParam("target").emptyToNull ?: "index.html"
-				throw RedirectException(target)
+				redirectTo(target)
 			}
 		}
 		templateContext["sones"] = soneRequest.core.localSones.sortedWith(Sone.NICE_NAME_COMPARATOR)

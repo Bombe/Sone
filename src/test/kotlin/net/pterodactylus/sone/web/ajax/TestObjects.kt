@@ -3,7 +3,6 @@ package net.pterodactylus.sone.web.ajax
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.eventbus.EventBus
 import freenet.clients.http.ToadletContext
-import freenet.l10n.BaseL10n
 import freenet.support.SimpleReadOnlyArrayBucket
 import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
@@ -20,6 +19,7 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.Sone.SoneStatus
 import net.pterodactylus.sone.data.Sone.SoneStatus.idle
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
+import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.get
 import net.pterodactylus.sone.test.mock
@@ -32,7 +32,7 @@ import net.pterodactylus.util.template.TemplateContextFactory
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.mockito.ArgumentMatchers
-import java.util.NoSuchElementException
+import java.util.*
 import javax.naming.SizeLimitExceededException
 
 /**
@@ -44,7 +44,6 @@ open class TestObjects {
 
 	val webInterface = mock<WebInterface>()
 	var formPassword = "form-password"
-	val l10n = mock<BaseL10n>()
 	val core = mock<Core>()
 	val eventBus = mock<EventBus>()
 	val preferences = Preferences(eventBus)
@@ -74,6 +73,11 @@ open class TestObjects {
 	val images = mutableMapOf<String, Image>()
 	val translations = mutableMapOf<String, String>()
 
+	private val translation = object : Translation {
+		override val currentLocale = Locale.ENGLISH
+		override fun translate(key: String) = translations[key] ?: ""
+	}
+
 	init {
 		whenever(webInterface.templateContextFactory).thenReturn(TemplateContextFactory())
 		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext), ArgumentMatchers.anyBoolean())).thenReturn(currentSone)
@@ -85,9 +89,7 @@ open class TestObjects {
 		whenever(webInterface.getNotification(ArgumentMatchers.anyString())).then { notifications[it[0]].asOptional() }
 		whenever(webInterface.getNewPosts(currentSone)).thenAnswer { newPosts.values }
 		whenever(webInterface.getNewReplies(currentSone)).thenAnswer { newReplies.values }
-		whenever(webInterface.l10n).thenReturn(l10n)
-
-		whenever(l10n.getString(ArgumentMatchers.anyString())).then { translations[it[0]] }
+		whenever(webInterface.translation).thenReturn(translation)
 
 		whenever(core.preferences).thenReturn(preferences)
 		whenever(core.updateChecker).thenReturn(updateChecker)

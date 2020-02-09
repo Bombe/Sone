@@ -2,6 +2,7 @@ package net.pterodactylus.sone.web.pages
 
 import freenet.clients.http.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
@@ -20,11 +21,12 @@ open class SoneTemplatePage(
 		templateRenderer: TemplateRenderer,
 		private val pageTitleKey: String? = null,
 		private val requiresLogin: Boolean = false,
-		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.l10n::getString) ?: "" }
+		private val pageTitle: (FreenetRequest) -> String = { pageTitleKey?.let(webInterface.translation::translate) ?: "" }
 ) : FreenetTemplatePage(templateRenderer, loaders, "noPermission.html") {
 
 	private val core = webInterface.core
 	private val sessionProvider: SessionProvider = webInterface
+	protected val translation: Translation = webInterface.translation
 
 	protected fun getCurrentSone(toadletContext: ToadletContext, createSession: Boolean = true) =
 			sessionProvider.getCurrentSone(toadletContext, createSession)
@@ -89,7 +91,7 @@ open class SoneTemplatePage(
 	private val String.urlEncode: String get() = URLEncoder.encode(this, "UTF-8")
 
 	override fun isEnabled(toadletContext: ToadletContext) =
-			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, webInterface.l10n, webInterface.sessionManager, core, webInterface))
+			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, webInterface.sessionManager, core, webInterface))
 
 	open fun isEnabled(soneRequest: SoneRequest) = when {
 		requiresLogin && getCurrentSone(soneRequest.toadletContext) == null -> false

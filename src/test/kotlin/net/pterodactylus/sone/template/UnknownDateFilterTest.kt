@@ -1,30 +1,32 @@
 package net.pterodactylus.sone.template
 
-import freenet.l10n.BaseL10n
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.equalTo
-import org.junit.Test
+import net.pterodactylus.sone.freenet.*
+import net.pterodactylus.sone.test.*
+import org.hamcrest.MatcherAssert.*
+import org.hamcrest.Matchers.*
+import org.junit.*
+import java.util.*
 
 /**
  * Unit test for [UnknownDateFilter].
  */
 class UnknownDateFilterTest {
 
-	private val baseL10n = mock<BaseL10n>()
+	private val translation = object : Translation {
+		override val currentLocale = Locale.ENGLISH
+		override fun translate(key: String) = if (key == unknownKey) "translated" else ""
+	}
 	private val unknownKey = "unknown.key"
-	private val filter = UnknownDateFilter(baseL10n, unknownKey)
+	private val filter = UnknownDateFilter(translation, unknownKey)
 
 	@Test
 	fun `filter returns given object for non-longs`() {
-	    val someObject = Any()
+		val someObject = Any()
 		assertThat(filter.format(null, someObject, null), equalTo<Any>(someObject))
 	}
 
 	@Test
 	fun `filter returns translated value of unknown key if zero is given`() {
-	    whenever(baseL10n.getString(unknownKey)).thenReturn("translated")
 		assertThat(filter.format(null, 0L, null), equalTo<Any>("translated"))
 	}
 

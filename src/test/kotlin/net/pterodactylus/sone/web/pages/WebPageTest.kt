@@ -6,6 +6,7 @@ import freenet.support.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.deepMock
@@ -26,6 +27,7 @@ import org.mockito.ArgumentMatchers.eq
 import java.io.*
 import java.net.*
 import java.nio.charset.*
+import java.util.*
 import kotlin.text.Charsets.UTF_8
 
 /**
@@ -40,16 +42,14 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	val core = webInterface.core
 	val eventBus = mock<EventBus>()
 	val preferences = Preferences(eventBus)
-	val l10n = webInterface.l10n!!
 	val sessionManager = mock<SessionManager>()
 
-	val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
+	open val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
 
 	val httpRequest = mock<HTTPRequest>()
 	val freenetRequest = mock<FreenetRequest>()
 
 	init {
-		whenever(freenetRequest.l10n).thenReturn(l10n)
 		whenever(freenetRequest.sessionManager).thenReturn(sessionManager)
 		whenever(freenetRequest.uri).thenReturn(mock())
 	}
@@ -77,12 +77,16 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	private val notifications = mutableMapOf<String, Notification>()
 	private val translations = mutableMapOf<String, String>()
 
+	private val translation = object : Translation {
+		override val currentLocale = Locale.ENGLISH
+		override fun translate(key: String) = translations[key] ?: key
+	}
+
 	init {
 		setupCore()
 		setupWebInterface()
 		setupHttpRequest()
 		setupFreenetRequest()
-		setupTranslations()
 	}
 
 	private fun setupCore() {
@@ -108,6 +112,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getNotifications(currentSone)).then { notifications.values }
 		whenever(webInterface.getNotification(anyString())).then { notifications[it[0]].asOptional() }
+		whenever(webInterface.translation).thenReturn(translation)
 	}
 
 	private fun setupHttpRequest() {
@@ -145,10 +150,6 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 		whenever(freenetRequest.method).thenReturn(GET)
 		whenever(freenetRequest.httpRequest).thenReturn(httpRequest)
 		whenever(freenetRequest.toadletContext).thenReturn(toadletContext)
-	}
-
-	private fun setupTranslations() {
-		whenever(l10n.getString(anyString())).then { translations[it[0]] ?: it[0] }
 	}
 
 	fun setMethod(method: Method) {

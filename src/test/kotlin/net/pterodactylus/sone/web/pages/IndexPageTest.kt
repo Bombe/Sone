@@ -34,7 +34,7 @@ class IndexPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> I
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.Index.Title")).thenReturn("index page title")
+		addTranslation("Page.Index.Title", "index page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("index page title"))
 	}
 

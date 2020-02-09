@@ -37,7 +37,7 @@ class ImageInserterTest {
 
 	@Test
 	fun `exception when inserting image is ignored`() {
-		doThrow(SoneException::class.java).`when`(freenetInterface).insertImage(eq(temporaryImage), eq(image), any(InsertToken::class.java))
+		doThrow(SoneException::class.java).whenever(freenetInterface).insertImage(eq(temporaryImage), eq(image), any(InsertToken::class.java))
 		imageInserter.insertImage(temporaryImage, image)
 		verify(freenetInterface).insertImage(eq(temporaryImage), eq(image), any(InsertToken::class.java))
 	}

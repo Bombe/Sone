@@ -1,5 +1,5 @@
 /*
- * Sone - MemoryDatabase.kt - Copyright © 2013–2019 David Roden
+ * Sone - MemoryDatabase.kt - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.TreeMultimap
-import com.google.common.util.concurrent.AbstractService
+import com.google.common.util.concurrent.*
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import net.pterodactylus.sone.data.Album
@@ -41,7 +41,7 @@ import net.pterodactylus.sone.database.ImageBuilder
 import net.pterodactylus.sone.database.PostBuilder
 import net.pterodactylus.sone.database.PostDatabase
 import net.pterodactylus.sone.database.PostReplyBuilder
-import net.pterodactylus.sone.utils.unit
+import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -70,6 +70,9 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val soneImages: Multimap<String, Image> = HashMultimap.create<String, Image>()
 	private val memoryBookmarkDatabase = MemoryBookmarkDatabase(this, configurationLoader)
 	private val memoryFriendDatabase = MemoryFriendDatabase(configurationLoader)
+	private val saveRateLimiter: RateLimiter = RateLimiter.create(1.0)
+	private val saveKnownPostsRateLimiter: RateLimiter = RateLimiter.create(1.0)
+	private val saveKnownPostRepliesRateLimiter: RateLimiter = RateLimiter.create(1.0)
 
 	override val soneLoader get() = this::getSone
 
@@ -82,8 +85,10 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override val bookmarkedPosts get() = memoryBookmarkDatabase.bookmarkedPosts
 
 	override fun save() {
-		saveKnownPosts()
-		saveKnownPostReplies()
+		if (saveRateLimiter.tryAcquire()) {
+			saveKnownPosts()
+			saveKnownPostReplies()
+		}
 	}
 
 	override fun doStart() {
@@ -311,15 +316,17 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 					}
 
 	private fun saveKnownPosts() =
-			try {
-				readLock.withLock {
-					knownPosts.forEachIndexed { index, knownPostId ->
-						configuration.getStringValue("KnownPosts/$index/ID").value = knownPostId
+			saveKnownPostsRateLimiter.tryAcquire().ifTrue {
+				try {
+					readLock.withLock {
+						knownPosts.forEachIndexed { index, knownPostId ->
+							configuration.getStringValue("KnownPosts/$index/ID").value = knownPostId
+						}
+						configuration.getStringValue("KnownPosts/${knownPosts.size}/ID").value = null
 					}
-					configuration.getStringValue("KnownPosts/${knownPosts.size}/ID").value = null
+				} catch (ce1: ConfigurationException) {
+					throw DatabaseException("Could not save database.", ce1)
 				}
-			} catch (ce1: ConfigurationException) {
-				throw DatabaseException("Could not save database.", ce1)
 			}
 
 	private fun loadKnownPostReplies(): Unit =
@@ -331,15 +338,17 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			}
 
 	private fun saveKnownPostReplies() =
-			try {
-				readLock.withLock {
-					knownPostReplies.forEachIndexed { index, knownPostReply ->
-						configuration.getStringValue("KnownReplies/$index/ID").value = knownPostReply
+			saveKnownPostRepliesRateLimiter.tryAcquire().ifTrue {
+				try {
+					readLock.withLock {
+						knownPostReplies.forEachIndexed { index, knownPostReply ->
+							configuration.getStringValue("KnownReplies/$index/ID").value = knownPostReply
+						}
+						configuration.getStringValue("KnownReplies/${knownPostReplies.size}/ID").value = null
 					}
-					configuration.getStringValue("KnownReplies/${knownPostReplies.size}/ID").value = null
+				} catch (ce1: ConfigurationException) {
+					throw DatabaseException("Could not save database.", ce1)
 				}
-			} catch (ce1: ConfigurationException) {
-				throw DatabaseException("Could not save database.", ce1)
 			}
 
 }

@@ -64,30 +64,9 @@
 					<input type="hidden" name="reply" value="<% reply.id|html>" />
 					<button type="submit" value="1"><%= View.Post.UnlikeLink|l10n|html></button>
 				</form>
-				<%if !reply.sone.current>
-					<%ifnull !reply.sone.trust>
-						<span class='separator'>·</span>
-						<form class="trust reply-trust<%if reply.sone.trust.assigned> hidden<%/if>" action="trust.html" method="post">
-							<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-							<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-							<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
-							<button type="submit" title="<%= View.Trust.Tooltip.Trust|l10n|html>">✓</button>
-						</form>
-						<form class="distrust reply-distrust<%if reply.sone.trust.assigned> hidden<%/if>" action="distrust.html" method="post">
-							<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-							<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-							<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
-							<button type="submit" title="<%= View.Trust.Tooltip.Distrust|l10n|html>">✗</button>
-						</form>
-						<form class="untrust reply-untrust<%if !reply.sone.trust.assigned> hidden<%/if>" action="untrust.html" method="post">
-							<input type="hidden" name="formPassword" value="<% formPassword|html>" />
-							<input type="hidden" name="returnPage" value="<% request.uri|html>" />
-							<input type="hidden" name="sone" value="<% reply.sone.id|html>" />
-							<button type="submit" title="<%= View.Trust.Tooltip.Untrust|l10n|html>">↶</button>
-						</form>
-					<%/if>
-				<%/if>
 			<%/if>
+			<span class='separator'>·</span>
+			<a class="wot-link" href="/WebOfTrust/ShowIdentity?id=<% reply.sone.id|html>"><%= View.Post.WebOfTrustLink|l10n|html></a>
 			<%if reply.sone.local>
 				<span class='separator'>·</span>
 				<form class="delete delete-reply" action="deleteReply.html" method="post">

@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
 import freenet.clients.http.SessionManager.*
-import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.util.web.*
@@ -19,9 +18,8 @@ class FreenetRequestTest {
 	private val method = Method.GET
 	private val httpRequest = mock(HTTPRequest::class.java)
 	private val toadletContext = mock(ToadletContext::class.java)
-	private val l10n = mock<BaseL10n>()
 	private val sessionManager = mock<SessionManager>()
-	private val request = FreenetRequest(uri, method, httpRequest, toadletContext, l10n, sessionManager)
+	private val request = FreenetRequest(uri, method, httpRequest, toadletContext, sessionManager)
 
 	@Test
 	fun `uri is retained correctly`() {
@@ -41,11 +39,6 @@ class FreenetRequestTest {
 	@Test
 	fun `toadlet context is retained correctly`() {
 		assertThat(request.toadletContext, equalTo(toadletContext))
-	}
-
-	@Test
-	fun `l10n is retained correctly`() {
-		assertThat(request.l10n, equalTo(l10n))
 	}
 
 	@Test

@@ -1,5 +1,5 @@
 /*
- * Sone - FreenetInterface.java - Copyright © 2010–2019 David Roden
+ * Sone - FreenetInterface.java - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ import static freenet.keys.USK.create;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.freenet.Key.routingKey;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -75,6 +74,7 @@ import freenet.support.api.Bucket;
 import freenet.support.api.RandomAccessBucket;
 import freenet.support.io.ArrayBucket;
 import freenet.support.io.ResumeFailedException;
+import net.pterodactylus.sone.freenet.*;
 
 /**
  * Contains all necessary functionality for interacting with the Freenet node.
@@ -255,7 +255,7 @@ public class FreenetInterface {
 	public void registerActiveUsk(FreenetURI requestUri,
 			USKCallback uskCallback) {
 		try {
-			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			soneUskCallbacks.put(FreenetURIsKt.getRoutingKeyString(requestUri), uskCallback);
 			node.clientCore.uskManager.subscribe(create(requestUri),
 					uskCallback, true, requestClient);
 		} catch (MalformedURLException mue1) {
@@ -267,7 +267,7 @@ public class FreenetInterface {
 	public void registerPassiveUsk(FreenetURI requestUri,
 			USKCallback uskCallback) {
 		try {
-			soneUskCallbacks.put(routingKey(requestUri), uskCallback);
+			soneUskCallbacks.put(FreenetURIsKt.getRoutingKeyString(requestUri), uskCallback);
 			node.clientCore
 					.uskManager
 					.subscribe(create(requestUri), uskCallback, false, requestClient);
@@ -327,7 +327,7 @@ public class FreenetInterface {
 		};
 		try {
 			node.clientCore.uskManager.subscribe(USK.create(uri), uskCallback, true, requestClient);
-			uriUskCallbacks.put(uri, uskCallback);
+			uriUskCallbacks.put(USK.create(uri).clearCopy().getURI(), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.WARNING, String.format("Could not subscribe to USK: %s", uri), mue1);
 		}
@@ -340,12 +340,12 @@ public class FreenetInterface {
 	 *            The URI to unregister the USK watcher for
 	 */
 	public void unregisterUsk(FreenetURI uri) {
-		USKCallback uskCallback = uriUskCallbacks.remove(uri);
-		if (uskCallback == null) {
-			logger.log(Level.INFO, String.format("Could not unregister unknown USK: %s", uri));
-			return;
-		}
 		try {
+			USKCallback uskCallback = uriUskCallbacks.remove(USK.create(uri).clearCopy().getURI());
+			if (uskCallback == null) {
+				logger.log(Level.INFO, String.format("Could not unregister unknown USK: %s", uri));
+				return;
+			}
 			node.clientCore.uskManager.unsubscribe(USK.create(uri), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.INFO, String.format("Could not unregister invalid USK: %s", uri), mue1);

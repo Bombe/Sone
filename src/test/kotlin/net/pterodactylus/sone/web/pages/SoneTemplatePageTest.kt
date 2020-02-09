@@ -31,7 +31,7 @@ class SoneTemplatePageTest : WebPageTest({ webInterface, loaders, templateRender
 	@Test
 	fun `page title is retrieved from l10n if page title key is given`() {
 		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "page.title", requiresLogin = false).let { page ->
-			whenever(l10n.getString("page.title")).thenReturn("Page Title")
+			addTranslation("page.title", "Page Title")
 			assertThat(page.getPageTitle(soneRequest), equalTo("Page Title"))
 		}
 	}

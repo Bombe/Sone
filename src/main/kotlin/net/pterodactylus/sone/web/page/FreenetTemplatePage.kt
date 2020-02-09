@@ -1,5 +1,5 @@
 /*
- * Sone - FreenetTemplatePage.kt - Copyright © 2010–2019 David Roden
+ * Sone - FreenetTemplatePage.kt - Copyright © 2010–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -97,6 +97,9 @@ open class FreenetTemplatePage(
 	open fun processTemplate(request: FreenetRequest, templateContext: TemplateContext) {
 		/* do nothing. */
 	}
+
+	fun redirectTo(target: String?): Nothing =
+			throw RedirectException(target)
 
 	class RedirectException(val target: String?) : Exception() {
 		override fun toString(): String = format("RedirectException{target='%s'}", target)

@@ -1,5 +1,5 @@
 /*
- * Sone - Matchers.java - Copyright © 2013–2019 David Roden
+ * Sone - Matchers.java - Copyright © 2013–2020 David Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@ import static java.util.regex.Pattern.compile;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import javax.annotation.*;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Image;
@@ -91,8 +93,7 @@ public class Matchers {
 		};
 	}
 
-	public static Matcher<Post> isPost(String postId, long time,
-			String text, Optional<String> recipient) {
+	public static Matcher<Post> isPost(String postId, long time, String text, @Nullable String recipient) {
 		return new PostMatcher(postId, time, text, recipient);
 	}
 
@@ -229,10 +230,10 @@ public class Matchers {
 		private final String postId;
 		private final long time;
 		private final String text;
-		private final Optional<String> recipient;
+		@Nullable
+		private final String recipient;
 
-		private PostMatcher(String postId, long time, String text,
-				Optional<String> recipient) {
+		private PostMatcher(String postId, long time, String text, @Nullable String recipient) {
 			this.postId = postId;
 			this.time = time;
 			this.text = text;
@@ -257,15 +258,15 @@ public class Matchers {
 						.appendValue(text);
 				return false;
 			}
-			if (recipient.isPresent()) {
+			if (recipient != null) {
 				if (!post.getRecipientId().isPresent()) {
 					mismatchDescription.appendText(
 							"Recipient not present");
 					return false;
 				}
-				if (!post.getRecipientId().get().equals(recipient.get())) {
+				if (!post.getRecipientId().get().equals(recipient)) {
 					mismatchDescription.appendText("Recipient is not ")
-							.appendValue(recipient.get());
+							.appendValue(recipient);
 					return false;
 				}
 			} else {
@@ -283,9 +284,9 @@ public class Matchers {
 					.appendValue(postId);
 			description.appendText(", created at @").appendValue(time);
 			description.appendText(", text ").appendValue(text);
-			if (recipient.isPresent()) {
+			if (recipient != null) {
 				description.appendText(", directed at ")
-						.appendValue(recipient.get());
+						.appendValue(recipient);
 			}
 		}
 

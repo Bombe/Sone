@@ -19,7 +19,7 @@ class UnlockSonePage @Inject constructor(webInterface: WebInterface, loaders: Lo
 			soneRequest.parameters["sone", 44]
 					.let(soneRequest.core::getLocalSone)
 					?.also(soneRequest.core::unlockSone)
-			throw RedirectException(soneRequest.parameters["returnPage", 256])
+			redirectTo(soneRequest.parameters["returnPage", 256])
 		}
 	}
 

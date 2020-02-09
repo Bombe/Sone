@@ -73,7 +73,7 @@ class KnownSonesPageTest : WebPageTest(::KnownSonesPage) {
 
 	@Test
 	fun `page returns correct title`() {
-		whenever(l10n.getString("Page.KnownSones.Title")).thenReturn("known sones page title")
+		addTranslation("Page.KnownSones.Title", "known sones page title")
 		assertThat(page.getPageTitle(soneRequest), equalTo("known sones page title"))
 	}
 

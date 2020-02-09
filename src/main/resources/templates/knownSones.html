@@ -2,14 +2,14 @@
 
 	<div class="page-id hidden">known-sones</div>
 
-	<script language="javascript">
+	<script type="application/javascript">
 
 		$(document).ready(function() {
 			$("select[name=sort]").change(function() {
-				value = $(this).val();
-				if ((value == "activity") || (value == "posts") || (value == "images")) {
+				const value = $(this).val();
+				if ((value === "activity") || (value === "posts") || (value === "images")) {
 					$("select[name=order]").val("desc");
-				} else if (value == "name") {
+				} else if (value === "name") {
 					$("select[name=order]").val("asc");
 				}
 			});
