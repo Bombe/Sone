@@ -6,7 +6,7 @@ plugins {
 }
 
 group = 'net.pterodactylus'
-version = '80'
+version = '81'
 
 repositories {
      mavenCentral()
