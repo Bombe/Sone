@@ -1,5 +1,5 @@
 /**
- * Sone - SoneLockedOnStartupNotificationTest.kt - Copyright © 2019 David ‘Bombe’ Roden
+ * Sone - SoneLockedOnStartupHandlerTest.kt - Copyright © 2019 David ‘Bombe’ Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
