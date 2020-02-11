@@ -43,6 +43,10 @@ class FreenetInterfaceTest {
 	@JvmField
 	val expectionException: ExpectedException = ExpectedException.none()
 
+	@Rule
+	@JvmField
+	val silencedLogging = silencedLogging()
+
 	@Suppress("UnstableApiUsage")
 	private val eventBus = mock<EventBus>()
 	private val node = mock<Node>()
