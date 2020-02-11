@@ -32,6 +32,7 @@ val remoteSone2 = createRemoteSone()
 val localSone1 = createLocalSone()
 val localSone2 = createLocalSone()
 
+val createRequestUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri
 val createInsertUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyRandomSource(), "").insertURI
 fun createId() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri.routingKey.asFreenetBase64
 
