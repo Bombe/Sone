@@ -1,13 +1,16 @@
 package net.pterodactylus.sone.core
 
+import com.google.inject.Guice
 import net.pterodactylus.sone.data.impl.IdOnlySone
 import net.pterodactylus.sone.freenet.wot.DefaultIdentity
 import net.pterodactylus.sone.freenet.wot.DefaultOwnIdentity
 import net.pterodactylus.sone.test.createInsertUri
 import net.pterodactylus.sone.test.createRequestUri
+import net.pterodactylus.sone.test.getInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.emptyArray
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import kotlin.test.Test
 
@@ -67,6 +70,12 @@ class SoneUriCreatorTest {
 	@Test
 	fun `generated insert URI has correct edition`() {
 		assertThat(insertUri!!.suggestedEdition, equalTo(123L))
+	}
+
+	@Test
+	fun `creator can be created by guice`() {
+		val injector = Guice.createInjector()
+		assertThat(injector.getInstance<SoneUriCreator>(), notNullValue())
 	}
 
 }
