@@ -104,14 +104,6 @@ public class FreenetInterface {
 	private final RequestClient imageInserts = new RequestClientBuilder().realTime().build();
 	private final RequestClient imageLoader = new RequestClientBuilder().realTime().build();
 
-	/**
-	 * Creates a new Freenet interface.
-	 *
-	 * @param eventBus
-	 *            The event bus
-	 * @param node
-	 *            The node to interact with
-	 */
 	@Inject
 	public FreenetInterface(EventBus eventBus, Node node) {
 		this.eventBus = eventBus;
