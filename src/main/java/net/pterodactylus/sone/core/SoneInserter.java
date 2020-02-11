@@ -27,12 +27,12 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +49,7 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.service.AbstractService;
@@ -237,7 +238,7 @@ public class SoneInserter extends AbstractService {
 						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
 						Stopwatch stopwatch = Stopwatch.createStarted();
-						FreenetURI finalUri = freenetInterface.insertDirectory(sone.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+						FreenetURI finalUri = freenetInterface.insertDirectory(getSoneInsertUri(sone), insertInformation.generateManifestEntries(), "index.html");
 						stopwatch.stop();
 						soneInsertDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
 						eventBus.post(new SoneInsertedEvent(sone, stopwatch.elapsed(MILLISECONDS), insertInformation.getFingerprint()));
@@ -283,6 +284,14 @@ public class SoneInserter extends AbstractService {
 	@Subscribe
 	public void insertionDelayChanged(InsertionDelayChangedEvent insertionDelayChangedEvent) {
 		setInsertionDelay(insertionDelayChangedEvent.getInsertionDelay());
+	}
+
+	private FreenetURI getSoneInsertUri(Sone sone) throws MalformedURLException {
+		return new FreenetURI(((OwnIdentity) sone.getIdentity()).getInsertUri())
+				.setKeyType("USK")
+				.setDocName("Sone")
+				.setMetaString(new String[0])
+				.setSuggestedEdition(sone.getLatestEdition());
 	}
 
 	/**

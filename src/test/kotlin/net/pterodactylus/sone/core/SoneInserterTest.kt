@@ -10,6 +10,7 @@ import freenet.keys.*
 import net.pterodactylus.sone.core.SoneInserter.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
@@ -55,8 +56,9 @@ class SoneInserterTest {
 	}
 
 	private fun createSone(insertUri: FreenetURI, fingerprint: String = "fingerprint"): Sone {
+		val ownIdentity = DefaultOwnIdentity("", "", "", insertUri.toString())
 		val sone = mock<Sone>()
-		whenever(sone.insertUri).thenReturn(insertUri)
+		whenever(sone.identity).thenReturn(ownIdentity)
 		whenever(sone.fingerprint).thenReturn(fingerprint)
 		whenever(sone.rootAlbum).thenReturn(mock())
 		whenever(core.getSone(anyString())).thenReturn(sone)
@@ -94,12 +96,11 @@ class SoneInserterTest {
 
 	@Test
 	fun `sone inserter inserts a sone if it is eligible`() {
-		val insertUri = mock<FreenetURI>()
 		val finalUri = mock<FreenetURI>()
 		val sone = createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
-		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenReturn(finalUri)
+		whenever(freenetInterface.insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenReturn(finalUri)
 		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		doAnswer {
 			soneInserter.stop()
@@ -107,7 +108,7 @@ class SoneInserterTest {
 		}.whenever(core).touchConfiguration()
 		soneInserter.serviceRun()
 		val soneEvents = ArgumentCaptor.forClass(SoneEvent::class.java)
-		verify(freenetInterface).insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))
+		verify(freenetInterface).insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))
 		verify(eventBus, times(2)).post(soneEvents.capture())
 		assertThat(soneEvents.allValues[0], instanceOf(SoneInsertingEvent::class.java))
 		assertThat(soneEvents.allValues[0].sone, equalTo(sone))
@@ -117,19 +118,18 @@ class SoneInserterTest {
 
 	@Test
 	fun `sone inserter bails out if it is stopped while inserting`() {
-		val insertUri = mock<FreenetURI>()
 		val finalUri = mock<FreenetURI>()
 		val sone = createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
 		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
-		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
+		whenever(freenetInterface.insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
 			soneInserter.stop()
 			finalUri
 		}
 		soneInserter.serviceRun()
 		val soneEvents = ArgumentCaptor.forClass(SoneEvent::class.java)
-		verify(freenetInterface).insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))
+		verify(freenetInterface).insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))
 		verify(eventBus, times(2)).post(soneEvents.capture())
 		assertThat(soneEvents.allValues[0], instanceOf(SoneInsertingEvent::class.java))
 		assertThat(soneEvents.allValues[0].sone, equalTo(sone))
@@ -140,7 +140,6 @@ class SoneInserterTest {
 
 	@Test
 	fun `sone inserter does not insert sone if it is not eligible`() {
-		val insertUri = mock<FreenetURI>()
 		createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
@@ -154,25 +153,24 @@ class SoneInserterTest {
 			soneInserter.stop()
 		}).start()
 		soneInserter.serviceRun()
-		verify(freenetInterface, never()).insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))
+		verify(freenetInterface, never()).insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))
 		verify(eventBus, never()).post(argThat(org.hamcrest.Matchers.any(SoneEvent::class.java)))
 	}
 
 	@Test
 	fun `sone inserter posts aborted event if an exception occurs`() {
-		val insertUri = mock<FreenetURI>()
 		val sone = createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
 		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
 		val soneException = SoneException(Exception())
-		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
+		whenever(freenetInterface.insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
 			soneInserter.stop()
 			throw soneException
 		}
 		soneInserter.serviceRun()
 		val soneEvents = ArgumentCaptor.forClass(SoneEvent::class.java)
-		verify(freenetInterface).insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))
+		verify(freenetInterface).insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))
 		verify(eventBus, times(2)).post(soneEvents.capture())
 		assertThat(soneEvents.allValues[0], instanceOf(SoneInsertingEvent::class.java))
 		assertThat(soneEvents.allValues[0].sone, equalTo(sone))
@@ -241,12 +239,11 @@ class SoneInserterTest {
 
 	@Test
 	fun `successful insert updates metrics`() {
-		val insertUri = mock<FreenetURI>()
 		val finalUri = mock<FreenetURI>()
 		createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
-		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenReturn(finalUri)
+		whenever(freenetInterface.insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenReturn(finalUri)
 		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry,"SoneId", soneModificationDetector, 1)
 		doAnswer {
 			soneInserter.stop()
@@ -259,12 +256,11 @@ class SoneInserterTest {
 
 	@Test
 	fun `unsuccessful insert does not update histogram but records error`() {
-		val insertUri = mock<FreenetURI>()
 		createSone(insertUri)
 		val soneModificationDetector = mock<SoneModificationDetector>()
 		whenever(soneModificationDetector.isEligibleForInsert).thenReturn(true)
 		val soneInserter = SoneInserter(core, eventBus, freenetInterface, metricRegistry, "SoneId", soneModificationDetector, 1)
-		whenever(freenetInterface.insertDirectory(eq(insertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
+		whenever(freenetInterface.insertDirectory(eq(expectedInsertUri), any<HashMap<String, Any>>(), eq("index.html"))).thenAnswer {
 			soneInserter.stop()
 			throw SoneException(Exception())
 		}
@@ -276,3 +272,10 @@ class SoneInserterTest {
 	}
 
 }
+
+val insertUri = createInsertUri
+val expectedInsertUri: FreenetURI = FreenetURI(insertUri.toString())
+		.setKeyType("USK")
+		.setDocName("Sone")
+		.setMetaString(kotlin.emptyArray())
+		.setSuggestedEdition(0)
