@@ -4,7 +4,6 @@ import com.codahale.metrics.*
 import com.google.common.base.*
 import com.google.common.base.Optional
 import com.google.common.eventbus.*
-import com.google.common.io.ByteStreams.*
 import com.google.common.util.concurrent.MoreExecutors.*
 import freenet.keys.*
 import net.pterodactylus.sone.core.SoneInserter.*
@@ -210,7 +209,7 @@ class SoneInserterTest {
 		val manifestElement = manifestCreator.createManifestElement("test.txt", "plain/text; charset=utf-8", "sone-inserter-manifest.txt")
 		assertThat(manifestElement!!.name, equalTo("test.txt"))
 		assertThat(manifestElement.mimeTypeOverride, equalTo("plain/text; charset=utf-8"))
-		val templateContent = String(toByteArray(manifestElement.data.inputStream), Charsets.UTF_8)
+		val templateContent = String(manifestElement.data.inputStream.readBytes(), Charsets.UTF_8)
 		assertThat(templateContent, containsString("Sone Version: ${SonePlugin.getPluginVersion()}\n"))
 		assertThat(templateContent, containsString("Core Startup: $now\n"))
 		assertThat(templateContent, containsString("Sone ID: SoneId\n"))
