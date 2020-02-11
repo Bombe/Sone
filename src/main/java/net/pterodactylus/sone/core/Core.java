@@ -180,22 +180,6 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final MetricRegistry metricRegistry;
 	private final Histogram configurationSaveTimeHistogram;
 
-	/**
-	 * Creates a new core.
-	 *
-	 * @param configuration
-	 *            The configuration of the core
-	 * @param freenetInterface
-	 *            The freenet interface
-	 * @param identityManager
-	 *            The identity manager
-	 * @param webOfTrustUpdater
-	 *            The WebOfTrust updater
-	 * @param eventBus
-	 *            The event bus
-	 * @param database
-	 *            The database
-	 */
 	@Inject
 	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry) {
 		super("Sone Core");
