@@ -192,14 +192,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	FreenetURI getRequestUri();
 
 	/**
-	 * Returns the insert URI of this Sone.
-	 *
-	 * @return The insert URI of this Sone
-	 */
-	@Nullable
-	FreenetURI getInsertUri();
-
-	/**
 	 * Returns the latest edition of this Sone.
 	 *
 	 * @return The latest edition of this Sone

@@ -46,7 +46,6 @@ import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
 import freenet.keys.FreenetURI;
 
@@ -187,26 +186,6 @@ public class SoneImpl implements Sone {
 			throw new IllegalStateException(
 					format("Identity %s's request URI is incorrect.",
 							getIdentity()), e);
-		}
-	}
-
-	/**
-	 * Returns the insert URI of this Sone.
-	 *
-	 * @return The insert URI of this Sone
-	 */
-	@Nullable
-	public FreenetURI getInsertUri() {
-		if (!isLocal()) {
-			return null;
-		}
-		try {
-			return new FreenetURI(((OwnIdentity) getIdentity()).getInsertUri())
-					.setDocName("Sone")
-					.setMetaString(new String[0])
-					.setSuggestedEdition(latestEdition);
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(format("Own identity %s's insert URI is incorrect.", getIdentity()), e);
 		}
 	}
 
