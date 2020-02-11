@@ -216,7 +216,7 @@ class SoneInserterTest {
 	}
 
 	@Test
-	fun `invalid template returns anull manifest element`() {
+	fun `invalid template returns a null manifest element`() {
 		val soneProperties = HashMap<String, Any>()
 		val manifestCreator = ManifestCreator(core, soneProperties)
 		assertThat(manifestCreator.createManifestElement("test.txt",
