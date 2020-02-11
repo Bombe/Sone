@@ -228,4 +228,9 @@ class SoneModuleTest {
 		injector.verifySingletonInstance<TickerShutdown>()
 	}
 
+	@Test
+	fun `sone URI creator is created as singleton`() {
+		injector.verifySingletonInstance<SoneUriCreator>()
+	}
+
 }

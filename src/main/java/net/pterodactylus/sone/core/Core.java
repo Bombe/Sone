@@ -180,8 +180,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final MetricRegistry metricRegistry;
 	private final Histogram configurationSaveTimeHistogram;
 
+	private final SoneUriCreator soneUriCreator;
+
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry, SoneUriCreator soneUriCreator) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -193,6 +195,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.eventBus = eventBus;
 		this.database = database;
 		this.metricRegistry = metricRegistry;
+		this.soneUriCreator = soneUriCreator;
 		preferences = new Preferences(eventBus);
 		this.configurationSaveTimeHistogram = metricRegistry.histogram("configuration.save.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
@@ -610,7 +613,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
-		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, metricRegistry, ownIdentity.getId());
+		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, metricRegistry, soneUriCreator, ownIdentity.getId());
 		soneInserter.insertionDelayChanged(new InsertionDelayChangedEvent(preferences.getInsertionDelay()));
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {

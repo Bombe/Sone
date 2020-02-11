@@ -52,7 +52,8 @@ class CoreTest {
 		val eventBus = mock<EventBus>()
 		val database = mock<Database>()
 		val metricRegistry = MetricRegistry()
-		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database, metricRegistry)
+		val soneUriCreator = SoneUriCreator()
+		val core = Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database, metricRegistry, soneUriCreator)
 		val ownIdentity = mock<OwnIdentity>()
 		val identity = mock<Identity>()
 		whenever(identity.id).thenReturn("sone-id")
@@ -169,7 +170,8 @@ class CoreTest {
 		val webOfTrustUpdater = mock<WebOfTrustUpdater>()
 		val database = mock<Database>()
 		val metricRegistry = MetricRegistry()
-		return Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database, metricRegistry)
+		val soneUriCreator = SoneUriCreator()
+		return Core(configuration, freenetInterface, identityManager, soneDownloader, imageInserter, updateChecker, webOfTrustUpdater, eventBus, database, metricRegistry, soneUriCreator)
 	}
 
 }

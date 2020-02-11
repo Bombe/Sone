@@ -7,6 +7,7 @@ import com.google.inject.*
 import com.google.inject.matcher.*
 import com.google.inject.name.Names.*
 import com.google.inject.spi.*
+import net.pterodactylus.sone.core.SoneUriCreator
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.*
@@ -61,6 +62,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(MetricRegistry::class.java).`in`(Singleton::class.java)
 		bind(WebOfTrustConnector::class.java).to(PluginWebOfTrustConnector::class.java).`in`(Singleton::class.java)
 		bind(TickerShutdown::class.java).`in`(Singleton::class.java)
+		bind(SoneUriCreator::class.java).`in`(Singleton::class.java)
 
 		bindListener(Matchers.any(), object : TypeListener {
 			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {

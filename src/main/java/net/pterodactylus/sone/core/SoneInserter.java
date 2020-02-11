@@ -27,7 +27,6 @@ import java.io.Closeable;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +48,6 @@ import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.service.AbstractService;
@@ -107,6 +105,7 @@ public class SoneInserter extends AbstractService {
 	private final FreenetInterface freenetInterface;
 
 	private final SoneModificationDetector soneModificationDetector;
+	private final SoneUriCreator soneUriCreator;
 	private final long delay;
 	private final String soneId;
 	private final Histogram soneInsertDurationHistogram;
@@ -124,8 +123,8 @@ public class SoneInserter extends AbstractService {
 	 * @param soneId
 	 *            The ID of the Sone to insert
 	 */
-	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, final String soneId) {
-		this(core, eventBus, freenetInterface, metricRegistry, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
+	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, SoneUriCreator soneUriCreator, final String soneId) {
+		this(core, eventBus, freenetInterface, metricRegistry, soneUriCreator, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
 			@Override
 			public boolean isLocked() {
 				Sone sone = core.getSone(soneId);
@@ -147,13 +146,14 @@ public class SoneInserter extends AbstractService {
 	}
 
 	@VisibleForTesting
-	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, SoneUriCreator soneUriCreator, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
 		super("Sone Inserter for “" + soneId + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.soneInsertDurationHistogram = metricRegistry.histogram("sone.insert.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 		this.soneInsertErrorMeter = metricRegistry.meter("sone.insert.errors");
+		this.soneUriCreator = soneUriCreator;
 		this.soneId = soneId;
 		this.soneModificationDetector = soneModificationDetector;
 		this.delay = delay;
@@ -238,7 +238,7 @@ public class SoneInserter extends AbstractService {
 						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
 						Stopwatch stopwatch = Stopwatch.createStarted();
-						FreenetURI finalUri = freenetInterface.insertDirectory(getSoneInsertUri(sone), insertInformation.generateManifestEntries(), "index.html");
+						FreenetURI finalUri = freenetInterface.insertDirectory(soneUriCreator.getInsertUri(sone), insertInformation.generateManifestEntries(), "index.html");
 						stopwatch.stop();
 						soneInsertDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
 						eventBus.post(new SoneInsertedEvent(sone, stopwatch.elapsed(MILLISECONDS), insertInformation.getFingerprint()));
@@ -284,14 +284,6 @@ public class SoneInserter extends AbstractService {
 	@Subscribe
 	public void insertionDelayChanged(InsertionDelayChangedEvent insertionDelayChangedEvent) {
 		setInsertionDelay(insertionDelayChangedEvent.getInsertionDelay());
-	}
-
-	private FreenetURI getSoneInsertUri(Sone sone) throws MalformedURLException {
-		return new FreenetURI(((OwnIdentity) sone.getIdentity()).getInsertUri())
-				.setKeyType("USK")
-				.setDocName("Sone")
-				.setMetaString(new String[0])
-				.setSuggestedEdition(sone.getLatestEdition());
 	}
 
 	/**
