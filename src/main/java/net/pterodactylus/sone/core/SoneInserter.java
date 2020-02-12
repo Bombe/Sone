@@ -23,10 +23,7 @@ import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
-import java.io.Closeable;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +46,6 @@ import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -378,19 +374,13 @@ public class SoneInserter extends AbstractService {
 		}
 
 		public ManifestElement createManifestElement(String name, String contentType, String templateName) {
-			InputStreamReader templateInputStreamReader = null;
-			InputStream templateInputStream = null;
 			Template template;
-			try {
-				templateInputStream = getClass().getResourceAsStream(templateName);
-				templateInputStreamReader = new InputStreamReader(templateInputStream, utf8Charset);
+			try (InputStream templateInputStream = getClass().getResourceAsStream(templateName);
+					InputStreamReader templateInputStreamReader = new InputStreamReader(templateInputStream, utf8Charset)) {
 				template = TemplateParser.parse(templateInputStreamReader);
-			} catch (TemplateException te1) {
-				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), te1);
+			} catch (IOException | TemplateException e1) {
+				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), e1);
 				return null;
-			} finally {
-				Closer.close(templateInputStreamReader);
-				Closer.close(templateInputStream);
 			}
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
@@ -398,17 +388,14 @@ public class SoneInserter extends AbstractService {
 			templateContext.set("currentSone", soneProperties);
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.getPluginVersion());
-			StringWriter writer = new StringWriter();
-			try {
+			try (StringWriter writer = new StringWriter()) {
 				template.render(templateContext, writer);
 				RandomAccessBucket bucket = new ArrayBucket(writer.toString().getBytes(Charsets.UTF_8));
 				buckets.add(bucket);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
-			} catch (TemplateException te1) {
-				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), te1);
+			} catch (IOException | TemplateException e1) {
+				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), e1);
 				return null;
-			} finally {
-				Closer.close(writer);
 			}
 		}
 
