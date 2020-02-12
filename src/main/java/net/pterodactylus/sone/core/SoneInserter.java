@@ -307,7 +307,6 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
 			soneProperties.put("time", currentTimeMillis());
-			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", Ordering.from(Post.NEWEST_FIRST).sortedCopy(sone.getPosts()));
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
