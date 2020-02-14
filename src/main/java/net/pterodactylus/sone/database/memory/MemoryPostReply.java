@@ -177,4 +177,17 @@ class MemoryPostReply implements PostReply {
 		return memoryPostReply.id.equals(id);
 	}
 
+	@Override
+	public String toString() {
+		return "MemoryPostReply{" +
+				"database=" + database +
+				", soneProvider=" + soneProvider +
+				", id='" + id + '\'' +
+				", soneId='" + soneId + '\'' +
+				", time=" + time +
+				", text='" + text + '\'' +
+				", postId='" + postId + '\'' +
+				'}';
+	}
+
 }
