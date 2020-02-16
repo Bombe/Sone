@@ -17,12 +17,13 @@
 
 package net.pterodactylus.sone.template;
 
+import static net.pterodactylus.sone.data.SoneKt.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*;
 import net.pterodactylus.util.template.Accessor;
 import net.pterodactylus.util.template.ReflectionAccessor;
 import net.pterodactylus.util.template.TemplateContext;
@@ -52,7 +53,7 @@ public class CollectionAccessor extends ReflectionAccessor {
 				}
 				sones.add((Sone) sone);
 			}
-			Collections.sort(sones, Sone.NICE_NAME_COMPARATOR);
+			sones.sort(niceNameComparator());
 			StringBuilder soneNames = new StringBuilder();
 			for (Sone sone : sones) {
 				if (soneNames.length() > 0) {

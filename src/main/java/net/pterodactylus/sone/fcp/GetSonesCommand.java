@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.fcp;
 
+import static net.pterodactylus.sone.data.SoneKt.*;
 import static net.pterodactylus.sone.fcp.AbstractSoneCommandKt.encodeSones;
 
 import java.util.ArrayList;
@@ -24,7 +25,8 @@ import java.util.Collections;
 import java.util.List;
 
 import net.pterodactylus.sone.core.Core;
-import net.pterodactylus.sone.data.Sone;
+import net.pterodactylus.sone.data.*;
+
 import freenet.support.SimpleFieldSet;
 
 /**
@@ -53,7 +55,7 @@ public class GetSonesCommand extends AbstractSoneCommand {
 		if (sones.size() < startSone) {
 			return new Response("Sones", encodeSones(Collections.<Sone> emptyList(), "Sones."));
 		}
-		Collections.sort(sones, Sone.NICE_NAME_COMPARATOR);
+		sones.sort(niceNameComparator());
 		return new Response("Sones", encodeSones(sones.subList(startSone, (maxSones == -1) ? sones.size() : Math.min(startSone + maxSones, sones.size())), "Sones."));
 	}
 

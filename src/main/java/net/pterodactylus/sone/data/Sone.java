@@ -32,7 +32,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.template.SoneAccessor;
 
 import freenet.keys.FreenetURI;
 
@@ -62,20 +61,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		/** The Sone is currently being downloaded. */
 		downloading,
 	}
-
-	/** comparator that sorts Sones by their nice name. */
-	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
-
-		@Override
-		public int compare(Sone leftSone, Sone rightSone) {
-			int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
-			if (diff != 0) {
-				return diff;
-			}
-			return leftSone.getId().compareToIgnoreCase(rightSone.getId());
-		}
-
-	};
 
 	/** Comparator that sorts Sones by last activity (least recent active first). */
 	public static final Comparator<Sone> LAST_ACTIVITY_COMPARATOR = new Comparator<Sone>() {

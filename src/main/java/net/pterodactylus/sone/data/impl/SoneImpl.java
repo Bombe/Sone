@@ -21,6 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.data.SoneKt.*;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -665,7 +666,7 @@ public class SoneImpl implements Sone {
 	/** {@inheritDoc} */
 	@Override
 	public int compareTo(Sone sone) {
-		return NICE_NAME_COMPARATOR.compare(this, sone);
+		return niceNameComparator().compare(this, sone);
 	}
 
 	//
