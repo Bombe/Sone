@@ -48,3 +48,6 @@ val postCountComparator: Comparator<Sone> =
 		comparing<Sone, Int> { it.posts.size }
 				.thenComparing<Int> { it.replies.size }
 				.reversed()
+
+val imageCountComparator: Comparator<Sone> =
+		comparing<Sone, Int> { it.rootAlbum.allImages.size }.reversed()

@@ -120,4 +120,26 @@ class SoneTest {
 		assertThat(postCountComparator.compare(sone1, sone2), equalTo(0))
 	}
 
+	@Test
+	fun `image count comparator sorts Sones correctly if number of images is different`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getRootAlbum() = AlbumImpl(this).also { it.addImage(createImage(this)) }
+		}
+		val sone2 = object : IdOnlySone("2") {
+			override fun getRootAlbum() = AlbumImpl(this).also { it.addImage(createImage(this)); it.addImage(createImage(this)) }
+		}
+		assertThat(imageCountComparator.compare(sone1, sone2), greaterThan(0))
+	}
+
+	@Test
+	fun `image count comparator treats Sones as equal if number of images is the same`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getRootAlbum() = AlbumImpl(this).also { it.addImage(createImage(this)) }
+		}
+		val sone2 = object : IdOnlySone("2") {
+			override fun getRootAlbum() = AlbumImpl(this).also { it.addImage(createImage(this)) }
+		}
+		assertThat(imageCountComparator.compare(sone1, sone2), equalTo(0))
+	}
+
 }

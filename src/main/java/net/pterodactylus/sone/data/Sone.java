@@ -18,13 +18,11 @@
 package net.pterodactylus.sone.data;
 
 import static com.google.common.collect.FluentIterable.from;
-import static java.util.Arrays.asList;
 import static net.pterodactylus.sone.data.Album.FLATTENER;
 import static net.pterodactylus.sone.data.Album.IMAGES;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -36,7 +34,6 @@ import net.pterodactylus.sone.freenet.wot.Identity;
 import freenet.keys.FreenetURI;
 
 import com.google.common.base.Function;
-import com.google.common.primitives.Ints;
 
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
@@ -61,21 +58,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		/** The Sone is currently being downloaded. */
 		downloading,
 	}
-
-	/** Comparator that sorts Sones by number of images (descending). */
-	public static final Comparator<Sone> IMAGE_COUNT_COMPARATOR = new Comparator<Sone>() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compare(Sone leftSone, Sone rightSone) {
-			int rightSoneImageCount = from(asList(rightSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
-			int leftSoneImageCount = from(asList(leftSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
-			/* sort descending. */
-			return Ints.compare(rightSoneImageCount, leftSoneImageCount);
-		}
-	};
 
 	public static final Function<Sone, List<Album>> toAllAlbums = new Function<Sone, List<Album>>() {
 		@Override

@@ -61,3 +61,6 @@ fun emptyPostReply(text: String = "", post: Post? = createPost(), sone: Sone = r
 	override fun isKnown() = known
 	override fun setKnown(known: Boolean): PostReply = this
 }
+
+fun createImage(sone: Sone): Image =
+		ImageImpl().modify().setSone(sone).update()
