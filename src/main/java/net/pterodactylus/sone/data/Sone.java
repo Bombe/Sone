@@ -32,13 +32,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.template.SoneAccessor;
 
 import freenet.keys.FreenetURI;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.primitives.Ints;
 
 /**
@@ -112,34 +110,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 			int leftSoneImageCount = from(asList(leftSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
 			/* sort descending. */
 			return Ints.compare(rightSoneImageCount, leftSoneImageCount);
-		}
-	};
-
-	/** Filter to remove Sones that have not been downloaded. */
-	public static final Predicate<Sone> EMPTY_SONE_FILTER = new Predicate<Sone>() {
-
-		@Override
-		public boolean apply(Sone sone) {
-			return (sone != null) && (sone.getTime() != 0);
-		}
-	};
-
-	/** Filter that matches all {@link Sone#isLocal() local Sones}. */
-	public static final Predicate<Sone> LOCAL_SONE_FILTER = new Predicate<Sone>() {
-
-		@Override
-		public boolean apply(Sone sone) {
-			return (sone != null) && (sone.getIdentity() instanceof OwnIdentity);
-		}
-
-	};
-
-	/** Filter that matches Sones that have at least one album. */
-	public static final Predicate<Sone> HAS_ALBUM_FILTER = new Predicate<Sone>() {
-
-		@Override
-		public boolean apply(Sone sone) {
-			return (sone != null) && !sone.getRootAlbum().getAlbums().isEmpty();
 		}
 	};
 
