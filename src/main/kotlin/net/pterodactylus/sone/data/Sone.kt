@@ -37,3 +37,14 @@ val niceNameComparator: Comparator<Sone> =
 @get:JvmName("lastActivityComparator") // TODO: remove once Sone is 100% Kotlin
 val lastActivityComparator: Comparator<Sone> =
 		comparing(Sone::getTime).reversed()
+
+/**
+ * Comparator that sorts Sones by their [post count][Sone.getPosts] (most posts
+ * first) and, failing that, by their [reply count][Sone.getReplies] (most
+ * replies first).
+ */
+@get:JvmName("postCountComparator") // TODO: remove once Sone is 100% Kotlin
+val postCountComparator: Comparator<Sone> =
+		comparing<Sone, Int> { it.posts.size }
+				.thenComparing<Int> { it.replies.size }
+				.reversed()

@@ -30,7 +30,7 @@ class KnownSonesPage @Inject constructor(webInterface: WebInterface, loaders: Lo
 							when (soneRequest.parameters["sort"]) {
 								"images" -> Sone.IMAGE_COUNT_COMPARATOR
 								"name" -> niceNameComparator.reversed()
-								"posts" -> Sone.POST_COUNT_COMPARATOR
+								"posts" -> postCountComparator
 								else -> lastActivityComparator
 							}.let { comparator ->
 								when (soneRequest.parameters["order"]) {

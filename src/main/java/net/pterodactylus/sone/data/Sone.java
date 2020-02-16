@@ -62,18 +62,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		downloading,
 	}
 
-	/** Comparator that sorts Sones by numbers of posts (descending). */
-	public static final Comparator<Sone> POST_COUNT_COMPARATOR = new Comparator<Sone>() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compare(Sone leftSone, Sone rightSone) {
-			return (leftSone.getPosts().size() != rightSone.getPosts().size()) ? (rightSone.getPosts().size() - leftSone.getPosts().size()) : (rightSone.getReplies().size() - leftSone.getReplies().size());
-		}
-	};
-
 	/** Comparator that sorts Sones by number of images (descending). */
 	public static final Comparator<Sone> IMAGE_COUNT_COMPARATOR = new Comparator<Sone>() {
 
