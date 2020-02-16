@@ -22,6 +22,12 @@ tasks.withType(JavaCompile) {
 	options.encoding = 'UTF-8'
 }
 
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
 configurations {
     provided {
         dependencies.all { dep ->
