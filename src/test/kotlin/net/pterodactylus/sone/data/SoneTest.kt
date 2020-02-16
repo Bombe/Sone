@@ -29,6 +29,39 @@ import kotlin.test.*
 class SoneTest {
 
 	@Test
+	fun `nice name comparator correctly compares Sones by their nice name`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getProfile() = Profile(this).apply { firstName = "Left" }
+		}
+		val sone2 = object : IdOnlySone("2") {
+			override fun getProfile() = Profile(this).apply { firstName = "Right" }
+		}
+		assertThat(niceNameComparator.compare(sone1, sone2), lessThan(0))
+	}
+
+	@Test
+	fun `nice name comparator correctly compares Sones by their ID if nice name is the same`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getProfile() = Profile(this).apply { firstName = "Left" }
+		}
+		val sone2 = object : IdOnlySone("2") {
+			override fun getProfile() = Profile(this).apply { firstName = "Left" }
+		}
+		assertThat(niceNameComparator.compare(sone1, sone2), lessThan(0))
+	}
+
+	@Test
+	fun `nice name comparator treats Sones as equal if nice name and ID are the same`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getProfile() = Profile(this).apply { firstName = "Left" }
+		}
+		val sone2 = object : IdOnlySone("1") {
+			override fun getProfile() = Profile(this).apply { firstName = "Left" }
+		}
+		assertThat(niceNameComparator.compare(sone1, sone2), equalTo(0))
+	}
+
+	@Test
 	fun `post count comparator sorts sones with different number of posts correctly`() {
 		val sone1 = object : IdOnlySone("1") {
 			override fun getPosts() = listOf(createPost(), createPost())
