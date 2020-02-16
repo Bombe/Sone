@@ -29,3 +29,11 @@ private val caseInsensitiveCompare = { left: String, right: String -> left.compa
 @get:JvmName("niceNameComparator") // TODO: remove once Sone is 100% Kotlin
 val niceNameComparator: Comparator<Sone> =
 		comparing(SoneAccessor::getNiceName, caseInsensitiveCompare).thenComparing(Sone::id)
+
+/**
+ * Comparator that sorts Sones by their [last activity][Sone.getTime], least
+ * recently active Sones first.
+ */
+@get:JvmName("lastActivityComparator") // TODO: remove once Sone is 100% Kotlin
+val lastActivityComparator: Comparator<Sone> =
+		comparing(Sone::getTime).reversed()

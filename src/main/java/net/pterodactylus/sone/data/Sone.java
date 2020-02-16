@@ -62,15 +62,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		downloading,
 	}
 
-	/** Comparator that sorts Sones by last activity (least recent active first). */
-	public static final Comparator<Sone> LAST_ACTIVITY_COMPARATOR = new Comparator<Sone>() {
-
-		@Override
-		public int compare(Sone firstSone, Sone secondSone) {
-			return (int) Math.min(Integer.MAX_VALUE, Math.max(Integer.MIN_VALUE, secondSone.getTime() - firstSone.getTime()));
-		}
-	};
-
 	/** Comparator that sorts Sones by numbers of posts (descending). */
 	public static final Comparator<Sone> POST_COUNT_COMPARATOR = new Comparator<Sone>() {
 
