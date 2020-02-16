@@ -47,7 +47,7 @@ class OptionalsTest {
 	}
 
 	@Test
-	fun `null as optional is asent optional`() {
+	fun `null as optional is absent optional`() {
 		val optional = null.asOptional()
 		assertThat(optional.isPresent, equalTo(false))
 	}
