@@ -62,6 +62,28 @@ class SoneTest {
 	}
 
 	@Test
+	fun `last activity comparator correctly compares Sones by last activity`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getTime() = 1000L
+		}
+		val sone2 = object : IdOnlySone("2") {
+			override fun getTime() = 2000L
+		}
+		assertThat(lastActivityComparator.compare(sone1, sone2), greaterThan(0))
+	}
+
+	@Test
+	fun `last activity comparator treats Sones as equal if last activity is the same`() {
+		val sone1 = object : IdOnlySone("1") {
+			override fun getTime() = 1000L
+		}
+		val sone2 = object : IdOnlySone("2") {
+			override fun getTime() = 1000L
+		}
+		assertThat(lastActivityComparator.compare(sone1, sone2), equalTo(0))
+	}
+
+	@Test
 	fun `post count comparator sorts sones with different number of posts correctly`() {
 		val sone1 = object : IdOnlySone("1") {
 			override fun getPosts() = listOf(createPost(), createPost())
