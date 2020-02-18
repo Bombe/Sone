@@ -24,7 +24,7 @@ import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.data.AlbumsKt.getAllImages;
+import static net.pterodactylus.sone.data.AlbumKt.getAllImages;
 
 import java.util.ArrayList;
 import java.util.Collection;

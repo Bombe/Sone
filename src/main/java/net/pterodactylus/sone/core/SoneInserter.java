@@ -40,7 +40,7 @@ import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
-import net.pterodactylus.sone.data.AlbumsKt;
+import net.pterodactylus.sone.data.AlbumKt;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -312,7 +312,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", SoneKt.getAllAlbums(sone).stream().filter(AlbumsKt.notEmpty()::invoke).collect(toList()));
+			soneProperties.put("albums", SoneKt.getAllAlbums(sone).stream().filter(AlbumKt.notEmpty()::invoke).collect(toList()));
 			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
 

@@ -1,5 +1,5 @@
 /**
- * Sone - AlbumsTest.kt - Copyright © 2019–2020 David ‘Bombe’ Roden
+ * Sone - AlbumTest.kt - Copyright © 2019–2020 David ‘Bombe’ Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,9 +23,9 @@ import org.hamcrest.Matchers.*
 import kotlin.test.*
 
 /**
- * Unit test for various helper method in `Albums.kt`.
+ * Unit test for various helper method in `Album.kt`.
  */
-class AlbumsTest {
+class AlbumTest {
 
 	@Test
 	fun `recursive list of all images for album is returned correctly`() {
