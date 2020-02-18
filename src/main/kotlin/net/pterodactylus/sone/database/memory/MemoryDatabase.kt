@@ -30,7 +30,7 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Reply.TIME_COMPARATOR
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.data.Sone.toAllAlbums
+import net.pterodactylus.sone.data.allAlbums
 import net.pterodactylus.sone.data.allImages
 import net.pterodactylus.sone.data.impl.AlbumBuilderImpl
 import net.pterodactylus.sone.data.impl.ImageBuilderImpl
@@ -123,9 +123,9 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			for (postReply in sone.replies) {
 				allPostReplies[postReply.id] = postReply
 			}
-			soneAlbums.putAll(sone.id, toAllAlbums.apply(sone)!!)
-			for (album in toAllAlbums.apply(sone)!!) {
-				allAlbums[album.id] = album
+			sone.rootAlbum.allAlbums.let { albums ->
+				soneAlbums.putAll(sone.id, albums)
+				albums.forEach { album -> allAlbums[album.id] = album }
 			}
 			sone.rootAlbum.allImages.let { images ->
 				soneImages.putAll(sone.id, images)

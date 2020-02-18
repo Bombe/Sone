@@ -21,3 +21,11 @@ package net.pterodactylus.sone.data
 val Album.allImages: Collection<Image>
 	get() =
 		images + albums.flatMap { it.allImages }
+
+/**
+ *  Returns this album and all albums contained in this album (recursively).
+ * A child album is always listed after its parent.
+ */
+val Album.allAlbums: List<Album>
+	get() =
+		listOf(this) + albums.flatMap(Album::allAlbums)

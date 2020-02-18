@@ -17,10 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
-import static net.pterodactylus.sone.data.Album.FLATTENER;
-
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -30,8 +27,6 @@ import javax.annotation.Nullable;
 import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.keys.FreenetURI;
-
-import com.google.common.base.Function;
 
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
@@ -56,14 +51,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		/** The Sone is currently being downloaded. */
 		downloading,
 	}
-
-	public static final Function<Sone, List<Album>> toAllAlbums = new Function<Sone, List<Album>>() {
-		@Override
-		public List<Album> apply(@Nullable Sone sone) {
-			return (sone == null) ? Collections.<Album>emptyList() : FLATTENER.apply(
-					sone.getRootAlbum());
-		}
-	};
 
 	/**
 	 * Returns the identity of this Sone.

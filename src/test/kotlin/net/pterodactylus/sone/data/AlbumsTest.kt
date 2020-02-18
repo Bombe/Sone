@@ -45,4 +45,21 @@ class AlbumsTest {
 
 	private fun createImage(sone: IdOnlySone, id: String) = ImageImpl(id).modify().setSone(sone).update()
 
+	@Test
+	fun `allAlbums returns itself and all its subalbums`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		val firstNestedAlbum = AlbumImpl(sone)
+		val secondNestedAlbum = AlbumImpl(sone)
+		val albumNestedInFirst = AlbumImpl(sone)
+		album.addAlbum(firstNestedAlbum)
+		album.addAlbum(secondNestedAlbum)
+		firstNestedAlbum.addAlbum(albumNestedInFirst)
+		val albums = album.allAlbums
+		assertThat(albums, containsInAnyOrder<Album>(album, firstNestedAlbum, secondNestedAlbum, albumNestedInFirst))
+		assertThat(albums.indexOf(firstNestedAlbum), greaterThan(albums.indexOf(album)))
+		assertThat(albums.indexOf(secondNestedAlbum), greaterThan(albums.indexOf(album)))
+		assertThat(albums.indexOf(albumNestedInFirst), greaterThan(albums.indexOf(firstNestedAlbum)))
+	}
+
 }
