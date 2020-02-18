@@ -53,7 +53,6 @@ import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostFound;
 import net.pterodactylus.sone.core.ConfigurationSoneParser.InvalidPostReplyFound;
 import net.pterodactylus.sone.core.event.*;
 import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.AlbumsKt;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Image;
 import net.pterodactylus.sone.data.Post;
@@ -63,6 +62,7 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneKt;
 import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.AlbumBuilder;
@@ -1392,7 +1392,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = AlbumsKt.getAllAlbums(sone.getRootAlbum());
+			List<Album> albums = SoneKt.getAllAlbums(sone);
 
 			int albumCounter = 0;
 			for (Album album : albums) {

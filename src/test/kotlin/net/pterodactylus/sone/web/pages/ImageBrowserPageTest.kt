@@ -1,6 +1,8 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.AlbumImpl
+import net.pterodactylus.sone.data.impl.ImageImpl
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
@@ -105,16 +107,13 @@ class ImageBrowserPageTest : WebPageTest(::ImageBrowserPage) {
 
 	private fun createSone(firstAlbumTitle: String, secondAlbumTitle: String): Sone {
 		return mock<Sone>().apply {
-			val rootAlbum = mock<Album>()
-			val firstAlbum = mock<Album>()
-			val firstImage = mock<Image>().run { whenever(isInserted).thenReturn(true); this }
-			whenever(firstAlbum.images).thenReturn(listOf(firstImage))
-			val secondAlbum = mock<Album>()
-			val secondImage = mock<Image>().run { whenever(isInserted).thenReturn(true); this }
-			whenever(secondAlbum.images).thenReturn(listOf(secondImage))
-			whenever(firstAlbum.title).thenReturn(firstAlbumTitle)
-			whenever(secondAlbum.title).thenReturn(secondAlbumTitle)
-			whenever(rootAlbum.albums).thenReturn(listOf(firstAlbum, secondAlbum))
+			val rootAlbum = AlbumImpl(this)
+			val firstAlbum = AlbumImpl(this).modify().setTitle(firstAlbumTitle).update()
+			firstAlbum.addImage(ImageImpl("1").modify().setSone(this).setKey("key").update())
+			val secondAlbum = AlbumImpl(this).modify().setTitle(secondAlbumTitle).update()
+			secondAlbum.addImage(ImageImpl("2").modify().setSone(this).setKey("key").update())
+			rootAlbum.addAlbum(firstAlbum)
+			rootAlbum.addAlbum(secondAlbum)
 			whenever(this.rootAlbum).thenReturn(rootAlbum)
 		}
 	}

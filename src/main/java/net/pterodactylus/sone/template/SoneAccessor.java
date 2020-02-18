@@ -17,10 +17,8 @@
 
 package net.pterodactylus.sone.template;
 
-import static com.google.common.collect.FluentIterable.from;
-import static java.util.Arrays.asList;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.data.Album.FLATTENER;
+import static java.util.stream.Collectors.toList;
 import static net.pterodactylus.sone.data.Album.IMAGES;
 
 import java.util.logging.Level;
@@ -30,6 +28,7 @@ import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneKt;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.sone.text.TimeTextConverter;
@@ -116,7 +115,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			}
 			return trust;
 		} else if (member.equals("allImages")) {
-			return from(asList(sone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES);
+			return SoneKt.getAllAlbums(sone).stream().flatMap(a -> IMAGES.apply(a).stream()).collect(toList());
 		} else if (member.equals("albums")) {
 			return sone.getRootAlbum().getAlbums();
 		}

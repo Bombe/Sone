@@ -142,4 +142,16 @@ class SoneTest {
 		assertThat(imageCountComparator.compare(sone1, sone2), equalTo(0))
 	}
 
+	@Test
+	fun `allAlbums returns all albums of a Sone but the root album`() {
+		val sone = object : IdOnlySone("1") {
+			private val rootAlbum = AlbumImpl(this)
+			override fun getRootAlbum() = rootAlbum
+		}
+		val album1 = AlbumImpl(sone).also(sone.rootAlbum::addAlbum)
+		val album11 = AlbumImpl(sone).also(album1::addAlbum)
+		val album2 = AlbumImpl(sone).also(sone.rootAlbum::addAlbum)
+		assertThat(sone.allAlbums, contains<Album>(album1, album11, album2))
+	}
+
 }

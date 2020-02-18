@@ -123,7 +123,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			for (postReply in sone.replies) {
 				allPostReplies[postReply.id] = postReply
 			}
-			sone.rootAlbum.allAlbums.let { albums ->
+			sone.allAlbums.let { albums ->
 				soneAlbums.putAll(sone.id, albums)
 				albums.forEach { album -> allAlbums[album.id] = album }
 			}

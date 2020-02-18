@@ -21,6 +21,7 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
+import static java.util.stream.Collectors.toList;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -39,12 +40,12 @@ import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
-import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumsKt;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneKt;
 import net.pterodactylus.sone.main.SonePlugin;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.HtmlFilter;
@@ -57,7 +58,6 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -312,7 +312,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(AlbumsKt.notEmpty()::invoke).toList());
+			soneProperties.put("albums", SoneKt.getAllAlbums(sone).stream().filter(AlbumsKt.notEmpty()::invoke).collect(toList()));
 			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
 

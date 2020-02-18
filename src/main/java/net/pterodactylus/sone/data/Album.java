@@ -17,41 +17,16 @@
 
 package net.pterodactylus.sone.data;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.annotation.Nonnull;
 
 import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
  */
 public interface Album extends Identified, Fingerprintable {
-
-	/** Function that flattens the given album and all albums beneath it. */
-	Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
-
-		@Override
-		@Nonnull
-		public List<Album> apply(Album album) {
-			if (album == null) {
-				return emptyList();
-			}
-			List<Album> albums = new ArrayList<>();
-			albums.add(album);
-			for (Album subAlbum : album.getAlbums()) {
-				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
-			}
-			return albums;
-		}
-	};
 
 	/** Function that transforms an album into the images it contains. */
 	Function<Album, List<Image>> IMAGES = new Function<Album, List<Image>>() {

@@ -51,3 +51,7 @@ val postCountComparator: Comparator<Sone> =
 
 val imageCountComparator: Comparator<Sone> =
 		comparing<Sone, Int> { it.rootAlbum.allImages.size }.reversed()
+
+val Sone.allAlbums: List<Album>
+	get() =
+		rootAlbum.albums.flatMap(Album::allAlbums)

@@ -29,9 +29,7 @@ class ImageBrowserPage @Inject constructor(webInterface: WebInterface, loaders: 
 		} else if (soneRequest.parameters["mode"] == "gallery") {
 			templateContext["galleryRequested"] = true
 			soneRequest.core.sones
-					.map(Sone::getRootAlbum)
-					.flatMap(Album::getAlbums)
-					.flatMap { Album.FLATTENER.apply(it)!! }
+					.flatMap(Sone::allAlbums)
 					.filterNot(Album::isEmpty)
 					.sortedBy(Album::getTitle)
 					.also { albums ->
