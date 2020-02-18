@@ -64,32 +64,6 @@ public interface Album extends Identified, Fingerprintable {
 	};
 
 	/**
-	 * Filter that removes all albums that do not have any images in any album
-	 * below it.
-	 */
-	Predicate<Album> NOT_EMPTY = new Predicate<Album>() {
-
-		@Override
-		public boolean apply(Album album) {
-			/* so, we flatten all albums below the given one and check whether at least one album… */
-			return FluentIterable.from(asList(album)).transformAndConcat(FLATTENER).anyMatch(new Predicate<Album>() {
-
-				@Override
-				public boolean apply(Album album) {
-					/* …contains any inserted images. */
-					return !album.getImages().isEmpty() && FluentIterable.from(album.getImages()).allMatch(new Predicate<Image>() {
-
-						@Override
-						public boolean apply(Image input) {
-							return input.isInserted();
-						}
-					});
-				}
-			});
-		}
-	};
-
-	/**
 	 * Returns the ID of this album.
 	 *
 	 * @return The ID of this album

@@ -43,7 +43,7 @@ class AlbumsTest {
 		assertThat(images.map(Image::id), containsInAnyOrder("image-1", "image-2", "image-3", "image-4"))
 	}
 
-	private fun createImage(sone: IdOnlySone, id: String) = ImageImpl(id).modify().setSone(sone).update()
+	private fun createImage(sone: IdOnlySone, id: String, key: String? = null) = ImageImpl(id).modify().setSone(sone).setKey(key).update()
 
 	@Test
 	fun `allAlbums returns itself and all its subalbums`() {
@@ -60,6 +60,58 @@ class AlbumsTest {
 		assertThat(albums.indexOf(firstNestedAlbum), greaterThan(albums.indexOf(album)))
 		assertThat(albums.indexOf(secondNestedAlbum), greaterThan(albums.indexOf(album)))
 		assertThat(albums.indexOf(albumNestedInFirst), greaterThan(albums.indexOf(firstNestedAlbum)))
+	}
+
+	@Test
+	fun `notEmpty finds album without images is empty`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		assertThat(notEmpty(album), equalTo(false))
+	}
+
+	@Test
+	fun `notEmpty finds album with one inserted image is not empty`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		album.addImage(createImage(sone, "1", "key"))
+		assertThat(notEmpty(album), equalTo(true))
+	}
+
+	@Test
+	fun `notEmpty finds album with one not-inserted image is empty`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		album.addImage(createImage(sone, "1"))
+		assertThat(notEmpty(album), equalTo(false))
+	}
+
+	@Test
+	fun `notEmpty finds album with empty subalbums is empty`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		val firstNestedAlbum = AlbumImpl(sone)
+		album.addAlbum(firstNestedAlbum)
+		assertThat(notEmpty(album), equalTo(false))
+	}
+
+	@Test
+	fun `notEmpty finds album with subalbum with not inserted image is empty`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		val firstNestedAlbum = AlbumImpl(sone)
+		firstNestedAlbum.addImage(createImage(sone, "1"))
+		album.addAlbum(firstNestedAlbum)
+		assertThat(notEmpty(album), equalTo(false))
+	}
+
+	@Test
+	fun `notEmpty finds album with subalbum with inserted image is not empty`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		val firstNestedAlbum = AlbumImpl(sone)
+		firstNestedAlbum.addImage(createImage(sone, "1", "key"))
+		album.addAlbum(firstNestedAlbum)
+		assertThat(notEmpty(album), equalTo(true))
 	}
 
 }

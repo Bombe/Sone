@@ -21,7 +21,6 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -41,6 +40,7 @@ import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.AlbumsKt;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
@@ -312,7 +312,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
+			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(AlbumsKt.notEmpty()::invoke).toList());
 			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
 

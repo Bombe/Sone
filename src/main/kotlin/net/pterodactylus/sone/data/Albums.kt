@@ -29,3 +29,10 @@ val Album.allImages: Collection<Image>
 val Album.allAlbums: List<Album>
 	get() =
 		listOf(this) + albums.flatMap(Album::allAlbums)
+
+@get:JvmName("notEmpty")
+val notEmpty: (Album) -> Boolean = { album ->
+	album.allImages.let { images ->
+		images.isNotEmpty() && images.any(Image::isInserted)
+	}
+}

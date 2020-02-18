@@ -37,6 +37,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.AlbumsKt;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
@@ -649,7 +650,7 @@ public class SoneImpl implements Sone {
 
 		hash.putString("Albums(", UTF_8);
 		for (Album album : rootAlbum.getAlbums()) {
-			if (!Album.NOT_EMPTY.apply(album)) {
+			if (!AlbumsKt.notEmpty().invoke(album)) {
 				continue;
 			}
 			hash.putString(album.getFingerprint(), UTF_8);
