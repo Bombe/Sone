@@ -20,7 +20,7 @@ package net.pterodactylus.sone.data
 /** Returns all images contained in this album and all its albums. */
 val Album.allImages: Collection<Image>
 	get() =
-		images + albums.flatMap { it.allImages }
+		images + albums.flatMap(Album::allImages)
 
 /**
  *  Returns this album and all albums contained in this album (recursively).

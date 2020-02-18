@@ -114,4 +114,23 @@ class AlbumsTest {
 		assertThat(notEmpty(album), equalTo(true))
 	}
 
+	@Test
+	fun `allImages returns images from album`() {
+		val sone = IdOnlySone("sone")
+		val album = AlbumImpl(sone)
+		val image1 = createImage(sone, "1").also(album::addImage)
+		val image2 = createImage(sone, "2").also(album::addImage)
+		assertThat(album.allImages, contains(image1, image2))
+	}
+
+	@Test
+	fun `allImages returns images from subalbum`() {
+		val sone = IdOnlySone("sone")
+		val album1 = AlbumImpl(sone)
+		val album2 = AlbumImpl(sone).also(album1::addAlbum)
+		val image1 = createImage(sone, "1").also(album1::addImage)
+		val image2 = createImage(sone, "2").also(album2::addImage)
+		assertThat(album1.allImages, contains(image1, image2))
+	}
+
 }
