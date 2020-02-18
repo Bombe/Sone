@@ -5,6 +5,7 @@ import com.google.common.base.Optional.*
 import freenet.crypt.*
 import freenet.keys.InsertableClientSSK.*
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.AlbumImpl
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
@@ -41,6 +42,7 @@ class SoneParserTest {
 		whenever(sone.identity).thenReturn(identity)
 		whenever(sone.requestUri).thenAnswer { clientSSK.uri.setKeyType("USK").setDocName("Sone") }
 		whenever(sone.time).thenReturn(currentTimeMillis() - DAYS.toMillis(1))
+		whenever(sone.rootAlbum).thenReturn(AlbumImpl(sone))
 	}
 
 	@Test
