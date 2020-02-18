@@ -55,3 +55,7 @@ val imageCountComparator: Comparator<Sone> =
 val Sone.allAlbums: List<Album>
 	get() =
 		rootAlbum.albums.flatMap(Album::allAlbums)
+
+val Sone.allImages: Collection<Image>
+	get() =
+		rootAlbum.allImages

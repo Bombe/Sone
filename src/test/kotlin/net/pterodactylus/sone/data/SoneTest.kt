@@ -154,4 +154,19 @@ class SoneTest {
 		assertThat(sone.allAlbums, contains<Album>(album1, album11, album2))
 	}
 
+	@Test
+	fun `allImages returns all images of a Sone`() {
+		val sone = object : IdOnlySone("1") {
+			private val rootAlbum = AlbumImpl(this)
+			override fun getRootAlbum() = rootAlbum
+		}
+		val album1 = AlbumImpl(sone).also(sone.rootAlbum::addAlbum)
+		val album11 = AlbumImpl(sone).also(album1::addAlbum)
+		val album2 = AlbumImpl(sone).also(sone.rootAlbum::addAlbum)
+		val image1 = createImage(sone).also(album1::addImage)
+		val image11 = createImage(sone).also(album11::addImage)
+		val image2 = createImage(sone).also(album2::addImage)
+		assertThat(sone.allImages, containsInAnyOrder(image1, image11, image2))
+	}
+
 }
