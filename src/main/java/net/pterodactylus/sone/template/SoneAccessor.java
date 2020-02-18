@@ -18,8 +18,6 @@
 package net.pterodactylus.sone.template;
 
 import static java.util.logging.Logger.getLogger;
-import static java.util.stream.Collectors.toList;
-import static net.pterodactylus.sone.data.Album.IMAGES;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -115,7 +113,7 @@ public class SoneAccessor extends ReflectionAccessor {
 			}
 			return trust;
 		} else if (member.equals("allImages")) {
-			return SoneKt.getAllAlbums(sone).stream().flatMap(a -> IMAGES.apply(a).stream()).collect(toList());
+			return SoneKt.getAllImages(sone);
 		} else if (member.equals("albums")) {
 			return sone.getRootAlbum().getAlbums();
 		}

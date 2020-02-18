@@ -17,26 +17,12 @@
 
 package net.pterodactylus.sone.data;
 
-import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
-
-import com.google.common.base.Function;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
  */
 public interface Album extends Identified, Fingerprintable {
-
-	/** Function that transforms an album into the images it contains. */
-	Function<Album, List<Image>> IMAGES = new Function<Album, List<Image>>() {
-
-		@Override
-		@Nonnull
-		public List<Image> apply(Album album) {
-			return (album != null) ? album.getImages() : Collections.<Image>emptyList();
-		}
-	};
 
 	/**
 	 * Returns the ID of this album.
