@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
@@ -15,16 +16,12 @@ import org.mockito.Mockito.*
  */
 class DeleteImagePageTest : WebPageTest(::DeleteImagePage) {
 
-	private val image = mock<Image>()
 	private val sone = mock<Sone>()
+	private val image = ImageImpl("image-id").modify().setSone(sone).update()!!
 
 	@Before
 	fun setupImage() {
-		val album = mock<Album>()
-		whenever(album.id).thenReturn("album-id")
-		whenever(image.id).thenReturn("image-id")
-		whenever(image.sone).thenReturn(sone)
-		whenever(image.album).thenReturn(album)
+		AlbumImpl(sone, "album-id").also { it.addImage(image) }
 		whenever(sone.isLocal).thenReturn(true)
 	}
 

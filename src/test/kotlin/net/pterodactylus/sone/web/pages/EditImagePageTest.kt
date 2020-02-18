@@ -1,8 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
-import net.pterodactylus.sone.data.Image.*
-import net.pterodactylus.sone.data.Image.Modifier.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.util.web.Method.*
@@ -16,19 +15,17 @@ import org.mockito.Mockito.*
  */
 class EditImagePageTest : WebPageTest(::EditImagePage) {
 
-	private val image = mock<Image>()
-	private val modifier = mockBuilder<Modifier>()
 	private val sone = mock<Sone>()
-	private val album = mock<Album>()
+	private val image = ImageImpl("image-id").modify().setSone(sone).update()!!
+	private val album = AlbumImpl(sone, "album-id").also {
+		it.addImage(ImageImpl("1").modify().setSone(sone).update())
+		it.addImage(image)
+		it.addImage(ImageImpl("2").modify().setSone(sone).update())
+	}
 
 	@Before
 	fun setupImage() {
 		whenever(sone.isLocal).thenReturn(true)
-		whenever(album.id).thenReturn("album-id")
-		whenever(modifier.update()).thenReturn(image)
-		whenever(image.sone).thenReturn(sone)
-		whenever(image.album).thenReturn(album)
-		whenever(image.modify()).thenReturn(modifier)
 	}
 
 	@Test
@@ -75,7 +72,7 @@ class EditImagePageTest : WebPageTest(::EditImagePage) {
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("moveLeft", "true")
 		verifyRedirect("return.html") {
-			verify(album).moveImageUp(image)
+			assertThat(album.images.indexOf(image), equalTo(0))
 			verify(core).touchConfiguration()
 		}
 	}
@@ -88,7 +85,7 @@ class EditImagePageTest : WebPageTest(::EditImagePage) {
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("moveRight", "true")
 		verifyRedirect("return.html") {
-			verify(album).moveImageDown(image)
+			assertThat(album.images.indexOf(image), equalTo(2))
 			verify(core).touchConfiguration()
 		}
 	}
@@ -100,7 +97,6 @@ class EditImagePageTest : WebPageTest(::EditImagePage) {
 		addHttpRequestPart("image", "image-id")
 		addHttpRequestPart("returnPage", "return.html")
 		addHttpRequestPart("title", "   ")
-		whenever(modifier.update()).doThrow<ImageTitleMustNotBeEmpty>()
 		verifyRedirect("emptyImageTitle.html") {
 			verify(core, never()).touchConfiguration()
 		}
@@ -115,9 +111,8 @@ class EditImagePageTest : WebPageTest(::EditImagePage) {
 		addHttpRequestPart("title", "Title")
 		addHttpRequestPart("description", "Description")
 		verifyRedirect("return.html") {
-			verify(modifier).setTitle("Title")
-			verify(modifier).setDescription("Description")
-			verify(modifier).update()
+			assertThat(image.title, equalTo("Title"))
+			assertThat(image.description, equalTo("Description"))
 			verify(core).touchConfiguration()
 		}
 	}
@@ -132,9 +127,8 @@ class EditImagePageTest : WebPageTest(::EditImagePage) {
 		addHttpRequestHeader("Host", "www.te.st")
 		addHttpRequestPart("description", "Get http://www.te.st/KSK@GPL.txt")
 		verifyRedirect("return.html") {
-			verify(modifier).setTitle("Title")
-			verify(modifier).setDescription("Get KSK@GPL.txt")
-			verify(modifier).update()
+			assertThat(image.title, equalTo("Title"))
+			assertThat(image.description, equalTo("Get KSK@GPL.txt"))
 			verify(core).touchConfiguration()
 		}
 	}

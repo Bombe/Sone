@@ -1,10 +1,9 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
-import net.pterodactylus.sone.data.Image.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.mockBuilder
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
@@ -20,10 +19,7 @@ import org.mockito.Mockito.eq
  */
 class UploadImagePageTest : WebPageTest(::UploadImagePage) {
 
-	private val parentAlbum = mock<Album>().apply {
-		whenever(id).thenReturn("parent-id")
-		whenever(sone).thenReturn(currentSone)
-	}
+	private val parentAlbum = AlbumImpl(currentSone, "parent-id")
 
 	@Test
 	fun `page returns correct path`() {
@@ -58,9 +54,9 @@ class UploadImagePageTest : WebPageTest(::UploadImagePage) {
 	@Test
 	fun `post request with parent that is not the current sone results in no permission error page`() {
 		setMethod(POST)
+		val remoteAlbum = AlbumImpl(mock(), "parent-id")
+		addAlbum("parent-id", remoteAlbum)
 		addHttpRequestPart("parent", "parent-id")
-		whenever(parentAlbum.sone).thenReturn(mock())
-		addAlbum("parent-id", parentAlbum)
 		verifyRedirect("noPermission.html")
 	}
 
@@ -97,19 +93,14 @@ class UploadImagePageTest : WebPageTest(::UploadImagePage) {
 		addHttpRequestHeader("Host", "localhost:8888")
 		addUploadedFile("image", "upload-image-value-image.png", "image/png", "upload-image-value-image.png")
 		val temporaryImage = TemporaryImage("temp-image")
-		val imageModifier = mockBuilder<Modifier>()
-		val image = mock<Image>().apply {
-			whenever(modify()).thenReturn(imageModifier)
-		}
+		val image = ImageImpl()
 		whenever(core.createTemporaryImage(eq("image/png"), any())).thenReturn(temporaryImage)
 		whenever(core.createImage(currentSone, parentAlbum, temporaryImage)).thenReturn(image)
 		verifyRedirect("imageBrowser.html?album=parent-id") {
-			verify(image).modify()
-			verify(imageModifier).setWidth(2)
-			verify(imageModifier).setHeight(1)
-			verify(imageModifier).setTitle("Title")
-			verify(imageModifier).setDescription("Description @ KSK@foo")
-			verify(imageModifier).update()
+			assertThat(image.width, equalTo(2))
+			assertThat(image.height, equalTo(1))
+			assertThat(image.title, equalTo("Title"))
+			assertThat(image.description, equalTo("Description @ KSK@foo"))
 		}
 	}
 

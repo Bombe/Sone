@@ -1,8 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.*
-import net.pterodactylus.sone.data.Album.*
-import net.pterodactylus.sone.data.Album.Modifier.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.util.web.Method.*
@@ -16,20 +14,16 @@ import org.mockito.Mockito.*
  */
 class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 
-	private val album = mock<Album>()
-	private val parentAlbum = mock<Album>()
-	private val modifier = mockBuilder<Modifier>()
-	private val sone = mock<Sone>()
+	private val album = AlbumImpl(currentSone, "album-id")
+	private val parentAlbum = AlbumImpl(currentSone, "parent-id").also {
+		it.addAlbum(AlbumImpl(currentSone))
+		it.addAlbum(album)
+		it.addAlbum(AlbumImpl(currentSone))
+	}
 
 	@Before
 	fun setup() {
-		whenever(album.id).thenReturn("album-id")
-		whenever(album.sone).thenReturn(sone)
-		whenever(album.parent).thenReturn(parentAlbum)
-		whenever(album.modify()).thenReturn(modifier)
-		whenever(modifier.update()).thenReturn(album)
-		whenever(parentAlbum.id).thenReturn("parent-id")
-		whenever(sone.isLocal).thenReturn(true)
+		whenever(currentSone.isLocal).thenReturn(true)
 		addHttpRequestHeader("Host", "www.te.st")
 	}
 
@@ -63,7 +57,7 @@ class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 	@Test
 	fun `post request with album of non-local sone redirects to no permissions page`() {
 		setMethod(POST)
-		whenever(sone.isLocal).thenReturn(false)
+		whenever(currentSone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		verifyRedirect("noPermission.html")
@@ -76,7 +70,7 @@ class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 		addHttpRequestPart("album", "album-id")
 		addHttpRequestPart("moveLeft", "true")
 		verifyRedirect("imageBrowser.html?album=parent-id") {
-			verify(parentAlbum).moveAlbumUp(album)
+			assertThat(parentAlbum.albums.indexOf(album), equalTo(0))
 			verify(core).touchConfiguration()
 		}
 	}
@@ -88,7 +82,7 @@ class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 		addHttpRequestPart("album", "album-id")
 		addHttpRequestPart("moveRight", "true")
 		verifyRedirect("imageBrowser.html?album=parent-id") {
-			verify(parentAlbum).moveAlbumDown(album)
+			assertThat(parentAlbum.albums.indexOf(album), equalTo(2))
 			verify(core).touchConfiguration()
 		}
 	}
@@ -98,7 +92,6 @@ class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 		setMethod(POST)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
-		whenever(modifier.setTitle("")).thenThrow(AlbumTitleMustNotBeEmpty())
 		verifyRedirect("emptyAlbumTitle.html")
 	}
 
@@ -110,9 +103,8 @@ class EditAlbumPageTest : WebPageTest(::EditAlbumPage) {
 		addHttpRequestPart("title", "title")
 		addHttpRequestPart("description", "description")
 		verifyRedirect("imageBrowser.html?album=album-id") {
-			verify(modifier).setTitle("title")
-			verify(modifier).setDescription("description")
-			verify(modifier).update()
+			assertThat(album.title, equalTo("title"))
+			assertThat(album.description, equalTo("description"))
 			verify(core).touchConfiguration()
 		}
 	}

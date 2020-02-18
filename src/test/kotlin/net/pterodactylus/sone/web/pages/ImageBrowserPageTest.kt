@@ -34,7 +34,7 @@ class ImageBrowserPageTest : WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `get request with album sets album and page in template context`() {
-		val album = mock<Album>()
+		val album = AlbumImpl(currentSone, "album-id")
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		addHttpRequestParameter("page", "5")
@@ -47,7 +47,7 @@ class ImageBrowserPageTest : WebPageTest(::ImageBrowserPage) {
 
 	@Test
 	fun `get request with image sets image in template context`() {
-		val image = mock<Image>()
+		val image = ImageImpl()
 		addImage("image-id", image)
 		addHttpRequestParameter("image", "image-id")
 		verifyNoRedirect {

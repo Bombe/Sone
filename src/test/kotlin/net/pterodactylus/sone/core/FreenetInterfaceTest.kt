@@ -57,7 +57,7 @@ class FreenetInterfaceTest {
 	private val uskManager = mock<USKManager>()
 	private val sone = mock<Sone>()
 	private val callbackCaptor: ArgumentCaptor<USKCallback> = forClass(USKCallback::class.java)
-	private val image = mock<Image>()
+	private val image: Image = ImageImpl()
 	private val insertToken: InsertToken
 	private val bucket = mock<Bucket>()
 	private val clientGetCallback: ArgumentCaptor<ClientGetCallback> = forClass(ClientGetCallback::class.java)

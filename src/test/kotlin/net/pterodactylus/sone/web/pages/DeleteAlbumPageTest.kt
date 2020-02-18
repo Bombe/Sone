@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.web.pages
 
-import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
@@ -16,20 +16,14 @@ import org.mockito.Mockito.verify
  */
 class DeleteAlbumPageTest : WebPageTest(::DeleteAlbumPage) {
 
-	private val sone = mock<Sone>()
-	private val album = mock<Album>()
-	private val parentAlbum = mock<Album>()
+	private val album = AlbumImpl(currentSone, "album-id")
+	private val parentAlbum = AlbumImpl(currentSone, "parent-id").also { it.addAlbum(album) }
 
 	@Before
 	fun setupAlbums() {
-		whenever(sone.id).thenReturn("sone-id")
-		whenever(sone.isLocal).thenReturn(true)
-		whenever(parentAlbum.id).thenReturn("parent-id")
-		whenever(parentAlbum.isRoot).thenReturn(true)
-		whenever(album.id).thenReturn("album-id")
-		whenever(album.sone).thenReturn(sone)
-		whenever(album.parent).thenReturn(parentAlbum)
-		whenever(sone.rootAlbum).thenReturn(parentAlbum)
+		whenever(currentSone.id).thenReturn("sone-id")
+		whenever(currentSone.isLocal).thenReturn(true)
+		whenever(currentSone.rootAlbum).thenReturn(parentAlbum)
 	}
 
 	@Test
@@ -50,7 +44,6 @@ class DeleteAlbumPageTest : WebPageTest(::DeleteAlbumPage) {
 
 	@Test
 	fun `get request with valid album ID sets album in template context`() {
-		val album = mock<Album>()
 		addAlbum("album-id", album)
 		addHttpRequestParameter("album", "album-id")
 		page.processTemplate(freenetRequest, templateContext)
@@ -66,7 +59,7 @@ class DeleteAlbumPageTest : WebPageTest(::DeleteAlbumPage) {
 	@Test
 	fun `post request redirects to no permissions page if album is not local`() {
 		setMethod(POST)
-		whenever(sone.isLocal).thenReturn(false)
+		whenever(currentSone.isLocal).thenReturn(false)
 		addAlbum("album-id", album)
 		addHttpRequestPart("album", "album-id")
 		verifyRedirect("noPermission.html")
@@ -94,12 +87,12 @@ class DeleteAlbumPageTest : WebPageTest(::DeleteAlbumPage) {
 	@Test
 	fun `album is deleted and page redirects to album if parent album is not root album`() {
 		setMethod(POST)
-		whenever(parentAlbum.isRoot).thenReturn(false)
-		whenever(sone.rootAlbum).thenReturn(mock())
-		addAlbum("album-id", album)
-		addHttpRequestPart("album", "album-id")
-		verifyRedirect("imageBrowser.html?album=parent-id") {
-			verify(core).deleteAlbum(album)
+		val subAlbum = AlbumImpl(currentSone, "sub-album-id")
+		album.addAlbum(subAlbum)
+		addAlbum("sub-album-id", subAlbum)
+		addHttpRequestPart("album", "sub-album-id")
+		verifyRedirect("imageBrowser.html?album=album-id") {
+			verify(core).deleteAlbum(subAlbum)
 		}
 	}
 

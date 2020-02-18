@@ -2,8 +2,8 @@ package net.pterodactylus.sone.core
 
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken
 import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier
-import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.TemporaryImage
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
@@ -23,7 +23,7 @@ import org.mockito.Mockito.verify
 class ImageInserterTest {
 
 	private val temporaryImage = mock<TemporaryImage>().apply { whenever(id).thenReturn("image-id") }
-	private val image = mock<Image>().apply { whenever(id).thenReturn("image-id") }
+	private val image = ImageImpl("image-id")
 	private val freenetInterface = mock<FreenetInterface>()
 	private val insertToken = mock<InsertToken>()
 	private val insertTokenSupplier: InsertTokenSupplier = mock<InsertTokenSupplier>().apply { whenever(apply(any())).thenReturn(insertToken) }

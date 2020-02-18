@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.utils.*
@@ -37,11 +38,12 @@ class KnownSonesPageTest : WebPageTest(::KnownSonesPage) {
 		whenever(this.time).thenReturn(time)
 		whenever(this.posts).thenReturn((0..(posts - 1)).map { mock<Post>() })
 		whenever(this.replies).thenReturn((0..(replies - 1)).map { mock<PostReply>() }.toSet())
-		val album = mock<Album>()
-		whenever(album.images).thenReturn(((0..(images - 1)).map { mock<Image>() }))
-		val rootAlbum = mock<Album>().apply {
-			whenever(albums).thenReturn(listOf(album))
+		val album = AlbumImpl(this)
+		repeat(images) {
+			ImageImpl().modify().setSone(this).update()
+					.also(album::addImage)
 		}
+		val rootAlbum = AlbumImpl(this).also { it.addAlbum(album) }
 		whenever(this.rootAlbum).thenReturn(rootAlbum)
 		whenever(this.profile).thenReturn(mock())
 		whenever(id).thenReturn(name.toLowerCase())
