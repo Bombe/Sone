@@ -44,12 +44,12 @@ abstract class AbstractSoneCommand
 		val requiresWriteAccess: Boolean = false) : AbstractCommand() {
 
 	@Throws(FcpException::class)
-	protected fun getSone(simpleFieldSet: SimpleFieldSet, parameterName: String, localOnly: Boolean): Sone =
-			getSone(simpleFieldSet, parameterName, localOnly, true).get()
+	protected fun SimpleFieldSet.getSone(parameterName: String, localOnly: Boolean): Sone =
+			getSone(parameterName, localOnly, true).get()
 
 	@Throws(FcpException::class)
-	protected fun getSone(simpleFieldSet: SimpleFieldSet, parameterName: String, localOnly: Boolean, mandatory: Boolean): Optional<Sone> {
-		val soneId = simpleFieldSet.get(parameterName)
+	protected fun SimpleFieldSet.getSone(parameterName: String, localOnly: Boolean, mandatory: Boolean): Optional<Sone> {
+		val soneId = get(parameterName)
 				.throwOnNullIf(mandatory) { FcpException("Could not load Sone ID from “$parameterName”.") }
 				?: return Optional.absent()
 		val sone = core.getSone(soneId)
@@ -60,9 +60,9 @@ abstract class AbstractSoneCommand
 	}
 
 	@Throws(FcpException::class)
-	protected fun getPost(simpleFieldSet: SimpleFieldSet, parameterName: String): Post {
+	protected fun SimpleFieldSet.getPost(parameterName: String): Post {
 		try {
-			val postId = simpleFieldSet.getString(parameterName)
+			val postId = getString(parameterName)
 			return core.getPost(postId)
 					?: throw FcpException("Could not load post from “$postId”.")
 		} catch (fspe1: FSParseException) {
@@ -71,9 +71,9 @@ abstract class AbstractSoneCommand
 	}
 
 	@Throws(FcpException::class)
-	protected fun getReply(simpleFieldSet: SimpleFieldSet, parameterName: String): PostReply {
+	protected fun SimpleFieldSet.getReply(parameterName: String): PostReply {
 		try {
-			val replyId = simpleFieldSet.getString(parameterName)
+			val replyId = getString(parameterName)
 			return core.getPostReply(replyId)
 					?: throw FcpException("Could not load reply from “$replyId”.")
 		} catch (fspe1: FSParseException) {
