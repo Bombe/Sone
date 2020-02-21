@@ -32,6 +32,8 @@ import com.google.common.collect.Collections2;
 
 import freenet.support.SimpleFieldSet;
 
+import static net.pterodactylus.sone.data.PostKt.noFuturePost;
+
 /**
  * Implementation of an FCP interface for other clients or plugins to
  * communicate with Sone.
@@ -67,7 +69,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 			allPosts.addAll(friendSone.getPosts());
 		}
 		allPosts.addAll(getCore().getDirectedPosts(sone.getId()));
-		allPosts = Collections2.filter(allPosts, Post.FUTURE_POSTS_FILTER);
+		allPosts = Collections2.filter(allPosts, noFuturePost()::invoke);
 
 		List<Post> sortedPosts = new ArrayList<>(allPosts);
 		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
