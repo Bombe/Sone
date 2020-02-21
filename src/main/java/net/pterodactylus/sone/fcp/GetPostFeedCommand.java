@@ -32,6 +32,7 @@ import com.google.common.collect.Collections2;
 
 import freenet.support.SimpleFieldSet;
 
+import static net.pterodactylus.sone.data.PostKt.newestFirst;
 import static net.pterodactylus.sone.data.PostKt.noFuturePost;
 
 /**
@@ -72,7 +73,7 @@ public class GetPostFeedCommand extends AbstractSoneCommand {
 		allPosts = Collections2.filter(allPosts, noFuturePost()::invoke);
 
 		List<Post> sortedPosts = new ArrayList<>(allPosts);
-		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
+		sortedPosts.sort(newestFirst());
 
 		if (sortedPosts.size() < startPost) {
 			return new Response("PostFeed", encodePosts(Collections.<Post> emptyList(), "Posts.", false));

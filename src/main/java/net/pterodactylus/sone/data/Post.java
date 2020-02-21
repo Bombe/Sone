@@ -19,8 +19,6 @@ package net.pterodactylus.sone.data;
 
 import static com.google.common.base.Optional.absent;
 
-import java.util.Comparator;
-
 import com.google.common.base.Optional;
 
 /**
@@ -28,16 +26,6 @@ import com.google.common.base.Optional;
  * know what is going on.
  */
 public interface Post extends Identified {
-
-	/** Comparator for posts, sorts descending by time. */
-	public static final Comparator<Post> NEWEST_FIRST = new Comparator<Post>() {
-
-		@Override
-		public int compare(Post leftPost, Post rightPost) {
-			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
-		}
-
-	};
 
 	//
 	// ACCESSORS
