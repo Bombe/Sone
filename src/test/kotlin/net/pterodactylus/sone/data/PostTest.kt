@@ -29,21 +29,21 @@ class PostTest {
 	fun `newestFirst comparator returns less-than 0 if first is newer than second`() {
 		val newerPost = createPost(time = 2000)
 		val olderPost = createPost(time = 1000)
-		assertThat(newestFirst.compare(newerPost, olderPost), lessThan(0))
+		assertThat(newestPostFirst.compare(newerPost, olderPost), lessThan(0))
 	}
 
 	@Test
 	fun `newestFirst comparator returns greater-than 0 if first is older than second`() {
 		val newerPost = createPost(time = 2000)
 		val olderPost = createPost(time = 1000)
-		assertThat(newestFirst.compare(olderPost, newerPost), greaterThan(0))
+		assertThat(newestPostFirst.compare(olderPost, newerPost), greaterThan(0))
 	}
 
 	@Test
 	fun `newestFirst comparator returns 0 if first and second are the same age`() {
 		val post1 = createPost(time = 1000)
 		val post2 = createPost(time = 1000)
-		assertThat(newestFirst.compare(post2, post1), equalTo(0))
+		assertThat(newestPostFirst.compare(post2, post1), equalTo(0))
 	}
 
 }

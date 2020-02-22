@@ -21,7 +21,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.data.PostKt.newestFirst;
+import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
 import static net.pterodactylus.sone.data.SoneKt.*;
 
 import java.net.MalformedURLException;
@@ -366,7 +366,7 @@ public class SoneImpl implements Sone {
 		synchronized (this) {
 			sortedPosts = new ArrayList<>(posts);
 		}
-		sortedPosts.sort(newestFirst());
+		sortedPosts.sort(newestPostFirst());
 		return sortedPosts;
 	}
 

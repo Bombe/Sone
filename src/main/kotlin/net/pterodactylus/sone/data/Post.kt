@@ -12,5 +12,5 @@ val noFuturePost: (Post) -> Boolean = { it.time <= System.currentTimeMillis() }
 /**
  * Comparator that orders posts by their time, newest posts first.
  */
-@get:JvmName("newestFirst")
-val newestFirst: Comparator<Post> = comparing(Post::getTime).reversed()
+@get:JvmName("newestPostFirst")
+val newestPostFirst: Comparator<Post> = comparing(Post::getTime).reversed()
