@@ -19,36 +19,13 @@ package net.pterodactylus.sone.data;
 
 import static com.google.common.base.Optional.absent;
 
-import java.util.Comparator;
-
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 /**
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
  */
 public interface Post extends Identified {
-
-	/** Comparator for posts, sorts descending by time. */
-	public static final Comparator<Post> NEWEST_FIRST = new Comparator<Post>() {
-
-		@Override
-		public int compare(Post leftPost, Post rightPost) {
-			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, rightPost.getTime() - leftPost.getTime()));
-		}
-
-	};
-
-	/** Filter for posts with timestamps from the future. */
-	public static final Predicate<Post> FUTURE_POSTS_FILTER = new Predicate<Post>() {
-
-		@Override
-		public boolean apply(Post post) {
-			return (post != null) && (post.getTime() <= System.currentTimeMillis());
-		}
-
-	};
 
 	//
 	// ACCESSORS

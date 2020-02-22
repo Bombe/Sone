@@ -43,11 +43,12 @@ fun createLocalSone(id: String? = createId()) = object : IdOnlySone(id) {
 }
 fun createRemoteSone(id: String? = createId()) = IdOnlySone(id)
 
-fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false): Post.EmptyPost {
+fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1): Post.EmptyPost {
 	return object : Post.EmptyPost("post-id") {
 		override fun getSone() = sone
 		override fun getText() = text
 		override fun isKnown() = known
+		override fun getTime() = time
 	}
 }
 

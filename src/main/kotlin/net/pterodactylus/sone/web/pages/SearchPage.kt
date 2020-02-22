@@ -58,7 +58,7 @@ class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer:
 		val postPagination = cache.get(phrases) {
 			soneRequest.core.sones
 					.flatMap(Sone::getPosts)
-					.filter { Post.FUTURE_POSTS_FILTER.apply(it) }
+					.filter(noFuturePost)
 					.scoreAndPaginate(phrases, soneRequest.core.preferences.postsPerPage) { it.allText(soneNameCache, soneRequest.core::getReplies) }
 		}.apply { page = soneRequest.parameters["postPage"].emptyToNull?.toIntOrNull() ?: 0 }
 
