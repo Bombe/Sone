@@ -17,10 +17,6 @@
 
 package net.pterodactylus.sone.data;
 
-import java.util.Comparator;
-
-import com.google.common.base.Predicate;
-
 /**
  * Defines methods common for all replies.
  *
@@ -28,19 +24,6 @@ import com.google.common.base.Predicate;
  *            The type of the reply
  */
 public interface Reply<T extends Reply<T>> extends Identified {
-
-	/** Filter for replies with timestamps from the future. */
-	public static final Predicate<Reply<?>> FUTURE_REPLY_FILTER = new Predicate<Reply<?>>() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public boolean apply(Reply<?> reply) {
-			return (reply != null) && (reply.getTime() <= System.currentTimeMillis());
-		}
-
-	};
 
 	/**
 	 * Returns the ID of the reply.

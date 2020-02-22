@@ -88,7 +88,7 @@ class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer:
 
 	private fun Post.allText(soneNameCache: (Sone) -> String, getReplies: (String) -> Collection<PostReply>) =
 			(text + recipient.orNull()?.let { " ${soneNameCache(it)}" } + getReplies(id)
-					.filter { PostReply.FUTURE_REPLY_FILTER.apply(it) }
+					.filter(noFutureReply)
 					.map { "${soneNameCache(it.sone)} ${it.text}" }.joinToString(" ", " ")).toLowerCase()
 
 	private fun Iterable<Phrase>.indicesFor(text: String, predicate: (Phrase) -> Boolean) =

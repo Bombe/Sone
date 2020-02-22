@@ -22,6 +22,7 @@ import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.greaterThan
 import org.hamcrest.Matchers.lessThan
+import java.util.concurrent.TimeUnit.DAYS
 import kotlin.test.Test
 
 class ReplyTest {
@@ -45,6 +46,18 @@ class ReplyTest {
 		val reply1 = emptyPostReply(time = 1000)
 		val reply2 = emptyPostReply(time = 1000)
 		assertThat(newestReplyFirst.compare(reply1, reply2), equalTo(0))
+	}
+
+	@Test
+	fun `noFutureReply filter recognizes reply from the future`() {
+		val futureReply = emptyPostReply(time = System.currentTimeMillis() + DAYS.toMillis(1))
+		assertThat(noFutureReply(futureReply), equalTo(false))
+	}
+
+	@Test
+	fun `noFutureReply filter recognizes reply from the present`() {
+		val futureReply = emptyPostReply(time = System.currentTimeMillis())
+		assertThat(noFutureReply(futureReply), equalTo(true))
 	}
 
 }
