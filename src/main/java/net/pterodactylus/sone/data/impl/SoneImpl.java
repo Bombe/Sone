@@ -22,6 +22,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
 import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
+import static net.pterodactylus.sone.data.ReplyKt.newestReplyFirst;
 import static net.pterodactylus.sone.data.SoneKt.*;
 
 import java.net.MalformedURLException;
@@ -626,7 +627,7 @@ public class SoneImpl implements Sone {
 		hash.putString(")", UTF_8);
 
 		List<PostReply> replies = new ArrayList<>(getReplies());
-		Collections.sort(replies, Reply.TIME_COMPARATOR);
+		replies.sort(newestReplyFirst().reversed());
 		hash.putString("Replies(", UTF_8);
 		for (PostReply reply : replies) {
 			hash.putString("Reply(", UTF_8).putString(reply.getId(), UTF_8).putString(")", UTF_8);

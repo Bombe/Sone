@@ -29,19 +29,6 @@ import com.google.common.base.Predicate;
  */
 public interface Reply<T extends Reply<T>> extends Identified {
 
-	/** Comparator that sorts replies ascending by time. */
-	public static final Comparator<? super Reply<?>> TIME_COMPARATOR = new Comparator<Reply<?>>() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compare(Reply<?> leftReply, Reply<?> rightReply) {
-			return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, leftReply.getTime() - rightReply.getTime()));
-		}
-
-	};
-
 	/** Filter for replies with timestamps from the future. */
 	public static final Predicate<Reply<?>> FUTURE_REPLY_FILTER = new Predicate<Reply<?>>() {
 

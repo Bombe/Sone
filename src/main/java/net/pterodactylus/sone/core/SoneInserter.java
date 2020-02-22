@@ -23,6 +23,7 @@ import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
 import static java.util.stream.Collectors.toList;
 import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
+import static net.pterodactylus.sone.data.ReplyKt.newestReplyFirst;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -310,7 +311,7 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("time", currentTimeMillis());
 			soneProperties.put("profile", sone.getProfile());
 			soneProperties.put("posts", Ordering.from(newestPostFirst()).sortedCopy(sone.getPosts()));
-			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
+			soneProperties.put("replies", Ordering.from(newestReplyFirst()).sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<>(sone.getLikedReplyIds()));
 			soneProperties.put("albums", SoneKt.getAllAlbums(sone).stream().filter(AlbumKt.notEmpty()::invoke).collect(toList()));
