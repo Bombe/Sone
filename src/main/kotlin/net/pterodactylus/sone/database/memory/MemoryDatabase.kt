@@ -297,12 +297,9 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 
 	protected fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
 
-	fun setPostReplyKnown(postReply: PostReply, known: Boolean): Unit =
+	override fun setPostReplyKnown(postReply: PostReply): Unit =
 			writeLock.withLock {
-				if (known)
-					knownPostReplies.add(postReply.id)
-				else
-					knownPostReplies.remove(postReply.id)
+				knownPostReplies.add(postReply.id)
 				saveKnownPostReplies()
 			}
 

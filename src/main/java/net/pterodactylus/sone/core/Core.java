@@ -797,9 +797,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		for (PostReply postReply : soneComparison.getNewPostReplies()) {
 			if (postReply.getSone().equals(newSone)) {
-				postReply.setKnown(true);
+				database.setPostReplyKnown(postReply);
 			} else if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
-				postReply.setKnown(true);
+				database.setPostReplyKnown(postReply);
 			} else if (!postReply.isKnown()) {
 				events.add(new NewPostReplyFoundEvent(postReply));
 			}
@@ -976,7 +976,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			post.setKnown(true);
 		}
 		for (PostReply reply : replies) {
-			reply.setKnown(true);
+			database.setPostReplyKnown(reply);
 		}
 
 		logger.info(String.format("Sone loaded successfully: %s", sone));
@@ -1118,7 +1118,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public void markReplyKnown(PostReply reply) {
 		boolean previouslyKnown = reply.isKnown();
-		reply.setKnown(true);
+		database.setPostReplyKnown(reply);
 		eventBus.post(new MarkPostReplyKnownEvent(reply));
 		if (!previouslyKnown) {
 			touchConfiguration();

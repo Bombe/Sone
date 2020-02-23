@@ -124,15 +124,6 @@ class MemoryPostReply implements PostReply {
 		return database.isPostReplyKnown(this);
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
-	@Override
-	public PostReply setKnown(boolean known) {
-		database.setPostReplyKnown(this, known);
-		return this;
-	}
-
 	//
 	// POSTREPLY METHODS
 	//

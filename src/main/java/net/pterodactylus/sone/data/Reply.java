@@ -60,13 +60,4 @@ public interface Reply<T extends Reply<T>> extends Identified {
 	 */
 	public boolean isKnown();
 
-	/**
-	 * Sets whether this reply is known.
-	 *
-	 * @param known
-	 *            {@code true} if this reply is known, {@code false} otherwise
-	 * @return This reply
-	 */
-	public T setKnown(boolean known);
-
 }

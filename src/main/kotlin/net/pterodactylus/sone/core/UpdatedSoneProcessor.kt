@@ -42,7 +42,7 @@ abstract class BasicUpdateSoneProcessor(private val database: Database, private 
 					.map { PostRemovedEvent(it) }
 					.forEach(eventBus::post)
 			newPostReplies
-					.onEach { postReply -> if (postReply.time <= sone.followingTime) postReply.isKnown = true }
+					.onEach { postReply -> if (postReply.time <= sone.followingTime) database.setPostReplyKnown(postReply) }
 					.mapNotNull { postReply -> postReply.isKnown.ifFalse { NewPostReplyFoundEvent(postReply) } }
 					.forEach(eventBus::post)
 			removedPostReplies

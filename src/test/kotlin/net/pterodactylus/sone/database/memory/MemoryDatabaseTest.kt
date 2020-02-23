@@ -405,7 +405,7 @@ class MemoryDatabaseTest {
 		prepareConfigurationValues()
 		val postReply = mock<PostReply>()
 		whenever(postReply.id).thenReturn("post-reply-id")
-		memoryDatabase.setPostReplyKnown(postReply, true)
+		memoryDatabase.setPostReplyKnown(postReply)
 		assertThat(configuration.getStringValue("KnownReplies/0/ID").value, equalTo("post-reply-id"))
 		assertThat(configuration.getStringValue("KnownReplies/1/ID").value, equalTo<Any>(null))
 	}
@@ -435,8 +435,8 @@ class MemoryDatabaseTest {
 		prepareConfigurationValues()
 		val postReply = mock<PostReply>()
 		whenever(postReply.id).thenReturn("post-reply-id")
-		memoryDatabase.setPostReplyKnown(postReply, true)
-		memoryDatabase.setPostReplyKnown(postReply, true)
+		memoryDatabase.setPostReplyKnown(postReply)
+		memoryDatabase.setPostReplyKnown(postReply)
 		verify(configuration, times(1)).getStringValue("KnownReplies/1/ID")
 	}
 
