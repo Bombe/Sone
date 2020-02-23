@@ -21,7 +21,8 @@ import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.TreeMultimap
-import com.google.common.util.concurrent.*
+import com.google.common.util.concurrent.AbstractService
+import com.google.common.util.concurrent.RateLimiter
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import net.pterodactylus.sone.data.Album
@@ -41,7 +42,8 @@ import net.pterodactylus.sone.database.ImageBuilder
 import net.pterodactylus.sone.database.PostBuilder
 import net.pterodactylus.sone.database.PostDatabase
 import net.pterodactylus.sone.database.PostReplyBuilder
-import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.utils.ifTrue
+import net.pterodactylus.sone.utils.unit
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.util.concurrent.locks.ReentrantReadWriteLock
