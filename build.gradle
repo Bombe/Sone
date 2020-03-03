@@ -37,7 +37,7 @@ configurations {
     }
     compile.extendsFrom provided
 }
- 
+
 dependencies {
     provided group: 'org.freenetproject', name: 'fred', version: '0.7.5.1475'
     provided group: 'org.freenetproject', name: 'freenet-ext', version: '29'
