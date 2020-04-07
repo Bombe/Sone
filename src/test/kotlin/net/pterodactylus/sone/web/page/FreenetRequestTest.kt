@@ -16,7 +16,6 @@ class FreenetRequestTest {
 	private val method = Method.GET
 	private val httpRequest = mock(HTTPRequest::class.java)
 	private val toadletContext = mock(ToadletContext::class.java)
-	private val sessionManager = mock<SessionManager>()
 	private val request = FreenetRequest(uri, method, httpRequest, toadletContext)
 
 	@Test
