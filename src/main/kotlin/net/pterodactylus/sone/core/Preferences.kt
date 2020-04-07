@@ -17,14 +17,12 @@
 
 package net.pterodactylus.sone.core
 
-import com.google.common.base.Predicates.*
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.fcp.FcpInterface.*
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.*
 import net.pterodactylus.sone.fcp.event.*
 import net.pterodactylus.sone.utils.*
-import net.pterodactylus.sone.utils.IntegerRangePredicate.*
 import net.pterodactylus.util.config.*
 import java.lang.Integer.*
 
@@ -34,7 +32,7 @@ import java.lang.Integer.*
  */
 class Preferences(private val eventBus: EventBus) {
 
-	private val _insertionDelay = DefaultOption(60, range(0, MAX_VALUE))
+	private val _insertionDelay = DefaultOption(60) { it in 0..MAX_VALUE }
 	val insertionDelay: Int get() = _insertionDelay.get()
 	var newInsertionDelay: Int?
 		get() = unsupported
@@ -44,7 +42,7 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(PreferenceChangedEvent("InsertionDelay", insertionDelay))
 		}
 
-	private val _postsPerPage = DefaultOption(10, range(1, MAX_VALUE))
+	private val _postsPerPage = DefaultOption(10) { it in 1..MAX_VALUE }
 	val postsPerPage: Int get() = _postsPerPage.get()
 	var newPostsPerPage: Int?
 		get() = unsupported
@@ -53,19 +51,19 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(PreferenceChangedEvent("PostsPerPage", postsPerPage))
 		}
 
-	private val _imagesPerPage = DefaultOption(9, range(1, MAX_VALUE))
+	private val _imagesPerPage = DefaultOption(9) { it in 1..MAX_VALUE }
 	val imagesPerPage: Int get() = _imagesPerPage.get()
 	var newImagesPerPage: Int?
 		get() = unsupported
 		set (value: Int?) = _imagesPerPage.set(value)
 
-	private val _charactersPerPost = DefaultOption(400, or(range(50, MAX_VALUE), equalTo(-1)))
+	private val _charactersPerPost = DefaultOption(400) { it == -1 || it in 50..MAX_VALUE }
 	val charactersPerPost: Int get() = _charactersPerPost.get()
 	var newCharactersPerPost: Int?
 		get() = unsupported
 		set(value) = _charactersPerPost.set(value)
 
-	private val _postCutOffLength = DefaultOption(200, range(50, MAX_VALUE))
+	private val _postCutOffLength = DefaultOption(200) { it in 50..MAX_VALUE }
 	val postCutOffLength: Int get() = _postCutOffLength.get()
 	var newPostCutOffLength: Int?
 		get() = unsupported
