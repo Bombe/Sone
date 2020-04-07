@@ -76,6 +76,7 @@ task notParallelTest(type: Test) {
     useJUnit {
         includeCategories 'net.pterodactylus.sone.test.NotParallel'
     }
+    dependsOn parallelTest
 }
 
 test {
