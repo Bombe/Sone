@@ -31,7 +31,7 @@ abstract class JsonPage(protected val webInterface: WebInterface) : Page<Freenet
 	protected fun createErrorJsonObject(error: String) =
 			JsonErrorReturnObject(error)
 
-	protected fun getCurrentSone(toadletContext: ToadletContext, createSession: Boolean = true) =
+	protected fun getCurrentSone(toadletContext: ToadletContext) =
 			sessionProvider.getCurrentSone(toadletContext)
 
 	override fun handleRequest(request: FreenetRequest, response: Response): Response {

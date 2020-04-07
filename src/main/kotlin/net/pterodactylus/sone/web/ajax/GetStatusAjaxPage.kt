@@ -35,7 +35,7 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 	}
 
 	override fun createJsonObject(request: FreenetRequest) =
-			getCurrentSone(request.toadletContext, false).let { currentSone ->
+			getCurrentSone(request.toadletContext).let { currentSone ->
 				createSuccessJsonObject().apply {
 					this["loggedIn"] = currentSone != null
 					this["options"] = currentSone?.options?.toJsonOptions() ?: jsonObject {}

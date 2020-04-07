@@ -21,7 +21,7 @@ class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface) :
 	override val requiresLogin = false
 
 	override fun createJsonObject(request: FreenetRequest) =
-			getCurrentSone(request.toadletContext, false).let { currentSone ->
+			getCurrentSone(request.toadletContext).let { currentSone ->
 				webInterface.getNotifications(currentSone)
 						.sortedBy(Notification::getCreatedTime)
 						.let { notifications ->
