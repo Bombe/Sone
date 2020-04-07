@@ -17,14 +17,17 @@
 
 package net.pterodactylus.sone.core
 
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.core.event.*
-import net.pterodactylus.sone.fcp.FcpInterface.*
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.*
-import net.pterodactylus.sone.fcp.event.*
-import net.pterodactylus.sone.utils.*
-import net.pterodactylus.util.config.*
-import java.lang.Integer.*
+import com.google.common.eventbus.EventBus
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
+import net.pterodactylus.sone.utils.DefaultOption
+import net.pterodactylus.util.config.Configuration
+import net.pterodactylus.util.config.ConfigurationException
+import java.lang.Integer.MAX_VALUE
 
 /**
  * Convenience interface for external classes that want to access the core’s
@@ -55,7 +58,7 @@ class Preferences(private val eventBus: EventBus) {
 	val imagesPerPage: Int get() = _imagesPerPage.get()
 	var newImagesPerPage: Int?
 		get() = unsupported
-		set (value: Int?) = _imagesPerPage.set(value)
+		set(value: Int?) = _imagesPerPage.set(value)
 
 	private val _charactersPerPost = DefaultOption(400) { it == -1 || it in 50..MAX_VALUE }
 	val charactersPerPost: Int get() = _charactersPerPost.get()
