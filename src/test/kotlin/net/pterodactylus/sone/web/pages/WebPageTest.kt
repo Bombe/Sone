@@ -104,9 +104,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	}
 
 	private fun setupWebInterface() {
-		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSone(eq(toadletContext))).thenReturn(currentSone)
-		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getNotifications(currentSone)).then { notifications.values }
 		whenever(webInterface.getNotification(anyString())).then { notifications[it[0]].asOptional() }
 		whenever(webInterface.translation).thenReturn(translation)
@@ -172,9 +170,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	}
 
 	fun unsetCurrentSone() {
-		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(null)
 		whenever(webInterface.getCurrentSone(eq(toadletContext))).thenReturn(null)
-		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(null)
 	}
 
 	fun addOwnIdentity(ownIdentity: OwnIdentity) {

@@ -23,7 +23,6 @@ import static java.util.logging.Logger.getLogger;
 import java.util.Collection;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.UUID;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -88,15 +87,12 @@ import net.pterodactylus.util.template.TemplateContextFactory;
 import net.pterodactylus.util.web.RedirectPage;
 import net.pterodactylus.util.web.TemplatePage;
 
-import freenet.clients.http.SessionManager;
-import freenet.clients.http.SessionManager.Session;
-import freenet.clients.http.ToadletContext;
-
 import com.codahale.metrics.*;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
+import freenet.clients.http.ToadletContext;
 
 /**
  * Bundles functionality that a web interface of a Freenet plugin needs, e.g.
@@ -140,6 +136,7 @@ public class WebInterface implements SessionProvider {
 	private final PageToadletRegistry pageToadletRegistry;
 	private final MetricRegistry metricRegistry;
 	private final Translation translation;
+	private final SessionProvider sessionProvider;
 
 	/** The “new post” notification. */
 	private final ListNotification<Post> newPostNotification;
@@ -162,7 +159,8 @@ public class WebInterface implements SessionProvider {
 			RenderFilter renderFilter,
 			LinkedElementRenderFilter linkedElementRenderFilter,
 			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
-			NotificationManager notificationManager, @Named("newRemotePost") ListNotification<Post> newPostNotification,
+			NotificationManager notificationManager, SessionProvider sessionProvider,
+			@Named("newRemotePost") ListNotification<Post> newPostNotification,
 			@Named("newRemotePostReply") ListNotification<PostReply> newReplyNotification,
 			@Named("localPost") ListNotification<Post> localPostNotification,
 			@Named("localReply") ListNotification<PostReply> localReplyNotification) {
@@ -182,6 +180,7 @@ public class WebInterface implements SessionProvider {
 		this.l10nFilter = l10nFilter;
 		this.translation = translation;
 		this.notificationManager = notificationManager;
+		this.sessionProvider = sessionProvider;
 		this.newPostNotification = newPostNotification;
 		this.newReplyNotification = newReplyNotification;
 		this.localPostNotification = localPostNotification;
@@ -216,75 +215,15 @@ public class WebInterface implements SessionProvider {
 		return templateContextFactory;
 	}
 
-	private Session getCurrentSessionWithoutCreation(ToadletContext toadletContenxt) {
-		return getSessionManager().useSession(toadletContenxt);
-	}
-
-	private Session getOrCreateCurrentSession(ToadletContext toadletContenxt) {
-		Session session = getCurrentSessionWithoutCreation(toadletContenxt);
-		if (session == null) {
-			session = getSessionManager().createSession(UUID.randomUUID().toString(), toadletContenxt);
-		}
-		return session;
-	}
-
-	public Sone getCurrentSoneCreatingSession(ToadletContext toadletContext) {
-		Collection<Sone> localSones = getCore().getLocalSones();
-		if (localSones.size() == 1) {
-			return localSones.iterator().next();
-		}
-		return getCurrentSone(getOrCreateCurrentSession(toadletContext));
-	}
-
-	public Sone getCurrentSoneWithoutCreatingSession(ToadletContext toadletContext) {
-		Collection<Sone> localSones = getCore().getLocalSones();
-		if (localSones.size() == 1) {
-			return localSones.iterator().next();
-		}
-		return getCurrentSone(getCurrentSessionWithoutCreation(toadletContext));
-	}
-
-	/**
-	 * Returns the currently logged in Sone.
-	 *
-	 * @param session
-	 *            The session
-	 * @return The currently logged in Sone, or {@code null} if no Sone is
-	 *         currently logged in
-	 */
-	private Sone getCurrentSone(Session session) {
-		if (session == null) {
-			return null;
-		}
-		String soneId = (String) session.getAttribute("Sone.CurrentSone");
-		if (soneId == null) {
-			return null;
-		}
-		return getCore().getLocalSone(soneId);
-	}
-
-	@Override
 	@Nullable
+	@Override
 	public Sone getCurrentSone(@Nonnull ToadletContext toadletContext) {
-		return getCurrentSoneWithoutCreatingSession(toadletContext);
+		return sessionProvider.getCurrentSone(toadletContext);
 	}
 
-	/**
-	 * Sets the currently logged in Sone.
-	 *
-	 * @param toadletContext
-	 *            The toadlet context
-	 * @param sone
-	 *            The Sone to set as currently logged in
-	 */
 	@Override
 	public void setCurrentSone(@Nonnull ToadletContext toadletContext, @Nullable Sone sone) {
-		Session session = getOrCreateCurrentSession(toadletContext);
-		if (sone == null) {
-			session.removeAttribute("Sone.CurrentSone");
-		} else {
-			session.setAttribute("Sone.CurrentSone", sone.getId());
-		}
+		sessionProvider.setCurrentSone(toadletContext, sone);
 	}
 
 	/**
@@ -308,15 +247,6 @@ public class WebInterface implements SessionProvider {
 
 	public Translation getTranslation() {
 		return translation;
-	}
-
-	/**
-	 * Returns the session manager of the node.
-	 *
-	 * @return The node’s session manager
-	 */
-	public SessionManager getSessionManager() {
-		return sonePlugin.pluginRespirator().getSessionManager("Sone");
 	}
 
 	/**
