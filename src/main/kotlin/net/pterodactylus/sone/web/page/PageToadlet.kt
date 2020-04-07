@@ -20,7 +20,6 @@ package net.pterodactylus.sone.web.page
 import freenet.client.HighLevelSimpleClient
 import freenet.clients.http.LinkEnabledCallback
 import freenet.clients.http.LinkFilterExceptedToadlet
-import freenet.clients.http.SessionManager
 import freenet.clients.http.Toadlet
 import freenet.clients.http.ToadletContext
 import freenet.support.MultiValueTable
@@ -36,7 +35,6 @@ import java.net.URI
  */
 class PageToadlet(
 		highLevelSimpleClient: HighLevelSimpleClient,
-		private val sessionManager: SessionManager,
 		val menuName: String?,
 		private val page: Page<FreenetRequest>,
 		private val pathPrefix: String

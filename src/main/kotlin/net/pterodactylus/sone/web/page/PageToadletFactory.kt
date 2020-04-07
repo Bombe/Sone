@@ -30,6 +30,6 @@ class PageToadletFactory @Inject constructor(
 
 	@JvmOverloads
 	fun createPageToadlet(page: Page<FreenetRequest>, menuName: String? = null) =
-			PageToadlet(highLevelSimpleClient, sessionManager, menuName ?: page.menuName, page, pathPrefix)
+			PageToadlet(highLevelSimpleClient, menuName ?: page.menuName, page, pathPrefix)
 
 }

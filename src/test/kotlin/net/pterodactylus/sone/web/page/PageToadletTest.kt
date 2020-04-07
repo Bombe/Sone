@@ -23,7 +23,6 @@ import freenet.clients.http.FProxyFetchInProgress.REFILTER_POLICY
 import freenet.clients.http.LinkEnabledCallback
 import freenet.clients.http.PageMaker
 import freenet.clients.http.ReceivedCookie
-import freenet.clients.http.SessionManager
 import freenet.clients.http.Toadlet
 import freenet.clients.http.ToadletContainer
 import freenet.clients.http.ToadletContext
@@ -57,7 +56,6 @@ import kotlin.text.Charsets.UTF_8
 class PageToadletTest {
 
 	private val highLevelSimpleClient = mock<HighLevelSimpleClient>()
-	private val sessionManager = mock<SessionManager>()
 	private val httpRequest = mock<HTTPRequest>()
 	private val toadletContext = deepMock<ToadletContext>()
 
@@ -73,7 +71,7 @@ class PageToadletTest {
 					super.handleRequest(request, response)
 							.also { capturedRequest = request }
 		}
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		pageToadlet.handleMethodGET(URI("/test"), httpRequest, toadletContext)
 		assertThat(capturedRequest!!.uri, equalTo(URI("/test")))
 		assertThat(capturedRequest!!.method, equalTo(Method.GET))
@@ -87,7 +85,7 @@ class PageToadletTest {
 					super.handleRequest(request, response)
 							.also { capturedRequest = request }
 		}
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		pageToadlet.handleMethodPOST(URI("/test"), httpRequest, toadletContext)
 		assertThat(capturedRequest!!.uri, equalTo(URI("/test")))
 		assertThat(capturedRequest!!.method, equalTo(Method.POST))
@@ -107,7 +105,7 @@ class PageToadletTest {
 						write("Content")
 					}
 		}
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		var writtenData: ByteArray? = null
 		var capturedReply: CapturedReply? = null
 		val toadletContext = object : DelegatingToadletContext(this.toadletContext) {
@@ -138,7 +136,7 @@ class PageToadletTest {
 	@Test
 	fun `link-enabled is true for non-callback pages`() {
 		val page = TestPage()
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		assertThat(pageToadlet.isEnabled(toadletContext), equalTo(true))
 	}
 
@@ -148,7 +146,7 @@ class PageToadletTest {
 		val page = object : TestPage(), LinkEnabledCallback {
 			override fun isEnabled(ctx: ToadletContext?) = false.also { capturedToadletContext = toadletContext }
 		}
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		assertThat(pageToadlet.isEnabled(toadletContext), equalTo(false))
 		assertThat(capturedToadletContext, sameInstance(toadletContext))
 	}
@@ -156,7 +154,7 @@ class PageToadletTest {
 	@Test
 	fun `link excemption is false for non-freenet pages`() {
 		val page = TestPage()
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		assertThat(pageToadlet.isLinkExcepted(URI("/test")), equalTo(false))
 	}
 
@@ -166,7 +164,7 @@ class PageToadletTest {
 		val page = object : TestPage(), FreenetPage {
 			override fun isLinkExcepted(link: URI) = true.also { capturedUri = link }
 		}
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		assertThat(pageToadlet.isLinkExcepted(URI("/test")), equalTo(true))
 		assertThat(capturedUri, equalTo(URI("/test")))
 	}
@@ -176,13 +174,13 @@ class PageToadletTest {
 		val page = object : TestPage() {
 			override fun getPath() = "test-path"
 		}
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", page, "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", page, "/path/")
 		assertThat(pageToadlet.path(), equalTo("/path/test-path"))
 	}
 
 	@Test
 	fun `menu name is returned correctly`() {
-		val pageToadlet = PageToadlet(highLevelSimpleClient, sessionManager, "MenuName", TestPage(), "/path/")
+		val pageToadlet = PageToadlet(highLevelSimpleClient, "MenuName", TestPage(), "/path/")
 		assertThat(pageToadlet.menuName, equalTo("MenuName"))
 	}
 
