@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.utils
 
-import com.google.common.base.Predicate
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
@@ -14,7 +13,7 @@ class DefaultOptionTest {
 
 	private val defaultValue = Any()
 	private val acceptedValue = Any()
-	private val matchesAcceptedValue = Predicate<Any?> { it == acceptedValue }
+	private val matchesAcceptedValue = { it: Any -> it == acceptedValue }
 
 	@Test
 	fun `default option returns default value when unset`() {
