@@ -12,6 +12,8 @@ import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.database.memory.*
 import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.wot.*
+import net.pterodactylus.sone.web.FreenetSessionProvider
+import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.util.config.*
 import net.pterodactylus.util.config.ConfigurationException
 import net.pterodactylus.util.logging.*
@@ -63,6 +65,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(WebOfTrustConnector::class.java).to(PluginWebOfTrustConnector::class.java).`in`(Singleton::class.java)
 		bind(TickerShutdown::class.java).`in`(Singleton::class.java)
 		bind(SoneUriCreator::class.java).`in`(Singleton::class.java)
+		bind(SessionProvider::class.java).to(FreenetSessionProvider::class.java).`in`(Singleton::class.java)
 
 		bindListener(Matchers.any(), object : TypeListener {
 			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {

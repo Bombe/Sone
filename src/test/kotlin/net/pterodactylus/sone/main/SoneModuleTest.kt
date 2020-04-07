@@ -4,7 +4,9 @@ import com.codahale.metrics.*
 import com.google.common.base.*
 import com.google.common.eventbus.*
 import com.google.inject.Guice.*
+import com.google.inject.Injector
 import com.google.inject.name.Names.*
+import freenet.clients.http.SessionManager
 import freenet.l10n.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.database.*
@@ -13,6 +15,7 @@ import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.test.*
+import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.util.config.*
 import net.pterodactylus.util.version.Version
 import org.hamcrest.MatcherAssert.*
@@ -41,14 +44,7 @@ class SoneModuleTest {
 		whenever(l10n()).thenReturn(l10n)
 	}
 
-	private val injector by lazy {
-		createInjector(
-				SoneModule(sonePlugin, EventBus()),
-				FreenetInterface::class.isProvidedByDeepMock(),
-				PluginRespiratorFacade::class.isProvidedByDeepMock(),
-				PluginConnector::class.isProvidedByDeepMock()
-		)
-	}
+	private val injector by lazy { createInjector() }
 
 	@AfterTest
 	fun removePropertiesFromCurrentDirectory() {
@@ -198,15 +194,19 @@ class SoneModuleTest {
 	@Test
 	fun `core is registered with event bus`() {
 		val eventBus = mock<EventBus>()
-		val injector = createInjector(
-				SoneModule(sonePlugin, eventBus),
-				FreenetInterface::class.isProvidedByDeepMock(),
-				PluginRespiratorFacade::class.isProvidedByDeepMock(),
-				PluginConnector::class.isProvidedByDeepMock()
-		)
+		val injector = createInjector(eventBus)
 		val core = injector.getInstance<Core>()
 		verify(eventBus).register(core)
 	}
+
+	private fun createInjector(eventBus: EventBus = EventBus()): Injector =
+			createInjector(
+					SoneModule(sonePlugin, eventBus),
+					FreenetInterface::class.isProvidedByDeepMock(),
+					PluginRespiratorFacade::class.isProvidedByDeepMock(),
+					PluginConnector::class.isProvidedByDeepMock(),
+					SessionManager::class.isProvidedByMock()
+			)
 
 	@Test
 	fun `metrics registry is created as singleton`() {
@@ -231,6 +231,11 @@ class SoneModuleTest {
 	@Test
 	fun `sone URI creator is created as singleton`() {
 		injector.verifySingletonInstance<SoneUriCreator>()
+	}
+
+	@Test
+	fun `session provider is created as singleton`() {
+		injector.verifySingletonInstance<SessionProvider>()
 	}
 
 }
