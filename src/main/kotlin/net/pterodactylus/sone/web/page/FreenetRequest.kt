@@ -29,13 +29,4 @@ open class FreenetRequest(uri: URI, method: Method,
 		val httpRequest: HTTPRequest,
 		val toadletContext: ToadletContext,
 		val sessionManager: SessionManager
-) : Request(uri, method) {
-
-	val session: Session
-		get() =
-			sessionManager.useSession(toadletContext)
-					?: sessionManager.createSession(randomUUID().toString(), toadletContext)
-
-	val existingSession: Session? get() = sessionManager.useSession(toadletContext)
-
-}
+) : Request(uri, method)
