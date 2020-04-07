@@ -2,21 +2,18 @@ package net.pterodactylus.sone.web.page
 
 import com.google.inject.*
 import freenet.client.*
-import freenet.clients.http.*
 import net.pterodactylus.sone.test.*
-import net.pterodactylus.sone.web.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
 
 private val highLevelSimpleClient = mock<HighLevelSimpleClient>()
-private val sessionManager = mock<SessionManager>()
 private const val pathPrefix = "/some/prefix/"
 
 class PageToadletFactoryTest {
 
-	private val pageToadletFactory = PageToadletFactory(highLevelSimpleClient, sessionManager, pathPrefix)
+	private val pageToadletFactory = PageToadletFactory(highLevelSimpleClient, pathPrefix)
 
 	@Test
 	fun `page toadlet without menu name is created without menu name`() {
@@ -59,7 +56,6 @@ class PageToadletFactoryTest {
 	fun `page toadlet factory can be created by guice`() {
 		val injector = Guice.createInjector(
 				HighLevelSimpleClient::class.isProvidedBy(highLevelSimpleClient),
-				SessionManager::class.isProvidedBy(sessionManager),
 				String::class.withNameIsProvidedBy("/Sone/", "toadletPathPrefix")
 		)
 	    assertThat(injector.getInstance<PageToadletFactory>(), notNullValue())
