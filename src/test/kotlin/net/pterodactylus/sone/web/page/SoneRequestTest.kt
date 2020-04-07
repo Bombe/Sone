@@ -19,10 +19,9 @@ class SoneRequestTest {
 	private val method = Method.GET
 	private val httpRequest = Mockito.mock(HTTPRequest::class.java)
 	private val toadletContext = Mockito.mock(ToadletContext::class.java)
-	private val sessionManager = mock<SessionManager>()
 	private val core = mock<Core>()
 	private val webInterface = mock<WebInterface>()
-	private val soneRequest = SoneRequest(uri, method, httpRequest, toadletContext, sessionManager, core, webInterface)
+	private val soneRequest = SoneRequest(uri, method, httpRequest, toadletContext, core, webInterface)
 
 	@Test
 	fun `freenet request properties are retained correctly`() {
@@ -30,7 +29,6 @@ class SoneRequestTest {
 		assertThat(soneRequest.method, equalTo(method))
 		assertThat(soneRequest.httpRequest, equalTo(httpRequest))
 		assertThat(soneRequest.toadletContext, equalTo(toadletContext))
-		assertThat(soneRequest.sessionManager, equalTo(sessionManager))
 	}
 
 	@Test
@@ -45,13 +43,12 @@ class SoneRequestTest {
 
 	@Test
 	fun `freenet request is wrapped correctly`() {
-	    val freenetRequest = FreenetRequest(uri, method, httpRequest, toadletContext, sessionManager)
+	    val freenetRequest = FreenetRequest(uri, method, httpRequest, toadletContext)
 		val wrappedSoneRequest = freenetRequest.toSoneRequest(core, webInterface)
 		assertThat(wrappedSoneRequest.uri, equalTo(uri))
 		assertThat(wrappedSoneRequest.method, equalTo(method))
 		assertThat(wrappedSoneRequest.httpRequest, equalTo(httpRequest))
 		assertThat(wrappedSoneRequest.toadletContext, equalTo(toadletContext))
-		assertThat(wrappedSoneRequest.sessionManager, equalTo(sessionManager))
 		assertThat(wrappedSoneRequest.core, sameInstance(core))
 		assertThat(wrappedSoneRequest.webInterface, sameInstance(webInterface))
 	}

@@ -91,7 +91,7 @@ open class SoneTemplatePage(
 	private val String.urlEncode: String get() = URLEncoder.encode(this, "UTF-8")
 
 	override fun isEnabled(toadletContext: ToadletContext) =
-			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, webInterface.sessionManager, core, webInterface))
+			isEnabled(SoneRequest(toadletContext.uri, Method.GET, HTTPRequestImpl(toadletContext.uri, "GET"), toadletContext, core, webInterface))
 
 	open fun isEnabled(soneRequest: SoneRequest) = when {
 		requiresLogin && getCurrentSone(soneRequest.toadletContext) == null -> false

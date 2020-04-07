@@ -45,10 +45,10 @@ class PageToadlet(
 	override fun path() = pathPrefix + page.path
 
 	override fun handleMethodGET(uri: URI, httpRequest: HTTPRequest, toadletContext: ToadletContext) =
-			handleRequest(FreenetRequest(uri, Method.GET, httpRequest, toadletContext, sessionManager))
+			handleRequest(FreenetRequest(uri, Method.GET, httpRequest, toadletContext))
 
 	fun handleMethodPOST(uri: URI?, httpRequest: HTTPRequest?, toadletContext: ToadletContext?) =
-			handleRequest(FreenetRequest(uri!!, Method.POST, httpRequest!!, toadletContext!!, sessionManager))
+			handleRequest(FreenetRequest(uri!!, Method.POST, httpRequest!!, toadletContext!!))
 
 	private fun handleRequest(pageRequest: FreenetRequest) {
 		pageRequest.toadletContext.bucketFactory.makeBucket(-1).use { pageBucket ->

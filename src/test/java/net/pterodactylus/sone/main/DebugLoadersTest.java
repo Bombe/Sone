@@ -70,7 +70,7 @@ public class DebugLoadersTest {
 		HTTPRequest httpRequest = mock(HTTPRequest.class);
 		ToadletContext toadletContext = mock(ToadletContext.class);
 		SessionManager sessionManager = mock(SessionManager.class);
-		FreenetRequest request = new FreenetRequest(uri, method, httpRequest, toadletContext, sessionManager);
+		FreenetRequest request = new FreenetRequest(uri, method, httpRequest, toadletContext);
 		OutputStream outputStream = new ByteArrayOutputStream();
 		Response response = new Response(outputStream);
 		page.handleRequest(request, response);

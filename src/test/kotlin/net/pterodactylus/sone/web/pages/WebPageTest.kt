@@ -42,7 +42,6 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	val core = webInterface.core
 	val eventBus = mock<EventBus>()
 	val preferences = Preferences(eventBus)
-	val sessionManager = mock<SessionManager>()
 
 	open val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
 
@@ -50,7 +49,6 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	val freenetRequest = mock<FreenetRequest>()
 
 	init {
-		whenever(freenetRequest.sessionManager).thenReturn(sessionManager)
 		whenever(freenetRequest.uri).thenReturn(mock())
 	}
 
@@ -106,7 +104,6 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	}
 
 	private fun setupWebInterface() {
-		whenever(webInterface.sessionManager).thenReturn(sessionManager)
 		whenever(webInterface.getCurrentSoneCreatingSession(eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSone(eq(toadletContext), anyBoolean())).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(eq(toadletContext))).thenReturn(currentSone)
