@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.utils;
 
-import com.google.common.base.Predicate;
+import java.util.function.Predicate;
 
 /**
  * Basic implementation of an {@link Option}.
@@ -66,7 +66,7 @@ public class DefaultOption<T> implements Option<T> {
 	 */
 	@Override
 	public boolean validate(T value) {
-		return (validator == null) || (value == null) || validator.apply(value);
+		return (validator == null) || (value == null) || validator.test(value);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class DefaultOption<T> implements Option<T> {
 	 */
 	@Override
 	public void set(T value) {
-		if ((value != null) && (validator != null) && (!validator.apply(value))) {
+		if ((value != null) && (validator != null) && (!validator.test(value))) {
 			throw new IllegalArgumentException("New Value (" + value + ") could not be validated.");
 		}
 		this.value = value;
