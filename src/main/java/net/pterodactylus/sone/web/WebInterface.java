@@ -265,8 +265,8 @@ public class WebInterface implements SessionProvider {
 
 	@Override
 	@Nullable
-	public Sone getCurrentSone(@Nonnull ToadletContext toadletContext, boolean createSession) {
-		return createSession ? getCurrentSoneCreatingSession(toadletContext) : getCurrentSoneWithoutCreatingSession(toadletContext);
+	public Sone getCurrentSone(@Nonnull ToadletContext toadletContext) {
+		return getCurrentSoneWithoutCreatingSession(toadletContext);
 	}
 
 	/**

@@ -80,7 +80,7 @@ open class TestObjects {
 
 	init {
 		whenever(webInterface.templateContextFactory).thenReturn(TemplateContextFactory())
-		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext), ArgumentMatchers.anyBoolean())).thenReturn(currentSone)
+		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(currentSone)
 		whenever(webInterface.core).thenReturn(core)
@@ -139,7 +139,7 @@ open class TestObjects {
 	}
 
 	protected fun unsetCurrentSone() {
-		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext), ArgumentMatchers.anyBoolean())).thenReturn(null)
+		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext))).thenReturn(null)
 		whenever(webInterface.getCurrentSoneWithoutCreatingSession(toadletContext)).thenReturn(null)
 		whenever(webInterface.getCurrentSoneCreatingSession(toadletContext)).thenReturn(null)
 	}
