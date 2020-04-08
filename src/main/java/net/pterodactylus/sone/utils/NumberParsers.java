@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.utils;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.primitives.Ints;

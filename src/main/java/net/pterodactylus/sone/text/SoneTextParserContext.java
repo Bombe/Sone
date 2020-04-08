@@ -18,7 +18,6 @@
 package net.pterodactylus.sone.text;
 
 import net.pterodactylus.sone.data.Sone;
-import net.pterodactylus.sone.web.page.FreenetRequest;
 
 /**
  * {@link ParserContext} implementation for the {@link SoneTextParser}. It

@@ -23,8 +23,6 @@ import java.util.Map;
 
 import net.pterodactylus.sone.utils.Option;
 
-import com.google.common.base.Predicate;
-
 /**
  * Stores various options that influence Sone’s behaviour.
  */

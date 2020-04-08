@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.core
 
-import com.google.common.base.Optional.*
 import net.pterodactylus.sone.core.ConfigurationSoneParser.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.database.*

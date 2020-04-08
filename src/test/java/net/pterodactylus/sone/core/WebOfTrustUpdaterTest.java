@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 import java.util.concurrent.CountDownLatch;
@@ -17,7 +16,6 @@ import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.SetPropertyJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.WebOfTrustContextUpdateJob;
 import net.pterodactylus.sone.core.WebOfTrustUpdaterImpl.WebOfTrustUpdateJob;
 import net.pterodactylus.sone.freenet.plugin.PluginException;
-import net.pterodactylus.sone.freenet.wot.Identity;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.WebOfTrustConnector;
 

@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.template
 
 import net.pterodactylus.sone.core.Core
-import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Profile
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions

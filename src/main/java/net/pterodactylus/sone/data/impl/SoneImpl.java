@@ -44,7 +44,6 @@ import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;

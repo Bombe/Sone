@@ -43,8 +43,6 @@ import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
 import net.pterodactylus.sone.data.AlbumKt;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
 import net.pterodactylus.sone.data.SoneKt;

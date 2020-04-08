@@ -42,7 +42,6 @@ import com.google.common.annotations.*;
 import com.google.common.eventbus.*;
 import com.google.common.cache.*;
 import com.google.inject.*;
-import com.google.inject.Module;
 import com.google.inject.name.*;
 import kotlin.jvm.functions.*;
 

@@ -17,12 +17,8 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.base.Function;
 
 /**
  * Interface for web of trust identities, defining all functions that can be

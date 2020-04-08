@@ -12,7 +12,6 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.*
-import net.pterodactylus.sone.web.notification.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*

@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
-import freenet.l10n.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.test.*

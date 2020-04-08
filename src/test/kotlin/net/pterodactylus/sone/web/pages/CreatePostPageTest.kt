@@ -1,9 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
-import com.google.common.base.Optional.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.test.*
-import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.web.Method.*

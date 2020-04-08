@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.core;
 
-import static com.google.common.base.Optional.absent;
-import static com.google.common.base.Optional.of;
 import static com.google.common.base.Ticker.systemTicker;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 
@@ -11,7 +9,6 @@ import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.base.Ticker;
 
 /**

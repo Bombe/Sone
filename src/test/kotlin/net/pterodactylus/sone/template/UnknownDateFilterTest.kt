@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.template
 
 import net.pterodactylus.sone.freenet.*
-import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*

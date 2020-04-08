@@ -5,7 +5,6 @@ import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.*
-import org.hamcrest.Matchers
 import org.hamcrest.Matchers.*
 
 /**

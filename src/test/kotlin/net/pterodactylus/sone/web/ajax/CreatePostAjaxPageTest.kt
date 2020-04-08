@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.web.ajax
 
-import com.google.common.base.Optional
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.test.getInstance

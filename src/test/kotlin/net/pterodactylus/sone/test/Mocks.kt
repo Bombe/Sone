@@ -23,7 +23,6 @@ import freenet.keys.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.SoneOptions.*
 import net.pterodactylus.sone.data.impl.*
-import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.utils.*
 
 val remoteSone1 = createRemoteSone()

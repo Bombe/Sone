@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.utils
 
-import java.util.function.Predicate
-
 /**
  * Basic implementation of an [Option].
  *

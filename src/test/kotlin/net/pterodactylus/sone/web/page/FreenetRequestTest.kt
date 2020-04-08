@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
 import freenet.support.api.*
-import net.pterodactylus.sone.test.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*

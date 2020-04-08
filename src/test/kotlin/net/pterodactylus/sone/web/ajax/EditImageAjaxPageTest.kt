@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.template.ParserFilter
