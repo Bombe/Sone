@@ -41,10 +41,13 @@ class FreenetSessionProvider @Inject constructor(private val soneProvider: SoneP
 			sessionManager.useSession(toadletContext)
 					?.removeAttribute("Sone.CurrentSone")
 		} else {
-			(sessionManager.useSession(toadletContext)
-					?: sessionManager.createSession(UUID.randomUUID().toString(), toadletContext))
+			sessionManager.getOrCreateSession(toadletContext)
 					?.setAttribute("Sone.CurrentSone", sone.id)
 		}
 	}
+
+	private fun SessionManager.getOrCreateSession(toadletContext: ToadletContext) =
+			useSession(toadletContext)
+					?: createSession(UUID.randomUUID().toString(), toadletContext)
 
 }
