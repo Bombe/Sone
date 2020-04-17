@@ -60,7 +60,7 @@ class IdentityManagerImpl @Inject constructor(
 
 				val onlyTrustedByAll = currentIdentities.mapValues { (ownIdentity, trustedIdentities) ->
 					trustedIdentities.filter { trustedIdentity ->
-						currentIdentities.all { trustedIdentity in it.value }
+						currentIdentities.filterValues { it.isNotEmpty() }.all { trustedIdentity in it.value }
 					}
 				}
 				logger.log(Level.FINE, "Reduced (${currentIdentities.size},(${currentIdentities.values.joinToString { it.size.toString() }})) identities to (${onlyTrustedByAll.size},(${onlyTrustedByAll.values.joinToString { it.size.toString() }})).")
