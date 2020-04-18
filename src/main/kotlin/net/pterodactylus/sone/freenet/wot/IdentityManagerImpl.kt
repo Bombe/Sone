@@ -58,9 +58,20 @@ class IdentityManagerImpl @Inject constructor(
 			try {
 				val currentIdentities = identityLoader.loadIdentities()
 
-				val onlyTrustedByAll = currentIdentities.mapValues { (ownIdentity, trustedIdentities) ->
+				val identitiesWithTrust = currentIdentities.values.flatten()
+						.groupBy { it.id }
+						.mapValues { (_, identities) ->
+							identities.reduce { accIdentity, identity ->
+								identity.trust.forEach { (ownIdentity: OwnIdentity?, trust: Trust?) ->
+									accIdentity.setTrust(ownIdentity, trust)
+								}
+								accIdentity
+							}
+						}
+
+				val onlyTrustedByAll = currentIdentities.mapValues { (_, trustedIdentities) ->
 					trustedIdentities.filter { trustedIdentity ->
-						currentIdentities.filterValues { it.isNotEmpty() }.all { trustedIdentity in it.value }
+						identitiesWithTrust[trustedIdentity.id]!!.trust.all { it.value.hasZeroOrPositiveTrust() }
 					}
 				}
 				logger.log(Level.FINE, "Reduced (${currentIdentities.size},(${currentIdentities.values.joinToString { it.size.toString() }})) identities to (${onlyTrustedByAll.size},(${onlyTrustedByAll.values.joinToString { it.size.toString() }})).")
@@ -95,4 +106,11 @@ private fun notThrowing(action: () -> Unit): Boolean =
 			true
 		} catch (e: Exception) {
 			false
+		}
+
+private fun Trust.hasZeroOrPositiveTrust() =
+		if (explicit == null) {
+			implicit == null || implicit >= 0
+		} else {
+			explicit >= 0
 		}

@@ -17,7 +17,9 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import java.util.Collections.*
+import java.util.Collections.synchronizedMap
+import java.util.Collections.synchronizedSet
+import kotlin.collections.set
 
 /**
  * A Web of Trust identity.
@@ -75,6 +77,10 @@ open class DefaultIdentity(private val id: String, private val nickname: String?
 		synchronized(properties) {
 			properties -= name
 		}
+	}
+
+	override fun getTrust(): Map<OwnIdentity, Trust> = synchronized(trustCache) {
+		trustCache.toMap()
 	}
 
 	override fun getTrust(ownIdentity: OwnIdentity) = synchronized(trustCache) {

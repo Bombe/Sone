@@ -131,6 +131,8 @@ public interface Identity {
 	 */
 	public Identity removeProperty(String name);
 
+	Map<OwnIdentity, Trust> getTrust();
+
 	/**
 	 * Retrieves the trust that this identity receives from the given own
 	 * identity. If this identity is not in the own identity’s trust tree, a
