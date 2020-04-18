@@ -3,6 +3,8 @@ package net.pterodactylus.sone.core
 import com.google.common.eventbus.EventBus
 import com.google.common.eventbus.Subscribe
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
@@ -12,6 +14,7 @@ import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
 import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.MapConfigurationBackend
+import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.emptyIterable
 import org.hamcrest.Matchers.equalTo
@@ -81,9 +84,7 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences saves null for default insertion delay setting`() {
-		val configuration = Configuration(MapConfigurationBackend())
-		preferences.saveTo(configuration)
-		assertThat(configuration.getIntValue("Option/InsertionDelay").getValue(null), nullValue())
+		verifySavedOption(nullValue()) { it.getIntValue("Option/InsertionDelay").getValue(null) }
 	}
 
 	@Test
@@ -291,6 +292,69 @@ class PreferencesTest {
 	@Test
 	fun `setting posts per page to valid value sends change event`() {
 		testPreferencesChangedEvent("PostsPerPage", { preferences.newPostsPerPage = it }, 31)
+	}
+
+	@Test
+	fun `default strict filtering is false`() {
+		assertThat(preferences.strictFiltering, equalTo(false))
+	}
+
+	@Test
+	fun `strict filtering can be set`() {
+		preferences.newStrictFiltering = true
+		assertThat(preferences.strictFiltering, equalTo(true))
+	}
+
+	@Test
+	fun `strict filtering returns to default on null`() {
+		preferences.newStrictFiltering = true
+		preferences.newStrictFiltering = null
+		assertThat(preferences.strictFiltering, equalTo(false))
+	}
+
+	@Test
+	fun `event is generated when strict filtering is activated`() {
+		val events = mutableListOf<StrictFilteringActivatedEvent>()
+		eventBus.register(object {
+			@Subscribe fun strictFilteringActivatedEvent(event: StrictFilteringActivatedEvent) =
+					events.add(event)
+		})
+		preferences.newStrictFiltering = true
+		assertThat(events, hasItem<StrictFilteringActivatedEvent>(instanceOf(StrictFilteringActivatedEvent::class.java)))
+	}
+
+	@Test
+	fun `event is generated when strict filtering is deactivated`() {
+		val events = mutableListOf<StrictFilteringDeactivatedEvent>()
+		eventBus.register(object {
+			@Subscribe fun strictFilteringDeactivatedEvent(event: StrictFilteringDeactivatedEvent) =
+					events.add(event)
+		})
+		preferences.newStrictFiltering = false
+		assertThat(events, hasItem<StrictFilteringDeactivatedEvent>(instanceOf(StrictFilteringDeactivatedEvent::class.java)))
+	}
+
+	@Test
+	fun `default strict filtering is saved as null`() {
+		verifySavedOption(nullValue()) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	@Test
+	fun `activated strict filtering is saved as true`() {
+		preferences.newStrictFiltering = true
+		verifySavedOption(equalTo(true)) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	@Test
+	fun `deactivated strict filtering is saved as false`() {
+		preferences.newStrictFiltering = false
+		verifySavedOption(equalTo(false)) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	private fun <T> verifySavedOption(matcher: Matcher<T>, getter: (Configuration) -> T) {
+		val configuration = Configuration(MapConfigurationBackend())
+		preferences.saveTo(configuration)
+		assertThat(getter(configuration), matcher)
 	}
 
 	private fun <T : Any> testPreferencesChangedEvent(name: String, setter: (T) -> Unit, value: T) {

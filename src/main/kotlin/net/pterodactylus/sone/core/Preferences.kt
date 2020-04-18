@@ -19,6 +19,8 @@ package net.pterodactylus.sone.core
 
 import com.google.common.eventbus.EventBus
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
@@ -99,6 +101,17 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(FullAccessRequiredChanged(fcpFullAccessRequired))
 		}
 
+	private val _strictFiltering = DefaultOption(false)
+	val strictFiltering: Boolean get() = _strictFiltering.get()
+	var newStrictFiltering: Boolean? = false
+		set(value) {
+			_strictFiltering.set(value)
+			when (strictFiltering) {
+				true -> eventBus.post(StrictFilteringActivatedEvent())
+				else -> eventBus.post(StrictFilteringDeactivatedEvent())
+			}
+		}
+
 	@Throws(ConfigurationException::class)
 	fun saveTo(configuration: Configuration) {
 		configuration.getIntValue("Option/ConfigurationVersion").value = 0
@@ -110,6 +123,7 @@ class Preferences(private val eventBus: EventBus) {
 		configuration.getBooleanValue("Option/RequireFullAccess").value = _requireFullAccess.real
 		configuration.getBooleanValue("Option/ActivateFcpInterface").value = _fcpInterfaceActive.real
 		configuration.getIntValue("Option/FcpFullAccessRequired").value = toInt(_fcpFullAccessRequired.real)
+		configuration.getBooleanValue("Option/StrictFiltering").value = _strictFiltering.real
 	}
 
 	private fun toInt(fullAccessRequired: FullAccessRequired?): Int? {
