@@ -17,12 +17,18 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import com.google.common.eventbus.*
-import com.google.inject.*
-import net.pterodactylus.util.service.*
-import java.util.concurrent.TimeUnit.*
-import java.util.logging.*
-import java.util.logging.Logger.*
+import com.google.common.eventbus.EventBus
+import com.google.common.eventbus.Subscribe
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
+import net.pterodactylus.util.service.AbstractService
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.logging.Level
+import java.util.logging.Logger
+import java.util.logging.Logger.getLogger
 
 /**
  * The identity manager takes care of loading and storing identities, their
@@ -42,6 +48,7 @@ class IdentityManagerImpl @Inject constructor(
 ) : AbstractService("Sone Identity Manager", false), IdentityManager {
 
 	private val currentOwnIdentities = mutableSetOf<OwnIdentity>()
+	private val strictFiltering = AtomicBoolean(false)
 
 	override val isConnected: Boolean
 		get() = notThrowing { webOfTrustConnector.ping() }
@@ -56,34 +63,16 @@ class IdentityManagerImpl @Inject constructor(
 
 		while (!shouldStop()) {
 			try {
-				val currentIdentities = identityLoader.loadAllIdentities()
-
-				val identitiesWithTrust = currentIdentities.values.flatten()
-						.groupBy { it.id }
-						.mapValues { (_, identities) ->
-							identities.reduce { accIdentity, identity ->
-								identity.trust.forEach { (ownIdentity: OwnIdentity?, trust: Trust?) ->
-									accIdentity.setTrust(ownIdentity, trust)
-								}
-								accIdentity
-							}
-						}
-
-				val onlyTrustedByAll = currentIdentities.mapValues { (_, trustedIdentities) ->
-					trustedIdentities.filter { trustedIdentity ->
-						identitiesWithTrust[trustedIdentity.id]!!.trust.all { it.value.hasZeroOrPositiveTrust() }
-					}
-				}
-				logger.log(Level.FINE, "Reduced (${currentIdentities.size},(${currentIdentities.values.joinToString { it.size.toString() }})) identities to (${onlyTrustedByAll.size},(${onlyTrustedByAll.values.joinToString { it.size.toString() }})).")
+				val currentIdentities = identityLoader.loadAllIdentities().applyStrictFiltering()
 
 				val identityChangeEventSender = IdentityChangeEventSender(eventBus, oldIdentities)
-				identityChangeEventSender.detectChanges(onlyTrustedByAll)
+				identityChangeEventSender.detectChanges(currentIdentities)
 
-				oldIdentities = onlyTrustedByAll
+				oldIdentities = currentIdentities
 
 				synchronized(currentOwnIdentities) {
 					currentOwnIdentities.clear()
-					currentOwnIdentities.addAll(onlyTrustedByAll.keys)
+					currentOwnIdentities.addAll(currentIdentities.keys)
 				}
 			} catch (wote1: WebOfTrustException) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1)
@@ -94,6 +83,38 @@ class IdentityManagerImpl @Inject constructor(
 			/* wait a minute before checking again. */
 			sleep(SECONDS.toMillis(60))
 		}
+	}
+
+	private fun Map<OwnIdentity, Set<Identity>>.applyStrictFiltering() =
+			if (strictFiltering.get()) {
+				val identitiesWithTrust = values.flatten()
+						.groupBy { it.id }
+						.mapValues { (_, identities) ->
+							identities.reduce { accIdentity, identity ->
+								identity.trust.forEach { (ownIdentity: OwnIdentity?, trust: Trust?) ->
+									accIdentity.setTrust(ownIdentity, trust)
+								}
+								accIdentity
+							}
+						}
+
+				mapValues { (_, trustedIdentities) ->
+					trustedIdentities.filter { trustedIdentity ->
+						identitiesWithTrust[trustedIdentity.id]!!.trust.all { it.value.hasZeroOrPositiveTrust() }
+					}
+				}
+			} else {
+				this
+			}
+
+	@Subscribe
+	fun strictFilteringActivated(event: StrictFilteringActivatedEvent) {
+		strictFiltering.set(true)
+	}
+
+	@Subscribe
+	fun strictFilteringDeactivated(event: StrictFilteringDeactivatedEvent) {
+		strictFiltering.set(false)
 	}
 
 }
