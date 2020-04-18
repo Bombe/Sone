@@ -31,7 +31,7 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 	private val logger: Logger = Logger.getLogger(IdentityLoader::class.java.name)
 
 	@Throws(WebOfTrustException::class)
-	fun loadIdentities() =
+	fun loadTrustedIdentities() =
 			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 				webOfTrustConnector.loadAllOwnIdentities()
 			}.let(this::loadTrustedIdentitiesForOwnIdentities)
