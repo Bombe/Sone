@@ -77,13 +77,13 @@ class IdentityManagerImpl @Inject constructor(
 				logger.log(Level.FINE, "Reduced (${currentIdentities.size},(${currentIdentities.values.joinToString { it.size.toString() }})) identities to (${onlyTrustedByAll.size},(${onlyTrustedByAll.values.joinToString { it.size.toString() }})).")
 
 				val identityChangeEventSender = IdentityChangeEventSender(eventBus, oldIdentities)
-				identityChangeEventSender.detectChanges(currentIdentities)
+				identityChangeEventSender.detectChanges(onlyTrustedByAll)
 
-				oldIdentities = currentIdentities
+				oldIdentities = onlyTrustedByAll
 
 				synchronized(currentOwnIdentities) {
 					currentOwnIdentities.clear()
-					currentOwnIdentities.addAll(currentIdentities.keys)
+					currentOwnIdentities.addAll(onlyTrustedByAll.keys)
 				}
 			} catch (wote1: WebOfTrustException) {
 				logger.log(Level.WARNING, "WoT has disappeared!", wote1)
