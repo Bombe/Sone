@@ -29,6 +29,16 @@ interface WebOfTrustConnector {
 	fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String? = null): Set<Identity>
 
 	/**
+	 * Loads all identities known to the given own identity that have the (optional) given context.
+	 *
+	 * @param ownIdentity The own identity
+	 * @param context The context to filter, or `null`
+	 * @return All trusted identities
+	 * @throws PluginException if an error occured talking to the Web of Trust plugin
+	 */
+	fun loadAllIdentities(ownIdentity: OwnIdentity, context: String? = null): Set<Identity>
+
+	/**
 	 * Adds the given context to the given identity.
 	 *
 	 * @param ownIdentity The identity to add the context to

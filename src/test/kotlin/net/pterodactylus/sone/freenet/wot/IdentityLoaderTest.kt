@@ -106,6 +106,7 @@ private open class TestWebOfTrustConnector : WebOfTrustConnector {
 
 	override fun loadAllOwnIdentities() = emptySet<OwnIdentity>()
 	override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) = emptySet<Identity>()
+	override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?) = emptySet<Identity>()
 	override fun addContext(ownIdentity: OwnIdentity, context: String) = Unit
 	override fun removeContext(ownIdentity: OwnIdentity, context: String) = Unit
 	override fun setProperty(ownIdentity: OwnIdentity, name: String, value: String) = Unit

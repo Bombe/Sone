@@ -56,7 +56,7 @@ class IdentityManagerImpl @Inject constructor(
 
 		while (!shouldStop()) {
 			try {
-				val currentIdentities = identityLoader.loadTrustedIdentities()
+				val currentIdentities = identityLoader.loadAllIdentities()
 
 				val identitiesWithTrust = currentIdentities.values.flatten()
 						.groupBy { it.id }

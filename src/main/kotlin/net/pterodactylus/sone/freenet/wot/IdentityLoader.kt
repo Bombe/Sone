@@ -36,6 +36,11 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 				webOfTrustConnector.loadAllOwnIdentities()
 			}.let(this::loadTrustedIdentitiesForOwnIdentities)
 
+	fun loadAllIdentities() =
+			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
+				webOfTrustConnector.loadAllOwnIdentities()
+			}.let(this::loadAllIdentitiesForOwnIdentities)
+
 	@Throws(PluginException::class)
 	private fun loadTrustedIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
 			ownIdentities
@@ -49,6 +54,22 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 							logger.fine { "Loading trusted identities for $ownIdentity from WoT..." }
 							time({ stopwatch, identities -> "Loaded ${identities.size} identities for ${ownIdentity.nickname} in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 								webOfTrustConnector.loadTrustedIdentities(ownIdentity, context?.context)
+							}
+						}
+					}
+
+	private fun loadAllIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
+			ownIdentities
+					.also { logger.fine { "Getting trusted identities for ${it.size} own identities..." } }
+					.associateWith { ownIdentity ->
+						logger.fine { "Getting trusted identities for $ownIdentity..." }
+						if (ownIdentity.doesNotHaveCorrectContext()) {
+							logger.fine { "Skipping $ownIdentity because of incorrect context." }
+							emptySet()
+						} else {
+							logger.fine { "Loading trusted identities for $ownIdentity from WoT..." }
+							time({ stopwatch, identities -> "Loaded ${identities.size} identities for ${ownIdentity.nickname} in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
+								webOfTrustConnector.loadAllIdentities(ownIdentity, context?.context)
 							}
 						}
 					}

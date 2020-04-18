@@ -17,15 +17,17 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import com.google.inject.*
-import freenet.support.*
-import kotlinx.coroutines.*
-import net.pterodactylus.sone.freenet.*
-import net.pterodactylus.sone.freenet.plugin.*
-import java.lang.String.*
-import java.util.logging.*
+import com.google.inject.Inject
+import freenet.support.SimpleFieldSet
+import kotlinx.coroutines.runBlocking
+import net.pterodactylus.sone.freenet.SimpleFieldSetBuilder
+import net.pterodactylus.sone.freenet.plugin.PluginConnector
+import net.pterodactylus.sone.freenet.plugin.PluginException
+import net.pterodactylus.sone.freenet.plugin.PluginReply
+import java.lang.String.format
+import java.util.logging.Level
 import java.util.logging.Logger
-import java.util.logging.Logger.*
+import java.util.logging.Logger.getLogger
 
 /**
  * Connector for the Web of Trust plugin.
@@ -45,6 +47,14 @@ class PluginWebOfTrustConnector @Inject constructor(private val pluginConnector:
 			performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.id).put("Selection", "+").put("Context", context ?: "").put("WantTrustValues", "true").get())
 					.fields
 					.parseIdentities { parseTrustedIdentity(it, ownIdentity) }
+
+	override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?): Set<Identity> =
+			performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.id).put("Selection", "+").put("Context", context ?: "").put("WantTrustValues", "true").get())
+					.fields
+					.parseIdentities { parseTrustedIdentity(it, ownIdentity) } +
+					performRequest(SimpleFieldSetBuilder().put("Message", "GetIdentitiesByScore").put("Truster", ownIdentity.id).put("Selection", "-").put("Context", context ?: "").put("WantTrustValues", "true").get())
+							.fields
+							.parseIdentities { parseTrustedIdentity(it, ownIdentity) }
 
 	@Throws(PluginException::class)
 	override fun addContext(ownIdentity: OwnIdentity, context: String) {
