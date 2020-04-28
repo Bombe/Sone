@@ -16,6 +16,7 @@ import net.pterodactylus.sone.core.FreenetInterface.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.freenet.wot.DefaultIdentity
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.test.Matchers.*
 import net.pterodactylus.sone.test.TestUtil.*
@@ -43,6 +44,10 @@ class FreenetInterfaceTest {
 	@JvmField
 	val expectionException: ExpectedException = ExpectedException.none()
 
+	@Rule
+	@JvmField
+	val silencedLogging = silencedLogging()
+
 	@Suppress("UnstableApiUsage")
 	private val eventBus = mock<EventBus>()
 	private val node = mock<Node>()
@@ -52,7 +57,7 @@ class FreenetInterfaceTest {
 	private val uskManager = mock<USKManager>()
 	private val sone = mock<Sone>()
 	private val callbackCaptor: ArgumentCaptor<USKCallback> = forClass(USKCallback::class.java)
-	private val image = mock<Image>()
+	private val image: Image = ImageImpl()
 	private val insertToken: InsertToken
 	private val bucket = mock<Bucket>()
 	private val clientGetCallback: ArgumentCaptor<ClientGetCallback> = forClass(ClientGetCallback::class.java)
@@ -60,6 +65,7 @@ class FreenetInterfaceTest {
 	private val fetchResult = mock<FetchResult>()
 	private val backgroundFetchCallback = mock<BackgroundFetchCallback>()
 	private val clientGetter = mock<ClientGetter>()
+	private val soneUriCreator = SoneUriCreator()
 	private val freenetInterface: FreenetInterface
 
 	init {
@@ -68,7 +74,7 @@ class FreenetInterfaceTest {
 		setField(node, "random", randomSource)
 		setField(nodeClientCore, "uskManager", uskManager)
 		setField(nodeClientCore, "clientContext", mock<ClientContext>())
-		freenetInterface = FreenetInterface(eventBus, node)
+		freenetInterface = FreenetInterface(eventBus, node, soneUriCreator)
 		insertToken = freenetInterface.InsertToken(image)
 		insertToken.setBucket(bucket)
 	}
@@ -83,7 +89,7 @@ class FreenetInterfaceTest {
 	fun setupSone() {
 		val insertSsk = createRandom(randomSource, "test-0")
 		whenever(sone.id).thenReturn(insertSsk.uri.routingKey.asFreenetBase64)
-		whenever(sone.requestUri).thenReturn(insertSsk.uri.uskForSSK())
+		whenever(sone.identity).thenReturn(DefaultIdentity("id", "name", insertSsk.uri.toString()))
 	}
 
 	@Before
@@ -184,7 +190,6 @@ class FreenetInterfaceTest {
 
 	@Test
 	fun `sone with wrong request uri will not be subscribed`() {
-		whenever(sone.requestUri).thenReturn(FreenetURI("KSK@GPLv3.txt"))
 		freenetInterface.registerUsk(FreenetURI("KSK@GPLv3.txt"), null)
 		verify(uskManager, never()).subscribe(any(USK::class.java), any(USKCallback::class.java), anyBoolean(), any(RequestClient::class.java))
 	}
@@ -258,16 +263,15 @@ class FreenetInterfaceTest {
 	}
 
 	@Test
-	fun `unregistering aregistered sone unregisters the sone`() {
-		freenetInterface.registerActiveUsk(sone.requestUri, mock())
+	fun `unregistering a registered sone unregisters the sone`() {
+		freenetInterface.registerActiveUsk(soneUriCreator.getRequestUri(sone), mock())
 		freenetInterface.unregisterUsk(sone)
 		verify(uskManager).unsubscribe(any(USK::class.java), any(USKCallback::class.java))
 	}
 
 	@Test
-	fun `unregistering asone with awrong request key will not unsubscribe`() {
-		whenever(sone.requestUri).thenReturn(FreenetURI("KSK@GPLv3.txt"))
-		freenetInterface.registerUsk(sone.requestUri, null)
+	fun `unregistering a sone with a wrong request key will not unsubscribe`() {
+		freenetInterface.registerUsk(FreenetURI("KSK@GPLv3.txt"), null)
 		freenetInterface.unregisterUsk(sone)
 		verify(uskManager, never()).unsubscribe(any(USK::class.java), any(USKCallback::class.java))
 	}

@@ -17,8 +17,6 @@
 
 package net.pterodactylus.sone.fcp;
 
-import com.google.common.base.Optional;
-
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.Sone;

@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.fcp
 
-import com.google.common.base.Optional.absent
-import com.google.common.base.Optional.of
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.test.mock

@@ -1,14 +1,11 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
-import freenet.clients.http.SessionManager.*
 import freenet.support.api.*
-import net.pterodactylus.sone.test.*
 import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.mockito.*
 import org.mockito.Mockito.*
 import java.net.*
 
@@ -18,8 +15,7 @@ class FreenetRequestTest {
 	private val method = Method.GET
 	private val httpRequest = mock(HTTPRequest::class.java)
 	private val toadletContext = mock(ToadletContext::class.java)
-	private val sessionManager = mock<SessionManager>()
-	private val request = FreenetRequest(uri, method, httpRequest, toadletContext, sessionManager)
+	private val request = FreenetRequest(uri, method, httpRequest, toadletContext)
 
 	@Test
 	fun `uri is retained correctly`() {
@@ -39,32 +35,6 @@ class FreenetRequestTest {
 	@Test
 	fun `toadlet context is retained correctly`() {
 		assertThat(request.toadletContext, equalTo(toadletContext))
-	}
-
-	@Test
-	fun `null is returned if no session exists`() {
-		assertThat(request.existingSession, nullValue())
-	}
-
-	@Test
-	fun `existing session can be retrieved`() {
-		val session = mock<Session>()
-		whenever(sessionManager.useSession(toadletContext)).thenReturn(session)
-		assertThat(request.existingSession, sameInstance(session))
-	}
-
-	@Test
-	fun `existing session is returned if it exists`() {
-		val session = mock<Session>()
-		whenever(sessionManager.useSession(toadletContext)).thenReturn(session)
-		assertThat(request.session, sameInstance(session))
-	}
-
-	@Test
-	fun `new session is returned if none exists`() {
-		val session = mock<Session>()
-		whenever(sessionManager.createSession(anyString(), ArgumentMatchers.eq(toadletContext))).thenReturn(session)
-		assertThat(request.session, sameInstance(session))
 	}
 
 }

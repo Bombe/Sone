@@ -123,14 +123,14 @@ class UpdatedSoneProcessorTest {
 	@Test
 	fun `updated Sone processor does not mark new reply as known if sone was not followed after reply`() {
 		updatedSoneProcessor.updateSone(newSone)
-		verify(postReplies[2], never()).isKnown = true
+		verify(database, never()).setPostReplyKnown(postReplies[2])
 	}
 
 	@Test
 	fun `updated Sone processor marks new reply as known if sone was followed after reply`() {
 		whenever(database.getFollowingTime("sone")).thenReturn(3500L)
 		updatedSoneProcessor.updateSone(newSone)
-		verify(postReplies[2]).isKnown = true
+		verify(database).setPostReplyKnown(postReplies[2])
 	}
 
 	@Test

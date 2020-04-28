@@ -2,7 +2,6 @@ package net.pterodactylus.sone.web
 
 import com.google.inject.Guice.*
 import freenet.client.*
-import freenet.clients.http.*
 import freenet.support.api.*
 import net.pterodactylus.sone.core.*
 import net.pterodactylus.sone.data.*
@@ -13,7 +12,6 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.text.*
-import net.pterodactylus.sone.web.notification.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
@@ -38,8 +36,7 @@ class WebInterfaceModuleTest {
 			SoneTextParser::class.isProvidedByMock(),
 			ElementLoader::class.isProvidedByMock(),
 			Loaders::class.isProvidedBy(loaders),
-			HighLevelSimpleClient::class.isProvidedByMock(),
-			SessionManager::class.isProvidedByMock()
+			HighLevelSimpleClient::class.isProvidedByMock()
 	)
 	private val injector = createInjector(webInterfaceModule, *additionalModules)!!
 	private val templateContext by lazy { injector.getInstance<TemplateContextFactory>().createTemplateContext()!! }

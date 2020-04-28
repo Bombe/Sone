@@ -28,10 +28,10 @@ class KnownSonesPage @Inject constructor(webInterface: WebInterface, loaders: Lo
 					.filterNot { soneRequest.parameters["filter"] == "not-own" && it.isLocal }
 					.sortedWith(
 							when (soneRequest.parameters["sort"]) {
-								"images" -> Sone.IMAGE_COUNT_COMPARATOR
-								"name" -> Sone.NICE_NAME_COMPARATOR.reversed()
-								"posts" -> Sone.POST_COUNT_COMPARATOR
-								else -> Sone.LAST_ACTIVITY_COMPARATOR
+								"images" -> imageCountComparator
+								"name" -> niceNameComparator.reversed()
+								"posts" -> postCountComparator
+								else -> lastActivityComparator
 							}.let { comparator ->
 								when (soneRequest.parameters["order"]) {
 									"asc" -> comparator.reversed()

@@ -21,18 +21,16 @@ import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.*;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.data.Album.NOT_EMPTY;
+import static java.util.stream.Collectors.toList;
+import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
+import static net.pterodactylus.sone.data.ReplyKt.newestReplyFirst;
 
-import java.io.Closeable;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringWriter;
+import java.io.*;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -44,13 +42,11 @@ import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertAbortedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertedEvent;
 import net.pterodactylus.sone.core.event.SoneInsertingEvent;
-import net.pterodactylus.sone.data.Album;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.Reply;
+import net.pterodactylus.sone.data.AlbumKt;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneKt;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.service.AbstractService;
 import net.pterodactylus.util.template.HtmlFilter;
 import net.pterodactylus.util.template.ReflectionAccessor;
@@ -62,7 +58,6 @@ import net.pterodactylus.util.template.TemplateParser;
 import net.pterodactylus.util.template.XmlFilter;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -106,6 +101,7 @@ public class SoneInserter extends AbstractService {
 	private final FreenetInterface freenetInterface;
 
 	private final SoneModificationDetector soneModificationDetector;
+	private final SoneUriCreator soneUriCreator;
 	private final long delay;
 	private final String soneId;
 	private final Histogram soneInsertDurationHistogram;
@@ -123,8 +119,8 @@ public class SoneInserter extends AbstractService {
 	 * @param soneId
 	 *            The ID of the Sone to insert
 	 */
-	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, final String soneId) {
-		this(core, eventBus, freenetInterface, metricRegistry, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
+	public SoneInserter(final Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, SoneUriCreator soneUriCreator, final String soneId) {
+		this(core, eventBus, freenetInterface, metricRegistry, soneUriCreator, soneId, new SoneModificationDetector(new LockableFingerprintProvider() {
 			@Override
 			public boolean isLocked() {
 				Sone sone = core.getSone(soneId);
@@ -146,13 +142,14 @@ public class SoneInserter extends AbstractService {
 	}
 
 	@VisibleForTesting
-	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
+	SoneInserter(Core core, EventBus eventBus, FreenetInterface freenetInterface, MetricRegistry metricRegistry, SoneUriCreator soneUriCreator, String soneId, SoneModificationDetector soneModificationDetector, long delay) {
 		super("Sone Inserter for “" + soneId + "”", false);
 		this.core = core;
 		this.eventBus = eventBus;
 		this.freenetInterface = freenetInterface;
 		this.soneInsertDurationHistogram = metricRegistry.histogram("sone.insert.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 		this.soneInsertErrorMeter = metricRegistry.meter("sone.insert.errors");
+		this.soneUriCreator = soneUriCreator;
 		this.soneId = soneId;
 		this.soneModificationDetector = soneModificationDetector;
 		this.delay = delay;
@@ -237,7 +234,7 @@ public class SoneInserter extends AbstractService {
 						long insertTime = currentTimeMillis();
 						eventBus.post(new SoneInsertingEvent(sone));
 						Stopwatch stopwatch = Stopwatch.createStarted();
-						FreenetURI finalUri = freenetInterface.insertDirectory(sone.getInsertUri(), insertInformation.generateManifestEntries(), "index.html");
+						FreenetURI finalUri = freenetInterface.insertDirectory(soneUriCreator.getInsertUri(sone), insertInformation.generateManifestEntries(), "index.html");
 						stopwatch.stop();
 						soneInsertDurationHistogram.update(stopwatch.elapsed(MICROSECONDS));
 						eventBus.post(new SoneInsertedEvent(sone, stopwatch.elapsed(MILLISECONDS), insertInformation.getFingerprint()));
@@ -310,13 +307,12 @@ public class SoneInserter extends AbstractService {
 			soneProperties.put("id", sone.getId());
 			soneProperties.put("name", sone.getName());
 			soneProperties.put("time", currentTimeMillis());
-			soneProperties.put("requestUri", sone.getRequestUri());
 			soneProperties.put("profile", sone.getProfile());
-			soneProperties.put("posts", Ordering.from(Post.NEWEST_FIRST).sortedCopy(sone.getPosts()));
-			soneProperties.put("replies", Ordering.from(Reply.TIME_COMPARATOR).reverse().sortedCopy(sone.getReplies()));
+			soneProperties.put("posts", Ordering.from(newestPostFirst()).sortedCopy(sone.getPosts()));
+			soneProperties.put("replies", Ordering.from(newestReplyFirst()).sortedCopy(sone.getReplies()));
 			soneProperties.put("likedPostIds", new HashSet<>(sone.getLikedPostIds()));
 			soneProperties.put("likedReplyIds", new HashSet<>(sone.getLikedReplyIds()));
-			soneProperties.put("albums", FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).filter(NOT_EMPTY).toList());
+			soneProperties.put("albums", SoneKt.getAllAlbums(sone).stream().filter(AlbumKt.notEmpty()::invoke).collect(toList()));
 			manifestCreator = new ManifestCreator(core, soneProperties);
 		}
 
@@ -377,19 +373,13 @@ public class SoneInserter extends AbstractService {
 		}
 
 		public ManifestElement createManifestElement(String name, String contentType, String templateName) {
-			InputStreamReader templateInputStreamReader = null;
-			InputStream templateInputStream = null;
 			Template template;
-			try {
-				templateInputStream = getClass().getResourceAsStream(templateName);
-				templateInputStreamReader = new InputStreamReader(templateInputStream, utf8Charset);
+			try (InputStream templateInputStream = getClass().getResourceAsStream(templateName);
+					InputStreamReader templateInputStreamReader = new InputStreamReader(templateInputStream, utf8Charset)) {
 				template = TemplateParser.parse(templateInputStreamReader);
-			} catch (TemplateException te1) {
-				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), te1);
+			} catch (IOException | TemplateException e1) {
+				logger.log(Level.SEVERE, String.format("Could not parse template “%s”!", templateName), e1);
 				return null;
-			} finally {
-				Closer.close(templateInputStreamReader);
-				Closer.close(templateInputStream);
 			}
 
 			TemplateContext templateContext = templateContextFactory.createTemplateContext();
@@ -397,17 +387,14 @@ public class SoneInserter extends AbstractService {
 			templateContext.set("currentSone", soneProperties);
 			templateContext.set("currentEdition", core.getUpdateChecker().getLatestEdition());
 			templateContext.set("version", SonePlugin.getPluginVersion());
-			StringWriter writer = new StringWriter();
-			try {
+			try (StringWriter writer = new StringWriter()) {
 				template.render(templateContext, writer);
 				RandomAccessBucket bucket = new ArrayBucket(writer.toString().getBytes(Charsets.UTF_8));
 				buckets.add(bucket);
 				return new ManifestElement(name, bucket, contentType, bucket.size());
-			} catch (TemplateException te1) {
-				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), te1);
+			} catch (IOException | TemplateException e1) {
+				logger.log(Level.SEVERE, String.format("Could not render template “%s”!", templateName), e1);
 				return null;
-			} finally {
-				Closer.close(writer);
 			}
 		}
 

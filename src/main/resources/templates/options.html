@@ -164,6 +164,10 @@
 			</select>
 		</p>
 
+		<h2><%= Page.Options.Section.WebOfTrustOptions.Title|l10n|html></h2>
+
+		<p><input type="checkbox" name="strict-filtering"<%if strict-filtering> checked="checked"<%/if> /> <%= Page.Options.Option.StrictFiltering.Description|l10n|html></p>
+
 		<p><button type="submit"><%= Page.Options.Button.Save|l10n|html></button></p>
 
 	</form>

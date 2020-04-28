@@ -1,5 +1,5 @@
 /**
- * Sone - Albums.kt - Copyright © 2019–2020 David ‘Bombe’ Roden
+ * Sone - Album.kt - Copyright © 2019–2020 David ‘Bombe’ Roden
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,4 +20,19 @@ package net.pterodactylus.sone.data
 /** Returns all images contained in this album and all its albums. */
 val Album.allImages: Collection<Image>
 	get() =
-		images + albums.flatMap { it.allImages }
+		images + albums.flatMap(Album::allImages)
+
+/**
+ *  Returns this album and all albums contained in this album (recursively).
+ * A child album is always listed after its parent.
+ */
+val Album.allAlbums: List<Album>
+	get() =
+		listOf(this) + albums.flatMap(Album::allAlbums)
+
+@get:JvmName("notEmpty")
+val notEmpty: (Album) -> Boolean = { album ->
+	album.allImages.let { images ->
+		images.isNotEmpty() && images.any(Image::isInserted)
+	}
+}

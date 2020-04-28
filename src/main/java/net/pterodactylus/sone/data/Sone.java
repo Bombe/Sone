@@ -17,14 +17,7 @@
 
 package net.pterodactylus.sone.data;
 
-import static com.google.common.collect.FluentIterable.from;
-import static java.util.Arrays.asList;
-import static net.pterodactylus.sone.data.Album.FLATTENER;
-import static net.pterodactylus.sone.data.Album.IMAGES;
-
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -32,14 +25,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
-import net.pterodactylus.sone.template.SoneAccessor;
 
 import freenet.keys.FreenetURI;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.primitives.Ints;
 
 /**
  * A Sone defines everything about a user: her profile, her status updates, her
@@ -64,101 +51,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 		/** The Sone is currently being downloaded. */
 		downloading,
 	}
-
-	/** comparator that sorts Sones by their nice name. */
-	public static final Comparator<Sone> NICE_NAME_COMPARATOR = new Comparator<Sone>() {
-
-		@Override
-		public int compare(Sone leftSone, Sone rightSone) {
-			int diff = SoneAccessor.getNiceName(leftSone).compareToIgnoreCase(SoneAccessor.getNiceName(rightSone));
-			if (diff != 0) {
-				return diff;
-			}
-			return leftSone.getId().compareToIgnoreCase(rightSone.getId());
-		}
-
-	};
-
-	/** Comparator that sorts Sones by last activity (least recent active first). */
-	public static final Comparator<Sone> LAST_ACTIVITY_COMPARATOR = new Comparator<Sone>() {
-
-		@Override
-		public int compare(Sone firstSone, Sone secondSone) {
-			return (int) Math.min(Integer.MAX_VALUE, Math.max(Integer.MIN_VALUE, secondSone.getTime() - firstSone.getTime()));
-		}
-	};
-
-	/** Comparator that sorts Sones by numbers of posts (descending). */
-	public static final Comparator<Sone> POST_COUNT_COMPARATOR = new Comparator<Sone>() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compare(Sone leftSone, Sone rightSone) {
-			return (leftSone.getPosts().size() != rightSone.getPosts().size()) ? (rightSone.getPosts().size() - leftSone.getPosts().size()) : (rightSone.getReplies().size() - leftSone.getReplies().size());
-		}
-	};
-
-	/** Comparator that sorts Sones by number of images (descending). */
-	public static final Comparator<Sone> IMAGE_COUNT_COMPARATOR = new Comparator<Sone>() {
-
-		/**
-		 * {@inheritDoc}
-		 */
-		@Override
-		public int compare(Sone leftSone, Sone rightSone) {
-			int rightSoneImageCount = from(asList(rightSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
-			int leftSoneImageCount = from(asList(leftSone.getRootAlbum())).transformAndConcat(FLATTENER).transformAndConcat(IMAGES).size();
-			/* sort descending. */
-			return Ints.compare(rightSoneImageCount, leftSoneImageCount);
-		}
-	};
-
-	/** Filter to remove Sones that have not been downloaded. */
-	public static final Predicate<Sone> EMPTY_SONE_FILTER = new Predicate<Sone>() {
-
-		@Override
-		public boolean apply(Sone sone) {
-			return (sone != null) && (sone.getTime() != 0);
-		}
-	};
-
-	/** Filter that matches all {@link Sone#isLocal() local Sones}. */
-	public static final Predicate<Sone> LOCAL_SONE_FILTER = new Predicate<Sone>() {
-
-		@Override
-		public boolean apply(Sone sone) {
-			return (sone != null) && (sone.getIdentity() instanceof OwnIdentity);
-		}
-
-	};
-
-	/** Filter that matches Sones that have at least one album. */
-	public static final Predicate<Sone> HAS_ALBUM_FILTER = new Predicate<Sone>() {
-
-		@Override
-		public boolean apply(Sone sone) {
-			return (sone != null) && !sone.getRootAlbum().getAlbums().isEmpty();
-		}
-	};
-
-	public static final Function<Sone, List<Album>> toAllAlbums = new Function<Sone, List<Album>>() {
-		@Override
-		public List<Album> apply(@Nullable Sone sone) {
-			return (sone == null) ? Collections.<Album>emptyList() : FLATTENER.apply(
-					sone.getRootAlbum());
-		}
-	};
-
-	public static final Function<Sone, List<Image>> toAllImages = new Function<Sone, List<Image>>() {
-		@Override
-		public List<Image> apply(@Nullable Sone sone) {
-			return (sone == null) ? Collections.<Image>emptyList() :
-					from(FLATTENER.apply(sone.getRootAlbum()))
-							.transformAndConcat(IMAGES).toList();
-		}
-	};
 
 	/**
 	 * Returns the identity of this Sone.
@@ -190,14 +82,6 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 */
 	@Nonnull
 	FreenetURI getRequestUri();
-
-	/**
-	 * Returns the insert URI of this Sone.
-	 *
-	 * @return The insert URI of this Sone
-	 */
-	@Nullable
-	FreenetURI getInsertUri();
 
 	/**
 	 * Returns the latest edition of this Sone.

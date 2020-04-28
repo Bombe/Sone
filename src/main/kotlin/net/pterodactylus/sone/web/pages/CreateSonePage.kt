@@ -21,7 +21,7 @@ class CreateSonePage @Inject constructor(webInterface: WebInterface, loaders: Lo
 	private val logger = Logger.getLogger(CreateSonePage::class.java.name)
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
-		templateContext["sones"] = soneRequest.core.localSones.sortedWith(Sone.NICE_NAME_COMPARATOR)
+		templateContext["sones"] = soneRequest.core.localSones.sortedWith(niceNameComparator)
 		templateContext["identitiesWithoutSone"] = soneRequest.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}".toLowerCase() }
 		if (soneRequest.isPOST) {
 			val identity = soneRequest.httpRequest.getPartAsStringFailsafe("identity", 43)

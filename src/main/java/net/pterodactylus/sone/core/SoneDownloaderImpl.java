@@ -17,7 +17,6 @@
 
 package net.pterodactylus.sone.core;
 
-import static freenet.support.io.Closer.close;
 import static java.lang.String.format;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.DAYS;
@@ -185,11 +184,8 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 	private Sone parseSone(Sone originalSone, FetchResult fetchResult, FreenetURI requestUri) {
 		logger.finest(() -> format("Parsing FetchResult (%d bytes, %s) for %s…", fetchResult.size(), fetchResult.getMimeType(), originalSone));
 		Bucket soneBucket = fetchResult.asBucket();
-		InputStream soneInputStream = null;
-		try {
-			soneInputStream = soneBucket.getInputStream();
-			Sone parsedSone = soneParser.parseSone(originalSone,
-					soneInputStream);
+		try (InputStream soneInputStream = soneBucket.getInputStream()) {
+			Sone parsedSone = soneParser.parseSone(originalSone, soneInputStream);
 			if (parsedSone != null) {
 				logger.finer(() -> format("Sone %s was successfully parsed.", parsedSone));
 				parsedSone.setLatestEdition(requestUri.getEdition());
@@ -198,8 +194,7 @@ public class SoneDownloaderImpl extends AbstractService implements SoneDownloade
 		} catch (Exception e1) {
 			logger.log(Level.WARNING, e1, () -> format("Could not parse Sone from %s!", requestUri));
 		} finally {
-			close(soneInputStream);
-			close(soneBucket);
+			soneBucket.free();
 		}
 		return null;
 	}

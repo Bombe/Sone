@@ -57,8 +57,8 @@ class MemoryDatabaseTest {
 		assertThat(memoryDatabase.getPostReply("reply2"), isPostReply("reply2", "post2", 4000L, "reply2"))
 		assertThat(memoryDatabase.getPostReply("reply3"), isPostReply("reply3", "post1", 5000L, "reply3"))
 		assertThat(memoryDatabase.getPostReply("reply4"), nullValue())
-		assertThat(memoryDatabase.getAlbum("album1"), isAlbum("album1", null, "album1", "album-description1"))
-		assertThat(memoryDatabase.getAlbum("album2"), isAlbum("album2", null, "album2", "album-description2"))
+		assertThat(memoryDatabase.getAlbum("album1"), isAlbum("album1", "root", "album1", "album-description1"))
+		assertThat(memoryDatabase.getAlbum("album2"), isAlbum("album2", "root", "album2", "album-description2"))
 		assertThat(memoryDatabase.getAlbum("album3"), isAlbum("album3", "album1", "album3", "album-description3"))
 		assertThat(memoryDatabase.getAlbum("album4"), nullValue())
 		assertThat(memoryDatabase.getImage("image1"), isImage("image1", 1000L, "KSK@image1", "image1", "image-description1", 16, 9))
@@ -123,9 +123,10 @@ class MemoryDatabaseTest {
 				.setDescription("album-description3")
 				.update()
 		firstAlbum.addAlbum(thirdAlbum)
-		val rootAlbum = mock<Album>()
-		whenever(rootAlbum.id).thenReturn("root")
-		whenever(rootAlbum.albums).thenReturn(listOf(firstAlbum, secondAlbum))
+		val rootAlbum = AlbumImpl(sone, "root").also {
+			it.addAlbum(firstAlbum)
+			it.addAlbum(secondAlbum)
+		}
 		whenever(sone.rootAlbum).thenReturn(rootAlbum)
 		val firstImage = TestImageBuilder().withId("image1")
 				.build()
@@ -404,7 +405,7 @@ class MemoryDatabaseTest {
 		prepareConfigurationValues()
 		val postReply = mock<PostReply>()
 		whenever(postReply.id).thenReturn("post-reply-id")
-		memoryDatabase.setPostReplyKnown(postReply, true)
+		memoryDatabase.setPostReplyKnown(postReply)
 		assertThat(configuration.getStringValue("KnownReplies/0/ID").value, equalTo("post-reply-id"))
 		assertThat(configuration.getStringValue("KnownReplies/1/ID").value, equalTo<Any>(null))
 	}
@@ -434,8 +435,8 @@ class MemoryDatabaseTest {
 		prepareConfigurationValues()
 		val postReply = mock<PostReply>()
 		whenever(postReply.id).thenReturn("post-reply-id")
-		memoryDatabase.setPostReplyKnown(postReply, true)
-		memoryDatabase.setPostReplyKnown(postReply, true)
+		memoryDatabase.setPostReplyKnown(postReply)
+		memoryDatabase.setPostReplyKnown(postReply)
 		verify(configuration, times(1)).getStringValue("KnownReplies/1/ID")
 	}
 

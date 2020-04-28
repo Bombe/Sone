@@ -21,6 +21,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
+import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
+import static net.pterodactylus.sone.data.ReplyKt.newestReplyFirst;
+import static net.pterodactylus.sone.data.SoneKt.*;
 
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -36,17 +39,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.data.Album;
+import net.pterodactylus.sone.data.AlbumKt;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Profile;
-import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions;
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions;
 import net.pterodactylus.sone.database.Database;
 import net.pterodactylus.sone.freenet.wot.Identity;
-import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 
 import freenet.keys.FreenetURI;
 
@@ -187,26 +189,6 @@ public class SoneImpl implements Sone {
 			throw new IllegalStateException(
 					format("Identity %s's request URI is incorrect.",
 							getIdentity()), e);
-		}
-	}
-
-	/**
-	 * Returns the insert URI of this Sone.
-	 *
-	 * @return The insert URI of this Sone
-	 */
-	@Nullable
-	public FreenetURI getInsertUri() {
-		if (!isLocal()) {
-			return null;
-		}
-		try {
-			return new FreenetURI(((OwnIdentity) getIdentity()).getInsertUri())
-					.setDocName("Sone")
-					.setMetaString(new String[0])
-					.setSuggestedEdition(latestEdition);
-		} catch (MalformedURLException e) {
-			throw new IllegalStateException(format("Own identity %s's insert URI is incorrect.", getIdentity()), e);
 		}
 	}
 
@@ -384,7 +366,7 @@ public class SoneImpl implements Sone {
 		synchronized (this) {
 			sortedPosts = new ArrayList<>(posts);
 		}
-		Collections.sort(sortedPosts, Post.NEWEST_FIRST);
+		sortedPosts.sort(newestPostFirst());
 		return sortedPosts;
 	}
 
@@ -644,7 +626,7 @@ public class SoneImpl implements Sone {
 		hash.putString(")", UTF_8);
 
 		List<PostReply> replies = new ArrayList<>(getReplies());
-		Collections.sort(replies, Reply.TIME_COMPARATOR);
+		replies.sort(newestReplyFirst().reversed());
 		hash.putString("Replies(", UTF_8);
 		for (PostReply reply : replies) {
 			hash.putString("Reply(", UTF_8).putString(reply.getId(), UTF_8).putString(")", UTF_8);
@@ -669,7 +651,7 @@ public class SoneImpl implements Sone {
 
 		hash.putString("Albums(", UTF_8);
 		for (Album album : rootAlbum.getAlbums()) {
-			if (!Album.NOT_EMPTY.apply(album)) {
+			if (!AlbumKt.notEmpty().invoke(album)) {
 				continue;
 			}
 			hash.putString(album.getFingerprint(), UTF_8);
@@ -686,7 +668,7 @@ public class SoneImpl implements Sone {
 	/** {@inheritDoc} */
 	@Override
 	public int compareTo(Sone sone) {
-		return NICE_NAME_COMPARATOR.compare(this, sone);
+		return niceNameComparator().compare(this, sone);
 	}
 
 	//

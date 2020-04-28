@@ -42,7 +42,7 @@ class IdentityLoaderTest {
 	@Test
 	fun loadingIdentities() {
 		val identityLoader = IdentityLoader(webOfTrustConnector, Context("Test"))
-		val identities = identityLoader.loadIdentities()
+		val identities = identityLoader.loadTrustedIdentities()
 		assertThat(identities.keys, hasSize(4))
 		assertThat(identities.keys, containsInAnyOrder(ownIdentities[0], ownIdentities[1], ownIdentities[2], ownIdentities[3]))
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities[0], createTrustedIdentitiesForFirstOwnIdentity())
@@ -54,7 +54,7 @@ class IdentityLoaderTest {
 	@Test
 	fun loadingIdentitiesWithoutContext() {
 		val identityLoaderWithoutContext = IdentityLoader(webOfTrustConnector)
-		val identities = identityLoaderWithoutContext.loadIdentities()
+		val identities = identityLoaderWithoutContext.loadTrustedIdentities()
 		assertThat(identities.keys, hasSize(4))
 		assertThat(identities.keys, containsInAnyOrder(ownIdentities[0], ownIdentities[1], ownIdentities[2], ownIdentities[3]))
 		verifyIdentitiesForOwnIdentity(identities, ownIdentities[0], createTrustedIdentitiesForFirstOwnIdentity())
@@ -106,6 +106,7 @@ private open class TestWebOfTrustConnector : WebOfTrustConnector {
 
 	override fun loadAllOwnIdentities() = emptySet<OwnIdentity>()
 	override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) = emptySet<Identity>()
+	override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?) = emptySet<Identity>()
 	override fun addContext(ownIdentity: OwnIdentity, context: String) = Unit
 	override fun removeContext(ownIdentity: OwnIdentity, context: String) = Unit
 	override fun setProperty(ownIdentity: OwnIdentity, name: String, value: String) = Unit

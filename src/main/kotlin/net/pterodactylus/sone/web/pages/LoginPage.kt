@@ -26,7 +26,7 @@ class LoginPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 				redirectTo(target)
 			}
 		}
-		templateContext["sones"] = soneRequest.core.localSones.sortedWith(Sone.NICE_NAME_COMPARATOR)
+		templateContext["sones"] = soneRequest.core.localSones.sortedWith(niceNameComparator)
 		templateContext["identitiesWithoutSone"] = soneRequest.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}" }
 	}
 

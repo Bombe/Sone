@@ -1,10 +1,7 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Album.Modifier.AlbumTitleMustNotBeEmpty
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.impl.AlbumImpl
-import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
@@ -20,8 +17,7 @@ import org.junit.Test
 class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::EditAlbumAjaxPage) {
 
 	private val sone = mock<Sone>()
-	private val localSone = mock<Sone>().apply { whenever(isLocal).thenReturn(true) }
-	private val album = mock<Album>().apply { whenever(id).thenReturn("album-id") }
+	private val album = AlbumImpl(sone, "album-id")
 
 	@Test
 	fun `request without album results in invalid-album-id`() {
@@ -30,7 +26,6 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 
 	@Test
 	fun `request with non-local album results in not-authorized`() {
-		whenever(album.sone).thenReturn(sone)
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
 		assertThatJsonFailed("not-authorized")
@@ -38,11 +33,11 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 
 	@Test
 	fun `request with moveLeft moves album to the left`() {
-		whenever(album.sone).thenReturn(localSone)
-		val swappedAlbum = mock<Album>().apply { whenever(id).thenReturn("swapped") }
-		val parentAlbum = mock<Album>()
-		whenever(parentAlbum.moveAlbumUp(album)).thenReturn(swappedAlbum)
-		whenever(album.parent).thenReturn(parentAlbum)
+		setupLocalSone()
+		AlbumImpl(sone).also {
+			it.addAlbum(AlbumImpl(sone, "swapped"))
+			it.addAlbum(album)
+		}
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
 		addRequestParameter("moveLeft", "true")
@@ -53,11 +48,11 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 
 	@Test
 	fun `request with moveRight moves album to the right`() {
-		whenever(album.sone).thenReturn(localSone)
-		val swappedAlbum = mock<Album>().apply { whenever(id).thenReturn("swapped") }
-		val parentAlbum = mock<Album>()
-		whenever(parentAlbum.moveAlbumDown(album)).thenReturn(swappedAlbum)
-		whenever(album.parent).thenReturn(parentAlbum)
+		setupLocalSone()
+		AlbumImpl(sone).also {
+			it.addAlbum(album)
+			it.addAlbum(AlbumImpl(sone, "swapped"))
+		}
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
 		addRequestParameter("moveRight", "true")
@@ -68,9 +63,7 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 
 	@Test
 	fun `request with missing title results in invalid-title`() {
-		whenever(album.sone).thenReturn(localSone)
-		whenever(album.modify()).thenReturn(deepMock())
-		whenever(album.modify().setTitle("")).thenThrow(AlbumTitleMustNotBeEmpty::class.java)
+		setupLocalSone()
 		addAlbum(album)
 		addRequestParameter("album", "album-id")
 		assertThatJsonFailed("invalid-album-title")
@@ -93,6 +86,10 @@ class EditAlbumAjaxPageTest : JsonPageTest("editAlbum.ajax", pageSupplier = ::Ed
 	@Test
 	fun `page can be created by dependency injection`() {
 	    assertThat(baseInjector.getInstance<EditAlbumAjaxPage>(), notNullValue())
+	}
+
+	private fun setupLocalSone() {
+		whenever(sone.isLocal).thenReturn(true)
 	}
 
 }

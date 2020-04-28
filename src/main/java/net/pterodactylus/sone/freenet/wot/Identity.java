@@ -17,12 +17,8 @@
 
 package net.pterodactylus.sone.freenet.wot;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
-
-import com.google.common.base.Function;
 
 /**
  * Interface for web of trust identities, defining all functions that can be
@@ -134,6 +130,8 @@ public interface Identity {
 	 *            The name of the property to remove
 	 */
 	public Identity removeProperty(String name);
+
+	Map<OwnIdentity, Trust> getTrust();
 
 	/**
 	 * Retrieves the trust that this identity receives from the given own

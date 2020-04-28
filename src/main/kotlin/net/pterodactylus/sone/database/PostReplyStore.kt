@@ -26,5 +26,6 @@ interface PostReplyStore {
 
 	fun storePostReply(postReply: PostReply)
 	fun removePostReply(postReply: PostReply)
+	fun setPostReplyKnown(postReply: PostReply)
 
 }

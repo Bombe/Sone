@@ -18,18 +18,16 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.client.*
-import freenet.clients.http.*
 import net.pterodactylus.util.web.*
 import javax.inject.*
 
 class PageToadletFactory @Inject constructor(
 		private val highLevelSimpleClient: HighLevelSimpleClient,
-		private val sessionManager: SessionManager,
 		@Named("toadletPathPrefix") private val pathPrefix: String
 ) {
 
 	@JvmOverloads
 	fun createPageToadlet(page: Page<FreenetRequest>, menuName: String? = null) =
-			PageToadlet(highLevelSimpleClient, sessionManager, menuName ?: page.menuName, page, pathPrefix)
+			PageToadlet(highLevelSimpleClient, menuName ?: page.menuName, page, pathPrefix)
 
 }

@@ -31,8 +31,8 @@ abstract class JsonPage(protected val webInterface: WebInterface) : Page<Freenet
 	protected fun createErrorJsonObject(error: String) =
 			JsonErrorReturnObject(error)
 
-	protected fun getCurrentSone(toadletContext: ToadletContext, createSession: Boolean = true) =
-			sessionProvider.getCurrentSone(toadletContext, createSession)
+	protected fun getCurrentSone(toadletContext: ToadletContext) =
+			sessionProvider.getCurrentSone(toadletContext)
 
 	override fun handleRequest(request: FreenetRequest, response: Response): Response {
 		if (core.preferences.requireFullAccess && !request.toadletContext.isAllowedFullAccess) {
@@ -41,7 +41,7 @@ abstract class JsonPage(protected val webInterface: WebInterface) : Page<Freenet
 		if (needsFormPassword && request.parameters["formPassword"] != webInterface.formPassword) {
 			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(createErrorJsonObject("auth-required").asJsonString())
 		}
-		if (requiresLogin && (sessionProvider.getCurrentSone(request.toadletContext, false) == null)) {
+		if (requiresLogin && (sessionProvider.getCurrentSone(request.toadletContext) == null)) {
 			return response.setStatusCode(403).setStatusText("Forbidden").setContentType("application/json").write(createErrorJsonObject("auth-required").asJsonString())
 		}
 		return try {

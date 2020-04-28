@@ -24,7 +24,7 @@ import static com.google.common.primitives.Longs.tryParse;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static java.util.logging.Logger.getLogger;
-import static net.pterodactylus.sone.data.AlbumsKt.getAllImages;
+import static net.pterodactylus.sone.data.AlbumKt.getAllImages;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,6 +62,7 @@ import net.pterodactylus.sone.data.Profile.Field;
 import net.pterodactylus.sone.data.Reply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.Sone.SoneStatus;
+import net.pterodactylus.sone.data.SoneKt;
 import net.pterodactylus.sone.data.SoneOptions.LoadExternalContent;
 import net.pterodactylus.sone.data.TemporaryImage;
 import net.pterodactylus.sone.database.AlbumBuilder;
@@ -90,7 +91,6 @@ import net.pterodactylus.util.thread.NamedThreadFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Stopwatch;
-import com.google.common.collect.FluentIterable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
@@ -180,24 +180,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	private final MetricRegistry metricRegistry;
 	private final Histogram configurationSaveTimeHistogram;
 
-	/**
-	 * Creates a new core.
-	 *
-	 * @param configuration
-	 *            The configuration of the core
-	 * @param freenetInterface
-	 *            The freenet interface
-	 * @param identityManager
-	 *            The identity manager
-	 * @param webOfTrustUpdater
-	 *            The WebOfTrust updater
-	 * @param eventBus
-	 *            The event bus
-	 * @param database
-	 *            The database
-	 */
+	private final SoneUriCreator soneUriCreator;
+
 	@Inject
-	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry) {
+	public Core(Configuration configuration, FreenetInterface freenetInterface, IdentityManager identityManager, SoneDownloader soneDownloader, ImageInserter imageInserter, UpdateChecker updateChecker, WebOfTrustUpdater webOfTrustUpdater, EventBus eventBus, Database database, MetricRegistry metricRegistry, SoneUriCreator soneUriCreator) {
 		super("Sone Core");
 		this.configuration = configuration;
 		this.freenetInterface = freenetInterface;
@@ -209,6 +195,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		this.eventBus = eventBus;
 		this.database = database;
 		this.metricRegistry = metricRegistry;
+		this.soneUriCreator = soneUriCreator;
 		preferences = new Preferences(eventBus);
 		this.configurationSaveTimeHistogram = metricRegistry.histogram("configuration.save.duration", () -> new Histogram(new ExponentiallyDecayingReservoir(3000, 0)));
 	}
@@ -626,7 +613,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.setLatestEdition(fromNullable(tryParse(property)).or(0L));
 		sone.setClient(new Client("Sone", SonePlugin.getPluginVersion()));
 		sone.setKnown(true);
-		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, metricRegistry, ownIdentity.getId());
+		SoneInserter soneInserter = new SoneInserter(this, eventBus, freenetInterface, metricRegistry, soneUriCreator, ownIdentity.getId());
 		soneInserter.insertionDelayChanged(new InsertionDelayChangedEvent(preferences.getInsertionDelay()));
 		eventBus.register(soneInserter);
 		synchronized (soneInserters) {
@@ -810,9 +797,9 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		for (PostReply postReply : soneComparison.getNewPostReplies()) {
 			if (postReply.getSone().equals(newSone)) {
-				postReply.setKnown(true);
+				database.setPostReplyKnown(postReply);
 			} else if (postReply.getTime() < database.getFollowingTime(newSone.getId())) {
-				postReply.setKnown(true);
+				database.setPostReplyKnown(postReply);
 			} else if (!postReply.isKnown()) {
 				events.add(new NewPostReplyFoundEvent(postReply));
 			}
@@ -989,7 +976,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			post.setKnown(true);
 		}
 		for (PostReply reply : replies) {
-			reply.setKnown(true);
+			database.setPostReplyKnown(reply);
 		}
 
 		logger.info(String.format("Sone loaded successfully: %s", sone));
@@ -1131,7 +1118,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 	 */
 	public void markReplyKnown(PostReply reply) {
 		boolean previouslyKnown = reply.isKnown();
-		reply.setKnown(true);
+		database.setPostReplyKnown(reply);
 		eventBus.post(new MarkPostReplyKnownEvent(reply));
 		if (!previouslyKnown) {
 			touchConfiguration();
@@ -1405,7 +1392,7 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getStringValue(sonePrefix + "/Likes/Reply/" + replyLikeCounter + "/ID").setValue(null);
 
 			/* save albums. first, collect in a flat structure, top-level first. */
-			List<Album> albums = FluentIterable.from(sone.getRootAlbum().getAlbums()).transformAndConcat(Album.FLATTENER).toList();
+			List<Album> albums = SoneKt.getAllAlbums(sone);
 
 			int albumCounter = 0;
 			for (Album album : albums) {

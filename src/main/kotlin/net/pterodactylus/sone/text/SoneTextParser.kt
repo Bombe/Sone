@@ -1,7 +1,6 @@
 package net.pterodactylus.sone.text
 
 import freenet.keys.*
-import freenet.support.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.database.*

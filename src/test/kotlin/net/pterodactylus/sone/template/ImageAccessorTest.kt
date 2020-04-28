@@ -1,13 +1,9 @@
 package net.pterodactylus.sone.template
 
-import net.pterodactylus.sone.data.Album
-import net.pterodactylus.sone.data.Image
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.data.impl.*
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
-import org.junit.Before
 import org.junit.Test
 
 /**
@@ -16,16 +12,6 @@ import org.junit.Test
 class ImageAccessorTest {
 
 	private val accessor = ImageAccessor()
-	private val album = mock<Album>()
-	private val images = listOf(mock<Image>(), mock())
-
-	@Before
-	fun setupImages() {
-		whenever(album.images).thenReturn(images)
-		images.forEach {
-			whenever(it.album).thenReturn(album)
-		}
-	}
 
 	@Test
 	fun `accessor returns next image for first image`() {
@@ -53,3 +39,7 @@ class ImageAccessorTest {
 	}
 
 }
+
+private val sone = IdOnlySone("sone")
+private val album = AlbumImpl(sone)
+private val images = listOf(ImageImpl().modify().setSone(sone).update(), ImageImpl().modify().setSone(sone).update()).onEach(album::addImage)

@@ -17,6 +17,7 @@ class PreferencesLoader(private val preferences: Preferences) {
 		loadRequireFullAccess(configuration)
 		loadFcpInterfaceActive(configuration)
 		loadFcpFullAccessRequired(configuration)
+		loadStrictFiltering(configuration)
 	}
 
 	private fun loadInsertionDelay(configuration: Configuration) {
@@ -53,6 +54,10 @@ class PreferencesLoader(private val preferences: Preferences) {
 	private fun loadFcpFullAccessRequired(configuration: Configuration) {
 		val fullAccessRequiredInteger = configuration.getIntValue("Option/FcpFullAccessRequired").getValue(null)
 		preferences.newFcpFullAccessRequired = fullAccessRequiredInteger?.let { FullAccessRequired.values()[it] }
+	}
+
+	private fun loadStrictFiltering(configuration: Configuration) {
+		preferences.newStrictFiltering = configuration.getBooleanValue("Option/StrictFiltering").getValue(null)
 	}
 
 }

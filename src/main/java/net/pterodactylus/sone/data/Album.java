@@ -17,77 +17,12 @@
 
 package net.pterodactylus.sone.data;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.emptyList;
-
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import javax.annotation.Nonnull;
-
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.ImmutableList;
 
 /**
  * Container for images that can also contain nested {@link Album}s.
  */
 public interface Album extends Identified, Fingerprintable {
-
-	/** Function that flattens the given album and all albums beneath it. */
-	Function<Album, List<Album>> FLATTENER = new Function<Album, List<Album>>() {
-
-		@Override
-		@Nonnull
-		public List<Album> apply(Album album) {
-			if (album == null) {
-				return emptyList();
-			}
-			List<Album> albums = new ArrayList<>();
-			albums.add(album);
-			for (Album subAlbum : album.getAlbums()) {
-				albums.addAll(FluentIterable.from(ImmutableList.of(subAlbum)).transformAndConcat(FLATTENER).toList());
-			}
-			return albums;
-		}
-	};
-
-	/** Function that transforms an album into the images it contains. */
-	Function<Album, List<Image>> IMAGES = new Function<Album, List<Image>>() {
-
-		@Override
-		@Nonnull
-		public List<Image> apply(Album album) {
-			return (album != null) ? album.getImages() : Collections.<Image>emptyList();
-		}
-	};
-
-	/**
-	 * Filter that removes all albums that do not have any images in any album
-	 * below it.
-	 */
-	Predicate<Album> NOT_EMPTY = new Predicate<Album>() {
-
-		@Override
-		public boolean apply(Album album) {
-			/* so, we flatten all albums below the given one and check whether at least one album… */
-			return FluentIterable.from(asList(album)).transformAndConcat(FLATTENER).anyMatch(new Predicate<Album>() {
-
-				@Override
-				public boolean apply(Album album) {
-					/* …contains any inserted images. */
-					return !album.getImages().isEmpty() && FluentIterable.from(album.getImages()).allMatch(new Predicate<Image>() {
-
-						@Override
-						public boolean apply(Image input) {
-							return input.isInserted();
-						}
-					});
-				}
-			});
-		}
-	};
 
 	/**
 	 * Returns the ID of this album.

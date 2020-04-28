@@ -21,19 +21,20 @@ import com.google.common.base.Preconditions.checkNotNull
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.common.collect.TreeMultimap
-import com.google.common.util.concurrent.*
+import com.google.common.util.concurrent.AbstractService
+import com.google.common.util.concurrent.RateLimiter
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Reply.TIME_COMPARATOR
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.data.Sone.toAllAlbums
-import net.pterodactylus.sone.data.Sone.toAllImages
+import net.pterodactylus.sone.data.allAlbums
+import net.pterodactylus.sone.data.allImages
 import net.pterodactylus.sone.data.impl.AlbumBuilderImpl
 import net.pterodactylus.sone.data.impl.ImageBuilderImpl
+import net.pterodactylus.sone.data.newestReplyFirst
 import net.pterodactylus.sone.database.AlbumBuilder
 import net.pterodactylus.sone.database.Database
 import net.pterodactylus.sone.database.DatabaseException
@@ -41,7 +42,8 @@ import net.pterodactylus.sone.database.ImageBuilder
 import net.pterodactylus.sone.database.PostBuilder
 import net.pterodactylus.sone.database.PostDatabase
 import net.pterodactylus.sone.database.PostReplyBuilder
-import net.pterodactylus.sone.utils.*
+import net.pterodactylus.sone.utils.ifTrue
+import net.pterodactylus.sone.utils.unit
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.util.concurrent.locks.ReentrantReadWriteLock
@@ -62,7 +64,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val sonePosts: Multimap<String, Post> = HashMultimap.create<String, Post>()
 	private val knownPosts = mutableSetOf<String>()
 	private val allPostReplies = mutableMapOf<String, PostReply>()
-	private val sonePostReplies: Multimap<String, PostReply> = TreeMultimap.create<String, PostReply>(Comparator { leftString, rightString -> leftString.compareTo(rightString) }, TIME_COMPARATOR)
+	private val sonePostReplies: Multimap<String, PostReply> = TreeMultimap.create<String, PostReply>(Comparator { leftString, rightString -> leftString.compareTo(rightString) }, newestReplyFirst)
 	private val knownPostReplies = mutableSetOf<String>()
 	private val allAlbums = mutableMapOf<String, Album>()
 	private val soneAlbums: Multimap<String, Album> = HashMultimap.create<String, Album>()
@@ -123,13 +125,13 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			for (postReply in sone.replies) {
 				allPostReplies[postReply.id] = postReply
 			}
-			soneAlbums.putAll(sone.id, toAllAlbums.apply(sone)!!)
-			for (album in toAllAlbums.apply(sone)!!) {
-				allAlbums[album.id] = album
+			sone.allAlbums.let { albums ->
+				soneAlbums.putAll(sone.id, albums)
+				albums.forEach { album -> allAlbums[album.id] = album }
 			}
-			soneImages.putAll(sone.id, toAllImages.apply(sone)!!)
-			for (image in toAllImages.apply(sone)!!) {
-				allImages[image.id] = image
+			sone.rootAlbum.allImages.let { images ->
+				soneImages.putAll(sone.id, images)
+				images.forEach { image -> allImages[image.id] = image }
 			}
 		}
 	}
@@ -227,7 +229,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			readLock.withLock {
 				allPostReplies.values
 						.filter { it.postId == postId }
-						.sortedWith(TIME_COMPARATOR)
+						.sortedWith(newestReplyFirst.reversed())
 			}
 
 	override fun newPostReplyBuilder(): PostReplyBuilder =
@@ -297,12 +299,9 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 
 	protected fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
 
-	fun setPostReplyKnown(postReply: PostReply, known: Boolean): Unit =
+	override fun setPostReplyKnown(postReply: PostReply): Unit =
 			writeLock.withLock {
-				if (known)
-					knownPostReplies.add(postReply.id)
-				else
-					knownPostReplies.remove(postReply.id)
+				knownPostReplies.add(postReply.id)
 				saveKnownPostReplies()
 			}
 

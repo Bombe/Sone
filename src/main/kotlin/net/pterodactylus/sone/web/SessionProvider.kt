@@ -8,7 +8,7 @@ import net.pterodactylus.sone.data.Sone
  */
 interface SessionProvider {
 
-	fun getCurrentSone(toadletContext: ToadletContext, createSession: Boolean = true): Sone?
+	fun getCurrentSone(toadletContext: ToadletContext): Sone?
 	fun setCurrentSone(toadletContext: ToadletContext, sone: Sone?)
 
 }

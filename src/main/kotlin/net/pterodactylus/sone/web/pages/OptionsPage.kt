@@ -40,9 +40,11 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			}
 			val fullAccessRequired = "require-full-access" in soneRequest.parameters
 			val fcpInterfaceActive = "fcp-interface-active" in soneRequest.parameters
+			val strictFiltering = "strict-filtering" in soneRequest.parameters
 
 			soneRequest.core.preferences.newRequireFullAccess = fullAccessRequired
 			soneRequest.core.preferences.newFcpInterfaceActive = fcpInterfaceActive
+			soneRequest.core.preferences.newStrictFiltering = strictFiltering
 
 			val postsPerPage = soneRequest.parameters["posts-per-page"]?.toIntOrNull()
 			val charactersPerPost = soneRequest.parameters["characters-per-post"]?.toIntOrNull()
@@ -82,6 +84,7 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			templateContext["require-full-access"] = preferences.requireFullAccess
 			templateContext["post-cut-off-length"] = preferences.postCutOffLength
 			templateContext["posts-per-page"] = preferences.postsPerPage
+			templateContext["strict-filtering"] = preferences.strictFiltering
 		}
 	}
 

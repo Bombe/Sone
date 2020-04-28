@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.web.pages
 
 import net.pterodactylus.sone.data.*
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
@@ -21,16 +22,13 @@ class EditProfilePageTest : WebPageTest(::EditProfilePage) {
 
 	@Before
 	fun setupProfile() {
-		val avatar = mock<Image>()
-		whenever(avatar.id).thenReturn("image-id")
-		whenever(avatar.sone).thenReturn(currentSone)
 		profile.firstName = "First"
 		profile.middleName = "Middle"
 		profile.lastName = "Last"
 		profile.birthDay = 31
 		profile.birthMonth = 12
 		profile.birthYear = 1999
-		profile.setAvatar(avatar)
+		profile.setAvatar(ImageImpl("image-id").modify().setSone(currentSone).update())
 		whenever(currentSone.profile).thenReturn(profile)
 	}
 
@@ -120,9 +118,7 @@ class EditProfilePageTest : WebPageTest(::EditProfilePage) {
 
 	@Test
 	fun `post request with new avatar ID and save profile saves the profile and redirects back to profile edit page`() {
-		val newAvatar = mock<Image>()
-		whenever(newAvatar.sone).thenReturn(currentSone)
-		whenever(newAvatar.id).thenReturn("avatar-id")
+		val newAvatar = ImageImpl("avatar-id").modify().setSone(currentSone).update()
 		addImage("avatar-id", newAvatar)
 		verifySingleFieldCanBeChanged("avatarId", "avatar-id") { profile.avatar }
 	}

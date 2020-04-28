@@ -10,6 +10,7 @@ import net.pterodactylus.sone.data.Sone.SoneStatus.downloading
 import net.pterodactylus.sone.data.Sone.SoneStatus.idle
 import net.pterodactylus.sone.data.Sone.SoneStatus.inserting
 import net.pterodactylus.sone.data.Sone.SoneStatus.unknown
+import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.freenet.L10nText
 import net.pterodactylus.sone.freenet.wot.Identity
 import net.pterodactylus.sone.freenet.wot.OwnIdentity
@@ -217,24 +218,24 @@ class SoneAccessorTest {
 
 	@Test
 	fun `accessor returns all images in the correct order`() {
-		val images = listOf(mock<Image>(), mock(), mock(), mock(), mock())
-		val firstAlbum = createAlbum(listOf(), listOf(images[0], images[3]))
-		val secondAlbum = createAlbum(listOf(), listOf(images[1], images[4], images[2]))
-		val rootAlbum = createAlbum(listOf(firstAlbum, secondAlbum), listOf())
+		val images = (0 until 5).map { ImageImpl().modify().setSone(sone).update() }
+		val firstAlbum = createAlbum(emptyList(), listOf(images[0], images[3]))
+		val secondAlbum = createAlbum(emptyList(), listOf(images[1], images[4], images[2]))
+		val rootAlbum = createAlbum(listOf(firstAlbum, secondAlbum), emptyList())
 		whenever(sone.rootAlbum).thenReturn(rootAlbum)
 		assertAccessorReturnValueMatches("allImages", contains(images[0], images[3], images[1], images[4], images[2]))
 	}
 
 	private fun createAlbum(albums: List<Album>, images: List<Image>) =
-			mock<Album>().apply {
-				whenever(this.albums).thenReturn(albums)
-				whenever(this.images).thenReturn(images)
+			AlbumImpl(sone).also {
+				albums.forEach(it::addAlbum)
+				images.forEach(it::addImage)
 			}
 
 	@Test
 	fun `accessor returns all albums in the correct order`() {
-		val albums = listOf(mock<Album>(), mock(), mock(), mock(), mock())
-		val rootAlbum = createAlbum(albums, listOf())
+		val albums = (0 until 5).map { AlbumImpl(sone)  }
+		val rootAlbum = createAlbum(albums, emptyList())
 		whenever(sone.rootAlbum).thenReturn(rootAlbum)
 		assertAccessorReturnValueMatches("albums", contains(*albums.toTypedArray()))
 	}

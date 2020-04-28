@@ -28,6 +28,7 @@ class PreferencesLoaderTest {
 		setupBooleanValue("RequireFullAccess", true)
 		setupBooleanValue("ActivateFcpInterface", true)
 		setupIntValue("FcpFullAccessRequired", 1)
+		setupBooleanValue("StrictFiltering", true)
 	}
 
 	private fun setupIntValue(optionName: String, value: Int) {
@@ -49,6 +50,7 @@ class PreferencesLoaderTest {
 		assertThat(preferences.requireFullAccess, equalTo(true))
 		assertThat(preferences.fcpInterfaceActive, equalTo(true))
 		assertThat(preferences.fcpFullAccessRequired, equalTo(FullAccessRequired.WRITING))
+		assertThat(preferences.strictFiltering, equalTo(true))
 	}
 
 	@Test

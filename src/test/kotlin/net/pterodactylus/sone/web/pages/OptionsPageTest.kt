@@ -27,6 +27,7 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 		core.preferences.newRequireFullAccess = true
 		core.preferences.newPostCutOffLength = 51
 		core.preferences.newPostsPerPage = 10
+		core.preferences.newStrictFiltering = true
 	}
 
 	@Before
@@ -76,6 +77,7 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 			assertThat(templateContext["require-full-access"], equalTo<Any>(true))
 			assertThat(templateContext["post-cut-off-length"], equalTo<Any>(51))
 			assertThat(templateContext["posts-per-page"], equalTo<Any>(10))
+			assertThat(templateContext["strict-filtering"], equalTo<Any>(true))
 		}
 	}
 
@@ -305,6 +307,16 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	@Test
 	fun `posts per page is set to default on invalid value`() {
 		verifyThatPreferencesCanBeSet("posts-per-page", "invalid", 10) { core.preferences.postsPerPage }
+	}
+
+	@Test
+	fun `strict filtering can be set to true`() {
+		verifyThatPreferencesCanBeSet("strict-filtering", "checked", true) { core.preferences.strictFiltering }
+	}
+
+	@Test
+	fun `strict filtering can be set to false`() {
+		verifyThatPreferencesCanBeSet("strict-filtering", null, false) { core.preferences.strictFiltering }
 	}
 
 	@Test

@@ -7,10 +7,10 @@ import net.pterodactylus.sone.web.*
 import net.pterodactylus.util.web.*
 import java.net.*
 
-class SoneRequest(uri: URI, method: Method, httpRequest: HTTPRequest, toadletContext: ToadletContext, sessionManager: SessionManager,
+class SoneRequest(uri: URI, method: Method, httpRequest: HTTPRequest, toadletContext: ToadletContext,
 				  val core: Core,
 				  val webInterface: WebInterface
-) : FreenetRequest(uri, method, httpRequest, toadletContext, sessionManager)
+) : FreenetRequest(uri, method, httpRequest, toadletContext)
 
 fun FreenetRequest.toSoneRequest(core: Core, webInterface: WebInterface) =
-		SoneRequest(uri, method, httpRequest, toadletContext, sessionManager, core, webInterface)
+		SoneRequest(uri, method, httpRequest, toadletContext, core, webInterface)

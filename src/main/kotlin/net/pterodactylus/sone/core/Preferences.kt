@@ -17,16 +17,19 @@
 
 package net.pterodactylus.sone.core
 
-import com.google.common.base.Predicates.*
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.core.event.*
-import net.pterodactylus.sone.fcp.FcpInterface.*
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.*
-import net.pterodactylus.sone.fcp.event.*
-import net.pterodactylus.sone.utils.*
-import net.pterodactylus.sone.utils.IntegerRangePredicate.*
-import net.pterodactylus.util.config.*
-import java.lang.Integer.*
+import com.google.common.eventbus.EventBus
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
+import net.pterodactylus.sone.utils.DefaultOption
+import net.pterodactylus.util.config.Configuration
+import net.pterodactylus.util.config.ConfigurationException
+import java.lang.Integer.MAX_VALUE
 
 /**
  * Convenience interface for external classes that want to access the core’s
@@ -34,7 +37,7 @@ import java.lang.Integer.*
  */
 class Preferences(private val eventBus: EventBus) {
 
-	private val _insertionDelay = DefaultOption(60, range(0, MAX_VALUE))
+	private val _insertionDelay = DefaultOption(60) { it in 0..MAX_VALUE }
 	val insertionDelay: Int get() = _insertionDelay.get()
 	var newInsertionDelay: Int?
 		get() = unsupported
@@ -44,7 +47,7 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(PreferenceChangedEvent("InsertionDelay", insertionDelay))
 		}
 
-	private val _postsPerPage = DefaultOption(10, range(1, MAX_VALUE))
+	private val _postsPerPage = DefaultOption(10) { it in 1..MAX_VALUE }
 	val postsPerPage: Int get() = _postsPerPage.get()
 	var newPostsPerPage: Int?
 		get() = unsupported
@@ -53,19 +56,19 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(PreferenceChangedEvent("PostsPerPage", postsPerPage))
 		}
 
-	private val _imagesPerPage = DefaultOption(9, range(1, MAX_VALUE))
+	private val _imagesPerPage = DefaultOption(9) { it in 1..MAX_VALUE }
 	val imagesPerPage: Int get() = _imagesPerPage.get()
 	var newImagesPerPage: Int?
 		get() = unsupported
-		set (value: Int?) = _imagesPerPage.set(value)
+		set(value: Int?) = _imagesPerPage.set(value)
 
-	private val _charactersPerPost = DefaultOption(400, or(range(50, MAX_VALUE), equalTo(-1)))
+	private val _charactersPerPost = DefaultOption(400) { it == -1 || it in 50..MAX_VALUE }
 	val charactersPerPost: Int get() = _charactersPerPost.get()
 	var newCharactersPerPost: Int?
 		get() = unsupported
 		set(value) = _charactersPerPost.set(value)
 
-	private val _postCutOffLength = DefaultOption(200, range(50, MAX_VALUE))
+	private val _postCutOffLength = DefaultOption(200) { it in 50..MAX_VALUE }
 	val postCutOffLength: Int get() = _postCutOffLength.get()
 	var newPostCutOffLength: Int?
 		get() = unsupported
@@ -98,6 +101,17 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(FullAccessRequiredChanged(fcpFullAccessRequired))
 		}
 
+	private val _strictFiltering = DefaultOption(false)
+	val strictFiltering: Boolean get() = _strictFiltering.get()
+	var newStrictFiltering: Boolean? = false
+		set(value) {
+			_strictFiltering.set(value)
+			when (strictFiltering) {
+				true -> eventBus.post(StrictFilteringActivatedEvent())
+				else -> eventBus.post(StrictFilteringDeactivatedEvent())
+			}
+		}
+
 	@Throws(ConfigurationException::class)
 	fun saveTo(configuration: Configuration) {
 		configuration.getIntValue("Option/ConfigurationVersion").value = 0
@@ -109,6 +123,7 @@ class Preferences(private val eventBus: EventBus) {
 		configuration.getBooleanValue("Option/RequireFullAccess").value = _requireFullAccess.real
 		configuration.getBooleanValue("Option/ActivateFcpInterface").value = _fcpInterfaceActive.real
 		configuration.getIntValue("Option/FcpFullAccessRequired").value = toInt(_fcpFullAccessRequired.real)
+		configuration.getBooleanValue("Option/StrictFiltering").value = _strictFiltering.real
 	}
 
 	private fun toInt(fullAccessRequired: FullAccessRequired?): Int? {

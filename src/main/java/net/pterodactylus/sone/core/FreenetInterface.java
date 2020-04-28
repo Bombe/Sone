@@ -91,6 +91,8 @@ public class FreenetInterface {
 	/** The node to interact with. */
 	private final Node node;
 
+	private final SoneUriCreator soneUriCreator;
+
 	/** The high-level client to use for requests. */
 	private final HighLevelSimpleClient client;
 	private final RequestClient requestClient = new RequestClientBuilder().realTime().build();
@@ -104,18 +106,11 @@ public class FreenetInterface {
 	private final RequestClient imageInserts = new RequestClientBuilder().realTime().build();
 	private final RequestClient imageLoader = new RequestClientBuilder().realTime().build();
 
-	/**
-	 * Creates a new Freenet interface.
-	 *
-	 * @param eventBus
-	 *            The event bus
-	 * @param node
-	 *            The node to interact with
-	 */
 	@Inject
-	public FreenetInterface(EventBus eventBus, Node node) {
+	public FreenetInterface(EventBus eventBus, Node node, SoneUriCreator soneUriCreator) {
 		this.eventBus = eventBus;
 		this.node = node;
+		this.soneUriCreator = soneUriCreator;
 		this.client = node.clientCore.makeClient(RequestStarter.INTERACTIVE_PRIORITY_CLASS, false, true);
 	}
 
@@ -291,9 +286,9 @@ public class FreenetInterface {
 		}
 		try {
 			logger.log(Level.FINEST, String.format("Unsubscribing from USK for %s…", sone));
-			node.clientCore.uskManager.unsubscribe(USK.create(sone.getRequestUri()), uskCallback);
+			node.clientCore.uskManager.unsubscribe(USK.create(soneUriCreator.getRequestUri(sone)), uskCallback);
 		} catch (MalformedURLException mue1) {
-			logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", sone.getRequestUri()), mue1);
+			logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", soneUriCreator.getRequestUri(sone)), mue1);
 		}
 	}
 

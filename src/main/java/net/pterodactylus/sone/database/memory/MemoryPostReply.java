@@ -124,15 +124,6 @@ class MemoryPostReply implements PostReply {
 		return database.isPostReplyKnown(this);
 	}
 
-	/**
-	 * {@inheritDocs}
-	 */
-	@Override
-	public PostReply setKnown(boolean known) {
-		database.setPostReplyKnown(this, known);
-		return this;
-	}
-
 	//
 	// POSTREPLY METHODS
 	//
@@ -175,6 +166,19 @@ class MemoryPostReply implements PostReply {
 		}
 		MemoryPostReply memoryPostReply = (MemoryPostReply) object;
 		return memoryPostReply.id.equals(id);
+	}
+
+	@Override
+	public String toString() {
+		return "MemoryPostReply{" +
+				"database=" + database +
+				", soneProvider=" + soneProvider +
+				", id='" + id + '\'' +
+				", soneId='" + soneId + '\'' +
+				", time=" + time +
+				", text='" + text + '\'' +
+				", postId='" + postId + '\'' +
+				'}';
 	}
 
 }

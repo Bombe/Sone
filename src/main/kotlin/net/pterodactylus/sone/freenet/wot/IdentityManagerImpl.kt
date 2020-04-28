@@ -17,12 +17,18 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import com.google.common.eventbus.*
-import com.google.inject.*
-import net.pterodactylus.util.service.*
-import java.util.concurrent.TimeUnit.*
-import java.util.logging.*
-import java.util.logging.Logger.*
+import com.google.common.eventbus.EventBus
+import com.google.common.eventbus.Subscribe
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
+import net.pterodactylus.util.service.AbstractService
+import java.util.concurrent.TimeUnit.SECONDS
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.logging.Level
+import java.util.logging.Logger
+import java.util.logging.Logger.getLogger
 
 /**
  * The identity manager takes care of loading and storing identities, their
@@ -42,6 +48,7 @@ class IdentityManagerImpl @Inject constructor(
 ) : AbstractService("Sone Identity Manager", false), IdentityManager {
 
 	private val currentOwnIdentities = mutableSetOf<OwnIdentity>()
+	private val strictFiltering = AtomicBoolean(false)
 
 	override val isConnected: Boolean
 		get() = notThrowing { webOfTrustConnector.ping() }
@@ -56,7 +63,7 @@ class IdentityManagerImpl @Inject constructor(
 
 		while (!shouldStop()) {
 			try {
-				val currentIdentities = identityLoader.loadIdentities()
+				val currentIdentities = identityLoader.loadAllIdentities().applyStrictFiltering()
 
 				val identityChangeEventSender = IdentityChangeEventSender(eventBus, oldIdentities)
 				identityChangeEventSender.detectChanges(currentIdentities)
@@ -78,6 +85,38 @@ class IdentityManagerImpl @Inject constructor(
 		}
 	}
 
+	private fun Map<OwnIdentity, Set<Identity>>.applyStrictFiltering() =
+			if (strictFiltering.get()) {
+				val identitiesWithTrust = values.flatten()
+						.groupBy { it.id }
+						.mapValues { (_, identities) ->
+							identities.reduce { accIdentity, identity ->
+								identity.trust.forEach { (ownIdentity: OwnIdentity?, trust: Trust?) ->
+									accIdentity.setTrust(ownIdentity, trust)
+								}
+								accIdentity
+							}
+						}
+
+				mapValues { (_, trustedIdentities) ->
+					trustedIdentities.filter { trustedIdentity ->
+						identitiesWithTrust[trustedIdentity.id]!!.trust.all { it.value.hasZeroOrPositiveTrust() }
+					}
+				}
+			} else {
+				this
+			}
+
+	@Subscribe
+	fun strictFilteringActivated(event: StrictFilteringActivatedEvent) {
+		strictFiltering.set(true)
+	}
+
+	@Subscribe
+	fun strictFilteringDeactivated(event: StrictFilteringDeactivatedEvent) {
+		strictFiltering.set(false)
+	}
+
 }
 
 private val logger: Logger = getLogger(IdentityManagerImpl::class.java.name)
@@ -88,4 +127,11 @@ private fun notThrowing(action: () -> Unit): Boolean =
 			true
 		} catch (e: Exception) {
 			false
+		}
+
+private fun Trust.hasZeroOrPositiveTrust() =
+		if (explicit == null) {
+			implicit == null || implicit >= 0
+		} else {
+			explicit >= 0
 		}

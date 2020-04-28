@@ -1,28 +1,35 @@
 package net.pterodactylus.sone.core
 
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.core.event.*
-import net.pterodactylus.sone.fcp.FcpInterface.*
-import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.*
-import net.pterodactylus.sone.fcp.event.*
-import net.pterodactylus.sone.test.*
-import net.pterodactylus.util.config.*
-import org.hamcrest.MatcherAssert.*
-import org.hamcrest.Matchers.*
-import org.junit.*
-import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito.atLeastOnce
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
+import com.google.common.eventbus.EventBus
+import com.google.common.eventbus.Subscribe
+import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
+import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.NO
+import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.WRITING
+import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
+import net.pterodactylus.sone.fcp.event.FcpInterfaceDeactivatedEvent
+import net.pterodactylus.sone.fcp.event.FullAccessRequiredChanged
+import net.pterodactylus.util.config.Configuration
+import net.pterodactylus.util.config.MapConfigurationBackend
+import org.hamcrest.Matcher
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.emptyIterable
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasItem
+import org.hamcrest.Matchers.instanceOf
+import org.hamcrest.Matchers.nullValue
+import org.junit.Test
 
 /**
  * Unit test for [Preferences].
  */
 class PreferencesTest {
 
-	private val eventBus = mock<EventBus>()
+	private val eventBus = EventBus()
 	private val preferences = Preferences(eventBus)
-	private val eventsCaptor = capture<Any>()
 
 	@Test
 	fun `preferences retain insertion delay`() {
@@ -32,9 +39,14 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences sends event on setting insertion delay`() {
+		val events = mutableListOf<InsertionDelayChangedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun insertionDelayChangedEvent(event: InsertionDelayChangedEvent) =
+					events.add(event)
+		})
 		preferences.newInsertionDelay = 15
-		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
-		assertThat(eventsCaptor.allValues, hasItem(InsertionDelayChangedEvent(15)))
+		assertThat(events, hasItem(InsertionDelayChangedEvent(15)))
 	}
 
 	@Test(expected = IllegalArgumentException::class)
@@ -44,13 +56,19 @@ class PreferencesTest {
 
 	@Test
 	fun `no event is sent when invalid insertion delay is set`() {
+		val events = mutableListOf<InsertionDelayChangedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun insertionDelayChanged(event: InsertionDelayChangedEvent) =
+					events.add(event)
+		})
 		try {
 			preferences.newInsertionDelay = -15
 		} catch (iae: IllegalArgumentException) {
 			/* ignore. */
 		}
 
-		verify(eventBus, never()).post(any())
+		assertThat(events, emptyIterable())
 	}
 
 	@Test
@@ -66,9 +84,7 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences saves null for default insertion delay setting`() {
-		val configuration = Configuration(MapConfigurationBackend())
-		preferences.saveTo(configuration)
-		assertThat(configuration.getIntValue("Option/InsertionDelay").getValue(null), nullValue())
+		verifySavedOption(nullValue()) { it.getIntValue("Option/InsertionDelay").getValue(null) }
 	}
 
 	@Test
@@ -189,23 +205,41 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain fcp interface active of true`() {
+		val events = mutableListOf<FcpInterfaceActivatedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun fcpInterfaceActivatedEvent(event: FcpInterfaceActivatedEvent) =
+					events.add(event)
+		})
 		preferences.newFcpInterfaceActive = true
 		assertThat(preferences.fcpInterfaceActive, equalTo(true))
-		verify(eventBus).post(any(FcpInterfaceActivatedEvent::class.java))
+		assertThat(events, hasItem<FcpInterfaceActivatedEvent>(instanceOf(FcpInterfaceActivatedEvent::class.java)))
 	}
 
 	@Test
 	fun `preferences retain fcp interface active of false`() {
+		val events = mutableListOf<FcpInterfaceDeactivatedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun fcpInterfaceDeactivatedEvent(event: FcpInterfaceDeactivatedEvent) =
+					events.add(event)
+		})
 		preferences.newFcpInterfaceActive = false
 		assertThat(preferences.fcpInterfaceActive, equalTo(false))
-		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent::class.java))
+		assertThat(events, hasItem<FcpInterfaceDeactivatedEvent>(instanceOf(FcpInterfaceDeactivatedEvent::class.java)))
 	}
 
 	@Test
 	fun `preferences return default value when fcp interface active is set to null`() {
+		val events = mutableListOf<FcpInterfaceDeactivatedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun fcpInterfaceDeactivatedEvent(event: FcpInterfaceDeactivatedEvent) =
+					events.add(event)
+		})
 		preferences.newFcpInterfaceActive = null
 		assertThat(preferences.fcpInterfaceActive, equalTo(false))
-		verify(eventBus).post(any(FcpInterfaceDeactivatedEvent::class.java))
+		assertThat(events, hasItem<FcpInterfaceDeactivatedEvent>(instanceOf(FcpInterfaceDeactivatedEvent::class.java)))
 	}
 
 	@Test
@@ -215,38 +249,34 @@ class PreferencesTest {
 
 	@Test
 	fun `preferences retain fcp full access required of no`() {
-		preferences.newFcpFullAccessRequired = NO
-		assertThat(preferences.fcpFullAccessRequired, equalTo(NO))
 		verifyFullAccessRequiredChangedEvent(NO)
 	}
 
-	private fun verifyFullAccessRequiredChangedEvent(
-			fullAccessRequired: FullAccessRequired) {
-		verify(eventBus).post(eventsCaptor.capture())
-		assertThat(eventsCaptor.value, instanceOf(FullAccessRequiredChanged::class.java))
-		assertThat((eventsCaptor.value as FullAccessRequiredChanged).fullAccessRequired,
-				equalTo(fullAccessRequired))
+	private fun verifyFullAccessRequiredChangedEvent(set: FullAccessRequired?, expected: FullAccessRequired = set!!) {
+		val events = mutableListOf<FullAccessRequiredChanged>()
+		eventBus.register(object {
+			@Subscribe
+			fun fullAccessRequiredChanged(event: FullAccessRequiredChanged) =
+					events.add(event)
+		})
+		preferences.newFcpFullAccessRequired = set
+		assertThat(preferences.fcpFullAccessRequired, equalTo(expected))
+		assertThat(events.single().fullAccessRequired, equalTo(expected))
 	}
 
 	@Test
 	fun `preferences retain fcp full access required of writing`() {
-		preferences.newFcpFullAccessRequired = WRITING
-		assertThat(preferences.fcpFullAccessRequired, equalTo(WRITING))
 		verifyFullAccessRequiredChangedEvent(WRITING)
 	}
 
 	@Test
 	fun `preferences retain fcp full access required of always`() {
-		preferences.newFcpFullAccessRequired = ALWAYS
-		assertThat(preferences.fcpFullAccessRequired, equalTo(ALWAYS))
 		verifyFullAccessRequiredChangedEvent(ALWAYS)
 	}
 
 	@Test
 	fun `preferences return default value when fcp full access required is set to null`() {
-		preferences.newFcpFullAccessRequired = null
-		assertThat(preferences.fcpFullAccessRequired, equalTo(ALWAYS))
-		verifyFullAccessRequiredChangedEvent(ALWAYS)
+		verifyFullAccessRequiredChangedEvent(null, ALWAYS)
 	}
 
 	@Test
@@ -264,10 +294,78 @@ class PreferencesTest {
 		testPreferencesChangedEvent("PostsPerPage", { preferences.newPostsPerPage = it }, 31)
 	}
 
+	@Test
+	fun `default strict filtering is false`() {
+		assertThat(preferences.strictFiltering, equalTo(false))
+	}
+
+	@Test
+	fun `strict filtering can be set`() {
+		preferences.newStrictFiltering = true
+		assertThat(preferences.strictFiltering, equalTo(true))
+	}
+
+	@Test
+	fun `strict filtering returns to default on null`() {
+		preferences.newStrictFiltering = true
+		preferences.newStrictFiltering = null
+		assertThat(preferences.strictFiltering, equalTo(false))
+	}
+
+	@Test
+	fun `event is generated when strict filtering is activated`() {
+		val events = mutableListOf<StrictFilteringActivatedEvent>()
+		eventBus.register(object {
+			@Subscribe fun strictFilteringActivatedEvent(event: StrictFilteringActivatedEvent) =
+					events.add(event)
+		})
+		preferences.newStrictFiltering = true
+		assertThat(events, hasItem<StrictFilteringActivatedEvent>(instanceOf(StrictFilteringActivatedEvent::class.java)))
+	}
+
+	@Test
+	fun `event is generated when strict filtering is deactivated`() {
+		val events = mutableListOf<StrictFilteringDeactivatedEvent>()
+		eventBus.register(object {
+			@Subscribe fun strictFilteringDeactivatedEvent(event: StrictFilteringDeactivatedEvent) =
+					events.add(event)
+		})
+		preferences.newStrictFiltering = false
+		assertThat(events, hasItem<StrictFilteringDeactivatedEvent>(instanceOf(StrictFilteringDeactivatedEvent::class.java)))
+	}
+
+	@Test
+	fun `default strict filtering is saved as null`() {
+		verifySavedOption(nullValue()) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	@Test
+	fun `activated strict filtering is saved as true`() {
+		preferences.newStrictFiltering = true
+		verifySavedOption(equalTo(true)) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	@Test
+	fun `deactivated strict filtering is saved as false`() {
+		preferences.newStrictFiltering = false
+		verifySavedOption(equalTo(false)) { it.getBooleanValue("Option/StrictFiltering").value }
+	}
+
+	private fun <T> verifySavedOption(matcher: Matcher<T>, getter: (Configuration) -> T) {
+		val configuration = Configuration(MapConfigurationBackend())
+		preferences.saveTo(configuration)
+		assertThat(getter(configuration), matcher)
+	}
+
 	private fun <T : Any> testPreferencesChangedEvent(name: String, setter: (T) -> Unit, value: T) {
+		val events = mutableListOf<PreferenceChangedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun preferenceChanged(event: PreferenceChangedEvent) =
+					events.add(event)
+		})
 		setter(value)
-		verify(eventBus, atLeastOnce()).post(eventsCaptor.capture())
-		assertThat(eventsCaptor.allValues, hasItem(PreferenceChangedEvent(name, value)))
+		assertThat(events, hasItem(PreferenceChangedEvent(name, value)))
 	}
 
 }

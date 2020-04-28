@@ -51,5 +51,5 @@ class PostAccessor(private val core: Core) : ReflectionAccessor() {
 
 }
 
-private fun Core.getReplies(post: Post) = getReplies(post.id).filter { Reply.FUTURE_REPLY_FILTER.apply(it) }
+private fun Core.getReplies(post: Post) = getReplies(post.id).filter(noFutureReply)
 private val TemplateContext?.currentSone: Sone? get() = this?.get("currentSone") as? Sone

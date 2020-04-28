@@ -18,24 +18,11 @@
 package net.pterodactylus.sone.web.page
 
 import freenet.clients.http.*
-import freenet.clients.http.SessionManager.*
 import freenet.support.api.*
-import net.pterodactylus.sone.freenet.*
 import net.pterodactylus.util.web.*
 import java.net.*
-import java.util.UUID.*
 
 open class FreenetRequest(uri: URI, method: Method,
 		val httpRequest: HTTPRequest,
-		val toadletContext: ToadletContext,
-		val sessionManager: SessionManager
-) : Request(uri, method) {
-
-	val session: Session
-		get() =
-			sessionManager.useSession(toadletContext)
-					?: sessionManager.createSession(randomUUID().toString(), toadletContext)
-
-	val existingSession: Session? get() = sessionManager.useSession(toadletContext)
-
-}
+		val toadletContext: ToadletContext
+) : Request(uri, method)

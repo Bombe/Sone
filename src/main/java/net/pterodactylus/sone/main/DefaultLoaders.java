@@ -1,13 +1,10 @@
 package net.pterodactylus.sone.main;
 
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+
 import javax.annotation.Nonnull;
 
 import net.pterodactylus.sone.web.WebInterface;
-import net.pterodactylus.util.io.Closer;
 import net.pterodactylus.util.template.ClassPathTemplateProvider;
 import net.pterodactylus.util.template.Template;
 import net.pterodactylus.util.template.TemplateProvider;
@@ -25,17 +22,11 @@ public class DefaultLoaders implements Loaders {
 	@Nonnull
 	@Override
 	public Template loadTemplate(@Nonnull String path) {
-		InputStream templateInputStream = null;
-		Reader reader = null;
-		try {
-			templateInputStream = getClass().getResourceAsStream(path);
-			reader = new InputStreamReader(templateInputStream, "UTF-8");
+		try (InputStream templateInputStream = getClass().getResourceAsStream(path);
+				Reader reader = new InputStreamReader(templateInputStream, "UTF-8");) {
 			return parse(reader);
-		} catch (UnsupportedEncodingException uee1) {
+		} catch (IOException ioe1) {
 			throw new RuntimeException("UTF-8 not supported.");
-		} finally {
-			Closer.close(reader);
-			Closer.close(templateInputStream);
 		}
 	}
 
