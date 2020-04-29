@@ -16,12 +16,11 @@ import net.pterodactylus.sone.web.FreenetSessionProvider
 import net.pterodactylus.sone.web.SessionProvider
 import net.pterodactylus.util.config.*
 import net.pterodactylus.util.config.ConfigurationException
-import net.pterodactylus.util.logging.*
 import net.pterodactylus.util.version.Version
 import java.io.*
 import java.util.concurrent.*
 import java.util.concurrent.Executors.*
-import java.util.logging.*
+import java.util.logging.Logger
 import javax.inject.*
 import javax.inject.Singleton
 
@@ -83,7 +82,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 	fun getNotificationTicker(): ScheduledExecutorService =
 			newSingleThreadScheduledExecutor()
 
-	private val logger: Logger = Logging.getLogger(javaClass)
+	private val logger: Logger = Logger.getLogger(javaClass.name)
 
 }
 

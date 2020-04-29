@@ -7,7 +7,7 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.Sone.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.utils.*
-import net.pterodactylus.util.logging.*
+import java.util.logging.Logger
 import javax.inject.Inject
 
 /**
@@ -24,7 +24,7 @@ interface UpdatedSoneProcessor {
 abstract class BasicUpdateSoneProcessor(private val database: Database, private val eventBus: EventBus) :
 		UpdatedSoneProcessor {
 
-	private val logger = Logging.getLogger(UpdatedSoneProcessor::javaClass.name)!!
+	private val logger = Logger.getLogger(UpdatedSoneProcessor::javaClass.name)!!
 
 	override fun updateSone(sone: Sone) {
 		val storedSone = database.getSone(sone.id) ?: return
