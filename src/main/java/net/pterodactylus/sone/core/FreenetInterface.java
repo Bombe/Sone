@@ -285,7 +285,8 @@ public class FreenetInterface {
 			return;
 		}
 		try {
-			logger.log(Level.FINEST, String.format("Unsubscribing from USK for %s…", sone));
+			logger.log(Level.FINE, String.format("Unsubscribing from USK for %s…", sone));
+			logger.log(Level.FINEST, String.format("USKs left: %d", soneUskCallbacks.size()));
 			node.clientCore.uskManager.unsubscribe(USK.create(soneUriCreator.getRequestUri(sone)), uskCallback);
 		} catch (MalformedURLException mue1) {
 			logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", soneUriCreator.getRequestUri(sone)), mue1);
