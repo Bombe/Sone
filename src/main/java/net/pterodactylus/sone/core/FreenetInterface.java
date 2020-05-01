@@ -24,6 +24,7 @@ import static java.util.logging.Logger.getLogger;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,8 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.TemporaryImage;
 
 import com.google.common.base.Function;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.google.common.eventbus.EventBus;
 import com.google.inject.Singleton;
 
@@ -98,7 +101,7 @@ public class FreenetInterface {
 	private final RequestClient requestClient = new RequestClientBuilder().realTime().build();
 
 	/** The USK callbacks. */
-	private final Map<String, USKCallback> soneUskCallbacks = new HashMap<>();
+	private final Multimap<String, USKCallback> soneUskCallbacks = ArrayListMultimap.create();
 
 	/** The not-Sone-related USK callbacks. */
 	private final Map<FreenetURI, USKCallback> uriUskCallbacks = Collections.synchronizedMap(new HashMap<FreenetURI, USKCallback>());
@@ -280,17 +283,19 @@ public class FreenetInterface {
 	 *            The Sone to unregister
 	 */
 	public void unregisterUsk(Sone sone) {
-		USKCallback uskCallback = soneUskCallbacks.remove(sone.getId());
-		if (uskCallback == null) {
+		Collection<USKCallback> uskCallbacks = soneUskCallbacks.removeAll(sone.getId());
+		if (uskCallbacks.isEmpty()) {
 			return;
 		}
-		try {
-			logger.log(Level.FINE, String.format("Unsubscribing from USK for %s…", sone));
-			logger.log(Level.FINEST, String.format("USKs left: %d", soneUskCallbacks.size()));
-			node.clientCore.uskManager.unsubscribe(USK.create(soneUriCreator.getRequestUri(sone)), uskCallback);
-		} catch (MalformedURLException mue1) {
-			logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", soneUriCreator.getRequestUri(sone)), mue1);
-		}
+		logger.log(Level.FINE, String.format("Unsubscribing %d from USK for %s…", uskCallbacks.size(), sone));
+		logger.log(Level.FINEST, String.format("USKs left: %d", soneUskCallbacks.size()));
+		uskCallbacks.forEach(uskCallback -> {
+			try {
+				node.clientCore.uskManager.unsubscribe(USK.create(soneUriCreator.getRequestUri(sone)), uskCallback);
+			} catch (MalformedURLException mue1) {
+				logger.log(Level.FINE, String.format("Could not unsubscribe USK “%s”!", soneUriCreator.getRequestUri(sone)), mue1);
+			}
+		});
 	}
 
 	/**
