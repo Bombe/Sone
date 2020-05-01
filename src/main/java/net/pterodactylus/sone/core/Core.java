@@ -1581,13 +1581,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		OwnIdentity ownIdentity = identityRemovedEvent.getOwnIdentity();
 		Identity identity = identityRemovedEvent.getIdentity();
 		trustedIdentities.remove(ownIdentity, identity);
-		for (Entry<OwnIdentity, Collection<Identity>> trustedIdentity : trustedIdentities.asMap().entrySet()) {
-			if (trustedIdentity.getKey().equals(ownIdentity)) {
-				continue;
-			}
-			if (trustedIdentity.getValue().contains(identity)) {
-				return;
-			}
+		if (otherOwnIdentityStillKnowsIdentity(ownIdentity, identity)) {
+			return;
 		}
 		Sone sone = getSone(identity.getId());
 		if (sone == null) {
@@ -1602,6 +1597,10 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		}
 		eventBus.post(new SoneRemovedEvent(sone));
 		database.removeSone(sone);
+	}
+
+	private boolean otherOwnIdentityStillKnowsIdentity(OwnIdentity ownIdentity, Identity identity) {
+		return trustedIdentities.entries().stream().anyMatch(e -> !e.getKey().equals(ownIdentity) && e.getValue().equals(identity));
 	}
 
 	/**
