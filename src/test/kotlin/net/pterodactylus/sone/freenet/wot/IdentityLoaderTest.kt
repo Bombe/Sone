@@ -17,9 +17,12 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import org.hamcrest.MatcherAssert.*
-import org.hamcrest.Matchers.*
-import org.junit.*
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.notNullValue
+import org.junit.Test
 
 /**
  * Unit test for [IdentityLoader].
@@ -67,6 +70,38 @@ class IdentityLoaderTest {
 		assertThat(identities[ownIdentity], equalTo<Collection<Identity>>(trustedIdentities))
 	}
 
+	@Test
+	fun `loading all identities merges remote identities’ trust values`() {
+		val ownIdentity1 = createOwnIdentity("o1")
+		val ownIdentity2 = createOwnIdentity("o2")
+		val webOfTrustConnector = object : TestWebOfTrustConnector() {
+			override fun loadAllOwnIdentities() = setOf(ownIdentity1, ownIdentity2)
+			override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?) = when (ownIdentity) {
+				ownIdentity1 -> setOf(createIdentity().setTrust(ownIdentity1, Trust(100, 50, 2)))
+				else -> setOf(createIdentity().setTrust(ownIdentity2, Trust(80, 40, 2)))
+			}
+		}
+		val identityLoader = IdentityLoader(webOfTrustConnector)
+		val allIdentities = identityLoader.loadAllIdentities()
+		assertThat(allIdentities[ownIdentity1]!!.first().trust[ownIdentity2], notNullValue())
+	}
+
+	@Test
+	fun `loading trusted identities merges remote identities’ trust values`() {
+		val ownIdentity1 = createOwnIdentity("o1")
+		val ownIdentity2 = createOwnIdentity("o2")
+		val webOfTrustConnector = object : TestWebOfTrustConnector() {
+			override fun loadAllOwnIdentities() = setOf(ownIdentity1, ownIdentity2)
+			override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) = when (ownIdentity) {
+				ownIdentity1 -> setOf(createIdentity().setTrust(ownIdentity1, Trust(100, 50, 2)))
+				else -> setOf(createIdentity().setTrust(ownIdentity2, Trust(80, 40, 2)))
+			}
+		}
+		val identityLoader = IdentityLoader(webOfTrustConnector)
+		val allIdentities = identityLoader.loadTrustedIdentities()
+		assertThat(allIdentities[ownIdentity1]!!.first().trust[ownIdentity2], notNullValue())
+	}
+
 }
 
 private fun createOwnIdentities() = listOf(
@@ -90,13 +125,13 @@ private fun createTrustedIdentitiesForThirdOwnIdentity() = setOf(
 
 private fun createTrustedIdentitiesForFourthOwnIdentity(): Set<Identity> = emptySet()
 
-private fun createOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: String, contexts: Set<String>, properties: Map<String, String>): OwnIdentity =
+private fun createOwnIdentity(id: String = "", nickname: String = "", requestUri: String = "", insertUri: String = "", contexts: Set<String> = setOf(), properties: Map<String, String> = mapOf()): OwnIdentity =
 		DefaultOwnIdentity(id, nickname, requestUri, insertUri).apply {
 			setContexts(contexts)
 			this.properties = properties
 		}
 
-private fun createIdentity(id: String, nickname: String, requestUri: String, contexts: Set<String>, properties: Map<String, String>): Identity =
+private fun createIdentity(id: String = "", nickname: String = "", requestUri: String = "", contexts: Set<String> = setOf(), properties: Map<String, String> = mapOf()): Identity =
 		DefaultIdentity(id, nickname, requestUri).apply {
 			setContexts(contexts)
 			this.properties = properties

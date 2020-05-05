@@ -35,11 +35,13 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 				webOfTrustConnector.loadAllOwnIdentities()
 			}.let(this::loadTrustedIdentitiesForOwnIdentities)
+					.mergeRemoteIdentities()
 
 	fun loadAllIdentities() =
 			time({ stopwatch, identities -> "Loaded ${identities.size} own identities in ${stopwatch.elapsed(MILLISECONDS) / 1000.0}s." }) {
 				webOfTrustConnector.loadAllOwnIdentities()
 			}.let(this::loadAllIdentitiesForOwnIdentities)
+					.mergeRemoteIdentities()
 
 	@Throws(PluginException::class)
 	private fun loadTrustedIdentitiesForOwnIdentities(ownIdentities: Collection<OwnIdentity>) =
@@ -81,5 +83,18 @@ class IdentityLoader @Inject constructor(private val webOfTrustConnector: WebOfT
 			Stopwatch.createStarted().let { stopwatch ->
 				loader().also { logger.fine(logMessage(stopwatch, it)) }
 			}
+
+	private fun Map<OwnIdentity, Set<Identity>>.mergeRemoteIdentities() =
+			values.flatten()
+					.groupBy { it.id }
+					.mapValues {
+						it.value.reduce { accIdentity, identity ->
+							identity.trust.forEach { (ownIdentity, trust) -> accIdentity.setTrust(ownIdentity, trust) }
+							accIdentity
+						}
+					}
+					.let { reducedIdentities ->
+						mapValues { it.value.map { identity -> reducedIdentities[identity.id]!! }.toSet() }
+					}
 
 }
