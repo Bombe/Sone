@@ -35,14 +35,15 @@ val createRequestUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyR
 val createInsertUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyRandomSource(), "").insertURI
 fun createId() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri.routingKey.asFreenetBase64
 
-fun createLocalSone(id: String? = createId()) = object : IdOnlySone(id) {
+fun createLocalSone(id: String? = createId()): Sone = object : IdOnlySone(id) {
 	private val options = DefaultSoneOptions()
 	override fun getOptions() = options
 	override fun isLocal() = true
 }
-fun createRemoteSone(id: String? = createId()) = IdOnlySone(id)
 
-fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1): Post.EmptyPost {
+fun createRemoteSone(id: String? = createId()): Sone = IdOnlySone(id)
+
+fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1): Post {
 	return object : Post.EmptyPost("post-id") {
 		override fun getSone() = sone
 		override fun getText() = text
