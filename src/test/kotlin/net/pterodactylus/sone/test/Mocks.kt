@@ -17,13 +17,18 @@
 
 package net.pterodactylus.sone.test
 
-import com.google.common.base.*
-import freenet.crypt.*
-import freenet.keys.*
-import net.pterodactylus.sone.data.*
-import net.pterodactylus.sone.data.SoneOptions.*
-import net.pterodactylus.sone.data.impl.*
-import net.pterodactylus.sone.utils.*
+import com.google.common.base.Optional
+import freenet.crypt.DummyRandomSource
+import freenet.keys.FreenetURI
+import freenet.keys.InsertableClientSSK
+import net.pterodactylus.sone.data.Image
+import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
+import net.pterodactylus.sone.data.impl.IdOnlySone
+import net.pterodactylus.sone.data.impl.ImageImpl
+import net.pterodactylus.sone.utils.asFreenetBase64
 
 val remoteSone1 = createRemoteSone()
 val remoteSone2 = createRemoteSone()
