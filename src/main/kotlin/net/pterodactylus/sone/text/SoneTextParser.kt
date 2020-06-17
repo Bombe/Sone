@@ -66,13 +66,15 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 		}
 		SSK, USK ->
 			try {
-				FreenetURI(linkWithoutBacklink).let { uri ->
-					uri.allMetaStrings
-							?.takeIf { (it.size > 1) || ((it.size == 1) && (it.single() != "")) }
-							?.lastOrNull()
-							?: uri.docName
-							?: "${uri.keyType}@${uri.routingKey.asFreenetBase64}"
-				}.let { FreenetLinkPart(linkWithoutBacklink.removeSuffix("/"), it, trusted = context?.routingKey?.contentEquals(FreenetURI(linkWithoutBacklink).routingKey) == true) }
+				FreenetURI(linkWithoutBacklink)
+						.workaroundForFaultyConstructorInFred1485AndBelow()
+						.let { uri ->
+							uri.allMetaStrings
+									?.takeIf { (it.size > 1) || ((it.size == 1) && (it.single() != "")) }
+									?.lastOrNull()
+									?: uri.docName
+									?: "${uri.keyType}@${uri.routingKey.asFreenetBase64}"
+						}.let { FreenetLinkPart(linkWithoutBacklink.removeSuffix("/"), it, trusted = context?.routingKey?.contentEquals(FreenetURI(linkWithoutBacklink).routingKey) == true) }
 			} catch (e: MalformedURLException) {
 				PlainTextPart(linkWithoutBacklink)
 			}
@@ -92,6 +94,9 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 	}
 
 }
+
+private fun FreenetURI.workaroundForFaultyConstructorInFred1485AndBelow() =
+	also { if (it.routingKey == null) throw MalformedURLException("SSK/USK without routing key") }
 
 private fun List<String>.mergeMultipleEmptyLines() = fold(emptyList<String>()) { previous, current ->
 	if (previous.isEmpty()) {

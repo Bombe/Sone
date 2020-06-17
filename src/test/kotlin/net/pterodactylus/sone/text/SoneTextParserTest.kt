@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.text
 
 import com.google.inject.Guice.*
+import freenet.keys.FreenetURI
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.database.*
@@ -248,6 +249,14 @@ class SoneTextParserTest {
 		val context = SoneTextParserContext(IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"))
 		val parts = soneTextParser.parse("USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0/../../../USK@nwa8lHa271k2QvJ8aa0Ov7IHAV-DFOCFgmDt3X6BpCI,DuQSUZiI~agF8c-6tjsFFGuZ8eICrzWCILB60nT8KKo,AQACAAE/sone/78/", context)
 		assertThat("Part Text", convertText(parts), equalTo("[USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|trusted|USK@qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU,aztSUkT-VT1dWvfSUt9YpfyW~Flmf5yXpBnIE~v8sAg,AAMC--8/test/0|test]"))
+	}
+
+	@Test
+	fun `broken usk links is parsed as plain text`() {
+		val context = SoneTextParserContext(IdOnlySone("qM1nmgU-YUnIttmEhqjTl7ifAF3Z6o~5EPwQW03uEQU"))
+		val parts = soneTextParser.parse("USK@/someCrazyName.R1/0", context)
+		FreenetURI("USK@/someCrazyName.R1/0")
+		assertThat("Part Text", convertText(parts), equalTo("USK@/someCrazyName.R1/0"))
 	}
 
 	@Test
