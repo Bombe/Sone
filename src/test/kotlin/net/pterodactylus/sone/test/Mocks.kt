@@ -28,7 +28,12 @@ import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.SoneOptions.DefaultSoneOptions
 import net.pterodactylus.sone.data.impl.IdOnlySone
 import net.pterodactylus.sone.data.impl.ImageImpl
+import net.pterodactylus.sone.freenet.wot.DefaultIdentity
+import net.pterodactylus.sone.freenet.wot.DefaultOwnIdentity
+import net.pterodactylus.sone.freenet.wot.Identity
+import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.utils.asFreenetBase64
+import net.pterodactylus.sone.utils.asOptional
 
 val remoteSone1 = createRemoteSone()
 val remoteSone2 = createRemoteSone()
@@ -40,20 +45,41 @@ val createRequestUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyR
 val createInsertUri: FreenetURI get() = InsertableClientSSK.createRandom(DummyRandomSource(), "").insertURI
 fun createId() = InsertableClientSSK.createRandom(DummyRandomSource(), "").uri.routingKey.asFreenetBase64
 
-fun createLocalSone(id: String? = createId()): Sone = object : IdOnlySone(id) {
+fun createOwnIdentity(id: String = "", nickname: String = "", requestUri: String = "", insertUri: String = "", contexts: Set<String> = setOf(), properties: Map<String, String> = mapOf()): OwnIdentity =
+		DefaultOwnIdentity(id, nickname, requestUri, insertUri).apply {
+			setContexts(contexts)
+			this.properties = properties
+		}
+
+fun createIdentity(id: String = "", nickname: String = "", requestUri: String = "", contexts: Set<String> = setOf(), properties: Map<String, String> = mapOf()): Identity =
+		DefaultIdentity(id, nickname, requestUri).apply {
+			setContexts(contexts)
+			this.properties = properties
+		}
+
+fun createLocalSone(id: String = createId(), identity: Identity = createOwnIdentity(id)): Sone = object : IdOnlySone(id) {
 	private val options = DefaultSoneOptions()
+	private val friends = mutableListOf<String>()
+	override fun getIdentity(): Identity = identity
 	override fun getOptions() = options
 	override fun isLocal() = true
+	override fun getFriends() = friends
+	override fun hasFriend(friendSoneId: String) = friendSoneId in friends
 }
 
-fun createRemoteSone(id: String? = createId()): Sone = IdOnlySone(id)
+fun createRemoteSone(id: String = createId(), identity: Identity = createIdentity(id)): Sone = object : IdOnlySone(id) {
+	override fun getIdentity(): Identity = identity
+}
 
-fun createPost(text: String = "", sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1): Post {
+fun createPost(text: String = "", sone: Sone? = remoteSone1, known: Boolean = false, time: Long = 1, loaded: Boolean = true, recipient: Sone? = null): Post {
 	return object : Post.EmptyPost("post-id") {
+		override fun getRecipientId() = recipient?.id.asOptional()
+		override fun getRecipient() = recipient.asOptional()
 		override fun getSone() = sone
 		override fun getText() = text
 		override fun isKnown() = known
 		override fun getTime() = time
+		override fun isLoaded() = loaded
 	}
 }
 
