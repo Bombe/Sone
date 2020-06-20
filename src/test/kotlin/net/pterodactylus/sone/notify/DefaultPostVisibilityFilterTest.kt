@@ -12,11 +12,11 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 
 /**
- * Unit test for [PostVisibilityFilterTest].
+ * Unit test for [DefaultPostVisibilityFilter].
  */
-class PostVisibilityFilterTest {
+class DefaultPostVisibilityFilterTest {
 
-	private val postVisibilityFilter = PostVisibilityFilter()
+	private val postVisibilityFilter = DefaultPostVisibilityFilter()
 	private val localSone = createLocalSone()
 	private val remoteSone = createRemoteSone()
 

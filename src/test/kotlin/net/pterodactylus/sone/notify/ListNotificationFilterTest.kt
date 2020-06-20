@@ -213,7 +213,7 @@ private fun matchThisPost(post: Post) = createPostVisibilityFilter { _, p -> p =
 private val showAllPosts = createPostVisibilityFilter { _, _ -> true }
 private val showNoPosts = createPostVisibilityFilter { _, _ -> false }
 
-private fun createPostVisibilityFilter(visible: (Sone?, Post) -> Boolean) = object : PostVisibilityFilter() {
+private fun createPostVisibilityFilter(visible: (Sone?, Post) -> Boolean) = object : PostVisibilityFilter {
 	override fun isPostVisible(sone: Sone?, post: Post) = visible(sone, post)
 	override fun isVisible(currentSone: Sone?) = Predicate<Post> { p -> p != null && isPostVisible(currentSone, p) }
 }
