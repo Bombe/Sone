@@ -32,7 +32,7 @@ class MarkPostReplyKnownDuringFirstStartHandlerTest {
 
 	private val markedAsKnown = mutableListOf<PostReply>()
 	private val notificationTester = NotificationHandlerTester { MarkPostReplyKnownDuringFirstStartHandler(it, Consumer { markedAsKnown += it }) }
-	private val postReply = emptyPostReply()
+	private val postReply = createPostReply()
 
 	@Test
 	fun `post reply is marked as known on new reply during first start`() {

@@ -205,7 +205,7 @@ class NotificationHandlerModuleTest {
 	fun `new-remote-post-reply notification has correct key and template`() {
 		loaders.templates += "/templates/notify/newReplyNotification.html" to "<% replies>".asTemplate()
 		val notification = injector.getInstance<ListNotification<PostReply>>(named("newRemotePostReply"))
-		val postReplies = listOf(emptyPostReply(), emptyPostReply())
+		val postReplies = listOf(createPostReply(), createPostReply())
 		postReplies.forEach(notification::add)
 		assertThat(notification.render(), equalTo(postReplies.toString()))
 	}
@@ -282,7 +282,7 @@ class NotificationHandlerModuleTest {
 	fun `local-reply notification has correct key and template`() {
 		loaders.templates += "/templates/notify/newReplyNotification.html" to "<% replies>".asTemplate()
 		val notification = injector.getInstance<ListNotification<PostReply>>(named("localReply"))
-		val replies = listOf(emptyPostReply("reply1"), emptyPostReply("reply2"))
+		val replies = listOf(createPostReply("reply1"), createPostReply("reply2"))
 		replies.forEach(notification::add)
 		assertThat(notification.render(), equalTo(replies.toString()))
 	}

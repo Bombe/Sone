@@ -83,7 +83,7 @@ fun createPost(text: String = "", sone: Sone? = remoteSone1, known: Boolean = fa
 	}
 }
 
-fun emptyPostReply(text: String = "", post: Post? = createPost(), sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1) = object : PostReply {
+fun createPostReply(text: String = "", post: Post? = createPost(), sone: Sone = remoteSone1, known: Boolean = false, time: Long = 1) = object : PostReply {
 	override val id = "reply-id"
 	override fun getSone() = sone
 	override fun getPostId() = post!!.id
