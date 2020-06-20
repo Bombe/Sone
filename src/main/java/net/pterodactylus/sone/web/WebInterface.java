@@ -17,8 +17,8 @@
 
 package net.pterodactylus.sone.web;
 
-import static com.google.common.collect.FluentIterable.from;
 import static java.util.logging.Logger.getLogger;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
 import java.util.Set;
@@ -273,7 +273,7 @@ public class WebInterface implements SessionProvider {
 				.addAll(newReplyNotification.getElements())
 				.addAll(localReplyNotification.getElements())
 				.build();
-		return from(allNewReplies).filter(replyVisibilityFilter.isVisible(currentSone)).toSet();
+		return allNewReplies.stream().filter(replyVisibilityFilter.isVisible(currentSone)).collect(toSet());
 	}
 
 	//

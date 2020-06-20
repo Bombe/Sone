@@ -91,14 +91,14 @@ public class ReplyVisibilityFilterTest {
 	@Test
 	public void predicateCorrectlyRecognizesVisibleReply() {
 		makePostPresentAndVisible();
-		assertThat(replyVisibilityFilter.isVisible(localSone).apply(postReply), is(true));
+		assertThat(replyVisibilityFilter.isVisible(localSone).test(postReply), is(true));
 	}
 
 	@Test
 	public void predicateCorrectlyRecognizesNotVisibleReply() {
 		makePostPresentAndVisible();
 		makeReplyComeFromFuture();
-		assertThat(replyVisibilityFilter.isVisible(localSone).apply(postReply), is(false));
+		assertThat(replyVisibilityFilter.isVisible(localSone).test(postReply), is(false));
 	}
 
 }

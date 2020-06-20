@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.notify;
 
+import java.util.function.Predicate;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.annotation.Nonnull;
@@ -12,7 +14,6 @@ import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 
 /**
  * Filter that checks a {@link PostReply} for visibility.
@@ -59,12 +60,7 @@ public class ReplyVisibilityFilter {
 
 	@Nonnull
 	public Predicate<PostReply> isVisible(@Nullable final Sone currentSone) {
-		return new Predicate<PostReply>() {
-			@Override
-			public boolean apply(@Nullable PostReply postReply) {
-				return (postReply != null) && isReplyVisible(currentSone, postReply);
-			}
-		};
+		return postReply -> (postReply != null) && isReplyVisible(currentSone, postReply);
 	}
 
 }
