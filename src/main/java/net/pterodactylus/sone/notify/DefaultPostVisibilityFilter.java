@@ -1,9 +1,5 @@
 package net.pterodactylus.sone.notify;
 
-import java.util.function.Predicate;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Singleton;
@@ -53,7 +49,6 @@ public class DefaultPostVisibilityFilter implements PostVisibilityFilter {
 	 */
 	@Override
 	public boolean isPostVisible(@Nullable Sone sone, @Nonnull Post post) {
-		checkNotNull(post, "post must not be null");
 		if (!post.isLoaded()) {
 			return false;
 		}
@@ -81,12 +76,6 @@ public class DefaultPostVisibilityFilter implements PostVisibilityFilter {
 			}
 		}
 		return post.getTime() <= System.currentTimeMillis();
-	}
-
-	@Override
-	@Nonnull
-	public Predicate<Post> isVisible(@Nullable final Sone currentSone) {
-		return post -> (post != null) && isPostVisible(currentSone, post);
 	}
 
 }

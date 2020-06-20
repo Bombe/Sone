@@ -215,7 +215,6 @@ private val showNoPosts = createPostVisibilityFilter { _, _ -> false }
 
 private fun createPostVisibilityFilter(visible: (Sone?, Post) -> Boolean) = object : PostVisibilityFilter {
 	override fun isPostVisible(sone: Sone?, post: Post) = visible(sone, post)
-	override fun isVisible(currentSone: Sone?) = Predicate<Post> { p -> p != null && isPostVisible(currentSone, p) }
 }
 
 private fun matchThisReply(reply: PostReply) = createReplyVisibilityFilter(showAllPosts) { _, r -> r == reply }
