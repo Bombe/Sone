@@ -26,7 +26,7 @@ class IndexPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 						.flatMap { it.posts } +
 				soneRequest.core.getDirectedPosts(currentSone.id)
 				).distinct()
-				.filter { postVisibilityFilter.isVisible(currentSone).apply(it) }
+				.filter { postVisibilityFilter.isVisible(currentSone).test(it) }
 				.sortedByDescending { it.time }
 				.let { posts ->
 					posts.paginate(soneRequest.core.preferences.postsPerPage)

@@ -111,13 +111,13 @@ class PostVisibilityFilterTest {
 	@Test
 	fun `predicate will correctly recognize visible post`() {
 		val post = createPost(sone = localSone)
-		assertThat(postVisibilityFilter.isVisible(null).apply(post), equalTo(true))
+		assertThat(postVisibilityFilter.isVisible(null).test(post), equalTo(true))
 	}
 
 	@Test
 	fun `predicate will correctly recognize not visible post`() {
 		val post = createPost(loaded = false)
-		assertThat(postVisibilityFilter.isVisible(null).apply(post), equalTo(false))
+		assertThat(postVisibilityFilter.isVisible(null).test(post), equalTo(false))
 	}
 
 }

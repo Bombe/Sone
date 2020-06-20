@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.notify;
 
+import java.util.function.Predicate;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.annotation.Nonnull;
@@ -11,8 +13,6 @@ import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.wot.OwnIdentity;
 import net.pterodactylus.sone.freenet.wot.Trust;
 import net.pterodactylus.util.notify.Notification;
-
-import com.google.common.base.Predicate;
 
 /**
  * Filters {@link Notification}s involving {@link Post}s.
@@ -84,12 +84,7 @@ public class PostVisibilityFilter {
 
 	@Nonnull
 	public Predicate<Post> isVisible(@Nullable final Sone currentSone) {
-		return new Predicate<Post>() {
-			@Override
-			public boolean apply(@Nullable Post post) {
-				return (post != null) && isPostVisible(currentSone, post);
-			}
-		};
+		return post -> (post != null) && isPostVisible(currentSone, post);
 	}
 
 }

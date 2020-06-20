@@ -264,7 +264,7 @@ public class WebInterface implements SessionProvider {
 				.addAll(newPostNotification.getElements())
 				.addAll(localPostNotification.getElements())
 				.build();
-		return from(allNewPosts).filter(postVisibilityFilter.isVisible(currentSone)).toSet();
+		return allNewPosts.stream().filter(postVisibilityFilter.isVisible(currentSone)).collect(toSet());
 	}
 
 	@Nonnull

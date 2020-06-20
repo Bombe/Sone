@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.notify;
 
 import static com.google.common.collect.FluentIterable.from;
+import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,7 +120,7 @@ public class ListNotificationFilter {
 	@Nonnull
 	private Optional<ListNotification<Post>> filterPostNotification(@Nonnull ListNotification<Post> postNotification,
 			@Nullable Sone currentSone) {
-		List<Post> newPosts = from(postNotification.getElements()).filter(postVisibilityFilter.isVisible(currentSone)).toList();
+		List<Post> newPosts = postNotification.getElements().stream().filter(postVisibilityFilter.isVisible(currentSone)).collect(toList());
 		if (newPosts.isEmpty()) {
 			return Optional.absent();
 		}
