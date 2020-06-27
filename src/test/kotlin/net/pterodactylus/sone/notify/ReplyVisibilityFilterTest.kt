@@ -1,17 +1,12 @@
 package net.pterodactylus.sone.notify
 
-import com.google.common.base.Optional
 import com.google.inject.Guice
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
-import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.freenet.wot.OwnIdentity
-import net.pterodactylus.sone.test.getInstance
-import net.pterodactylus.sone.test.mock
-import net.pterodactylus.sone.test.whenever
+import net.pterodactylus.sone.test.createLocalSone
+import net.pterodactylus.sone.test.createPost
+import net.pterodactylus.sone.test.createPostReply
+import net.pterodactylus.sone.test.verifySingletonInstance
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
-import org.hamcrest.Matchers.sameInstance
 import org.junit.Test
 
 /**
@@ -19,83 +14,51 @@ import org.junit.Test
  */
 class ReplyVisibilityFilterTest {
 
-	private val postVisibilityFilter = mock<PostVisibilityFilter>()
-	private val replyVisibilityFilter = ReplyVisibilityFilter(postVisibilityFilter)
-	private val localSone = mock<Sone>()
-	private val localIdentity = mock<OwnIdentity>()
-	private val post = mock<Post>()
-	private val postReply = mock<PostReply>()
+	private val replyVisibilityFilter = ReplyVisibilityFilter(showAllPosts)
+	private val localSone = createLocalSone()
+	private val post = createPost()
 
 	@Test
 	fun `reply visibility filter is only created once`() {
 		val injector = Guice.createInjector()
-		val firstFilter = injector.getInstance<ReplyVisibilityFilter>()
-		val secondFilter = injector.getInstance<ReplyVisibilityFilter>()
-		assertThat(firstFilter, sameInstance(secondFilter))
-	}
-
-	private fun makePostPresent() {
-		whenever(postReply.post).thenReturn(Optional.of(post))
+		injector.verifySingletonInstance<ReplyVisibilityFilter>()
 	}
 
 	@Test
 	fun `reply is not visible if post is not visible`() {
-		makePostPresent()
-		assertThat(replyVisibilityFilter.isReplyVisible(localSone, postReply), equalTo(false))
-	}
-
-	private fun makePostAbsent() {
-		whenever(postReply.post).thenReturn(Optional.absent())
+		val postReply = createPostReply(post = post)
+		val replyVisibilityFilter = ReplyVisibilityFilter(showNoPosts)
+		assertThat(replyVisibilityFilter.isReplyVisible(null, postReply), equalTo(false))
 	}
 
 	@Test
 	fun `reply is not visible if post is not present`() {
-		makePostAbsent()
-		assertThat(replyVisibilityFilter.isReplyVisible(localSone, postReply), equalTo(false))
-	}
-
-	private fun makePostPresentAndVisible() {
-		makePostPresent()
-		whenever(postVisibilityFilter.isPostVisible(localSone, post)).thenReturn(true)
-	}
-
-	private fun makeReplyComeFromFuture() {
-		whenever(postReply.time).thenReturn(System.currentTimeMillis() + 1000)
+		val postReply = createPostReply(post = null)
+		assertThat(replyVisibilityFilter.isReplyVisible(null, postReply), equalTo(false))
 	}
 
 	@Test
 	fun `reply is not visible if it is from the future`() {
-		makePostPresentAndVisible()
-		makeReplyComeFromFuture()
-		assertThat(replyVisibilityFilter.isReplyVisible(localSone, postReply), equalTo(false))
+		val postReply = createPostReply(post = post, time = System.currentTimeMillis() + 100000)
+		assertThat(replyVisibilityFilter.isReplyVisible(null, postReply), equalTo(false))
 	}
 
 	@Test
 	fun `reply is visible if it is not from the future`() {
-		makePostPresentAndVisible()
-		assertThat(replyVisibilityFilter.isReplyVisible(localSone, postReply), equalTo(true))
+		val postReply = createPostReply(post = post)
+		assertThat(replyVisibilityFilter.isReplyVisible(null, postReply), equalTo(true))
 	}
 
 	@Test
 	fun `predicate correctly recognizes visible reply`() {
-		makePostPresentAndVisible()
+		val postReply = createPostReply(post = post)
 		assertThat(replyVisibilityFilter.isVisible(localSone).test(postReply), equalTo(true))
 	}
 
 	@Test
 	fun `predicate correctly recognizes not visible reply`() {
-		makePostPresentAndVisible()
-		makeReplyComeFromFuture()
+		val postReply = createPostReply(post = post, time = System.currentTimeMillis() + 100000)
 		assertThat(replyVisibilityFilter.isVisible(localSone).test(postReply), equalTo(false))
 	}
 
-	init {
-		whenever(localSone.id).thenReturn(LOCAL_ID)
-		whenever(localSone.isLocal).thenReturn(true)
-		whenever(localSone.identity).thenReturn(localIdentity)
-		whenever(post.recipientId).thenReturn(Optional.absent())
-	}
-
 }
-
-private const val LOCAL_ID = "local-id"
