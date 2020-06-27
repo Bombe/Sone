@@ -1,6 +1,5 @@
 package net.pterodactylus.sone.notify
 
-import com.google.common.base.Predicate
 import com.google.inject.Guice
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
@@ -208,20 +207,3 @@ private fun createNewReplyNotification() =
 
 private fun createMentionNotification() =
 		ListNotification<Post>("mention-notification", "", Template())
-
-private fun matchThisPost(post: Post) = createPostVisibilityFilter { _, p -> p == post }
-private val showAllPosts = createPostVisibilityFilter { _, _ -> true }
-private val showNoPosts = createPostVisibilityFilter { _, _ -> false }
-
-private fun createPostVisibilityFilter(visible: (Sone?, Post) -> Boolean) = object : PostVisibilityFilter {
-	override fun isPostVisible(sone: Sone?, post: Post) = visible(sone, post)
-}
-
-private fun matchThisReply(reply: PostReply) = createReplyVisibilityFilter(showAllPosts) { _, r -> r == reply }
-private val showAllReplies = createReplyVisibilityFilter(showAllPosts) { _, _ -> true }
-private val showNoReplies = createReplyVisibilityFilter(showAllPosts) { _, _ -> false }
-
-private fun createReplyVisibilityFilter(postVisibilityFilter: PostVisibilityFilter, visible: (Sone?, PostReply) -> Boolean) = object : ReplyVisibilityFilter(postVisibilityFilter) {
-	override fun isReplyVisible(sone: Sone?, reply: PostReply) = visible(sone, reply)
-	override fun isVisible(currentSone: Sone?) = Predicate<PostReply> { r -> r != null && isReplyVisible(currentSone, r) }
-}
