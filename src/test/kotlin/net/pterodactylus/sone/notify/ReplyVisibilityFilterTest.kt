@@ -14,20 +14,20 @@ import org.junit.Test
  */
 class ReplyVisibilityFilterTest {
 
-	private val replyVisibilityFilter = ReplyVisibilityFilter(showAllPosts)
+	private val replyVisibilityFilter = DefaultReplyVisibilityFilter(showAllPosts)
 	private val localSone = createLocalSone()
 	private val post = createPost()
 
 	@Test
 	fun `reply visibility filter is only created once`() {
 		val injector = Guice.createInjector()
-		injector.verifySingletonInstance<ReplyVisibilityFilter>()
+		injector.verifySingletonInstance<DefaultReplyVisibilityFilter>()
 	}
 
 	@Test
 	fun `reply is not visible if post is not visible`() {
 		val postReply = createPostReply(post = post)
-		val replyVisibilityFilter = ReplyVisibilityFilter(showNoPosts)
+		val replyVisibilityFilter = DefaultReplyVisibilityFilter(showNoPosts)
 		assertThat(replyVisibilityFilter.isReplyVisible(null, postReply), equalTo(false))
 	}
 

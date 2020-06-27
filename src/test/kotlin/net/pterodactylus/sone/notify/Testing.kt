@@ -17,7 +17,7 @@ fun matchThisReply(reply: PostReply) = createReplyVisibilityFilter(showAllPosts)
 val showAllReplies = createReplyVisibilityFilter(showAllPosts) { _, _ -> true }
 val showNoReplies = createReplyVisibilityFilter(showAllPosts) { _, _ -> false }
 
-private fun createReplyVisibilityFilter(postVisibilityFilter: PostVisibilityFilter, visible: (Sone?, PostReply) -> Boolean) = object : ReplyVisibilityFilter(postVisibilityFilter) {
+private fun createReplyVisibilityFilter(postVisibilityFilter: PostVisibilityFilter, visible: (Sone?, PostReply) -> Boolean) = object : DefaultReplyVisibilityFilter(postVisibilityFilter) {
 	override fun isReplyVisible(sone: Sone?, reply: PostReply) = visible(sone, reply)
 	override fun isVisible(currentSone: Sone?) = Predicate<PostReply> { r -> r != null && isReplyVisible(currentSone, r) }
 }
