@@ -3,7 +3,6 @@ package net.pterodactylus.sone.notify
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
-import java.util.function.Predicate
 
 fun matchThisPost(post: Post) = createPostVisibilityFilter { _, p -> p == post }
 val showAllPosts = createPostVisibilityFilter { _, _ -> true }

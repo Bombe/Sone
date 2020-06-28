@@ -17,7 +17,8 @@
 
 package net.pterodactylus.sone.notify
 
-import net.pterodactylus.util.notify.*
+import net.pterodactylus.util.notify.Notification
+import net.pterodactylus.util.notify.NotificationManager
 
 /**
  * Returns whether the notification manager contains a notification with the given ID.

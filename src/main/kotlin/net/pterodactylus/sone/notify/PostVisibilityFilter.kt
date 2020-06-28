@@ -3,7 +3,6 @@ package net.pterodactylus.sone.notify
 import com.google.inject.ImplementedBy
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
-import java.util.function.Predicate
 
 @ImplementedBy(DefaultPostVisibilityFilter::class)
 interface PostVisibilityFilter {

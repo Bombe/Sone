@@ -1,7 +1,5 @@
 package net.pterodactylus.sone.notify;
 
-import java.util.function.Predicate;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import javax.annotation.Nonnull;
