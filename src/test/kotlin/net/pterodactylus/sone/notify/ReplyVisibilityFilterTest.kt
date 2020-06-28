@@ -52,13 +52,13 @@ class ReplyVisibilityFilterTest {
 	@Test
 	fun `predicate correctly recognizes visible reply`() {
 		val postReply = createPostReply(post = post)
-		assertThat(replyVisibilityFilter.isVisible(localSone).test(postReply), equalTo(true))
+		assertThat(replyVisibilityFilter.isVisible(localSone).invoke(postReply), equalTo(true))
 	}
 
 	@Test
 	fun `predicate correctly recognizes not visible reply`() {
 		val postReply = createPostReply(post = post, time = System.currentTimeMillis() + 100000)
-		assertThat(replyVisibilityFilter.isVisible(localSone).test(postReply), equalTo(false))
+		assertThat(replyVisibilityFilter.isVisible(localSone).invoke(postReply), equalTo(false))
 	}
 
 }

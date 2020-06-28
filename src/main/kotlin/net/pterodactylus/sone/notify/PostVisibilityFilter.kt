@@ -11,7 +11,7 @@ interface PostVisibilityFilter {
 	fun isPostVisible(sone: Sone?, post: Post): Boolean
 
 	@JvmDefault
-	fun isVisible(currentSone: Sone?): Predicate<Post?> =
-			Predicate { p: Post? -> p != null && isPostVisible(currentSone, p) }
+	fun isVisible(currentSone: Sone?) =
+			{ p: Post? -> p != null && isPostVisible(currentSone, p) }
 
 }

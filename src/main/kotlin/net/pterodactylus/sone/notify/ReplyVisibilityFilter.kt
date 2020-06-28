@@ -11,7 +11,7 @@ interface ReplyVisibilityFilter {
 	fun isReplyVisible(sone: Sone?, reply: PostReply): Boolean
 
 	@JvmDefault
-	fun isVisible(currentSone: Sone?): Predicate<PostReply> =
-			Predicate { reply: PostReply -> isReplyVisible(currentSone, reply) }
+	fun isVisible(currentSone: Sone?) =
+			{ reply: PostReply -> isReplyVisible(currentSone, reply) }
 
 }

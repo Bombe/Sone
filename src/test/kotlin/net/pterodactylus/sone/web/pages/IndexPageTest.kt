@@ -40,7 +40,7 @@ class IndexPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> I
 
 	@Before
 	fun setupPostVisibilityFilter() {
-		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn(Predicate<Post> { true })
+		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn { true }
 	}
 
 	@Before
@@ -107,7 +107,7 @@ class IndexPageTest : WebPageTest({ webInterface, loaders, templateRenderer -> I
 		val followedPosts = listOf(createPost(2500, true), createPost(1500))
 		whenever(followedSone.posts).thenReturn(followedPosts)
 		whenever(currentSone.friends).thenReturn(listOf("followed1", "followed2"))
-		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn(Predicate<Post> { (it?.time ?: 10000) < 2500 })
+		whenever(postVisibilityFilter.isVisible(ArgumentMatchers.eq(currentSone))).thenReturn { (it?.time ?: 10000) < 2500 }
 		addSone("followed1", followedSone)
 		page.processTemplate(freenetRequest, templateContext)
 		@Suppress("UNCHECKED_CAST")

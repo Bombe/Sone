@@ -264,7 +264,7 @@ public class WebInterface implements SessionProvider {
 				.addAll(newPostNotification.getElements())
 				.addAll(localPostNotification.getElements())
 				.build();
-		return allNewPosts.stream().filter(postVisibilityFilter.isVisible(currentSone)).collect(toSet());
+		return allNewPosts.stream().filter(p -> postVisibilityFilter.isPostVisible(currentSone, p)).collect(toSet());
 	}
 
 	@Nonnull
@@ -273,7 +273,7 @@ public class WebInterface implements SessionProvider {
 				.addAll(newReplyNotification.getElements())
 				.addAll(localReplyNotification.getElements())
 				.build();
-		return allNewReplies.stream().filter(replyVisibilityFilter.isVisible(currentSone)).collect(toSet());
+		return allNewReplies.stream().filter(r -> replyVisibilityFilter.isReplyVisible(currentSone, r)).collect(toSet());
 	}
 
 	//
