@@ -10,9 +10,9 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Test
 
 /**
- * Unit test for [ReplyVisibilityFilterTest].
+ * Unit test for [DefaultReplyVisibilityFilterTest].
  */
-class ReplyVisibilityFilterTest {
+class DefaultReplyVisibilityFilterTest {
 
 	private val replyVisibilityFilter = DefaultReplyVisibilityFilter(showAllPosts)
 	private val localSone = createLocalSone()
