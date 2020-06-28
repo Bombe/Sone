@@ -30,3 +30,28 @@ operator fun NotificationManager.contains(id: String) =
  */
 fun NotificationManager.hasFirstStartNotification() =
 		"first-start-notification" in this
+
+
+/**
+ * Returns whether this notification is for new Sones.
+ */
+val Notification.isNewSoneNotification: Boolean
+	get() = id == "new-sone-notification"
+
+/**
+ * Returns whether this notification is for new posts.
+ */
+val Notification.isNewPostNotification: Boolean
+	get() = id == "new-post-notification"
+
+/**
+ * Returns whether this notification is for new replies.
+ */
+val Notification.isNewReplyNotification: Boolean
+	get() = id == "new-reply-notification"
+
+/**
+ * Returns whether this notification is for mentions.
+ */
+val Notification.isMentionNotification: Boolean
+	get() = id == "mention-notification"
