@@ -14,6 +14,8 @@ public interface ReplyVisibilityFilter {
 
 	boolean isReplyVisible(@Nullable Sone sone, @Nonnull PostReply reply);
 
-	Predicate<PostReply> isVisible(@Nullable final Sone currentSone);
+	default Predicate<PostReply> isVisible(@Nullable final Sone currentSone) {
+		return reply -> (reply != null) && isReplyVisible(currentSone, reply);
+	}
 
 }

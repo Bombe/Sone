@@ -59,10 +59,4 @@ public class DefaultReplyVisibilityFilter implements ReplyVisibilityFilter {
 		return reply.getTime() <= System.currentTimeMillis();
 	}
 
-	@Nonnull
-	@Override
-	public Predicate<PostReply> isVisible(@Nullable final Sone currentSone) {
-		return postReply -> (postReply != null) && isReplyVisible(currentSone, postReply);
-	}
-
 }
