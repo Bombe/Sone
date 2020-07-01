@@ -23,7 +23,7 @@ import org.junit.Test
  */
 class ListNotificationFilterTest {
 
-	private val listNotificationFilter = ListNotificationFilter(showAllPosts, showAllReplies)
+	private val listNotificationFilter = DefaultListNotificationFilter(showAllPosts, showAllReplies)
 
 	@Test
 	fun `filter is only created once`() {
@@ -72,7 +72,7 @@ class ListNotificationFilterTest {
 		localSone.options.isShowNewPostNotifications = true
 		val newPostNotification = createNewPostNotification()
 		newPostNotification.add(createPost())
-		val listNotificationFilter = ListNotificationFilter(showNoPosts, showAllReplies)
+		val listNotificationFilter = DefaultListNotificationFilter(showNoPosts, showAllReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newPostNotification), localSone)
 		assertThat(filteredNotifications, emptyIterable())
 	}
@@ -104,7 +104,7 @@ class ListNotificationFilterTest {
 		val newPostNotification = createNewPostNotification()
 		newPostNotification.add(createPost())
 		newPostNotification.add(createPost())
-		val listNotificationFilter = ListNotificationFilter(matchThisPost(newPostNotification.elements[1]), showAllReplies)
+		val listNotificationFilter = DefaultListNotificationFilter(matchThisPost(newPostNotification.elements[1]), showAllReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newPostNotification), localSone)
 		assertThat((filteredNotifications[0] as ListNotification<Post>).elements, contains(newPostNotification.elements[1]))
 	}
@@ -116,7 +116,7 @@ class ListNotificationFilterTest {
 		val newReplyNotification = createNewReplyNotification()
 		newReplyNotification.add(createPostReply())
 		newReplyNotification.add(createPostReply())
-		val listNotificationFilter = ListNotificationFilter(showAllPosts, matchThisReply(newReplyNotification.elements[1]))
+		val listNotificationFilter = DefaultListNotificationFilter(showAllPosts, matchThisReply(newReplyNotification.elements[1]))
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newReplyNotification), localSone)
 		assertThat(filteredNotifications, hasSize(1))
 		assertThat((filteredNotifications[0] as ListNotification<PostReply?>).elements[0], equalTo(newReplyNotification.elements[1]))
@@ -140,7 +140,7 @@ class ListNotificationFilterTest {
 		val newReplyNotification = createNewReplyNotification()
 		newReplyNotification.add(createPostReply())
 		newReplyNotification.add(createPostReply())
-		val listNotificationFilter = ListNotificationFilter(showAllPosts, showNoReplies)
+		val listNotificationFilter = DefaultListNotificationFilter(showAllPosts, showNoReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newReplyNotification), localSone)
 		assertThat(filteredNotifications, emptyIterable())
 	}
@@ -170,7 +170,7 @@ class ListNotificationFilterTest {
 		val mentionNotification = createMentionNotification()
 		mentionNotification.add(createPost())
 		mentionNotification.add(createPost())
-		val listNotificationFilter = ListNotificationFilter(matchThisPost(mentionNotification.elements[1]), showAllReplies)
+		val listNotificationFilter = DefaultListNotificationFilter(matchThisPost(mentionNotification.elements[1]), showAllReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(mentionNotification), null)
 		assertThat(filteredNotifications, hasSize(1))
 		assertThat((filteredNotifications[0] as ListNotification<Post?>).elements[0], equalTo(mentionNotification.elements[1]))
@@ -181,7 +181,7 @@ class ListNotificationFilterTest {
 		val mentionNotification = createMentionNotification()
 		mentionNotification.add(createPost())
 		mentionNotification.add(createPost())
-		val listNotificationFilter = ListNotificationFilter(showNoPosts, showAllReplies)
+		val listNotificationFilter = DefaultListNotificationFilter(showNoPosts, showAllReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(mentionNotification), null)
 		assertThat(filteredNotifications, emptyIterable())
 	}

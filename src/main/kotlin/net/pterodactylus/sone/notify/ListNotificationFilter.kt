@@ -16,75 +16,17 @@
  */
 package net.pterodactylus.sone.notify
 
-import net.pterodactylus.sone.data.Post
-import net.pterodactylus.sone.data.PostReply
+import com.google.inject.ImplementedBy
 import net.pterodactylus.sone.data.Sone
-import net.pterodactylus.sone.utils.ifTrue
 import net.pterodactylus.util.notify.Notification
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
- * Filter for [ListNotification]s.
+ * Filters [list notifications][ListNotification], depending on the current
+ * [Sone] and [its options][Sone.getOptions].
  */
-@Singleton
-class ListNotificationFilter @Inject constructor(private val postVisibilityFilter: PostVisibilityFilter, private val replyVisibilityFilter: ReplyVisibilityFilter) {
+@ImplementedBy(DefaultListNotificationFilter::class)
+interface ListNotificationFilter {
 
-	/**
-	 * Filters new-post and new-reply notifications in the given list of
-	 * notifications. If `currentSone` is `null`, new-post and
-	 * new-reply notifications are removed completely. If `currentSone` is
-	 * not `null`, only posts that are posted by a friend Sone or the Sone
-	 * itself, and replies that are replies to posts of friend Sones or the Sone
-	 * itself will be retained in the notifications.
-	 *
-	 * @param notifications
-	 * The notifications to filter
-	 * @param currentSone
-	 * The current Sone, or `null` if not logged in
-	 * @return The filtered notifications
-	 */
-	fun filterNotifications(notifications: Collection<Notification>, currentSone: Sone?) =
-			notifications.mapNotNull { it.filtered(currentSone) }
-
-	@Suppress("UNCHECKED_CAST")
-	private fun Notification.filtered(currentSone: Sone?): Notification? = when {
-		isNewSoneNotification -> {
-			takeIf { currentSone == null || currentSone.options.isShowNewSoneNotifications }
-		}
-		isNewPostNotification -> {
-			(currentSone != null && currentSone.options.isShowNewPostNotifications).ifTrue {
-				(this as ListNotification<Post>).filterNotification { postVisibilityFilter.isPostVisible(currentSone, it) }
-			}
-		}
-		isNewReplyNotification -> {
-			(currentSone != null && currentSone.options.isShowNewReplyNotifications).ifTrue {
-				(this as ListNotification<PostReply>).filterNotification { replyVisibilityFilter.isReplyVisible(currentSone, it) }
-			}
-		}
-		isMentionNotification -> {
-			(this as ListNotification<Post>).filterNotification { postVisibilityFilter.isPostVisible(currentSone, it) }
-		}
-		else -> this
-	}
+	fun filterNotifications(notifications: Collection<Notification>, currentSone: Sone?): Collection<Notification>
 
 }
-
-/**
- * Filters the elements of this list notification.
- *
- * @param filter The filter for the notification’s elements
- * @return A list notification containing the filtered elements, or `null`
- * if the notification does not have any elements after filtering
- */
-private fun <T> ListNotification<T>.filterNotification(filter: (T) -> Boolean) =
-		elements.filter(filter).let { filteredElements ->
-			when (filteredElements.size) {
-				0 -> null
-				elements.size -> this
-				else -> ListNotification(this).apply {
-					setElements(filteredElements)
-					setLastUpdateTime(lastUpdatedTime)
-				}
-			}
-		}
