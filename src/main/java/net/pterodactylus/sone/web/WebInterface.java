@@ -17,19 +17,14 @@
 
 package net.pterodactylus.sone.web;
 
-import static java.util.logging.Logger.getLogger;
-
 import java.util.Collection;
 import java.util.TimeZone;
-import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.ElementLoader;
 import net.pterodactylus.sone.core.event.*;
-import net.pterodactylus.sone.data.Post;
-import net.pterodactylus.sone.data.PostReply;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.freenet.L10nFilter;
 import net.pterodactylus.sone.freenet.Translation;
@@ -229,16 +224,6 @@ public class WebInterface implements SessionProvider {
 	 */
 	public String getFormPassword() {
 		return formPassword;
-	}
-
-	@Nonnull
-	public Collection<Post> getNewPosts(@Nullable Sone currentSone) {
-		return newElements.getNewPosts();
-	}
-
-	@Nonnull
-	public Collection<PostReply> getNewReplies(@Nullable Sone currentSone) {
-		return newElements.getNewReplies();
 	}
 
 	//

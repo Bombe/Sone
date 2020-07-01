@@ -85,8 +85,6 @@ open class TestObjects {
 		whenever(webInterface.formPassword).then { formPassword }
 		whenever(webInterface.getNotifications(currentSone)).thenAnswer { notifications.values }
 		whenever(webInterface.getNotification(ArgumentMatchers.anyString())).then { notifications[it[0]].asOptional() }
-		whenever(webInterface.getNewPosts(currentSone)).thenAnswer { newPosts.values }
-		whenever(webInterface.getNewReplies(currentSone)).thenAnswer { newReplies.values }
 		whenever(webInterface.translation).thenReturn(translation)
 
 		whenever(core.preferences).thenReturn(preferences)
