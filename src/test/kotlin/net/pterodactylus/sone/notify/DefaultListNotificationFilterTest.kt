@@ -19,9 +19,9 @@ import org.hamcrest.Matchers.hasSize
 import org.junit.Test
 
 /**
- * Unit test for [ListNotificationFilterTest].
+ * Unit test for [DefaultListNotificationFilter].
  */
-class ListNotificationFilterTest {
+class DefaultListNotificationFilterTest {
 
 	private val listNotificationFilter = DefaultListNotificationFilter(showAllPosts, showAllReplies)
 
