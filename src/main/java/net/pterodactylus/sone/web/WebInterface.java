@@ -18,15 +18,12 @@
 package net.pterodactylus.sone.web;
 
 import static java.util.logging.Logger.getLogger;
-import static java.util.stream.Collectors.toSet;
 
 import java.util.Collection;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.inject.Named;
 
 import net.pterodactylus.sone.core.Core;
 import net.pterodactylus.sone.core.ElementLoader;
@@ -41,10 +38,8 @@ import net.pterodactylus.sone.main.PluginHomepage;
 import net.pterodactylus.sone.main.PluginVersion;
 import net.pterodactylus.sone.main.PluginYear;
 import net.pterodactylus.sone.main.SonePlugin;
-import net.pterodactylus.sone.notify.ListNotification;
 import net.pterodactylus.sone.notify.ListNotificationFilter;
 import net.pterodactylus.sone.notify.PostVisibilityFilter;
-import net.pterodactylus.sone.notify.ReplyVisibilityFilter;
 import net.pterodactylus.sone.template.LinkedElementRenderFilter;
 import net.pterodactylus.sone.template.ParserFilter;
 import net.pterodactylus.sone.template.RenderFilter;
@@ -89,7 +84,6 @@ import net.pterodactylus.util.web.TemplatePage;
 
 import com.codahale.metrics.*;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.Subscribe;
 import com.google.inject.Inject;
 import freenet.clients.http.ToadletContext;
@@ -99,9 +93,6 @@ import freenet.clients.http.ToadletContext;
  * references to l10n helpers.
  */
 public class WebInterface implements SessionProvider {
-
-	/** The logger. */
-	private static final Logger logger = getLogger(WebInterface.class.getName());
 
 	/** The loaders for templates, pages, and classpath providers. */
 	private final Loaders loaders;
@@ -126,7 +117,6 @@ public class WebInterface implements SessionProvider {
 
 	private final ListNotificationFilter listNotificationFilter;
 	private final PostVisibilityFilter postVisibilityFilter;
-	private final ReplyVisibilityFilter replyVisibilityFilter;
 
 	private final ElementLoader elementLoader;
 	private final LinkedElementRenderFilter linkedElementRenderFilter;
@@ -138,37 +128,23 @@ public class WebInterface implements SessionProvider {
 	private final Translation translation;
 	private final SessionProvider sessionProvider;
 
-	/** The “new post” notification. */
-	private final ListNotification<Post> newPostNotification;
-
-	/** The “new reply” notification. */
-	private final ListNotification<PostReply> newReplyNotification;
-
-	/** The invisible “local post” notification. */
-	private final ListNotification<Post> localPostNotification;
-
-	/** The invisible “local reply” notification. */
-	private final ListNotification<PostReply> localReplyNotification;
+	private final NewElements newElements;
 
 	@Inject
 	public WebInterface(SonePlugin sonePlugin, Loaders loaders, ListNotificationFilter listNotificationFilter,
-			PostVisibilityFilter postVisibilityFilter, ReplyVisibilityFilter replyVisibilityFilter,
-			ElementLoader elementLoader, TemplateContextFactory templateContextFactory,
-			TemplateRenderer templateRenderer,
-			ParserFilter parserFilter, ShortenFilter shortenFilter,
-			RenderFilter renderFilter,
-			LinkedElementRenderFilter linkedElementRenderFilter,
-			PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
-			NotificationManager notificationManager, SessionProvider sessionProvider,
-			@Named("newRemotePost") ListNotification<Post> newPostNotification,
-			@Named("newRemotePostReply") ListNotification<PostReply> newReplyNotification,
-			@Named("localPost") ListNotification<Post> localPostNotification,
-			@Named("localReply") ListNotification<PostReply> localReplyNotification) {
+						PostVisibilityFilter postVisibilityFilter,
+						ElementLoader elementLoader, TemplateContextFactory templateContextFactory,
+						TemplateRenderer templateRenderer,
+						ParserFilter parserFilter, ShortenFilter shortenFilter,
+						RenderFilter renderFilter,
+						LinkedElementRenderFilter linkedElementRenderFilter,
+						PageToadletRegistry pageToadletRegistry, MetricRegistry metricRegistry, Translation translation, L10nFilter l10nFilter,
+						NotificationManager notificationManager, SessionProvider sessionProvider,
+						NewElements newElements) {
 		this.sonePlugin = sonePlugin;
 		this.loaders = loaders;
 		this.listNotificationFilter = listNotificationFilter;
 		this.postVisibilityFilter = postVisibilityFilter;
-		this.replyVisibilityFilter = replyVisibilityFilter;
 		this.elementLoader = elementLoader;
 		this.templateRenderer = templateRenderer;
 		this.parserFilter = parserFilter;
@@ -181,10 +157,7 @@ public class WebInterface implements SessionProvider {
 		this.translation = translation;
 		this.notificationManager = notificationManager;
 		this.sessionProvider = sessionProvider;
-		this.newPostNotification = newPostNotification;
-		this.newReplyNotification = newReplyNotification;
-		this.localPostNotification = localPostNotification;
-		this.localReplyNotification = localReplyNotification;
+		this.newElements = newElements;
 		formPassword = sonePlugin.pluginRespirator().getToadletContainer().getFormPassword();
 
 		this.templateContextFactory = templateContextFactory;
@@ -260,20 +233,12 @@ public class WebInterface implements SessionProvider {
 
 	@Nonnull
 	public Collection<Post> getNewPosts(@Nullable Sone currentSone) {
-		Set<Post> allNewPosts = ImmutableSet.<Post> builder()
-				.addAll(newPostNotification.getElements())
-				.addAll(localPostNotification.getElements())
-				.build();
-		return allNewPosts.stream().filter(p -> postVisibilityFilter.isPostVisible(currentSone, p)).collect(toSet());
+		return newElements.getNewPosts();
 	}
 
 	@Nonnull
 	public Collection<PostReply> getNewReplies(@Nullable Sone currentSone) {
-		Set<PostReply> allNewReplies = ImmutableSet.<PostReply>builder()
-				.addAll(newReplyNotification.getElements())
-				.addAll(localReplyNotification.getElements())
-				.build();
-		return allNewReplies.stream().filter(r -> replyVisibilityFilter.isReplyVisible(currentSone, r)).collect(toSet());
+		return newElements.getNewReplies();
 	}
 
 	//
