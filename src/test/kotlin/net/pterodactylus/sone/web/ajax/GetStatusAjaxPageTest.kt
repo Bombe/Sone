@@ -15,6 +15,7 @@ import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.text.TimeText
 import net.pterodactylus.sone.text.TimeTextConverter
 import net.pterodactylus.sone.utils.jsonArray
+import net.pterodactylus.sone.web.NewElements
 import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.notify.Notification
 import org.hamcrest.MatcherAssert.assertThat
@@ -37,7 +38,11 @@ class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = fals
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
-	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, timeTextConverter, l10nFilter, TimeZone.getTimeZone("UTC"))
+	private val newElements = mock<NewElements>().apply {
+		whenever(newPosts).then { this@GetStatusAjaxPageTest.newPosts.values }
+		whenever(newReplies).then { this@GetStatusAjaxPageTest.newReplies.values }
+	}
+	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getTimeZone("UTC"))
 
 	@Before
 	fun setupTimeTextConverter() {

@@ -273,7 +273,7 @@ public class WebInterface implements SessionProvider {
 
 		pageToadletRegistry.addPage(new RedirectPage<FreenetRequest>("", "index.html"));
 		pageToadletRegistry.addPage(new IndexPage(this, loaders, templateRenderer, postVisibilityFilter));
-		pageToadletRegistry.addPage(new NewPage(this, loaders, templateRenderer));
+		pageToadletRegistry.addPage(new NewPage(this, loaders, templateRenderer, newElements));
 		pageToadletRegistry.addPage(new CreateSonePage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new KnownSonesPage(this, loaders, templateRenderer));
 		pageToadletRegistry.addPage(new EditProfilePage(this, loaders, templateRenderer));
@@ -322,7 +322,7 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new TemplatePage<FreenetRequest>("OpenSearch.xml", "application/opensearchdescription+xml", templateContextFactory, openSearchTemplate));
 		pageToadletRegistry.addPage(new GetImagePage(this));
 		pageToadletRegistry.addPage(new GetTranslationAjaxPage(this));
-		pageToadletRegistry.addPage(new GetStatusAjaxPage(this, elementLoader, timeTextConverter, l10nFilter, TimeZone.getDefault()));
+		pageToadletRegistry.addPage(new GetStatusAjaxPage(this, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getDefault()));
 		pageToadletRegistry.addPage(new GetNotificationsAjaxPage(this));
 		pageToadletRegistry.addPage(new DismissNotificationAjaxPage(this));
 		pageToadletRegistry.addPage(new CreatePostAjaxPage(this));

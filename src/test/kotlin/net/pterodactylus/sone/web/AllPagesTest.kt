@@ -233,6 +233,7 @@ val baseInjector by lazy {
 			FreenetInterface::class.isProvidedByMock(),
 			Template::class.isProvidedByMock(),
 			WebInterface::class.isProvidedByDeepMock(),
-			TemplateRenderer::class.isProvidedByMock()
+			TemplateRenderer::class.isProvidedByMock(),
+			NewElements::class.isProvidedByMock()
 	)!!
 }
