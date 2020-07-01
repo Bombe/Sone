@@ -38,10 +38,6 @@ class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = fals
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
-	private val newElements = mock<NewElements>().apply {
-		whenever(newPosts).then { this@GetStatusAjaxPageTest.newPosts.values }
-		whenever(newReplies).then { this@GetStatusAjaxPageTest.newReplies.values }
-	}
 	override var page: JsonPage = GetStatusAjaxPage(webInterface, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getTimeZone("UTC"))
 
 	@Before

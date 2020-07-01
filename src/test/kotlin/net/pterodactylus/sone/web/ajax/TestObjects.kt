@@ -25,6 +25,7 @@ import net.pterodactylus.sone.test.get
 import net.pterodactylus.sone.test.mock
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asOptional
+import net.pterodactylus.sone.web.NewElements
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
@@ -49,6 +50,7 @@ open class TestObjects {
 	val preferences = Preferences(eventBus)
 	val updateChecker = mock<UpdateChecker>()
 	val elementLoader = mock<ElementLoader>()
+	val newElements = mock<NewElements>()
 
 	val toadletContext = mock<ToadletContext>()
 	val freenetRequest = mock<FreenetRequest>()
@@ -102,6 +104,9 @@ open class TestObjects {
 		whenever(elementLoader.loadElement(ArgumentMatchers.anyString())).thenAnswer {
 			linkedElements[it.getArgument(0)] ?: LinkedElement(it.getArgument(0), loading = true)
 		}
+
+		whenever(newElements.newPosts).then { newPosts.values }
+		whenever(newElements.newReplies).then { newReplies.values }
 
 		whenever(currentSone.options).thenReturn(DefaultSoneOptions())
 		currentSone.mock("soneId", "Sone_Id", true, 1000, idle)
