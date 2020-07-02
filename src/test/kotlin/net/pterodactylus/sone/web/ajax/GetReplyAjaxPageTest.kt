@@ -8,6 +8,7 @@ import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.utils.asTemplate
 import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.template.ReflectionAccessor
+import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -16,10 +17,12 @@ import org.junit.Test
 /**
  * Unit test for [GetReplyAjaxPage].
  */
-class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = false,
-		pageSupplier = { webInterface ->
-			GetReplyAjaxPage(webInterface, "<%core>\n<%request>\n<%reply.text>\n<%currentSone>".asTemplate())
-		}) {
+class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = false) {
+
+	private val templateContextFactory = TemplateContextFactory().apply {
+		addAccessor(Any::class.java, ReflectionAccessor())
+	}
+	override val page: JsonPage by lazy { GetReplyAjaxPage(webInterface, templateContextFactory, "<%core>\n<%request>\n<%reply.text>\n<%currentSone>".asTemplate()) }
 
 	@Test
 	fun `request without reply id results in invalid-reply-id`() {
@@ -36,7 +39,6 @@ class GetReplyAjaxPageTest : JsonPageTest("getReply.ajax", needsFormPassword = f
 			whenever(time).thenReturn(1000)
 			whenever(text).thenReturn("reply text")
 		}
-		webInterface.templateContextFactory.addAccessor(Any::class.java, ReflectionAccessor())
 		addReply(reply)
 		addRequestParameter("reply", "reply-id")
 		assertThatJsonIsSuccessful()

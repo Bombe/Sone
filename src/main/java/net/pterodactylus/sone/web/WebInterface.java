@@ -174,15 +174,6 @@ public class WebInterface implements SessionProvider {
 		return sonePlugin.core();
 	}
 
-	/**
-	 * Returns the template context factory of the web interface.
-	 *
-	 * @return The template context factory
-	 */
-	public TemplateContextFactory getTemplateContextFactory() {
-		return templateContextFactory;
-	}
-
 	@Nullable
 	@Override
 	public Sone getCurrentSone(@Nonnull ToadletContext toadletContext) {
@@ -308,12 +299,12 @@ public class WebInterface implements SessionProvider {
 		pageToadletRegistry.addPage(new GetImagePage(this));
 		pageToadletRegistry.addPage(new GetTranslationAjaxPage(this));
 		pageToadletRegistry.addPage(new GetStatusAjaxPage(this, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getDefault()));
-		pageToadletRegistry.addPage(new GetNotificationsAjaxPage(this));
+		pageToadletRegistry.addPage(new GetNotificationsAjaxPage(this, templateContextFactory));
 		pageToadletRegistry.addPage(new DismissNotificationAjaxPage(this));
 		pageToadletRegistry.addPage(new CreatePostAjaxPage(this));
 		pageToadletRegistry.addPage(new CreateReplyAjaxPage(this));
-		pageToadletRegistry.addPage(new GetReplyAjaxPage(this, replyTemplate));
-		pageToadletRegistry.addPage(new GetPostAjaxPage(this, postTemplate));
+		pageToadletRegistry.addPage(new GetReplyAjaxPage(this, templateContextFactory, replyTemplate));
+		pageToadletRegistry.addPage(new GetPostAjaxPage(this, templateContextFactory, postTemplate));
 		pageToadletRegistry.addPage(new GetLinkedElementAjaxPage(this, elementLoader, linkedElementRenderFilter));
 		pageToadletRegistry.addPage(new GetTimesAjaxPage(this, timeTextConverter, l10nFilter, TimeZone.getDefault()));
 		pageToadletRegistry.addPage(new MarkAsKnownAjaxPage(this));

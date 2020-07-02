@@ -9,6 +9,7 @@ import net.pterodactylus.sone.utils.asOptional
 import net.pterodactylus.sone.utils.asTemplate
 import net.pterodactylus.sone.web.baseInjector
 import net.pterodactylus.util.template.ReflectionAccessor
+import net.pterodactylus.util.template.TemplateContextFactory
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
@@ -17,10 +18,12 @@ import org.junit.Test
 /**
  * Unit test for [GetPostAjaxPage].
  */
-class GetPostAjaxPageTest : JsonPageTest("getPost.ajax", needsFormPassword = false,
-		pageSupplier = { webInterface ->
-			GetPostAjaxPage(webInterface, "<%core>\n<%request>\n<%post.text>\n<%currentSone>\n<%localSones>".asTemplate())
-		}) {
+class GetPostAjaxPageTest : JsonPageTest("getPost.ajax", needsFormPassword = false) {
+
+	private val templateContextFactory = TemplateContextFactory().apply {
+		addAccessor(Any::class.java, ReflectionAccessor())
+	}
+	override val page: JsonPage by lazy { GetPostAjaxPage(webInterface, templateContextFactory, "<%core>\n<%request>\n<%post.text>\n<%currentSone>\n<%localSones>".asTemplate()) }
 
 	@Test
 	fun `request with missing post results in invalid-post-id`() {
@@ -37,7 +40,6 @@ class GetPostAjaxPageTest : JsonPageTest("getPost.ajax", needsFormPassword = fal
 			whenever(recipientId).thenReturn("recipient-id".asOptional())
 			whenever(text).thenReturn("post text")
 		}
-		webInterface.templateContextFactory.addAccessor(Any::class.java, ReflectionAccessor())
 		addPost(post)
 		addRequestParameter("post", "post-id")
 		assertThatJsonIsSuccessful()

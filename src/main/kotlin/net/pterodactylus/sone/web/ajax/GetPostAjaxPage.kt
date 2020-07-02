@@ -8,13 +8,14 @@ import net.pterodactylus.sone.utils.render
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
+import net.pterodactylus.util.template.TemplateContextFactory
 import javax.inject.Inject
 
 /**
  * This AJAX handler retrieves information and rendered representation of a [Post].
  */
 @ToadletPath("getPost.ajax")
-class GetPostAjaxPage @Inject constructor(webInterface: WebInterface, private val postTemplate: Template) : LoggedInJsonPage(webInterface) {
+class GetPostAjaxPage @Inject constructor(webInterface: WebInterface, private val templateContextFactory: TemplateContextFactory, private val postTemplate: Template) : LoggedInJsonPage(webInterface) {
 
 	override val needsFormPassword = false
 
@@ -33,7 +34,7 @@ class GetPostAjaxPage @Inject constructor(webInterface: WebInterface, private va
 					} ?: createErrorJsonObject("invalid-post-id")
 
 	private fun Post.render(currentSone: Sone, request: FreenetRequest) =
-			webInterface.templateContextFactory.createTemplateContext().apply {
+			templateContextFactory.createTemplateContext().apply {
 				set("core", core)
 				set("request", request)
 				set("post", this@render)

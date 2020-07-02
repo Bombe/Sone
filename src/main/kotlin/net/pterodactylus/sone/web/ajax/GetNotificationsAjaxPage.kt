@@ -8,6 +8,7 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.notify.TemplateNotification
+import net.pterodactylus.util.template.TemplateContextFactory
 import java.io.StringWriter
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ import javax.inject.Inject
  * AJAX handler to return all current notifications.
  */
 @ToadletPath("getNotifications.ajax")
-class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface) : JsonPage(webInterface) {
+class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface, private val templateContextFactory: TemplateContextFactory) : JsonPage(webInterface) {
 
 	override val needsFormPassword = false
 	override val requiresLogin = false
@@ -46,7 +47,7 @@ class GetNotificationsAjaxPage @Inject constructor(webInterface: WebInterface) :
 	)
 
 	private fun TemplateNotification.render(currentSone: Sone?, freenetRequest: FreenetRequest) = StringWriter().use {
-		val mergedTemplateContext = webInterface.templateContextFactory.createTemplateContext()
+		val mergedTemplateContext = templateContextFactory.createTemplateContext()
 				.mergeContext(templateContext)
 				.apply {
 					this["core"] = core

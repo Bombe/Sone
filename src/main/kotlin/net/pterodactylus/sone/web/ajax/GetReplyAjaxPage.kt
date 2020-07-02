@@ -8,13 +8,14 @@ import net.pterodactylus.sone.utils.render
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
+import net.pterodactylus.util.template.TemplateContextFactory
 import javax.inject.Inject
 
 /**
  * This AJAX page returns the details of a reply.
  */
 @ToadletPath("getReply.ajax")
-class GetReplyAjaxPage @Inject constructor(webInterface: WebInterface, private val template: Template) : LoggedInJsonPage(webInterface) {
+class GetReplyAjaxPage @Inject constructor(webInterface: WebInterface, val templateContextFactory: TemplateContextFactory, private val template: Template) : LoggedInJsonPage(webInterface) {
 
 	override val needsFormPassword = false
 
@@ -37,7 +38,7 @@ class GetReplyAjaxPage @Inject constructor(webInterface: WebInterface, private v
 	).toList().toTypedArray())
 
 	private fun PostReply.render(currentSone: Sone, request: FreenetRequest) =
-			webInterface.templateContextFactory.createTemplateContext().apply {
+			templateContextFactory.createTemplateContext().apply {
 				set("core", core)
 				set("request", request)
 				set("reply", this@render)

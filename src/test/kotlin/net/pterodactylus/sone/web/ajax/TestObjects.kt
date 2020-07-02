@@ -81,7 +81,6 @@ open class TestObjects {
 	}
 
 	init {
-		whenever(webInterface.templateContextFactory).thenReturn(TemplateContextFactory())
 		whenever(webInterface.getCurrentSone(ArgumentMatchers.eq(toadletContext))).thenReturn(currentSone)
 		whenever(webInterface.core).thenReturn(core)
 		whenever(webInterface.formPassword).then { formPassword }

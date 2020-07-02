@@ -25,7 +25,9 @@ import java.io.Writer
 /**
  * Unit test for [GetNotificationsAjaxPage].
  */
-class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requiresLogin = false, needsFormPassword = false, pageSupplier = ::GetNotificationsAjaxPage) {
+class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requiresLogin = false, needsFormPassword = false) {
+
+	override val page: JsonPage by lazy { GetNotificationsAjaxPage(webInterface, TemplateContextFactory()) }
 
 	private val testNotifications = listOf(
 			createNotification("n1", 2000, "t1", 5000, true),
@@ -89,7 +91,6 @@ class GetNotificationsAjaxPageTest : JsonPageTest("getNotifications.ajax", requi
 
 	@Test
 	fun `template notifications are rendered correctly`() {
-		whenever(webInterface.templateContextFactory).thenReturn(TemplateContextFactory())
 		whenever(updateChecker.hasLatestVersion()).thenReturn(true)
 		whenever(updateChecker.latestEdition).thenReturn(999)
 		whenever(updateChecker.latestVersion).thenReturn(Version(0, 1, 2))
