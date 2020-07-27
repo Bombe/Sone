@@ -32,9 +32,9 @@ import org.junit.Test
 class IdentityLoaderTest {
 
 	private val ownIdentities = createOwnIdentities()
-	private val webOfTrustConnector = object : TestWebOfTrustConnector() {
-		override fun loadAllOwnIdentities() = ownIdentities.toSet()
-		override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) =
+	private val webOfTrustConnector = dummyWebOfTrustConnector
+			.overrideLoadAllOwnIdentities { ownIdentities.toSet() }
+			.overrideLoadTrustedIdentities { ownIdentity, _ ->
 				when (ownIdentity) {
 					ownIdentities[0] -> createTrustedIdentitiesForFirstOwnIdentity()
 					ownIdentities[1] -> createTrustedIdentitiesForSecondOwnIdentity()
@@ -42,7 +42,7 @@ class IdentityLoaderTest {
 					ownIdentities[3] -> createTrustedIdentitiesForFourthOwnIdentity()
 					else -> throw RuntimeException()
 				}
-	}
+			}
 
 	@Test
 	fun loadingIdentities() {
@@ -76,13 +76,14 @@ class IdentityLoaderTest {
 	fun `loading all identities merges remote identities’ trust values`() {
 		val ownIdentity1 = createOwnIdentity("o1")
 		val ownIdentity2 = createOwnIdentity("o2")
-		val webOfTrustConnector = object : TestWebOfTrustConnector() {
-			override fun loadAllOwnIdentities() = setOf(ownIdentity1, ownIdentity2)
-			override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?) = when (ownIdentity) {
-				ownIdentity1 -> setOf(createIdentity().setTrust(ownIdentity1, Trust(100, 50, 2)))
-				else -> setOf(createIdentity().setTrust(ownIdentity2, Trust(80, 40, 2)))
-			}
-		}
+		val webOfTrustConnector = dummyWebOfTrustConnector
+				.overrideLoadAllOwnIdentities { setOf(ownIdentity1, ownIdentity2) }
+				.overrideLoadAllIdentities { ownIdentity, _ ->
+					when (ownIdentity) {
+						ownIdentity1 -> setOf(createIdentity().setTrust(ownIdentity1, Trust(100, 50, 2)))
+						else -> setOf(createIdentity().setTrust(ownIdentity2, Trust(80, 40, 2)))
+					}
+				}
 		val identityLoader = IdentityLoader(webOfTrustConnector)
 		val allIdentities = identityLoader.loadAllIdentities()
 		assertThat(allIdentities[ownIdentity1]!!.first().trust[ownIdentity2], notNullValue())
@@ -92,13 +93,14 @@ class IdentityLoaderTest {
 	fun `loading trusted identities merges remote identities’ trust values`() {
 		val ownIdentity1 = createOwnIdentity("o1")
 		val ownIdentity2 = createOwnIdentity("o2")
-		val webOfTrustConnector = object : TestWebOfTrustConnector() {
-			override fun loadAllOwnIdentities() = setOf(ownIdentity1, ownIdentity2)
-			override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) = when (ownIdentity) {
-				ownIdentity1 -> setOf(createIdentity().setTrust(ownIdentity1, Trust(100, 50, 2)))
-				else -> setOf(createIdentity().setTrust(ownIdentity2, Trust(80, 40, 2)))
-			}
-		}
+		val webOfTrustConnector = dummyWebOfTrustConnector
+				.overrideLoadAllOwnIdentities { setOf(ownIdentity1, ownIdentity2) }
+				.overrideLoadTrustedIdentities { ownIdentity, _ ->
+					when (ownIdentity) {
+						ownIdentity1 -> setOf(createIdentity().setTrust(ownIdentity1, Trust(100, 50, 2)))
+						else -> setOf(createIdentity().setTrust(ownIdentity2, Trust(80, 40, 2)))
+					}
+				}
 		val identityLoader = IdentityLoader(webOfTrustConnector)
 		val allIdentities = identityLoader.loadTrustedIdentities()
 		assertThat(allIdentities[ownIdentity1]!!.first().trust[ownIdentity2], notNullValue())
@@ -126,16 +128,3 @@ private fun createTrustedIdentitiesForThirdOwnIdentity() = setOf(
 )
 
 private fun createTrustedIdentitiesForFourthOwnIdentity(): Set<Identity> = emptySet()
-
-private open class TestWebOfTrustConnector : WebOfTrustConnector {
-
-	override fun loadAllOwnIdentities() = emptySet<OwnIdentity>()
-	override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) = emptySet<Identity>()
-	override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?) = emptySet<Identity>()
-	override fun addContext(ownIdentity: OwnIdentity, context: String) = Unit
-	override fun removeContext(ownIdentity: OwnIdentity, context: String) = Unit
-	override fun setProperty(ownIdentity: OwnIdentity, name: String, value: String) = Unit
-	override fun removeProperty(ownIdentity: OwnIdentity, name: String) = Unit
-	override fun ping() = Unit
-
-}

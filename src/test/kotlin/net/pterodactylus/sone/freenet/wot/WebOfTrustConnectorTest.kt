@@ -13,6 +13,18 @@ val dummyWebOfTrustConnector = object : WebOfTrustConnector {
 
 open class DelegatingWebOfTrustConnector(private val delegate: WebOfTrustConnector) : WebOfTrustConnector by delegate
 
+fun WebOfTrustConnector.overrideLoadAllOwnIdentities(override: () -> Set<OwnIdentity>): WebOfTrustConnector = object : DelegatingWebOfTrustConnector(this) {
+	override fun loadAllOwnIdentities() = override()
+}
+
+fun WebOfTrustConnector.overrideLoadTrustedIdentities(override: (ownIdentity: OwnIdentity, context: String?) -> Set<Identity>): WebOfTrustConnector = object : DelegatingWebOfTrustConnector(this) {
+	override fun loadTrustedIdentities(ownIdentity: OwnIdentity, context: String?) = override(ownIdentity, context)
+}
+
+fun WebOfTrustConnector.overrideLoadAllIdentities(override: (ownIdentity: OwnIdentity, context: String?) -> Set<Identity>): WebOfTrustConnector = object : DelegatingWebOfTrustConnector(this) {
+	override fun loadAllIdentities(ownIdentity: OwnIdentity, context: String?) = override(ownIdentity, context)
+}
+
 fun WebOfTrustConnector.overridePing(override: () -> Unit): WebOfTrustConnector = object : DelegatingWebOfTrustConnector(this) {
 	override fun ping() = override()
 }
