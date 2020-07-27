@@ -1,33 +1,32 @@
 package net.pterodactylus.sone.freenet.wot
 
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.freenet.plugin.*
-import net.pterodactylus.sone.test.*
-import org.hamcrest.MatcherAssert.*
-import org.hamcrest.Matchers.*
-import org.junit.*
-import org.mockito.Mockito.*
+import com.google.common.eventbus.EventBus
+import net.pterodactylus.sone.freenet.plugin.PluginException
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.equalTo
+import org.junit.Test
 
 /**
  * Unit test for [IdentityManagerImpl].
  */
 class IdentityManagerTest {
 
-	private val eventBus = mock<EventBus>()
-	private val webOfTrustConnector = mock<WebOfTrustConnector>()
-	private val identityManager = IdentityManagerImpl(eventBus, webOfTrustConnector, IdentityLoader(webOfTrustConnector, Context("Test")))
+	private val eventBus = EventBus()
 
 	@Test
 	fun identityManagerPingsWotConnector() {
+		var pingCalled = false
+		val webOfTrustConnector = dummyWebOfTrustConnector.overridePing { Unit.also { pingCalled = true } }
+		val identityManager = IdentityManagerImpl(eventBus, webOfTrustConnector, IdentityLoader(webOfTrustConnector, Context("Test")))
 		assertThat(identityManager.isConnected, equalTo(true))
-		verify(webOfTrustConnector).ping()
+		assertThat(pingCalled, equalTo(true))
 	}
 
 	@Test
 	fun disconnectedWotConnectorIsRecognized() {
-		doThrow(PluginException::class.java).whenever(webOfTrustConnector).ping()
+		val webOfTrustConnector = dummyWebOfTrustConnector.overridePing { throw PluginException() }
+		val identityManager = IdentityManagerImpl(eventBus, webOfTrustConnector, IdentityLoader(webOfTrustConnector, Context("Test")))
 		assertThat(identityManager.isConnected, equalTo(false))
-		verify(webOfTrustConnector).ping()
 	}
 
 }
