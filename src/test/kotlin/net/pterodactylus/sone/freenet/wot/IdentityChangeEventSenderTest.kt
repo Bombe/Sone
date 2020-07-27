@@ -17,19 +17,24 @@
 
 package net.pterodactylus.sone.freenet.wot
 
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.freenet.wot.event.*
-import net.pterodactylus.sone.test.*
-import org.junit.*
-import org.mockito.ArgumentMatchers.eq
-import org.mockito.Mockito.verify
+import com.google.common.eventbus.EventBus
+import com.google.common.eventbus.Subscribe
+import net.pterodactylus.sone.freenet.wot.event.IdentityAddedEvent
+import net.pterodactylus.sone.freenet.wot.event.IdentityRemovedEvent
+import net.pterodactylus.sone.freenet.wot.event.IdentityUpdatedEvent
+import net.pterodactylus.sone.freenet.wot.event.OwnIdentityAddedEvent
+import net.pterodactylus.sone.freenet.wot.event.OwnIdentityRemovedEvent
+import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.containsInAnyOrder
+import org.junit.Test
 
 /**
  * Unit test for [IdentityChangeEventSender].
  */
 class IdentityChangeEventSenderTest {
 
-	private val eventBus = mock<EventBus>()
+	private val eventBus = EventBus()
 	private val ownIdentities = listOf(
 			createOwnIdentity("O1", setOf("Test"), "KeyA" to "ValueA"),
 			createOwnIdentity("O2", setOf("Test2"), "KeyB" to "ValueB"),
@@ -46,16 +51,55 @@ class IdentityChangeEventSenderTest {
 	@Test
 	fun addingAnOwnIdentityIsDetectedAndReportedCorrectly() {
 		val newIdentities = createNewIdentities()
+		val ownIdentityRemovedEvents = mutableListOf<OwnIdentityRemovedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun ownIdentityRemoved(ownIdentityRemovedEvent: OwnIdentityRemovedEvent) {
+				ownIdentityRemovedEvents += ownIdentityRemovedEvent
+			}
+		})
+		val identityRemovedEvents = mutableListOf<IdentityRemovedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun identityRemovedEvent(identityRemovedEvent: IdentityRemovedEvent) {
+				identityRemovedEvents += identityRemovedEvent
+			}
+		})
+		val owIdentityAddedEvents = mutableListOf<OwnIdentityAddedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun ownIdentityAdded(ownIdentityAddedEvent: OwnIdentityAddedEvent) {
+				owIdentityAddedEvents += ownIdentityAddedEvent
+			}
+		})
+		val identityAddedEvents = mutableListOf<IdentityAddedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun identityAdded(identityAddedEvent: IdentityAddedEvent) {
+				identityAddedEvents += identityAddedEvent
+			}
+		})
+		val identityUpdatedEvents = mutableListOf<IdentityUpdatedEvent>()
+		eventBus.register(object {
+			@Subscribe
+			fun identityUpdatedEvent(identityUpdatedEvent: IdentityUpdatedEvent) {
+				identityUpdatedEvents += identityUpdatedEvent
+			}
+		})
 		identityChangeEventSender.detectChanges(newIdentities)
-		verify(eventBus).post(eq(OwnIdentityRemovedEvent(ownIdentities[0])))
-		verify(eventBus).post(eq(IdentityRemovedEvent(ownIdentities[0], identities[0])))
-		verify(eventBus).post(eq(IdentityRemovedEvent(ownIdentities[0], identities[1])))
-		verify(eventBus).post(eq(OwnIdentityAddedEvent(ownIdentities[2])))
-		verify(eventBus).post(eq(IdentityAddedEvent(ownIdentities[2], identities[1])))
-		verify(eventBus).post(eq(IdentityAddedEvent(ownIdentities[2], identities[2])))
-		verify(eventBus).post(eq(IdentityRemovedEvent(ownIdentities[1], identities[0])))
-		verify(eventBus).post(eq(IdentityAddedEvent(ownIdentities[1], identities[2])))
-		verify(eventBus).post(eq(IdentityUpdatedEvent(ownIdentities[1], identities[1])))
+		assertThat(ownIdentityRemovedEvents, contains(OwnIdentityRemovedEvent(ownIdentities[0])))
+		assertThat(identityRemovedEvents, containsInAnyOrder(
+				IdentityRemovedEvent(ownIdentities[0], identities[0]),
+				IdentityRemovedEvent(ownIdentities[0], identities[1]),
+				IdentityRemovedEvent(ownIdentities[1], identities[0])
+		))
+		assertThat(owIdentityAddedEvents, contains(OwnIdentityAddedEvent(ownIdentities[2])))
+		assertThat(identityAddedEvents, containsInAnyOrder(
+				IdentityAddedEvent(ownIdentities[2], identities[1]),
+				IdentityAddedEvent(ownIdentities[2], identities[2]),
+				IdentityAddedEvent(ownIdentities[1], identities[2])
+		))
+		assertThat(identityUpdatedEvents, contains(IdentityUpdatedEvent(ownIdentities[1], identities[1])))
 	}
 
 	private fun createNewIdentities() = mapOf(
