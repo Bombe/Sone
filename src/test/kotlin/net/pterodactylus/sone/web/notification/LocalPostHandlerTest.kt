@@ -22,6 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.notify.*
+import net.pterodactylus.sone.test.createPost
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
@@ -86,6 +87,15 @@ class LocalPostHandlerTest {
 		notificationManager.addNotification(notification)
 		eventBus.post(PostRemovedEvent(remotePost))
 		assertThat(notification.elements, contains(remotePost))
+	}
+
+	@Test
+	// this scenario can happen when sones are removed.
+	fun `handler removes post from notification if sone is missing`() {
+		val post = createPost(sone = null)
+		notification.add(post)
+		eventBus.post(PostRemovedEvent(post))
+		assertThat(notification.elements, emptyIterable())
 	}
 
 	@Test

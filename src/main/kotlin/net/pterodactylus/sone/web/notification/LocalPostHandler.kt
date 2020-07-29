@@ -17,12 +17,16 @@
 
 package net.pterodactylus.sone.web.notification
 
-import com.google.common.eventbus.*
-import net.pterodactylus.sone.core.event.*
-import net.pterodactylus.sone.data.*
-import net.pterodactylus.sone.notify.*
-import net.pterodactylus.util.notify.*
-import javax.inject.*
+import com.google.common.eventbus.Subscribe
+import net.pterodactylus.sone.core.event.MarkPostKnownEvent
+import net.pterodactylus.sone.core.event.NewPostFoundEvent
+import net.pterodactylus.sone.core.event.PostRemovedEvent
+import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.notify.ListNotification
+import net.pterodactylus.sone.notify.hasFirstStartNotification
+import net.pterodactylus.util.notify.NotificationManager
+import javax.inject.Inject
+import javax.inject.Named
 
 /**
  * Handler for local posts.
@@ -56,4 +60,4 @@ class LocalPostHandler @Inject constructor(private val notificationManager: Noti
 }
 
 private fun Post.onLocal(action: (Post) -> Unit) =
-		if (sone.isLocal) action(this) else Unit
+		if ((sone == null) || sone!!.isLocal) action(this) else Unit
