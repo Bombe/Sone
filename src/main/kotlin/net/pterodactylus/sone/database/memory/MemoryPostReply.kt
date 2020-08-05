@@ -19,6 +19,7 @@ package net.pterodactylus.sone.database.memory
 import com.google.common.base.Optional
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.database.PostReplyBuilder
 import net.pterodactylus.sone.database.SoneProvider
 import net.pterodactylus.sone.utils.asOptional
 
@@ -67,4 +68,14 @@ class MemoryPostReply(
 				'}'
 	}
 
+	class Shell(val id: String, val soneId: String, val postId: String, val time: Long, val text: String) {
+
+		fun build(postReplyBuilder: PostReplyBuilder): PostReply {
+			return postReplyBuilder.withId(id).from(soneId).to(postId).withTime(time).withText(text).build()
+		}
+
+	}
+
 }
+
+fun PostReply.toShell() = MemoryPostReply.Shell(id, sone.id, postId, time, text)

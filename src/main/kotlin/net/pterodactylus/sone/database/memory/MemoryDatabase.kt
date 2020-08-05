@@ -63,7 +63,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val allPosts = mutableMapOf<String, Post>()
 	private val sonePosts: Multimap<String, Post> = HashMultimap.create<String, Post>()
 	private val knownPosts = mutableSetOf<String>()
-	private val allPostReplies = mutableMapOf<String, PostReply>()
+	private val allPostReplies = mutableMapOf<String, MemoryPostReply.Shell>()
 	private val sonePostReplies: Multimap<String, PostReply> = TreeMultimap.create<String, PostReply>(Comparator { leftString, rightString -> leftString.compareTo(rightString) }, newestReplyFirst)
 	private val knownPostReplies = mutableSetOf<String>()
 	private val allAlbums = mutableMapOf<String, Album>()
@@ -123,7 +123,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			}
 			sonePostReplies.putAll(sone.id, sone.replies)
 			for (postReply in sone.replies) {
-				allPostReplies[postReply.id] = postReply
+				allPostReplies[postReply.id] = postReply.toShell()
 			}
 			sone.allAlbums.let { albums ->
 				soneAlbums.putAll(sone.id, albums)
@@ -223,12 +223,15 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 		}
 	}
 
-	override fun getPostReply(id: String) = readLock.withLock { allPostReplies[id] }
+	override fun getPostReply(id: String) = readLock.withLock {
+		allPostReplies[id]?.build(newPostReplyBuilder())
+	}
 
 	override fun getReplies(postId: String) =
 			readLock.withLock {
 				allPostReplies.values
 						.filter { it.postId == postId }
+						.map { it.build(newPostReplyBuilder()) }
 						.sortedWith(newestReplyFirst.reversed())
 			}
 
@@ -237,7 +240,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 
 	override fun storePostReply(postReply: PostReply) =
 			writeLock.withLock {
-				allPostReplies[postReply.id] = postReply
+				allPostReplies[postReply.id] = postReply.toShell()
 			}
 
 	override fun removePostReply(postReply: PostReply) =
@@ -297,7 +300,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 				saveKnownPosts()
 			}
 
-	protected fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
+	internal fun isPostReplyKnown(postReply: PostReply) = readLock.withLock { postReply.id in knownPostReplies }
 
 	override fun setPostReplyKnown(postReply: PostReply): Unit =
 			writeLock.withLock {
