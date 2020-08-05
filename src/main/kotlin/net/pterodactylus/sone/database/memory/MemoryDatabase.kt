@@ -47,6 +47,8 @@ import net.pterodactylus.sone.utils.unit
 import net.pterodactylus.util.config.Configuration
 import net.pterodactylus.util.config.ConfigurationException
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock
 import kotlin.concurrent.withLock
 
 /**
@@ -56,8 +58,8 @@ import kotlin.concurrent.withLock
 class MemoryDatabase @Inject constructor(private val configuration: Configuration) : AbstractService(), Database {
 
 	private val lock = ReentrantReadWriteLock()
-	private val readLock by lazy { lock.readLock()!! }
-	private val writeLock by lazy { lock.writeLock()!! }
+	private val readLock: ReadLock by lazy { lock.readLock() }
+	private val writeLock: WriteLock by lazy { lock.writeLock() }
 	private val configurationLoader = ConfigurationLoader(configuration)
 	private val allSones = mutableMapOf<String, Sone>()
 	private val allPosts = mutableMapOf<String, Post>()
