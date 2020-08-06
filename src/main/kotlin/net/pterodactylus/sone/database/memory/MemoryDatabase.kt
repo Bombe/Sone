@@ -291,7 +291,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override fun isPostBookmarked(post: Post) =
 			memoryBookmarkDatabase.isPostBookmarked(post)
 
-	protected fun isPostKnown(post: Post) = readLock.withLock { post.id in knownPosts }
+	internal fun isPostKnown(post: Post) = readLock.withLock { post.id in knownPosts }
 
 	fun setPostKnown(post: Post, known: Boolean): Unit =
 			writeLock.withLock {
