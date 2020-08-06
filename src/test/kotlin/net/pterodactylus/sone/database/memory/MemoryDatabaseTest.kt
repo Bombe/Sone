@@ -177,26 +177,18 @@ class MemoryDatabaseTest {
 
 	@Test
 	fun `post recipients are detected correctly`() {
-		val postWithRecipient = createPost(of(RECIPIENT_ID))
+		val postWithRecipient = createPost(id = "p1", recipient = createRemoteSone(RECIPIENT_ID))
 		memoryDatabase.storePost(postWithRecipient)
-		val postWithoutRecipient = createPost(absent())
+		val postWithoutRecipient = createPost(id = "p2", recipient = null)
 		memoryDatabase.storePost(postWithoutRecipient)
-		assertThat(memoryDatabase.getDirectedPosts(RECIPIENT_ID), contains(postWithRecipient))
-	}
-
-	private fun createPost(recipient: Optional<String>): Post {
-		val postWithRecipient = mock<Post>()
-		whenever(postWithRecipient.id).thenReturn(randomUUID().toString())
-		whenever(postWithRecipient.sone).thenReturn(sone)
-		whenever(postWithRecipient.recipientId).thenReturn(recipient)
-		return postWithRecipient
+		assertThat(memoryDatabase.getDirectedPosts(RECIPIENT_ID), contains(isPost(isRecipientId = equalTo(RECIPIENT_ID))))
 	}
 
 	@Test
 	fun `post replies are managed correctly`() {
-		val firstPost = createPost(absent())
+		val firstPost = createPost()
 		val firstPostFirstReply = createPostReply(id = "p1r1", post = firstPost, time = 1000L)
-		val secondPost = createPost(absent())
+		val secondPost = createPost()
 		val secondPostFirstReply = createPostReply(id = "p2r1", post = secondPost, time = 1000L)
 		val secondPostSecondReply = createPostReply(id = "p2r2", post = secondPost, time = 2000L)
 		memoryDatabase.storePost(firstPost)

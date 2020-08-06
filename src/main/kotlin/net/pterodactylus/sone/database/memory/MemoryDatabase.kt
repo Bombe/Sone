@@ -62,8 +62,8 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val writeLock: WriteLock by lazy { lock.writeLock() }
 	private val configurationLoader = ConfigurationLoader(configuration)
 	private val allSones = mutableMapOf<String, Sone>()
-	private val allPosts = mutableMapOf<String, Post>()
-	private val sonePosts: Multimap<String, Post> = HashMultimap.create<String, Post>()
+	private val allPosts = mutableMapOf<String, MemoryPost.Shell>()
+	private val sonePosts: Multimap<String, MemoryPost.Shell> = HashMultimap.create<String, MemoryPost.Shell>()
 	private val knownPosts = mutableSetOf<String>()
 	private val allPostReplies = mutableMapOf<String, MemoryPostReply.Shell>()
 	private val sonePostReplies: Multimap<String, PostReply> = TreeMultimap.create<String, PostReply>(Comparator { leftString, rightString -> leftString.compareTo(rightString) }, newestReplyFirst)
@@ -119,8 +119,8 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 			removeSone(sone)
 
 			allSones[sone.id] = sone
-			sonePosts.putAll(sone.id, sone.posts)
-			for (post in sone.posts) {
+			sonePosts.putAll(sone.id, sone.posts.map(Post::toShell))
+			for (post in sone.posts.map(Post::toShell)) {
 				allPosts[post.id] = post
 			}
 			sonePostReplies.putAll(sone.id, sone.replies)
@@ -193,17 +193,17 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override fun getFollowingTime(friendSoneId: String) =
 			memoryFriendDatabase.getFollowingTime(friendSoneId)
 
-	override fun getPost(postId: String) =
-			readLock.withLock { allPosts[postId] }
+	override fun getPost(postId: String): Post? =
+			readLock.withLock { allPosts[postId]?.build(newPostBuilder()) }
 
 	override fun getPosts(soneId: String): Collection<Post> =
-			sonePosts[soneId].toSet()
+			sonePosts[soneId].map { it.build(newPostBuilder()) }.toSet()
 
 	override fun getDirectedPosts(recipientId: String) =
 			readLock.withLock {
-				allPosts.values.filter {
-					it.recipientId.orNull() == recipientId
-				}
+				allPosts.values
+						.filter { it.recipientId == recipientId }
+						.map { it.build(newPostBuilder()) }
 			}
 
 	override fun newPostBuilder(): PostBuilder = MemoryPostBuilder(this, this)
@@ -211,8 +211,10 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	override fun storePost(post: Post) {
 		checkNotNull(post, "post must not be null")
 		writeLock.withLock {
-			allPosts[post.id] = post
-			sonePosts[post.sone.id].add(post)
+			post.toShell().also { shell ->
+				allPosts[post.id] = shell
+				sonePosts[post.sone.id].add(shell)
+			}
 		}
 	}
 
@@ -220,7 +222,7 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 		checkNotNull(post, "post must not be null")
 		writeLock.withLock {
 			allPosts.remove(post.id)
-			sonePosts[post.sone.id].remove(post)
+			sonePosts[post.sone.id].remove(post.toShell())
 			post.sone.removePost(post)
 		}
 	}

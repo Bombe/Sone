@@ -34,6 +34,7 @@ import net.pterodactylus.sone.freenet.wot.Identity
 import net.pterodactylus.sone.freenet.wot.OwnIdentity
 import net.pterodactylus.sone.utils.asFreenetBase64
 import net.pterodactylus.sone.utils.asOptional
+import java.util.UUID
 
 val remoteSone1 = createRemoteSone()
 val remoteSone2 = createRemoteSone()
@@ -71,8 +72,8 @@ fun createRemoteSone(id: String = createId(), identity: Identity = createIdentit
 	override fun getIdentity(): Identity = identity
 }
 
-fun createPost(text: String = "", sone: Sone? = remoteSone1, known: Boolean = false, time: Long = 1, loaded: Boolean = true, recipient: Sone? = null): Post {
-	return object : Post.EmptyPost("post-id") {
+fun createPost(text: String = "text", sone: Sone? = remoteSone1, known: Boolean = false, time: Long = 1, loaded: Boolean = true, recipient: Sone? = null, id: String = UUID.randomUUID().toString()): Post {
+	return object : Post.EmptyPost(id) {
 		override fun getRecipientId() = recipient?.id.asOptional()
 		override fun getRecipient() = recipient.asOptional()
 		override fun getSone() = sone

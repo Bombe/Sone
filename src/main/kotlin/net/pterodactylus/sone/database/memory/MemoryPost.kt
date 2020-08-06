@@ -18,6 +18,7 @@ package net.pterodactylus.sone.database.memory
 
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.Sone
+import net.pterodactylus.sone.database.PostBuilder
 import net.pterodactylus.sone.database.SoneProvider
 import net.pterodactylus.sone.utils.asOptional
 
@@ -25,7 +26,7 @@ import net.pterodactylus.sone.utils.asOptional
  * A post is a short message that a user writes in his Sone to let other users
  * know what is going on.
  */
-internal class MemoryPost(
+class MemoryPost(
 		private val postDatabase: MemoryDatabase,
 		private val soneProvider: SoneProvider,
 		override val id: String,
@@ -59,4 +60,13 @@ internal class MemoryPost(
 
 	override fun toString() = "${javaClass.name}[id=$id,sone=$soneId,recipient=$recipientId,time=$time,text=$text]"
 
+	data class Shell(val id: String, val soneId: String, val recipientId: String?, val time: Long, val text: String) {
+
+		fun build(postBuilder: PostBuilder) =
+				postBuilder.withId(id).from(soneId).let { if (recipientId != null) it.to(recipientId) else it }.withTime(time).withText(text).build()
+
+	}
+
 }
+
+fun Post.toShell() = MemoryPost.Shell(id, sone!!.id, recipient.orNull()?.id, time, text)

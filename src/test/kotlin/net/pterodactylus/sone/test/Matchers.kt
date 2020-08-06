@@ -1,6 +1,7 @@
 package net.pterodactylus.sone.test
 
 import freenet.support.*
+import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.web.*
@@ -105,6 +106,9 @@ fun hasField(name: String, valueMatcher: Matcher<String>) = object : TypeSafeDia
 				.appendText(", value ").appendValue(valueMatcher)
 	}
 }
+
+fun isPost(isRecipientId: Matcher<String?> = any(String::class.java)) = AttributeMatcher<Post>("post")
+		.addAttribute("recipient ID", { it.recipientId.orNull() }, isRecipientId)
 
 /**
  * [TypeSafeDiagnosingMatcher] implementation that aims to cut down boilerplate on verifying the attributes
