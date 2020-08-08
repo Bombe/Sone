@@ -17,6 +17,7 @@
 
 package net.pterodactylus.sone.data
 
+import net.pterodactylus.sone.database.PostReplyBuilder
 import java.util.Comparator.comparing
 
 /**
@@ -32,3 +33,13 @@ val newestReplyFirst: Comparator<Reply<*>> =
  */
 val noFutureReply: (Reply<*>) -> Boolean =
 		{ it.getTime() <= System.currentTimeMillis() }
+
+data class PostReplyShell(val id: String, val soneId: String, val postId: String, val time: Long, val text: String) {
+
+	fun build(postReplyBuilder: PostReplyBuilder): PostReply {
+		return postReplyBuilder.withId(id).from(soneId).to(postId).withTime(time).withText(text).build()
+	}
+
+}
+
+fun PostReply.toShell() = PostReplyShell(id, sone.id, postId, time, text)

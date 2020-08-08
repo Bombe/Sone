@@ -29,12 +29,15 @@ import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.data.PostReply
+import net.pterodactylus.sone.data.PostReplyShell
+import net.pterodactylus.sone.data.PostShell
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.data.allAlbums
 import net.pterodactylus.sone.data.allImages
 import net.pterodactylus.sone.data.impl.AlbumBuilderImpl
 import net.pterodactylus.sone.data.impl.ImageBuilderImpl
 import net.pterodactylus.sone.data.newestReplyFirst
+import net.pterodactylus.sone.data.toShell
 import net.pterodactylus.sone.database.AlbumBuilder
 import net.pterodactylus.sone.database.Database
 import net.pterodactylus.sone.database.DatabaseException
@@ -62,10 +65,10 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val writeLock: WriteLock by lazy { lock.writeLock() }
 	private val configurationLoader = ConfigurationLoader(configuration)
 	private val allSones = mutableMapOf<String, Sone>()
-	private val allPosts = mutableMapOf<String, MemoryPost.Shell>()
-	private val sonePosts: Multimap<String, MemoryPost.Shell> = HashMultimap.create<String, MemoryPost.Shell>()
+	private val allPosts = mutableMapOf<String, PostShell>()
+	private val sonePosts: Multimap<String, PostShell> = HashMultimap.create<String, PostShell>()
 	private val knownPosts = mutableSetOf<String>()
-	private val allPostReplies = mutableMapOf<String, MemoryPostReply.Shell>()
+	private val allPostReplies = mutableMapOf<String, PostReplyShell>()
 	private val sonePostReplies: Multimap<String, PostReply> = TreeMultimap.create<String, PostReply>(Comparator { leftString, rightString -> leftString.compareTo(rightString) }, newestReplyFirst)
 	private val knownPostReplies = mutableSetOf<String>()
 	private val allAlbums = mutableMapOf<String, Album>()

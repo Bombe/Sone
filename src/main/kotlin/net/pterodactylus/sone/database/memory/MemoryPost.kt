@@ -17,6 +17,7 @@
 package net.pterodactylus.sone.database.memory
 
 import net.pterodactylus.sone.data.Post
+import net.pterodactylus.sone.data.PostShell
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.database.PostBuilder
 import net.pterodactylus.sone.database.SoneProvider
@@ -60,13 +61,4 @@ class MemoryPost(
 
 	override fun toString() = "${javaClass.name}[id=$id,sone=$soneId,recipient=$recipientId,time=$time,text=$text]"
 
-	data class Shell(val id: String, val soneId: String, val recipientId: String?, val time: Long, val text: String) {
-
-		fun build(postBuilder: PostBuilder) =
-				postBuilder.withId(id).from(soneId).let { if (recipientId != null) it.to(recipientId) else it }.withTime(time).withText(text).build()
-
-	}
-
 }
-
-fun Post.toShell() = MemoryPost.Shell(id, sone!!.id, recipient.orNull()?.id, time, text)
