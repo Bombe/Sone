@@ -58,7 +58,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(PluginYear::class.java).toInstance(PluginYear(sonePlugin.year))
 		bind(PluginHomepage::class.java).toInstance(PluginHomepage(sonePlugin.homepage))
 		bind(Database::class.java).to(MemoryDatabase::class.java).`in`(Singleton::class.java)
-		bind(Translation::class.java).toInstance(BaseL10nTranslation(sonePlugin.l10n().base))
+		bind(Translation::class.java).toInstance(BaseL10nTranslation { sonePlugin.l10n().base })
 		loaders?.let { bind(Loaders::class.java).toInstance(it) }
 		bind(MetricRegistry::class.java).`in`(Singleton::class.java)
 		bind(WebOfTrustConnector::class.java).to(PluginWebOfTrustConnector::class.java).`in`(Singleton::class.java)
