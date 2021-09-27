@@ -44,14 +44,14 @@ class ReloadingPageTest {
 
 	@Test
 	fun `requesting valid file results in 200 and delivers file`() {
-		val fileContent = listOf("Hello", "World").joinToString("\n", postfix = "\n")
-		Files.writeString(Paths.get(folder.path, "file.txt"), fileContent)
+		val fileContent = listOf("Hello", "World").joinToString("\n", postfix = "\n").toByteArray()
+		Files.write(Paths.get(folder.path, "file.txt"), fileContent)
 		webPageTest.request("/prefix/path/file.txt")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("text/plain"))
-		assertThat(responseBytes.toByteArray(), equalTo(fileContent.toByteArray()))
+		assertThat(responseBytes.toByteArray(), equalTo(fileContent))
 	}
 
 	@Test
