@@ -8,7 +8,6 @@ import org.hamcrest.Matchers.*
 import org.junit.*
 import org.junit.rules.*
 import java.nio.file.*
-import kotlin.text.Charsets.UTF_8
 
 /**
  * Unit test for [ReloadingPage].
@@ -45,13 +44,14 @@ class ReloadingPageTest {
 
 	@Test
 	fun `requesting valid file results in 200 and delivers file`() {
-		Files.write(Paths.get(folder.path, "file.txt"), listOf("Hello", "World"), UTF_8)
+		val fileContent = listOf("Hello", "World").joinToString("\n", postfix = "\n")
+		Files.writeString(Paths.get(folder.path, "file.txt"), fileContent)
 		webPageTest.request("/prefix/path/file.txt")
 		page.handleRequest(freenetRequest, response)
 		assertThat(response.statusCode, equalTo(200))
 		assertThat(response.statusText, equalTo("OK"))
 		assertThat(response.contentType, equalTo("text/plain"))
-		assertThat(responseBytes.toByteArray(), equalTo("Hello\nWorld\n".toByteArray()))
+		assertThat(responseBytes.toByteArray(), equalTo(fileContent.toByteArray()))
 	}
 
 	@Test
