@@ -147,7 +147,7 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `config-not-read event is sent to event bus when new config is true`() {
+	fun `config-not-read event is sent to event bus when config file is invalid`() {
 		File("sone.properties").deleteAfter {
 			writeText("Invalid")
 			val configNotReadReceived = AtomicBoolean()
@@ -160,7 +160,7 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `config-not-read event is not sent to event bus when first start is true`() {
+	fun `config-not-read event is not sent to event bus when config file does not exist`() {
 		File("sone.properties").delete()
 		val configNotReadReceived = AtomicBoolean()
 		runSonePluginWithRealInjector {
@@ -171,7 +171,7 @@ class SonePluginTest {
 	}
 
 	@Test
-	fun `config-not-read event is not sent to event bus when new config is false`() {
+	fun `config-not-read event is not sent to event bus when config file is valid`() {
 		File("sone.properties").deleteAfter {
 			writeText("# comment")
 			val configNotReadReceived = AtomicBoolean()
