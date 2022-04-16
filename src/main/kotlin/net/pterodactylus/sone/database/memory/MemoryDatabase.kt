@@ -58,7 +58,9 @@ import kotlin.concurrent.withLock
  * Memory-based [PostDatabase] implementation.
  */
 @Singleton
-class MemoryDatabase @Inject constructor(private val configuration: Configuration) : AbstractService(), Database {
+class MemoryDatabase constructor(private val configuration: Configuration, private val saveKnownPostRepliesRateLimiter: RateLimiter) : AbstractService(), Database {
+
+	@javax.inject.Inject constructor(configuration: Configuration): this(configuration, RateLimiter.create(1.0))
 
 	private val lock = ReentrantReadWriteLock()
 	private val readLock: ReadLock by lazy { lock.readLock() }
@@ -79,7 +81,6 @@ class MemoryDatabase @Inject constructor(private val configuration: Configuratio
 	private val memoryFriendDatabase = MemoryFriendDatabase(configurationLoader)
 	private val saveRateLimiter: RateLimiter = RateLimiter.create(1.0)
 	private val saveKnownPostsRateLimiter: RateLimiter = RateLimiter.create(1.0)
-	private val saveKnownPostRepliesRateLimiter: RateLimiter = RateLimiter.create(1.0)
 
 	override val soneLoader get() = this::getSone
 

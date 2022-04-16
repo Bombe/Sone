@@ -17,8 +17,7 @@
 
 package net.pterodactylus.sone.database.memory
 
-import com.google.common.base.*
-import com.google.common.base.Optional.*
+import com.google.common.util.concurrent.RateLimiter
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.data.impl.*
 import net.pterodactylus.sone.test.*
@@ -31,7 +30,6 @@ import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.*
 import org.mockito.invocation.*
 import java.util.Arrays.*
-import java.util.UUID.*
 import kotlin.test.*
 
 /**
@@ -40,7 +38,7 @@ import kotlin.test.*
 class MemoryDatabaseTest {
 
 	private val configuration = deepMock<Configuration>()
-	private val memoryDatabase = MemoryDatabase(configuration)
+	private val memoryDatabase = MemoryDatabase(configuration, RateLimiter.create(0.001))
 	private val sone = mock<Sone>()
 
 	@BeforeTest
@@ -413,7 +411,6 @@ class MemoryDatabaseTest {
 	}
 
 	@Test
-	@Dirty("the rate limiter should be mocked")
 	fun `setting post replies as knows twice in a row only saves the database once`() {
 		prepareConfigurationValues()
 		val postReply = mock<PostReply>()
