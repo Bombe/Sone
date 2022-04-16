@@ -119,12 +119,6 @@ pitest {
     timeoutFactor = 3.0
 }
 
-apply plugin: 'findbugs'
-
-findbugs {
-    ignoreFailures = true
-}
-
 apply plugin: 'idea'
 
 task countLinesMain(type: Exec) {
