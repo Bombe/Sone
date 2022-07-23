@@ -19,6 +19,7 @@ package net.pterodactylus.sone.template
 
 import com.codahale.metrics.*
 import net.pterodactylus.sone.freenet.*
+import net.pterodactylus.sone.test.OverrideLocale
 import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
@@ -26,11 +27,15 @@ import org.jsoup.*
 import org.jsoup.nodes.*
 import org.junit.*
 import java.util.*
+import java.util.Locale.ENGLISH
 
 /**
  * Unit test for [HistogramRenderer].
  */
 class HistogramRendererTest {
+
+	@get:Rule
+	val overrideLocale = OverrideLocale(ENGLISH)
 
 	private val translation = object : Translation {
 		override val currentLocale = Locale.ENGLISH

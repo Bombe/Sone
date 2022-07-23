@@ -31,8 +31,10 @@ class GetStatusAjaxPage(webInterface: WebInterface, private val elementLoader: E
 	@Inject constructor(webInterface: WebInterface, elementLoader: ElementLoader, newElements: NewElements, timeTextConverter: TimeTextConverter, l10nFilter: L10nFilter):
 			this(webInterface, elementLoader, newElements, timeTextConverter, l10nFilter, TimeZone.getDefault())
 
-	private val dateFormatter = SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
-		this.timeZone = timeZone
+	private val dateFormatter by lazy {
+		SimpleDateFormat("MMM d, yyyy, HH:mm:ss").apply {
+			this.timeZone = timeZone
+		}
 	}
 
 	override fun createJsonObject(request: FreenetRequest) =

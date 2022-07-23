@@ -7,6 +7,7 @@ import net.pterodactylus.sone.data.Sone.SoneStatus.downloading
 import net.pterodactylus.sone.data.Sone.SoneStatus.inserting
 import net.pterodactylus.sone.freenet.L10nFilter
 import net.pterodactylus.sone.freenet.L10nText
+import net.pterodactylus.sone.test.OverrideLocale
 import net.pterodactylus.sone.test.deepMock
 import net.pterodactylus.sone.test.getInstance
 import net.pterodactylus.sone.test.isProvidedByMock
@@ -26,15 +27,20 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
 import org.hamcrest.Matchers.notNullValue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.ArgumentMatchers.any
 import org.mockito.ArgumentMatchers.anyLong
+import java.util.Locale.ENGLISH
 import java.util.TimeZone
 
 /**
  * Unit test for [GetStatusAjaxPage].
  */
 class GetStatusAjaxPageTest: JsonPageTest("getStatus.ajax", requiresLogin = false, needsFormPassword = false) {
+
+	@get:Rule
+	val overrideLocale = OverrideLocale(ENGLISH)
 
 	private val timeTextConverter = mock<TimeTextConverter>()
 	private val l10nFilter = mock<L10nFilter>()
