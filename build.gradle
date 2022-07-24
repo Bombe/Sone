@@ -66,6 +66,11 @@ dependencies {
 apply from: 'version.gradle'
 
 task parallelTest(type: Test) {
+    // Forcing locale is needed because some tests examine the
+    // locale-dependent formatting of numbers and dates.
+    systemProperty 'user.language', 'en'
+    systemProperty 'user.country', 'US'
+
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
     useJUnit {
         excludeCategories 'net.pterodactylus.sone.test.NotParallel'
