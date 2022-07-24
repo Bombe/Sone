@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.32'
     id 'org.jetbrains.kotlin.plugin.noarg' version '1.4.32'
-    id 'info.solidsoft.pitest' version '1.4.5'
+    id 'info.solidsoft.pitest' version '1.7.4'
+    id 'jacoco'
 }
 
 group = 'net.pterodactylus'
@@ -36,7 +37,7 @@ configurations {
             configurations.default.exclude group: dep.group, module: dep.name
         }
     }
-    compile.extendsFrom provided
+    implementation.extendsFrom provided
 }
 
 dependencies {
@@ -44,23 +45,23 @@ dependencies {
     provided group: 'org.freenetproject', name: 'freenet-ext', version: '29'
     provided group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
 
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
-    compile group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.0-RC'
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8'
+    implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-coroutines-core', version: '1.3.0-RC'
 
-    compile group: 'net.pterodactylus', name: 'utils', version: '0.13.1'
-    compile group: 'com.google.inject', name: 'guice', version: '4.2.2'
-    compile group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
-    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.1'
-    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
-    compile group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0'
-    compile group: 'javax.activation', name: 'javax.activation-api', version: '1.2.0'
+    implementation group: 'net.pterodactylus', name: 'utils', version: '0.13.1'
+    implementation group: 'com.google.inject', name: 'guice', version: '4.2.2'
+    implementation group: 'com.google.guava', name: 'guava', version: '27.0.1-jre'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.1'
+    implementation group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.9.1'
+    implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.10.2'
+    implementation group: 'io.dropwizard.metrics', name: 'metrics-core', version: '4.1.0'
+    implementation group: 'javax.activation', name: 'javax.activation-api', version: '1.2.0'
 
-    testCompile group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit'
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.28.2'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+    testImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-test-junit'
+    testImplementation group: 'junit', name: 'junit', version: '4.11'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.12.4'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
 }
 
 apply from: 'version.gradle'
@@ -87,7 +88,8 @@ test {
 
 task fatJar(type: Jar) {
     archiveFileName = project.name.toLowerCase() + '-jar-with-dependencies.jar'
-    from { (configurations.runtime - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) } }
+    from { (configurations.runtimeClasspath - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) } }
+    setDuplicatesStrategy(DuplicatesStrategy.INCLUDE)
     manifest {
         attributes('Plugin-Main-Class': 'net.pterodactylus.sone.main.SonePlugin')
     }
@@ -104,16 +106,19 @@ javadoc {
     failOnError = false
 }
 
-apply plugin: 'jacoco'
-
 jacoco {
-    toolVersion = '0.8.4'
+    toolVersion = '0.8.8'
 }
 
-jacocoTestReport.dependsOn test
+jacocoTestReport {
+    executionData(layout.buildDirectory.getAsFileTree().matching {
+        include "jacoco/*.exec"
+    })
+    dependsOn test
+}
 
 pitest {
-    pitestVersion = '1.4.10'
+    pitestVersion = '1.7.4'
     outputFormats = ['HTML', 'XML']
     timestampedReports = false
     timeoutFactor = 3.0
