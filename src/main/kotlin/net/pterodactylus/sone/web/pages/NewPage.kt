@@ -25,7 +25,7 @@ class NewPage @Inject constructor(webInterface: WebInterface, loaders: Loaders, 
 		SoneTemplatePage(webInterface, loaders, templateRenderer, pageTitleKey = "Page.New.Title") {
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) =
-			getCurrentSone(soneRequest.toadletContext).let { currentSone ->
+			getCurrentSone(soneRequest.toadletContext).let { _ ->
 				(newElements.newPosts + newElements.newReplies.mapPresent { it.post })
 						.distinct()
 						.sortedByDescending { it.time }

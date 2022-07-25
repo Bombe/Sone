@@ -70,7 +70,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {
 				typeEncounter.register(InjectionListener { injectee ->
 					logger.fine { "Injecting $injectee..." }
-					eventBus.register(injectee)
+					eventBus.register(injectee as Any)
 				})
 			}
 		})

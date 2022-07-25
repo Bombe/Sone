@@ -108,12 +108,12 @@ class IdentityManagerImpl @Inject constructor(
 			}
 
 	@Subscribe
-	fun strictFilteringActivated(event: StrictFilteringActivatedEvent) {
+	fun strictFilteringActivated(@Suppress("UNUSED_PARAMETER") event: StrictFilteringActivatedEvent) {
 		strictFiltering.set(true)
 	}
 
 	@Subscribe
-	fun strictFilteringDeactivated(event: StrictFilteringDeactivatedEvent) {
+	fun strictFilteringDeactivated(@Suppress("UNUSED_PARAMETER") event: StrictFilteringDeactivatedEvent) {
 		strictFiltering.set(false)
 	}
 
