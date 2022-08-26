@@ -51,7 +51,7 @@ class FreenetInterfaceTest {
 	@Suppress("UnstableApiUsage")
 	private val eventBus = mock<EventBus>()
 	private val node = mock<Node>()
-	private val nodeClientCore = mock<NodeClientCore>()
+	private val clientContext = mock<ClientContext>()
 	private val highLevelSimpleClient: HighLevelSimpleClient = mock(HighLevelSimpleClient::class.java, withSettings().extraInterfaces(RequestClient::class.java))
 	private val randomSource = DummyRandomSource()
 	private val uskManager = mock<USKManager>()
@@ -69,12 +69,8 @@ class FreenetInterfaceTest {
 	private val freenetInterface: FreenetInterface
 
 	init {
-		whenever(nodeClientCore.makeClient(anyShort(), anyBoolean(), anyBoolean())).thenReturn(highLevelSimpleClient)
-		setField(node, "clientCore", nodeClientCore)
 		setField(node, "random", randomSource)
-		setField(nodeClientCore, "uskManager", uskManager)
-		setField(nodeClientCore, "clientContext", mock<ClientContext>())
-		freenetInterface = FreenetInterface(eventBus, node, soneUriCreator)
+		freenetInterface = FreenetInterface(eventBus, node, uskManager, clientContext, soneUriCreator) { _, _, _ -> highLevelSimpleClient }
 		insertToken = freenetInterface.InsertToken(image)
 		insertToken.setBucket(bucket)
 	}

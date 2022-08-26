@@ -2,9 +2,13 @@ package net.pterodactylus.sone.main
 
 import com.google.inject.*
 import freenet.client.*
+import freenet.client.async.ClientContext
+import freenet.client.async.USKManager
 import freenet.clients.http.*
 import freenet.node.*
 import freenet.pluginmanager.*
+import net.pterodactylus.sone.freenet.DefaultHighLevelSimpleClientCreator
+import net.pterodactylus.sone.freenet.HighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.plugin.*
 import javax.inject.Provider
 import javax.inject.Singleton
@@ -26,5 +30,21 @@ class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 	@Provides
 	@Singleton
 	fun getSessionManager() = pluginRespirator.getSessionManager("Sone")!!
+
+	@Provides
+	fun getNodeClientCore(node: Node): NodeClientCore =
+		node.clientCore
+
+	@Provides
+	fun getHighLevelSimpleClientCreator(nodeClientCore: NodeClientCore): HighLevelSimpleClientCreator =
+		DefaultHighLevelSimpleClientCreator(nodeClientCore)
+
+	@Provides
+	fun getClientContext(nodeClientCore: NodeClientCore): ClientContext =
+		nodeClientCore.clientContext
+
+	@Provides
+	fun getUskManager(nodeClientCore: NodeClientCore): USKManager =
+		nodeClientCore.uskManager
 
 }

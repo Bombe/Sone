@@ -38,6 +38,7 @@ class SonePluginTest {
 		setField(node, "clientCore", clientCore)
 		whenever(pluginRespirator.node).thenReturn(node)
 		setField(clientCore, "uskManager", uskManager)
+		setField(clientCore, "clientContext", mock<ClientContext>())
 	}
 
 	@Test

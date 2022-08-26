@@ -2,9 +2,12 @@ package net.pterodactylus.sone.main
 
 import com.google.inject.*
 import freenet.client.*
+import freenet.client.async.ClientContext
+import freenet.client.async.USKManager
 import freenet.clients.http.*
 import freenet.node.*
 import freenet.pluginmanager.*
+import net.pterodactylus.sone.freenet.HighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
@@ -24,10 +27,18 @@ class FreenetModuleTest {
 	val expectedException = ExpectedException.none()!!
 
 	private val sessionManager = mock<SessionManager>()
+	private val uskManager = mock<USKManager>()
+	private val clientContext = mock<ClientContext>()
 	private val pluginRespirator = deepMock<PluginRespirator>().apply {
 		whenever(getSessionManager("Sone")).thenReturn(sessionManager)
 	}
-	private val node = pluginRespirator.node!!
+	private val nodeClientCore = mock<NodeClientCore>().also {
+		setField(it, "uskManager", uskManager)
+		setField(it, "clientContext", clientContext)
+	}
+	private val node = pluginRespirator.node!!.also {
+		setField(it, "clientCore", nodeClientCore)
+	}
 	private val highLevelSimpleClient = pluginRespirator.hlSimpleClient!!
 	private val toadletContainer: ToadletContainer = pluginRespirator.toadletContainer
 	private val pageMaker: PageMaker = pluginRespirator.pageMaker
@@ -111,6 +122,21 @@ class FreenetModuleTest {
 	@Test
 	fun `plugin connector facade is returned as singleton`() {
 		injector.verifySingletonInstance<PluginConnector>()
+	}
+
+	@Test
+	fun `high level simple client creator is returned correctly`() {
+		assertThat(injector.getInstance<HighLevelSimpleClientCreator>(), notNullValue());
+	}
+
+	@Test
+	fun `client context is returned correctly`() {
+		assertThat(injector.getInstance<ClientContext>(), sameInstance(clientContext))
+	}
+
+	@Test
+	fun `usk manager is returned correctly`() {
+		assertThat(injector.getInstance<USKManager>(), sameInstance(uskManager))
 	}
 
 }
