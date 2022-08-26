@@ -1,8 +1,8 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.4.32'
-    id 'org.jetbrains.kotlin.plugin.noarg' version '1.4.32'
+    id 'org.jetbrains.kotlin.jvm' version '1.7.10'
+    id 'org.jetbrains.kotlin.plugin.noarg' version '1.7.10'
     id 'info.solidsoft.pitest' version '1.7.4'
     id 'jacoco'
 }

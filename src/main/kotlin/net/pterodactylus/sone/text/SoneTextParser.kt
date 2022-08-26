@@ -32,7 +32,7 @@ class SoneTextParser @Inject constructor(private val soneProvider: SoneProvider?
 				else
 					LinkType.values()
 							.mapNotNull { it.findNext(remainder.second) }
-							.minBy { it.position }
+							.minByOrNull { it.position }
 							.let {
 								when {
 									it == null -> PlainTextPart(remainder.second) to ""
