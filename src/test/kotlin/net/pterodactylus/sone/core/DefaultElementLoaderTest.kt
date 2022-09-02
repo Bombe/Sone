@@ -126,14 +126,14 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
-	fun `element loader can not extract description if html is more complicated`() {
+	fun `element loader can extract description if html is more complicated`() {
 		runWithCallback(textKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader3.html"))
 			val linkedElement = elementLoader.loadElement(textKey)
 			assertThat(linkedElement, isLinkedElement(equalTo(textKey), allOf(
 				hasEntry("type", "html"), hasEntry("size", 204), hasEntry("sizeHuman", "204 B"),
 				hasEntry("title", "Some Nice Page Title"),
-				hasEntry("description", null)
+				hasEntry("description", "This is the first paragraph of the very nice freesite.")
 			)))
 		}
 	}

@@ -6,7 +6,6 @@ import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.jsoup.nodes.TextNode
 import java.io.ByteArrayInputStream
 import java.net.URLDecoder
 import java.nio.charset.Charset
@@ -101,7 +100,6 @@ private val Document.metaDescription: String?
 
 private val Document.firstNonHeadingParagraph: String?
 	get() = body().children()
-		.filter { it.children().all { it is TextNode } }
 		.map { it to it.text() }
 		.filterNot { it.second == "" }
 		.firstOrNull { !it.first.tagName().startsWith("h", ignoreCase = true) }
