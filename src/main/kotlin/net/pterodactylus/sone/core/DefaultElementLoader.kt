@@ -58,29 +58,6 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 			}
 		}
 
-		private val String?.emptyToNull get() = if (this == "") null else this
-
-		private val Document.metaDescription: String?
-			get() = head().getElementsByTag("meta")
-					.map { it.attr("name") to it.attr("content") }
-					.firstOrNull { it.first == "description" }
-					?.second
-
-		private val Document.firstNonHeadingParagraph: String?
-			get() = body().children()
-					.filter { it.children().all { it is TextNode } }
-					.map { it to it.text() }
-					.filterNot { it.second == "" }
-					.firstOrNull { !it.first.tagName().startsWith("h", ignoreCase = true) }
-					?.second
-
-		private val Int.human get() = when (this) {
-			in 0..1023 -> "$this B"
-			in 1024..1048575 -> "${this / 1024} KiB"
-			in 1048576..1073741823 -> "${this / 1048576} MiB"
-			else -> "${this / 1073741824} GiB"
-		}
-
 		override fun failed(uri: FreenetURI) {
 			failureCache.put(uri.toString().decode().normalize(), true)
 			removeLoadingLink(uri)
@@ -110,7 +87,29 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		return LinkedElement(link, loading = true)
 	}
 
-	private fun String.decode() = URLDecoder.decode(this, "UTF-8")!!
-	private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFC)!!
+}
 
+private fun String.decode() = URLDecoder.decode(this, "UTF-8")!!
+private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFC)!!
+private val String?.emptyToNull get() = if (this == "") null else this
+
+private val Document.metaDescription: String?
+	get() = head().getElementsByTag("meta")
+		.map { it.attr("name") to it.attr("content") }
+		.firstOrNull { it.first == "description" }
+		?.second
+
+private val Document.firstNonHeadingParagraph: String?
+	get() = body().children()
+		.filter { it.children().all { it is TextNode } }
+		.map { it to it.text() }
+		.filterNot { it.second == "" }
+		.firstOrNull { !it.first.tagName().startsWith("h", ignoreCase = true) }
+		?.second
+
+private val Int.human get() = when (this) {
+	in 0..1023 -> "$this B"
+	in 1024..1048575 -> "${this / 1024} KiB"
+	in 1048576..1073741823 -> "${this / 1048576} MiB"
+	else -> "${this / 1073741824} GiB"
 }
