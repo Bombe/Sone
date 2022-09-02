@@ -9,14 +9,20 @@ import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.contains
+import org.hamcrest.Matchers.containsString
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.hasEntry
+import org.hamcrest.Matchers.not
 import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.junit.Rule
 import org.junit.Test
 import java.io.ByteArrayOutputStream
 import java.util.concurrent.TimeUnit.MINUTES
 import java.util.concurrent.atomic.AtomicReference
+import java.util.logging.Handler
+import java.util.logging.Level.ALL
+import java.util.logging.LogRecord
+import java.util.logging.Logger
 import kotlin.math.min
 
 /**
@@ -50,6 +56,7 @@ class DefaultElementLoaderTest {
 	fun `element loader does not cancel on image mime type with 2 mib size`() {
 		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
 			assertThat(callback.shouldCancel(freenetURI, "image/png", sizeOkay), equalTo(false))
+			assertThat(loggedRecords.map(LogRecord::getMessage), not(contains(containsString("Canceling download"))))
 		}
 	}
 
@@ -57,6 +64,7 @@ class DefaultElementLoaderTest {
 	fun `element loader does cancel on image mime type with more than 2 mib size`() {
 		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
 			assertThat(callback.shouldCancel(freenetURI, "image/png", sizeNotOkay), equalTo(true))
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(containsString("Canceling download")))
 		}
 	}
 
@@ -64,6 +72,7 @@ class DefaultElementLoaderTest {
 	fun `element loader does cancel on audio mime type`() {
 		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
 			assertThat(callback.shouldCancel(freenetURI, "audio/mpeg", sizeOkay), equalTo(true))
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(containsString("Canceling download")))
 		}
 	}
 
@@ -71,6 +80,7 @@ class DefaultElementLoaderTest {
 	fun `element loader does cancel on video mime type`() {
 		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
 			assertThat(callback.shouldCancel(freenetURI, "video/mkv", sizeOkay), equalTo(true))
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(containsString("Canceling download")))
 		}
 	}
 
@@ -78,6 +88,7 @@ class DefaultElementLoaderTest {
 	fun `element loader does cancel on text mime type`() {
 		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
 			assertThat(callback.shouldCancel(freenetURI, "text/plain", sizeOkay), equalTo(true))
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(containsString("Canceling download")))
 		}
 	}
 
@@ -85,6 +96,7 @@ class DefaultElementLoaderTest {
 	fun `element loader does not cancel on text html mime type`() {
 		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
 			assertThat(callback.shouldCancel(freenetURI, "text/html", sizeOkay), equalTo(false))
+			assertThat(loggedRecords.map(LogRecord::getMessage), not(contains(containsString("Canceling download"))))
 		}
 	}
 
@@ -100,6 +112,16 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element loader logs information about downloaded image`() {
+		runWithCallback(decomposedKey) { _, _, callback, _ ->
+			callback.loaded(FreenetURI(normalizedKey), "image/png", read("/static/images/unknown-image-0.png"))
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(allOf(
+				containsString(normalizedKey), containsString("2451")
+			)))
+		}
+	}
+
+	@Test
 	fun `element loader can extract description from description header`() {
 		runWithCallback(textKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader.html"))
@@ -108,6 +130,17 @@ class DefaultElementLoaderTest {
 				hasEntry("type", "html"), hasEntry("size", 266), hasEntry("sizeHuman", "266 B"),
 				hasEntry("title", "Some Nice Page Title"),
 				hasEntry("description", "This is an example of a very nice freesite.")
+			)))
+		}
+	}
+
+	@Test
+	fun `element loader logs information from downloaded freesite`() {
+		runWithCallback(textKey) { _, _, callback, _ ->
+			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader.html"))
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(allOf(
+				containsString(textKey), containsString("Some Nice Page Title"),
+				containsString("This is an example of a very nice freesite.")
 			)))
 		}
 	}
@@ -172,6 +205,14 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element loading failure is logged`() {
+		runWithCallback(IMAGE_ID) { _, _, callback, _ ->
+			callback.failed(freenetURI)
+			assertThat(loggedRecords.map(LogRecord::getMessage), contains(containsString("Download failed")))
+		}
+	}
+
+	@Test
 	fun `image is loaded again after failure cache is expired`() {
 		runWithCallback(IMAGE_ID, createTicker(1, MINUTES.toNanos(31))) { elementLoader, _, callback, _ ->
 			elementLoader.loadElement(IMAGE_ID)
@@ -192,6 +233,23 @@ class DefaultElementLoaderTest {
 
 	@get:Rule
 	val silencedLoggin = silencedLogging()
+
+	private val loggedRecords = mutableListOf<LogRecord>()
+
+	init {
+		Logger.getLogger(DefaultElementLoader::class.qualifiedName)
+			.apply { level = ALL }
+			.apply {
+				addHandler(object : Handler() {
+					override fun publish(record: LogRecord) {
+						loggedRecords += record
+					}
+
+					override fun flush() = Unit
+					override fun close() = Unit
+				})
+			}
+	}
 
 }
 

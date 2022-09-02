@@ -11,6 +11,7 @@ import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.text.Normalizer
 import java.util.concurrent.TimeUnit.MINUTES
+import java.util.logging.Logger
 import javax.activation.MimeType
 import javax.imageio.ImageIO
 import javax.inject.Inject
@@ -25,9 +26,18 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 	private val loadingLinks: Cache<String, Boolean> = CacheBuilder.newBuilder().build()
 	private val failureCache: Cache<String, Boolean> = CacheBuilder.newBuilder().ticker(ticker).expireAfterWrite(30, MINUTES).build()
 	private val elementCache: Cache<String, LinkedElement> = CacheBuilder.newBuilder().build()
+	private val logger = Logger.getLogger(DefaultElementLoader::class.qualifiedName)
 	private val callback = object: FreenetInterface.BackgroundFetchCallback {
 		override fun shouldCancel(uri: FreenetURI, mimeType: String, size: Long): Boolean {
-			return (size > 2097152) || (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html"))
+			if (size > 2097152) {
+				logger.fine { "Canceling download of $uri because it’s > 2 MiB." }
+				return true
+			}
+			if (!mimeType.startsWith("image/") && !mimeType.startsWith("text/html")) {
+				logger.fine { "Canceling download of $uri because of its MIME type, $mimeType." }
+				return true
+			}
+			return false
 		}
 
 		override fun loaded(uri: FreenetURI, mimeTypeText: String, data: ByteArray) {
@@ -39,6 +49,9 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 						}?.let {
 							elementCache.get(uri.toString().decode().normalize()) {
 								LinkedElement(uri.toString(), properties = mapOf("type" to "image", "size" to data.size, "sizeHuman" to data.size.human))
+									.apply {
+										logger.fine("Downloaded image from $link: size=${properties["size"]}.")
+									}
 							}
 						}
 					}
@@ -49,7 +62,9 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 									"type" to "html", "size" to data.size, "sizeHuman" to data.size.human,
 									"title" to document.title().emptyToNull,
 									"description" to (document.metaDescription ?: document.firstNonHeadingParagraph)
-							))
+							)).apply {
+								logger.fine { "Extracted information from $link: title=${properties["title"]}, description=${properties["description"]}." }
+							}
 						}
 					}
 				}
@@ -60,6 +75,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 		override fun failed(uri: FreenetURI) {
 			failureCache.put(uri.toString().decode().normalize(), true)
 			removeLoadingLink(uri)
+			logger.fine { "Download failed for $uri." }
 		}
 
 		private fun removeLoadingLink(uri: FreenetURI) {
