@@ -4,9 +4,14 @@ import com.google.common.base.Ticker
 import freenet.keys.FreenetURI
 import net.pterodactylus.sone.core.FreenetInterface.BackgroundFetchCallback
 import net.pterodactylus.sone.test.*
+import org.hamcrest.Description
+import org.hamcrest.Matcher
 import org.hamcrest.MatcherAssert.assertThat
+import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.equalTo
+import org.hamcrest.Matchers.hasEntry
+import org.hamcrest.TypeSafeDiagnosingMatcher
 import org.junit.Rule
 import org.junit.Test
 import java.io.ByteArrayOutputStream
@@ -88,11 +93,9 @@ class DefaultElementLoaderTest {
 		runWithCallback(decomposedKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(normalizedKey), "image/png", read("/static/images/unknown-image-0.png"))
 			val linkedElement = elementLoader.loadElement(decomposedKey)
-			mapOf(
-				"type" to "image",
-				"size" to 2451,
-				"sizeHuman" to "2 KiB"
-			).also { assertThat(linkedElement, equalTo(LinkedElement(normalizedKey, properties = it))) }
+			assertThat(linkedElement, isLinkedElement(equalTo(normalizedKey), allOf(
+				hasEntry("type", "image"), hasEntry("size", 2451), hasEntry("sizeHuman", "2 KiB"),
+			)))
 		}
 	}
 
@@ -101,13 +104,11 @@ class DefaultElementLoaderTest {
 		runWithCallback(textKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader.html"))
 			val linkedElement = elementLoader.loadElement(textKey)
-			mapOf(
-				"type" to "html",
-				"size" to 266,
-				"sizeHuman" to "266 B",
-				"title" to "Some Nice Page Title",
-				"description" to "This is an example of a very nice freesite."
-			).also { assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = it))) }
+			assertThat(linkedElement, isLinkedElement(equalTo(textKey), allOf(
+				hasEntry("type", "html"), hasEntry("size", 266), hasEntry("sizeHuman", "266 B"),
+				hasEntry("title", "Some Nice Page Title"),
+				hasEntry("description", "This is an example of a very nice freesite.")
+			)))
 		}
 	}
 
@@ -116,13 +117,11 @@ class DefaultElementLoaderTest {
 		runWithCallback(textKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader2.html"))
 			val linkedElement = elementLoader.loadElement(textKey)
-			mapOf(
-				"type" to "html",
-				"size" to 185,
-				"sizeHuman" to "185 B",
-				"title" to "Some Nice Page Title",
-				"description" to "This is the first paragraph of the very nice freesite."
-			).also { assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = it))) }
+			assertThat(linkedElement, isLinkedElement(equalTo(textKey), allOf(
+				hasEntry("type", "html"), hasEntry("size", 185), hasEntry("sizeHuman", "185 B"),
+				hasEntry("title", "Some Nice Page Title"),
+				hasEntry("description", "This is the first paragraph of the very nice freesite.")
+			)))
 		}
 	}
 
@@ -131,13 +130,11 @@ class DefaultElementLoaderTest {
 		runWithCallback(textKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader3.html"))
 			val linkedElement = elementLoader.loadElement(textKey)
-			mapOf(
-				"type" to "html",
-				"size" to 204,
-				"sizeHuman" to "204 B",
-				"title" to "Some Nice Page Title",
-				"description" to null
-			).also { assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = it))) }
+			assertThat(linkedElement, isLinkedElement(equalTo(textKey), allOf(
+				hasEntry("type", "html"), hasEntry("size", 204), hasEntry("sizeHuman", "204 B"),
+				hasEntry("title", "Some Nice Page Title"),
+				hasEntry("description", null)
+			)))
 		}
 	}
 
@@ -146,13 +143,10 @@ class DefaultElementLoaderTest {
 		runWithCallback(textKey) { elementLoader, _, callback, _ ->
 			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader4.html"))
 			val linkedElement = elementLoader.loadElement(textKey)
-			mapOf(
-				"type" to "html",
-				"size" to 229,
-				"sizeHuman" to "229 B",
-				"title" to null,
-				"description" to "This is an example of a very nice freesite."
-			).also { assertThat(linkedElement, equalTo(LinkedElement(textKey, properties = it))) }
+			assertThat(linkedElement, isLinkedElement(equalTo(textKey), allOf(
+				hasEntry("type", "html"), hasEntry("size", 229), hasEntry("sizeHuman", "229 B"), hasEntry("title", null),
+				hasEntry("description", "This is an example of a very nice freesite.")
+			)))
 		}
 	}
 
@@ -212,6 +206,21 @@ private fun createTicker(vararg times: Long = LongArray(1) { 1 }) = object : Tic
 	override fun read() =
 		times[min(times.size - 1, counter)]
 			.also { counter++ }
+}
+
+private fun isLinkedElement(link: Matcher<String> = everything(), properties: Matcher<Map<String, Any?>> = everything(), failed: Matcher<Boolean> = everything(), loading: Matcher<Boolean> = everything()) = object : TypeSafeDiagnosingMatcher<LinkedElement>() {
+	override fun matchesSafely(item: LinkedElement, mismatchDescription: Description) =
+		handleMatcher(link, item.link, mismatchDescription) &&
+				handleMatcher(properties, item.properties, mismatchDescription) &&
+				handleMatcher(failed, item.failed, mismatchDescription) &&
+				handleMatcher(loading, item.loading, mismatchDescription)
+
+	override fun describeTo(description: Description) {
+		description.appendText("is linked element for key matching ").appendValue(link)
+			.appendText(", properties matching ").appendValue(properties)
+			.appendText(", failed matching ").appendValue(failed)
+			.appendText(", loading matching ").appendValue(loading)
+	}
 }
 
 private const val IMAGE_ID = "KSK@gpl.png"

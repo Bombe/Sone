@@ -9,6 +9,12 @@ import org.hamcrest.*
 import org.hamcrest.Matchers.*
 
 /**
+ * A kotlin-ified version of Hamcrest’s [anything()][anything]. It matches
+ * everything and has the right type, too!
+ */
+inline fun <reified T> everything(): Matcher<T> = any(T::class.java)
+
+/**
  * Returns a [hamcrest matcher][Matcher] constructed from the given predicate.
  */
 fun <T> matches(description: String? = null, predicate: (T) -> Boolean) = object : TypeSafeDiagnosingMatcher<T>() {
@@ -37,6 +43,10 @@ fun hasHeader(name: String, value: String) = object : TypeSafeDiagnosingMatcher<
 				.appendText(", value is ").appendValue(value)
 	}
 }
+
+fun <T> handleMatcher(matcher: Matcher<T>, item: T, mismatchDescription: Description) =
+	matcher.matches(item)
+		.onFalse { matcher.describeMismatch(item, mismatchDescription) }
 
 fun <T : Any> compare(value: T, comparison: (T) -> Boolean, onError: (T) -> Unit) =
 		false.takeUnless { comparison(value) }
@@ -96,9 +106,7 @@ fun isOwnIdentity(id: String, nickname: String, requestUri: String, insertUri: S
 
 fun hasField(name: String, valueMatcher: Matcher<String>) = object : TypeSafeDiagnosingMatcher<SimpleFieldSet>() {
 	override fun matchesSafely(item: SimpleFieldSet, mismatchDescription: Description) =
-			valueMatcher.matches(item.get(name)).onFalse {
-				valueMatcher.describeMismatch(item, mismatchDescription)
-			}
+		handleMatcher(valueMatcher, item.get(name), mismatchDescription)
 
 	override fun describeTo(description: Description) {
 		description
