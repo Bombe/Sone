@@ -99,10 +99,10 @@ private val Document.metaDescription: String?
 		?.second
 
 private val Document.firstNonHeadingParagraph: String?
-	get() = body().children()
+	get() = body().select("div, p")
+		.filter { it.textNodes().isNotEmpty() }
 		.map { it to it.text() }
-		.filterNot { it.second == "" }
-		.firstOrNull { !it.first.tagName().startsWith("h", ignoreCase = true) }
+		.firstOrNull { it.second != "" }
 		?.second
 
 private val Int.human get() = when (this) {

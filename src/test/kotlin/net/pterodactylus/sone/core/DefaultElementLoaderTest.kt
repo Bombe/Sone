@@ -151,6 +151,18 @@ class DefaultElementLoaderTest {
 	}
 
 	@Test
+	fun `element loader can extract first paragraph from real-world example`() {
+		runWithCallback(textKey) { elementLoader, _, callback, _ ->
+			callback.loaded(FreenetURI(textKey), "text/html; charset=UTF-8", read("element-loader5.html"))
+			val linkedElement = elementLoader.loadElement(textKey)
+			assertThat(linkedElement, isLinkedElement(equalTo(textKey), allOf(
+				hasEntry("type", "html"), hasEntry("title", "Some Nice Page Title"),
+				hasEntry("description", "This is the first paragraph of the very nice freesite.")
+			)))
+		}
+	}
+
+	@Test
 	fun `image is not loaded again after it failed`() {
 		runWithCallback(IMAGE_ID) { elementLoader, _, callback, _ ->
 			elementLoader.loadElement(IMAGE_ID)
