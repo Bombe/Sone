@@ -188,6 +188,7 @@ public class FreenetInterface {
 			}
 		};
 		FetchContext fetchContext = client.getFetchContext();
+		fetchContext.dontEnterImplicitArchives = false;
 		try {
 			ClientGetter clientGetter = client.fetch(uri, 2097152, callback, fetchContext, RequestStarter.INTERACTIVE_PRIORITY_CLASS);
 			clientGetter.setMetaSnoop(snoop);
