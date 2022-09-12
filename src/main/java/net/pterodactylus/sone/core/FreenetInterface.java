@@ -179,6 +179,9 @@ public class FreenetInterface {
 		SnoopMetadata snoop = new SnoopMetadata() {
 			@Override
 			public boolean snoopMetadata(Metadata meta, ClientContext context) {
+				if (meta.isArchiveManifest()) {
+					return false;
+				}
 				String mimeType = meta.getMIMEType();
 				boolean cancel = (mimeType == null) || backgroundFetchCallback.shouldCancel(uri, mimeType, meta.dataLength());
 				if (cancel) {
