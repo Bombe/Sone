@@ -49,6 +49,7 @@ class IdentityManagerImpl @Inject constructor(
 
 	private val currentOwnIdentities = mutableSetOf<OwnIdentity>()
 	private val strictFiltering = AtomicBoolean(false)
+	private val noNegativeIdentityFilter = NoNegativeIdentityFilter()
 
 	override val isConnected: Boolean
 		get() = notThrowing { webOfTrustConnector.ping() }
@@ -87,22 +88,7 @@ class IdentityManagerImpl @Inject constructor(
 
 	private fun Map<OwnIdentity, Set<Identity>>.applyStrictFiltering() =
 			if (strictFiltering.get()) {
-				val identitiesWithTrust = values.flatten()
-						.groupBy { it.id }
-						.mapValues { (_, identities) ->
-							identities.reduce { accIdentity, identity ->
-								identity.trust.forEach { (ownIdentity: OwnIdentity?, trust: Trust?) ->
-									accIdentity.setTrust(ownIdentity, trust)
-								}
-								accIdentity
-							}
-						}
-
-				mapValues { (_, trustedIdentities) ->
-					trustedIdentities.filter { trustedIdentity ->
-						identitiesWithTrust[trustedIdentity.id]!!.trust.all { it.value.hasZeroOrPositiveTrust() }
-					}
-				}
+				noNegativeIdentityFilter.filter(this)
 			} else {
 				this
 			}
@@ -127,11 +113,4 @@ private fun notThrowing(action: () -> Unit): Boolean =
 			true
 		} catch (e: Exception) {
 			false
-		}
-
-private fun Trust.hasZeroOrPositiveTrust() =
-		if (explicit == null) {
-			implicit == null || implicit >= 0
-		} else {
-			explicit >= 0
 		}
