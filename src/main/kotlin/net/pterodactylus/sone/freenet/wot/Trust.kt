@@ -21,3 +21,6 @@ package net.pterodactylus.sone.freenet.wot
  * Container class for trust in the web of trust.
  */
 data class Trust(val explicit: Int?, val implicit: Int?, val distance: Int?)
+
+fun trustExplicitely(value: Int) = Trust(explicit = value, implicit = null, distance = 1)
+fun trustImplicitely(value: Int, distance: Int = 2) = Trust(explicit = null, implicit = value, distance)
