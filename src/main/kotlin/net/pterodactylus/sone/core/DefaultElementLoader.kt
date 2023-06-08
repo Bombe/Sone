@@ -104,7 +104,7 @@ class DefaultElementLoader(private val freenetInterface: FreenetInterface, ticke
 
 }
 
-private fun String.decode() = URLDecoder.decode(this, "UTF-8")!!
+private fun String.decode() = try { URLDecoder.decode(this, "UTF-8")!! } catch (e: RuntimeException) { freenet.support.Logger.error(DefaultElementLoader::class.java, "Could not decode %s!".format(this), e); throw e }
 private fun String.normalize() = Normalizer.normalize(this, Normalizer.Form.NFC)!!
 private val String?.emptyToNull get() = if (this == "") null else this
 
