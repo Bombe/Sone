@@ -24,6 +24,8 @@ import com.google.inject.Singleton
 import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
 import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
 import net.pterodactylus.util.service.AbstractService
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeUnit.MINUTES
 import java.util.concurrent.TimeUnit.SECONDS
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.logging.Level
@@ -80,8 +82,8 @@ class IdentityManagerImpl @Inject constructor(
 				logger.log(Level.SEVERE, "Uncaught exception in IdentityManager thread!", e)
 			}
 
-			/* wait a minute before checking again. */
-			sleep(SECONDS.toMillis(60))
+			/* wait ten minutes before checking again. */
+			sleep(MINUTES.toMillis(10))
 		}
 	}
 
