@@ -18,6 +18,7 @@
 package net.pterodactylus.sone.data
 
 import java.util.Comparator.comparing
+import java.util.concurrent.TimeUnit
 
 /**
  * Comparator that orders replies by their time, newest replies first.
@@ -25,6 +26,13 @@ import java.util.Comparator.comparing
 @get:JvmName("newestReplyFirst")
 val newestReplyFirst: Comparator<Reply<*>> =
 		comparing(Reply<*>::getTime).reversed()
+
+/**
+ * Predicate that returns whether a reply less than a year old,
+ * i.e. whether it should be visible now.
+ */
+@get:JvmName("noOldReply")
+val noOldReply: (Reply<*>) -> Boolean = { it.getTime() > (System.currentTimeMillis() - (TimeUnit.DAYS.toMillis(365))) }
 
 /**
  * Predicate that returns whether a reply is _not_ from the future,

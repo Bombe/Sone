@@ -18,9 +18,12 @@
 package net.pterodactylus.sone.data
 
 import net.pterodactylus.sone.data.impl.*
+import net.pterodactylus.sone.data.impl.SoneImpl.filterRemotePosts
+import net.pterodactylus.sone.data.impl.SoneImpl.filterRemoteReplies
 import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
+import java.util.concurrent.TimeUnit
 import kotlin.test.*
 
 /**
@@ -118,6 +121,30 @@ class SoneTest {
 			override fun getReplies() = setOf(emptyPostReply(), emptyPostReply())
 		}
 		assertThat(postCountComparator.compare(sone1, sone2), equalTo(0))
+	}
+
+	@Test
+	fun `post filtering skips old posts`() {
+		var oldPosts = listOf<Post>(createPost(time = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(400)));
+		assertThat(filterRemotePosts(oldPosts), empty())
+	}
+
+	@Test
+	fun `post filtering keeps recent posts`() {
+		var recentPosts = listOf<Post>(createPost(time = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(300)));
+		assertThat(filterRemotePosts(recentPosts), hasSize(recentPosts.size));
+	}
+
+	@Test
+	fun `reply filtering skips old replies`() {
+		var oldReplies = listOf(emptyPostReply(time = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(400)));
+		assertThat(filterRemoteReplies(oldReplies), empty())
+	}
+
+	@Test
+	fun `reply filtering keeps recent replies`() {
+		var recentReplies = listOf(emptyPostReply(time = System.currentTimeMillis() - TimeUnit.DAYS.toMillis(300)));
+		assertThat(filterRemoteReplies(recentReplies), hasSize(recentReplies.size))
 	}
 
 	@Test
