@@ -27,6 +27,13 @@ val newestReplyFirst: Comparator<Reply<*>> =
 		comparing(Reply<*>::getTime).reversed()
 
 /**
+ * Predicate that returns whether a reply less than a year old,
+ * i.e. whether it should be visible now.
+ */
+@get:JvmName("noOldReply")
+val noOldReply: (Reply<*>) -> Boolean = { it.getTime() > (System.currentTimeMillis() - (365 * 24 * 60 * 60 * 1000)) }
+
+/**
  * Predicate that returns whether a reply is _not_ from the future,
  * i.e. whether it should be visible now.
  */
