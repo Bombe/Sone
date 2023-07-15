@@ -21,8 +21,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.logging.Logger.getLogger;
+import static java.util.stream.Collectors.toList;
 import static net.pterodactylus.sone.data.PostKt.newestPostFirst;
+import static net.pterodactylus.sone.data.PostKt.noOldPost;
 import static net.pterodactylus.sone.data.ReplyKt.newestReplyFirst;
+import static net.pterodactylus.sone.data.ReplyKt.noOldReply;
 import static net.pterodactylus.sone.data.SoneKt.*;
 
 import java.net.MalformedURLException;
@@ -37,6 +40,8 @@ import java.util.logging.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import org.jetbrains.annotations.NotNull;
 
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.AlbumKt;
@@ -367,7 +372,7 @@ public class SoneImpl implements Sone {
 			sortedPosts = new ArrayList<>(posts);
 		}
 		sortedPosts.sort(newestPostFirst());
-		return sortedPosts;
+        return sortedPosts;
 	}
 
 	/**
@@ -379,11 +384,27 @@ public class SoneImpl implements Sone {
 	 */
 	@Nonnull
 	public Sone setPosts(@Nonnull Collection<Post> posts) {
+		List<Post> sortedPosts;
+		synchronized (this) {
+			sortedPosts = new ArrayList<>(posts);
+		}
+		sortedPosts.sort(newestPostFirst());
+        List<Post> limitedPosts = this.local
+            ? sortedPosts
+            : filterRemotePosts(sortedPosts);
 		synchronized (this) {
 			this.posts.clear();
-			this.posts.addAll(posts);
+			this.posts.addAll(limitedPosts);
 		}
 		return this;
+	}
+
+	@NotNull
+	public static List<Post> filterRemotePosts(List<Post> sortedPosts) {
+		return sortedPosts.stream()
+				.filter(noOldPost()::invoke)
+				.limit(100)
+				.collect(toList());
 	}
 
 	/**
@@ -430,9 +451,25 @@ public class SoneImpl implements Sone {
 	 */
 	@Nonnull
 	public Sone setReplies(@Nonnull Collection<PostReply> replies) {
+		List<PostReply> sortedReplies;
+		synchronized (this) {
+			sortedReplies = new ArrayList<>(replies);
+		}
+		sortedReplies.sort(newestReplyFirst());
+        List<PostReply> limitedReplies = this.local
+            ? sortedReplies
+            : filterRemoteReplies(sortedReplies);
 		this.replies.clear();
-		this.replies.addAll(replies);
+		this.replies.addAll(limitedReplies);
 		return this;
+	}
+
+	@NotNull
+	public static List<PostReply> filterRemoteReplies(List<PostReply> sortedReplies) {
+		return sortedReplies.stream()
+				.filter(noOldReply()::invoke)
+				.limit(100)
+				.collect(toList());
 	}
 
 	/**

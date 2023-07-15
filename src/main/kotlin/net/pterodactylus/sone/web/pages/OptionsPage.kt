@@ -51,6 +51,8 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			val postCutOffLength = soneRequest.parameters["post-cut-off-length"]?.toIntOrNull()
 			val imagesPerPage = soneRequest.parameters["images-per-page"]?.toIntOrNull()
 			val insertionDelay = soneRequest.parameters["insertion-delay"]?.toIntOrNull()
+			val downloadBackwardsLimit = soneRequest.parameters["download-backwards-limit"]?.toIntOrNull()
+			val downloadCountLimit = soneRequest.parameters["download-count-limit"]?.toIntOrNull()
 			val fcpFullAccessRequired = soneRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
 
 			if (cantSetOption { soneRequest.core.preferences.newPostsPerPage = postsPerPage }) fieldsWithErrors += "posts-per-page"
@@ -58,6 +60,8 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			if (cantSetOption { soneRequest.core.preferences.newPostCutOffLength = postCutOffLength }) fieldsWithErrors += "post-cut-off-length"
 			if (cantSetOption { soneRequest.core.preferences.newImagesPerPage = imagesPerPage }) fieldsWithErrors += "images-per-page"
 			if (cantSetOption { soneRequest.core.preferences.newInsertionDelay = insertionDelay }) fieldsWithErrors += "insertion-delay"
+			if (cantSetOption { soneRequest.core.preferences.newDownloadBackwardsLimit = downloadBackwardsLimit }) fieldsWithErrors += "download-backwards-limit"
+			if (cantSetOption { soneRequest.core.preferences.newDownloadCountLimit = downloadCountLimit }) fieldsWithErrors += "download-count-limit"
 			fcpFullAccessRequired?.also { if (cantSetOption { soneRequest.core.preferences.newFcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
 
 			if (fieldsWithErrors.isEmpty()) {
@@ -77,6 +81,8 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 		}
 		soneRequest.core.preferences.let { preferences ->
 			templateContext["insertion-delay"] = preferences.insertionDelay
+			templateContext["download-backwards-limit"] = preferences.downloadBackwardsLimit
+			templateContext["download-count-limit"] = preferences.downloadCountLimit
 			templateContext["characters-per-post"] = preferences.charactersPerPost
 			templateContext["fcp-full-access-required"] = preferences.fcpFullAccessRequired.ordinal
 			templateContext["images-per-page"] = preferences.imagesPerPage

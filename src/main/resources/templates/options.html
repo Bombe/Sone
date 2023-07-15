@@ -5,6 +5,12 @@
 			getTranslation("WebInterface.DefaultText.Option.InsertionDelay", function(insertionDelayDefaultText) {
 				registerInputTextareaSwap("#sone #options input[name=insertion-delay]", insertionDelayDefaultText, "insertion-delay", true, true);
 			});
+			getTranslation("WebInterface.DefaultText.Option.DownloadBackwardsLimit", function(downloadBackwardsLimitDefaultText) {
+				registerInputTextareaSwap("#sone #options input[name=download-backwards-limit]", downloadBackwardsLimitDefaultText, "download-backwards-limit", true, true);
+			});
+			getTranslation("WebInterface.DefaultText.Option.DownloadCountLimit", function(downloadCountLimitDefaultText) {
+				registerInputTextareaSwap("#sone #options input[name=download-count-limit]", downloadCountLimitDefaultText, "download-count-limit", true, true);
+			});
 			getTranslation("WebInterface.DefaultText.Option.PostsPerPage", function(postsPerPageText) {
 				registerInputTextareaSwap("#sone #options input[name=posts-per-page]", postsPerPageText, "posts-per-page", true, true);
 			});
@@ -121,6 +127,18 @@
 			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
 		<%/if>
 		<p><input type="text" name="insertion-delay" value="<% insertion-delay|html>" /></p>
+
+		<p><%= Page.Options.Option.DownloadBackwardsLimit.Description|l10n|html></p>
+		<%if =download-backwards-limit|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
+		<p><input type="text" name="download-backwards-limit" value="<% download-backwards-limit|html>" /></p>
+
+		<p><%= Page.Options.Option.DownloadCountLimit.Description|l10n|html></p>
+		<%if =download-count-limit|in collection=fieldErrors>
+			<p class="warning"><%= Page.Options.Warnings.ValueNotChanged|l10n|html></p>
+		<%/if>
+		<p><input type="text" name="download-count-limit" value="<% download-count-limit|html>" /></p>
 
 		<p><%= Page.Options.Option.PostsPerPage.Description|l10n|html></p>
 		<%if =posts-per-page|in collection=fieldErrors>
