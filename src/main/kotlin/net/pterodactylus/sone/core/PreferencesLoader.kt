@@ -10,6 +10,8 @@ class PreferencesLoader(private val preferences: Preferences) {
 
 	fun loadFrom(configuration: Configuration) {
 		loadInsertionDelay(configuration)
+		loadDownloadBackwardsLimit(configuration)
+		loadDownloadCountLimit(configuration)
 		loadPostsPerPage(configuration)
 		loadImagesPerPage(configuration)
 		loadCharactersPerPost(configuration)
@@ -22,6 +24,14 @@ class PreferencesLoader(private val preferences: Preferences) {
 
 	private fun loadInsertionDelay(configuration: Configuration) {
 		preferences.newInsertionDelay = configuration.getIntValue("Option/InsertionDelay").getValue(null)
+	}
+
+	private fun loadDownloadBackwardsLimit(configuration: Configuration) {
+		preferences.newDownloadBackwardsLimit = configuration.getIntValue("Option/DownloadBackwardsLimit").getValue(null)
+	}
+
+	private fun loadDownloadCountLimit(configuration: Configuration) {
+		preferences.newDownloadCountLimit = configuration.getIntValue("Option/DownloadCountLimit").getValue(null)
 	}
 
 	private fun loadPostsPerPage(configuration: Configuration) {

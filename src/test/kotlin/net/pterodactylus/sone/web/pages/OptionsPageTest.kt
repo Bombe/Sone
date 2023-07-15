@@ -20,6 +20,8 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	@Before
 	fun setupPreferences() {
 		core.preferences.newInsertionDelay = 1
+		core.preferences.newDownloadBackwardsLimit = 30
+		core.preferences.newDownloadCountLimit = 10
 		core.preferences.newCharactersPerPost = 50
 		core.preferences.newFcpFullAccessRequired = WRITING
 		core.preferences.newImagesPerPage = 4
@@ -69,6 +71,8 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 			assertThat(templateContext["enable-sone-insert-notifications"], equalTo<Any>(true))
 			assertThat(templateContext["load-linked-images"], equalTo<Any>("FOLLOWED"))
 			assertThat(templateContext["show-custom-avatars"], equalTo<Any>("FOLLOWED"))
+			assertThat(templateContext["download-backwards-limit"], equalTo<Any>(30))
+			assertThat(templateContext["download-count-limit"], equalTo<Any>(10))
 			assertThat(templateContext["insertion-delay"], equalTo<Any>(1))
 			assertThat(templateContext["characters-per-post"], equalTo<Any>(50))
 			assertThat(templateContext["fcp-full-access-required"], equalTo<Any>(1))
@@ -197,6 +201,46 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	@Test
 	fun `setting insertion to an invalid value will reset it`() {
 		verifyThatPreferencesCanBeSet("insertion-delay", "foo", 60) { core.preferences.insertionDelay }
+	}
+
+	@Test
+	fun `download backwards limit can not be set to less than -1 days`() {
+		verifyThatWrongValueForPreferenceIsDetected("download-backwards-limit", "-2")
+	}
+
+	@Test
+	fun `download backwards limit can be set to 0 days`() {
+		verifyThatPreferencesCanBeSet("download-backwards-limit", "0", 0) { core.preferences.downloadBackwardsLimit }
+	}
+
+	@Test
+	fun `download backwards limit can be set to -1 days`() {
+		verifyThatPreferencesCanBeSet("download-backwards-limit", "-1", -1) { core.preferences.downloadBackwardsLimit }
+	}
+
+	@Test
+	fun `setting download backwards limit to an invalid value will reset it`() {
+		verifyThatPreferencesCanBeSet("download-backwards-limit", "foo", 365) { core.preferences.downloadBackwardsLimit }
+	}
+
+	@Test
+	fun `download count limit can not be set to less than -1 posts or replies`() {
+		verifyThatWrongValueForPreferenceIsDetected("download-count-limit", "-2")
+	}
+
+	@Test
+	fun `download count limit can be set to -1 posts or replies`() {
+		verifyThatPreferencesCanBeSet("download-count-limit", "-1", -1) { core.preferences.downloadCountLimit }
+	}
+
+	@Test
+	fun `download count limit can be set to 0 posts or replies`() {
+		verifyThatPreferencesCanBeSet("download-count-limit", "0", 0) { core.preferences.downloadCountLimit }
+	}
+
+	@Test
+	fun `setting download count limit to an invalid value will reset it`() {
+		verifyThatPreferencesCanBeSet("download-count-limit", "foo", 100) { core.preferences.downloadCountLimit }
 	}
 
 	@Test

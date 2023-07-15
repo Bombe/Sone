@@ -21,6 +21,8 @@ import com.google.common.eventbus.EventBus
 import net.pterodactylus.sone.core.event.InsertionDelayChangedEvent
 import net.pterodactylus.sone.core.event.StrictFilteringActivatedEvent
 import net.pterodactylus.sone.core.event.StrictFilteringDeactivatedEvent
+import net.pterodactylus.sone.core.event.DownloadBackwardsLimitChangedEvent
+import net.pterodactylus.sone.core.event.DownloadCountLimitChangedEvent
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired
 import net.pterodactylus.sone.fcp.FcpInterface.FullAccessRequired.ALWAYS
 import net.pterodactylus.sone.fcp.event.FcpInterfaceActivatedEvent
@@ -45,6 +47,26 @@ class Preferences(private val eventBus: EventBus) {
 			_insertionDelay.set(value)
 			eventBus.post(InsertionDelayChangedEvent(insertionDelay))
 			eventBus.post(PreferenceChangedEvent("InsertionDelay", insertionDelay))
+		}
+
+	private val _downloadBackwardsLimit = DefaultOption(365) { it in -1..MAX_VALUE }
+	val downloadBackwardsLimit: Int get() = _downloadBackwardsLimit.get()
+	var newDownloadBackwardsLimit: Int?
+		get() = unsupported
+		set(value) {
+			_downloadBackwardsLimit.set(value)
+			eventBus.post(DownloadBackwardsLimitChangedEvent(downloadBackwardsLimit))
+			eventBus.post(PreferenceChangedEvent("downloadBackwardsLimit", downloadBackwardsLimit))
+		}
+
+	private val _downloadCountLimit = DefaultOption(100) { it in -1..MAX_VALUE }
+	val downloadCountLimit: Int get() = _downloadCountLimit.get()
+	var newDownloadCountLimit: Int?
+		get() = unsupported
+		set(value) {
+			_downloadCountLimit.set(value)
+			eventBus.post(DownloadCountLimitChangedEvent(downloadCountLimit))
+			eventBus.post(PreferenceChangedEvent("downloadCountLimit", downloadCountLimit))
 		}
 
 	private val _postsPerPage = DefaultOption(10) { it in 1..MAX_VALUE }
@@ -116,6 +138,8 @@ class Preferences(private val eventBus: EventBus) {
 	fun saveTo(configuration: Configuration) {
 		configuration.getIntValue("Option/ConfigurationVersion").value = 0
 		configuration.getIntValue("Option/InsertionDelay").value = _insertionDelay.real
+		configuration.getIntValue("Option/DownloadBackwardsLimit").value = _downloadBackwardsLimit.real
+		configuration.getIntValue("Option/DownloadCountLimit").value = _downloadCountLimit.real
 		configuration.getIntValue("Option/PostsPerPage").value = _postsPerPage.real
 		configuration.getIntValue("Option/ImagesPerPage").value = _imagesPerPage.real
 		configuration.getIntValue("Option/CharactersPerPost").value = _charactersPerPost.real
