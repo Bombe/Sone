@@ -199,7 +199,7 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	}
 
 	@Test
-	fun `setting insertion to an invalid value will reset it`() {
+	fun `setting insertion delay to an invalid value will reset it`() {
 		verifyThatPreferencesCanBeSet("insertion-delay", "foo", 60) { core.preferences.insertionDelay }
 	}
 
