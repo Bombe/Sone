@@ -49,26 +49,6 @@ class Preferences(private val eventBus: EventBus) {
 			eventBus.post(PreferenceChangedEvent("InsertionDelay", insertionDelay))
 		}
 
-	private val _downloadBackwardsLimit = DefaultOption(365) { it in -1..MAX_VALUE }
-	val downloadBackwardsLimit: Int get() = _downloadBackwardsLimit.get()
-	var newDownloadBackwardsLimit: Int?
-		get() = unsupported
-		set(value) {
-			_downloadBackwardsLimit.set(value)
-			eventBus.post(DownloadBackwardsLimitChangedEvent(downloadBackwardsLimit))
-			eventBus.post(PreferenceChangedEvent("downloadBackwardsLimit", downloadBackwardsLimit))
-		}
-
-	private val _downloadCountLimit = DefaultOption(100) { it in -1..MAX_VALUE }
-	val downloadCountLimit: Int get() = _downloadCountLimit.get()
-	var newDownloadCountLimit: Int?
-		get() = unsupported
-		set(value) {
-			_downloadCountLimit.set(value)
-			eventBus.post(DownloadCountLimitChangedEvent(downloadCountLimit))
-			eventBus.post(PreferenceChangedEvent("downloadCountLimit", downloadCountLimit))
-		}
-
 	private val _postsPerPage = DefaultOption(10) { it in 1..MAX_VALUE }
 	val postsPerPage: Int get() = _postsPerPage.get()
 	var newPostsPerPage: Int?
@@ -138,8 +118,6 @@ class Preferences(private val eventBus: EventBus) {
 	fun saveTo(configuration: Configuration) {
 		configuration.getIntValue("Option/ConfigurationVersion").value = 0
 		configuration.getIntValue("Option/InsertionDelay").value = _insertionDelay.real
-		configuration.getIntValue("Option/DownloadBackwardsLimit").value = _downloadBackwardsLimit.real
-		configuration.getIntValue("Option/DownloadCountLimit").value = _downloadCountLimit.real
 		configuration.getIntValue("Option/PostsPerPage").value = _postsPerPage.real
 		configuration.getIntValue("Option/ImagesPerPage").value = _imagesPerPage.real
 		configuration.getIntValue("Option/CharactersPerPost").value = _charactersPerPost.real

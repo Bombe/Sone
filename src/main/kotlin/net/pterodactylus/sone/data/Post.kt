@@ -1,7 +1,8 @@
 package net.pterodactylus.sone.data
 
 import java.util.Comparator.comparing
-import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.days
 
 /**
  * Predicate that returns whether a post is _not_ from the future,
@@ -14,8 +15,9 @@ val noFuturePost: (Post) -> Boolean = { it.time <= System.currentTimeMillis() }
  * Predicate that returns whether a post less than a year old,
  * i.e. whether it should be visible now.
  */
+@OptIn(ExperimentalTime::class)
 @get:JvmName("noOldPost")
-val noOldPost: (Post) -> Boolean = { it.time > (System.currentTimeMillis() - (TimeUnit.DAYS.toMillis(365))) }
+val noOldPost: (Post, Int) -> Boolean = { p: Post, days: Int -> p.time > (System.currentTimeMillis() - days.days.inMilliseconds) }
 
 /**
  * Comparator that orders posts by their time, newest posts first.

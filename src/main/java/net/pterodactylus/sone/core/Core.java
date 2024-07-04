@@ -951,6 +951,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 		sone.getOptions().setShowNewSoneNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").getValue(true));
 		sone.getOptions().setShowNewPostNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").getValue(true));
 		sone.getOptions().setShowNewReplyNotifications(configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").getValue(true));
+		sone.getOptions().setDownloadBackwardsLimitDays(configuration.getIntValue(sonePrefix + "/Options/DownloadBackwardsLimit").getValue(365));
+		sone.getOptions().setDownloadCountLimit(configuration.getIntValue(sonePrefix + "/Options/DownloadCountLimit").getValue(100));
 		sone.getOptions().setShowCustomAvatars(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").getValue(LoadExternalContent.NEVER.name())));
 		sone.getOptions().setLoadLinkedImages(LoadExternalContent.valueOf(configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").getValue(LoadExternalContent.NEVER.name())));
 
@@ -1430,6 +1432,8 @@ public class Core extends AbstractService implements SoneProvider, PostProvider,
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewSones").setValue(sone.getOptions().isShowNewSoneNotifications());
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewPosts").setValue(sone.getOptions().isShowNewPostNotifications());
 			configuration.getBooleanValue(sonePrefix + "/Options/ShowNotification/NewReplies").setValue(sone.getOptions().isShowNewReplyNotifications());
+			configuration.getIntValue(sonePrefix + "/Options/DownloadBackwardsLimit").setValue(sone.getOptions().getDownloadBackwardsLimitDays());
+			configuration.getIntValue(sonePrefix + "/Options/DownloadCountLimit").setValue(sone.getOptions().getDownloadCountLimit());
 			configuration.getStringValue(sonePrefix + "/Options/ShowCustomAvatars").setValue(sone.getOptions().getShowCustomAvatars().name());
 			configuration.getStringValue(sonePrefix + "/Options/LoadLinkedImages").setValue(sone.getOptions().getLoadLinkedImages().name());
 

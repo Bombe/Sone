@@ -389,9 +389,9 @@ public class SoneImpl implements Sone {
 			sortedPosts = new ArrayList<>(posts);
 		}
 		sortedPosts.sort(newestPostFirst());
-        List<Post> limitedPosts = this.local
-            ? sortedPosts
-            : filterRemotePosts(sortedPosts);
+		List<Post> limitedPosts = this.local
+			? sortedPosts
+			: this.filterRemotePosts(sortedPosts);
 		synchronized (this) {
 			this.posts.clear();
 			this.posts.addAll(limitedPosts);
@@ -399,11 +399,20 @@ public class SoneImpl implements Sone {
 		return this;
 	}
 
+	/**
+	 * Filters posts of downloaded Sones.
+	 *
+	 * @param sortedPosts
+	 * 		The new (and only) posts of this Sone
+	 *
+	 * @return posts limited by download-count-limit and may time backwards.
+	 * */
+	@Override
 	@NotNull
-	public static List<Post> filterRemotePosts(List<Post> sortedPosts) {
+	public List<Post> filterRemotePosts(List<Post> sortedPosts) {
 		return sortedPosts.stream()
-				.filter(noOldPost()::invoke)
-				.limit(100)
+				.filter(post -> noOldPost().invoke(post, this.getOptions().getDownloadBackwardsLimitDays()))
+				.limit(this.getOptions().getDownloadCountLimit())
 				.collect(toList());
 	}
 
@@ -456,19 +465,20 @@ public class SoneImpl implements Sone {
 			sortedReplies = new ArrayList<>(replies);
 		}
 		sortedReplies.sort(newestReplyFirst());
-        List<PostReply> limitedReplies = this.local
-            ? sortedReplies
-            : filterRemoteReplies(sortedReplies);
+		List<PostReply> limitedReplies = this.local
+			? sortedReplies
+			: this.filterRemoteReplies(sortedReplies);
 		this.replies.clear();
 		this.replies.addAll(limitedReplies);
 		return this;
 	}
 
+	@Override
 	@NotNull
-	public static List<PostReply> filterRemoteReplies(List<PostReply> sortedReplies) {
+	public List<PostReply> filterRemoteReplies(List<PostReply> sortedReplies) {
 		return sortedReplies.stream()
-				.filter(noOldReply()::invoke)
-				.limit(100)
+				.filter(reply -> noOldReply().invoke(reply, this.getOptions().getDownloadBackwardsLimitDays()))
+				.limit(this.getOptions().getDownloadCountLimit())
 				.collect(toList());
 	}
 

@@ -18,7 +18,8 @@
 package net.pterodactylus.sone.data
 
 import java.util.Comparator.comparing
-import java.util.concurrent.TimeUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.days
 
 /**
  * Comparator that orders replies by their time, newest replies first.
@@ -31,8 +32,9 @@ val newestReplyFirst: Comparator<Reply<*>> =
  * Predicate that returns whether a reply less than a year old,
  * i.e. whether it should be visible now.
  */
+@OptIn(ExperimentalTime::class)
 @get:JvmName("noOldReply")
-val noOldReply: (Reply<*>) -> Boolean = { it.getTime() > (System.currentTimeMillis() - (TimeUnit.DAYS.toMillis(365))) }
+val noOldReply: (Reply<*>, Int) -> Boolean = { r: Reply<*>, days: Int -> r.getTime() > (System.currentTimeMillis() - days.days.inMilliseconds) }
 
 /**
  * Predicate that returns whether a reply is _not_ from the future,

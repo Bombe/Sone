@@ -11,13 +11,16 @@ import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.sone.web.pages.SearchPage.Optionality.*
 import net.pterodactylus.util.template.*
 import net.pterodactylus.util.text.*
-import java.util.concurrent.TimeUnit.*
 import javax.inject.*
+import kotlin.time.ExperimentalTime
+import kotlin.time.minutes
+import kotlin.time.toJavaDuration
 
 /**
  * This page lets the user search for posts and replies that contain certain
  * words.
  */
+@OptIn(ExperimentalTime::class)
 @TemplatePath("/templates/search.html")
 @ToadletPath("search.html")
 class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer, ticker: Ticker = Ticker.systemTicker()) :
@@ -27,7 +30,7 @@ class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer:
 	constructor(webInterface: WebInterface, loaders: Loaders, templateRenderer: TemplateRenderer) :
 			this(webInterface, loaders, templateRenderer, Ticker.systemTicker())
 
-	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5, MINUTES).build()
+	private val cache: Cache<Iterable<Phrase>, Pagination<Post>> = CacheBuilder.newBuilder().ticker(ticker).expireAfterAccess(5.minutes.toJavaDuration()).build()
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		val startTime = System.currentTimeMillis()

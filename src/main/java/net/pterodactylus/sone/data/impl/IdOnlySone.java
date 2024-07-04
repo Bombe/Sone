@@ -7,10 +7,16 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import org.jetbrains.annotations.NotNull;
+
 import net.pterodactylus.sone.data.Album;
 import net.pterodactylus.sone.data.Client;
 import net.pterodactylus.sone.data.Post;
 import net.pterodactylus.sone.data.PostReply;
+
+import static java.util.stream.Collectors.toList;
+import static net.pterodactylus.sone.data.PostKt.noOldPost;
+import static net.pterodactylus.sone.data.ReplyKt.noOldReply;
 import net.pterodactylus.sone.data.Profile;
 import net.pterodactylus.sone.data.Sone;
 import net.pterodactylus.sone.data.SoneOptions;
@@ -130,6 +136,15 @@ public class IdOnlySone implements Sone {
 		return this;
 	}
 
+	@NotNull
+	@Override
+	public List<Post> filterRemotePosts(List<Post> sortedPosts) {
+		return sortedPosts.stream()
+				.filter(post -> noOldPost().invoke(post, this.getOptions().getDownloadBackwardsLimitDays()))
+				.limit(this.getOptions().getDownloadCountLimit())
+				.collect(toList());
+	}
+
 	@Override
 	public void addPost(Post post) {
 	}
@@ -146,6 +161,15 @@ public class IdOnlySone implements Sone {
 	@Override
 	public Sone setReplies(Collection<PostReply> replies) {
 		return this;
+	}
+
+	@NotNull
+	@Override
+	public List<PostReply> filterRemoteReplies(List<PostReply> sortedReplies) {
+		return sortedReplies.stream()
+				.filter(reply -> noOldReply().invoke(reply, this.getOptions().getDownloadBackwardsLimitDays()))
+				.limit(this.getOptions().getDownloadCountLimit())
+				.collect(toList());
 	}
 
 	@Override

@@ -24,6 +24,8 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import org.jetbrains.annotations.NotNull;
+
 import net.pterodactylus.sone.freenet.wot.Identity;
 
 import freenet.keys.FreenetURI;
@@ -228,6 +230,9 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	@Nonnull
 	Sone setPosts(@Nonnull Collection<Post> posts);
 
+	@NotNull
+	List<Post> filterRemotePosts(List<Post> sortedPosts);
+
 	/**
 	 * Adds the given post to this Sone. The post will not be added if its {@link
 	 * Post#getSone() Sone} is not this Sone.
@@ -262,6 +267,9 @@ public interface Sone extends Identified, Fingerprintable, Comparable<Sone> {
 	 */
 	@Nonnull
 	Sone setReplies(@Nonnull Collection<PostReply> replies);
+
+	@NotNull
+	List<PostReply> filterRemoteReplies(List<PostReply> sortedReplies);
 
 	/**
 	 * Adds a reply to this Sone. If the given reply was not made by this Sone,

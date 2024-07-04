@@ -29,6 +29,8 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 				val showNewSoneNotification = "show-notification-new-sones" in soneRequest.parameters
 				val showNewPostNotification = "show-notification-new-posts" in soneRequest.parameters
 				val showNewReplyNotification = "show-notification-new-replies" in soneRequest.parameters
+				val downloadBackwardsLimitDays = soneRequest.parameters["download-backwards-limit"].emptyToNull
+				val downloadCountLimitDays = soneRequest.parameters["download-count-limit"].emptyToNull
 
 				options.isAutoFollow = autoFollow
 				options.isSoneInsertNotificationEnabled = enableSoneInsertNotification
@@ -37,7 +39,17 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 				options.isShowNewReplyNotifications = showNewReplyNotification
 				loadLinkedImages?.also { if (cantSetOption { options.loadLinkedImages = LoadExternalContent.valueOf(loadLinkedImages) }) fieldsWithErrors += "load-linked-images" }
 				showCustomAvatars?.also { if (cantSetOption { options.showCustomAvatars = LoadExternalContent.valueOf(showCustomAvatars) }) fieldsWithErrors += "show-custom-avatars" }
-			}
+				downloadBackwardsLimitDays?.also { if (cantSetOption { options.downloadBackwardsLimitDays = downloadBackwardsLimitDays.toInt() }) fieldsWithErrors += "download-backwards-limit" }
+				if (options.downloadBackwardsLimitDays < -1 || downloadBackwardsLimitDays.isNullOrBlank()) {
+					options.downloadBackwardsLimitDays = 365
+					fieldsWithErrors += "download-backwards-limit"
+				}
+				downloadCountLimitDays?.also { if (cantSetOption { options.downloadCountLimit = downloadCountLimitDays.toInt() }) fieldsWithErrors += "download-count-limit" }
+				if (options.downloadCountLimit < -1 || downloadCountLimitDays.isNullOrBlank()) {
+					options.downloadCountLimit = 100
+					fieldsWithErrors += "download-count-limit"
+				}
+            }
 			val fullAccessRequired = "require-full-access" in soneRequest.parameters
 			val fcpInterfaceActive = "fcp-interface-active" in soneRequest.parameters
 			val strictFiltering = "strict-filtering" in soneRequest.parameters
@@ -51,8 +63,6 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			val postCutOffLength = soneRequest.parameters["post-cut-off-length"]?.toIntOrNull()
 			val imagesPerPage = soneRequest.parameters["images-per-page"]?.toIntOrNull()
 			val insertionDelay = soneRequest.parameters["insertion-delay"]?.toIntOrNull()
-			val downloadBackwardsLimit = soneRequest.parameters["download-backwards-limit"]?.toIntOrNull()
-			val downloadCountLimit = soneRequest.parameters["download-count-limit"]?.toIntOrNull()
 			val fcpFullAccessRequired = soneRequest.parameters["fcp-full-access-required"]?.toIntOrNull()
 
 			if (cantSetOption { soneRequest.core.preferences.newPostsPerPage = postsPerPage }) fieldsWithErrors += "posts-per-page"
@@ -60,8 +70,6 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			if (cantSetOption { soneRequest.core.preferences.newPostCutOffLength = postCutOffLength }) fieldsWithErrors += "post-cut-off-length"
 			if (cantSetOption { soneRequest.core.preferences.newImagesPerPage = imagesPerPage }) fieldsWithErrors += "images-per-page"
 			if (cantSetOption { soneRequest.core.preferences.newInsertionDelay = insertionDelay }) fieldsWithErrors += "insertion-delay"
-			if (cantSetOption { soneRequest.core.preferences.newDownloadBackwardsLimit = downloadBackwardsLimit }) fieldsWithErrors += "download-backwards-limit"
-			if (cantSetOption { soneRequest.core.preferences.newDownloadCountLimit = downloadCountLimit }) fieldsWithErrors += "download-count-limit"
 			fcpFullAccessRequired?.also { if (cantSetOption { soneRequest.core.preferences.newFcpFullAccessRequired = FullAccessRequired.values()[fcpFullAccessRequired] }) fieldsWithErrors += "fcp-full-access-required" }
 
 			if (fieldsWithErrors.isEmpty()) {
@@ -76,13 +84,13 @@ class OptionsPage @Inject constructor(webInterface: WebInterface, loaders: Loade
 			templateContext["show-notification-new-posts"] = options.isShowNewPostNotifications
 			templateContext["show-notification-new-replies"] = options.isShowNewReplyNotifications
 			templateContext["enable-sone-insert-notifications"] = options.isSoneInsertNotificationEnabled
+			templateContext["download-count-limit"] = options.downloadCountLimit
+			templateContext["download-backwards-limit"] = options.downloadBackwardsLimitDays
 			templateContext["load-linked-images"] = options.loadLinkedImages.toString()
 			templateContext["show-custom-avatars"] = options.showCustomAvatars.toString()
 		}
 		soneRequest.core.preferences.let { preferences ->
 			templateContext["insertion-delay"] = preferences.insertionDelay
-			templateContext["download-backwards-limit"] = preferences.downloadBackwardsLimit
-			templateContext["download-count-limit"] = preferences.downloadCountLimit
 			templateContext["characters-per-post"] = preferences.charactersPerPost
 			templateContext["fcp-full-access-required"] = preferences.fcpFullAccessRequired.ordinal
 			templateContext["images-per-page"] = preferences.imagesPerPage
