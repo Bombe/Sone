@@ -23,6 +23,10 @@ public interface SoneOptions {
 
 	boolean isShowNewReplyNotifications();
 	void setShowNewReplyNotifications(boolean showNewReplyNotifications);
+	int getDownloadBackwardsLimitDays();
+	void setDownloadBackwardsLimitDays(int days);
+	int getDownloadCountLimit();
+	void setDownloadCountLimit(int count);
 
 	LoadExternalContent getShowCustomAvatars();
 	void setShowCustomAvatars(LoadExternalContent showCustomAvatars);
@@ -62,9 +66,10 @@ public interface SoneOptions {
 		private boolean showNewSoneNotifications = true;
 		private boolean showNewPostNotifications = true;
 		private boolean showNewReplyNotifications = true;
+		private int downloadBackwardsLimitDays = 365;
+		private int downloadCountLimitDays = 100;
 		private LoadExternalContent showCustomAvatars = NEVER;
 		private LoadExternalContent loadLinkedImages = NEVER;
-
 		@Override
 		public boolean isAutoFollow() {
 			return autoFollow;
@@ -116,6 +121,27 @@ public interface SoneOptions {
 		}
 
 		@Override
+		public int getDownloadBackwardsLimitDays() {
+			return downloadBackwardsLimitDays;
+		}
+
+		@Override
+		public void setDownloadBackwardsLimitDays(int downloadBackwardsLimitDays) {
+			this.downloadBackwardsLimitDays = downloadBackwardsLimitDays;
+		}
+
+		@Override
+		public int getDownloadCountLimit() {
+		return downloadCountLimitDays;
+		}
+
+		@Override
+		public void setDownloadCountLimit(int count) {
+			this.downloadCountLimitDays = count;
+
+		}
+
+		@Override
 		public LoadExternalContent getShowCustomAvatars() {
 			return showCustomAvatars;
 		}
@@ -135,7 +161,6 @@ public interface SoneOptions {
 		public void setLoadLinkedImages(@Nonnull LoadExternalContent loadLinkedImages) {
 			this.loadLinkedImages = loadLinkedImages;
 		}
-
 	}
 
 }

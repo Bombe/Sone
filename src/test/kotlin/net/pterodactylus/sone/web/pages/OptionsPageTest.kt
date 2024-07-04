@@ -20,8 +20,6 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 	@Before
 	fun setupPreferences() {
 		core.preferences.newInsertionDelay = 1
-		core.preferences.newDownloadBackwardsLimit = 30
-		core.preferences.newDownloadCountLimit = 10
 		core.preferences.newCharactersPerPost = 50
 		core.preferences.newFcpFullAccessRequired = WRITING
 		core.preferences.newImagesPerPage = 4
@@ -40,6 +38,8 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 			isShowNewReplyNotifications = true
 			isShowNewSoneNotifications = true
 			isSoneInsertNotificationEnabled = true
+		    downloadBackwardsLimitDays = 30
+		    downloadCountLimit = 10
 			loadLinkedImages = FOLLOWED
 			showCustomAvatars = FOLLOWED
 		})
@@ -210,17 +210,17 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 
 	@Test
 	fun `download backwards limit can be set to 0 days`() {
-		verifyThatPreferencesCanBeSet("download-backwards-limit", "0", 0) { core.preferences.downloadBackwardsLimit }
+		verifyThatOptionCanBeSet("download-backwards-limit", "0", 0) { currentSone.options.downloadBackwardsLimitDays }
 	}
 
 	@Test
 	fun `download backwards limit can be set to -1 days`() {
-		verifyThatPreferencesCanBeSet("download-backwards-limit", "-1", -1) { core.preferences.downloadBackwardsLimit }
+		verifyThatOptionCanBeSet("download-backwards-limit", "-1", -1) { currentSone.options.downloadBackwardsLimitDays }
 	}
 
 	@Test
 	fun `setting download backwards limit to an invalid value will reset it`() {
-		verifyThatPreferencesCanBeSet("download-backwards-limit", "foo", 365) { core.preferences.downloadBackwardsLimit }
+		verifyThatOptionCanBeSet("download-backwards-limit", "foo", 365) { currentSone.options.downloadBackwardsLimitDays }
 	}
 
 	@Test
@@ -230,17 +230,17 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 
 	@Test
 	fun `download count limit can be set to -1 posts or replies`() {
-		verifyThatPreferencesCanBeSet("download-count-limit", "-1", -1) { core.preferences.downloadCountLimit }
+		verifyThatOptionCanBeSet("download-count-limit", "-1", -1) { currentSone.options.downloadCountLimit }
 	}
 
 	@Test
 	fun `download count limit can be set to 0 posts or replies`() {
-		verifyThatPreferencesCanBeSet("download-count-limit", "0", 0) { core.preferences.downloadCountLimit }
+		verifyThatOptionCanBeSet("download-count-limit", "0", 0) { currentSone.options.downloadCountLimit }
 	}
 
 	@Test
 	fun `setting download count limit to an invalid value will reset it`() {
-		verifyThatPreferencesCanBeSet("download-count-limit", "foo", 100) { core.preferences.downloadCountLimit }
+		verifyThatOptionCanBeSet("download-count-limit", "foo", 100) { currentSone.options.downloadCountLimit }
 	}
 
 	@Test
