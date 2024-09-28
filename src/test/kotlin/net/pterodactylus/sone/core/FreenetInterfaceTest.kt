@@ -69,7 +69,7 @@ class FreenetInterfaceTest {
 	private val freenetInterface: FreenetInterface
 
 	init {
-		setField(node, "random", randomSource)
+		whenever(node.getRandom()).thenReturn(randomSource)
 		freenetInterface = FreenetInterface(eventBus, node, uskManager, clientContext, soneUriCreator) { _, _, _ -> highLevelSimpleClient }
 		insertToken = freenetInterface.InsertToken(image)
 		insertToken.setBucket(bucket)
