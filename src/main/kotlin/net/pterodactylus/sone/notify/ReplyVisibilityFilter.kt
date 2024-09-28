@@ -5,11 +5,11 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
 
 @ImplementedBy(DefaultReplyVisibilityFilter::class)
+@JvmDefaultWithoutCompatibility
 interface ReplyVisibilityFilter {
 
 	fun isReplyVisible(sone: Sone?, reply: PostReply): Boolean
 
-	@JvmDefault
 	fun isVisible(currentSone: Sone?) =
 			{ reply: PostReply -> isReplyVisible(currentSone, reply) }
 
