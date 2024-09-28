@@ -10,6 +10,7 @@ import net.pterodactylus.sone.web.page.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
+import java.util.Locale
 
 /**
  * Unit test for [KnownSonesPage].
@@ -46,7 +47,7 @@ class KnownSonesPageTest : WebPageTest(::KnownSonesPage) {
 		val rootAlbum = AlbumImpl(this).also { it.addAlbum(album) }
 		whenever(this.rootAlbum).thenReturn(rootAlbum)
 		whenever(this.profile).thenReturn(mock())
-		whenever(id).thenReturn(name.toLowerCase())
+		whenever(id).thenReturn(name.lowercase(Locale.US))
 		whenever(this.name).thenReturn(name)
 	}
 

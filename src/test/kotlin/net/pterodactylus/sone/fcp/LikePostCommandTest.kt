@@ -6,6 +6,7 @@ import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
+import org.junit.Assert.assertThrows
 import org.mockito.Mockito.*
 
 /**
@@ -37,31 +38,35 @@ class LikePostCommandTest : SoneCommandTest() {
 	@Test
 	fun `request with invalid post id results in FCP exception`() {
 		parameters += "Post" to "InvalidPostId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test
 	fun `request with missing local sone results in FCP exception`() {
 		parameters += "Post" to "PostId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test
 	fun `request with invalid sone results in FCP exception`() {
 		parameters += "Post" to "PostId"
 		parameters += "Sone" to "InvalidSoneId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test
 	fun `request with valid remote sone results in FCP exception`() {
 		parameters += "Post" to "PostId"
 		parameters += "Sone" to "RemoteSoneId"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	@Test

@@ -34,7 +34,7 @@ class PostAccessorTest {
 				createPostReply(-4000)
 		)
 		whenever(core.getReplies("post-id")).thenReturn(replies)
-		val repliesForPost = accessor[null, post, "replies"] as Collection<PostReply>
+		val repliesForPost = accessor[null, post, "replies"] as Collection<*>
 		assertThat(repliesForPost, contains(
 				replies[1],
 				replies[2],
@@ -51,7 +51,7 @@ class PostAccessorTest {
 	fun `accessor returns the liking sones`() {
 		val sones = setOf<Sone>()
 		whenever(core.getLikes(post)).thenReturn(sones)
-		val likingSones = accessor[null, post, "likes"] as Set<Sone>
+		val likingSones = accessor[null, post, "likes"] as Set<*>
 		assertThat(likingSones, equalTo(sones))
 	}
 

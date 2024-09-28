@@ -13,6 +13,7 @@ import net.pterodactylus.util.template.*
 import net.pterodactylus.util.text.*
 import java.util.concurrent.TimeUnit.*
 import javax.inject.*
+import java.util.Locale
 
 /**
  * This page lets the user search for posts and replies that contain certain
@@ -84,15 +85,15 @@ class SearchPage(webInterface: WebInterface, loaders: Loaders, templateRenderer:
 			}
 
 	private fun Sone.allText(soneNameCache: (Sone) -> String) =
-			(soneNameCache(this) + profile.fields.map { "${it.name} ${it.value}" }.joinToString(" ", " ")).toLowerCase()
+			(soneNameCache(this) + profile.fields.map { "${it.name} ${it.value}" }.joinToString(" ", " ")).lowercase(Locale.US)
 
 	private fun Post.allText(soneNameCache: (Sone) -> String, getReplies: (String) -> Collection<PostReply>) =
 			(text + recipient.orNull()?.let { " ${soneNameCache(it)}" } + getReplies(id)
 					.filter(noFutureReply)
-					.map { "${soneNameCache(it.sone)} ${it.text}" }.joinToString(" ", " ")).toLowerCase()
+					.map { "${soneNameCache(it.sone)} ${it.text}" }.joinToString(" ", " ")).lowercase(Locale.US)
 
 	private fun Iterable<Phrase>.indicesFor(text: String, predicate: (Phrase) -> Boolean) =
-			filter(predicate).map(Phrase::phrase).map(String::toLowerCase).flatMap { text.findAll(it) }
+			filter(predicate).map(Phrase::phrase).map { it.lowercase(Locale.US) }.flatMap { text.findAll(it) }
 
 	private fun score(text: String, phrases: Iterable<Phrase>): Double {
 		val requiredPhrases = phrases.count { it.required }

@@ -8,6 +8,7 @@ import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
 import java.util.logging.*
 import javax.inject.*
+import java.util.Locale
 
 /**
  * The “create Sone” page lets the user create a new Sone.
@@ -22,7 +23,7 @@ class CreateSonePage @Inject constructor(webInterface: WebInterface, loaders: Lo
 
 	override fun handleRequest(soneRequest: SoneRequest, templateContext: TemplateContext) {
 		templateContext["sones"] = soneRequest.core.localSones.sortedWith(niceNameComparator)
-		templateContext["identitiesWithoutSone"] = soneRequest.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}".toLowerCase() }
+		templateContext["identitiesWithoutSone"] = soneRequest.core.identityManager.allOwnIdentities.filterNot { "Sone" in it.contexts }.sortedBy { "${it.nickname}@${it.id}".lowercase(Locale.US) }
 		if (soneRequest.isPOST) {
 			val identity = soneRequest.httpRequest.getPartAsStringFailsafe("identity", 43)
 			soneRequest.core.identityManager.allOwnIdentities.firstOrNull { it.id == identity }?.let { ownIdentity ->

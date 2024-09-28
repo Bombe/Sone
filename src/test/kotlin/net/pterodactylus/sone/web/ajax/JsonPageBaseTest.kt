@@ -130,6 +130,6 @@ class JsonPageBaseTest : TestObjects() {
 	    assertThat(page.isPrefixPage, equalTo(false))
 	}
 
-	private fun String.asJson() = objectMapper.readValue(this, Map::class.java) as Map<String, Any>
+	private fun String.asJson() = objectMapper.readValue(this, Map::class.java) as Map<*, *>
 
 }

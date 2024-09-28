@@ -5,6 +5,7 @@ import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import net.pterodactylus.util.web.Request
+import java.util.Locale
 
 val Request.isGET get() = this.method == GET
 val Request.isPOST get() = this.method == POST
@@ -32,5 +33,5 @@ val FreenetRequest.headers get() = Headers(httpRequest)
 val HTTPRequest.headers get() = Headers(this)
 
 class Headers(private val request: HTTPRequest) {
-	operator fun get(name: String): String? = request.getHeader(name.toLowerCase())
+	operator fun get(name: String): String? = request.getHeader(name.lowercase(Locale.US))
 }

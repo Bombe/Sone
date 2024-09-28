@@ -94,12 +94,12 @@ class IdentityManagerImpl @Inject constructor(
 			}
 
 	@Subscribe
-	fun strictFilteringActivated(event: StrictFilteringActivatedEvent) {
+	fun StrictFilteringActivatedEvent.strictFilteringActivated() {
 		strictFiltering.set(true)
 	}
 
 	@Subscribe
-	fun strictFilteringDeactivated(event: StrictFilteringDeactivatedEvent) {
+	fun StrictFilteringDeactivatedEvent.strictFilteringDeactivated() {
 		strictFiltering.set(false)
 	}
 

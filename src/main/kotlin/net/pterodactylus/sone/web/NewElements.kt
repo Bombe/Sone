@@ -48,5 +48,3 @@ class NewElements @Inject constructor(
 				.flatMap(ListNotification<PostReply>::elements)
 				.filter { replyVisibilityFilter.isReplyVisible(null, it) }
 }
-
-private fun <R> Collection<*>.cast(): List<R> = map { it as R }

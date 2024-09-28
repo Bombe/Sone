@@ -6,6 +6,7 @@ import net.pterodactylus.sone.test.whenever
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.nullValue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 
 /**
@@ -84,8 +85,9 @@ class GetSoneCommandTest : SoneCommandTest() {
 		whenever(localSone.id).thenReturn("RemoteSone")
 		parameters += "Sone" to "SoneId"
 		parameters += "LocalSone" to "RemoteSone"
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 }

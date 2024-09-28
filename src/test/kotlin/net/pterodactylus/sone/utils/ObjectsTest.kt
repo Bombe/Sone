@@ -23,13 +23,13 @@ class ObjectsTest {
 	@Test
 	fun `exception is thrown for null and true condition`() {
 		assertFailsWith(IllegalArgumentException::class) {
-			null.throwOnNullIf(true) { IllegalArgumentException() }
+			null.throwOnNullIf<Unit>(true) { IllegalArgumentException() }
 		}
 	}
 
 	@Test
 	fun `exception is not thrown for null and false condition`() {
-		assertThat(null.throwOnNullIf(false) { IllegalArgumentException() }, nullValue())
+		assertThat(null.throwOnNullIf<Unit>(false) { IllegalArgumentException() }, nullValue())
 	}
 
 	@Test
@@ -47,13 +47,13 @@ class ObjectsTest {
 	@Test
 	fun `onNull is executed on null`() {
 		val called = CountDownLatch(1)
-		null.onNull { called.countDown() }
+		null.onNull<Unit> { called.countDown() }
 		assertThat(called.count, equalTo(0L))
 	}
 
 	@Test
 	fun `onNull returns null when called on null`() {
-		assertThat(null.onNull {}, nullValue())
+		assertThat(null.onNull<Unit> {}, nullValue())
 	}
 
 	@Test

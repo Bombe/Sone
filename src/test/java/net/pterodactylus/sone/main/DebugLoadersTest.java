@@ -1,5 +1,7 @@
 package net.pterodactylus.sone.main;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.Files.write;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
@@ -12,6 +14,8 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import net.pterodactylus.sone.web.page.FreenetRequest;
 import net.pterodactylus.util.template.Template;
@@ -24,8 +28,6 @@ import net.pterodactylus.util.web.Response;
 import freenet.clients.http.ToadletContext;
 import freenet.support.api.HTTPRequest;
 
-import com.google.common.base.Charsets;
-import com.google.common.io.Files;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,11 +49,11 @@ public class DebugLoadersTest {
 	public void setupLoader() throws IOException {
 		String templatePath = temporaryFolder.newFolder("temps").getPath();
 		loaders = new DebugLoaders(templatePath);
-		File templateFile = new File(templatePath, "template.txt");
-		Files.write("<%if foo>foo<%else>bar<%/if>", templateFile, Charsets.UTF_8);
+		Path templateFile = Paths.get(templatePath, "template.txt");
+		write(templateFile, "<%if foo>foo<%else>bar<%/if>".getBytes(UTF_8));
 		new File(templatePath, "templates").mkdir();
-		File secondTemplateFile = new File(templatePath, "templates/template.txt");
-		Files.write("<%if foo>foo<%else>bar<%/if>", secondTemplateFile, Charsets.UTF_8);
+		Path secondTemplateFile = Paths.get(templatePath, "templates/template.txt");
+		write(secondTemplateFile, "<%if foo>foo<%else>bar<%/if>".getBytes(UTF_8));
 	}
 
 	@Test

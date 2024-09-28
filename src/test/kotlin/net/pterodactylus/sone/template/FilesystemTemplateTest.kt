@@ -4,19 +4,16 @@ import net.pterodactylus.util.template.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.rules.*
 import java.io.*
 import java.lang.Thread.*
 import kotlin.test.Test
+import net.pterodactylus.sone.template.FilesystemTemplate.TemplateFileNotFoundException
+import org.junit.Assert.assertThrows
 
 /**
  * Unit test for [FilesystemTemplate].
  */
 class FilesystemTemplateTest() {
-
-	@Rule
-	@JvmField
-	val expectedException: ExpectedException = ExpectedException.none()
 
 	private val tempFile = File.createTempFile("template-", ".dat")
 	private val filesystemTemplate: FilesystemTemplate
@@ -48,8 +45,9 @@ class FilesystemTemplateTest() {
 	@Test
 	fun `loading template from non existing file throws exception`() {
 		val filesystemTemplate = FilesystemTemplate("/a/b/c.dat")
-		expectedException.expect(FilesystemTemplate.TemplateFileNotFoundException::class.java)
-		filesystemTemplate.initialContext
+		assertThrows(TemplateFileNotFoundException::class.java) {
+			filesystemTemplate.initialContext
+		}
 	}
 
 	@Test

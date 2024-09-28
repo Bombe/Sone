@@ -8,15 +8,13 @@ import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.test.*
 import net.pterodactylus.sone.utils.*
 import org.junit.*
-import org.junit.rules.*
+import org.junit.Assert.assertThrows
 import org.mockito.ArgumentMatchers.*
 
 /**
  * Base class for Sone FCP command tests.
  */
 abstract class SoneCommandTest {
-
-	@Rule @JvmField val expectedException = ExpectedException.none()!!
 
 	protected val core = mock<Core>()
 	protected val command: AbstractSoneCommand by lazy { createCommand(core) }
@@ -63,13 +61,15 @@ abstract class SoneCommandTest {
 	}
 
 	protected fun executeCommandAndExpectFcpException() {
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	protected fun requestWithoutAnyParameterResultsInFcpException() {
-		expectedException.expect(FcpException::class.java)
-		command.execute(parameters)
+		assertThrows(FcpException::class.java) {
+			command.execute(parameters)
+		}
 	}
 
 	protected fun requestWithEmptySoneParameterResultsInFcpException() {

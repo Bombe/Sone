@@ -13,7 +13,7 @@ import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.rules.*
+import org.junit.Assert.assertThrows
 import org.mockito.*
 import org.mockito.Mockito.*
 
@@ -21,10 +21,6 @@ import org.mockito.Mockito.*
  * Unit test for [FreenetModule].
  */
 class FreenetModuleTest {
-
-	@Rule
-	@JvmField
-	val expectedException = ExpectedException.none()!!
 
 	private val sessionManager = mock<SessionManager>()
 	private val uskManager = mock<USKManager>()
@@ -47,8 +43,9 @@ class FreenetModuleTest {
 
 	@Test
 	fun `plugin respirator is not bound`() {
-		expectedException.expect(Exception::class.java)
-		injector.getInstance<PluginRespirator>()
+		assertThrows(Exception::class.java) {
+			injector.getInstance<PluginRespirator>()
+		}
 	}
 
 	@Test
@@ -103,6 +100,7 @@ class FreenetModuleTest {
 	}
 
 	@Test
+	@Suppress("DEPRECATION")
 	fun `plugin respirator facade is returned correctly`() {
 		val pluginRespiratorFacade = injector.getInstance<PluginRespiratorFacade>()
 		pluginRespiratorFacade.getPluginTalker(mock(), "test.plugin", "test-request-1")

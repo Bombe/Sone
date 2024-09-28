@@ -8,13 +8,10 @@ import net.pterodactylus.util.web.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.rules.*
+import org.junit.Assert.assertThrows
 
 class TemplateRendererTest {
 
-	@Rule
-	@JvmField
-	val expectedException: ExpectedException = ExpectedException.none()
 	private val templateContextFactory = TemplateContextFactory()
 	private val templateRenderer = TemplateRenderer(templateContextFactory)
 
@@ -45,8 +42,9 @@ class TemplateRendererTest {
 
 	@Test
 	fun `redirect exceptions are thrown`() {
-		expectedException.expect(RedirectException::class.java)
-		templateRenderer.render(Template()) { _ -> throw RedirectException("foo") }
+		assertThrows(RedirectException::class.java) {
+			templateRenderer.render(Template()) { _ -> throw RedirectException("foo") }
+		}
 	}
 
 	@Test

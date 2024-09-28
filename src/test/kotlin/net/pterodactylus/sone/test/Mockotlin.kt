@@ -30,5 +30,6 @@ inline fun <reified T> argumentCaptor(): ArgumentCaptor<T> = ArgumentCaptor.forC
 
 fun <T> eq(t: T): T {
 	ArgumentMatchers.eq(t)
+	@Suppress("UNCHECKED_CAST")
 	return null as T
 }

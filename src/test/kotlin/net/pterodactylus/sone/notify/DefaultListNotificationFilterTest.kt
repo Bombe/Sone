@@ -106,7 +106,7 @@ class DefaultListNotificationFilterTest {
 		newPostNotification.add(createPost())
 		val listNotificationFilter = DefaultListNotificationFilter(matchThisPost(newPostNotification.elements[1]), showAllReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newPostNotification), localSone)
-		assertThat((filteredNotifications[0] as ListNotification<Post>).elements, contains(newPostNotification.elements[1]))
+		assertThat((filteredNotifications[0] as ListNotification<*>).elements, contains(newPostNotification.elements[1]))
 	}
 
 	@Test
@@ -119,7 +119,7 @@ class DefaultListNotificationFilterTest {
 		val listNotificationFilter = DefaultListNotificationFilter(showAllPosts, matchThisReply(newReplyNotification.elements[1]))
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newReplyNotification), localSone)
 		assertThat(filteredNotifications, hasSize(1))
-		assertThat((filteredNotifications[0] as ListNotification<PostReply?>).elements[0], equalTo(newReplyNotification.elements[1]))
+		assertThat((filteredNotifications[0] as ListNotification<*>).elements[0], equalTo(newReplyNotification.elements[1]))
 	}
 
 	@Test
@@ -130,7 +130,7 @@ class DefaultListNotificationFilterTest {
 		newReplyNotification.add(createPostReply())
 		newReplyNotification.add(createPostReply())
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(newReplyNotification), localSone)
-		assertThat(filteredNotifications, contains<Notification>(newReplyNotification))
+		assertThat(filteredNotifications, contains(newReplyNotification))
 	}
 
 	@Test
@@ -173,7 +173,7 @@ class DefaultListNotificationFilterTest {
 		val listNotificationFilter = DefaultListNotificationFilter(matchThisPost(mentionNotification.elements[1]), showAllReplies)
 		val filteredNotifications = listNotificationFilter.filterNotifications(listOf(mentionNotification), null)
 		assertThat(filteredNotifications, hasSize(1))
-		assertThat((filteredNotifications[0] as ListNotification<Post?>).elements[0], equalTo(mentionNotification.elements[1]))
+		assertThat((filteredNotifications[0] as ListNotification<*>).elements[0], equalTo(mentionNotification.elements[1]))
 	}
 
 	@Test

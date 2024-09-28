@@ -26,7 +26,6 @@ import org.hamcrest.Matchers.equalTo
 import org.hamcrest.Matchers.notNullValue
 import org.hamcrest.Matchers.nullValue
 import org.junit.*
-import org.junit.rules.*
 import org.mockito.*
 import org.mockito.ArgumentCaptor.*
 import org.mockito.ArgumentMatchers.eq
@@ -34,15 +33,12 @@ import org.mockito.Mockito.*
 import java.io.*
 import java.util.*
 import kotlin.test.Test
+import org.junit.Assert.assertThrows
 
 /**
  * Unit test for [FreenetInterface].
  */
 class FreenetInterfaceTest {
-
-	@Rule
-	@JvmField
-	val expectionException: ExpectedException = ExpectedException.none()
 
 	@Rule
 	@JvmField
@@ -163,8 +159,9 @@ class FreenetInterfaceTest {
 		whenever(highLevelSimpleClient.getInsertContext(anyBoolean())).thenReturn(insertContext)
 		val insertBlockCaptor = forClass(InsertBlock::class.java)
 		whenever(highLevelSimpleClient.insert(insertBlockCaptor.capture(), eq(null as String?), eq(false), eq(insertContext), eq(insertToken), anyShort())).thenThrow(InsertException::class.java)
-		expectionException.expect(SoneInsertException::class.java)
-		freenetInterface.insertImage(temporaryImage, image, insertToken)
+		assertThrows(SoneInsertException::class.java) {
+			freenetInterface.insertImage(temporaryImage, image, insertToken)
+		}
 	}
 
 	@Test
@@ -180,8 +177,9 @@ class FreenetInterfaceTest {
 	@Test
 	fun `insert exception is forwarded as sone exception`() {
 		whenever(highLevelSimpleClient.insertManifest(any(), any(), any())).thenThrow(InsertException::class.java)
-		expectionException.expect(SoneException::class.java)
-		freenetInterface.insertDirectory(null, null, null)
+		assertThrows(SoneException::class.java) {
+			freenetInterface.insertDirectory(null, null, null)
+		}
 	}
 
 	@Test

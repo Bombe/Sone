@@ -115,7 +115,7 @@ open class TestObjects {
 		whenever(freenetRequest.httpRequest).thenReturn(httpRequest)
 
 		whenever(httpRequest.method).thenReturn("GET")
-		whenever(httpRequest.getHeader(ArgumentMatchers.anyString())).thenAnswer { requestHeaders[it.get<String>(0).toLowerCase()] }
+		whenever(httpRequest.getHeader(ArgumentMatchers.anyString())).thenAnswer { requestHeaders[it.get<String>(0).lowercase(Locale.US)] }
 		whenever(httpRequest.getParam(ArgumentMatchers.anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: "" }
 		whenever(httpRequest.getParam(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenAnswer { requestParameters[it.getArgument(0)] ?: it.getArgument(1) }
 		whenever(httpRequest.getParam(ArgumentMatchers.anyString(), ArgumentMatchers.isNull())).thenAnswer { requestParameters[it.getArgument(0)] }
@@ -148,7 +148,7 @@ open class TestObjects {
 	}
 
 	protected fun addRequestHeader(key: String, value: String) {
-		requestHeaders += key.toLowerCase() to value
+		requestHeaders += key.lowercase(Locale.US) to value
 	}
 
 	protected fun addRequestParameter(key: String, value: String) {

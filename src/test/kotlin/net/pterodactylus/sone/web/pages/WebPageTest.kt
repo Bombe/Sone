@@ -112,7 +112,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 
 	private fun setupHttpRequest() {
 		whenever(httpRequest.method).thenReturn("GET")
-		whenever(httpRequest.getHeader(anyString())).then { requestHeaders[it.get<String>(0).toLowerCase()] }
+		whenever(httpRequest.getHeader(anyString())).then { requestHeaders[it.get<String>(0).lowercase(Locale.US)] }
 		whenever(httpRequest.hasParameters()).then { getRequestParameters.isNotEmpty() }
 		whenever(httpRequest.parameterNames).then { getRequestParameters.keys }
 		whenever(httpRequest.isParameterSet(anyString())).then { it[0] in getRequestParameters }
@@ -158,7 +158,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	}
 
 	fun addHttpRequestHeader(name: String, value: String) {
-		requestHeaders[name.toLowerCase()] = value
+		requestHeaders[name.lowercase(Locale.US)] = value
 	}
 
 	fun addHttpRequestParameter(name: String, value: String) {

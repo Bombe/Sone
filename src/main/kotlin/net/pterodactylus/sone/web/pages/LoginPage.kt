@@ -35,7 +35,7 @@ class LoginPage @Inject constructor(webInterface: WebInterface, loaders: Loaders
 
 	override fun isEnabled(soneRequest: SoneRequest) = when {
 		soneRequest.core.preferences.requireFullAccess && !soneRequest.toadletContext.isAllowedFullAccess -> false
-		else -> getCurrentSone(soneRequest.toadletContext, false) == null
+		else -> getCurrentSone(soneRequest.toadletContext) == null
 	}
 
 }

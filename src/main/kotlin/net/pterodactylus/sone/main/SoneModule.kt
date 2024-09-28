@@ -67,7 +67,7 @@ open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: 
 		bind(SessionProvider::class.java).to(FreenetSessionProvider::class.java).`in`(Singleton::class.java)
 
 		bindListener(Matchers.any(), object : TypeListener {
-			override fun <I> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {
+			override fun <I : Any> hear(typeLiteral: TypeLiteral<I>, typeEncounter: TypeEncounter<I>) {
 				typeEncounter.register(InjectionListener { injectee ->
 					logger.fine { "Injecting $injectee..." }
 					eventBus.register(injectee)

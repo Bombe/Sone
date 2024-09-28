@@ -99,7 +99,7 @@ class ConfigurationLoaderTest {
 		val sone1Id = setupStringValue("SoneFollowingTimes/0/Sone", "Sone1")
 		val sone1Time = setupLongValue("SoneFollowingTimes/0/Time", 1000L)
 		val sone2Id = setupStringValue("SoneFollowingTimes/1/Sone", "Sone2")
-		val sone2Time = setupLongValue("SoneFollowingTimes/1/Time", 2000L)
+		setupLongValue("SoneFollowingTimes/1/Time", 2000L)
 		setupStringValue("SoneFollowingTimes/2/Sone")
 		configurationLoader.removeSoneFollowingTime("Sone1")
 		assertThat(sone1Id.value, equalTo("Sone2"))

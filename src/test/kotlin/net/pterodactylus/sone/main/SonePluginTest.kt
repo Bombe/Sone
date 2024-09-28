@@ -219,6 +219,7 @@ class SonePluginTest {
 		assertThat(shutdownReceived.get(), equalTo(true))
 	}
 
+	@Suppress("UNCHECKED_CAST")
 	private fun <T> getInjected(clazz: Class<T>, annotation: Annotation? = null): T? =
 			injected[TypeLiteral.get(clazz) to annotation] as? T
 
