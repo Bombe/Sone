@@ -35,10 +35,10 @@ class SonePluginTest {
 	private val uskManager = deepMock<USKManager>()
 
 	init {
-		setField(node, "clientCore", clientCore)
+		whenever(node.getClientCore()).thenReturn(clientCore)
 		whenever(pluginRespirator.node).thenReturn(node)
-		setField(clientCore, "uskManager", uskManager)
-		setField(clientCore, "clientContext", mock<ClientContext>())
+		whenever(clientCore.getUskManager()).thenReturn(uskManager)
+		whenever(clientCore.getClientContext()).thenReturnMock()
 	}
 
 	@Test

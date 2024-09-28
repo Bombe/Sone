@@ -33,11 +33,11 @@ class FreenetModuleTest {
 		whenever(getSessionManager("Sone")).thenReturn(sessionManager)
 	}
 	private val nodeClientCore = mock<NodeClientCore>().also {
-		setField(it, "uskManager", uskManager)
-		setField(it, "clientContext", clientContext)
+		whenever(it.getUskManager()).thenReturn(uskManager)
+		whenever(it.getClientContext()).thenReturn(clientContext)
 	}
 	private val node = pluginRespirator.node!!.also {
-		setField(it, "clientCore", nodeClientCore)
+		whenever(it.getClientCore()).thenReturn(nodeClientCore)
 	}
 	private val highLevelSimpleClient = pluginRespirator.hlSimpleClient!!
 	private val toadletContainer: ToadletContainer = pluginRespirator.toadletContainer

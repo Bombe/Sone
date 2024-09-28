@@ -223,7 +223,7 @@ public class FreenetInterface {
 	 */
 	public void insertImage(TemporaryImage temporaryImage, Image image, InsertToken insertToken) throws SoneException {
 		String filenameHint = image.getId() + "." + temporaryImage.getMimeType().substring(temporaryImage.getMimeType().lastIndexOf("/") + 1);
-		InsertableClientSSK key = InsertableClientSSK.createRandom(node.random, "");
+		InsertableClientSSK key = InsertableClientSSK.createRandom(node.getRandom(), "");
 		FreenetURI targetUri = key.getInsertURI().setDocName(filenameHint);
 		InsertContext insertContext = client.getInsertContext(true);
 		RandomAccessBucket bucket = new ArrayBucket(temporaryImage.getImageData());

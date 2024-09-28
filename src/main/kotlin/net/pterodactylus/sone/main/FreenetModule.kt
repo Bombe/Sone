@@ -33,7 +33,7 @@ class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 
 	@Provides
 	fun getNodeClientCore(node: Node): NodeClientCore =
-		node.clientCore
+		node.getClientCore()
 
 	@Provides
 	fun getHighLevelSimpleClientCreator(nodeClientCore: NodeClientCore): HighLevelSimpleClientCreator =
@@ -41,10 +41,10 @@ class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 
 	@Provides
 	fun getClientContext(nodeClientCore: NodeClientCore): ClientContext =
-		nodeClientCore.clientContext
+		nodeClientCore.getClientContext()
 
 	@Provides
 	fun getUskManager(nodeClientCore: NodeClientCore): USKManager =
-		nodeClientCore.uskManager
+		nodeClientCore.getUskManager()
 
 }
