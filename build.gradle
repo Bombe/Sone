@@ -41,7 +41,7 @@ configurations {
 }
 
 dependencies {
-    provided group: 'org.freenetproject', name: 'fred', version: '0.7.5.1475'
+    provided group: 'org.freenetproject', name: 'fred', version: '0.7.5.1498'
     provided group: 'org.freenetproject', name: 'freenet-ext', version: '29'
     provided group: 'org.bouncycastle', name: 'bcprov-jdk15on', version: '1.54'
 
