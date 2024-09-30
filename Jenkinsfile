@@ -7,11 +7,17 @@ pipeline {
 
     stages {
         stage('Build') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
                 sh './gradlew clean classes testClasses'
             }
         }
         stage('Test') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
                 sh './gradlew test'
             }
@@ -22,12 +28,18 @@ pipeline {
             }
         }
         stage('Binary') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
                 sh './gradlew fatJar'
                 archiveArtifacts artifacts: 'build/libs/sone*-jar-with-dependencies.jar', fingerprint: true
             }
         }
         stage('Reports') {
+            tools {
+                jdk 'OpenJDK 8'
+            }
             steps {
                 sh './gradlew jacocoTestReport findbugsMain countLines'
                 jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
