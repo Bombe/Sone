@@ -23,7 +23,7 @@ pipeline {
             }
             post {
                 always {
-                    junit 'build/test-results/test/*.xml'
+                    junit 'build/test-results/*/*.xml'
                 }
             }
         }
@@ -41,10 +41,8 @@ pipeline {
                 jdk 'OpenJDK 8'
             }
             steps {
-                sh './gradlew jacocoTestReport findbugsMain countLines'
+                sh './gradlew jacocoTestReport'
                 jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
-                findbugs canComputeNew: false, defaultEncoding: '', excludePattern: '', healthy: '', includePattern: '', pattern: '**/findbugs/main.xml', unHealthy: ''
-                sloccountPublish encoding: '', pattern: 'build/reports/cloc/*.xml'
             }
         }
     }
