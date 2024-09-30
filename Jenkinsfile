@@ -6,7 +6,7 @@ pipeline {
     }
 
     stages {
-        stage('Build') {
+        stage('Build (Java 8)') {
             tools {
                 jdk 'OpenJDK 8'
             }
@@ -14,7 +14,7 @@ pipeline {
                 sh './gradlew clean classes testClasses'
             }
         }
-        stage('Test') {
+        stage('Test (Java 8)') {
             tools {
                 jdk 'OpenJDK 8'
             }
@@ -24,10 +24,11 @@ pipeline {
             post {
                 always {
                     junit 'build/test-results/*/*.xml'
+                    jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
                 }
             }
         }
-        stage('Binary') {
+        stage('Binary (Java 8)') {
             tools {
                 jdk 'OpenJDK 8'
             }
@@ -36,13 +37,24 @@ pipeline {
                 archiveArtifacts artifacts: 'build/libs/sone*-jar-with-dependencies.jar', fingerprint: true
             }
         }
-        stage('Reports') {
+        stage('Build (Java 17)') {
             tools {
-                jdk 'OpenJDK 8'
+                jdk 'OpenJDK 17'
             }
             steps {
-                sh './gradlew jacocoTestReport'
-                jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew clean classes testClasses'
+                }
+            }
+        }
+        stage('Test (Java 17)') {
+            tools {
+                jdk 'OpenJDK 17'
+            }
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh './gradlew test'
+                }
             }
         }
     }
