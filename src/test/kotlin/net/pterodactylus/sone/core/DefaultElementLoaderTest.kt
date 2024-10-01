@@ -236,19 +236,19 @@ class DefaultElementLoaderTest {
 
 	private val loggedRecords = mutableListOf<LogRecord>()
 
-	init {
-		Logger.getLogger(DefaultElementLoader::class.qualifiedName)
-			.apply { level = ALL }
-			.apply {
-				addHandler(object : Handler() {
-					override fun publish(record: LogRecord) {
-						loggedRecords += record
-					}
-
-					override fun flush() = Unit
-					override fun close() = Unit
-				})
+	@Suppress("unused")
+	// keep this instance around so its configuration isn’t lost
+	private val logger = Logger.getLogger(DefaultElementLoader::class.qualifiedName)
+	.apply { level = ALL }
+	.apply {
+		addHandler(object : Handler() {
+			override fun publish(record: LogRecord) {
+				loggedRecords += record
 			}
+
+			override fun flush() = Unit
+			override fun close() = Unit
+		})
 	}
 
 }
