@@ -19,12 +19,13 @@ pipeline {
                 jdk 'OpenJDK 8'
             }
             steps {
-                sh './gradlew test'
+                sh './gradlew test jacocoTestReport'
             }
             post {
                 always {
                     junit 'build/test-results/*/*.xml'
                     jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
+                    recordCoverage(tools: [[parser: 'JACOCO', pattern: '**/jacocoTestReport.xml']])
                 }
             }
         }

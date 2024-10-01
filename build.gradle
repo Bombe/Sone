@@ -115,6 +115,9 @@ jacocoTestReport {
         include "jacoco/*.exec"
     })
     dependsOn test
+    reports {
+        xml.required = true
+    }
 }
 
 pitest {
