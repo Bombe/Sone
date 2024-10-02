@@ -11,7 +11,7 @@ pipeline {
                 jdk 'OpenJDK 8'
             }
             steps {
-                sh './gradlew clean classes testClasses'
+                sh './gradlew --no-daemon clean classes testClasses'
             }
         }
         stage('Test (Java 8)') {
@@ -19,7 +19,7 @@ pipeline {
                 jdk 'OpenJDK 8'
             }
             steps {
-                sh './gradlew test jacocoTestReport'
+                sh './gradlew --no-daemon test jacocoTestReport'
             }
             post {
                 always {
@@ -34,7 +34,7 @@ pipeline {
                 jdk 'OpenJDK 8'
             }
             steps {
-                sh './gradlew fatJar'
+                sh './gradlew --no-daemon fatJar'
                 archiveArtifacts artifacts: 'build/libs/sone*-jar-with-dependencies.jar', fingerprint: true
             }
         }
@@ -44,7 +44,7 @@ pipeline {
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew clean test'
+                    sh './gradlew --no-daemon clean test'
                 }
             }
         }
@@ -54,7 +54,7 @@ pipeline {
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew clean test'
+                    sh './gradlew --no-daemon clean test'
                 }
             }
         }
