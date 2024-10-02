@@ -4,7 +4,7 @@ import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.web.*
 import java.net.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Page that delivers a {@link TemporaryImage} to the browser.

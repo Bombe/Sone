@@ -8,7 +8,7 @@ import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
 import java.net.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Lets the user browser another Sone.

@@ -23,7 +23,7 @@ import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler for remote replies.

@@ -5,7 +5,7 @@ import net.pterodactylus.sone.main.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.web.*
 import java.util.concurrent.atomic.*
-import javax.inject.*
+import jakarta.inject.*
 
 private const val soneMenu = "Navigation.Menu.Sone"
 private const val soneMenuName = "$soneMenu.Name"

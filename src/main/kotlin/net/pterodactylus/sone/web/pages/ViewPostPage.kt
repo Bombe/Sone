@@ -7,7 +7,7 @@ import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.*
 import java.net.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * This page lets the user view a post and all its replies.

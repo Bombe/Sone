@@ -18,7 +18,7 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import java.text.SimpleDateFormat
 import java.util.TimeZone
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * The “get status” AJAX handler returns all information that is necessary to

@@ -23,7 +23,7 @@ import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.utils.*
 import java.util.concurrent.atomic.*
 import java.util.function.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * [Runnable] that is scheduled via an [Executor][java.util.concurrent.Executor],

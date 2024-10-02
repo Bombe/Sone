@@ -9,7 +9,7 @@ import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
 import net.pterodactylus.util.template.Template
 import net.pterodactylus.util.template.TemplateContextFactory
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * This AJAX handler retrieves information and rendered representation of a [Post].

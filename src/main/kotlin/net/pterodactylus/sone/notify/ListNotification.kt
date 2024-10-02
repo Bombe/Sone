@@ -85,11 +85,10 @@ class ListNotification<T> : TemplateNotification {
 		if (other !is ListNotification<*>) {
 			return false
 		}
-		val listNotification = other as ListNotification<*>?
-		if (!super.equals(listNotification)) {
+		if (!super.equals(other)) {
 			return false
 		}
-		return (key == listNotification.key) && (realElements == listNotification.realElements)
+		return (key == other.key) && (realElements == other.realElements)
 	}
 
 }

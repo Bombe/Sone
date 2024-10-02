@@ -5,7 +5,7 @@ import net.pterodactylus.sone.text.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.sone.web.*
 import net.pterodactylus.sone.web.page.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * This AJAX page create a reply.

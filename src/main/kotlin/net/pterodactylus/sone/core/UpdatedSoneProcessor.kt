@@ -8,7 +8,7 @@ import net.pterodactylus.sone.data.Sone.*
 import net.pterodactylus.sone.database.*
 import net.pterodactylus.sone.utils.*
 import java.util.logging.Logger
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * An `UpdatedSoneProcessor` is called to process a [Sone] after it has been

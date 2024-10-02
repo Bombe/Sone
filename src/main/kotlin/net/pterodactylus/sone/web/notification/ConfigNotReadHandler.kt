@@ -20,7 +20,7 @@ package net.pterodactylus.sone.web.notification
 import com.google.common.eventbus.*
 import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.util.notify.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler for [ConfigNotRead] events.

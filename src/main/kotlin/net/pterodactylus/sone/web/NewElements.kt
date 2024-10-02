@@ -21,8 +21,8 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.notify.ListNotification
 import net.pterodactylus.sone.notify.PostVisibilityFilter
 import net.pterodactylus.sone.notify.ReplyVisibilityFilter
-import javax.inject.Inject
-import javax.inject.Named
+import jakarta.inject.Inject
+import jakarta.inject.Named
 
 /**
  * Container for new elements that should be shown in the web interface.

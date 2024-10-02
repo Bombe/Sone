@@ -10,8 +10,8 @@ import freenet.pluginmanager.*
 import net.pterodactylus.sone.freenet.DefaultHighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.HighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.plugin.*
-import javax.inject.Provider
-import javax.inject.Singleton
+import jakarta.inject.Provider
+import jakarta.inject.Singleton
 
 /**
  * Guice [Module] that supplies some objects that are in fact supplied by the Freenet node.

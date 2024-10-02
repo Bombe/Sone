@@ -22,7 +22,7 @@ import net.pterodactylus.sone.core.event.*
 import net.pterodactylus.sone.data.*
 import net.pterodactylus.sone.notify.*
 import net.pterodactylus.util.notify.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler for the [MentionOfLocalSoneFoundEvent] and

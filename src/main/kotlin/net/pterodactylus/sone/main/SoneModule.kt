@@ -21,8 +21,8 @@ import java.io.*
 import java.util.concurrent.*
 import java.util.concurrent.Executors.*
 import java.util.logging.Logger
-import javax.inject.*
-import javax.inject.Singleton
+import jakarta.inject.*
+import jakarta.inject.Singleton
 
 open class SoneModule(private val sonePlugin: SonePlugin, private val eventBus: EventBus) : AbstractModule() {
 

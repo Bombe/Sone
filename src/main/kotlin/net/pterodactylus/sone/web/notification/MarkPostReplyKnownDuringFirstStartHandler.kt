@@ -24,7 +24,7 @@ import net.pterodactylus.sone.notify.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import java.util.function.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler that marks post replies [as known][net.pterodactylus.sone.core.Core.markReplyKnown]

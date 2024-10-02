@@ -23,8 +23,8 @@ import com.google.common.collect.Multimap
 import com.google.common.collect.TreeMultimap
 import com.google.common.util.concurrent.AbstractService
 import com.google.common.util.concurrent.RateLimiter
-import com.google.inject.Inject
 import com.google.inject.Singleton
+import jakarta.inject.Inject
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
 import net.pterodactylus.sone.data.Post
@@ -60,7 +60,7 @@ import kotlin.concurrent.withLock
 @Singleton
 class MemoryDatabase constructor(private val configuration: Configuration, private val saveKnownPostRepliesRateLimiter: RateLimiter) : AbstractService(), Database {
 
-	@javax.inject.Inject constructor(configuration: Configuration): this(configuration, RateLimiter.create(1.0))
+	@Inject constructor(configuration: Configuration): this(configuration, RateLimiter.create(1.0))
 
 	private val lock = ReentrantReadWriteLock()
 	private val readLock: ReadLock by lazy { lock.readLock() }

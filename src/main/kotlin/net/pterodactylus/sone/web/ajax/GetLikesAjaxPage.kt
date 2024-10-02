@@ -7,7 +7,7 @@ import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.utils.parameters
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * AJAX page that retrieves the number of “likes” a [net.pterodactylus.sone.data.Post]

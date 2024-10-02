@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
+import jakarta.inject.Inject;
 
 import net.pterodactylus.sone.core.FreenetInterface.InsertToken;
 import net.pterodactylus.sone.core.FreenetInterface.InsertTokenSupplier;

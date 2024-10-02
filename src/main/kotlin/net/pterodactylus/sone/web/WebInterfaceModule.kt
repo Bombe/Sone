@@ -12,8 +12,8 @@ import net.pterodactylus.sone.template.*
 import net.pterodactylus.sone.text.*
 import net.pterodactylus.util.notify.*
 import net.pterodactylus.util.template.*
-import javax.inject.*
-import javax.inject.Singleton
+import jakarta.inject.*
+import jakarta.inject.Singleton
 
 class WebInterfaceModule : AbstractModule() {
 

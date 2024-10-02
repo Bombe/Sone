@@ -8,7 +8,7 @@ import freenet.support.*
 import freenet.support.api.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * [PluginConnector] implementation that uses a [PluginRespiratorFacade] and coroutines to send

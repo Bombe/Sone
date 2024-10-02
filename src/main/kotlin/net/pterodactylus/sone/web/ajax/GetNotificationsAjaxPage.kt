@@ -10,7 +10,7 @@ import net.pterodactylus.util.notify.Notification
 import net.pterodactylus.util.notify.TemplateNotification
 import net.pterodactylus.util.template.TemplateContextFactory
 import java.io.StringWriter
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * AJAX handler to return all current notifications.

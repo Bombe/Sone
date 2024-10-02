@@ -12,7 +12,7 @@ import net.pterodactylus.sone.web.pages.SearchPage.Optionality.*
 import net.pterodactylus.util.template.*
 import net.pterodactylus.util.text.*
 import java.util.concurrent.TimeUnit.*
-import javax.inject.*
+import jakarta.inject.*
 import java.util.Locale
 
 /**

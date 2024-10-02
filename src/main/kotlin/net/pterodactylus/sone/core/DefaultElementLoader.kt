@@ -6,15 +6,16 @@ import com.google.common.cache.CacheBuilder
 import freenet.keys.FreenetURI
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import java.io.ByteArrayInputStream
 import java.net.URLDecoder
 import java.nio.charset.Charset
 import java.text.Normalizer
 import java.util.concurrent.TimeUnit.MINUTES
 import java.util.logging.Logger
-import javax.activation.MimeType
 import javax.imageio.ImageIO
-import javax.inject.Inject
+import jakarta.activation.MimeType
+import jakarta.inject.Inject
 
 /**
  * [ElementLoader] implementation that uses a simple Guava [com.google.common.cache.Cache].
@@ -116,7 +117,7 @@ private val Document.metaDescription: String?
 
 private val Document.firstNonHeadingParagraph: String?
 	get() = body().select("div, p")
-		.filter { it.textNodes().isNotEmpty() }
+		.filter { it: Element -> it.textNodes().isNotEmpty() }
 		.map { it to it.text() }
 		.firstOrNull { it.second != "" }
 		?.second

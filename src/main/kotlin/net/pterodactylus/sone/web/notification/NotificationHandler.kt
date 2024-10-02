@@ -19,7 +19,7 @@ package net.pterodactylus.sone.web.notification
 
 import net.pterodactylus.sone.freenet.wot.*
 import net.pterodactylus.sone.text.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Container that causes notification handlers to be created and (more importantly) registered

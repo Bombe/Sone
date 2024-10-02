@@ -24,7 +24,7 @@ import net.pterodactylus.sone.notify.*
 import net.pterodactylus.sone.utils.*
 import net.pterodactylus.util.notify.*
 import java.util.function.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Handler that marks a [new][NewPostFoundEvent] [post][Post] as known while

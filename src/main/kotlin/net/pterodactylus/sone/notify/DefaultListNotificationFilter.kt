@@ -21,8 +21,8 @@ import net.pterodactylus.sone.data.PostReply
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.utils.ifTrue
 import net.pterodactylus.util.notify.Notification
-import javax.inject.Inject
-import javax.inject.Singleton
+import jakarta.inject.Inject
+import jakarta.inject.Singleton
 
 /**
  * Filter for [ListNotification]s.

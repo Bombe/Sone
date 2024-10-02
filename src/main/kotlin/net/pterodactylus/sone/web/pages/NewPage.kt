@@ -12,7 +12,7 @@ import net.pterodactylus.sone.web.page.TemplatePath
 import net.pterodactylus.sone.web.page.TemplateRenderer
 import net.pterodactylus.sone.web.page.ToadletPath
 import net.pterodactylus.util.template.TemplateContext
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * Page that displays all new posts and replies. The posts are filtered using

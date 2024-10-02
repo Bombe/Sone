@@ -25,8 +25,8 @@ import net.pterodactylus.sone.data.Post
 import net.pterodactylus.sone.notify.ListNotification
 import net.pterodactylus.sone.notify.hasFirstStartNotification
 import net.pterodactylus.util.notify.NotificationManager
-import javax.inject.Inject
-import javax.inject.Named
+import jakarta.inject.Inject
+import jakarta.inject.Named
 
 /**
  * Handler for local posts.

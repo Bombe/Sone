@@ -193,7 +193,7 @@ class HistogramRendererTest {
 			metricRenderer.format(templateContext, histogram, parameters)
 					.let { "<table id='t'>$it</table>" }
 					.let(Jsoup::parseBodyFragment)
-					.getElementById("t").child(0).child(0)
+					.getElementById("t")!!.child(0).child(0)
 					.let(verify)
 
 	private fun verifyColumnIsNumeric(column: Int) =

@@ -79,12 +79,12 @@ class JsonReturnObjectTest {
 		jsonReturnObject.put("object", objectNode)
 		val json = objectMapper.writeValueAsString(jsonReturnObject)
 		val parsedJson = objectMapper.readTree(json)
-		assertThat(parsedJson, equalTo<JsonNode>(ObjectNode(JsonNodeFactory.instance).apply {
+		assertThat(parsedJson, equalTo(ObjectNode(JsonNodeFactory.instance).apply {
 			put("success", true)
 			put("text", "text")
 			put("int", 123)
 			put("boolean", true)
-			set("object", objectNode)
+			set<JsonNode>("object", objectNode)
 		}))
 	}
 

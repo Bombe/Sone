@@ -9,7 +9,7 @@ import net.pterodactylus.sone.text.LinkType.USK
 import net.pterodactylus.sone.utils.*
 import org.bitpedia.util.*
 import java.net.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * [Parser] implementation that can recognize Freenet URIs.

@@ -8,7 +8,7 @@ import com.google.inject.name.Names
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.sameInstance
 import org.mockito.Mockito
-import javax.inject.Provider
+import jakarta.inject.Provider
 import kotlin.reflect.KClass
 
 fun <T : Any> KClass<T>.isProvidedBy(instance: T) = Module { it.bind(this.java).toProvider(Provider<T> { instance }) }

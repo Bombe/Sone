@@ -9,7 +9,7 @@ import net.pterodactylus.sone.utils.jsonArray
 import net.pterodactylus.sone.utils.jsonObject
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.*
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * Renders linked elements after they have been loaded.

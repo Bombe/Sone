@@ -22,7 +22,7 @@ import freenet.clients.http.ToadletContext
 import net.pterodactylus.sone.data.Sone
 import net.pterodactylus.sone.database.SoneProvider
 import java.util.UUID
-import javax.inject.Inject
+import jakarta.inject.Inject
 
 /**
  * [SoneProvider] implementation based on Freenet’s [SessionManager].

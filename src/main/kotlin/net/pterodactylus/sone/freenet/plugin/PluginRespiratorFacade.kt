@@ -23,7 +23,7 @@ package net.pterodactylus.sone.freenet.plugin
 import freenet.pluginmanager.*
 import freenet.support.*
 import freenet.support.api.*
-import javax.inject.*
+import jakarta.inject.*
 
 /**
  * Facade for the only method of a [plugin respirator][PluginRespirator] that Sone actually uses,
