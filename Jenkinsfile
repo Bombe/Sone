@@ -24,7 +24,6 @@ pipeline {
             post {
                 always {
                     junit 'build/test-results/*/*.xml'
-                    jacoco classPattern: 'build/classes/*/main', sourcePattern: '**/src/main/'
                     recordCoverage(tools: [[parser: 'JACOCO', pattern: '**/jacocoTestReport.xml']])
                 }
             }
