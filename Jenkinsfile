@@ -38,23 +38,23 @@ pipeline {
                 archiveArtifacts artifacts: 'build/libs/sone*-jar-with-dependencies.jar', fingerprint: true
             }
         }
-        stage('Build (Java 17)') {
+        stage('Compatibility (Java 17)') {
             tools {
                 jdk 'OpenJDK 17'
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew clean classes testClasses'
+                    sh './gradlew clean test'
                 }
             }
         }
-        stage('Test (Java 17)') {
+        stage('Compatibility (Java 21)') {
             tools {
-                jdk 'OpenJDK 17'
+                jdk 'OpenJDK 21'
             }
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh './gradlew test'
+                    sh './gradlew clean test'
                 }
             }
         }
