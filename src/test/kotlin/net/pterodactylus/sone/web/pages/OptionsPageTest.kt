@@ -38,8 +38,8 @@ class OptionsPageTest : WebPageTest(::OptionsPage) {
 			isShowNewReplyNotifications = true
 			isShowNewSoneNotifications = true
 			isSoneInsertNotificationEnabled = true
-		    downloadBackwardsLimitDays = 30
-		    downloadCountLimit = 10
+			downloadBackwardsLimitDays = 30
+			downloadCountLimit = 10
 			loadLinkedImages = FOLLOWED
 			showCustomAvatars = FOLLOWED
 		})
