@@ -13,7 +13,6 @@ import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
-import org.junit.Assert.assertThrows
 import org.mockito.*
 import org.mockito.Mockito.*
 
@@ -42,10 +41,8 @@ class FreenetModuleTest {
 	private val injector = Guice.createInjector(module)
 
 	@Test
-	fun `plugin respirator is not bound`() {
-		assertThrows(Exception::class.java) {
-			injector.getInstance<PluginRespirator>()
-		}
+	fun `plugin respirator is returned correctly`() {
+		assertThat(injector.getInstance(), sameInstance(pluginRespirator))
 	}
 
 	@Test

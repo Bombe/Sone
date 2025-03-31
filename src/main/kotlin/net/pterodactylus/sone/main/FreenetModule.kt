@@ -19,6 +19,7 @@ import jakarta.inject.Singleton
 class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 
 	override fun configure(binder: Binder): Unit = binder.run {
+		bind(PluginRespirator::class.java).toInstance(pluginRespirator)
 		bind(PluginRespiratorFacade::class.java).toInstance(FredPluginRespiratorFacade(pluginRespirator))
 		bind(PluginConnector::class.java).to(FredPluginConnector::class.java).`in`(Singleton::class.java)
 		bind(Node::class.java).toInstance(pluginRespirator.node)
