@@ -41,7 +41,7 @@ open class WebPageTest(pageSupplier: (WebInterface, Loaders, TemplateRenderer) -
 	val webInterface = deepMock<WebInterface>()
 	val core = webInterface.core
 	val eventBus = mock<EventBus>()
-	val preferences = Preferences(eventBus)
+	val preferences = DefaultPreferences(eventBus)
 
 	open val page by lazy { pageSupplier(webInterface, loaders, templateRenderer) }
 

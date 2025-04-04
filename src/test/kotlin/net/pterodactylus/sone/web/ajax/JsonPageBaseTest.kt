@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.web.ajax
 
-import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.core.DefaultPreferences
 import net.pterodactylus.sone.test.whenever
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.web.Response
@@ -39,7 +39,7 @@ class JsonPageBaseTest : TestObjects() {
 
 	@Before
 	fun setupCore() {
-		whenever(core.preferences).thenReturn(Preferences(eventBus))
+		whenever(core.preferences).thenReturn(DefaultPreferences(eventBus))
 	}
 
 	@Before

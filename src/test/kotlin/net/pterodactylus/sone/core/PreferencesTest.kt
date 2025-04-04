@@ -24,12 +24,12 @@ import org.hamcrest.Matchers.nullValue
 import org.junit.Test
 
 /**
- * Unit test for [Preferences].
+ * Unit test for [DefaultPreferences].
  */
-class PreferencesTest {
+class DefaultPreferencesTest {
 
 	private val eventBus = EventBus()
-	private val preferences = Preferences(eventBus)
+	private val preferences = DefaultPreferences(eventBus)
 
 	@Test
 	fun `preferences retain insertion delay`() {

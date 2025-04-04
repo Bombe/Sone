@@ -8,7 +8,7 @@ import freenet.support.api.HTTPRequest
 import net.pterodactylus.sone.core.Core
 import net.pterodactylus.sone.core.ElementLoader
 import net.pterodactylus.sone.core.LinkedElement
-import net.pterodactylus.sone.core.Preferences
+import net.pterodactylus.sone.core.DefaultPreferences
 import net.pterodactylus.sone.core.UpdateChecker
 import net.pterodactylus.sone.data.Album
 import net.pterodactylus.sone.data.Image
@@ -29,7 +29,6 @@ import net.pterodactylus.sone.web.NewElements
 import net.pterodactylus.sone.web.WebInterface
 import net.pterodactylus.sone.web.page.FreenetRequest
 import net.pterodactylus.util.notify.Notification
-import net.pterodactylus.util.template.TemplateContextFactory
 import net.pterodactylus.util.web.Method.GET
 import net.pterodactylus.util.web.Method.POST
 import org.mockito.ArgumentMatchers
@@ -47,7 +46,7 @@ open class TestObjects {
 	var formPassword = "form-password"
 	val core = mock<Core>()
 	val eventBus = mock<EventBus>()
-	val preferences = Preferences(eventBus)
+	val preferences = DefaultPreferences(eventBus)
 	val updateChecker = mock<UpdateChecker>()
 	val elementLoader = mock<ElementLoader>()
 	val newElements = mock<NewElements>()

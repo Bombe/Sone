@@ -35,7 +35,7 @@ import java.lang.Integer.MAX_VALUE
  * Convenience interface for external classes that want to access the core’s
  * configuration.
  */
-class Preferences(private val eventBus: EventBus) {
+class DefaultPreferences(private val eventBus: EventBus) {
 
 	private val _insertionDelay = DefaultOption(60) { it in 0..MAX_VALUE }
 	val insertionDelay: Int get() = _insertionDelay.get()

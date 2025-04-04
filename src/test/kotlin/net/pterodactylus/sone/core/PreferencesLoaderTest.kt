@@ -14,7 +14,7 @@ class PreferencesLoaderTest {
 
 	@Suppress("UnstableApiUsage")
 	private val eventBus = EventBus()
-	private val preferences = Preferences(eventBus)
+	private val preferences = DefaultPreferences(eventBus)
 	private val configuration = Configuration(MapConfigurationBackend())
 	private val preferencesLoader = PreferencesLoader(preferences)
 
