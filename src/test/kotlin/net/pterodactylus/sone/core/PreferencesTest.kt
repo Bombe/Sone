@@ -285,16 +285,6 @@ class DefaultPreferencesTest {
 	}
 
 	@Test
-	fun `setting insertion delay to valid value sends change event`() {
-		testPreferencesChangedEvent("InsertionDelay", { preferences.newInsertionDelay = it }, 30)
-	}
-
-	@Test
-	fun `setting posts per page to valid value sends change event`() {
-		testPreferencesChangedEvent("PostsPerPage", { preferences.newPostsPerPage = it }, 31)
-	}
-
-	@Test
 	fun `default strict filtering is false`() {
 		assertThat(preferences.strictFiltering, equalTo(false))
 	}
@@ -355,17 +345,6 @@ class DefaultPreferencesTest {
 		val configuration = Configuration(MapConfigurationBackend())
 		preferences.saveTo(configuration)
 		assertThat(getter(configuration), matcher)
-	}
-
-	private fun <T : Any> testPreferencesChangedEvent(name: String, setter: (T) -> Unit, value: T) {
-		val events = mutableListOf<PreferenceChangedEvent>()
-		eventBus.register(object {
-			@Subscribe
-			fun preferenceChanged(event: PreferenceChangedEvent) =
-					events.add(event)
-		})
-		setter(value)
-		assertThat(events, hasItem(PreferenceChangedEvent(name, value)))
 	}
 
 }

@@ -44,7 +44,6 @@ class DefaultPreferences(private val eventBus: EventBus) {
 		set(value) {
 			_insertionDelay.set(value)
 			eventBus.post(InsertionDelayChangedEvent(insertionDelay))
-			eventBus.post(PreferenceChangedEvent("InsertionDelay", insertionDelay))
 		}
 
 	private val _postsPerPage = DefaultOption(10) { it in 1..MAX_VALUE }
@@ -53,7 +52,6 @@ class DefaultPreferences(private val eventBus: EventBus) {
 		get() = unsupported
 		set(value) {
 			_postsPerPage.set(value)
-			eventBus.post(PreferenceChangedEvent("PostsPerPage", postsPerPage))
 		}
 
 	private val _imagesPerPage = DefaultOption(9) { it in 1..MAX_VALUE }
