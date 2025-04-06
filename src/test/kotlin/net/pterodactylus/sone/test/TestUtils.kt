@@ -1,6 +1,6 @@
 package net.pterodactylus.sone.test
 
-import org.junit.rules.ExpectedException
+import org.junit.Assert.assertThrows
 import sun.misc.Unsafe
 
 inline fun <reified O : Any> setField(instance: O, name: String, value: Any?) {
@@ -12,4 +12,4 @@ inline fun <reified O : Any> setField(instance: O, name: String, value: Any?) {
 	unsafe.putObject(instance, offset, value)
 }
 
-inline fun <reified T : Throwable> ExpectedException.expect() = expect(T::class.java)
+inline fun <reified T : Throwable> assertThrows(noinline block: () -> Unit): T = assertThrows(T::class.java, block)
