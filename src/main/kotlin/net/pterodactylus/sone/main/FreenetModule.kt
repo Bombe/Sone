@@ -7,10 +7,10 @@ import freenet.client.async.USKManager
 import freenet.clients.http.*
 import freenet.node.*
 import freenet.pluginmanager.*
+import jakarta.inject.Named
 import net.pterodactylus.sone.freenet.DefaultHighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.HighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.plugin.*
-import jakarta.inject.Provider
 import jakarta.inject.Singleton
 
 /**
@@ -47,5 +47,10 @@ class FreenetModule(private val pluginRespirator: PluginRespirator) : Module {
 	@Provides
 	fun getUskManager(nodeClientCore: NodeClientCore): USKManager =
 		nodeClientCore.getUskManager()
+
+	@Provides
+	@Named("NodeUserDir")
+	fun getNodeUserDir(pluginRespirator: PluginRespirator): String =
+		pluginRespirator.node.userDir.path
 
 }

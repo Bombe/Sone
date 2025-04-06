@@ -1,18 +1,22 @@
 package net.pterodactylus.sone.main
 
-import com.google.inject.*
+import com.google.inject.Guice.createInjector
+import com.google.inject.Injector
+import com.google.inject.name.Names
 import freenet.client.*
 import freenet.client.async.ClientContext
 import freenet.client.async.USKManager
 import freenet.clients.http.*
 import freenet.node.*
 import freenet.pluginmanager.*
+import java.io.File
 import net.pterodactylus.sone.freenet.HighLevelSimpleClientCreator
 import net.pterodactylus.sone.freenet.plugin.*
 import net.pterodactylus.sone.test.*
 import org.hamcrest.MatcherAssert.*
 import org.hamcrest.Matchers.*
 import org.junit.*
+import org.junit.rules.TemporaryFolder
 import org.mockito.*
 import org.mockito.Mockito.*
 
@@ -37,8 +41,6 @@ class FreenetModuleTest {
 	private val highLevelSimpleClient = pluginRespirator.hlSimpleClient!!
 	private val toadletContainer: ToadletContainer = pluginRespirator.toadletContainer
 	private val pageMaker: PageMaker = pluginRespirator.pageMaker
-	private val module = FreenetModule(pluginRespirator)
-	private val injector = Guice.createInjector(module)
 
 	@Test
 	fun `plugin respirator is returned correctly`() {
@@ -133,5 +135,21 @@ class FreenetModuleTest {
 	fun `usk manager is returned correctly`() {
 		assertThat(injector.getInstance<USKManager>(), sameInstance(uskManager))
 	}
+
+	@Test
+	fun `node user dir is returned correctly`() {
+		assertThat(createInjector("/node/user-dir").getInstance<String>(Names.named("NodeUserDir")), equalTo("/node/user-dir"))
+	}
+
+	private fun createInjector(databasePath: String = tempFolder.newFolder().path): Injector {
+		whenever(node.userDir).thenReturn(File(databasePath))
+		return createInjector(FreenetModule(pluginRespirator))
+	}
+
+	@Rule
+	@JvmField
+	val tempFolder = TemporaryFolder()
+
+	private val injector by lazy { createInjector() }
 
 }
