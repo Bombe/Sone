@@ -24,7 +24,7 @@ interface UpdatedSoneProcessor {
 abstract class BasicUpdateSoneProcessor(private val database: Database, private val eventBus: EventBus) :
 		UpdatedSoneProcessor {
 
-	private val logger = Logger.getLogger(UpdatedSoneProcessor::javaClass.name)!!
+	private val logger = Logger.getLogger(UpdatedSoneProcessor::class.qualifiedName)!!
 
 	override fun updateSone(sone: Sone) {
 		val storedSone = database.getSone(sone.id) ?: return
